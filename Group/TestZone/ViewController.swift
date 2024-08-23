@@ -3,7 +3,6 @@
 //  Group_Project
 //
 //  Created by CatSlave on 7/11/24.
-//
 
 import UIKit
 import SnapKit
