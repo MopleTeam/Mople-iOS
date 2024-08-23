@@ -207,8 +207,6 @@
 				52CB0B3B2C72A9AE002B6D20 /* Extension */,
 				52CB0B3C2C72AA1F002B6D20 /* CommonUI */,
 				52CB0B392C72A8E3002B6D20 /* Resources */,
-				5286C4D62C5202840083F432 /* ServerAPI.swift */,
-				5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */,
 				52CB0B3A2C72A961002B6D20 /* TestZone */,
 			);
 			path = Group;
@@ -241,6 +239,7 @@
 			children = (
 				52C72E8D2C4FBD6400CFF329 /* ViewController.swift */,
 				52C72EAA2C4FBFA800CFF329 /* LocalDataManager.swift */,
+				5286C4D62C5202840083F432 /* ServerAPI.swift */,
 			);
 			path = TestZone;
 			sourceTree = "<group>";
@@ -332,7 +331,7 @@
 		52E238272C7455C80066C9A3 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
-				52E238332C75E0570066C9A3 /* Login */,
+				52E238332C75E0570066C9A3 /* LoginScene */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -354,14 +353,14 @@
 			path = UseCases;
 			sourceTree = "<group>";
 		};
-		52E238332C75E0570066C9A3 /* Login */ = {
+		52E238332C75E0570066C9A3 /* LoginScene */ = {
 			isa = PBXGroup;
 			children = (
 				52E2383D2C76E8B30066C9A3 /* Flows */,
 				52E238342C75E06A0066C9A3 /* ViewModel */,
 				52E238352C75E06F0066C9A3 /* View */,
 			);
-			path = Login;
+			path = LoginScene;
 			sourceTree = "<group>";
 		};
 		52E238342C75E06A0066C9A3 /* ViewModel */ = {
@@ -376,6 +375,7 @@
 			isa = PBXGroup;
 			children = (
 				520805162C69E0770015F6E0 /* LoginViewController.swift */,
+				5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
