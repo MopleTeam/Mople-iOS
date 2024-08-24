@@ -10,8 +10,11 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import PhotosUI
 
 class ProfileSetupViewController: UIViewController {
+    
+    private let photoManager: photoService!
     
     private var disposeBag = DisposeBag()
     
@@ -91,6 +94,15 @@ class ProfileSetupViewController: UIViewController {
         return sv
     }()
     
+    init(photoManager: photoService) {
+        self.photoManager = photoManager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -149,6 +161,14 @@ class ProfileSetupViewController: UIViewController {
     }
     
     private func setupAction() {
+
+        let tapGesture = UITapGestureRecognizer()
+        self.profileImageView.addGestureRecognizer(tapGesture)
+
+        tapGesture.rx.event
+            .bind(with: self, onNext: { vc, _ in
+                print("tap test")
+            }).disposed(by: disposeBag)
         
         self.nameCheckButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
@@ -166,3 +186,24 @@ class ProfileSetupViewController: UIViewController {
     }
     
 }
+//
+//extension ProfileSetupViewController: PHPickerViewControllerDelegate {
+//    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+//        picker.dismiss(animated: true)
+//        guard let itemprovider = results.first?.itemProvider,
+//        itemprovider.canLoadObject(ofClass: UIImage.self) else { return }
+//        
+//        itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
+//            if let error {
+//                #warning("Present Alert")
+//                print(error)
+//            }
+//            
+//            if let selectedImage = image as? UIImage{
+//                DispatchQueue.main.async {
+//                    self.profileImageView.image = selectedImage
+//                }
+//            }
+//        }
+//    }
+//}

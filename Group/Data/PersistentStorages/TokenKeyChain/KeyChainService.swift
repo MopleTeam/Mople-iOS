@@ -16,6 +16,9 @@ protocol KeyChainService {
 }
 
 class TokenKeyChain: KeyChainService {
+    
+    private(set) static var cachedToken: TokenInfo?
+    
     enum Key: String {
         case service = "com.Side.GroupManager"
         case account = "userToken"
@@ -48,6 +51,10 @@ class TokenKeyChain: KeyChainService {
     }
     
     func getToken() -> TokenInfo? {
+        if let token = Self.cachedToken {
+            return token
+        }
+        
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Key.service.rawValue,
@@ -60,13 +67,12 @@ class TokenKeyChain: KeyChainService {
         
         guard status == errSecSuccess,
               let data = item as? Data,
-              let tokens = try? JSONDecoder().decode(TokenInfo.self, from: data) else {
-            print("Tokens Failed to retrieve tokens: \(status)")
+              let token = try? JSONDecoder().decode(TokenInfo.self, from: data) else {
             return nil
         }
         
-        print("Tokens retrieved successfully")
-        return tokens
+        Self.cachedToken = token
+        return token
     }
     
     func deleteToken() {

@@ -14,7 +14,7 @@ import AuthenticationServices
 
 final class LoginViewController: UIViewController {
     
-    private var loginViewModel: LoginViewModel!
+    private let loginViewModel: LoginViewModel!
     
     var disposeBag = DisposeBag()
     
@@ -60,10 +60,13 @@ final class LoginViewController: UIViewController {
         return sv
     }()
     
-    static func create(with viewModel: LoginViewModel) -> LoginViewController {
-        let view = LoginViewController()
-        view.loginViewModel = viewModel
-        return view
+    init(with viewModel: LoginViewModel) {
+        self.loginViewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -106,12 +109,12 @@ final class LoginViewController: UIViewController {
         bindingDataState(output)
     }
     
-    private func makeInputAction() -> LoginInput {
+    private func makeInputAction() -> ViewModelInput<Void> {
         let loginAction = loginButton.rx.controlEvent(.touchUpInside).map { _ in }
-        
         return .init(login: loginAction)
     }
     
+    #warning("Alert Task")
     private func bindingDataState(_ output: LoginOutput) {
         output.notifyError
             .bind(with: self, onNext: { vc, _ in
@@ -119,3 +122,4 @@ final class LoginViewController: UIViewController {
             }).disposed(by: disposeBag)
     }
 }
+

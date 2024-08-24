@@ -20,8 +20,14 @@ final class AppDIContainer {
         return DefaultDataTransferService(with: apiDataNetwork)
     }()
     
+    lazy var appleLoginService = DefaultAppleLoginService()
+    
+    lazy var tokenKeychainService = TokenKeyChain()
+    
     func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
-        return LoginSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        return LoginSceneDIContainer(apiDataTransferService: apiDataTransferService,
+                                     appleLoginService: appleLoginService,
+                                     tokenKeyChainService: tokenKeychainService)
     }
 }
 

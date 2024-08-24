@@ -11,17 +11,20 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
     
     let apiDataTransferService: DataTransferService
     
-    let appleLoginService: AppleLoginService = DefaultAppleLoginService()
-    let tokenKeyChainService: KeyChainService = TokenKeyChain()
+    let appleLoginService: AppleLoginService
+    let tokenKeyChainService: KeyChainService
     
-    
-    init(apiDataTransferService: DataTransferService) {
+    init(apiDataTransferService: DataTransferService,
+         appleLoginService: AppleLoginService,
+         tokenKeyChainService: KeyChainService) {
         self.apiDataTransferService = apiDataTransferService
+        self.appleLoginService = appleLoginService
+        self.tokenKeyChainService = tokenKeyChainService
     }
 
     func makeLoginViewController(action: LoginViewModelAction) -> LoginViewController {
         let viewModel = makeLoginViewModel(action)
-        let loginView = LoginViewController.create(with: viewModel)
+        let loginView = LoginViewController(with: viewModel)
         setAppleLoginProvider(loginView)
         return loginView
     }
@@ -36,7 +39,8 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
     }
     
     private func makeLoginViewModel(_ action: LoginViewModelAction) -> LoginViewModel {
-        return DefaultLoginViewModel(loginUseCase: makeLoginUseCase(), action: action)
+        return DefaultLoginViewModel(loginUseCase: makeLoginUseCase(),
+                                     action: action)
     }
     
     func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginFlowCoordinator {
@@ -46,12 +50,12 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
     }
     
     func makeProfileSetupViewController() -> ProfileSetupViewController {
-        return ProfileSetupViewController()
+        let photoManager = PhotoManager()
+        return ProfileSetupViewController(photoManager: photoManager)
     }
     
     private func makeUserRepository() -> UserRepository {
         DefaultGroupRepository(dataTransferService: apiDataTransferService,
                                tokenKeyCahinService: tokenKeyChainService)
     }
-    
 }

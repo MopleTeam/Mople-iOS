@@ -250,7 +250,7 @@ class ViewController: UIViewController {
     }
     
     @objc private func presentLoginView() {
-        self.navigationController?.pushViewController(LoginViewController(), animated: true)
+//        self.navigationController?.pushViewController(LoginViewController(), animated: true)
     }
     
     @objc private func setupApsLabel() {
@@ -510,14 +510,13 @@ extension ViewController: PHPickerViewControllerDelegate {
             
             if itemprovider.canLoadObject(ofClass: UIImage.self){
                 itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
+                    
                     if let error{
                         print(error)
                     }
                     if let selectedImage = image as? UIImage{
                         DispatchQueue.main.async {
-                            
-//                            selectedImage.pngData()
-                            
+//
                             self.imageView.image = selectedImage
                         }
                     }

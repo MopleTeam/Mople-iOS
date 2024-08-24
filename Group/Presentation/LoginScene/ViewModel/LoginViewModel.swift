@@ -9,15 +9,15 @@ import RxSwift
 import RxRelay
 
 protocol LoginViewModel {
-    func transform(input: LoginInput) -> LoginOutput
+    func transform(input: ViewModelInput<Void>) -> LoginOutput
 }
 
 struct LoginViewModelAction {
     var showProfileView: () -> Void
 }
 
-struct LoginInput {
-    let login: Observable<Void>
+struct ViewModelInput<T> {
+    let login: Observable<T>
 }
 
 struct LoginOutput {
@@ -38,7 +38,7 @@ final class DefaultLoginViewModel: LoginViewModel {
         self.action = action
     }
     
-    func transform(input: LoginInput) -> LoginOutput {
+    func transform(input: ViewModelInput<Void>) -> LoginOutput {
         input.login
             .bind(with: self, onNext: { vm, _ in
                 vm.executeLogin()

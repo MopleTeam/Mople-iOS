@@ -17,6 +17,7 @@
 		528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484172C6B8CA100D50C6A /* AppDesign.swift */; };
 		5286C4D72C5202840083F432 /* ServerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D62C5202840083F432 /* ServerAPI.swift */; };
 		5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* KeyChainService.swift */; };
+		528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoManager.swift */; };
 		52B6F63B2C77655200DA2D75 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* UserRepository.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
 		52B87E302C6B2A460026B601 /* Pretendard-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */; };
@@ -70,6 +71,7 @@
 		528484172C6B8CA100D50C6A /* AppDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDesign.swift; sourceTree = "<group>"; };
 		5286C4D62C5202840083F432 /* ServerAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerAPI.swift; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
+		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* UserRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -135,6 +137,33 @@
 				528484172C6B8CA100D50C6A /* AppDesign.swift */,
 			);
 			path = AppDesign;
+			sourceTree = "<group>";
+		};
+		528D27C32C79F67400178F14 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				52CB0B482C732186002B6D20 /* DataTransferService.swift */,
+				52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */,
+				52CB0B462C7308A8002B6D20 /* Endpoint.swift */,
+				52CB0B442C730816002B6D20 /* NetworkConfig.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		528D27C42C79F68500178F14 /* AppleLogin */ = {
+			isa = PBXGroup;
+			children = (
+				52E2382E2C74601D0066C9A3 /* AppleLoginService.swift */,
+			);
+			path = AppleLogin;
+			sourceTree = "<group>";
+		};
+		528D27C52C79F68B00178F14 /* Photos */ = {
+			isa = PBXGroup;
+			children = (
+				528D27C62C79F6B800178F14 /* PhotoManager.swift */,
+			);
+			path = Photos;
 			sourceTree = "<group>";
 		};
 		52B6F6392C77653F00DA2D75 /* Interfaces */ = {
@@ -204,7 +233,6 @@
 				52CB0B432C7307D0002B6D20 /* Infrastructure */,
 				52CB0B3E2C72AAA9002B6D20 /* Data */,
 				52E238262C7454FD0066C9A3 /* Utils */,
-				52CB0B3B2C72A9AE002B6D20 /* Extension */,
 				52CB0B3C2C72AA1F002B6D20 /* CommonUI */,
 				52CB0B392C72A8E3002B6D20 /* Resources */,
 				52CB0B3A2C72A961002B6D20 /* TestZone */,
@@ -242,16 +270,6 @@
 				5286C4D62C5202840083F432 /* ServerAPI.swift */,
 			);
 			path = TestZone;
-			sourceTree = "<group>";
-		};
-		52CB0B3B2C72A9AE002B6D20 /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				5208051A2C69E2480015F6E0 /* UIColor+Ext.swift */,
-				526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */,
-				52B87E392C6B2D440026B601 /* UIFont+Ext.swift */,
-			);
-			path = Extension;
 			sourceTree = "<group>";
 		};
 		52CB0B3C2C72AA1F002B6D20 /* CommonUI */ = {
@@ -293,11 +311,9 @@
 		52CB0B432C7307D0002B6D20 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
-				52CB0B482C732186002B6D20 /* DataTransferService.swift */,
-				52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */,
-				52CB0B462C7308A8002B6D20 /* Endpoint.swift */,
-				52CB0B442C730816002B6D20 /* NetworkConfig.swift */,
-				52E2382E2C74601D0066C9A3 /* AppleLoginService.swift */,
+				528D27C52C79F68B00178F14 /* Photos */,
+				528D27C42C79F68500178F14 /* AppleLogin */,
+				528D27C32C79F67400178F14 /* Network */,
 			);
 			path = Infrastructure;
 			sourceTree = "<group>";
@@ -324,6 +340,9 @@
 			isa = PBXGroup;
 			children = (
 				526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */,
+				5208051A2C69E2480015F6E0 /* UIColor+Ext.swift */,
+				526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */,
+				52B87E392C6B2D440026B601 /* UIFont+Ext.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -533,6 +552,7 @@
 				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */,
+				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52E238212C743C0E0066C9A3 /* DefaultTextField.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
