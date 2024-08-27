@@ -13,12 +13,34 @@ enum TokenError: Error {
 
 struct APIEndpoints {
     
-    private static var token = TokenKeyChain.cachedToken
-    
-    private static var accessToken: String? {
-        token?.accessToken
+    private static func getAccessTokenParameters() throws -> [String:String] {
+        guard let token = TokenKeyChain.cachedToken?.accessToken else { throw TokenError.noTokenError }
+        return ["Authorization":"Bearer \(token)"]
     }
     
+    private static func getRefreshTokenParameters() throws -> [String:String] {
+        guard let token = TokenKeyChain.cachedToken?.refreshToken else { throw TokenError.noTokenError }
+        return ["refreshToken": token]
+    }
+}
+
+// MARK: - Token Refresh
+extension APIEndpoints {
+    static func reissueToken() throws -> Endpoint<String> {
+        let (authHeader, refreshParameters) = try (getAccessTokenParameters()
+                                                   , getRefreshTokenParameters())
+        
+        let headerParameters = ["Content-Type":"application/json"].merging(authHeader) { current, _ in current }
+        
+        return Endpoint(path: "auth/access-token",
+                        method: .post,
+                        headerParameters: headerParameters,
+                        bodyParameters: refreshParameters)
+    }
+}
+
+// MARK: - Login
+extension APIEndpoints {
     static func login(code: String) -> Endpoint<Data> {
         
         return Endpoint(path: "auth/apple/login",
@@ -26,14 +48,27 @@ struct APIEndpoints {
                         queryParameters: ["code": code],
                         responseDecoder: RawDataResponseDecoder())
     }
-    
+}
+
+
+// MARK: - Profile
+extension APIEndpoints {
+
     static func setupProfile(image: Data, nickName: String) throws -> Endpoint<Void> {
-        guard let token = accessToken else { throw TokenError.noTokenError }
+        let token = try getAccessTokenParameters()
         
         return Endpoint(path: "user/me",
                         method: .patch,
-                        headerParameters: ["Authorization":token],
+                        headerParameters: token,
                         bodyParameters: ["profileImg" : image, "nickName" : nickName],
                         bodyEncoder: MultipartFormEncoder())
+    }
+    
+    static func checkNickname(name: String) throws -> Endpoint<Bool> {
+        let token = try getAccessTokenParameters()
+        
+        return Endpoint(path: "user/nickname/\(name)/duplicated",
+                        method: .get,
+                        headerParameters: token)
     }
 }

@@ -5,21 +5,22 @@
 //  Created by CatSlave on 8/12/24.
 //
 
-import Foundation
 import UIKit
 import RxSwift
 import RxCocoa
+import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileSetupViewController: UIViewController {
+class ProfileSetupViewController: UIViewController, StoryboardView {
+    typealias Reactor = ProfileSetupViewModel
     
-    private let photoManager: photoService!
+    // MARK: - Variables
+    private let photoManager: PhotoService
     
-    private var disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
-    private var isOverlap: Bool = false
-    
+    // MARK: - UI Components
     private let testBackButton: UIButton = {
         let btn = UIButton()
         btn.backgroundColor = .systemMint
@@ -33,12 +34,18 @@ class ProfileSetupViewController: UIViewController {
         return label
     }()
     
-    private let imageContainerView = UIView()
+    private let imageContainerView : UIView = {
+        let view = UIView()
+        return view
+    }()
     
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = AppDesign.Profile.profileImage
+        imageView.backgroundColor = .systemRed
+        imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
 
@@ -94,7 +101,11 @@ class ProfileSetupViewController: UIViewController {
         return sv
     }()
     
-    init(photoManager: photoService) {
+    
+    // MARK: - LifeCycle
+    init(photoManager: PhotoService,
+         profileSetupReactor: ProfileSetupViewModel) {
+        defer { self.reactor = profileSetupReactor }
         self.photoManager = photoManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -108,6 +119,8 @@ class ProfileSetupViewController: UIViewController {
         setupUI()
     }
     
+    
+    // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
         setupTextField()
@@ -160,6 +173,26 @@ class ProfileSetupViewController: UIViewController {
         self.nameTextField.rightView = nameCheckButton
     }
     
+    // MARK: - Selectors
+    func bind(reactor: ProfileSetupViewModel) {
+        self.nameCheckButton.rx.controlEvent(.touchUpInside)
+            .compactMap({ _ in
+                return self.nameTextField.text
+            })
+            .map { Reactor.Action.checkNickname(name: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$nameOverlap)
+            .skip(1)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isOverlap in
+                vc.nameCheckLabel.isOverlapCheck = isOverlap
+                vc.nextButton.isEnabled = !isOverlap
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setupAction() {
 
         let tapGesture = UITapGestureRecognizer()
@@ -167,43 +200,47 @@ class ProfileSetupViewController: UIViewController {
 
         tapGesture.rx.event
             .bind(with: self, onNext: { vc, _ in
-                print("tap test")
+                vc.photoManager.requestPhotoLibraryPermission(delegate: self)
             }).disposed(by: disposeBag)
-        
-        self.nameCheckButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.nameCheckLabel.isOverlapCheck = vc.isOverlap
-                vc.nextButton.isEnabled = !vc.isOverlap
-                vc.isOverlap.toggle()
-            })
-            .disposed(by: disposeBag)
         
         self.testBackButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        self.nextButton.rx.controlEvent(.touchUpInside)
+            .subscribe(onNext: { _ in
+                print("Next Button Tapped")
+            })
+            .disposed(by: disposeBag)
+            
     }
     
 }
-//
-//extension ProfileSetupViewController: PHPickerViewControllerDelegate {
-//    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-//        picker.dismiss(animated: true)
-//        guard let itemprovider = results.first?.itemProvider,
-//        itemprovider.canLoadObject(ofClass: UIImage.self) else { return }
-//        
-//        itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
-//            if let error {
-//                #warning("Present Alert")
-//                print(error)
-//            }
-//            
-//            if let selectedImage = image as? UIImage{
-//                DispatchQueue.main.async {
-//                    self.profileImageView.image = selectedImage
-//                }
-//            }
-//        }
-//    }
-//}
+
+// MARK: - Photos
+extension ProfileSetupViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let itemprovider = results.first?.itemProvider,
+        itemprovider.canLoadObject(ofClass: UIImage.self) else { return }
+        
+        itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
+            if let error {
+                #warning("Present Alert")
+                print(error)
+            }
+            
+            if let selectedImage = image as? UIImage{
+                
+                DispatchQueue.main.async {
+                    let targetSize = self.profileImageView.frame.size
+                    
+                    let resizeImage = selectedImage.resize(size: targetSize, cornerRadius: targetSize.width/2)
+                    self.profileImageView.image = resizeImage
+                }
+            }
+        }
+    }
+}

@@ -13,9 +13,10 @@ protocol KeyChainService {
     func getToken() -> TokenInfo?
     func deleteToken()
     func hasToken() -> Bool
+    func reissueToken(accessToken: String)
 }
 
-class TokenKeyChain: KeyChainService {
+struct TokenKeyChain: KeyChainService {
     
     private(set) static var cachedToken: TokenInfo?
     
@@ -72,6 +73,7 @@ class TokenKeyChain: KeyChainService {
         }
         
         Self.cachedToken = token
+        
         return token
     }
     
@@ -93,5 +95,11 @@ class TokenKeyChain: KeyChainService {
 
     func hasToken() -> Bool {
         return getToken() != nil
+    }
+    
+    func reissueToken(accessToken: String) {
+        Self.cachedToken?.accessToken = accessToken
+        guard let tokenData = try? JSONEncoder().encode(Self.cachedToken) else { return }
+        self.saveToken(tokenData)
     }
 }

@@ -9,17 +9,17 @@ import Foundation
 import UIKit
 import PhotosUI
 
-protocol photoService {
-    typealias PhotoDelegate = UIViewController & PHPickerViewControllerDelegate
+protocol PhotoService {
+    typealias Delegate = UIViewController & PHPickerViewControllerDelegate
     
-    func requestPhotoLibraryPermission(delegate: PhotoDelegate)
+    func requestPhotoLibraryPermission(delegate: Delegate)
 }
 
-final class PhotoManager: photoService {
+final class PhotoManager: PhotoService {
     
-    private var delegate: PhotoDelegate?
+    private var delegate: Delegate?
     
-    func requestPhotoLibraryPermission(delegate: PhotoDelegate) {
+    func requestPhotoLibraryPermission(delegate: Delegate) {
         self.delegate = delegate
         
         PHPhotoLibrary.requestAuthorization { [weak self] status in

@@ -190,6 +190,7 @@ class ViewController: UIViewController {
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.clipsToBounds = true
         imageView.backgroundColor = .systemYellow
         imageView.contentMode = .scaleAspectFill
         return imageView

@@ -10,9 +10,11 @@ import UIKit
 final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
     
     let apiDataTransferService: DataTransferService
-    
     let appleLoginService: AppleLoginService
     let tokenKeyChainService: KeyChainService
+    
+    private lazy var groupRepository: GroupRepository = .init(dataTransferService: apiDataTransferService,
+                                                              tokenKeyCahinService: tokenKeyChainService)
     
     init(apiDataTransferService: DataTransferService,
          appleLoginService: AppleLoginService,
@@ -21,7 +23,17 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
         self.appleLoginService = appleLoginService
         self.tokenKeyChainService = tokenKeyChainService
     }
+    
+    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginFlowCoordinator {
+        let flow = LoginFlowCoordinator(navigationController: navigationController,
+                                        dependencies: self)
+        return flow
+    }
+}
 
+// MARK: - Apple Login
+extension LoginSceneDIContainer {
+    
     func makeLoginViewController(action: LoginViewModelAction) -> LoginViewController {
         let viewModel = makeLoginViewModel(action)
         let loginView = LoginViewController(with: viewModel)
@@ -29,33 +41,33 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
         return loginView
     }
     
-    private func setAppleLoginProvider(_ view: UIViewController) {
-        self.appleLoginService.setPresentationContextProvider(view)
-    }
-    
-    private func makeLoginUseCase() -> LoginUseCase {
-        return DefaultLoginUseCase(appleLoginService: appleLoginService,
-                                   userRepository: makeUserRepository())
-    }
-    
     private func makeLoginViewModel(_ action: LoginViewModelAction) -> LoginViewModel {
         return DefaultLoginViewModel(loginUseCase: makeLoginUseCase(),
                                      action: action)
     }
     
-    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginFlowCoordinator {
-        let flow = LoginFlowCoordinator(navigationController: navigationController,
-                                        dependencies: self)
-        return flow
+    private func makeLoginUseCase() -> UserLogin {
+        return UserLoginImpl(appleLoginService: appleLoginService,
+                                   userRepository: groupRepository)
     }
     
+    private func setAppleLoginProvider(_ view: UIViewController) {
+        self.appleLoginService.setPresentationContextProvider(view)
+    }
+}
+
+// MARK: - Profile Setup
+extension LoginSceneDIContainer {
     func makeProfileSetupViewController() -> ProfileSetupViewController {
-        let photoManager = PhotoManager()
-        return ProfileSetupViewController(photoManager: photoManager)
+        return ProfileSetupViewController(photoManager: PhotoManager(),
+                                          profileSetupReactor: makeProfileSetupReactor())
     }
     
-    private func makeUserRepository() -> UserRepository {
-        DefaultGroupRepository(dataTransferService: apiDataTransferService,
-                               tokenKeyCahinService: tokenKeyChainService)
+    private func makeProfileSetupReactor() -> ProfileSetupViewModel {
+        return ProfileSetupViewModel(profileSetup: makeProfileSetup())
+    }
+    
+    private func makeProfileSetup() -> ProfileSetup {
+        return ProfileSetupImpl(repository: groupRepository)
     }
 }

@@ -80,11 +80,7 @@ class DefaultAppleLoginService: NSObject, AppleLoginService {
     }
 
     func startAppleLogin() -> Single<String> {
-        return Single.create { [weak self] single in
-            guard let self = self else {
-                single(.failure(NSError(domain: "AppleLoginService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is nil"])))
-                return Disposables.create()
-            }
+        return Single.create { single in
 
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()

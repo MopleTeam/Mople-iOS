@@ -14,10 +14,12 @@ import AuthenticationServices
 
 final class LoginViewController: UIViewController {
     
-    private let loginViewModel: LoginViewModel!
+    // MARK: - Variables
+    private let loginViewModel: LoginViewModel
     
     var disposeBag = DisposeBag()
     
+    // MARK: - UI Components
     private let titleContainerView = UIView()
     
     private let mainTitle : UILabel = {
@@ -60,6 +62,7 @@ final class LoginViewController: UIViewController {
         return sv
     }()
     
+    // MARK: - LifeCycle
     init(with viewModel: LoginViewModel) {
         self.loginViewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -75,12 +78,14 @@ final class LoginViewController: UIViewController {
         setBinding()
     }
     
-    // MARK: - Setup UI
+    
+    // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
         setupNavi()
     }
     
+    #warning("네비 전역 설정")
     private func setupNavi() {
         self.navigationController?.isNavigationBarHidden = true
     }
@@ -103,13 +108,13 @@ final class LoginViewController: UIViewController {
         }
     }
     
-    // MARK: - ViewModel Bind
+    // MARK: - Selectors
     private func setBinding() {
         let output = loginViewModel.transform(input: makeInputAction())
         bindingDataState(output)
     }
     
-    private func makeInputAction() -> ViewModelInput<Void> {
+    private func makeInputAction() -> ViewModelInput {
         let loginAction = loginButton.rx.controlEvent(.touchUpInside).map { _ in }
         return .init(login: loginAction)
     }

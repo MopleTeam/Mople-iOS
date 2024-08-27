@@ -22,9 +22,14 @@ final class AppFlowCoordinator: BaseCoordinator {
     #warning("진입 뷰 조절")
     override func start() {
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
-        let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
-        flow.navigationController = navigationController
-        flow.start()
+        
+        if !loginSceneDIContainer.tokenKeyChainService.hasToken() {
+            
+        } else {
+            let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
+            flow.navigationController = navigationController
+            flow.start()
+        }
     }
     
     

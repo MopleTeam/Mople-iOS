@@ -62,32 +62,27 @@ final class DefaultNetworkService {
     
     private func request(request: URLRequest) -> Single<Data?> {
         
-        return Single.create { [weak self] single in
-            
-            guard let self = self else {
-                single(.failure(NetworkError.unknownError))
-                return Disposables.create()
-            }
+        return Single.create { single in
             
             self.logger.log(request: request)
             
             let task = self.sessionManager.request(request)
-                .subscribe(with: self, onSuccess: { service, value in
+                .subscribe(onSuccess: { value in
                     if let err = value.error {
                         var error: NetworkError
                         
                         if let response = value.response as? HTTPURLResponse {
                             error = .error(statusCode: response.statusCode, data: value.data)
                         } else {
-                            error = service.resolve(error: err)
+                            error = self.resolve(error: err)
                         }
                         
-                        service.logger.log(error: error)
+                        self.logger.log(error: error)
                         single(.failure(error))
                         return
                     }
                     
-                    service.logger.log(responseData: value.data)
+                    self.logger.log(responseData: value.data)
                     single(.success(value.data))
                 })
             
@@ -114,10 +109,7 @@ extension DefaultNetworkService: NetworkService {
             let urlRequest = try endpoint.urlRequest(with: config)
             return request(request: urlRequest)
         } catch {
-            return Single.create {
-                $0(.failure(NetworkError.urlGeneration))
-                return Disposables.create()
-            }
+            return Single.error(NetworkError.urlGeneration)
         }
     }
 }
