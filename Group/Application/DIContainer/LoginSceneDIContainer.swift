@@ -34,16 +34,16 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
 // MARK: - Apple Login
 extension LoginSceneDIContainer {
     
-    func makeLoginViewController(action: LoginViewModelAction) -> LoginViewController {
-        let viewModel = makeLoginViewModel(action)
-        let loginView = LoginViewController(with: viewModel)
+    func makeLoginViewController(action: LoginAction) -> LoginViewController {
+        let reacotr = makeLoginViewReacotr(action)
+        let loginView = LoginViewController(reactor: reacotr)
         setAppleLoginProvider(loginView)
         return loginView
     }
     
-    private func makeLoginViewModel(_ action: LoginViewModelAction) -> LoginViewModel {
-        return DefaultLoginViewModel(loginUseCase: makeLoginUseCase(),
-                                     action: action)
+    private func makeLoginViewReacotr(_ action: LoginAction) -> LoginViewReacotr {
+        return LoginViewReacotr(loginUseCase: makeLoginUseCase(),
+                                loginAction: action)
     }
     
     private func makeLoginUseCase() -> UserLogin {
@@ -60,14 +60,14 @@ extension LoginSceneDIContainer {
 extension LoginSceneDIContainer {
     func makeProfileSetupViewController() -> ProfileSetupViewController {
         return ProfileSetupViewController(photoManager: PhotoManager(),
-                                          profileSetupReactor: makeProfileSetupReactor())
+                                          reactor: makeProfileSetupReactor())
     }
     
-    private func makeProfileSetupReactor() -> ProfileSetupViewModel {
-        return ProfileSetupViewModel(profileSetup: makeProfileSetup())
+    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
+        return ProfileSetupViewReactor(profileSetup: makeProfileSetup())
     }
     
-    private func makeProfileSetup() -> ProfileSetup {
-        return ProfileSetupImpl(repository: groupRepository)
+    private func makeProfileSetup() -> ProfileSetupUseCase {
+        return ProfileSetupUseCaseImpl(repository: groupRepository)
     }
 }

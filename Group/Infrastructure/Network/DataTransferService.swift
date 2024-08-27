@@ -107,10 +107,7 @@ extension DefaultDataTransferService: DataTransferService {
     }
         
     // MARK: - Private
-    private func decode<T: Decodable>(
-        data: Data?,
-        decoder: ResponseDecoder
-    ) -> Single<T> {
+    private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) -> Single<T> {
         return Single.create(subscribe: { emitter in
             guard let data = data else {
                 emitter(.failure(DataTransferError.noResponse))

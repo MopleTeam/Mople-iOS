@@ -5,18 +5,17 @@
 //  Created by CatSlave on 8/12/24.
 //
 
-import Foundation
 import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import ReactorKit
 import AuthenticationServices
 
-final class LoginViewController: UIViewController {
+final class LoginViewController: UIViewController, StoryboardView {
+    typealias Reactor = LoginViewReacotr
     
     // MARK: - Variables
-    private let loginViewModel: LoginViewModel
-    
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -63,8 +62,8 @@ final class LoginViewController: UIViewController {
     }()
     
     // MARK: - LifeCycle
-    init(with viewModel: LoginViewModel) {
-        self.loginViewModel = viewModel
+    init(reactor: LoginViewReacotr) {
+        defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -75,7 +74,7 @@ final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setBinding()
+//        setBinding()
     }
     
     
@@ -109,22 +108,18 @@ final class LoginViewController: UIViewController {
     }
     
     // MARK: - Selectors
-    private func setBinding() {
-        let output = loginViewModel.transform(input: makeInputAction())
-        bindingDataState(output)
-    }
-    
-    private func makeInputAction() -> ViewModelInput {
-        let loginAction = loginButton.rx.controlEvent(.touchUpInside).map { _ in }
-        return .init(login: loginAction)
-    }
-    
-    #warning("Alert Task")
-    private func bindingDataState(_ output: LoginOutput) {
-        output.notifyError
-            .bind(with: self, onNext: { vc, _ in
-                print("에러 발생")
-            }).disposed(by: disposeBag)
+    func bind(reactor: LoginViewReacotr) {
+        self.loginButton.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.executeLogin }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .compactMap { $0.errorMessage }
+            .subscribe(onNext: { message in
+                print("로그인 에러 발생 : \(message)")
+            })
+            .disposed(by: disposeBag)
     }
 }
 

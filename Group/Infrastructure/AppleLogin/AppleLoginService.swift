@@ -62,12 +62,6 @@ protocol AppleLoginService {
 enum LoginError: Error {
     case noAuthCode
     case completeError
-    
-    var message: String {
-        switch self {
-        default: "로그인 실패"
-        }
-    }
 }
 
 class DefaultAppleLoginService: NSObject, AppleLoginService {

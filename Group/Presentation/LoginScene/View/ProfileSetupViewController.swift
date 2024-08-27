@@ -13,7 +13,7 @@ import SnapKit
 import PhotosUI
 
 class ProfileSetupViewController: UIViewController, StoryboardView {
-    typealias Reactor = ProfileSetupViewModel
+    typealias Reactor = ProfileSetupViewReactor
     
     // MARK: - Variables
     private let photoManager: PhotoService
@@ -104,8 +104,8 @@ class ProfileSetupViewController: UIViewController, StoryboardView {
     
     // MARK: - LifeCycle
     init(photoManager: PhotoService,
-         profileSetupReactor: ProfileSetupViewModel) {
-        defer { self.reactor = profileSetupReactor }
+         reactor: ProfileSetupViewReactor) {
+        defer { self.reactor = reactor }
         self.photoManager = photoManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -174,7 +174,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView {
     }
     
     // MARK: - Selectors
-    func bind(reactor: ProfileSetupViewModel) {
+    func bind(reactor: ProfileSetupViewReactor) {
         self.nameCheckButton.rx.controlEvent(.touchUpInside)
             .compactMap({ _ in
                 return self.nameTextField.text
@@ -189,6 +189,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView {
             .drive(with: self, onNext: { vc, isOverlap in
                 vc.nameCheckLabel.isOverlapCheck = isOverlap
                 vc.nextButton.isEnabled = !isOverlap
+                vc.endEditNameTextField(bool: !isOverlap)
             })
             .disposed(by: disposeBag)
     }
@@ -217,6 +218,15 @@ class ProfileSetupViewController: UIViewController, StoryboardView {
             
     }
     
+}
+
+// MARK: - Helper
+extension ProfileSetupViewController {
+    private func endEditNameTextField(bool: Bool) {
+        if bool {
+            self.nameTextField.resignFirstResponder()
+        }
+    }
 }
 
 // MARK: - Photos

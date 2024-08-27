@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 protocol LoginFlowCoordinaotorDependencies {
-    func makeLoginViewController(action: LoginViewModelAction) -> LoginViewController
+    func makeLoginViewController(action: LoginAction) -> LoginViewController
     func makeProfileSetupViewController() -> ProfileSetupViewController
 }
 
@@ -24,7 +24,7 @@ final class LoginFlowCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let action = LoginViewModelAction(showProfileView: showProfileView)
+        let action = LoginAction(showProfileView: showProfileView)
         let vc = dependencies.makeLoginViewController(action: action)
         
         navigationController.pushViewController(vc, animated: false)

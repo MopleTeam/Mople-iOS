@@ -25,7 +25,7 @@ final class GroupRepository {
 extension GroupRepository {
     private func reissueToken() -> Single<Void> {
         return Single.create { emitter in
-            
+            print("토큰 재발급 요청")
             do {
                 let endpoint = try APIEndpoints.reissueToken()
                 

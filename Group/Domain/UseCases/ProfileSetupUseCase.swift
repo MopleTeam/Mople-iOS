@@ -8,11 +8,11 @@
 import Foundation
 import RxSwift
 
-protocol ProfileSetup {
+protocol ProfileSetupUseCase {
     func checkNickName(name: String) -> Single<Bool>
 }
 
-final class ProfileSetupImpl: ProfileSetup {
+final class ProfileSetupUseCaseImpl: ProfileSetupUseCase {
     
     let repository: ProfileSetupRepository
     

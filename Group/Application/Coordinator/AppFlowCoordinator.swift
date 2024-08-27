@@ -23,14 +23,13 @@ final class AppFlowCoordinator: BaseCoordinator {
     override func start() {
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
         
-        if !loginSceneDIContainer.tokenKeyChainService.hasToken() {
-            
-        } else {
-            let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
-            flow.navigationController = navigationController
-            flow.start()
-        }
+        _ = loginSceneDIContainer.tokenKeyChainService.hasToken()
+        
+        let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
+        flow.navigationController = navigationController
+        flow.start()
     }
-    
-    
 }
+    
+    
+
