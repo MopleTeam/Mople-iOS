@@ -7,6 +7,14 @@
 
 import UIKit
 
+protocol SignInListener {
+    func signIn()
+}
+
+protocol SignOutListener {
+    func signOut()
+}
+
 final class AppFlowCoordinator: BaseCoordinator {
     
     
@@ -19,15 +27,37 @@ final class AppFlowCoordinator: BaseCoordinator {
     }
     
     
-    #warning("진입 뷰 조절")
+    #warning("KeyChain Mock")
     override func start() {
+        if appDIContainer.tokenKeychainService.hasToken() {
+            mainFlowStart()
+        } else {
+            loginFlowStart()
+        }
+    }
+    
+    private func mainFlowStart() {
+        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer()
+        let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
+        start(coordinator: flow)
+    }
+    
+    private func loginFlowStart() {
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
-        
-        _ = loginSceneDIContainer.tokenKeyChainService.hasToken()
-        
         let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
-        flow.navigationController = navigationController
-        flow.start()
+        start(coordinator: flow)
+    }
+}
+
+extension AppFlowCoordinator: SignInListener {
+    func signIn() {
+        mainFlowStart()
+    }
+}
+
+extension AppFlowCoordinator: SignOutListener {
+    func signOut() {
+        
     }
 }
     

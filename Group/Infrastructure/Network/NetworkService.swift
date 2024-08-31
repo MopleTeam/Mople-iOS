@@ -9,19 +9,12 @@ import Foundation
 import RxSwift
 import RxRelay
 
-protocol NetworkCancellable {
-    func cancel()
-}
-
-extension URLSessionTask: NetworkCancellable { }
-
 enum NetworkError: Error {
     case error(statusCode: Int, data: Data?)
     case notConnected
-    case cancelled
-    case generic(Error)
+    case unknownError(Error?)
     case urlGeneration
-    case unknownError
+    case responseError(err: ErrorResponse?)
 }
 
 protocol NetworkService {
@@ -83,7 +76,24 @@ final class DefaultNetworkService {
                     }
                     
                     self.logger.log(responseData: value.data)
-                    single(.success(value.data))
+                    
+                    guard let httpResponse = value.response as? HTTPURLResponse else {
+                        single(.failure(NetworkError.unknownError(nil)))
+                        return
+                    }
+                    
+                    switch httpResponse.statusCode {
+                    case 400:
+                        guard let data = value.data,
+                              let responseError = try? JSONDecoder().decode(ErrorResponse.self, from: data) else {
+                            single(.failure(NetworkError.responseError(err: nil)))
+                            return
+                        }
+                        single(.failure(NetworkError.responseError(err: responseError)))
+                        return
+                    default:
+                        single(.success(value.data))
+                    }
                 })
             
             return task
@@ -95,8 +105,7 @@ final class DefaultNetworkService {
         let code = URLError.Code(rawValue: (error as NSError).code)
         switch code {
         case .notConnectedToInternet: return .notConnected
-        case .cancelled: return .cancelled
-        default: return .generic(error)
+        default: return .unknownError(error)
         }
     }
 }

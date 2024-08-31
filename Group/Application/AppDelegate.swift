@@ -24,10 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
                 
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-        LocalDataManager.shared.saveDeviceToken(token: deviceTokenString)
         print("디바이스 토큰 확인")
         print("deviceToken:\(deviceTokenString)")
-        NotificationCenter.default.post(name: .deviceTokenSaved, object: nil)
     }
     
     
@@ -106,9 +104,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         let url = response.notification.request.content.userInfo
         print(url)
-        
-        print(type(of: url))
-        
+
         if let apsArray = url["aps"] as? [String:Any],
            let alert = apsArray["alert"] as? [String:String],
            let body = alert["body"],
@@ -117,33 +113,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print("\(title.decoded)")
         }
         
-        
-        
-        
         let urlString = url.reduce("Push Url") { partialResult, apsValue in
             partialResult + "\n" + "Key : \(apsValue.key)" + "\n" + "Value : \(apsValue.value)"
         }
-        
-        print(urlString)
-        
-        LocalDataManager.shared.saveApsUrl(url: urlString)
-        
-        NotificationCenter.default.post(name: .urlSaved, object: nil)
-        
-        switch response.actionIdentifier {
-               case UNNotificationDefaultActionIdentifier:
-                   // 사용자가 알림을 탭했을 때의 기본 동작
-                   print("사용자가 알림을 탭했습니다.")
-                   // 여기서 필요한 로직을 구현 (예: 특정 화면으로 이동)
-               case "ACCEPT_ACTION":
-                   print("사용자가 수락 버튼을 탭했습니다.")
-                   // 수락 동작 처리
-               case "DECLINE_ACTION":
-                   print("사용자가 거절 버튼을 탭했습니다.")
-                   // 거절 동작 처리
-               default:
-                   break
-               }
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {

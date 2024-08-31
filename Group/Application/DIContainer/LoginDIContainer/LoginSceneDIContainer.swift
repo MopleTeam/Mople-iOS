@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
+final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
     
     let apiDataTransferService: DataTransferService
     let appleLoginService: AppleLoginService
@@ -24,8 +24,8 @@ final class LoginSceneDIContainer: LoginFlowCoordinaotorDependencies {
         self.tokenKeyChainService = tokenKeyChainService
     }
     
-    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginFlowCoordinator {
-        let flow = LoginFlowCoordinator(navigationController: navigationController,
+    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
+        let flow = LoginCoordinator(navigationController: navigationController,
                                         dependencies: self)
         return flow
     }
@@ -41,8 +41,9 @@ extension LoginSceneDIContainer {
         return loginView
     }
     
+    #warning("Mock")
     private func makeLoginViewReacotr(_ action: LoginAction) -> LoginViewReacotr {
-        return LoginViewReacotr(loginUseCase: makeLoginUseCase(),
+        return LoginViewReacotr(loginUseCase: UserLoginMock(),
                                 loginAction: action)
     }
     
@@ -58,16 +59,18 @@ extension LoginSceneDIContainer {
 
 // MARK: - Profile Setup
 extension LoginSceneDIContainer {
-    func makeProfileSetupViewController() -> ProfileSetupViewController {
+    func makeProfileSetupViewController(action: SignInAction) -> ProfileSetupViewController {
         return ProfileSetupViewController(photoManager: PhotoManager(),
-                                          reactor: makeProfileSetupReactor())
+                                          reactor: makeProfileSetupReactor(action))
     }
     
-    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
-        return ProfileSetupViewReactor(profileSetup: makeProfileSetup())
+    private func makeProfileSetupReactor(_ action: SignInAction) -> ProfileSetupViewReactor {
+        return ProfileSetupViewReactor(profileSetupUseCase: ProfileSetupMock(),
+                                       signInAction: action
+        )
     }
     
-    private func makeProfileSetup() -> ProfileSetupUseCase {
-        return ProfileSetupUseCaseImpl(repository: groupRepository)
+    private func makeProfileSetup() -> ProfileSetup {
+        return ProfileSetupImpl(repository: groupRepository)
     }
 }

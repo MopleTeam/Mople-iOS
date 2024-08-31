@@ -8,6 +8,11 @@
 import Foundation
 import RxSwift
 
+enum ServerError: Error {
+    case httpRespon(statusCode: Int)
+    case errRespon(message: String?)
+}
+
 enum DataTransferError: Error {
     case noResponse
     case parsing(Error)
@@ -148,7 +153,14 @@ final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
 class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     init() { }
     func resolve(error: NetworkError) -> Error {
-        return error
+        switch error {
+        case .error(let statusCode, _):
+            return ServerError.httpRespon(statusCode: statusCode)
+        case .responseError(let err):
+            return ServerError.errRespon(message: err?.message)
+        @unknown default:
+            return error
+        }
     }
 }
 
@@ -159,6 +171,7 @@ class JSONResponseDecoder: ResponseDecoder {
     init() { }
  
     func decode<T: Decodable>(_ data: Data) throws -> T {
+        
         return try jsonDecoder.decode(T.self, from: data)
     }
 }
@@ -182,6 +195,7 @@ class RawDataResponseDecoder: ResponseDecoder {
         }
     }
 }
+
 
 
 

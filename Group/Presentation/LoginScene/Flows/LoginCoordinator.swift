@@ -6,19 +6,18 @@
 //
 
 import UIKit
-import RxSwift
 
-protocol LoginFlowCoordinaotorDependencies {
+protocol LoginCoordinaotorDependencies {
     func makeLoginViewController(action: LoginAction) -> LoginViewController
-    func makeProfileSetupViewController() -> ProfileSetupViewController
+    func makeProfileSetupViewController(action: SignInAction) -> ProfileSetupViewController
 }
 
-final class LoginFlowCoordinator: BaseCoordinator {
+final class LoginCoordinator: BaseCoordinator {
     
-    private let dependencies: LoginFlowCoordinaotorDependencies
+    private let dependencies: LoginCoordinaotorDependencies
     
     init(navigationController: UINavigationController,
-         dependencies: LoginFlowCoordinaotorDependencies) {
+         dependencies: LoginCoordinaotorDependencies) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
     }
@@ -31,7 +30,14 @@ final class LoginFlowCoordinator: BaseCoordinator {
     }
     
     private func showProfileView() {
-        let vc = self.dependencies.makeProfileSetupViewController() // 액션 추가
+        let action = SignInAction(completedSignIn: completedSignIn)
+        let vc = self.dependencies.makeProfileSetupViewController(action: action)
         self.navigationController.pushViewController(vc, animated: true)
+    }
+    
+    private func completedSignIn() {
+        self.navigationController.viewControllers = []
+        self.parentCoordinator?.didFinish(coordinator: self)
+        (self.parentCoordinator as? SignInListener)?.signIn()
     }
 }

@@ -25,4 +25,8 @@ class DefaultTextField: UITextField {
         textColor = setValues.textConfig.color
         tintColor = setValues.textConfig.color
     }
+    
+    func updateLayout() {
+        self.setNeedsLayout()
+    }
 }

@@ -19,6 +19,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // 앱이 실행중이지 않다면(메모리에 없다면)
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        AppAppearance.setupAppearance()
+        
         let window = UIWindow(windowScene: windowScene)
         let navigationController = UINavigationController()
 
@@ -31,17 +33,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = window
         self.window?.makeKeyAndVisible()
-    }
-    
-    private func setViewController(_ connectionOptions: UIScene.ConnectionOptions) -> ViewController {
-        
-        let viewController = ViewController()
-        
-        let enterUrl = filterUrl(enterType: connectionOptions)
-        
-        viewController.setEnteredUrl(urlString: enterUrl)
-        
-        return viewController
     }
     
     private func filterUrl(enterType: UIScene.ConnectionOptions) -> String? {
@@ -65,10 +56,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Url Scheme
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let url = URLContexts.first?.url,
-              let mainVC = getFirstViewController() else { return }
-        
-        mainVC.setEnteredUrl(urlString: url.absoluteString)
     }
     
     
@@ -79,10 +66,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL else {
             return
         }
-        
-        guard let mainVC = getFirstViewController() else { return }
-        
-        mainVC.setEnteredUrl(urlString: url.absoluteString)
     }
     
     // 앱 접속 시 아이콘에 표시된 횟수 초기화
@@ -116,19 +99,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         DispatchQueue.main.async {
             UIApplication.shared.registerForRemoteNotifications()
         }
-    }
-}
-
-extension SceneDelegate {
-    private func getFirstViewController() -> ViewController? {
-        guard let rootViewController = self.window?.rootViewController,
-              let naviController = rootViewController as? UINavigationController,
-              let viewController = naviController.viewControllers.first(where: { $0.isKind(of: ViewController.self) }),
-              let mainVC = viewController as? ViewController else {
-            return nil
-        }
-        
-        return mainVC
     }
 }
 

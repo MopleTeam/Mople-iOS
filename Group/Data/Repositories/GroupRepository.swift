@@ -11,10 +11,10 @@ import RxSwift
 final class GroupRepository {
     
     private let dataTransferService: DataTransferService
-    private let tokenKeyChainService: KeyChainService
+    private var tokenKeyChainService: KeyChainService?
     
     init(dataTransferService: DataTransferService,
-         tokenKeyCahinService: KeyChainService) {
+         tokenKeyCahinService: KeyChainService? = nil) {
         self.dataTransferService = dataTransferService
         self.tokenKeyChainService = tokenKeyCahinService
     }
@@ -31,7 +31,7 @@ extension GroupRepository {
                 
                 let task = self.dataTransferService.request(with: endpoint)
                     .subscribe(onSuccess: { accessToken in
-                        self.tokenKeyChainService.reissueToken(accessToken: accessToken)
+                        self.tokenKeyChainService?.reissueToken(accessToken: accessToken)
                         emitter(.success(()))
                     }, onFailure: { err in
                         emitter(.failure(err))
@@ -54,13 +54,13 @@ extension GroupRepository {
                 return .error(error)
             }
         }.retry { err in
-            err.enumerated().flatMap { count, err -> Single<Void> in
+            err.flatMap { err -> Single<Void> in
                 if err is DataTransferError {
                     return self.reissueToken()
                 } else {
                     return .error(err)
                 }
-            }
+            }.take(1)
         }
     }
     
@@ -79,7 +79,7 @@ extension GroupRepository {
                 } else {
                     return .error(err)
                 }
-            }
+            }.take(1)
         }
     }
 
@@ -123,7 +123,7 @@ extension GroupRepository: LoginRepository {
                         
             let task = self.dataTransferService.request(with: endpoint)
                 .subscribe(with: self, onSuccess: { repo, token in
-                    repo.tokenKeyChainService.saveToken(token)
+                    repo.tokenKeyChainService?.saveToken(token)
                     emitter(.success(()))
                 }, onFailure: { _, err in
                     emitter(.failure(err))
@@ -135,6 +135,12 @@ extension GroupRepository: LoginRepository {
 
 // MARK: - Profile Setup
 extension GroupRepository: ProfileSetupRepository {
+    func getRandomNickname() -> Single<Data> {
+        return requestWithRetry { () throws -> Endpoint<Data> in
+            try APIEndpoints.getRandomNickname()
+        }
+    }
+    
     func checkNickname(name: String) -> Single<Bool> {
         return requestWithRetry(endpointClosure: { () throws -> Endpoint<Bool> in
             try APIEndpoints.checkNickname(name: name)

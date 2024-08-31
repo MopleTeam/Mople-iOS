@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum HTTPMethodType: String {
     case get     = "GET"
@@ -57,19 +58,6 @@ class Endpoint<R>: ResponseRequestable {
 
 protocol BodyEncoder {
     func encode(_ parameters: [String: Any]) -> Data?
-}
-
-struct JSONBodyEncoder: BodyEncoder {
-    func encode(_ parameters: [String: Any]) -> Data? {
-        return try? JSONSerialization.data(withJSONObject: parameters)
-    }
-}
-
-// Use Test
-struct AsciiBodyEncoder: BodyEncoder {
-    func encode(_ parameters: [String: Any]) -> Data? {
-        return parameters.queryString.data(using: String.Encoding.ascii, allowLossyConversion: true)
-    }
 }
 
 protocol Requestable {
@@ -173,7 +161,19 @@ private extension Encodable {
     }
 }
 
+// MARK: - Encoder
+struct JSONBodyEncoder: BodyEncoder {
+    func encode(_ parameters: [String: Any]) -> Data? {
+        return try? JSONSerialization.data(withJSONObject: parameters)
+    }
+}
 
+// Use Test
+struct AsciiBodyEncoder: BodyEncoder {
+    func encode(_ parameters: [String: Any]) -> Data? {
+        return parameters.queryString.data(using: String.Encoding.ascii, allowLossyConversion: true)
+    }
+}
 
 struct MultipartFormEncoder: Hashable, Equatable, BodyEncoder {
     public struct Part: Hashable, Equatable {
@@ -210,7 +210,6 @@ struct MultipartFormEncoder: Hashable, Equatable, BodyEncoder {
     }
     
     public var boundary: String
-    public var parts: [Part]
     
     public var contentType: String {
         return "multipart/form-data; boundary=\(self.boundary)"
@@ -218,7 +217,9 @@ struct MultipartFormEncoder: Hashable, Equatable, BodyEncoder {
     
     func encode(_ parameters: [String : Any]) -> Data? {
         var body = Data()
-        for part in self.parts {
+        let parts = makePart(part: parameters)
+        
+        for part in parts {
             body.append("--\(self.boundary)\r\n")
             body.append("Content-Disposition: form-data; name=\"\(part.name)\"")
             if let filename = part.filename?.replacingOccurrences(of: "\"", with: "_") {
@@ -233,29 +234,26 @@ struct MultipartFormEncoder: Hashable, Equatable, BodyEncoder {
             body.append("\r\n")
         }
         body.append("--\(self.boundary)--\r\n")
-        
         return body
     }
     
-    public init(parts: [Part] = [], boundary: String = UUID().uuidString) {
-        self.parts = parts
+    public init(boundary: String = UUID().uuidString) {
         self.boundary = boundary
     }
-    
-    public subscript(name: String) -> Part? {
-        get {
-            return self.parts.first(where: { $0.name == name })
-        }
-        set {
-            precondition(newValue == nil || newValue?.name == name)
-            
-            var parts = self.parts
-            parts = parts.filter { $0.name != name }
-            if let newValue = newValue {
-                parts.append(newValue)
+}
+
+extension MultipartFormEncoder {
+    public func makePart(part: [String:Any]) -> [Part] {
+        return part.compactMap({ key, value in
+            switch value {
+            case let value as String :
+                Part(name: key, value: value)
+            case let value as Data:
+                Part(name: key, data: value, filename: key, contentType: "image")
+            default:
+                nil
             }
-            self.parts = parts
-        }
+        })
     }
 }
 
@@ -264,3 +262,4 @@ extension Data {
         self.append(string.data(using: .utf8, allowLossyConversion: true)!)
     }
 }
+

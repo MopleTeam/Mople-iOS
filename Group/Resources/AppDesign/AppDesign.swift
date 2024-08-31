@@ -41,7 +41,8 @@ struct AppDesign {
     enum Profile: TextConstructive {
         
         // Image
-        static let profileImage = UIImage(named: "DefaultProfile")
+        static let selectImage = UIImage(named: "selectImage")
+        static let defaultImage = UIImage(named: "defaultImage")
         
         // Back Color
         static let textFieldBackColor = UIColor(hexCode: "F6F8FA")
@@ -77,7 +78,7 @@ struct AppDesign {
             case .checkTitle:
                 return ("이미 사용중인 닉네임입니다.",
                         .pretendard(type: .reqular, size: 14),
-                        .init(hexCode: "FF3B30"))
+                        .clear)
             case .nextButton:
                 return ("프로필 생성하기",
                         .pretendard(type: .semiBold, size: 16),

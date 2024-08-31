@@ -6,17 +6,28 @@
 //
 
 import UIKit
+import RxSwift
 
 class DefaultButton: UIButton {
     
     override var isEnabled: Bool {
         didSet {
             let opacity: CGFloat = isEnabled ? 1 : 0.2
-            self.configuration?.background.backgroundColor = self.backColor?.withAlphaComponent(opacity)
+            self.configuration?.background.backgroundColor = self.activeColor?.withAlphaComponent(opacity)
         }
     }
+    
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        view.hidesWhenStopped = true
+        view.color = .white
+        return view
+    }()
         
-    private var backColor: UIColor?
+    
+    /// 비활성화 색
+    private var activeColor: UIColor?
+    private var defaultTitle: String?
     
     init(backColor: UIColor? = nil,
          radius: CGFloat? = nil,
@@ -24,23 +35,34 @@ class DefaultButton: UIButton {
         
         super.init(frame: .zero)
         configuration = .filled()
+        self.setupUI()
         self.defaultBackgroundColor(color: backColor)
         self.defaultTitleSetup(textConfigure)
         self.setRadius(radius: radius)
+
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func setupUI() {
+        self.addSubview(loadingIndicator)
+        
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+    
     private func defaultBackgroundColor(color: UIColor?) {
-        self.backColor = color
+        self.activeColor = color
         configuration?.background.backgroundColor = color
     }
     
     private func defaultTitleSetup(_ setValues: TextConstructive) {
         let config = setValues.textConfig
         
+        defaultTitle = config.text
         configuration?.title = config.text
         
         let transformer = UIConfigurationTextAttributesTransformer { incoming in
@@ -58,5 +80,10 @@ class DefaultButton: UIButton {
         
         clipsToBounds = true
         layer.cornerRadius = radius
+    }
+    
+    func loading(status: Bool) {
+        configuration?.showsActivityIndicator = status
+        configuration?.title = status ? nil : defaultTitle
     }
 }

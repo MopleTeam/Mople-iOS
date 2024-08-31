@@ -14,12 +14,12 @@ enum TokenError: Error {
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = TokenKeyChain.cachedToken?.accessToken else { throw TokenError.noTokenError }
+        guard let token = KeyChainServiceImpl.cachedToken?.accessToken else { throw TokenError.noTokenError }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = TokenKeyChain.cachedToken?.refreshToken else { throw TokenError.noTokenError }
+        guard let token = KeyChainServiceImpl.cachedToken?.refreshToken else { throw TokenError.noTokenError }
         return ["refreshToken": token]
     }
 }
@@ -60,7 +60,7 @@ extension APIEndpoints {
         return Endpoint(path: "user/me",
                         method: .patch,
                         headerParameters: token,
-                        bodyParameters: ["profileImg" : image, "nickName" : nickName],
+                        bodyParameters: ["profileImg" : image, "nickname" : nickName],
                         bodyEncoder: MultipartFormEncoder())
     }
     
@@ -70,5 +70,14 @@ extension APIEndpoints {
         return Endpoint(path: "user/nickname/\(name)/duplicated",
                         method: .get,
                         headerParameters: token)
+    }
+    
+    static func getRandomNickname() throws -> Endpoint<Data> {
+        let token = try getAccessTokenParameters()
+        
+        return Endpoint(path: "user/nickname/random",
+                        method: .get,
+                        headerParameters: token,
+                        responseDecoder: RawDataResponseDecoder())
     }
 }

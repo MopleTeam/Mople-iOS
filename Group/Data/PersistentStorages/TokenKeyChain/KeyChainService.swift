@@ -16,7 +16,7 @@ protocol KeyChainService {
     func reissueToken(accessToken: String)
 }
 
-struct TokenKeyChain: KeyChainService {
+final class KeyChainServiceImpl: KeyChainService {
     
     private(set) static var cachedToken: TokenInfo?
     
@@ -42,13 +42,12 @@ struct TokenKeyChain: KeyChainService {
         
         let status = SecItemAdd(query as CFDictionary, nil)
         
-        #if DEBUG
-        if status == errSecSuccess {
-            print("Tokens saved successfully")
-        } else {
-            print("Tokens Failed to save tokens: \(status)")
+        guard status == errSecSuccess,
+              let token = try? JSONDecoder().decode(TokenInfo.self, from: tokens) else {
+            return
         }
-        #endif
+        
+        Self.cachedToken = token
     }
     
     func getToken() -> TokenInfo? {
