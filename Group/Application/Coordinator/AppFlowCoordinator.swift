@@ -39,6 +39,7 @@ final class AppFlowCoordinator: BaseCoordinator {
     private func mainFlowStart() {
         let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer()
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
+        flow.navigationController.isNavigationBarHidden = true
         start(coordinator: flow)
     }
     

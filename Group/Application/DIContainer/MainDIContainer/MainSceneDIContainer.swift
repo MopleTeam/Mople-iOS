@@ -39,10 +39,11 @@ extension MainSceneDIContainer {
         let homeDI = HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
         let navigationController = UINavigationController()
+
         navigationController.tabBarItem = .init(title: "홈",
                                                 image: UIImage(systemName: "house.fill"),
                                                 selectedImage: nil)
-        
+          
         return homeDI.makeHomeFlowCoordinator(navigationController: navigationController)
     }
     

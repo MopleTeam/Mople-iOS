@@ -19,7 +19,7 @@ final class TabBarCoordinator: BaseCoordinator {
     init(navigationController: UINavigationController,
          dependencies: TabBarCoordinaotorDependencies) {
         self.dependencies = dependencies
-        self.tabBarController = UITabBarController()
+        self.tabBarController = CustomTabBarController()
         super.init(navigationController: navigationController)
     }
     
@@ -28,6 +28,7 @@ final class TabBarCoordinator: BaseCoordinator {
         coordinators.forEach { self.start(coordinator: $0) }
         let viewControllers = coordinators.map { $0.navigationController }
         tabBarController.setViewControllers(viewControllers, animated: true)
+        
         navigationController.pushViewController(tabBarController, animated: true)
     }
 }

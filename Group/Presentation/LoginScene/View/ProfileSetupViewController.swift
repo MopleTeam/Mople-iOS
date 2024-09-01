@@ -216,7 +216,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
-//                vc.showAlert(message: message)
+                vc.showAlert(message: message)
             })
             .disposed(by: disposeBag)
         
