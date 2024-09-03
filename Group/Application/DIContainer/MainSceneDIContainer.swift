@@ -10,11 +10,15 @@ import UIKit
 final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
     
     let apiDataTransferService: DataTransferService
+    let tokenKeyChainService: KeyChainService
     
-    private lazy var groupRepository: GroupRepository = .init(dataTransferService: apiDataTransferService)
+    private lazy var groupRepository: GroupRepository = .init(dataTransferService: apiDataTransferService,
+                                                              tokenKeyCahinService: tokenKeyChainService)
     
-    init(apiDataTransferService: DataTransferService) {
+    init(apiDataTransferService: DataTransferService,
+         tokenKeyChainService: KeyChainService) {
         self.apiDataTransferService = apiDataTransferService
+        self.tokenKeyChainService = tokenKeyChainService
     }
     
     func makeMainFlowCoordinator(navigationController: UINavigationController) -> TabBarCoordinator {

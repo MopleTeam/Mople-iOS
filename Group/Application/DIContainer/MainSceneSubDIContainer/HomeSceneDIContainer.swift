@@ -22,6 +22,10 @@ final class HomeSceneDIContainer: HomeCoordinatorDependencies {
     }
     
     func makeHomeViewController() -> HomeViewController {
-        return HomeViewController()
+        return HomeViewController(reactor: makeHomeViewReactor())
+    }
+    
+    func makeHomeViewReactor() -> ScheduleViewReactor {
+        return ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock())
     }
 }

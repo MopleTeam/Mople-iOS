@@ -12,7 +12,7 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
+class ProfileSetupViewController: UIViewController, View, Alertable {
     typealias Reactor = ProfileSetupViewReactor
     
     // MARK: - Variables
@@ -28,7 +28,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
     
     // MARK: - UI Components
     private let mainTitle: DefaultLabel = {
-        let label = DefaultLabel(configure: AppDesign.Profile.main)
+        let label = DefaultLabel(itemConfigure: AppDesign.Profile.main)
         label.numberOfLines = 2
         return label
     }()
@@ -47,7 +47,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
         return imageView
     }()
 
-    private let nameTitle = DefaultLabel(configure: AppDesign.Profile.nameTitle)
+    private let nameTitle = DefaultLabel(itemConfigure: AppDesign.Profile.nameTitle)
     
     private let nameTextFieldContainer: UIView = {
         let view = UIView()
@@ -61,7 +61,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
     
     private let nameCheckButton = DefaultButton(backColor: AppDesign.Profile.checkButtonBackColor,
                                                 radius: 6,
-                                                textConfigure: AppDesign.Profile.checkButton)
+                                                itemConfigure: AppDesign.Profile.checkButton)
     
     private let nameCheckContanierView: UIView = {
         let view = UIView()
@@ -69,7 +69,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
         return view
     }()
     
-    private let nameCheckLabel = DefaultLabel(configure: AppDesign.Profile.checkTitle)
+    private let nameCheckLabel = DefaultLabel(itemConfigure: AppDesign.Profile.checkTitle)
     
     private lazy var nameStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameTitle, nameTextFieldContainer, nameCheckContanierView])
@@ -83,7 +83,7 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
     private var nextButton: DefaultButton = {
         let button = DefaultButton(backColor: AppDesign.Profile.nextButtonBackColor,
                                    radius: 8,
-                                   textConfigure: AppDesign.Profile.nextButton)
+                                   itemConfigure: AppDesign.Profile.nextButton)
         button.isEnabled = false
         return button
     }()
@@ -123,7 +123,6 @@ class ProfileSetupViewController: UIViewController, StoryboardView, Alertable {
     private func setupUI() {
         setupTextField()
         setupLayout()
-        
         setupAction()
     }
 

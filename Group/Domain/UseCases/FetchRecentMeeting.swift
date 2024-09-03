@@ -7,20 +7,19 @@
 import Foundation
 import RxSwift
 
-protocol FetchRecentMeeting {
-    func fetchRecent() -> Single<[Event]>
+protocol FetchRecentSchedule {
+    func fetchRecent() -> Single<[Schedule]>
 }
 
-class fetchRecentMeetingMock: FetchRecentMeeting {
+class fetchRecentScheduleMock: FetchRecentSchedule {
     
-    func getEvents() -> [Event] {
+    func getEvents() -> [Schedule] {
         return [
             .init(groupName: "모임 1", eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date()),
             .init(groupName: "모임 2", eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date()),
             .init(groupName: "모임 3", eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date()),
             .init(groupName: "모임 4", eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date()),
-            .init(groupName: "모임 5", eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date()),
-            .init(groupName: "모임 6", eventName: "모임 6 일정", location: "대구시 어딘가", participants: getUser(), date: Date())]
+            .init(groupName: "모임 5", eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date())]
     }
 
     func getUser() -> [Participant] {
@@ -33,12 +32,12 @@ class fetchRecentMeetingMock: FetchRecentMeeting {
         return members
     }
     
-    func fetchRecent() -> Single<[Event]> {
-        return Single.just([])
+    func fetchRecent() -> Single<[Schedule]> {
+        return Single.just(getEvents())
     }
 }
     
-struct Event {
+struct Schedule {
     let id: UUID
     let groupName: String?
     let eventName: String?

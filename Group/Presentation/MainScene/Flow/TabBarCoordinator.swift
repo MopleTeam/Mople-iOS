@@ -25,7 +25,10 @@ final class TabBarCoordinator: BaseCoordinator {
     
     override func start() {
         let coordinators = dependencies.getMainFlowCoordinator()
-        coordinators.forEach { self.start(coordinator: $0) }
+        coordinators.forEach {
+            $0.navigationController.navigationBar.isHidden = true
+            self.start(coordinator: $0)
+        }
         let viewControllers = coordinators.map { $0.navigationController }
         tabBarController.setViewControllers(viewControllers, animated: true)
         

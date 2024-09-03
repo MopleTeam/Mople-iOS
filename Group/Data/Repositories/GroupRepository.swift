@@ -11,10 +11,10 @@ import RxSwift
 final class GroupRepository {
     
     private let dataTransferService: DataTransferService
-    private var tokenKeyChainService: KeyChainService?
+    private var tokenKeyChainService: KeyChainService
     
     init(dataTransferService: DataTransferService,
-         tokenKeyCahinService: KeyChainService? = nil) {
+         tokenKeyCahinService: KeyChainService) {
         self.dataTransferService = dataTransferService
         self.tokenKeyChainService = tokenKeyCahinService
     }
@@ -31,7 +31,7 @@ extension GroupRepository {
                 
                 let task = self.dataTransferService.request(with: endpoint)
                     .subscribe(onSuccess: { accessToken in
-                        self.tokenKeyChainService?.reissueToken(accessToken: accessToken)
+                        self.tokenKeyChainService.reissueToken(accessToken: accessToken)
                         emitter(.success(()))
                     }, onFailure: { err in
                         emitter(.failure(err))
@@ -123,7 +123,7 @@ extension GroupRepository: LoginRepository {
                         
             let task = self.dataTransferService.request(with: endpoint)
                 .subscribe(with: self, onSuccess: { repo, token in
-                    repo.tokenKeyChainService?.saveToken(token)
+                    repo.tokenKeyChainService.saveToken(token)
                     emitter(.success(()))
                 }, onFailure: { _, err in
                     emitter(.failure(err))

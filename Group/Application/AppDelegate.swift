@@ -30,24 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     
-    private func registerForRemoteNotifications() {
-        
-        let acceptAction = UNNotificationAction(identifier: "ACCEPT_ACTION",
-              title: "Accept",
-              options: [])
-        let declineAction = UNNotificationAction(identifier: "DECLINE_ACTION",
-              title: "Decline",
-              options: [])
-        // Define the notification type
-        let meetingInviteCategory =
-              UNNotificationCategory(identifier: "MEETING_INVITATION",
-              actions: [acceptAction, declineAction],
-              intentIdentifiers: [],
-              hiddenPreviewsBodyPlaceholder: "",
-              options: .customDismissAction)
-                
+    private func registerForRemoteNotifications() {                
         let center = UNUserNotificationCenter.current()
-        center.setNotificationCategories([meetingInviteCategory])
         
         center.delegate = self
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]

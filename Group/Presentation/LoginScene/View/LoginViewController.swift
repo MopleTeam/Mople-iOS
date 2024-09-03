@@ -12,7 +12,7 @@ import SnapKit
 import ReactorKit
 import AuthenticationServices
 
-final class LoginViewController: UIViewController, StoryboardView {
+final class LoginViewController: UIViewController, View {
     typealias Reactor = LoginViewReacotr
     
     // MARK: - Variables
@@ -22,13 +22,13 @@ final class LoginViewController: UIViewController, StoryboardView {
     private let titleContainerView = UIView()
     
     private let mainTitle : UILabel = {
-        let label = DefaultLabel(configure: AppDesign.Login.main)
+        let label = DefaultLabel(itemConfigure: AppDesign.Login.main)
         label.textAlignment = .center
         return label
     }()
     
     private let subTitle: UILabel = {
-        let label = DefaultLabel(configure: AppDesign.Login.sub)
+        let label = DefaultLabel(itemConfigure: AppDesign.Login.sub)
         label.textAlignment = .center
         return label
     }()
@@ -74,21 +74,14 @@ final class LoginViewController: UIViewController, StoryboardView {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-//        setBinding()
     }
     
     
     // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
-        setupNavi()
     }
-    
-    #warning("네비 전역 설정")
-    private func setupNavi() {
-        self.navigationController?.isNavigationBarHidden = true
-    }
-    
+        
     private func setupLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(loginStackView)

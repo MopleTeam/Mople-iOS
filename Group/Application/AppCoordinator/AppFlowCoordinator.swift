@@ -27,9 +27,9 @@ final class AppFlowCoordinator: BaseCoordinator {
     }
     
     
-    #warning("KeyChain Mock")
     override func start() {
-        if appDIContainer.tokenKeychainService.hasToken() {
+        self.navigationController.navigationBar.isHidden = true
+        if appDIContainer.hasToken {
             mainFlowStart()
         } else {
             loginFlowStart()
@@ -39,7 +39,6 @@ final class AppFlowCoordinator: BaseCoordinator {
     private func mainFlowStart() {
         let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer()
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
-        flow.navigationController.isNavigationBarHidden = true
         start(coordinator: flow)
     }
     

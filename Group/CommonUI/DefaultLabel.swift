@@ -17,18 +17,20 @@ class DefaultLabel: UILabel {
     }
     
     
-    init(configure: TextConstructive) {
+    init(backColor: UIColor? = nil,
+         radius: CGFloat? = nil,
+         itemConfigure: UIConstructive) {
         super.init(frame: .zero)
-        setType(configure)
+        setType(itemConfigure)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
-    private func setType(_ setValues: TextConstructive) {
-        text = setValues.textConfig.text
-        font = setValues.textConfig.font
-        textColor = setValues.textConfig.color
+    private func setType(_ setValues: UIConstructive) {
+        text = setValues.uiConfig.text
+        font = setValues.uiConfig.font
+        textColor = setValues.uiConfig.color
     }
 }

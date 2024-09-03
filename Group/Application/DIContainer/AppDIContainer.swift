@@ -9,6 +9,12 @@ import Foundation
 
 final class AppDIContainer {
     
+    // MARK: - 로그인이 된 상태인지 체크
+    var hasToken: Bool {
+        return tokenKeychainService.hasToken()
+    }
+    
+    // MARK: - 앱 서비스
     lazy var appConfiguration = AppConfiguration()
     
     lazy var apiDataTransferService: DataTransferService = {
@@ -22,41 +28,24 @@ final class AppDIContainer {
     
     lazy var appleLoginService = DefaultAppleLoginService()
     
-    lazy var tokenKeychainService = KeyChainServiceImpl()
+    #warning("Mock")
+    lazy var tokenKeychainService = KeyChainServiceMock()
 }
 
 // MARK: - Make DIContainer
 extension AppDIContainer {
     
-    // MARK: - 로그인
-    func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
+    // MARK: - 로그인 플로우
+        func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
         return LoginSceneDIContainer(apiDataTransferService: apiDataTransferService,
                                      appleLoginService: appleLoginService,
                                      tokenKeyChainService: tokenKeychainService)
     }
     
+    // MARK: - 메인 플로우
     func makeMainSceneDIContainer() -> MainSceneDIContainer {
-        return MainSceneDIContainer(apiDataTransferService: apiDataTransferService)
-    }
-    
-    // MARK: - 메인
-    func makeHomeSceneDIContainer() -> HomeSceneDIContainer {
-        return HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
-    }
-    
-    // MARK: - 모임 리스트
-    func makeGroupListSceneDIContainer() -> GroupListSceneDIContainer {
-        return GroupListSceneDIContainer(apiDataTransferService: apiDataTransferService)
-    }
-    
-    // MARK: - 캘린더
-    func makeCalendarSceneDIContainer() -> CalendarSceneDIContainer {
-        return CalendarSceneDIContainer(apiDataTransferService: apiDataTransferService)
-    }
-    
-    // MARK: - 프로필
-    func makeProfileSceneDIContainer() -> ProfileSceneDIContainer {
-        return ProfileSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        return MainSceneDIContainer(apiDataTransferService: apiDataTransferService,
+                                    tokenKeyChainService: tokenKeychainService)
     }
 }
 

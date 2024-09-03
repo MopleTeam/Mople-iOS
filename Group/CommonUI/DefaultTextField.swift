@@ -9,7 +9,7 @@ import UIKit
 
 class DefaultTextField: UITextField {
     
-    init(configure: TextConstructive) {
+    init(configure: UIConstructive) {
         super.init(frame: .zero)
         backgroundColor = .clear
         setType(configure)
@@ -19,11 +19,11 @@ class DefaultTextField: UITextField {
         super.init(coder: coder)
     }
     
-    private func setType(_ setValues: TextConstructive) {
-        placeholder = setValues.textConfig.text
-        font = setValues.textConfig.font
-        textColor = setValues.textConfig.color
-        tintColor = setValues.textConfig.color
+    private func setType(_ setValues: UIConstructive) {
+        placeholder = setValues.uiConfig.text
+        font = setValues.uiConfig.font
+        textColor = setValues.uiConfig.color
+        tintColor = setValues.uiConfig.color
     }
     
     func updateLayout() {

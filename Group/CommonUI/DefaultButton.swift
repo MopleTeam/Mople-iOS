@@ -31,13 +31,13 @@ class DefaultButton: UIButton {
     
     init(backColor: UIColor? = nil,
          radius: CGFloat? = nil,
-         textConfigure: TextConstructive) {
+         itemConfigure: UIConstructive) {
         
         super.init(frame: .zero)
         configuration = .filled()
         self.setupUI()
-        self.defaultBackgroundColor(color: backColor)
-        self.defaultTitleSetup(textConfigure)
+        self.setBackgroundColor(color: backColor)
+        self.setItemConfigrue(itemConfigure)
         self.setRadius(radius: radius)
 
     }
@@ -54,16 +54,17 @@ class DefaultButton: UIButton {
         }
     }
     
-    private func defaultBackgroundColor(color: UIColor?) {
+    private func setBackgroundColor(color: UIColor?) {
         self.activeColor = color
         configuration?.background.backgroundColor = color
     }
     
-    private func defaultTitleSetup(_ setValues: TextConstructive) {
-        let config = setValues.textConfig
+    private func setItemConfigrue(_ setValues: UIConstructive) {
+        let config = setValues.uiConfig
         
         defaultTitle = config.text
         configuration?.title = config.text
+        configuration?.image = config.image
         
         let transformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
