@@ -6,21 +6,37 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import ReactorKit
 
-final class ScheduleListCollectionViewController: UIViewController {
+final class ScheduleListCollectionViewController: UIViewController, View {
+    
+    typealias Reactor = ScheduleViewReactor
+    
+    var disposeBag = DisposeBag()
+    
     lazy var collectionView: UICollectionView = {
-        
-        // CollectionView 생성 시 FlowLayout 생성 필수
-        //
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 8
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 0, right: 20)
         collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
+//        collectionView.bounces = false
         return collectionView
     }()
-
+    
+    init(reactor: ScheduleViewReactor) {
+        super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .clear
@@ -38,6 +54,15 @@ final class ScheduleListCollectionViewController: UIViewController {
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    func bind(reactor: ScheduleViewReactor) {
+        reactor.pulse(\.$schedules)
+            .asDriver(onErrorJustReturn: [])
+            .drive(self.collectionView.rx.items(cellIdentifier: ScheduleListCell.reuseIdentifier, cellType: ScheduleListCell.self)) {index, item, cell in
+                cell.viewModel = ScheduleListItemViewModel(schedule: item)
+            }
+            .disposed(by: disposeBag)
     }
 }
 

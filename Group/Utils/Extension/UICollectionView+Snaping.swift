@@ -13,7 +13,8 @@ extension UICollectionView {
     func verticalSnapToItem(targetContentOffset: UnsafeMutablePointer<CGPoint>,
                             scrollView: UIScrollView,
                             velocity: CGPoint){
-
+        guard checkTopOrBottom() else { return }
+        
         targetContentOffset.pointee = scrollView.contentOffset
 
         var indexPath = getFirstItems()
@@ -31,12 +32,11 @@ extension UICollectionView {
     }
     
     private func getFirstItems() -> IndexPath {
-        var indexPaths = self.indexPathsForVisibleItems.sorted()
+        let indexPaths = self.indexPathsForVisibleItems.sorted()
         return indexPaths.first!
     }
     
     private func checkLastItem(currentIndex: Int, totalCount: Int) -> Bool {
-        
         return currentIndex < (totalCount - 1)
     }
     
@@ -51,4 +51,16 @@ extension UICollectionView {
             }
         }
     }
+    
+    private func checkTopOrBottom(threshold: CGFloat = 50) -> Bool {
+        let contentSize = self.contentSize.width
+        let contentMinOffsetX = self.contentOffset.x + threshold
+        let contentMaxOffsetX = self.contentOffset.x + self.frame.width - threshold
+        
+        guard contentMinOffsetX > 0 else { return false }
+        guard contentMaxOffsetX < contentSize else { return false }
+        
+        return true
+    }
 }
+

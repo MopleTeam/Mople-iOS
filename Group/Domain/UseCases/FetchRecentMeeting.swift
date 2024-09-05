@@ -26,7 +26,7 @@ class fetchRecentScheduleMock: FetchRecentSchedule {
         var members: [Participant] = []
         let num = Int.random(in: 1...10)
         for i in 1...num {
-            members.append(.init(name: "User\(i)", imagePath: "https://picsum.photos/200"))
+            members.append(.init(name: "User\(i)", imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"))
         }
         
         return members

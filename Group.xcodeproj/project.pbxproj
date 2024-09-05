@@ -20,6 +20,10 @@
 		5211F9082C86F2DB00403980 /* ScheduleListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9072C86F2DB00403980 /* ScheduleListCell.swift */; };
 		5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */; };
 		5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */; };
+		5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9122C89CEF800403980 /* ParticipantImageView.swift */; };
+		5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9142C89D56D00403980 /* UIView+Identifier.swift */; };
+		5211F9172C89DD0100403980 /* ScheduleListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9162C89DD0100403980 /* ScheduleListItemViewModel.swift */; };
+		5211F91A2C89E39600403980 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5211F9192C89E39600403980 /* Kingfisher */; };
 		524A50C92C68735000862AD6 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 524A50C82C68735000862AD6 /* MultipartForm */; };
 		524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */; };
 		524E33D12C804C7A004B15FC /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* Validator.swift */; };
@@ -107,6 +111,9 @@
 		5211F9072C86F2DB00403980 /* ScheduleListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListCell.swift; sourceTree = "<group>"; };
 		5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AddChild.swift"; sourceTree = "<group>"; };
 		5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Snaping.swift"; sourceTree = "<group>"; };
+		5211F9122C89CEF800403980 /* ParticipantImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantImageView.swift; sourceTree = "<group>"; };
+		5211F9142C89D56D00403980 /* UIView+Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Identifier.swift"; sourceTree = "<group>"; };
+		5211F9162C89DD0100403980 /* ScheduleListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListItemViewModel.swift; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+Ext.swift"; sourceTree = "<group>"; };
 		524E33D02C804C7A004B15FC /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* Alertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alertable.swift; sourceTree = "<group>"; };
@@ -184,6 +191,7 @@
 			files = (
 				52C72EA32C4FBE4100CFF329 /* RxSwift in Frameworks */,
 				52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */,
+				5211F91A2C89E39600403980 /* Kingfisher in Frameworks */,
 				524A50C92C68735000862AD6 /* MultipartForm in Frameworks */,
 				52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */,
 				52E2383A2C765A2D0066C9A3 /* ReactorKit in Frameworks */,
@@ -243,6 +251,7 @@
 			children = (
 				5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */,
 				5211F9062C86F2C700403980 /* Cell */,
+				5211F9102C89CDEB00403980 /* CsutomUI */,
 			);
 			path = ScheduleListView;
 			sourceTree = "<group>";
@@ -253,6 +262,15 @@
 				5211F9072C86F2DB00403980 /* ScheduleListCell.swift */,
 			);
 			path = Cell;
+			sourceTree = "<group>";
+		};
+		5211F9102C89CDEB00403980 /* CsutomUI */ = {
+			isa = PBXGroup;
+			children = (
+				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
+				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
+			);
+			path = CsutomUI;
 			sourceTree = "<group>";
 		};
 		524E33CD2C8028A4004B15FC /* RxSwift */ = {
@@ -389,6 +407,7 @@
 			isa = PBXGroup;
 			children = (
 				5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */,
+				5211F9162C89DD0100403980 /* ScheduleListItemViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -496,6 +515,7 @@
 				5211F8FD2C85A86900403980 /* PreView.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
+				5211F9142C89D56D00403980 /* UIView+Identifier.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -624,7 +644,6 @@
 				528484152C6B86F600D50C6A /* DefaultButton.swift */,
 				52E2381E2C7405820066C9A3 /* DefaultLabel.swift */,
 				52E238202C743C0E0066C9A3 /* DefaultTextField.swift */,
-				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
 			);
 			path = CommonUI;
 			sourceTree = "<group>";
@@ -800,6 +819,7 @@
 				52C72EA52C4FBE5900CFF329 /* SnapKit */,
 				524A50C82C68735000862AD6 /* MultipartForm */,
 				52E238392C765A2D0066C9A3 /* ReactorKit */,
+				5211F9192C89E39600403980 /* Kingfisher */,
 			);
 			productName = Group;
 			productReference = 52C72E862C4FBD6400CFF329 /* Group.app */;
@@ -837,6 +857,7 @@
 				52C72EA42C4FBE5900CFF329 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */,
+				5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			productRefGroup = 52C72E872C4FBD6400CFF329 /* Products */;
 			projectDirPath = "";
@@ -881,6 +902,7 @@
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
+				5211F9172C89DD0100403980 /* ScheduleListItemViewModel.swift in Sources */,
 				527A3E992C836287007FE63B /* CalendarViewController.swift in Sources */,
 				52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */,
 				52E238252C7454230066C9A3 /* UserProfile.swift in Sources */,
@@ -902,6 +924,7 @@
 				526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */,
 				527A3E892C834E10007FE63B /* KeyChainServiceMock.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
+				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
@@ -928,6 +951,7 @@
 				52E2381F2C7405820066C9A3 /* DefaultLabel.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				5211F8FE2C85A86900403980 /* PreView.swift in Sources */,
+				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+Ext.swift in Sources */,
 				5211F9002C86B37B00403980 /* HomeButton.swift in Sources */,
@@ -1180,6 +1204,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.12.0;
+			};
+		};
 		524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davbeck/MultipartForm";
@@ -1215,6 +1247,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5211F9192C89E39600403980 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		524A50C82C68735000862AD6 /* MultipartForm */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */;

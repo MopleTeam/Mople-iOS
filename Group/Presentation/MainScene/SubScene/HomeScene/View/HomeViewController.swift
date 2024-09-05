@@ -8,6 +8,7 @@
 import UIKit
 import ReactorKit
 
+
 final class HomeViewController: UIViewController, View {
  
     typealias Reactor = ScheduleViewReactor
@@ -41,7 +42,7 @@ final class HomeViewController: UIViewController, View {
     
     private let containerView = UIView()
     
-    private let scheduleListCollectionView = ScheduleListCollectionViewController()
+    private lazy var scheduleListCollectionView = ScheduleListCollectionViewController(reactor: reactor!)
     
     private let emptyDataView: UILabel = {
         let label = UILabel()
@@ -103,8 +104,8 @@ final class HomeViewController: UIViewController, View {
     }
     
     init(reactor: ScheduleViewReactor) {
-        defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
         addScheduleListCollectionView()
     }
     
@@ -140,7 +141,6 @@ final class HomeViewController: UIViewController, View {
         addChild(scheduleListCollectionView)
         containerView.addSubview(scheduleListCollectionView.view)
         scheduleListCollectionView.didMove(toParent: self)
-        self.emptyDataView.isHidden = true
         scheduleListCollectionView.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -160,26 +160,7 @@ final class HomeViewController: UIViewController, View {
                     }
                 })
                 .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$schedules)
-            .asDriver(onErrorJustReturn: [])
-            .drive(self.scheduleListCollectionView.collectionView.rx.items(cellIdentifier: ScheduleListCell.reuseIdentifier, cellType: ScheduleListCell.self)) {index, item, cell in
-            }
-            .disposed(by: disposeBag)
     }
 }
-
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct HomeViewController_PreView: PreviewProvider {
-//    static var previews: some View {
-//        HomeViewController()
-//            .showPreview()
-//    }
-//}
-//#endif
-
-
 
 
