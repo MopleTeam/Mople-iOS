@@ -7,7 +7,7 @@
 
 import UIKit
 import ReactorKit
-
+import Kingfisher
 
 final class HomeViewController: UIViewController, View {
  
@@ -147,6 +147,11 @@ final class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: ScheduleViewReactor) {
+        self.makeScheduleButton.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.logOutTest }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$schedules)
                 .asDriver(onErrorJustReturn: [])
                 .drive(onNext: { [weak self] schedules in

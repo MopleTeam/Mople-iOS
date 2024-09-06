@@ -21,11 +21,12 @@ final class HomeSceneDIContainer: HomeCoordinatorDependencies {
         return flow
     }
     
-    func makeHomeViewController() -> HomeViewController {
-        return HomeViewController(reactor: makeHomeViewReactor())
+    func makeHomeViewController(action: LogOutAction) -> HomeViewController {
+        return HomeViewController(reactor: makeHomeViewReactor(action))
     }
     
-    func makeHomeViewReactor() -> ScheduleViewReactor {
-        return ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock())
+    func makeHomeViewReactor(_ action: LogOutAction) -> ScheduleViewReactor {
+        return ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock(),
+                                   logOutAction: action)
     }
 }

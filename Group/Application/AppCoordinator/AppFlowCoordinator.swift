@@ -29,10 +29,16 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     override func start() {
         self.navigationController.navigationBar.isHidden = true
-        if appDIContainer.hasToken {
-            mainFlowStart()
+        fadeOut { [weak self] in
+            self?.checkEntry()
+        }
+    }
+    
+    private func checkEntry() {
+        if self.appDIContainer.hasToken {
+            self.mainFlowStart()
         } else {
-            loginFlowStart()
+            self.loginFlowStart()
         }
     }
     
@@ -57,7 +63,7 @@ extension AppFlowCoordinator: SignInListener {
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
-        
+        loginFlowStart()
     }
 }
     

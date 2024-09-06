@@ -7,6 +7,8 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 final class ScheduleListCell: UICollectionViewCell {
     
@@ -17,10 +19,11 @@ final class ScheduleListCell: UICollectionViewCell {
     }
 
     private let remainingDateLabel: DefaultLabel = {
-        let label = DefaultLabel(backColor: AppDesign.HomeSchedule.dayBackColor,
-                                  radius: 4,
-                                  itemConfigure: AppDesign.HomeSchedule.day)
-        label.backgroundColor = .systemRed
+        let label = DefaultLabel(backColor: AppDesign.HomeSchedule.remainingDateLabel,
+                                 radius: 4,
+                                 padding: .init(top: 2, left: 6, bottom: 2, right: 6),
+                                 itemConfigure: AppDesign.HomeSchedule.day)
+        
         return label
     }()
     
@@ -73,7 +76,11 @@ final class ScheduleListCell: UICollectionViewCell {
     }()
     
     private let participantCountLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.HomeSchedule.count)
+        let label = DefaultLabel(backColor: AppDesign.HomeSchedule.participantCountLabel,
+                                 radius: 4,
+                                 padding: .init(top: 2, left: 6, bottom: 2, right: 6),
+                                 itemConfigure: AppDesign.HomeSchedule.count)
+        
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
     }()
@@ -91,7 +98,7 @@ final class ScheduleListCell: UICollectionViewCell {
         let sv = UIStackView(arrangedSubviews: [remainingDateLabel, titleLabel, infoStackView, participantStackView])
         sv.axis = .vertical
         sv.spacing = 16
-        sv.alignment = .fill
+        sv.alignment = .leading
         sv.distribution = .fill
         return sv
     }()
@@ -114,11 +121,11 @@ final class ScheduleListCell: UICollectionViewCell {
 
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(20)
-        }
+        }    
         
-//        participantStackView.snp.makeConstraints { make in
-//            make.height.equalTo(28)
-//        }
+        infoStackView.snp.makeConstraints { make in
+            make.width.equalToSuperview()
+        }
     }
     
     private func setRadius() {

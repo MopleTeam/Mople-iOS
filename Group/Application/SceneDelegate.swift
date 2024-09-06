@@ -76,7 +76,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidEnterBackground(_ scene: UIScene) {
         self.wasInBackground = true
         
-        let test = URLComponents()
         
     }
 

@@ -134,7 +134,8 @@ struct AppDesign {
     
     enum HomeSchedule: UIConstructive {
         
-        static let dayBackColor = AppDesign.defaultBlue.withAlphaComponent(0.1)
+        static let remainingDateLabel = AppDesign.defaultBlue.withAlphaComponent(0.1)
+        static let participantCountLabel = UIColor(hexCode: "888888").withAlphaComponent(0.1)
         
         case day
         case title

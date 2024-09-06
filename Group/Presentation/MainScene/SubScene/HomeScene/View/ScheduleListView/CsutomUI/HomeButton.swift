@@ -11,16 +11,9 @@ import SwiftUI
 
 final class HomeButton: UIButton {
     
-    private let buttonImage: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
+    private let buttonImage = UIImageView()
     
-    private let buttonTitle: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        return label
-    }()
+    private let buttonTitle = UILabel()
     
     private lazy var allStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [buttonImage, buttonTitle])
@@ -30,6 +23,7 @@ final class HomeButton: UIButton {
         sv.spacing = 26
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        sv.isUserInteractionEnabled = false
         return sv
     }()
     
@@ -56,6 +50,7 @@ final class HomeButton: UIButton {
         buttonImage.image = config.image
         buttonTitle.text = config.text
         buttonTitle.font = config.font
+        buttonTitle.textColor = config.color
         addSubview(allStackView)
         
         allStackView.snp.makeConstraints { make in
@@ -69,7 +64,6 @@ final class HomeButton: UIButton {
         clipsToBounds = true
         layer.cornerRadius = radius
     }
-    
 }
 
 #if canImport(SwiftUI) && DEBUG

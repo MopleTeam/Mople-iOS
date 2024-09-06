@@ -10,7 +10,7 @@ import RxSwift
 import RxRelay
 
 struct LoginAction {
-    var showProfileView: () -> Void
+    var logIn: () -> Void
 }
 
 enum LoginFacingError: Error {
@@ -70,7 +70,7 @@ final class LoginViewReacotr: Reactor {
         
         switch mutation {
         case .showProfileView:
-            loginAction.showProfileView()
+            loginAction.logIn()
         case .catchError(let err):
             newState = handleError(state: newState, err: err)
         }

@@ -19,11 +19,6 @@ final class CustomTabBarController: UITabBarController {
         updateTabBarFrame()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.updateTabBarFrame()
-    }
-
     private func setupUI() {
         tabBar.backgroundColor = .white
         tabBar.isTranslucent = true
@@ -45,7 +40,6 @@ extension UIApplication {
     var keyWindow: UIWindow? {
         return UIApplication.shared
             .connectedScenes
-            .filter { $0.activationState == .foregroundActive }
             .first(where: { $0 is UIWindowScene })
             .flatMap({ $0 as? UIWindowScene })?.windows
             .first(where: \.isKeyWindow)

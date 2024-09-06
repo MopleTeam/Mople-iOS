@@ -54,6 +54,8 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        
     }
     
     func bind(reactor: ScheduleViewReactor) {
