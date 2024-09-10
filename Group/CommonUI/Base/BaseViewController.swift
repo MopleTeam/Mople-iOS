@@ -10,6 +10,10 @@ import SnapKit
 
 class BaseViewController: UIViewController {
     
+    var titleViewBottom: ConstraintItem {
+        return mainStackView.snp.bottom
+    }
+    
     private let titleLable: BaseLabel = {
         let label = BaseLabel(configure: AppDesign.Main.NaviView)
         label.textAlignment = .center

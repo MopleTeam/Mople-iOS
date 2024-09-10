@@ -24,11 +24,15 @@ class GroupListViewController: BaseViewController, View {
     
     private let maskingView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = AppDesign.mainBackColor
         return view
     }()
     
-    private let tableContainerView = UIView()
+    private let tableContainerView: UIView = {
+        let view = UIView()
+        view.clipsToBounds = true
+        return view
+    }()
     
     private lazy var groupListTableView = GroupListTableViewController(reactor: reactor!)
     
@@ -48,19 +52,25 @@ class GroupListViewController: BaseViewController, View {
         addScheduleListCollectionView()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.maskingView.addMasking()
+    }
+    
     func setupUI() {
-//        self.contentView.addSubview(maskingView)
-        self.contentView.addSubview(tableContainerView)
-        self.contentView.addSubview(emptyView)
-//
-//        maskingView.snp.makeConstraints { make in
-//            make.top.horizontalEdges.equalToSuperview()
-//            make.height.equalTo(15)
-//        }
-        
+        self.view.addSubview(tableContainerView)
+        self.view.addSubview(emptyView)
+        self.view.addSubview(maskingView)
+
+        maskingView.snp.makeConstraints { make in
+            make.top.equalTo(titleViewBottom)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(15)
+        }
+
         tableContainerView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.top.equalTo(titleViewBottom)
+            make.bottom.horizontalEdges.equalToSuperview()
         }
         
         emptyView.snp.makeConstraints { make in
@@ -92,10 +102,10 @@ extension UIView {
     func addMasking() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
-            UIColor.systemMint.cgColor,
+            AppDesign.mainBackColor.cgColor,
             UIColor.clear.cgColor
         ]
-        
+
         gradientLayer.frame = self.bounds
         
         self.layer.mask = gradientLayer
