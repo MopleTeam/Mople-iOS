@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-class ProfileSetupMock: ProfileSetup {
+final class ProfileSetupMock: ProfileSetup {
     func getRandomNickname() -> Single<String?> {
         return Single.just("랜덤닉네임")
             .delay(.seconds(1), scheduler: MainScheduler.instance)

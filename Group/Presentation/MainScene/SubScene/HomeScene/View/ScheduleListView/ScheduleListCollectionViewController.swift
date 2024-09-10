@@ -16,7 +16,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
-    lazy var collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 8
@@ -24,7 +24,6 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         collectionView.contentInset = .init(top: 0, left: 20, bottom: 0, right: 20)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.bounces = false
         return collectionView
     }()
     
@@ -39,23 +38,20 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .clear
         setupUI()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        setCollectionView()
     }
 
     private func setupUI() {
         view.addSubview(collectionView)
-        self.collectionView.delegate = self
-        collectionView.register(ScheduleListCell.self, forCellWithReuseIdentifier: ScheduleListCell.reuseIdentifier)
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        
+    }
+    
+    private func setCollectionView() {
+        self.collectionView.delegate = self
+        collectionView.register(ScheduleListCell.self, forCellWithReuseIdentifier: ScheduleListCell.reuseIdentifier)
     }
     
     func bind(reactor: ScheduleViewReactor) {

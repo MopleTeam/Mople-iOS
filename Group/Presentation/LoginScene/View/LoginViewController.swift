@@ -22,13 +22,13 @@ final class LoginViewController: UIViewController, View {
     private let titleContainerView = UIView()
     
     private let mainTitle : UILabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.Login.main)
+        let label = BaseLabel(configure: AppDesign.Login.title)
         label.textAlignment = .center
         return label
     }()
     
     private let subTitle: UILabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.Login.sub)
+        let label = BaseLabel(configure: AppDesign.Login.subTitle)
         label.textAlignment = .center
         return label
     }()

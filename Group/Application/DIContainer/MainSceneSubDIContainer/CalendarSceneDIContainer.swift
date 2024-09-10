@@ -22,7 +22,7 @@ final class CalendarSceneDIContainer: CalendarCoordinatorDependencies {
     }
     
     func makeCalendarViewController() -> CalendarViewController {
-        return CalendarViewController()
+        return CalendarViewController(title: "일정관리")
     }
 
 }

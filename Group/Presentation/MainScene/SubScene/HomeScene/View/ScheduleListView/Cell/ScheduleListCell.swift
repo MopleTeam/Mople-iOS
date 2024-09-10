@@ -7,8 +7,6 @@
 
 import UIKit
 import SnapKit
-import RxSwift
-import RxCocoa
 
 final class ScheduleListCell: UICollectionViewCell {
     
@@ -18,51 +16,45 @@ final class ScheduleListCell: UICollectionViewCell {
         }
     }
 
-    private let remainingDateLabel: DefaultLabel = {
-        let label = DefaultLabel(backColor: AppDesign.HomeSchedule.remainingDateLabel,
+    private let remainingDateLabel: BaseLabel = {
+        let label = BaseLabel(backColor: AppDesign.HomeSchedule.remainingDateLabel,
                                  radius: 4,
-                                 padding: .init(top: 2, left: 6, bottom: 2, right: 6),
-                                 itemConfigure: AppDesign.HomeSchedule.day)
+                                 padding: .init(top: 0, left: 6, bottom: 0, right: 6),
+                                 configure: AppDesign.HomeSchedule.day)
         
         return label
     }()
     
-    private let titleLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.HomeSchedule.title)
-        label.backgroundColor = .systemOrange
+    private let titleLabel: BaseLabel = {
+        let label = BaseLabel(configure: AppDesign.HomeSchedule.title)
         return label
     }()
     
-    #warning("이미지랑 합친 label 만들기")
-    private let placeInfoLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.HomeSchedule.info)
-        label.backgroundColor = .systemYellow
-        return label
-    }()
+    private let placeInfoLabel = IconLabelView(iconSize: 24,
+                                               configure: AppDesign.HomeSchedule.placeInfo)
     
-    private let dateInfoLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.HomeSchedule.info)
-        label.backgroundColor = .systemGreen
-        return label
-    }()
+    private let dateInfoLabel = IconLabelView(iconSize: 24,
+                                              configure: AppDesign.HomeSchedule.dateInfo)
     
-    private let detailPlaceInfoLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.HomeSchedule.info)
-        label.setContentHuggingPriority(.init(1), for: .vertical)
-        label.backgroundColor = .systemBlue
-        return label
+    private let detailPlaceInfoLabel = IconLabelView(iconSize: 24,
+                                                     configure: AppDesign.HomeSchedule.detailPlaceInfo)
+    
+    private let emptyView: UIView = {
+        let view = UIView()
+        view.setContentHuggingPriority(.init(1), for: .vertical)
+        return view
     }()
     
     private lazy var infoStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [placeInfoLabel, dateInfoLabel, detailPlaceInfoLabel])
-        sv.backgroundColor = .purple
         sv.axis = .vertical
         sv.spacing = 4
         sv.alignment = .fill
         sv.distribution = .fill
+        sv.backgroundColor = AppDesign.mainBackColor
+        sv.layer.cornerRadius = 8
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 12, left: 12, bottom: 12, right: 12)
-        sv.setContentHuggingPriority(.init(1), for: .vertical)
         return sv
     }()
     
@@ -75,13 +67,12 @@ final class ScheduleListCell: UICollectionViewCell {
         return sv
     }()
     
-    private let participantCountLabel: DefaultLabel = {
-        let label = DefaultLabel(backColor: AppDesign.HomeSchedule.participantCountLabel,
+    private let participantCountLabel: BaseLabel = {
+        let label = BaseLabel(backColor: AppDesign.HomeSchedule.participantCountLabel,
                                  radius: 4,
-                                 padding: .init(top: 2, left: 6, bottom: 2, right: 6),
-                                 itemConfigure: AppDesign.HomeSchedule.count)
+                                 padding: .init(top: 0, left: 6, bottom: 0, right: 6),
+                                 configure: AppDesign.HomeSchedule.count)
         
-        label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
     }()
     
@@ -89,7 +80,7 @@ final class ScheduleListCell: UICollectionViewCell {
         let sv = UIStackView(arrangedSubviews: [participantsImageViews, participantCountLabel])
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.alignment = .fill
+        sv.alignment = .center
         sv.spacing = 4
         return sv
     }()
@@ -102,10 +93,9 @@ final class ScheduleListCell: UICollectionViewCell {
         sv.distribution = .fill
         return sv
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        print("cell 생성")
         setupUI()
         setRadius()
     }
@@ -113,8 +103,7 @@ final class ScheduleListCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
+
     private func setupUI() {
         self.contentView.backgroundColor = .white
         self.contentView.addSubview(mainStackView)
@@ -126,37 +115,63 @@ final class ScheduleListCell: UICollectionViewCell {
         infoStackView.snp.makeConstraints { make in
             make.width.equalToSuperview()
         }
+        
+        remainingDateLabel.snp.makeConstraints { make in
+            make.height.equalTo(21)
+        }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.height.equalTo(28)
+        }
+        
+        placeInfoLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
+        }
+        
+        dateInfoLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
+        }
+        
+        detailPlaceInfoLabel.snp.makeConstraints { make in
+            make.height.equalTo(40)
+        }
+        
+        participantCountLabel.snp.makeConstraints { make in
+            make.height.equalTo(21)
+        }
     }
     
     private func setRadius() {
         self.contentView.clipsToBounds = true
         self.contentView.layer.cornerRadius = 12
     }
-    
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        print("재사용 됩니다.")
+    }
+}
+
+// MARK: - 데이터 입력
+extension ScheduleListCell {
     private func setData(viewModel: ScheduleListItemViewModel?) {
         guard let viewModel = viewModel else { return }
         
         self.remainingDateLabel.text = "D-\(viewModel.remainingDayCount)"
         self.titleLabel.text = viewModel.title
-        self.placeInfoLabel.text = viewModel.place
-        self.detailPlaceInfoLabel.text = viewModel.detailPlace
-        self.dateInfoLabel.text = viewModel.releaseDate
+        self.placeInfoLabel.setText(viewModel.place)
+        self.detailPlaceInfoLabel.setText(viewModel.detailPlace)
+        self.dateInfoLabel.setText(viewModel.releaseDate)
         self.participantCountLabel.text = "\(viewModel.participants.count) 명"
         setParticipantImage(participants: viewModel.participants)
     }
     
+    /// 썸네일 뷰 스택뷰에 추가
     private func setParticipantImage(participants: [Participant]) {
         
         participantsImageViews.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        let imageViews = participants.enumerated().map { index, value in
-            let view = ParticipantImageView(index: index, imagePath: value.imagePath)
-            view.layer.zPosition = .init(-index)
-            view.snp.makeConstraints { make in
-                make.size.equalTo(28)
-            }
-            return view
-        }
+
+        let imageViews = getParticipantImage(participants)
         
         imageViews.forEach {
             self.participantsImageViews.addArrangedSubview($0)
@@ -165,19 +180,36 @@ final class ScheduleListCell: UICollectionViewCell {
         setNeedsLayout()
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        print("재사용 됩니다.")
+    /// 표시할 이미지 제한 및 썸네일 뷰 만들기
+    private func getParticipantImage(_ participants: [Participant]) -> [ParticipantImageView] {
+        let sliceCount = participants.enumerated().filter { index, _ in
+            return index < 10
+        }
+        
+        let imageViews = sliceCount.map { index, value in
+            let view = ParticipantImageView(index: index, imagePath: value.imagePath)
+            view.layer.zPosition = .init(-index)
+            view.snp.makeConstraints { make in
+                make.size.equalTo(24)
+            }
+            return view
+        }
+        
+        return imageViews
     }
+    
 }
 
-//#if DEBUG
-//import SwiftUI
-//
-//@available(iOS 13, *)
-//struct HeaderView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        HomeViewController(reactor: ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock())).showPreview()
-//    }
-//}
-//#endif
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+@available(iOS 13, *)
+struct HeaderView_Preview: PreviewProvider {
+    static var previews: some View {
+        HomeViewController(reactor: ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock(), logOutAction: LogOutAction(logOut: {
+            
+        }))).showPreview()
+    }
+}
+#endif
+

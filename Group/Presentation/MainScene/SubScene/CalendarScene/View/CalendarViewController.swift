@@ -7,10 +7,10 @@
 
 import UIKit
 
-final class CalendarViewController: UIViewController {
+
+final class CalendarViewController: BaseViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.backgroundColor = .systemYellow
     }
 }

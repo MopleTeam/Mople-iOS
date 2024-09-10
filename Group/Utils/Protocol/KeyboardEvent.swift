@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-protocol KeyboardEvent where Self: UIViewController {
+protocol KeyboardEvent: AnyObject {
     var transformView: UIView { get }
     var transformScrollView: UIScrollView { get }
     var contentView: UIView { get }

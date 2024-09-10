@@ -27,8 +27,8 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
     private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
-    private let mainTitle: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.Profile.main)
+    private let mainTitle: BaseLabel = {
+        let label = BaseLabel(configure: AppDesign.Profile.main)
         label.numberOfLines = 2
         return label
     }()
@@ -47,7 +47,7 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
         return imageView
     }()
 
-    private let nameTitle = DefaultLabel(itemConfigure: AppDesign.Profile.nameTitle)
+    private let nameTitle = BaseLabel(configure: AppDesign.Profile.nameTitle)
     
     private let nameTextFieldContainer: UIView = {
         let view = UIView()
@@ -57,11 +57,11 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
         return view
     }()
     
-    private let nameTextField = DefaultTextField(configure: AppDesign.Profile.nameText)
+    private let nameTextField = BaseTextField(configure: AppDesign.Profile.nameText)
     
-    private let nameCheckButton = DefaultButton(backColor: AppDesign.Profile.checkButtonBackColor,
+    private let nameCheckButton = BaseButton(backColor: AppDesign.Profile.checkButtonBackColor,
                                                 radius: 6,
-                                                itemConfigure: AppDesign.Profile.checkButton)
+                                                configure: AppDesign.Profile.checkButton)
     
     private let nameCheckContanierView: UIView = {
         let view = UIView()
@@ -69,7 +69,7 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
         return view
     }()
     
-    private let nameCheckLabel = DefaultLabel(itemConfigure: AppDesign.Profile.checkTitle)
+    private let nameCheckLabel = BaseLabel(configure: AppDesign.Profile.checkTitle)
     
     private lazy var nameStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameTitle, nameTextFieldContainer, nameCheckContanierView])
@@ -80,10 +80,10 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
         return sv
     }()
     
-    private var nextButton: DefaultButton = {
-        let button = DefaultButton(backColor: AppDesign.Profile.nextButtonBackColor,
+    private var nextButton: BaseButton = {
+        let button = BaseButton(backColor: AppDesign.Profile.nextButtonBackColor,
                                    radius: 8,
-                                   itemConfigure: AppDesign.Profile.nextButton)
+                                   configure: AppDesign.Profile.nextButton)
         button.isEnabled = false
         return button
     }()

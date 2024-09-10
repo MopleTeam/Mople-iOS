@@ -25,7 +25,7 @@ final class HomeSceneDIContainer: HomeCoordinatorDependencies {
         return HomeViewController(reactor: makeHomeViewReactor(action))
     }
     
-    func makeHomeViewReactor(_ action: LogOutAction) -> ScheduleViewReactor {
+    private func makeHomeViewReactor(_ action: LogOutAction) -> ScheduleViewReactor {
         return ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock(),
                                    logOutAction: action)
     }

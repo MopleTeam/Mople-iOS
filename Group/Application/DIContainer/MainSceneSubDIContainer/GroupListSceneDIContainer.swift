@@ -22,7 +22,12 @@ final class GroupListSceneDIContainer: GroupListCoordinatorDependencies {
     }
     
     func makeGroupListViewController() -> GroupListViewController {
-        return GroupListViewController()
+        return GroupListViewController(title: "모임",
+                                       reactor: makeGroupListViewReactor())
+    }
+    
+    private func makeGroupListViewReactor() -> GroupListViewReactor {
+        return GroupListViewReactor(fetchUseCase: FetchGroupListMock())
     }
 }
 

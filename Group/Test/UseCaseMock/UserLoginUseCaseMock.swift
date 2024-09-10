@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-class UserLoginMock: UserLogin {
+final class UserLoginMock: UserLogin {
     func login() -> Single<Void> {
         return Single.just(())
     }

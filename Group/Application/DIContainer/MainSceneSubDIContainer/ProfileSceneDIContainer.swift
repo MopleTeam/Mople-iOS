@@ -22,6 +22,6 @@ final class ProfileSceneDIContainer: ProfileCoordinatorDependencies {
     }
     
     func makeProfileViewController() -> ProfileViewController {
-        return ProfileViewController()
+        return ProfileViewController(title: "마이페이지")
     }
 }

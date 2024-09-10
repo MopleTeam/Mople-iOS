@@ -5,7 +5,6 @@
 //  Created by CatSlave on 9/3/24.
 //
 
-import Foundation
 import ReactorKit
 
 struct LogOutAction {

@@ -7,10 +7,9 @@
 
 import UIKit
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.backgroundColor = .systemGray
+//        self.view.backgroundColor = .systemGray
     }
 }

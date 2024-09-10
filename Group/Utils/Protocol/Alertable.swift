@@ -8,7 +8,7 @@
 import UIKit
 
 
-protocol Alertable { }
+protocol Alertable: AnyObject { }
 
 extension Alertable where Self: UIViewController {
     

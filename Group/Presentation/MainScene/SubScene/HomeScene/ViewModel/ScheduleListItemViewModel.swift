@@ -19,10 +19,10 @@ struct ScheduleListItemViewModel {
 extension ScheduleListItemViewModel {
     init(schedule: Schedule) {
         self.remainingDayCount = 3
-        self.title = "스케쥴 제목"
-        self.place = "지역명"
-        self.detailPlace = "자세한 지역명"
-        self.releaseDate = "자세한 날짜"
-        self.participants = schedule.participants ?? []
+        self.title = "백설공주 없는 일곱 난쟁이"
+        self.place = "제주도 여행"
+        self.detailPlace = "제주 제주시 애월읍 납읍로 21\n애월후식제주"
+        self.releaseDate = schedule.stringDate
+        self.participants = schedule.participants
     }
 }

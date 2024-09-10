@@ -15,8 +15,8 @@ final class HomeViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
-    private let titleLabel: DefaultLabel = {
-        let label = DefaultLabel(itemConfigure: AppDesign.Home.title)
+    private let titleLabel: BaseLabel = {
+        let label = BaseLabel(configure: AppDesign.Home.title)
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
         return label
@@ -24,9 +24,7 @@ final class HomeViewController: UIViewController, View {
     
     private let notifyButton: UIButton = {
         let btn = UIButton()
-        btn.setImage(UIImage(named: "Bell"), for: .normal)
-        btn.contentVerticalAlignment = .fill
-        btn.contentHorizontalAlignment = .fill
+        btn.setImage(AppDesign.Home.notifyImage, for: .normal)
         return btn
     }()
     
@@ -40,7 +38,7 @@ final class HomeViewController: UIViewController, View {
         return sv
     }()
     
-    private let containerView = UIView()
+    private let collectionContainerView = UIView()
     
     private lazy var scheduleListCollectionView = ScheduleListCollectionViewController(reactor: reactor!)
     
@@ -89,7 +87,7 @@ final class HomeViewController: UIViewController, View {
     
     private lazy var allStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [topStackView,
-                                                containerView,
+                                                collectionContainerView,
                                                 buttonStackView,
                                                 spacerView])
         sv.axis = .vertical
@@ -101,12 +99,12 @@ final class HomeViewController: UIViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        addScheduleListCollectionView()
     }
     
     init(reactor: ScheduleViewReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
-        addScheduleListCollectionView()
     }
     
     required init?(coder: NSCoder) {
@@ -114,16 +112,16 @@ final class HomeViewController: UIViewController, View {
     }
     
     private func setupUI() {
-        self.view.backgroundColor = AppDesign.Home.BackColor
+        self.view.backgroundColor = AppDesign.mainBackColor
         
         self.view.addSubview(allStackView)
-        self.containerView.addSubview(emptyDataView)
+        self.collectionContainerView.addSubview(emptyDataView)
         
         allStackView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
         
-        containerView.snp.makeConstraints { make in
+        collectionContainerView.snp.makeConstraints { make in
             make.height.equalTo(285)
         }
         
@@ -139,7 +137,7 @@ final class HomeViewController: UIViewController, View {
     
     private func addScheduleListCollectionView() {
         addChild(scheduleListCollectionView)
-        containerView.addSubview(scheduleListCollectionView.view)
+        collectionContainerView.addSubview(scheduleListCollectionView.view)
         scheduleListCollectionView.didMove(toParent: self)
         scheduleListCollectionView.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -154,15 +152,9 @@ final class HomeViewController: UIViewController, View {
         
         reactor.pulse(\.$schedules)
                 .asDriver(onErrorJustReturn: [])
-                .drive(onNext: { [weak self] schedules in
-                    guard let self = self else { return }
-                    if schedules.isEmpty {
-                        self.emptyDataView.isHidden = false
-                        self.scheduleListCollectionView.view.isHidden = true
-                    } else {
-                        self.emptyDataView.isHidden = true
-                        self.scheduleListCollectionView.view.isHidden = false
-                    }
+                .drive(with: self, onNext: { vc, schedules in
+                    vc.emptyDataView.isHidden = !schedules.isEmpty
+                    vc.collectionContainerView.isHidden = schedules.isEmpty
                 })
                 .disposed(by: disposeBag)
     }
