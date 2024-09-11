@@ -13,7 +13,6 @@
 		5211E8BC2C7C4DAF00EAB613 /* ProfileSetupRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BB2C7C4DAF00EAB613 /* ProfileSetupRepository.swift */; };
 		5211E8BE2C7C515500EAB613 /* ProfileSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */; };
 		5211F8F62C84234800403980 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* CustomTabBar.swift */; };
-		5211F8FE2C85A86900403980 /* PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FD2C85A86900403980 /* PreView.swift */; };
 		5211F9002C86B37B00403980 /* HomeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FF2C86B37B00403980 /* HomeButton.swift */; };
 		5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */; };
 		5211F9052C86E71500403980 /* ScheduleListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */; };
@@ -35,11 +34,15 @@
 		5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */; };
 		5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453E2C900E12009E0784 /* GroupListCell.swift */; };
 		523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645422C901CF7009E0784 /* GroupListViewReactor.swift */; };
+		523645462C90B2EA009E0784 /* UIView+Masking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645452C90B2EA009E0784 /* UIView+Masking.swift */; };
+		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
+		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
 		524A50C92C68735000862AD6 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 524A50C82C68735000862AD6 /* MultipartForm */; };
 		524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */; };
 		524E33D12C804C7A004B15FC /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* Validator.swift */; };
 		524E33D42C80508C004B15FC /* Alertable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* Alertable.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */; };
+		525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 525AA90B2C915C6D0087913F /* FSCalendar */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */; };
 		526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */; };
 		527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E672C82C905007FE63B /* ProfileSetupMock.swift */; };
@@ -115,7 +118,6 @@
 		5211E8BB2C7C4DAF00EAB613 /* ProfileSetupRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupRepository.swift; sourceTree = "<group>"; };
 		5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetup.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
-		5211F8FD2C85A86900403980 /* PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreView.swift; sourceTree = "<group>"; };
 		5211F8FF2C86B37B00403980 /* HomeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButton.swift; sourceTree = "<group>"; };
 		5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListCollectionViewController.swift; sourceTree = "<group>"; };
 		5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewReactor.swift; sourceTree = "<group>"; };
@@ -136,6 +138,9 @@
 		5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableViewController.swift; sourceTree = "<group>"; };
 		5236453E2C900E12009E0784 /* GroupListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListCell.swift; sourceTree = "<group>"; };
 		523645422C901CF7009E0784 /* GroupListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListViewReactor.swift; sourceTree = "<group>"; };
+		523645452C90B2EA009E0784 /* UIView+Masking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Masking.swift"; sourceTree = "<group>"; };
+		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
+		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+Ext.swift"; sourceTree = "<group>"; };
 		524E33D02C804C7A004B15FC /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* Alertable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alertable.swift; sourceTree = "<group>"; };
@@ -216,6 +221,7 @@
 				5211F91A2C89E39600403980 /* Kingfisher in Frameworks */,
 				524A50C92C68735000862AD6 /* MultipartForm in Frameworks */,
 				52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */,
+				525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */,
 				52E2383A2C765A2D0066C9A3 /* ReactorKit in Frameworks */,
 				52C72E9F2C4FBE4100CFF329 /* RxCocoa in Frameworks */,
 			);
@@ -330,6 +336,15 @@
 				523645282C8E522A009E0784 /* IconLabelView.swift */,
 			);
 			path = Custom;
+			sourceTree = "<group>";
+		};
+		523645472C90B703009E0784 /* PreView */ = {
+			isa = PBXGroup;
+			children = (
+				523645482C90B711009E0784 /* UIView+PreView.swift */,
+				5236454A2C90B734009E0784 /* UIViewController+PreView.swift */,
+			);
+			path = PreView;
 			sourceTree = "<group>";
 		};
 		524E33CD2C8028A4004B15FC /* RxSwift */ = {
@@ -570,15 +585,16 @@
 		528D27C82C7A3ABE00178F14 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				523645472C90B703009E0784 /* PreView */,
 				524E33CD2C8028A4004B15FC /* RxSwift */,
 				526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */,
 				5208051A2C69E2480015F6E0 /* UIColor+Ext.swift */,
 				52B87E392C6B2D440026B601 /* UIFont+Ext.swift */,
 				528D27CA2C7A3AD500178F14 /* UIImage+Ext.swift */,
-				5211F8FD2C85A86900403980 /* PreView.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				5211F9142C89D56D00403980 /* UIView+Identifier.swift */,
+				523645452C90B2EA009E0784 /* UIView+Masking.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -885,6 +901,7 @@
 				524A50C82C68735000862AD6 /* MultipartForm */,
 				52E238392C765A2D0066C9A3 /* ReactorKit */,
 				5211F9192C89E39600403980 /* Kingfisher */,
+				525AA90B2C915C6D0087913F /* FSCalendar */,
 			);
 			productName = Group;
 			productReference = 52C72E862C4FBD6400CFF329 /* Group.app */;
@@ -923,6 +940,7 @@
 				524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 				5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */,
 			);
 			productRefGroup = 52C72E872C4FBD6400CFF329 /* Products */;
 			projectDirPath = "";
@@ -998,12 +1016,14 @@
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
+				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
 				5211E8BC2C7C4DAF00EAB613 /* ProfileSetupRepository.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */,
 				527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentMeeting.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
+				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
 				527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */,
 				523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */,
 				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
@@ -1020,11 +1040,11 @@
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
 				527A3E7D2C834BC1007FE63B /* CalendarCoordinator.swift in Sources */,
+				523645462C90B2EA009E0784 /* UIView+Masking.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
-				5211F8FE2C85A86900403980 /* PreView.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+Ext.swift in Sources */,
@@ -1296,6 +1316,14 @@
 				minimumVersion = 0.1.0;
 			};
 		};
+		525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/WenchaoD/FSCalendar.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.4;
+			};
+		};
 		52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -1332,6 +1360,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */;
 			productName = MultipartForm;
+		};
+		525AA90B2C915C6D0087913F /* FSCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */;
+			productName = FSCalendar;
 		};
 		52C72E9E2C4FBE4100CFF329 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;

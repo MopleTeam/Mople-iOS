@@ -28,13 +28,6 @@ class BaseViewController: UIViewController {
         return sv
     }()
     
-    public let contentView: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppDesign.mainBackColor
-        view.clipsToBounds = true
-        return view
-    }()
-
     init(title: String?) {
         super.init(nibName: nil, bundle: nil)
         self.titleLable.setText(text: title)
@@ -52,16 +45,10 @@ class BaseViewController: UIViewController {
     private func setupUI() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainStackView)
-        self.view.addSubview(contentView)
         
         mainStackView.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
             make.height.equalTo(56)
-        }
-        
-        contentView.snp.makeConstraints { make in
-            make.top.equalTo(mainStackView.snp.bottom)
-            make.horizontalEdges.bottom.equalToSuperview()
         }
     }
 }

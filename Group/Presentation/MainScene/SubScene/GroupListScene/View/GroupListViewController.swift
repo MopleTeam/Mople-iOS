@@ -28,8 +28,9 @@ class GroupListViewController: BaseViewController, View {
         return view
     }()
     
-    private let tableContainerView: UIView = {
+    private let containerView: UIView = {
         let view = UIView()
+        view.backgroundColor = AppDesign.mainBackColor
         view.clipsToBounds = true
         return view
     }()
@@ -58,9 +59,9 @@ class GroupListViewController: BaseViewController, View {
     }
     
     func setupUI() {
-        self.view.addSubview(tableContainerView)
-        self.view.addSubview(emptyView)
+        self.view.addSubview(containerView)
         self.view.addSubview(maskingView)
+        self.containerView.addSubview(emptyView)
 
         maskingView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
@@ -68,7 +69,7 @@ class GroupListViewController: BaseViewController, View {
             make.height.equalTo(15)
         }
 
-        tableContainerView.snp.makeConstraints { make in
+        containerView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.bottom.horizontalEdges.equalToSuperview()
         }
@@ -80,7 +81,7 @@ class GroupListViewController: BaseViewController, View {
     
     private func addScheduleListCollectionView() {
         addChild(groupListTableView)
-        tableContainerView.addSubview(groupListTableView.view)
+        containerView.addSubview(groupListTableView.view)
         groupListTableView.didMove(toParent: self)
         groupListTableView.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -92,22 +93,10 @@ class GroupListViewController: BaseViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, groupList in
                 vc.emptyView.isHidden = !groupList.isEmpty
-                vc.tableContainerView.isHidden = groupList.isEmpty
+                vc.groupListTableView.view.isHidden = groupList.isEmpty
             })
             .disposed(by: disposeBag)
     }
 }
 
-extension UIView {
-    func addMasking() {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            AppDesign.mainBackColor.cgColor,
-            UIColor.clear.cgColor
-        ]
 
-        gradientLayer.frame = self.bounds
-        
-        self.layer.mask = gradientLayer
-    }
-}

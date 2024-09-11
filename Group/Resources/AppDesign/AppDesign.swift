@@ -237,7 +237,6 @@ extension AppDesign {
             }
         }
     }
-    
 }
 
 

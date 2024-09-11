@@ -99,7 +99,6 @@ final class GroupListCell: UITableViewCell {
     private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackVIew)
-//        self.scheduleView.addSubview(scheduleLabel)
         
         mainStackVIew.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()

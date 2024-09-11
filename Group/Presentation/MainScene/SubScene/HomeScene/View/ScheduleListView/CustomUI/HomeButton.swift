@@ -74,17 +74,4 @@ final class HomeButton: UIButton {
     }
 }
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
 
-struct MyYellowButtonPreview: PreviewProvider{
-    static var previews: some View {
-        UIViewPreview {
-            let button = HomeButton(backColor: .systemYellow,
-                                    radius: 5,
-                                    itemConfigure: AppDesign.Home.makeGroup)
-            return button
-        }
-    }
-}
-#endif

@@ -65,8 +65,20 @@ class BaseEmptyView: UIView {
 //struct BaseEmptyView_Preview: PreviewProvider{
 //    static var previews: some View {
 //        UIViewPreview {
-//            return BaseEmptyView(configure: AppDesign.)
+//            return BaseEmptyView(configure: AppDesign.Group.empty)
 //        }
 //    }
 //}
 //#endif
+
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+@available(iOS 13.0, *)
+struct BaseEmptyView_Preview: PreviewProvider {
+    static var previews: some View {
+        BaseEmptyView(configure: AppDesign.Group.empty)
+            .showPreview()
+    }
+}
+#endif

@@ -15,12 +15,14 @@ final class GroupListTableViewController: UIViewController, View {
     typealias Reactor = GroupListViewReactor
     var disposeBag = DisposeBag()
     
+    private let headerView = UIView()
+    
     private let tableView: UITableView = {
-        let table = UITableView()
-        table.backgroundColor = .clear
+        let table = UITableView(frame: .zero, style: .grouped)
         table.separatorStyle = .none
-        table.clipsToBounds = false
+        table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
+        table.clipsToBounds = false
         return table
     }()
     
@@ -41,16 +43,16 @@ final class GroupListTableViewController: UIViewController, View {
     
     
     private func setupUI() {
-        self.view.backgroundColor = .clear
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(20)
-            make.verticalEdges.equalToSuperview().inset(28)
+            make.verticalEdges.equalToSuperview()
         }
     }
     
     private func setupTableView() {
+        tableView.delegate = self
         self.tableView.register(GroupListCell.self, forCellReuseIdentifier: GroupListCell.reuseIdentifier)
     }
     
@@ -63,5 +65,15 @@ final class GroupListTableViewController: UIViewController, View {
                 
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension GroupListTableViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return headerView
+    }
+ 
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 28
     }
 }
