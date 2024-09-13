@@ -10,18 +10,23 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class GroupListTableViewController: UIViewController, View {
+final class GroupListTableViewController: UIViewController, View, UIScrollViewDelegate {
     
     typealias Reactor = GroupListViewReactor
     var disposeBag = DisposeBag()
     
-    private let headerView = UIView()
+    private let headerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemMint
+        return view
+    }()
     
     private let tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .grouped)
+        let table = UITableView()
         table.separatorStyle = .none
         table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
+        table.contentInset = .init(top: 28, left: 0, bottom: 50, right: 0)
         table.clipsToBounds = false
         return table
     }()
@@ -39,6 +44,7 @@ final class GroupListTableViewController: UIViewController, View {
         super.viewDidLoad()
         setupUI()
         setupTableView()
+        setAction()
     }
     
     
@@ -52,9 +58,20 @@ final class GroupListTableViewController: UIViewController, View {
     }
     
     private func setupTableView() {
-        tableView.delegate = self
         self.tableView.register(GroupListCell.self, forCellReuseIdentifier: GroupListCell.reuseIdentifier)
     }
+    
+    private func setAction() {
+        tableView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        tableView.rx.itemSelected
+            .subscribe(with: self, onNext: { vc, _ in
+                print("셀 선택 됨")
+            })
+            .disposed(by: disposeBag)
+    }
+    
     
     func bind(reactor: GroupListViewReactor) {
         reactor.pulse(\.$groupList)
@@ -68,12 +85,3 @@ final class GroupListTableViewController: UIViewController, View {
     }
 }
 
-extension GroupListTableViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return headerView
-    }
- 
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 28
-    }
-}

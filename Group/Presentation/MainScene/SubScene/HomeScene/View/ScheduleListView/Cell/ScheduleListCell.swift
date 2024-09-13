@@ -93,7 +93,7 @@ final class ScheduleListCell: UICollectionViewCell {
         sv.distribution = .fill
         return sv
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -148,7 +148,6 @@ final class ScheduleListCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        print("재사용 됩니다.")
     }
 }
 

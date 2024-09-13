@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CalendarCoordinatorDependencies {
-    func makeCalendarViewController() -> CalendarViewController
+    func makeCalendarViewController() -> CalendarAndEventsViewController
 }
 
 final class CalendarCoordinator: BaseCoordinator {

@@ -21,13 +21,7 @@ class GroupListViewController: BaseViewController, View {
         let view = BaseEmptyView(configure: AppDesign.Group.empty)
         return view
     }()
-    
-    private let maskingView: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppDesign.mainBackColor
-        return view
-    }()
-    
+
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = AppDesign.mainBackColor
@@ -52,22 +46,10 @@ class GroupListViewController: BaseViewController, View {
         setupUI()
         addScheduleListCollectionView()
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        self.maskingView.addMasking()
-    }
-    
+
     func setupUI() {
         self.view.addSubview(containerView)
-        self.view.addSubview(maskingView)
         self.containerView.addSubview(emptyView)
-
-        maskingView.snp.makeConstraints { make in
-            make.top.equalTo(titleViewBottom)
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(15)
-        }
 
         containerView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
@@ -98,5 +80,8 @@ class GroupListViewController: BaseViewController, View {
             .disposed(by: disposeBag)
     }
 }
+
+
+
 
 

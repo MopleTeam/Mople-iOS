@@ -21,8 +21,8 @@ final class CalendarSceneDIContainer: CalendarCoordinatorDependencies {
         return flow
     }
     
-    func makeCalendarViewController() -> CalendarViewController {
-        return CalendarViewController(title: "일정관리")
+    func makeCalendarViewController() -> CalendarAndEventsViewController {
+        return CalendarAndEventsViewController(title: "일정관리")
     }
 
 }

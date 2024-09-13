@@ -20,11 +20,26 @@ class BaseViewController: UIViewController {
         return label
     }()
     
+    private let rightButtonContainerView = UIView()
+    private let leftButtonContainerView = UIView()
+    
+    let leftButton: UIButton = {
+        let btn = UIButton()
+        return btn
+    }()
+    
+    let rightButton: UIButton = {
+        let btn = UIButton()
+        return btn
+    }()
+    
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleLable])
+        let sv = UIStackView(arrangedSubviews: [leftButtonContainerView, titleLable, rightButtonContainerView])
         sv.axis = .horizontal
         sv.distribution = .fill
         sv.alignment = .fill
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
         return sv
     }()
     
@@ -49,6 +64,34 @@ class BaseViewController: UIViewController {
         mainStackView.snp.makeConstraints { make in
             make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
             make.height.equalTo(56)
+        }
+        
+        leftButtonContainerView.snp.makeConstraints { make in
+            make.width.equalTo(leftButtonContainerView.snp.height)
+        }
+        
+        rightButtonContainerView.snp.makeConstraints { make in
+            make.width.equalTo(rightButtonContainerView.snp.height)
+        }
+    }
+}
+
+extension BaseViewController {
+    func addRightButton(setImage: UIImage) {
+        rightButtonContainerView.addSubview(rightButton)
+        
+        rightButton.setImage(setImage, for: .normal)
+        
+        rightButton.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func addLeftButton() {
+        leftButtonContainerView.addSubview(leftButton)
+        
+        leftButton.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
 }

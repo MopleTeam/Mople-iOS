@@ -79,3 +79,6 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
         return CGSize(width: fullWidth, height: fullHeight)
     }
 }
+
+
+
