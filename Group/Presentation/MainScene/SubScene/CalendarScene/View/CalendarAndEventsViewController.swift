@@ -47,6 +47,8 @@ final class CalendarAndEventsViewController: BaseViewController {
         addRightButton(setImage: UIImage(named: "Calendar")!)
         setAction()
         setupCalendarObserver()
+        self.calendarView.scopeGesture.delegate = self
+        self.view.addGestureRecognizer(self.calendarView.scopeGesture)
     }
 
     private func setupUI() {
@@ -103,16 +105,32 @@ final class CalendarAndEventsViewController: BaseViewController {
     }
 }
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct CalendarAndEventsViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        CalendarAndEventsViewController(title: "일정관리").showPreview()
+extension CalendarAndEventsViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        //        let shouldBegin = self.tableView.contentOffset.y <= -self.tableView.contentInset.top
+        //        if shouldBegin {
+        let velocity = self.calendarView.scopeGesture.velocity(in: self.view)
+        switch self.calendarView.calendar.scope {
+        case .month:
+            return velocity.y < 0
+        case .week:
+            return velocity.y > 0
+        }
+        //        }
+        //        return shouldBegin
     }
 }
-#endif
+
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//@available(iOS 13, *)
+//struct CalendarAndEventsViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        CalendarAndEventsViewController(title: "일정관리").showPreview()
+//    }
+//}
+//#endif
 
 
 

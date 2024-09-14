@@ -41,8 +41,16 @@ final class CalendarViewController: UIViewController {
         calendar.headerHeight = 0
         calendar.rowHeight = 60
         calendar.collectionViewLayout.sectionInsets = .init(top: 5, left: 24, bottom: 5, right: 24)
-        
         return calendar
+    }()
+    
+    lazy var scopeGesture: UIPanGestureRecognizer = {
+        [unowned self] in
+        let panGesture = UIPanGestureRecognizer(target: self.calendar, action: #selector(self.calendar.handleScopeGesture(_:)))
+        
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        return panGesture
     }()
     
     private let herderContainerView = UIView()
@@ -53,7 +61,11 @@ final class CalendarViewController: UIViewController {
         setCalendar()
         setupUI()
         setObservable()
+        
+        
     }
+    
+
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -265,7 +277,7 @@ extension CalendarViewController {
     }
 }
 
-// MARK: - Helper
+// MARK: - 외부 사용 액션
 extension CalendarViewController {
     func changeScope() {
         let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month

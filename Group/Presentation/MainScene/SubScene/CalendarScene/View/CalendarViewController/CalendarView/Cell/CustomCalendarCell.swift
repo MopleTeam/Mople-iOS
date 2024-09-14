@@ -81,8 +81,44 @@ extension CustomCalendarCell {
                     isSelected: Bool,
                     isToday: Bool) {
         
-        dotContainer.isHidden = !containsEvent
-        setBackGroundColor(isToday, isSelected)
+        setBackClear(isToday)
+        changeBackColor(containsEvent, isSelected, isToday)
+    }
+    
+    private func setBackClear(_ isToday: Bool) {
+        if isToday {
+            indicatorView.backgroundColor = .clear
+        }
+    }
+    
+    private func changeBackColor(_ containsEvent: Bool,
+                                 _ isSelected: Bool,
+                                 _ isToday: Bool) {
+        if isSelected {
+            showViewAnimated(containsEvent, isToday)
+        } else {
+            showView(containsEvent, isToday)
+        }
+    }
+    
+    private func showViewAnimated(_ containsEvent: Bool,
+                                  _ isToday: Bool) {
+        
+        self.indicatorView.transform = self.indicatorView.transform.scaledBy(x: 0.001, y: 0.001)
+        
+        UIView.bounceAnimate {
+            self.indicatorView.transform = CGAffineTransform.identity.scaledBy(x: 1.0, y: 1.0)
+            self.setBackGroundColor(isToday, true)
+            self.dotContainer.isHidden = !containsEvent
+        }
+    }
+    
+    private func showView(_ containsEvent: Bool,
+                          _ isToday: Bool) {
+        
+        self.setBackGroundColor(isToday, false)
+        self.dotContainer.isHidden = !containsEvent
+        
     }
     
     private func setEvent(_ containsEvent: Bool) {
@@ -97,3 +133,16 @@ extension CustomCalendarCell {
         }
     }
 }
+
+
+
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+@available(iOS 13, *)
+struct CalendarAndEventsViewController_Preview: PreviewProvider {
+    static var previews: some View {
+        CalendarAndEventsViewController(title: "일정관리").showPreview()
+    }
+}
+#endif
