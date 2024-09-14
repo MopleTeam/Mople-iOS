@@ -81,11 +81,11 @@ extension CustomCalendarCell {
                     isSelected: Bool,
                     isToday: Bool) {
         
-        setBackClear(isToday)
+        clearBackColor(isToday)
         changeBackColor(containsEvent, isSelected, isToday)
     }
     
-    private func setBackClear(_ isToday: Bool) {
+    private func clearBackColor(_ isToday: Bool) {
         if isToday {
             indicatorView.backgroundColor = .clear
         }
