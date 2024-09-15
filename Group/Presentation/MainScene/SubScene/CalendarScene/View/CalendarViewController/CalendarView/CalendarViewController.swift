@@ -44,15 +44,6 @@ final class CalendarViewController: UIViewController {
         return calendar
     }()
     
-    lazy var scopeGesture: UIPanGestureRecognizer = {
-        [unowned self] in
-        let panGesture = UIPanGestureRecognizer(target: self.calendar, action: #selector(self.calendar.handleScopeGesture(_:)))
-        
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 2
-        return panGesture
-    }()
-    
     private let herderContainerView = UIView()
     
     // MARK: - LifeCycle
@@ -61,11 +52,7 @@ final class CalendarViewController: UIViewController {
         setCalendar()
         setupUI()
         setObservable()
-        
-        
     }
-    
-
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -134,7 +121,6 @@ extension CalendarViewController: FSCalendarDataSource {
     func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
         let cell = calendar.dequeueReusableCell(withIdentifier: "CustomCell", for: date, at: position) as! CustomCalendarCell
         
-        print("셀 다시 그립니다.")
         cell.updateCell(containsEvent: true,
                         isSelected: checkSelected(date),
                         isToday: checkToday(date))

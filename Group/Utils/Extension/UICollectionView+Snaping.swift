@@ -56,7 +56,7 @@ extension UICollectionView {
         let contentSize = self.contentSize.width
         let contentMinOffsetX = self.contentOffset.x + threshold
         let contentMaxOffsetX = self.contentOffset.x + self.frame.width - threshold
-        
+                
         guard contentMinOffsetX > 0 else { return false }
         guard contentMaxOffsetX < contentSize else { return false }
         

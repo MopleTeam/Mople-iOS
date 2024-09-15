@@ -1,5 +1,5 @@
 {
-  "originHash" : "08174eb7bc99c45065e585fc8c22d4f6b97e2eab6347a50343e104d6b32547b2",
+  "originHash" : "a12e722d0255aafed37b069a5679055c357346c59e576002405df72087b3c40a",
   "pins" : [
     {
       "identity" : "fscalendar",
@@ -35,6 +35,15 @@
       "state" : {
         "revision" : "8fa33f09c6f6621a2aa536d739956d53b84dd139",
         "version" : "3.2.0"
+      }
+    },
+    {
+      "identity" : "rxdatasources",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RxSwiftCommunity/RxDataSources.git",
+      "state" : {
+        "revision" : "90c29b48b628479097fe775ed1966d75ac374518",
+        "version" : "5.0.2"
       }
     },
     {

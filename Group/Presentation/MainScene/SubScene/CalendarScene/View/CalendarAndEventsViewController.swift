@@ -14,6 +14,8 @@ final class CalendarAndEventsViewController: BaseViewController {
     
     var disposeBag = DisposeBag()
     
+    private lazy var panGesture = UIPanGestureRecognizer(target: self.calendarView.calendar, action: #selector(self.calendarView.calendar.handleScopeGesture(_:)))
+    
     private let calendarContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = AppDesign.mainBackColor
@@ -47,8 +49,7 @@ final class CalendarAndEventsViewController: BaseViewController {
         addRightButton(setImage: UIImage(named: "Calendar")!)
         setAction()
         setupCalendarObserver()
-        self.calendarView.scopeGesture.delegate = self
-        self.view.addGestureRecognizer(self.calendarView.scopeGesture)
+        setGesture()
     }
 
     private func setupUI() {
@@ -103,22 +104,31 @@ final class CalendarAndEventsViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    #warning("제스처 방식 기록 필요")
+    private func setGesture() {
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        panGesture.delegate = self
+        self.view.addGestureRecognizer(panGesture)
+    }
 }
 
 extension CalendarAndEventsViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        //        let shouldBegin = self.tableView.contentOffset.y <= -self.tableView.contentInset.top
-        //        if shouldBegin {
-        let velocity = self.calendarView.scopeGesture.velocity(in: self.view)
-        switch self.calendarView.calendar.scope {
-        case .month:
-            return velocity.y < 0
-        case .week:
-            return velocity.y > 0
-        }
-        //        }
-        //        return shouldBegin
-    }
+    // 구현하지 않아도 제스처는 정상 동작, 하단 테이블뷰의 위치에 따라서 조건을 추가할것이라면 아래 메서드 사용해야함
+//    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+//        let shouldBegin = self.tableView.contentOffset.y <= -self.tableView.contentInset.top
+//        if shouldBegin {
+//            let velocity = self.panGesture.velocity(in: self.view)
+//            switch self.calendarView.calendar.scope {
+//            case .month:
+//                return velocity.y < 0
+//            case .week:
+//                return velocity.y > 0
+//            }
+//        }
+//        return shouldBegin
+//    }
 }
 
 //#if canImport(SwiftUI) && DEBUG

@@ -168,6 +168,7 @@ extension AppDesign {
         case detailPlaceInfo
         case dateInfo
         case count
+        case moreSchedule
         
         var itemConfig: ItemConfigure {
             switch self {
@@ -196,6 +197,10 @@ extension AppDesign {
             case .count:
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 12),
                                        color: AppDesign.defaultGray2)
+            case .moreSchedule:
+                return makeUIConfigure(text: "더보기",
+                                       font: .pretendard(type: .semiBold, size: 20),
+                                       color: AppDesign.defaultGray)
             }
         }
     }
