@@ -12,6 +12,8 @@ import RxCocoa
 
 final class CalendarAndEventsViewController: BaseViewController {
     
+//    var testObservable = obser
+    
     var disposeBag = DisposeBag()
     
     private lazy var panGesture = UIPanGestureRecognizer(target: self.calendarView.calendar, action: #selector(self.calendarView.calendar.handleScopeGesture(_:)))

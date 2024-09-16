@@ -71,7 +71,7 @@
 		528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoManager.swift */; };
 		528D27CB2C7A3AD500178F14 /* UIImage+Resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27CA2C7A3AD500178F14 /* UIImage+Resize.swift */; };
 		528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */; };
-		529A26062C96A781009F4CFA /* FooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* FooterView.swift */; };
+		529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
 		52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* LoginRepository.swift */; };
@@ -178,7 +178,7 @@
 		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		528D27CA2C7A3AD500178F14 /* UIImage+Resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Resize.swift"; sourceTree = "<group>"; };
 		528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewReactor.swift; sourceTree = "<group>"; };
-		529A26052C96A781009F4CFA /* FooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterView.swift; sourceTree = "<group>"; };
+		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -640,7 +640,7 @@
 		529A26042C96A776009F4CFA /* FooterView */ = {
 			isa = PBXGroup;
 			children = (
-				529A26052C96A781009F4CFA /* FooterView.swift */,
+				529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */,
 			);
 			path = FooterView;
 			sourceTree = "<group>";
@@ -1050,7 +1050,7 @@
 				527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
 				5211F9172C89DD0100403980 /* ScheduleListItemViewModel.swift in Sources */,
-				529A26062C96A781009F4CFA /* FooterView.swift in Sources */,
+				529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */,
 				527A3E992C836287007FE63B /* CalendarAndEventsViewController.swift in Sources */,
 				52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */,
 				52E238252C7454230066C9A3 /* UserProfile.swift in Sources */,

@@ -76,7 +76,7 @@ final class CalendarViewController: UIViewController {
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(36)
         }
-        
+
         calendar.calendarWeekdayView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }

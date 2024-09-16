@@ -42,6 +42,7 @@ final class HomeViewController: UIViewController, View {
     
     private lazy var scheduleListCollectionView = ScheduleListCollectionViewController(reactor: reactor!)
     
+    #warning("configure")
     private let emptyDataView: UILabel = {
         let label = UILabel()
         label.text = "빈 화면"
@@ -142,6 +143,14 @@ final class HomeViewController: UIViewController, View {
         scheduleListCollectionView.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func setAction() {
+        self.notifyButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+//                vc.scheduleListCollectionView.collectionView.scrollRectToVisible(.init(x: 1000, y: 0, width: 0, height: 0), animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     func bind(reactor: ScheduleViewReactor) {

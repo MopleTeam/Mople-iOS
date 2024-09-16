@@ -38,8 +38,6 @@ class BaseViewController: UIViewController {
         sv.axis = .horizontal
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
         return sv
     }()
     
@@ -62,16 +60,17 @@ class BaseViewController: UIViewController {
         self.view.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
+            make.top.equalTo(self.view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(56)
         }
-        
+                
         leftButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(leftButtonContainerView.snp.height)
+            make.width.equalTo(mainStackView.snp.height)
         }
         
         rightButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(rightButtonContainerView.snp.height)
+            make.width.equalTo(mainStackView.snp.height)
         }
     }
 }

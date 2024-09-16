@@ -10,22 +10,27 @@ import UIKit
 
 extension UICollectionView {
     
+    private var contentWidth: CGFloat {
+        return self.contentSize.width
+    }
+    
+    private var boundsWidth: CGFloat {
+        return self.bounds.size.width
+    }
+}
+
+extension UICollectionView {
+    
     func verticalSnapToItem(targetContentOffset: UnsafeMutablePointer<CGPoint>,
                             scrollView: UIScrollView,
                             velocity: CGPoint){
-        guard checkTopOrBottom() else { return }
         
         targetContentOffset.pointee = scrollView.contentOffset
-
+        
         var indexPath = getFirstItems()
         
-        let numberOfItems = self.numberOfItems(inSection: indexPath.section)
-        
-        guard checkLastItem(currentIndex: indexPath.item, totalCount: numberOfItems) else {
-            self.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true )
-            return
-        }
-        
+        guard checkTopOrBottom(), checkLastItem(indexPath: indexPath, velocityX: velocity.x) else { return }
+ 
         checkVelocity(velocity, &indexPath)
 
         self.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true )
@@ -36,8 +41,34 @@ extension UICollectionView {
         return indexPaths.first!
     }
     
-    private func checkLastItem(currentIndex: Int, totalCount: Int) -> Bool {
-        return currentIndex < (totalCount - 1)
+    private func checkTopOrBottom(threshold: CGFloat = 50) -> Bool {
+        print(#function)
+        let contentMinOffsetX = self.contentOffset.x
+        let contentMaxOffsetX = contentMinOffsetX + boundsWidth
+        
+        return contentMinOffsetX > 0 && contentMaxOffsetX < contentWidth
+    }
+    
+    private func checkLastItem(indexPath: IndexPath,
+                               velocityX: CGFloat) -> Bool {
+        
+        print(#function)
+        let totalCount = self.numberOfItems(inSection: indexPath.section)
+        guard indexPath.item >= (totalCount - 1) else { return true }
+        
+        if velocityX > 0 {
+            scrollToFooter(animated: true)
+        } else {
+            self.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true )
+        }
+        
+        return false
+    }
+    
+    private func scrollToFooter(animated: Bool) {
+        let rightmostOffset = CGPoint(x: max(contentWidth - boundsWidth, 0), y: 0)
+        
+        self.setContentOffset(rightmostOffset, animated: animated)
     }
     
     private func checkVelocity(_ velocity: CGPoint,_ indexPath: inout IndexPath) {
@@ -50,17 +81,6 @@ extension UICollectionView {
                 indexPath.item += 1
             }
         }
-    }
-    
-    private func checkTopOrBottom(threshold: CGFloat = 50) -> Bool {
-        let contentSize = self.contentSize.width
-        let contentMinOffsetX = self.contentOffset.x + threshold
-        let contentMaxOffsetX = self.contentOffset.x + self.frame.width - threshold
-                
-        guard contentMinOffsetX > 0 else { return false }
-        guard contentMaxOffsetX < contentSize else { return false }
-        
-        return true
     }
 }
 

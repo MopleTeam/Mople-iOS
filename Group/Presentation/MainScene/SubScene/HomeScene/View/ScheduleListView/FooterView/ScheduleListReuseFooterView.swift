@@ -7,17 +7,22 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
-class FooterView: UICollectionReusableView {
+final class ScheduleListReuseFooterView: UICollectionReusableView {
     
-    private let label: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.HomeSchedule.moreSchedule)
+    var disposeBag = DisposeBag()
+    
+    private let label: BaseButton = {
+        let label = BaseButton(configure: AppDesign.HomeSchedule.moreSchedule)
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
+        setAction()
     }
     
     required init?(coder: NSCoder) {
@@ -33,4 +38,11 @@ class FooterView: UICollectionReusableView {
         }
     }
     
+    private func setAction() {
+        label.rx.controlEvent(.touchUpInside)
+            .subscribe(onNext: { _ in
+                print("터치 됨")
+            })
+            .disposed(by: disposeBag)
+    }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+#warning("custom 네비로 사용하지 않음")
 final class AppAppearance {
     
     static func setupAppearance() {
@@ -35,7 +36,7 @@ final class AppAppearance {
 
 extension UINavigationController {
     @objc override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return .darkContent
     }
 }
 

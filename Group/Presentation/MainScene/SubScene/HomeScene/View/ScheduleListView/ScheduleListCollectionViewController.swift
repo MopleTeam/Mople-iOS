@@ -20,9 +20,8 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumInteritemSpacing = 8
+        layout.minimumLineSpacing = 8
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.contentInset = .init(top: 0, left: 20, bottom: 0, right: 20)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
@@ -49,11 +48,6 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         setCollectionView()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-    }
-    
     private func setupUI() {
         view.addSubview(collectionView)
         
@@ -65,15 +59,20 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     private func setCollectionView() {
         self.collectionView.delegate = self
         collectionView.register(ScheduleListCell.self, forCellWithReuseIdentifier: ScheduleListCell.reuseIdentifier)
-        collectionView.register(FooterView.self,
+        collectionView.register(ScheduleListReuseFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: FooterView.reuseIdentifier)
+                                withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
+        
+        collectionView.register(UICollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: UICollectionView.elementKindSectionHeader)
     }
     
     typealias Section = SectionModel<Void, Schedule>
     
     private func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<Section> {
-        return RxCollectionViewSectionedReloadDataSource<Section>(
+        
+        let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
              configureCell: { _, collectionView, indexPath, item in
                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleListCell.reuseIdentifier, for: indexPath) as! ScheduleListCell
                  cell.viewModel = ScheduleListItemViewModel(schedule: item)
@@ -81,13 +80,13 @@ final class ScheduleListCollectionViewController: UIViewController, View {
              },
              configureSupplementaryView: { _, collectionView, kind, indexPath in
                  if kind == UICollectionView.elementKindSectionFooter {
-                     let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterView.reuseIdentifier, for: indexPath) as! FooterView
-                     return footerView
+                     return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier, for: indexPath) as! ScheduleListReuseFooterView
+                 } else {
+                     return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: UICollectionView.elementKindSectionHeader, for: indexPath)
                  }
-                 
-                 return UICollectionReusableView()
              }
          )
+        return dataSource
     }
     
     #warning("학습 필요")
@@ -123,9 +122,12 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         let fullHeight = collectionView.bounds.height
         
-        return CGSize(width: 100, height: fullHeight)
+        return CGSize(width: 120, height: fullHeight)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let fullHeight = collectionView.bounds.height
+        return CGSize(width: 20, height: fullHeight)
     }
 }
-
-
 
