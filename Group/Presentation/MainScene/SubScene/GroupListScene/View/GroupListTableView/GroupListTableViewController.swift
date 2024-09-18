@@ -15,12 +15,6 @@ final class GroupListTableViewController: UIViewController, View, UIScrollViewDe
     typealias Reactor = GroupListViewReactor
     var disposeBag = DisposeBag()
     
-    private let headerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemMint
-        return view
-    }()
-    
     private let tableView: UITableView = {
         let table = UITableView()
         table.separatorStyle = .none

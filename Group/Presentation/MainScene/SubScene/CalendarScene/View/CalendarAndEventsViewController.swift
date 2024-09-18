@@ -12,20 +12,17 @@ import RxCocoa
 
 final class CalendarAndEventsViewController: BaseViewController {
     
-//    var testObservable = obser
-    
     var disposeBag = DisposeBag()
     
-    private lazy var panGesture = UIPanGestureRecognizer(target: self.calendarView.calendar, action: #selector(self.calendarView.calendar.handleScopeGesture(_:)))
+    private var calendarHeightObservable: AnyObserver<CGFloat>?
+    private var calendarScopeObservable: AnyObserver<ScopeType>?
     
-    private let calendarContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppDesign.mainBackColor
-        return view
-    }()
+    private let calendarContainerView = UIView()
     
-    private let calendarView: CalendarViewController = {
-        let calendarView = CalendarViewController()
+    private lazy var calendarView: CalendarViewController = {
+        let calendarView = CalendarViewController(heightObservable: calendarHeightObservable!,
+                                                  scopeObservable: calendarScopeObservable!)
+        
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         return calendarView
@@ -33,7 +30,7 @@ final class CalendarAndEventsViewController: BaseViewController {
     
     private let emptyView: UIView = {
         let view = UIView()
-        view.backgroundColor = AppDesign.mainBackColor
+        view.backgroundColor = AppDesign.defaultWihte
         return view
     }()
     
@@ -44,26 +41,33 @@ final class CalendarAndEventsViewController: BaseViewController {
         return btn
     }()
     
+    init(title: String) {
+        super.init(title: title)
+        calendarHeightObservable = getCalendarHeightObserver()
+        calendarScopeObservable = getCalendarScopeObserver()
+    }
+    
+    @MainActor required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         addScheduleListCollectionView()
         addRightButton(setImage: UIImage(named: "Calendar")!)
         setAction()
-        setupCalendarObserver()
         setGesture()
     }
 
     private func setupUI() {
         self.view.addSubview(calendarContainerView)
         self.view.addSubview(emptyView)
-        
-        let height = calendarView.calendarMaxHeight
-        
+                
         calendarContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(height)
+            make.height.equalTo(1) // 최소 높이 설정 (Calender 생성 시 높이 update)
         }
         
         emptyView.snp.makeConstraints { make in
@@ -81,13 +85,29 @@ final class CalendarAndEventsViewController: BaseViewController {
         }
     }
     
-    private func setupCalendarObserver() {
-        self.calendarView.heightObservable
-            .skip(1)
+    private func getCalendarHeightObserver() -> AnyObserver<CGFloat> {
+        let heightUpdate: PublishSubject<CGFloat> = .init()
+        
+        heightUpdate
             .subscribe(with: self, onNext: { vc, height in
                 vc.updateCalendarView(height)
             })
             .disposed(by: disposeBag)
+
+        return heightUpdate.asObserver()
+    }
+    
+    private func getCalendarScopeObserver() -> AnyObserver<ScopeType> {
+        let scopeUpdate: PublishSubject<ScopeType> = .init()
+        
+        scopeUpdate
+            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, scope in
+                vc.updateBackgroundColor(scope: scope)
+            })
+            .disposed(by: disposeBag)
+        
+        return scopeUpdate.asObserver()
     }
     
     private func updateCalendarView(_ height: CGFloat) {
@@ -95,7 +115,24 @@ final class CalendarAndEventsViewController: BaseViewController {
             self.calendarContainerView.snp.updateConstraints { make in
                 make.height.equalTo(height)
             }
+            
+            print("캘린더 뷰 업데이트 ")
             self.view.layoutIfNeeded()
+        }
+    }
+    
+    #warning("참고")
+    // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
+    private func updateBackgroundColor(scope: ScopeType) {
+        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
+            switch scope {
+            case .week:
+                self.calendarContainerView.backgroundColor = AppDesign.mainBackColor
+                self.emptyView.backgroundColor = AppDesign.mainBackColor
+            case .month:
+                self.calendarContainerView.backgroundColor = AppDesign.defaultWihte
+                self.emptyView.backgroundColor = AppDesign.defaultWihte
+            }
         }
     }
 
@@ -109,40 +146,54 @@ final class CalendarAndEventsViewController: BaseViewController {
     
     #warning("제스처 방식 기록 필요")
     private func setGesture() {
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 2
-        panGesture.delegate = self
-        self.view.addGestureRecognizer(panGesture)
+        calendarView.scopeGesture.minimumNumberOfTouches = 1 // 최소 손가락 인식
+        calendarView.scopeGesture.maximumNumberOfTouches = 2 // 최대 손가락 인식
+        calendarView.scopeGesture.delegate = self
+        self.view.addGestureRecognizer(calendarView.scopeGesture)
     }
 }
 
 extension CalendarAndEventsViewController: UIGestureRecognizerDelegate {
-    // 구현하지 않아도 제스처는 정상 동작, 하단 테이블뷰의 위치에 따라서 조건을 추가할것이라면 아래 메서드 사용해야함
-//    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-//        let shouldBegin = self.tableView.contentOffset.y <= -self.tableView.contentInset.top
-//        if shouldBegin {
-//            let velocity = self.panGesture.velocity(in: self.view)
-//            switch self.calendarView.calendar.scope {
-//            case .month:
-//                return velocity.y < 0
-//            case .week:
-//                return velocity.y > 0
-//            }
-//        }
-//        return shouldBegin
-//    }
+     /*
+      테이블뷰가 상단에 붙어있을 때만 동작
+     month인 경우 y가 -인 경우 (화면을 위로 올리는 경우)에만 동작
+     왜 사용하지?
+     예시로 month인 상태에서 아래 테이블뷰를 리로드 동작이 있다고 가정해보자
+     그럼 velocity.y 는 양수일 것 이다.
+     사용자는 아래로 스크롤했으나 Calendar Scope는 Month -> Week 으로 변경된다.
+    
+     조건 1 : 테이블뷰가 최상단에 있을 것
+     조건 2 : 캘린더의 타입에 따라서 스크롤 방향에 맞춰 변경할 것
+      */
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        //        let shouldBegin = self.tableView.contentOffset.y <= -self.tableView.contentInset.top
+        //        if shouldBegin {
+        let velocity = self.calendarView.scopeGesture.velocity(in: self.view)
+        
+        switch self.calendarView.calendar.scope {
+            
+        case .month:
+            return velocity.y < 0
+        case .week:
+            return velocity.y > 0
+        }
+    }
+    //        return shouldBegin
+    
 }
 
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//@available(iOS 13, *)
-//struct CalendarAndEventsViewController_Preview: PreviewProvider {
-//    static var previews: some View {
-//        CalendarAndEventsViewController(title: "일정관리").showPreview()
-//    }
-//}
-//#endif
+
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+@available(iOS 13, *)
+struct TestCalendarAndEventsViewController_Preview: PreviewProvider {
+    static var previews: some View {
+        CalendarAndEventsViewController(title: "일정관리").showPreview()
+    }
+}
+#endif
 
 
 

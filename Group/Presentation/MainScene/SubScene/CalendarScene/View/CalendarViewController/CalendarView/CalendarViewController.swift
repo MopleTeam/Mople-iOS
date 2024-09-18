@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import FSCalendar
 
 private enum MonthType: Int {
@@ -15,10 +16,13 @@ private enum MonthType: Int {
     case sixWeekMonth = 6
 }
 
+enum ScopeType {
+    case week
+    case month
+}
+
 final class CalendarViewController: UIViewController {
-    
-    var disposeBag = DisposeBag()
-    
+        
     // MARK: - Variables
     private var monthType: MonthType = .fiveWeekMonth
     private var isWeekView: Bool = false
@@ -27,10 +31,27 @@ final class CalendarViewController: UIViewController {
     private let currentCalendar = Calendar.current
     private lazy var today: Date = self.currentCalendar.startOfDay(for: Date())
     
-    lazy var calendarMaxHeight = calendar.weekdayHeight + (calendar.rowHeight * 6)
-    
     // MARK: - Observable
-    var heightObservable: BehaviorSubject<CGFloat> = .init(value: 0)
+    private let heightObservable: AnyObserver<CGFloat>
+    private let scopeObservable: AnyObserver<ScopeType>
+    
+    public lazy var scopeGesture = UIPanGestureRecognizer(target: self, action: #selector(changeScope))
+    
+    private let headerContainerView: FSCalendarHeaderView = {
+        let view = FSCalendarHeaderView()
+        view.backgroundColor = AppDesign.Calendar.headerColor
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 10
+        return view
+    }()
+    
+    private let headerLabel: IconLabelView = {
+        let label = IconLabelView(iconSize: 24,
+                                  configure: AppDesign.Calendar.header,
+                                  iconAligment: .right)
+        label.setText("2024년 9월")
+        return label
+    }()
     
     // MARK: - UI Components
     let calendar: FSCalendar = {
@@ -44,14 +65,27 @@ final class CalendarViewController: UIViewController {
         return calendar
     }()
     
-    private let herderContainerView = UIView()
+    private let weekContainerView = UIView()
+    
+    init(heightObservable: AnyObserver<CGFloat>,
+         scopeObservable: AnyObserver<ScopeType>) {
+        
+        self.heightObservable = heightObservable
+        self.scopeObservable = scopeObservable
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setCalendar()
         setupUI()
-        setObservable()
     }
     
     override func viewDidLayoutSubviews() {
@@ -62,16 +96,36 @@ final class CalendarViewController: UIViewController {
     // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = AppDesign.defaultWihte
+        
         self.view.addSubview(calendar)
-        calendar.addSubview(herderContainerView)
-        herderContainerView.addSubview(calendar.calendarWeekdayView)
+        self.view.addSubview(headerContainerView)
+        
+        calendar.addSubview(weekContainerView)
+        
+        headerContainerView.addSubview(headerLabel)
+        weekContainerView.addSubview(calendar.calendarWeekdayView)
+        
+        headerContainerView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(56)
+        }
+        
+        #warning("정리")
+        // 컴파일러가 추측 가능한 headerLabel의 최소 사이즈가 있음
+        headerLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
         
         calendar.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
+            let calendarMaxHeight = calendar.weekdayHeight + (calendar.rowHeight * 6)
+            
+            make.top.equalTo(headerContainerView.snp.bottom).offset(16)
+            make.horizontalEdges.equalToSuperview()
             make.height.equalTo(calendarMaxHeight)
         }
         
-        herderContainerView.snp.makeConstraints { make in
+        weekContainerView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(36)
@@ -96,21 +150,6 @@ final class CalendarViewController: UIViewController {
         calendar.appearance.todayColor = .clear
         calendar.appearance.selectionColor = .clear
         calendar.appearance.titleWeekendColor = .systemRed
-    }
-    
-    // MARK: - Set Observable
-    private func setObservable() {
-        setHeightObserver()
-    }
-    
-    private func setHeightObserver() {
-        self.heightObservable
-            .skip(1)
-            .asDriver(onErrorJustReturn: calendarMaxHeight)
-            .drive(with: self, onNext: { vc, height in
-                vc.updateCalendar(height)
-            })
-            .disposed(by: disposeBag)
     }
     
     // MARK: - Selectors
@@ -142,9 +181,23 @@ extension CalendarViewController: FSCalendarDelegate {
     
     // 캘린더 크기 변경 발생 시 실행
     func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
-        heightObservable.onNext(changeHeight(bounds.height))
+        let resultHeight = changeHeight(bounds.height)
+        let currentScope: ScopeType = calendar.scope == .month ? .month : .week
         
+        notifyChangeHeight(resultHeight)
+        notifyChangeScope(currentScope)
+        updateCalendar(resultHeight)
         self.view.layoutIfNeeded()
+    }
+    
+    private func notifyChangeHeight(_ calendarHeight : CGFloat) {
+        let headerHeight = headerContainerView.frame.height
+        let spacing: CGFloat = 16
+        self.heightObservable.onNext(headerHeight + spacing + calendarHeight)
+    }
+    
+    private func notifyChangeScope(_ scope: ScopeType) {
+        self.scopeObservable.onNext(scope)
     }
 }
 
@@ -265,6 +318,7 @@ extension CalendarViewController {
 
 // MARK: - 외부 사용 액션
 extension CalendarViewController {
+    @objc
     func changeScope() {
         let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
         updateIsWeekViewFlag(scope: calendar.scope)

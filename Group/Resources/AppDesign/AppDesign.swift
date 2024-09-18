@@ -244,4 +244,25 @@ extension AppDesign {
     }
 }
 
+// MARK: - Calendar Flow Design
+extension AppDesign {
+    
+    enum Calendar: UIConstructive {
+        
+        static let headerColor: UIColor = .init(hexCode: "FAFAFA")
+        
+        case header
+        
+        var itemConfig: ItemConfigure {
+            switch self {
+                
+            case .header:
+                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
+                                       color: AppDesign.defaultBlack,
+                                       image: UIImage(named: "arrow"))
+            }
+        }
+    }
+}
+
 

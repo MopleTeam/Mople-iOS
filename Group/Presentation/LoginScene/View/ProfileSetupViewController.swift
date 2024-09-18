@@ -41,7 +41,6 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = AppDesign.Profile.selectImage
-        imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
         return imageView
@@ -116,6 +115,11 @@ class ProfileSetupViewController: UIViewController, View, Alertable {
         print("ViewDidLoad 시점")
         super.viewDidLoad()
         setupUI()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.profileImageView.layer.cornerRadius = self.profileImageView.frame.width/2
     }
     
     
@@ -324,14 +328,11 @@ extension ProfileSetupViewController: PHPickerViewControllerDelegate {
             
             if let selectedImage = image as? UIImage,
                let imageData = selectedImage.jpegData(compressionQuality: 0.5) {
-                print("이미지 크기 : \(imageData)")
                 self.selectedImage.accept(imageData)
                 
                 DispatchQueue.main.async {
-                    let targetSize = self.profileImageView.frame.size
-                    
-                    let resizeImage = selectedImage.resize(size: targetSize, cornerRadius: targetSize.width/2)
-                    self.profileImageView.image = resizeImage
+                    self.profileImageView.clipsToBounds = true
+                    self.profileImageView.image = selectedImage
                 }
             }
         }

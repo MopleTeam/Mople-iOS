@@ -21,6 +21,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 8
+        layout.sectionInset = .init(top: 0, left: 20, bottom: 0, right: 0)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
@@ -62,10 +63,6 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         collectionView.register(ScheduleListReuseFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
-        
-        collectionView.register(UICollectionReusableView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: UICollectionView.elementKindSectionHeader)
     }
     
     typealias Section = SectionModel<Void, Schedule>
@@ -82,7 +79,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
                  if kind == UICollectionView.elementKindSectionFooter {
                      return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier, for: indexPath) as! ScheduleListReuseFooterView
                  } else {
-                     return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: UICollectionView.elementKindSectionHeader, for: indexPath)
+                     return UICollectionReusableView()
                  }
              }
          )
@@ -123,11 +120,6 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
         let fullHeight = collectionView.bounds.height
         
         return CGSize(width: 120, height: fullHeight)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let fullHeight = collectionView.bounds.height
-        return CGSize(width: 20, height: fullHeight)
     }
 }
 
