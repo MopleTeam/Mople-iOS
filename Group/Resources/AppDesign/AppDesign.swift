@@ -252,6 +252,8 @@ extension AppDesign {
         static let headerColor: UIColor = .init(hexCode: "FAFAFA")
         
         case header
+        case pickerCompleteButton
+        
         
         var itemConfig: ItemConfigure {
             switch self {
@@ -260,9 +262,33 @@ extension AppDesign {
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
                                        color: AppDesign.defaultBlack,
                                        image: UIImage(named: "arrow"))
+                
+            case .pickerCompleteButton:
+                return makeUIConfigure(text: "완료",
+                                       font: .pretendard(type: .semiBold, size: 16),
+                                       color: AppDesign.defaultWihte)
             }
         }
     }
 }
 
-
+extension AppDesign {
+    
+    enum DatePicker: UIConstructive {
+        
+        static let completeButtonColor: UIColor = AppDesign.defaultBlue
+        static let closeImage = UIImage(named: "close")
+        
+        case pickerComplete
+        
+        var itemConfig: ItemConfigure {
+            switch self {
+                
+            case .pickerComplete:
+                return makeUIConfigure(text: "완료",
+                                       font: .pretendard(type: .semiBold, size: 16),
+                                       color: AppDesign.defaultWihte)
+            }
+        }
+    }
+}

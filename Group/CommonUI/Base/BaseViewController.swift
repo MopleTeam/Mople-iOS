@@ -11,39 +11,20 @@ import SnapKit
 class BaseViewController: UIViewController {
     
     var titleViewBottom: ConstraintItem {
-        return mainStackView.snp.bottom
+        return navigationView.snp.bottom
     }
     
-    private let titleLable: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Main.NaviView)
-        label.textAlignment = .center
-        return label
+    private let navigationView: CustomNavigationBar = {
+        let navi = CustomNavigationBar()
+        return navi
     }()
     
-    private let rightButtonContainerView = UIView()
-    private let leftButtonContainerView = UIView()
-    
-    let leftButton: UIButton = {
-        let btn = UIButton()
-        return btn
-    }()
-    
-    let rightButton: UIButton = {
-        let btn = UIButton()
-        return btn
-    }()
-    
-    private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [leftButtonContainerView, titleLable, rightButtonContainerView])
-        sv.axis = .horizontal
-        sv.distribution = .fill
-        sv.alignment = .fill
-        return sv
-    }()
+    let rightButton = UIButton()
+    let leftButton = UIButton()
     
     init(title: String?) {
         super.init(nibName: nil, bundle: nil)
-        self.titleLable.setText(text: title)
+        setTitle(title)
     }
     
     override func viewDidLoad() {
@@ -57,27 +38,23 @@ class BaseViewController: UIViewController {
     
     private func setupUI() {
         self.view.backgroundColor = .white
-        self.view.addSubview(mainStackView)
+        self.view.addSubview(navigationView)
         
-        mainStackView.snp.makeConstraints { make in
+        navigationView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(56)
         }
-                
-        leftButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(mainStackView.snp.height)
-        }
-        
-        rightButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(mainStackView.snp.height)
-        }
+    }
+    
+    private func setTitle(_ title: String?) {
+        self.navigationView.titleLable.text = title
     }
 }
 
 extension BaseViewController {
     func addRightButton(setImage: UIImage) {
-        rightButtonContainerView.addSubview(rightButton)
+        navigationView.rightButtonContainerView.addSubview(rightButton)
         
         rightButton.setImage(setImage, for: .normal)
         
@@ -87,7 +64,7 @@ extension BaseViewController {
     }
     
     func addLeftButton() {
-        leftButtonContainerView.addSubview(leftButton)
+        navigationView.leftButtonContainerView.addSubview(leftButton)
         
         leftButton.snp.makeConstraints { make in
             make.edges.equalToSuperview()

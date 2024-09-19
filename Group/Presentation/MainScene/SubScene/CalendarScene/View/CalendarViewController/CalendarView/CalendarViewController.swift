@@ -23,6 +23,8 @@ enum ScopeType {
 
 final class CalendarViewController: UIViewController {
         
+    var disposeBag = DisposeBag()
+    
     // MARK: - Variables
     private var monthType: MonthType = .fiveWeekMonth
     private var isWeekView: Bool = false
@@ -37,12 +39,12 @@ final class CalendarViewController: UIViewController {
     
     public lazy var scopeGesture = UIPanGestureRecognizer(target: self, action: #selector(changeScope))
     
-    private let headerContainerView: FSCalendarHeaderView = {
-        let view = FSCalendarHeaderView()
-        view.backgroundColor = AppDesign.Calendar.headerColor
-        view.clipsToBounds = true
-        view.layer.cornerRadius = 10
-        return view
+    private let headerContainerView: UIButton = {
+        let btn = UIButton()
+        btn.backgroundColor = AppDesign.Calendar.headerColor
+        btn.clipsToBounds = true
+        btn.layer.cornerRadius = 10
+        return btn
     }()
     
     private let headerLabel: IconLabelView = {
@@ -86,6 +88,7 @@ final class CalendarViewController: UIViewController {
         super.viewDidLoad()
         setCalendar()
         setupUI()
+        setBinding()
     }
     
     override func viewDidLayoutSubviews() {
@@ -153,6 +156,17 @@ final class CalendarViewController: UIViewController {
     }
     
     // MARK: - Selectors
+    
+    private func setBinding() {
+        self.headerContainerView.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                let datePickView = BaseDatePickViewController(title: "날짜 선택")
+                datePickView.modalPresentationStyle = .overCurrentContext
+                vc.present(datePickView, animated: true)
+            })
+            .disposed(by: disposeBag)
+            
+    }
 }
 
 // MARK: - DataSource
@@ -184,19 +198,28 @@ extension CalendarViewController: FSCalendarDelegate {
         let resultHeight = changeHeight(bounds.height)
         let currentScope: ScopeType = calendar.scope == .month ? .month : .week
         
-        notifyChangeHeight(resultHeight)
         notifyChangeScope(currentScope)
+        notifyChangeHeight(resultHeight, currentScope)
+        
         updateCalendar(resultHeight)
         self.view.layoutIfNeeded()
     }
-    
-    private func notifyChangeHeight(_ calendarHeight : CGFloat) {
-        let headerHeight = headerContainerView.frame.height
+}
+
+// MARK: - 부모뷰에게 전달하기
+extension CalendarViewController {
+    private func notifyChangeHeight(_ calendarHeight : CGFloat, _ currentScope: ScopeType) {
+        let headerHeight: CGFloat = currentScope == .month ? 56 : 0
         let spacing: CGFloat = 16
         self.heightObservable.onNext(headerHeight + spacing + calendarHeight)
     }
     
     private func notifyChangeScope(_ scope: ScopeType) {
+        headerContainerView.snp.updateConstraints { make in
+            let height = scope == .month ? 56 : 0
+            make.height.equalTo(height)
+        }
+        
         self.scopeObservable.onNext(scope)
     }
 }
