@@ -18,7 +18,7 @@ final class BaseDatePickViewController: UIViewController {
     private let dateObservable: BehaviorRelay<DateComponents>
     
     // MARK: - Variables
-    private let currentCalendar: Calendar
+    private let currentCalendar = Calendar.current
     private let todayComponents: DateComponents
     private lazy var selectedDate: DateComponents = todayComponents
     
@@ -73,11 +73,9 @@ final class BaseDatePickViewController: UIViewController {
     
     // MARK: - LifeCycle
     init(title: String?,
-         clenader: Calendar,
          todayComponents: DateComponents,
          dateObservable: BehaviorRelay<DateComponents>) {
         
-        self.currentCalendar = clenader
         self.todayComponents = todayComponents
         self.dateObservable = dateObservable
         

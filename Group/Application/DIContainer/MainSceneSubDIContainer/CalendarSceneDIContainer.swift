@@ -22,7 +22,12 @@ final class CalendarSceneDIContainer: CalendarCoordinatorDependencies {
     }
     
     func makeCalendarViewController() -> CalendarAndEventsViewController {
-        return CalendarAndEventsViewController(title: "일정관리")
+        return CalendarAndEventsViewController(title: "일정관리",
+                                               reactor: makeCalendarViewReactor())
     }
 
+    private func makeCalendarViewReactor() -> CalendarViewReactor {
+        return CalendarViewReactor(fetchUseCase: fetchRecentScheduleMock())
+    }
+    
 }

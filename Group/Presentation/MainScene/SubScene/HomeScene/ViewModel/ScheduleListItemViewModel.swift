@@ -8,21 +8,19 @@
 import Foundation
 
 struct ScheduleListItemViewModel {
-    let remainingDayCount: Int
+    let group: Group
     let title: String
+    let date: String
     let place: String
-    let releaseDate: String
-    let detailPlace: String
-    let participants: [Participant]
+    let participantCount: Int
 }
 
 extension ScheduleListItemViewModel {
     init(schedule: Schedule) {
-        self.remainingDayCount = 3
-        self.title = "백설공주 없는 일곱 난쟁이"
-        self.place = "제주도 여행"
-        self.detailPlace = "제주 제주시 애월읍 납읍로 21\n애월후식제주"
-        self.releaseDate = schedule.stringDate
-        self.participants = schedule.participants
+        self.group = schedule.group
+        self.title = schedule.title
+        self.place = schedule.place
+        self.date = schedule.stringDate
+        self.participantCount = schedule.participants.count
     }
 }

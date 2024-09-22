@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 import RxRelay
 import FSCalendar
 
@@ -30,13 +31,15 @@ final class CalendarViewController: UIViewController {
     private var isWeekView: Bool = false
     private var selectedDate: Date?
     
-    private let currentCalendar: Calendar
+    private let currentCalendar = Calendar.current
     private let todayComponents: DateComponents
+    private var eventDateComponents: [DateComponents] = []
     
     // MARK: - Observable
     private let heightObservable: AnyObserver<CGFloat>
     private let scopeObservable: AnyObserver<ScopeType>
     private let dateObservable: BehaviorRelay<DateComponents>
+    private let eventObservable: Observable<[DateComponents]>
     
     // MARK: - UI Components
     let calendar: FSCalendar = {
@@ -53,16 +56,16 @@ final class CalendarViewController: UIViewController {
     private let weekContainerView = UIView()
     
     // MARK: - LifeCycle
-    init(currentCalendar: Calendar,
-         todayComponents: DateComponents,
+    init(todayComponents: DateComponents,
          heightObservable: AnyObserver<CGFloat>,
          scopeObservable: AnyObserver<ScopeType>,
+         eventObservable: Observable<[DateComponents]>,
          dateObservable: BehaviorRelay<DateComponents>) {
         
-        self.currentCalendar = currentCalendar
         self.todayComponents = todayComponents
         self.heightObservable = heightObservable
         self.scopeObservable = scopeObservable
+        self.eventObservable = eventObservable
         self.dateObservable = dateObservable
         
         super.init(nibName: nil, bundle: nil)
@@ -130,6 +133,12 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Binding
     private func setBind() {
+        eventObservable
+            .subscribe(with: self, onNext: { vc, events in
+                vc.updateEvents(with: events)
+            })
+            .disposed(by: disposeBag)
+        
         dateObservable
             .skip(1)
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -148,8 +157,7 @@ final class CalendarViewController: UIViewController {
 extension CalendarViewController: FSCalendarDataSource {
     func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
         let cell = calendar.dequeueReusableCell(withIdentifier: "CustomCell", for: date, at: position) as! CustomCalendarCell
-        
-        cell.updateCell(containsEvent: true,
+        cell.updateCell(containsEvent: checkContainsEvent(date),
                         isSelected: checkSelected(date),
                         isToday: checkToday(date))
         return cell
@@ -277,13 +285,30 @@ extension CalendarViewController {
 
 // MARK: - 셀 업데이트
 extension CalendarViewController {
+    
+    
+    /// 일정이 있는 날인지 체크
+    private func checkContainsEvent(_ date: Date) -> Bool {
+        let dateComponent = currentCalendar.dateComponents([.year, .month, .day], from: date)
+        return eventDateComponents.contains { $0 == dateComponent }
+    }
+    
+    /// 이벤트 업데이트
+    /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
+    private func updateEvents(with dateComponents: [DateComponents]) {
+        self.eventDateComponents = dateComponents
+        calendar.reloadData()
+    }
+    
     /// 선택 여부에 따라서 셀 컬러 변경
     /// - Parameters:
     ///   - date: 선택된 날짜
     ///   - isSelected: 선택된 셀 or 선택됐던 셀
     private func updateCell(_ date: Date, isSelected: Bool) {
         guard let cell = calendar.cell(for: date, at: .current) as? CustomCalendarCell else { return }
-        cell.updateCell(containsEvent: true, isSelected: isSelected, isToday: checkToday(date))
+        cell.updateCell(containsEvent: checkContainsEvent(date),
+                        isSelected: isSelected,
+                        isToday: checkToday(date))
     }
     
     /// 셀 그릴 때 선택된 셀 구분
@@ -330,13 +355,13 @@ extension CalendarViewController {
 
 
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct CalendarViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        CalendarAndEventsViewController(title: "일정관리").showPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//@available(iOS 13, *)
+//struct CalendarViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        CalendarAndEventsViewController(title: "일정관리").showPreview()
+//    }
+//}
+//#endif

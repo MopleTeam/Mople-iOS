@@ -1,32 +1,32 @@
 //
-//  ScheduleListCell.swift
+//  EventTableViewCell.swift
 //  Group
 //
-//  Created by CatSlave on 9/3/24.
+//  Created by CatSlave on 9/22/24.
 //
 
 import UIKit
 import SnapKit
 
-final class ScheduleListCell: UICollectionViewCell {
+final class EventTableViewCell: UITableViewCell {
 
-    private var eventView: EventView = .init(type: .detail)
+    private var eventView: EventView = .init(type: .simple)
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: .default, reuseIdentifier: reuseIdentifier)
         setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func setupUI() {
-        setLayout()
+        setupLayout()
         setRadius()
     }
     
-    private func setLayout() {
+    private func setupLayout() {
         self.contentView.backgroundColor = .white
         self.contentView.addSubview(eventView)
 
@@ -44,20 +44,3 @@ final class ScheduleListCell: UICollectionViewCell {
         self.eventView.configure(viewModel)
     }
 }
-
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct HeaderView_Preview: PreviewProvider {
-    static var previews: some View {
-        HomeViewController(reactor: ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock(), logOutAction: LogOutAction(logOut: {
-            
-        }))).showPreview()
-    }
-}
-#endif
-
-
-
-

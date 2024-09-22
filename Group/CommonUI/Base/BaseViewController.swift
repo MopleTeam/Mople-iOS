@@ -6,11 +6,23 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import SnapKit
 
 class BaseViewController: UIViewController {
     
-    var titleViewBottom: ConstraintItem {
+    public var rightButtonObservable: Observable<Void> {
+        return rightButton.rx.controlEvent(.touchUpInside)
+            .asObservable()
+    }
+    
+    public var leftButtonObservable: Observable<Void> {
+        return leftButton.rx.controlEvent(.touchUpInside)
+            .asObservable()
+    }
+    
+    public var titleViewBottom: ConstraintItem {
         return navigationView.snp.bottom
     }
     
@@ -19,8 +31,8 @@ class BaseViewController: UIViewController {
         return navi
     }()
     
-    let rightButton = UIButton()
-    let leftButton = UIButton()
+    private let rightButton = UIButton()
+    private let leftButton = UIButton()
     
     init(title: String?) {
         super.init(nibName: nil, bundle: nil)
@@ -53,7 +65,7 @@ class BaseViewController: UIViewController {
 }
 
 extension BaseViewController {
-    func addRightButton(setImage: UIImage) {
+    public func addRightButton(setImage: UIImage?) {
         navigationView.rightButtonContainerView.addSubview(rightButton)
         
         rightButton.setImage(setImage, for: .normal)
@@ -63,7 +75,7 @@ extension BaseViewController {
         }
     }
     
-    func addLeftButton() {
+    public func addLeftButton() {
         navigationView.leftButtonContainerView.addSubview(leftButton)
         
         leftButton.snp.makeConstraints { make in

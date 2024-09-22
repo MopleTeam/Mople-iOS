@@ -15,7 +15,7 @@ final class EventView: UIView {
         case detail
     }
     
-    private let thumbnailView: ThumbnailTitleView = {
+    private lazy var thumbnailView: ThumbnailTitleView = {
         let view = ThumbnailTitleView(type: .simple)
         return view
     }()
@@ -104,10 +104,10 @@ final class EventView: UIView {
     
     public func configure(_ viewModel: ScheduleListItemViewModel) {
         self.titleLabel.text = viewModel.title
-        self.countInfoLabel.setText(viewModel.place)
-        
-        self.dateInfoLabel.setText(viewModel.releaseDate)
-        self.placeInfoLabel.setText("제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95제주특별자치도 제주시 일주서로 95")
+        self.countInfoLabel.setText("\(viewModel.participantCount)")
+        self.dateInfoLabel.setText(viewModel.date)
+        self.placeInfoLabel.setText(viewModel.place)
+        self.thumbnailView.setData(viewModel.group)
     }
 }
 

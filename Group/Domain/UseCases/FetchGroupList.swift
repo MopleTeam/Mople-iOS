@@ -12,9 +12,4 @@ protocol FetchGroupList {
     func fetchGroupList() -> Single<[Group]>
 }
 
-struct Group {
-    let thumbnailPath: String
-    let name: String
-    let memberCount: Int
-    let lastSchedule: Date
-}
+

@@ -15,6 +15,8 @@ final class ThumbnailTitleView: UIView {
         case detail
     }
     
+    private var viewType: ViewType
+    
     private let thumbnailView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
@@ -29,7 +31,6 @@ final class ThumbnailTitleView: UIView {
         let view = IconLabelView(iconSize: 20,
                                  configure: AppDesign.Group.member,
                                  contentSpacing: 4)
-        view.setText("5명")
         return view
     }()
     
@@ -60,31 +61,31 @@ final class ThumbnailTitleView: UIView {
     
     
     init(type: ViewType) {
-        super.init(frame: .zero)
-        setupUI(type)
-        loadImage()
+        self.viewType = type
         
-        #warning("그룹 이름, 멤버 수 설정")
-        groupTitleLabel.setText(text: "그룹 이름")
+        defer {
+            setupUI()
+        }
+        
+        super.init(frame: .zero)
     }
-    
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupUI(_ type: ViewType) {
+    private func setupUI() {
         addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
-        infoConfigure(type)
+        infoConfigure()
     }
     
-    private func infoConfigure(_ viewCase: ViewType) {
-        switch viewCase {
+    private func infoConfigure() {
+        switch viewType {
         case .simple:
             setThumbnail(size: 28, radius: 8)
             groupTitleLabel.setType(configure: AppDesign.HomeSchedule.group)
@@ -101,9 +102,19 @@ final class ThumbnailTitleView: UIView {
         }
         thumbnailView.layer.cornerRadius = radius
     }
+    
+    
+    public func setData(_ info: Group) {
+        loadImage(info.thumbnailPath)
+        groupTitleLabel.setText(text: info.name)
+        
+        if viewType == .detail {
+            memberCountView.setText("\(info.memberCount)")
+        }
+    }
 
-    private func loadImage() {
-        let imageUrl = URL(string: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300")
+    private func loadImage(_ path: String) {
+        let imageUrl = URL(string: path)
         thumbnailView.kf.setImage(with: imageUrl)
     }
 }

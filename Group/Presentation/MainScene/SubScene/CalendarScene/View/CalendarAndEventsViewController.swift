@@ -9,22 +9,29 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import ReactorKit
 
-final class CalendarAndEventsViewController: BaseViewController {
+final class CalendarAndEventsViewController: BaseViewController, View {
+    
+    typealias Reactor = CalendarViewReactor
     
     var disposeBag = DisposeBag()
     
-    private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
-    private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
-    private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
-    
+    // MARK: - Variables
     private let currentCalendar = Calendar.current
-
+    
     private lazy var todayComponents = {
         var components = self.currentCalendar.dateComponents([.year, .month, .day], from: Date())
         return components
     }()
     
+    // MARK: - Observable
+    private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
+    private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
+    private let eventObservable: BehaviorRelay<[DateComponents]> = .init(value: [])
+    private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
+    
+    // MARK: - UI Components
     private let headerContainerView: UIButton = {
         let btn = UIButton()
         btn.backgroundColor = AppDesign.Calendar.headerColor
@@ -44,11 +51,12 @@ final class CalendarAndEventsViewController: BaseViewController {
     private let calendarContainerView = UIView()
     
     private lazy var calendarView: CalendarViewController = {
-        let calendarView = CalendarViewController(currentCalendar: currentCalendar,
-                                                  todayComponents: todayComponents,
+        let calendarView = CalendarViewController(todayComponents: todayComponents,
                                                   heightObservable: calendarHeightObservable.asObserver(),
                                                   scopeObservable: calendarScopeObservable.asObserver(),
+                                                  eventObservable: eventObservable.asObservable(),
                                                   dateObservable: calendarDateObservable)
+        
         
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -61,30 +69,35 @@ final class CalendarAndEventsViewController: BaseViewController {
         return view
     }()
     
-    private let testBtn: UIButton = {
-        let btn = UIButton()
-        btn.setTitle("테스트", for: .normal)
-        btn.backgroundColor = .green
-        return btn
-    }()
+    // MARK: - LifeCycle
+    init(title: String,
+         reactor: CalendarViewReactor) {
+         super.init(title: title)
+        self.reactor = reactor
+     }
+     
+     required init?(coder: NSCoder) {
+         fatalError("init(coder:) has not been implemented")
+     }
+     
+     override func viewDidLoad() {
+         super.viewDidLoad()
+         setupUI()
+         setObservable()
+     }
     
-    init(title: String) {
-        super.init(title: title)
-    }
-    
-    @MainActor required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        addScheduleListCollectionView()
-        addRightButton(setImage: UIImage(named: "Calendar")!)
-        setObservable()
-    }
-
+    // MARK: - UI Setup
     private func setupUI() {
+        setupNavi()
+        setLayout()
+        addScheduleListCollectionView()
+    }
+    
+    private func setupNavi() {
+        addRightButton(setImage: .calendar)
+    }
+    
+    private func setLayout() {
         self.view.addSubview(headerContainerView)
         self.view.addSubview(calendarContainerView)
         self.view.addSubview(emptyView)
@@ -122,44 +135,17 @@ final class CalendarAndEventsViewController: BaseViewController {
         }
     }
     
-    private func updateCalendarView(_ height: CGFloat) {
-        UIView.animate(withDuration: 0.33) {
-            self.calendarContainerView.snp.updateConstraints { make in
-                make.height.equalTo(height)
-            }
-            
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    private func updateHeaderView(_ scope: ScopeType) {
-        let height = scope == .month ? 56 : 0
-
-        UIView.animate(withDuration: 0.2) {
-            self.headerContainerView.snp.updateConstraints { make in
-                make.height.equalTo(height)
-            }
-            
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    #warning("참고")
-    // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
-    private func updateBackgroundColor(scope: ScopeType) {
-        let views: [UIView] = [self.calendarContainerView, self.emptyView]
-        
-        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
-            
-            views.forEach {
-                let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor
-                $0.backgroundColor = color
-            }
-            
-        }
-    }
-    
     // MARK: - Selectors
+    func bind(reactor: CalendarViewReactor) {
+        reactor.state
+            .map { $0.dates }
+            .asDriver(onErrorJustReturn: [])
+            .drive(with: self, onNext: { vc, dates in
+                let components = dates.map { vc.currentCalendar.dateComponents([.year, .month, .day], from: $0) }
+                vc.eventObservable.accept(components)
+            })
+            .disposed(by: disposeBag)
+    }
     
     private func setObservable() {
         setBinding()
@@ -199,7 +185,7 @@ final class CalendarAndEventsViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
             
-        rightButton.rx.controlEvent(.touchUpInside)
+        rightButtonObservable
             .subscribe(with: self, onNext: { vc, _ in
                 vc.calendarView.changeScope()
             })
@@ -211,7 +197,6 @@ final class CalendarAndEventsViewController: BaseViewController {
 extension CalendarAndEventsViewController {
     private func presentDatePicker() {
         let datePickView = BaseDatePickViewController(title: "날짜 선택",
-                                                      clenader: currentCalendar,
                                                       todayComponents: todayComponents,
                                                       dateObservable: calendarDateObservable)
         
@@ -226,19 +211,58 @@ extension CalendarAndEventsViewController {
     }
 }
 
+// MARK: - UI Update
+extension CalendarAndEventsViewController {
+    private func updateCalendarView(_ height: CGFloat) {
+        UIView.animate(withDuration: 0.33) {
+            self.calendarContainerView.snp.updateConstraints { make in
+                make.height.equalTo(height)
+            }
+            
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func updateHeaderView(_ scope: ScopeType) {
+        let height = scope == .month ? 56 : 0
 
-
-
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct TestCalendarAndEventsViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        CalendarAndEventsViewController(title: "일정관리").showPreview()
+        UIView.animate(withDuration: 0.2) {
+            self.headerContainerView.snp.updateConstraints { make in
+                make.height.equalTo(height)
+            }
+            
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    #warning("참고")
+    // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
+    private func updateBackgroundColor(scope: ScopeType) {
+        let views: [UIView] = [self.calendarContainerView, self.emptyView]
+        
+        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
+            
+            views.forEach {
+                let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor
+                $0.backgroundColor = color
+            }
+            
+        }
     }
 }
-#endif
+
+
+
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//@available(iOS 13, *)
+//struct TestCalendarAndEventsViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        CalendarAndEventsViewController(title: "일정관리").showPreview()
+//    }
+//}
+//#endif
 
 
 

@@ -10,13 +10,26 @@ import RxSwift
 
 final class fetchRecentScheduleMock: FetchRecentSchedule {
     
+    var groupCount: Int = 1
+    
     func getEvents() -> [Schedule] {
         return [
-            .init(groupName: "모임 1", eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 1))),
-            .init(groupName: "모임 2", eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 2))),
-            .init(groupName: "모임 3", eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 3))),
-            .init(groupName: "모임 4", eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 4))),
-            .init(groupName: "모임 5", eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 5)))]
+            .init(group: getGroup(), eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 1))),
+            .init(group: getGroup(), eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 2))),
+            .init(group: getGroup(), eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 3))),
+            .init(group: getGroup(), eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 4))),
+            .init(group: getGroup(), eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 5)))]
+    }
+    
+    func getGroup() -> Group {
+        let group: Group = .init(thumbnailPath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300",
+              name: "모임 \(groupCount)",
+              memberCount: Int.random(in: 1...20),
+              lastSchedule: Date())
+        
+        groupCount += 1
+        
+        return group
     }
 
     func getUser() -> [Participant] {

@@ -9,23 +9,23 @@ import Foundation
 
 struct Schedule {
     let id: UUID
-    let groupName: String
-    let eventName: String
-    let location: String
+    let group: Group
+    let title: String
+    let place: String
     let participants: [Participant]
-    private let date: Date
+    let date: Date
     
     init(id: UUID = UUID(),
-         groupName: String,
+         group: Group,
          eventName: String,
          location: String,
          participants: [Participant],
          date: Date) {
         
         self.id = id
-        self.groupName = groupName
-        self.eventName = eventName
-        self.location = location
+        self.group = group
+        self.title = eventName
+        self.place = location
         self.participants = participants
         self.date = date
     }
@@ -41,6 +41,13 @@ struct Schedule {
         
         return dateFormatter.string(from: self.date)
     }
+}
+
+struct Group {
+    let thumbnailPath: String
+    let name: String
+    let memberCount: Int
+    let lastSchedule: Date
 }
 
 struct Participant {
