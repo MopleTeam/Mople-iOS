@@ -72,7 +72,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
              configureCell: { _, collectionView, indexPath, item in
                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleListCell.reuseIdentifier, for: indexPath) as! ScheduleListCell
-                 cell.viewModel = ScheduleListItemViewModel(schedule: item)
+                 cell.configure(viewModel: ScheduleListItemViewModel(schedule: item))
                  return cell
              },
              configureSupplementaryView: { _, collectionView, kind, indexPath in
@@ -112,6 +112,8 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
         
         let fullWidth = collectionView.bounds.width - 40
         let fullHeight = collectionView.bounds.height
+        
+        print("ifno path: \(fullHeight)")
         
         return CGSize(width: fullWidth, height: fullHeight)
     }

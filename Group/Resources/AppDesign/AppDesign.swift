@@ -33,7 +33,8 @@ struct AppDesign {
     static let defaultBlue = UIColor(hexCode: "3366FF")
     static let defaultGray = UIColor(hexCode: "666666")
     static let defaultGray2 = UIColor(hexCode: "888888")
-    
+    static let defaultGray3 = UIColor(hexCode: "F6F7FA")
+    static let defaultGray4 = UIColor(hexCode: "555555")
 }
 
 // MARK: - App Design
@@ -162,45 +163,59 @@ extension AppDesign {
         static let remainingDateLabel = AppDesign.defaultBlue.withAlphaComponent(0.1)
         static let participantCountLabel = AppDesign.defaultGray2.withAlphaComponent(0.1)
         
-        case day
-        case title
-        case placeInfo
-        case detailPlaceInfo
-        case dateInfo
+        case group
+        case event
         case count
+        case date
+        case place
         case moreSchedule
         
         var itemConfig: ItemConfigure {
             switch self {
-            case .day:
-                return makeUIConfigure(font: .pretendard(type: .bold, size: 12),
-                                       color: defaultBlue)
-            case .title:
+            case .group:
+                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 12),
+                                       color: defaultGray2)
+            case .event:
                 return makeUIConfigure(font: .pretendard(type: .bold, size: 20),
                                        color: AppDesign.defaultBlack)
-            case .placeInfo:
-                return makeUIConfigure(font: .pretendard(type: .medium, size: 14),
-                                       color: AppDesign.defaultGray,
-                                       image: .init(named: "place"))
-                
-            case .detailPlaceInfo:
-                return makeUIConfigure(font: .pretendard(type: .medium, size: 14),
-                                       color: AppDesign.defaultGray,
-                                       image: .init(named: "place"))
-                
-            case .dateInfo:
-                return makeUIConfigure(font: .pretendard(type: .medium, size: 14),
-                                       color: AppDesign.defaultGray,
-                                       image: .init(named: "date"))
-                
-                
             case .count:
-                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 12),
-                                       color: AppDesign.defaultGray2)
+                return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
+                                       color: AppDesign.defaultGray,
+                                       image: .member)
+            case .date:
+                return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
+                                       color: AppDesign.defaultGray,
+                                       image: .date)
+            case .place:
+                return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
+                                       color: AppDesign.defaultGray,
+                                       image: .place)
             case .moreSchedule:
                 return makeUIConfigure(text: "더보기",
-                                       font: .pretendard(type: .semiBold, size: 20),
-                                       color: AppDesign.defaultGray)
+                                       font: .pretendard(type: .bold, size: 16),
+                                       color: AppDesign.defaultGray4)
+            }
+        }
+    }
+}
+
+// MARK: - Weather
+extension AppDesign {
+    
+    enum Weather: UIConstructive {
+        static let backColor = AppDesign.defaultGray3
+        
+        case temperature
+        case city
+        
+        var itemConfig: ItemConfigure {
+            switch self {
+            case .temperature:
+                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 14),
+                                       color: AppDesign.defaultBlack)
+            case .city:
+                return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
+                                       color: AppDesign.defaultGray2)
             }
         }
     }
@@ -210,7 +225,7 @@ extension AppDesign {
 extension AppDesign {
     
     enum Group: UIConstructive {
-        static let scheduleBack = UIColor(hexCode: "F6F7FA")
+        static let scheduleBack = AppDesign.defaultGray3
         
         case title
         case empty

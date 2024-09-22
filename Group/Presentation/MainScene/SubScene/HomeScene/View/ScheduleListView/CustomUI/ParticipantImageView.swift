@@ -10,14 +10,11 @@ import Kingfisher
 
 final class ParticipantImageView: UIImageView {
     
-    private var index: Int?
     private var task: DownloadTask?
     
-    init(index: Int?,
-         imagePath: String?) {
+    init(imagePath: String?) {
 
         super.init(frame: .zero)
-        self.index = index
         self.setImage(imagePath)
         self.setLayer()
         self.contentMode = .scaleAspectFill

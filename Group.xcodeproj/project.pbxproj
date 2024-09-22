@@ -44,6 +44,9 @@
 		5259B0082C9C0E33006B2711 /* BaseDatePickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0072C9C0E33006B2711 /* BaseDatePickViewController.swift */; };
 		5259B00A2C9C5C81006B2711 /* CustomNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */; };
 		5259B00D2C9FD316006B2711 /* EventTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B00C2C9FD316006B2711 /* EventTableViewController.swift */; };
+		5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0132C9FF32F006B2711 /* ThumbnailView.swift */; };
+		5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0152CA013A8006B2711 /* WeatherView.swift */; };
+		5259B0182CA028C2006B2711 /* EventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0172CA028C2006B2711 /* EventView.swift */; };
 		525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 525AA90B2C915C6D0087913F /* FSCalendar */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */; };
@@ -154,6 +157,9 @@
 		5259B0072C9C0E33006B2711 /* BaseDatePickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseDatePickViewController.swift; sourceTree = "<group>"; };
 		5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomNavigationBar.swift; sourceTree = "<group>"; };
 		5259B00C2C9FD316006B2711 /* EventTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTableViewController.swift; sourceTree = "<group>"; };
+		5259B0132C9FF32F006B2711 /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
+		5259B0152CA013A8006B2711 /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
+		5259B0172CA028C2006B2711 /* EventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventView.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEvent.swift; sourceTree = "<group>"; };
 		526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Ext.swift"; sourceTree = "<group>"; };
@@ -355,6 +361,9 @@
 			children = (
 				523645282C8E522A009E0784 /* IconLabelView.swift */,
 				5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */,
+				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
+				5259B0152CA013A8006B2711 /* WeatherView.swift */,
+				5259B0172CA028C2006B2711 /* EventView.swift */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -1078,6 +1087,8 @@
 				52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */,
 				52E238252C7454230066C9A3 /* UserProfile.swift in Sources */,
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
+				5259B0182CA028C2006B2711 /* EventView.swift in Sources */,
+				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
@@ -1130,6 +1141,7 @@
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				523645352C8FFE5B009E0784 /* Schedule.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* EventTableViewController.swift in Sources */,
+				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
 				527A3E7D2C834BC1007FE63B /* CalendarCoordinator.swift in Sources */,

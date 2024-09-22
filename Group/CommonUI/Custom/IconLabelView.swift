@@ -18,8 +18,15 @@ final class IconLabelView: UIView {
     private var configure: UIConstructive
     private var iconSize: CGFloat
     
-    private let imageContainerView = UIView()
-    private let labelContainerView = UIView()
+    private let imageContainerView: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
+    private let labelContainerView: UIView = {
+        let view = UIView()
+        return view
+    }()
     
     private lazy var imageView: UIImageView = {
         let view = UIImageView()
@@ -48,10 +55,14 @@ final class IconLabelView: UIView {
          iconAligment: IconAlignment = .left) {
         self.configure = configure
         self.iconSize = iconSize
+        
+        defer {
+            setupUI()
+            mainStackView.spacing = contentSpacing
+            setIconAligment(iconAligment)
+        }
+        
         super.init(frame: .zero)
-        setupUI()
-        mainStackView.spacing = contentSpacing
-        setIconAligment(iconAligment)
     }
     
     required init?(coder: NSCoder) {
@@ -76,10 +87,10 @@ final class IconLabelView: UIView {
             make.centerX.top.equalToSuperview()
             make.size.equalTo(iconSize)
         }
-                
+        
         infoLabel.snp.makeConstraints { make in
-            make.centerX.horizontalEdges.equalToSuperview()
-            make.top.equalToSuperview().inset(iconSize / 6)
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalToSuperview().inset(2)
             make.bottom.lessThanOrEqualToSuperview()
         }
     }
@@ -90,7 +101,7 @@ final class IconLabelView: UIView {
         }
     }
     
-    public func setText(_ text: String) {
+    public func setText(_ text: String?) {
         self.infoLabel.text = text
     }
 }
@@ -109,22 +120,22 @@ extension UIStackView {
 }
 
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13.0, *)
-struct IconLabelView_Preview: PreviewProvider {
-    static var previews: some View {
-        let headerLabel: IconLabelView = {
-            let label = IconLabelView(iconSize: 24,
-                                      configure: AppDesign.Calendar.header,
-                                      iconAligment: .right)
-            label.setText("2024년 9월")
-            label.backgroundColor = .systemYellow
-            return label
-        }()
-        
-        headerLabel.showPreview().frame(width: 200, height: 40)
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//@available(iOS 13.0, *)
+//struct IconLabelView_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let headerLabel: IconLabelView = {
+//            let label = IconLabelView(iconSize: 24,
+//                                      configure: AppDesign.Calendar.header,
+//                                      iconAligment: .right)
+//            label.setText("2024년 9월")
+//            label.backgroundColor = .systemYellow
+//            return label
+//        }()
+//        
+//        headerLabel.showPreview().frame(width: 200, height: 40)
+//    }
+//}
+//#endif

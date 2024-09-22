@@ -16,7 +16,7 @@ class BaseLabel: UILabel {
         }
     }
     
-    var padding: UIEdgeInsets
+    private var padding: UIEdgeInsets
     
     override func drawText(in rect: CGRect) {
         super.drawText(in: rect.inset(by: padding))
@@ -31,11 +31,11 @@ class BaseLabel: UILabel {
     init(backColor: UIColor? = nil,
          radius: CGFloat? = nil,
          padding: UIEdgeInsets = .zero,
-         configure: UIConstructive) {
+         configure: UIConstructive? = nil) {
         self.padding = padding
         super.init(frame: .zero)
         
-        setType(configure)
+        setType(configure: configure)
         setBackground(color: backColor, radius: radius)
     }
     
@@ -44,10 +44,10 @@ class BaseLabel: UILabel {
         super.init(coder: coder)
     }
     
-    private func setType(_ setValues: UIConstructive) {
-        text = setValues.itemConfig.text
-        font = setValues.itemConfig.font
-        textColor = setValues.itemConfig.color
+    public func setType(configure: UIConstructive?) {
+        text = configure?.itemConfig.text
+        font = configure?.itemConfig.font
+        textColor = configure?.itemConfig.color
     }
     
     public func setText(text: String?) {
@@ -63,3 +63,4 @@ extension BaseLabel {
         self.layer.cornerRadius = radius ?? 0
     }
 }
+

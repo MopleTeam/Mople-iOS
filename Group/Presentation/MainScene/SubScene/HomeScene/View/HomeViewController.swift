@@ -123,7 +123,7 @@ final class HomeViewController: UIViewController, View {
         }
         
         collectionContainerView.snp.makeConstraints { make in
-            make.height.equalTo(285)
+            make.height.equalTo(270)
         }
         
         notifyButton.snp.makeConstraints { make in
