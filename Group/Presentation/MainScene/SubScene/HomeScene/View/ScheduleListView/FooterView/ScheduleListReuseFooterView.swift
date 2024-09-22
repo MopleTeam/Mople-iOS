@@ -15,7 +15,10 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     var disposeBag = DisposeBag()
     
     private let label: BaseButton = {
-        let label = BaseButton(configure: AppDesign.HomeSchedule.moreSchedule)
+        let label = BaseButton(backColor: AppDesign.defaultWihte,
+                               radius: 12,
+                               configure: AppDesign.HomeSchedule.moreSchedule)
+        
         return label
     }()
     
@@ -30,11 +33,10 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     }
     
     private func setupUI() {
-        self.backgroundColor = .systemYellow
         self.addSubview(label)
         
         label.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.edges.equalToSuperview()
         }
     }
     

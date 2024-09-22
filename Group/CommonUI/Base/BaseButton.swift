@@ -65,6 +65,7 @@ class BaseButton: UIButton {
         defaultTitle = config.text
         configuration?.title = config.text
         configuration?.image = config.image
+        configuration?.imagePlacement = .top
         
         let transformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming

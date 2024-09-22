@@ -20,18 +20,10 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 8
-        layout.sectionInset = .init(top: 0, left: 20, bottom: 0, right: 0)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
-    }()
-    
-    private let emptyView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemYellow
-        return view
     }()
     
     init(reactor: ScheduleViewReactor) {
@@ -121,7 +113,17 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         let fullHeight = collectionView.bounds.height
         
-        return CGSize(width: 120, height: fullHeight)
+        return CGSize(width: 89, height: fullHeight)
+    }
+    
+    #warning("참고")
+    // 컬렉션 뷰 레이아웃 조정
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 8)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 8
     }
 }
 

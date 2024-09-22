@@ -193,7 +193,8 @@ extension AppDesign {
             case .moreSchedule:
                 return makeUIConfigure(text: "더보기",
                                        font: .pretendard(type: .bold, size: 16),
-                                       color: AppDesign.defaultGray4)
+                                       color: AppDesign.defaultGray4,
+                                       image: .plus)
             }
         }
     }
