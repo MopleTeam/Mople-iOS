@@ -7,7 +7,7 @@
 
 import UIKit
 import RxSwift
-import RxCocoa
+import RxRelay
 import FSCalendar
 
 private enum MonthType: Int {
@@ -30,30 +30,13 @@ final class CalendarViewController: UIViewController {
     private var isWeekView: Bool = false
     private var selectedDate: Date?
     
-    private let currentCalendar = Calendar.current
-    private lazy var today: Date = self.currentCalendar.startOfDay(for: Date())
+    private let currentCalendar: Calendar
+    private let todayComponents: DateComponents
     
     // MARK: - Observable
     private let heightObservable: AnyObserver<CGFloat>
     private let scopeObservable: AnyObserver<ScopeType>
-    
-    public lazy var scopeGesture = UIPanGestureRecognizer(target: self, action: #selector(changeScope))
-    
-    private let headerContainerView: UIButton = {
-        let btn = UIButton()
-        btn.backgroundColor = AppDesign.Calendar.headerColor
-        btn.clipsToBounds = true
-        btn.layer.cornerRadius = 10
-        return btn
-    }()
-    
-    private let headerLabel: IconLabelView = {
-        let label = IconLabelView(iconSize: 24,
-                                  configure: AppDesign.Calendar.header,
-                                  iconAligment: .right)
-        label.setText("2024년 9월")
-        return label
-    }()
+    private let dateObservable: BehaviorRelay<DateComponents>
     
     // MARK: - UI Components
     let calendar: FSCalendar = {
@@ -69,11 +52,18 @@ final class CalendarViewController: UIViewController {
     
     private let weekContainerView = UIView()
     
-    init(heightObservable: AnyObserver<CGFloat>,
-         scopeObservable: AnyObserver<ScopeType>) {
+    // MARK: - LifeCycle
+    init(currentCalendar: Calendar,
+         todayComponents: DateComponents,
+         heightObservable: AnyObserver<CGFloat>,
+         scopeObservable: AnyObserver<ScopeType>,
+         dateObservable: BehaviorRelay<DateComponents>) {
         
+        self.currentCalendar = currentCalendar
+        self.todayComponents = todayComponents
         self.heightObservable = heightObservable
         self.scopeObservable = scopeObservable
+        self.dateObservable = dateObservable
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -82,13 +72,11 @@ final class CalendarViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setCalendar()
         setupUI()
-        setBinding()
+        setBind()
     }
     
     override func viewDidLayoutSubviews() {
@@ -101,30 +89,15 @@ final class CalendarViewController: UIViewController {
         self.view.backgroundColor = AppDesign.defaultWihte
         
         self.view.addSubview(calendar)
-        self.view.addSubview(headerContainerView)
         
         calendar.addSubview(weekContainerView)
         
-        headerContainerView.addSubview(headerLabel)
         weekContainerView.addSubview(calendar.calendarWeekdayView)
-        
-        headerContainerView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(56)
-        }
-        
-        #warning("정리")
-        // 컴파일러가 추측 가능한 headerLabel의 최소 사이즈가 있음
-        headerLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
         
         calendar.snp.makeConstraints { make in
             let calendarMaxHeight = calendar.weekdayHeight + (calendar.rowHeight * 6)
             
-            make.top.equalTo(headerContainerView.snp.bottom).offset(16)
-            make.horizontalEdges.equalToSuperview()
+            make.top.horizontalEdges.equalToSuperview()
             make.height.equalTo(calendarMaxHeight)
         }
         
@@ -155,17 +128,19 @@ final class CalendarViewController: UIViewController {
         calendar.appearance.titleWeekendColor = .systemRed
     }
     
-    // MARK: - Selectors
-    
-    private func setBinding() {
-        self.headerContainerView.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                let datePickView = BaseDatePickViewController(title: "날짜 선택")
-                datePickView.modalPresentationStyle = .overCurrentContext
-                vc.present(datePickView, animated: true)
+    // MARK: - Binding
+    private func setBind() {
+        dateObservable
+            .skip(1)
+            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, date in
+                let year = date.year ?? 2025
+                let month = date.month ?? 1
+                let day = date.day ?? 1
+                
+                vc.moveToSelectedDate(year: year, month: month, day: day)
             })
             .disposed(by: disposeBag)
-            
     }
 }
 
@@ -184,6 +159,28 @@ extension CalendarViewController: FSCalendarDataSource {
 // MARK: - Delegate
 extension CalendarViewController: FSCalendarDelegate {
     
+    func minimumDate(for calendar: FSCalendar) -> Date {
+        var components = todayComponents
+        components.month = 1
+        components.day = 1
+        let date = currentCalendar.date(from: components) ?? Date()
+        return currentCalendar.date(byAdding: .year, value: -10, to: date) ?? Date()
+    }
+
+    func maximumDate(for calendar: FSCalendar) -> Date {
+        var components = todayComponents
+        components.month = 12
+        components.day = 31
+        let date = currentCalendar.date(from: components) ?? Date()
+        return currentCalendar.date(byAdding: .year, value: 10, to: date) ?? Date()
+    }
+    
+    func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        let changeDate = calendar.currentPage
+        let updateComponents = currentCalendar.dateComponents([.year, .month, .day], from: changeDate)
+        dateObservable.accept(updateComponents)
+    }
+    
     // 셀 선택 시
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         if let selectedDate = selectedDate {
@@ -198,29 +195,10 @@ extension CalendarViewController: FSCalendarDelegate {
         let resultHeight = changeHeight(bounds.height)
         let currentScope: ScopeType = calendar.scope == .month ? .month : .week
         
-        notifyChangeScope(currentScope)
-        notifyChangeHeight(resultHeight, currentScope)
+        self.scopeObservable.onNext(currentScope)
+        self.heightObservable.onNext(resultHeight)
         
         updateCalendar(resultHeight)
-        self.view.layoutIfNeeded()
-    }
-}
-
-// MARK: - 부모뷰에게 전달하기
-extension CalendarViewController {
-    private func notifyChangeHeight(_ calendarHeight : CGFloat, _ currentScope: ScopeType) {
-        let headerHeight: CGFloat = currentScope == .month ? 56 : 0
-        let spacing: CGFloat = 16
-        self.heightObservable.onNext(headerHeight + spacing + calendarHeight)
-    }
-    
-    private func notifyChangeScope(_ scope: ScopeType) {
-        headerContainerView.snp.updateConstraints { make in
-            let height = scope == .month ? 56 : 0
-            make.height.equalTo(height)
-        }
-        
-        self.scopeObservable.onNext(scope)
     }
 }
 
@@ -319,19 +297,18 @@ extension CalendarViewController {
     private func checkToday(_ date: Date) -> Bool {
         let targetComponents = currentCalendar.dateComponents([.year, .month, .day], from: date)
         
-        let todayComponents = currentCalendar.dateComponents([.year, .month, .day], from: today)
-        
         return targetComponents == todayComponents
     }
 }
 
 // MARK: - 특정 달로 이동하기
 extension CalendarViewController {
-    private func moveToSpecificYearMonth(year: Int, month: Int) {
+
+    private func moveToSelectedDate(year: Int, month: Int, day: Int) {
         var dateComponents = DateComponents()
         dateComponents.year = year
         dateComponents.month = month
-        dateComponents.day = 1 // 해당 월의 1일로 설정
+        dateComponents.day = day
         
         if let date = currentCalendar.date(from: dateComponents) {
             self.calendar.setCurrentPage(date, animated: false)

@@ -23,7 +23,7 @@ final class TabBarCoordinator: BaseCoordinator {
     init(navigationController: UINavigationController,
          dependencies: TabBarCoordinaotorDependencies) {
         self.dependencies = dependencies
-        self.tabBarController = CustomTabBarController()
+        self.tabBarController = MainTabBarController()
         super.init(navigationController: navigationController)
     }
     

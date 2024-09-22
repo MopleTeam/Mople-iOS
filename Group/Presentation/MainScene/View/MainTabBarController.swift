@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CustomTabBarController: UITabBarController {
+final class MainTabBarController: UITabBarController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,26 +22,19 @@ final class CustomTabBarController: UITabBarController {
     private func setupUI() {
         tabBar.backgroundColor = .white
         tabBar.isTranslucent = true
+        
         tabBar.layer.cornerRadius = 18
         tabBar.layer.borderWidth = 1
         tabBar.layer.borderColor = UIColor(hexCode: "F2F2F2").cgColor
-//        tabBar.layer.shadowOpacity = 0.5
-//        tabBar.layer.shadowRadius = 18
-//        tabBar.layer.shadowColor = UIColor.black.cgColor//UIColor(hexCode: "F2F2F2").cgColor
-//        tabBar.layer.shadowOffset = CGSize(width: 0, height: -4)
         
+        tabBar.layer.shadowOpacity = 0.05
+        tabBar.layer.shadowRadius = 24
+        tabBar.layer.shadowColor = UIColor.black.cgColor
+        tabBar.layer.shadowOffset = CGSize(width: 0, height: -4)
         tabBar.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         
         tabBar.items?.forEach({ $0.titlePositionAdjustment = UIOffset(horizontal: 0.0, vertical: -5.0) })
     }
-
-    
-//    self.layer.cornerRadius = 8
-//    self.layer.shadowRadius = 8
-//    self.layer.shadowOpacity = 0.5
-//    self.layer.shadowColor = UIColorSet.background(.shadow).cgColor
-//    self.layer.shadowOffset = CGSize(width: 2, height: 2)
-    
     
     private func updateTabBarFrame() {
         let newHeight: CGFloat = 65 + UIScreen.bottomSafeArea

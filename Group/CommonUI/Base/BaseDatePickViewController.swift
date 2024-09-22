@@ -14,8 +14,31 @@ final class BaseDatePickViewController: UIViewController {
     
     var disposeBag: DisposeBag = DisposeBag()
     
-    private let currentCalendar = Calendar.current
+    // MARK: - Observable
+    private let dateObservable: BehaviorRelay<DateComponents>
     
+    // MARK: - Variables
+    private let currentCalendar: Calendar
+    private let todayComponents: DateComponents
+    private lazy var selectedDate: DateComponents = todayComponents
+    
+    private lazy var currentYear: Int = {
+        todayComponents.year ?? 2024
+    }()
+    
+    private lazy var currentMonth: Int = {
+        todayComponents.month ?? 1
+    }()
+    
+    private lazy var years: [Int] = {
+        let startYear = currentYear - 10
+        let endYear = currentYear + 10
+        return Array(startYear...endYear)
+    }()
+    
+    private var months: [Int] = Array(1...12)
+    
+    // MARK: - UI Components
     private let navigationView = CustomNavigationBar()
     
     private let rightBarButton: UIButton = {
@@ -33,6 +56,8 @@ final class BaseDatePickViewController: UIViewController {
         return btn
     }()
     
+    private let emptyView = UIView()
+        
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [navigationView, datePicker, completeButton])
         sv.axis = .vertical
@@ -46,26 +71,21 @@ final class BaseDatePickViewController: UIViewController {
         return sv
     }()
     
-    private lazy var currentYear: Int = {
-        currentCalendar.component(.year, from: Date())
-    }()
-    
-    private lazy var currentMonth: Int = {
-        currentCalendar.component(.month, from: Date())
-    }()
-    
-    private lazy var years: [Int] = {
-        let currentYear = currentCalendar.component(.year, from: Date())
-        let startYear = currentYear - 10
-        let endYear = currentYear + 10
-        return Array(startYear...endYear)
-    }()
-    
-    private var months: [Int] = Array(1...12)
-    
-    init(title: String?) {
+    // MARK: - LifeCycle
+    init(title: String?,
+         clenader: Calendar,
+         todayComponents: DateComponents,
+         dateObservable: BehaviorRelay<DateComponents>) {
+        
+        self.currentCalendar = clenader
+        self.todayComponents = todayComponents
+        self.dateObservable = dateObservable
+        
+        defer {
+            setTitle(title)
+        }
+        
         super.init(nibName: nil, bundle: nil)
-        setTitle(title)
     }
     
     required init?(coder: NSCoder) {
@@ -73,27 +93,17 @@ final class BaseDatePickViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        setupDatePicker()
-        setRightBarButton()
+        setupUI()
+        setNavigationView()
         setupBinding()
-        setDate()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        UIView.animate(withDuration: 0.5) {
-            self.view.backgroundColor = .black.withAlphaComponent(0.6)
-        }
-    }
-    
-    private func setupDatePicker() {
-        self.view.backgroundColor = .clear
+    // MARK: - UI Setup
+    private func setupUI() {
         view.addSubview(mainStackView)
         
-        
         mainStackView.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalToSuperview()
-            make.height.equalTo(361)
+            make.edges.equalToSuperview()
         }
         
         navigationView.snp.makeConstraints { make in
@@ -109,48 +119,48 @@ final class BaseDatePickViewController: UIViewController {
         navigationView.titleLable.text = title
     }
     
-    private func setRightBarButton() {
-        navigationView.rightButtonContainerView.addSubview(rightBarButton)
-        
-        rightBarButton.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+    private func setNavigationView() {
+        navigationView.setRightItem(item: rightBarButton)
     }
     
-    private func setupBinding() {
+    private func setDatePicker(month: Int, year: Int) {
         datePicker.dataSource = self
         datePicker.delegate = self
         
-        rightBarButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.dismissView()
-            })
-            .disposed(by: disposeBag)
-        
-        completeButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.dismissView()
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func setDate() {
-        let monthIndex = months.firstIndex(of: currentMonth) ?? 0
-        let yearIndex = years.firstIndex(of: currentYear) ?? 0
+        let monthIndex = months.firstIndex(of: month) ?? 0
+        let yearIndex = years.firstIndex(of: year) ?? 0
         
         datePicker.selectRow(monthIndex, inComponent: 0, animated: false)
         datePicker.selectRow(yearIndex, inComponent: 1, animated: false)
     }
     
-    private func dismissView() {
-        UIView.animate(withDuration: 0.1) {
-            self.view.backgroundColor = .clear
-        } completion: { _ in
-            self.dismiss(animated: true)
-        }
+    // MARK: - Selectors
+    private func setupBinding() {
+        dateObservable
+            .subscribe(with: self, onNext: { vc, date in
+                vc.selectedDate = date
+                let month = date.month ?? 1
+                let year = date.year ?? 2024
+                vc.setDatePicker(month: month, year: year)
+            })
+            .disposed(by: disposeBag)
+        
+        rightBarButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        completeButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.dateObservable.accept(vc.selectedDate)
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
-//
+
+// MARK: - DatePicker
 extension BaseDatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 2
@@ -169,7 +179,7 @@ extension BaseDatePickViewController: UIPickerViewDataSource, UIPickerViewDelega
         let label = UILabel()
         label.textAlignment = .center
         label.textColor = .black
-        label.text = "asdf"
+        label.font = .pretendard(type: .bold, size: 22)
         
         if component == 0 {
             label.text = "\(months[row]) 월"
@@ -180,17 +190,16 @@ extension BaseDatePickViewController: UIPickerViewDataSource, UIPickerViewDelega
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        print("row : \(row), componet : \(component)")
+        
+        if component == 0 {
+            selectedDate.month = months[row]
+        } else {
+            selectedDate.year = years[row]
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 35
     }
 }
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct BaseDatePickViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        BaseDatePickViewController(title: "날짜선택").showPreview()
-    }
-}
-#endif

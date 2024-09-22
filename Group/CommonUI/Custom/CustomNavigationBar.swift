@@ -53,3 +53,15 @@ final class CustomNavigationBar: UIView {
         }
     }
 }
+
+// MARK: - Set Item
+extension CustomNavigationBar {
+    
+    public func setRightItem(item: UIButton) {
+        rightButtonContainerView.addSubview(item)
+        
+        item.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+}
