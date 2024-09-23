@@ -28,6 +28,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     // MARK: - Observable
     private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
     private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
+    private let calendarScopeChangeObservable: PublishSubject<Void> = .init()
     private let eventObservable: BehaviorRelay<[DateComponents]> = .init(value: [])
     private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
     
@@ -45,6 +46,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
                                   configure: AppDesign.Calendar.header,
                                   iconAligment: .right)
         label.isUserInteractionEnabled = false
+        
         return label
     }()
     
@@ -54,6 +56,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         let calendarView = CalendarViewController(todayComponents: todayComponents,
                                                   heightObservable: calendarHeightObservable.asObserver(),
                                                   scopeObservable: calendarScopeObservable.asObserver(),
+                                                  scopeChangeObservable: calendarScopeChangeObservable,
                                                   eventObservable: eventObservable.asObservable(),
                                                   dateObservable: calendarDateObservable)
         
@@ -95,6 +98,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     private func setupNavi() {
         addRightButton(setImage: .calendar)
+        addLeftButton(setImage: .close)
+        hideLeftButton(isHidden: true)
     }
     
     private func setLayout() {
@@ -163,8 +168,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, scope in
                 vc.updateHeaderView(scope)
-                
                 vc.updateBackgroundColor(scope: scope)
+                vc.naviItemChange(scope: scope)
             })
             .disposed(by: disposeBag)
         
@@ -176,18 +181,20 @@ final class CalendarAndEventsViewController: BaseViewController, View {
                 vc.headerLabel.setText("\(year)년 \(monty)월")
             })
             .disposed(by: disposeBag)
+        
+        rightButtonObservable
+            .bind(to: calendarScopeChangeObservable)
+            .disposed(by: disposeBag)
+        
+        leftButtonObservable
+            .bind(to: calendarScopeChangeObservable)
+            .disposed(by: disposeBag)
     }
     
     private func setAction() {
         headerContainerView.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.presentDatePicker()
-            })
-            .disposed(by: disposeBag)
-            
-        rightButtonObservable
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.calendarView.changeScope()
             })
             .disposed(by: disposeBag)
     }
@@ -249,20 +256,18 @@ extension CalendarAndEventsViewController {
             
         }
     }
+    
+    private func naviItemChange(scope: ScopeType) {
+        let isScopeMonth = scope == .month
+        
+        hideRightButton(isHidden: !isScopeMonth)
+        hideLeftButton(isHidden: isScopeMonth)
+    }
 }
 
 
 
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//@available(iOS 13, *)
-//struct TestCalendarAndEventsViewController_Preview: PreviewProvider {
-//    static var previews: some View {
-//        CalendarAndEventsViewController(title: "일정관리").showPreview()
-//    }
-//}
-//#endif
+
 
 
 

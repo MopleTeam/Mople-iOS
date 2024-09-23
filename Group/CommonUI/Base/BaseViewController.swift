@@ -75,11 +75,21 @@ extension BaseViewController {
         }
     }
     
-    public func addLeftButton() {
+    public func addLeftButton(setImage: UIImage?) {
         navigationView.leftButtonContainerView.addSubview(leftButton)
+        
+        leftButton.setImage(setImage, for: .normal)
         
         leftButton.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    public func hideRightButton(isHidden: Bool) {
+        rightButton.isHidden = isHidden
+    }
+    
+    public func hideLeftButton(isHidden: Bool) {
+        leftButton.isHidden = isHidden
     }
 }

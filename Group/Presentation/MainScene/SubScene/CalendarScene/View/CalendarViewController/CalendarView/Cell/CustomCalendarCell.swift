@@ -80,7 +80,6 @@ extension CustomCalendarCell {
     func updateCell(containsEvent: Bool,
                     isSelected: Bool,
                     isToday: Bool) {
-        
         clearBackColor(isToday)
         changeBackColor(containsEvent, isSelected, isToday)
     }
@@ -135,14 +134,15 @@ extension CustomCalendarCell {
 }
 
 
-//
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//@available(iOS 13, *)
-//struct CalendarAndEventsViewController_Preview: PreviewProvider {
-//    static var previews: some View {
-//        CalendarAndEventsViewController(title: "일정관리").showPreview()
-//    }
-//}
-//#endif
+
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+@available(iOS 13, *)
+struct CalendarAndEventsViewController_Preview: PreviewProvider {
+    static var previews: some View {
+        CalendarAndEventsViewController(title: "일정관리", reactor: CalendarViewReactor(fetchUseCase: fetchRecentScheduleMock())).showPreview()
+    }
+}
+#endif
+ 

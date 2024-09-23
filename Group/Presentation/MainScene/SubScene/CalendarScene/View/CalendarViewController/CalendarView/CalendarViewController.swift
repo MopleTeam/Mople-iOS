@@ -36,13 +36,20 @@ final class CalendarViewController: UIViewController {
     private var eventDateComponents: [DateComponents] = []
     
     // MARK: - Observable
+    
+    // Output
     private let heightObservable: AnyObserver<CGFloat>
     private let scopeObservable: AnyObserver<ScopeType>
-    private let dateObservable: BehaviorRelay<DateComponents>
+    
+    // Input
+    private let scopeChangeObservable: Observable<Void>
     private let eventObservable: Observable<[DateComponents]>
     
+    // Input/Output
+    private let dateObservable: BehaviorRelay<DateComponents>
+    
     // MARK: - UI Components
-    let calendar: FSCalendar = {
+    private let calendar: FSCalendar = {
         let calendar = FSCalendar()
         calendar.scrollDirection = .horizontal
         calendar.adjustsBoundingRectWhenChangingMonths = true
@@ -59,13 +66,18 @@ final class CalendarViewController: UIViewController {
     init(todayComponents: DateComponents,
          heightObservable: AnyObserver<CGFloat>,
          scopeObservable: AnyObserver<ScopeType>,
+         scopeChangeObservable: Observable<Void>,
          eventObservable: Observable<[DateComponents]>,
          dateObservable: BehaviorRelay<DateComponents>) {
         
         self.todayComponents = todayComponents
+        
         self.heightObservable = heightObservable
         self.scopeObservable = scopeObservable
+        
+        self.scopeChangeObservable = scopeChangeObservable
         self.eventObservable = eventObservable
+        
         self.dateObservable = dateObservable
         
         super.init(nibName: nil, bundle: nil)
@@ -129,10 +141,17 @@ final class CalendarViewController: UIViewController {
         calendar.appearance.todayColor = .clear
         calendar.appearance.selectionColor = .clear
         calendar.appearance.titleWeekendColor = .systemRed
+        
     }
     
     // MARK: - Binding
     private func setBind() {
+        scopeChangeObservable
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.changeScope()
+            })
+            .disposed(by: disposeBag)
+        
         eventObservable
             .subscribe(with: self, onNext: { vc, events in
                 vc.updateEvents(with: events)
@@ -142,12 +161,8 @@ final class CalendarViewController: UIViewController {
         dateObservable
             .skip(1)
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vc, date in
-                let year = date.year ?? 2025
-                let month = date.month ?? 1
-                let day = date.day ?? 1
-                
-                vc.moveToSelectedDate(year: year, month: month, day: day)
+            .subscribe(with: self, onNext: { vc, dateComponents in
+                vc.moveToSelectedDate(dateComponents: dateComponents)
             })
             .disposed(by: disposeBag)
     }
@@ -186,17 +201,35 @@ extension CalendarViewController: FSCalendarDelegate {
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         let changeDate = calendar.currentPage
         let updateComponents = currentCalendar.dateComponents([.year, .month, .day], from: changeDate)
+        
         dateObservable.accept(updateComponents)
     }
     
     // 셀 선택 시
+    // week 일 때 선택 한다면 옵져버로 신호 보내서 헤더 이름 바꾸기
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        if let selectedDate = selectedDate {
-            updateCell(selectedDate, isSelected: false)
-        }
+        
+        changeMonth(date: date, with: monthPosition)
+        deSeletedCell()
         updateCell(date, isSelected: true)
-        self.selectedDate = date
+        
+        selectedDate = date
     }
+    
+    private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
+        if calendar.scope == .month {
+            switch monthPosition {
+            case .current:
+                changeWeekScope()
+            case .next, .previous:
+                let dateComponents = currentCalendar.dateComponents([.year, .month, .day], from: date)
+                self.moveToSelectedDate(dateComponents: dateComponents, animated: true)
+            default:
+                break
+            }
+        }
+    }
+    
     
     // 캘린더 크기 변경 발생 시 실행
     func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
@@ -286,6 +319,44 @@ extension CalendarViewController {
 // MARK: - 셀 업데이트
 extension CalendarViewController {
     
+    /// 기존에 선택된 셀 지우기
+    private func deSeletedCell() {
+        guard let selectedDate = selectedDate else { return }
+        updateCell(selectedDate, isSelected: false)
+    }
+    
+    /// 월간 달력에서 주간으로 변경되는 메서드
+    private func changeWeekScope() {
+        if calendar.scope == .month {
+            updateIsWeekViewFlag(scope: calendar.scope)
+            calendar.setScope(.week, animated: true)
+        }
+    }
+    
+    /// 스코프가 변경을 위한 메서드
+    private func changeScope() {
+        updateDateComponentsOnScopeChange()
+        updateIsWeekViewFlag(scope: calendar.scope)
+        
+        let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
+        calendar.setScope(changeScope, animated: true)
+    }
+    
+    /// 주간 달력에서 다른 달로 넘어갈 때 Header Name을 변경하기 위한 메서드
+    private func updateDateComponentsOnScopeChange() {
+        guard let selectedDate = calendar.selectedDate,
+              checkWeekdayIsSelected(selectedDate: selectedDate) else { return }
+        
+        let components = currentCalendar.dateComponents([.year, .month], from: selectedDate)
+        dateObservable.accept(components)
+    }
+    
+    /// 현재 표시된 주간 뷰에서 선택된 날짜가 있는 지 체크
+    private func checkWeekdayIsSelected(selectedDate: Date) -> Bool {
+        guard calendar.scope == .week else { return false }
+        let weekdays = calendar.visibleCells().compactMap { calendar.date(for: $0) }
+        return weekdays.contains { $0 == selectedDate }
+    }
     
     /// 일정이 있는 날인지 체크
     private func checkContainsEvent(_ date: Date) -> Bool {
@@ -314,6 +385,8 @@ extension CalendarViewController {
     /// 셀 그릴 때 선택된 셀 구분
     /// - Parameter date: 그릴려고 하는 날짜
     private func checkSelected(_ date: Date) -> Bool {
+        
+        
         return selectedDate == date
     }
     
@@ -326,42 +399,12 @@ extension CalendarViewController {
     }
 }
 
-// MARK: - 특정 달로 이동하기
+// MARK: - 특정 달로 이동
 extension CalendarViewController {
-
-    private func moveToSelectedDate(year: Int, month: Int, day: Int) {
-        var dateComponents = DateComponents()
-        dateComponents.year = year
-        dateComponents.month = month
-        dateComponents.day = day
+    private func moveToSelectedDate(dateComponents: DateComponents, animated: Bool = false) {
         
         if let date = currentCalendar.date(from: dateComponents) {
-            self.calendar.setCurrentPage(date, animated: false)
+            self.calendar.setCurrentPage(date, animated: animated)
         }
     }
 }
-
-// MARK: - 외부 사용 액션
-extension CalendarViewController {
-    @objc
-    func changeScope() {
-        let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
-        updateIsWeekViewFlag(scope: calendar.scope)
-        calendar.setScope(changeScope, animated: true)
-    }
-}
-
-
-
-
-
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//@available(iOS 13, *)
-//struct CalendarViewController_Preview: PreviewProvider {
-//    static var previews: some View {
-//        CalendarAndEventsViewController(title: "일정관리").showPreview()
-//    }
-//}
-//#endif
