@@ -11,7 +11,7 @@ import RxSwift
 final class FetchGroupListMock: FetchGroupList {
     
     private var randomThumnail: String {
-        return "https://picsum.photos/id/50/200/300"
+        return "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"
     }
     
     

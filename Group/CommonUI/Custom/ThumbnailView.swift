@@ -8,6 +8,25 @@
 import UIKit
 import SnapKit
 
+// MARK: - ViewModel
+struct ThumbnailViewModel {
+    let thumbnailPath: String?
+    let title: String?
+    let participantCount: String?
+    let date: Date?
+}
+
+extension ThumbnailViewModel {
+    init?(group: Group?) {
+        guard let group = group else { return nil }
+        self .thumbnailPath = group.thumbnailPath
+        self.title = group.name
+        self.participantCount = group.memberCountString
+        self.date = group.lastSchedule
+    }
+}
+
+// MARK: - View
 final class ThumbnailTitleView: UIView {
     
     enum ViewType {
@@ -88,7 +107,7 @@ final class ThumbnailTitleView: UIView {
         switch viewType {
         case .simple:
             setThumbnail(size: 28, radius: 8)
-            groupTitleLabel.setType(configure: AppDesign.HomeSchedule.group)
+            groupTitleLabel.setType(configure: AppDesign.Schedule.group)
         case .detail:
             setThumbnail(size: 56, radius: 12)
             groupTitleLabel.setType(configure: AppDesign.Group.title)
@@ -104,16 +123,19 @@ final class ThumbnailTitleView: UIView {
     }
     
     
-    public func setData(_ info: Group) {
-        loadImage(info.thumbnailPath)
-        groupTitleLabel.setText(text: info.name)
+    public func configure(with viewModel: ThumbnailViewModel?) {
+        guard let viewModel = viewModel else { return }
+        
+        loadImage(viewModel.thumbnailPath)
+        groupTitleLabel.text = viewModel.title
         
         if viewType == .detail {
-            memberCountView.setText("\(info.memberCount)")
+            setDetailView(text: viewModel.participantCount)
         }
     }
 
-    private func loadImage(_ path: String) {
+    private func loadImage(_ path: String?) {
+        guard let path = path else { return }
         let imageUrl = URL(string: path)
         thumbnailView.kf.setImage(with: imageUrl)
     }
@@ -121,11 +143,15 @@ final class ThumbnailTitleView: UIView {
 
 extension ThumbnailTitleView {
     private func makeDetail() {
-        
         groupInfoStackView.addArrangedSubview(memberCountView)
         
         memberCountView.snp.makeConstraints { make in
             make.height.equalTo(20)
         }
+    }
+    
+    private func setDetailView(text: String?) {
+        guard let memberCount = text else { return }
+        memberCountView.setText(memberCount)
     }
 }

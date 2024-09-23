@@ -14,11 +14,11 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
     
     func getEvents() -> [Schedule] {
         return [
-            .init(group: getGroup(), eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 1))),
-            .init(group: getGroup(), eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 2))),
-            .init(group: getGroup(), eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 3))),
-            .init(group: getGroup(), eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 4))),
-            .init(group: getGroup(), eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 5)))]
+            .init(group: getGroup(), eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 1)), weather: getWeather()),
+            .init(group: getGroup(), eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 2)), weather: getWeather()),
+            .init(group: getGroup(), eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 3)), weather: getWeather()),
+            .init(group: getGroup(), eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 4)), weather: getWeather()),
+            .init(group: getGroup(), eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 5)), weather: getWeather())]
     }
     
     func getGroup() -> Group {
@@ -40,6 +40,11 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
         }
         
         return members
+    }
+    
+    func getWeather() -> WeatherInfo {
+        return WeatherInfo(imagePath: "https://openweathermap.org/img/wn/0\(Int.random(in: 1...4))d@2x.png",
+                           temperature: Int.random(in: 20...30))
     }
     
     func fetchRecent() -> Single<[Schedule]> {

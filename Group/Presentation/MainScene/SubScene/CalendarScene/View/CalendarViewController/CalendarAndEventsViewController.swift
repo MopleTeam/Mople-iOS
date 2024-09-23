@@ -26,11 +26,18 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     }()
     
     // MARK: - Observable
+    
+    // Calendar
     private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
     private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
     private let calendarScopeChangeObservable: PublishSubject<Void> = .init()
     private let eventObservable: BehaviorRelay<[DateComponents]> = .init(value: [])
+    
+    // Clendar & DatePicker
     private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
+    
+    // ScheduleTableView
+    private let scheduleListObservable: BehaviorRelay<[Schedule]> = .init(value: [])
     
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -50,7 +57,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         return label
     }()
     
-    private let calendarContainerView = UIView()
+    // 캘린더
+    private let calendarContainer = UIView()
     
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(todayComponents: todayComponents,
@@ -66,10 +74,12 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         return calendarView
     }()
     
-    private let emptyView: UIView = {
-        let view = UIView()
-        view.backgroundColor = AppDesign.defaultWihte
-        return view
+    // 스케쥴 리스트 테이블 뷰
+    private let scheduleListContainer = UIView()
+    
+    private lazy var scheduleListTableView: ScheduleTableViewController = {
+        let scheduleListTableView = ScheduleTableViewController(eventObservable: scheduleListObservable.asObservable())
+        return scheduleListTableView
     }()
     
     // MARK: - LifeCycle
@@ -93,7 +103,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     private func setupUI() {
         setupNavi()
         setLayout()
-        addScheduleListCollectionView()
+        setContainer()
     }
     
     private func setupNavi() {
@@ -104,8 +114,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     private func setLayout() {
         self.view.addSubview(headerContainerView)
-        self.view.addSubview(calendarContainerView)
-        self.view.addSubview(emptyView)
+        self.view.addSubview(calendarContainer)
+        self.view.addSubview(scheduleListContainer)
                 
         headerContainerView.addSubview(headerLabel)
         
@@ -119,23 +129,37 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             make.center.equalToSuperview()
         }
         
-        calendarContainerView.snp.makeConstraints { make in
+        calendarContainer.snp.makeConstraints { make in
             make.top.equalTo(headerContainerView.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(1) // 최소 높이 설정 (Calender 생성 시 높이 update)
         }
         
-        emptyView.snp.makeConstraints { make in
-            make.top.equalTo(calendarContainerView.snp.bottom)
+        scheduleListContainer.snp.makeConstraints { make in
+            make.top.equalTo(calendarContainer.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
     }
     
-    private func addScheduleListCollectionView() {
+    private func setContainer() {
+        addCalendarView()
+        addScheduleListView()
+    }
+    
+    private func addCalendarView() {
         addChild(calendarView)
-        calendarContainerView.addSubview(calendarView.view)
+        calendarContainer.addSubview(calendarView.view)
         calendarView.didMove(toParent: self)
         calendarView.view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    private func addScheduleListView() {
+        addChild(scheduleListTableView)
+        scheduleListContainer.addSubview(scheduleListTableView.view)
+        scheduleListTableView.didMove(toParent: self)
+        scheduleListTableView.view.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -149,6 +173,10 @@ final class CalendarAndEventsViewController: BaseViewController, View {
                 let components = dates.map { vc.currentCalendar.dateComponents([.year, .month, .day], from: $0) }
                 vc.eventObservable.accept(components)
             })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$ScheduleList)
+            .bind(to: scheduleListObservable)
             .disposed(by: disposeBag)
     }
     
@@ -167,9 +195,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         calendarScopeObservable
             .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, scope in
-                vc.updateHeaderView(scope)
-                vc.updateBackgroundColor(scope: scope)
-                vc.naviItemChange(scope: scope)
+                vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
         
@@ -203,15 +229,14 @@ final class CalendarAndEventsViewController: BaseViewController, View {
 // MARK: - Date Picker
 extension CalendarAndEventsViewController {
     private func presentDatePicker() {
-        let datePickView = BaseDatePickViewController(title: "날짜 선택",
-                                                      todayComponents: todayComponents,
-                                                      dateObservable: calendarDateObservable)
+        let datePickView = DatePickViewController(title: "날짜 선택",
+                                                  todayComponents: todayComponents,
+                                                  dateObservable: calendarDateObservable)
         
         datePickView.modalPresentationStyle = .pageSheet
         
         if let sheet = datePickView.sheetPresentationController {
             sheet.detents = [ .medium() ]
-            
         }
         
         self.present(datePickView, animated: true)
@@ -222,7 +247,7 @@ extension CalendarAndEventsViewController {
 extension CalendarAndEventsViewController {
     private func updateCalendarView(_ height: CGFloat) {
         UIView.animate(withDuration: 0.33) {
-            self.calendarContainerView.snp.updateConstraints { make in
+            self.calendarContainer.snp.updateConstraints { make in
                 make.height.equalTo(height)
             }
             
@@ -230,30 +255,36 @@ extension CalendarAndEventsViewController {
         }
     }
     
-    private func updateHeaderView(_ scope: ScopeType) {
+    private func updateMainView(_ scope: ScopeType) {
+        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
+            self.updateHeaderView(scope: scope)
+            self.updateBackgroundColor(scope: scope)
+            self.naviItemChange(scope: scope)
+            self.hideScheduleListTableView(scope: scope)
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func updateHeaderView(scope: ScopeType) {
         let height = scope == .month ? 56 : 0
-
-        UIView.animate(withDuration: 0.2) {
-            self.headerContainerView.snp.updateConstraints { make in
-                make.height.equalTo(height)
-            }
-            
-            self.view.layoutIfNeeded()
+        
+        self.headerContainerView.snp.updateConstraints { make in
+            make.height.equalTo(height)
         }
     }
     
-    #warning("참고")
+    private func hideScheduleListTableView(scope: ScopeType) {
+        scheduleListTableView.hideView(isHide: scope == .month)
+    }
+    
+#warning("참고")
     // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
     private func updateBackgroundColor(scope: ScopeType) {
-        let views: [UIView] = [self.calendarContainerView, self.emptyView]
+        let views: [UIView] = [self.calendarContainer, self.scheduleListContainer]
         
-        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
-            
-            views.forEach {
-                let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor
-                $0.backgroundColor = color
-            }
-            
+        views.forEach {
+            let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor
+            $0.backgroundColor = color
         }
     }
     

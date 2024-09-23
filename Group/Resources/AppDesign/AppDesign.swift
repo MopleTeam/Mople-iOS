@@ -157,14 +157,15 @@ extension AppDesign {
             }
         }
     }
-    
-    enum HomeSchedule: UIConstructive {
-        
-        static let remainingDateLabel = AppDesign.defaultBlue.withAlphaComponent(0.1)
-        static let participantCountLabel = AppDesign.defaultGray2.withAlphaComponent(0.1)
+}
+
+// MARK: - Schedule
+extension AppDesign {
+    enum Schedule: UIConstructive {
         
         case group
-        case event
+        case title
+        case smallTitle
         case count
         case date
         case place
@@ -175,8 +176,11 @@ extension AppDesign {
             case .group:
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 12),
                                        color: defaultGray2)
-            case .event:
+            case .title:
                 return makeUIConfigure(font: .pretendard(type: .bold, size: 20),
+                                       color: AppDesign.defaultBlack)
+            case .smallTitle:
+                return makeUIConfigure(font: .pretendard(type: .bold, size: 18),
                                        color: AppDesign.defaultBlack)
             case .count:
                 return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
@@ -304,6 +308,23 @@ extension AppDesign {
                 return makeUIConfigure(text: "완료",
                                        font: .pretendard(type: .semiBold, size: 16),
                                        color: AppDesign.defaultWihte)
+            }
+        }
+    }
+}
+
+extension AppDesign {
+    
+    enum SchedeleTable: UIConstructive {
+        
+        case header
+        
+        var itemConfig: ItemConfigure {
+            switch self {
+                
+            case .header:
+                return makeUIConfigure(font: .pretendard(type: .medium, size: 14),
+                                       color: .init(hexCode: "999999"))
             }
         }
     }

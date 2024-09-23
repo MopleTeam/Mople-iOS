@@ -8,19 +8,21 @@
 import Foundation
 
 struct Schedule {
-    let id: UUID
-    let group: Group
-    let title: String
-    let place: String
-    let participants: [Participant]
-    let date: Date
+    let id: UUID?
+    let group: Group?
+    let title: String?
+    let place: String?
+    let participants: [Participant]?
+    let date: Date?
+    let weather: WeatherInfo?
     
     init(id: UUID = UUID(),
          group: Group,
          eventName: String,
          location: String,
          participants: [Participant],
-         date: Date) {
+         date: Date,
+         weather: WeatherInfo) {
         
         self.id = id
         self.group = group
@@ -28,10 +30,11 @@ struct Schedule {
         self.place = location
         self.participants = participants
         self.date = date
+        self.weather = weather
     }
     
-    var stringDate: String {
-        var dateFormatter: DateFormatter = {
+    var stringDate: String? {
+        let dateFormatter: DateFormatter = {
             let dateFormatter = DateFormatter()
             dateFormatter.locale = Locale(identifier: "ko_KR")
             dateFormatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
@@ -39,15 +42,21 @@ struct Schedule {
             return dateFormatter
         }()
         
-        return dateFormatter.string(from: self.date)
+        guard let date = self.date else { return nil }
+        return dateFormatter.string(from: date)
     }
 }
 
 struct Group {
-    let thumbnailPath: String
-    let name: String
-    let memberCount: Int
-    let lastSchedule: Date
+    let thumbnailPath: String?
+    let name: String?
+    let memberCount: Int?
+    let lastSchedule: Date?
+    
+    var memberCountString: String? {
+        guard let memberCount else { return nil }
+        return "\(memberCount)명"
+    }
 }
 
 struct Participant {
@@ -60,4 +69,9 @@ struct Participant {
         self.name = name
         self.imagePath = imagePath
     }
+}
+
+struct WeatherInfo {
+    let imagePath: String?
+    let temperature: Int?
 }

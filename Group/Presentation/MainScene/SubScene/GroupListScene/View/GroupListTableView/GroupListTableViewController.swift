@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class GroupListTableViewController: UIViewController, View, UIScrollViewDelegate {
+final class GroupListTableViewController: UIViewController, View {
     
     typealias Reactor = GroupListViewReactor
     var disposeBag = DisposeBag()
@@ -46,19 +46,16 @@ final class GroupListTableViewController: UIViewController, View, UIScrollViewDe
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.verticalEdges.equalToSuperview()
+            make.edges.equalToSuperview()
         }
     }
     
     private func setupTableView() {
+        self.tableView.delegate = self
         self.tableView.register(GroupListCell.self, forCellReuseIdentifier: GroupListCell.reuseIdentifier)
     }
     
     private func setAction() {
-        tableView.rx.setDelegate(self)
-            .disposed(by: disposeBag)
-        
         tableView.rx.itemSelected
             .subscribe(with: self, onNext: { vc, _ in
                 print("셀 선택 됨")
@@ -71,11 +68,16 @@ final class GroupListTableViewController: UIViewController, View, UIScrollViewDe
         reactor.pulse(\.$groupList)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: GroupListCell.reuseIdentifier, cellType: GroupListCell.self)) { index, item, cell in
-                
+                cell.configure(with: ThumbnailViewModel(group: item))
                 cell.selectionStyle = .none
-                
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension GroupListTableViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 152
     }
 }
 

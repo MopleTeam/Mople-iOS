@@ -10,7 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class BaseDatePickViewController: UIViewController {
+final class DatePickViewController: UIViewController {
     
     var disposeBag: DisposeBag = DisposeBag()
     
@@ -159,7 +159,7 @@ final class BaseDatePickViewController: UIViewController {
 }
 
 // MARK: - DatePicker
-extension BaseDatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension DatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 2
     }

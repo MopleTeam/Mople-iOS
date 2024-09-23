@@ -13,11 +13,10 @@ final class ParticipantImageView: UIImageView {
     private var task: DownloadTask?
     
     init(imagePath: String?) {
-
         super.init(frame: .zero)
+        
+        self.setupUI()
         self.setImage(imagePath)
-        self.setLayer()
-        self.contentMode = .scaleAspectFill
     }
     
     required init?(coder: NSCoder) {
@@ -30,7 +29,6 @@ final class ParticipantImageView: UIImageView {
     }
     
     private func setImage(_ path: String?) {
-        self.image = AppDesign.Profile.defaultImage
         guard let path = path else { return }
         let imageUrl = URL(string: path)
         task = self.kf.setImage(
@@ -44,11 +42,20 @@ final class ParticipantImageView: UIImageView {
         task?.cancel()
     }
     
+    private func setupUI() {
+        defaultImage()
+        setLayer()
+    }
+    
+    private func defaultImage() {
+        self.image = AppDesign.Profile.defaultImage
+        self.contentMode = .scaleAspectFill
+    }
+    
     private func setLayer() {
         self.clipsToBounds = true
         
         self.layer.borderWidth = 2
         self.layer.borderColor = AppDesign.defaultWihte.cgColor
     }
-    
 }

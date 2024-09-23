@@ -51,7 +51,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     
     private func setCollectionView() {
         self.collectionView.delegate = self
-        collectionView.register(ScheduleListCell.self, forCellWithReuseIdentifier: ScheduleListCell.reuseIdentifier)
+        collectionView.register(ScheduleCollectionCell.self, forCellWithReuseIdentifier: ScheduleCollectionCell.reuseIdentifier)
         collectionView.register(ScheduleListReuseFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
@@ -63,8 +63,8 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
              configureCell: { _, collectionView, indexPath, item in
-                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleListCell.reuseIdentifier, for: indexPath) as! ScheduleListCell
-                 cell.configure(viewModel: ScheduleListItemViewModel(schedule: item))
+                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleCollectionCell.reuseIdentifier, for: indexPath) as! ScheduleCollectionCell
+                 cell.configure(with: ScheduleViewModel(schedule: item))
                  return cell
              },
              configureSupplementaryView: { _, collectionView, kind, indexPath in

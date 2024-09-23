@@ -8,9 +8,9 @@
 import UIKit
 import SnapKit
 
-final class ScheduleListCell: UICollectionViewCell {
+final class ScheduleCollectionCell: UICollectionViewCell {
 
-    private var eventView: EventView = .init(type: .detail)
+    private let scheduleView = ScheduleView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,9 +28,9 @@ final class ScheduleListCell: UICollectionViewCell {
     
     private func setLayout() {
         self.contentView.backgroundColor = .white
-        self.contentView.addSubview(eventView)
+        self.contentView.addSubview(scheduleView)
 
-        eventView.snp.makeConstraints { make in
+        scheduleView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -40,8 +40,8 @@ final class ScheduleListCell: UICollectionViewCell {
         self.contentView.layer.cornerRadius = 12
     }
 
-    public func configure(viewModel: ScheduleListItemViewModel) {
-        self.eventView.configure(viewModel)
+    public func configure(with viewModel: ScheduleViewModel) {
+        self.scheduleView.configure(viewModel)
     }
 }
 

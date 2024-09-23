@@ -49,10 +49,6 @@ class BaseLabel: UILabel {
         font = configure?.itemConfig.font
         textColor = configure?.itemConfig.color
     }
-    
-    public func setText(text: String?) {
-        self.text = text
-    }
 }
 
 // MARK: - 배경 적용하기

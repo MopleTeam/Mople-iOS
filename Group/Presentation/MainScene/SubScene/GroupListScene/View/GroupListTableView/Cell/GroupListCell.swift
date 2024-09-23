@@ -13,11 +13,14 @@ final class GroupListCell: UITableViewCell {
     
     private let thumbnailView = ThumbnailTitleView(type: .detail)
     
+    private let containerView = UIView()
+    
+    #warning("데이터 입력 필요")
     private let scheduleLabel: BaseLabel = {
         let label = BaseLabel(backColor: AppDesign.Group.scheduleBack,
                               radius: 10,
                               configure: AppDesign.Group.schedule)
-        label.setText(text: "새로운 일정을 추가해보세요.")
+        label.text = "새로운 일정을 추가해보세요."
         label.textAlignment = .center
         return label
     }()
@@ -49,13 +52,19 @@ final class GroupListCell: UITableViewCell {
         self.contentView.addSubview(mainStackVIew)
         
         mainStackVIew.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().inset(8)
         }
         
         scheduleLabel.snp.makeConstraints { make in
             make.height.equalTo(44)
         }
+    }
+
+    public func configure(with viewModel: ThumbnailViewModel?) {
+        guard let viewModel = viewModel else { return }
+        thumbnailView.configure(with: viewModel)
     }
 }
 

@@ -18,10 +18,10 @@ final class CalendarViewReactor: Reactor {
     }
     
     struct State {
-        @Pulse var events: [Schedule] = []
+        @Pulse var ScheduleList: [Schedule] = []
         
         var dates: [Date] {
-            events.map {
+            ScheduleList.compactMap {
                 return $0.date
             }
         }
@@ -49,7 +49,7 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case .fetchScheduleList(let scheduleList):
-            newState.events = scheduleList
+            newState.ScheduleList = scheduleList
         }
         
         return newState
