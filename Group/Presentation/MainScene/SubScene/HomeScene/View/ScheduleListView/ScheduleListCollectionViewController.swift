@@ -14,6 +14,7 @@ import RxDataSources
 final class ScheduleListCollectionViewController: UIViewController, View {
     
     typealias Reactor = ScheduleViewReactor
+    typealias Section = SectionModel<Void, Schedule>
     
     var disposeBag = DisposeBag()
     
@@ -57,12 +58,10 @@ final class ScheduleListCollectionViewController: UIViewController, View {
                                 withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
     }
     
-    typealias Section = SectionModel<Void, Schedule>
-    
     private func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<Section> {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
-             configureCell: { _, collectionView, indexPath, item in
+             configureCell: { test, collectionView, indexPath, item in
                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleCollectionCell.reuseIdentifier, for: indexPath) as! ScheduleCollectionCell
                  cell.configure(with: ScheduleViewModel(schedule: item))
                  return cell
@@ -104,9 +103,7 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
         
         let fullWidth = collectionView.bounds.width - 40
         let fullHeight = collectionView.bounds.height
-        
-        print("ifno path: \(fullHeight)")
-        
+                
         return CGSize(width: fullWidth, height: fullHeight)
     }
     

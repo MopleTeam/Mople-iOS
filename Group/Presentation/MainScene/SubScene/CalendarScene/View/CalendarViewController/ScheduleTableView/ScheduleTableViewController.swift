@@ -9,12 +9,16 @@ import UIKit
 import RxSwift
 import RxRelay
 import RxCocoa
+import RxDataSources
 
 final class ScheduleTableViewController: UIViewController {
     
+    typealias Section = SectionModel<DateComponents, Schedule>
+    
     var disposeBag = DisposeBag()
     
-    private let eventObservable: Observable<[Schedule]>
+    private let eventObservable: Observable<[ScheduleTableModel]>
+    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
     
     private let tableView: UITableView = {
         
@@ -23,17 +27,16 @@ final class ScheduleTableViewController: UIViewController {
         table.separatorStyle = .none
         table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
+        table.sectionFooterHeight = 8
+    
+        let headerView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
+        table.tableHeaderView = headerView
         
-        #warning("15버전 Issue")
-        // 15버전 부터 테이블 뷰 상단에 padding이 나옴
-        table.sectionHeaderTopPadding = 0.0
-        
-        table.contentInset = .init(top: 28, left: 0, bottom: 50, right: 0)
         table.clipsToBounds = true
         return table
     }()
     
-    init(eventObservable: Observable<[Schedule]>) {
+    init(eventObservable: Observable<[ScheduleTableModel]>) {
         self.eventObservable = eventObservable
         super.init(nibName: nil, bundle: nil)
     }
@@ -70,14 +73,20 @@ final class ScheduleTableViewController: UIViewController {
     }
     
     private func setBinding() {
-        eventObservable
-            .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: ScheduleTableViewCell.reuseIdentifier, cellType: ScheduleTableViewCell.self)) { index, item, cell in
+        dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableModel>(
+            configureCell: { dataSource, tableView, indexPath, item in
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as? ScheduleTableViewCell else { return UITableViewCell() }
                 
                 cell.configure(viewModel: .init(schedule: item))
                 cell.selectionStyle = .none
                 
+                return cell
             }
+        )
+        
+        eventObservable
+            .asDriver(onErrorJustReturn: [])
+            .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
     }
     
@@ -106,8 +115,8 @@ extension ScheduleTableViewController: UITableViewDelegate {
             return nil
         }
         
-        header.setText("2024년 9월 25일 일요일")
-        
+        let headerText = dataSource?[section].headerText
+        header.setText(headerText)
         return header
     }
     

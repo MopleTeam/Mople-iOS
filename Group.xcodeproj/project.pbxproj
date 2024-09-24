@@ -107,6 +107,8 @@
 		52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B462C7308A8002B6D20 /* Endpoint.swift */; };
 		52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B482C732186002B6D20 /* DataTransferService.swift */; };
 		52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */; };
+		52CB41DE2CA2EC2B0071679D /* ScheduleTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41DD2CA2EC2B0071679D /* ScheduleTableViewModel.swift */; };
+		52CB41E22CA2F2910071679D /* DateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41E12CA2F2910071679D /* DateManager.swift */; };
 		52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2381E2C7405820066C9A3 /* BaseLabel.swift */; };
 		52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238202C743C0E0066C9A3 /* BaseTextField.swift */; };
 		52E238252C7454230066C9A3 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238242C7454230066C9A3 /* UserProfile.swift */; };
@@ -219,6 +221,8 @@
 		52CB0B462C7308A8002B6D20 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		52CB0B482C732186002B6D20 /* DataTransferService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTransferService.swift; sourceTree = "<group>"; };
 		52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		52CB41DD2CA2EC2B0071679D /* ScheduleTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewModel.swift; sourceTree = "<group>"; };
+		52CB41E12CA2F2910071679D /* DateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateManager.swift; sourceTree = "<group>"; };
 		52E2381E2C7405820066C9A3 /* BaseLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLabel.swift; sourceTree = "<group>"; };
 		52E238202C743C0E0066C9A3 /* BaseTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTextField.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -584,6 +588,7 @@
 			isa = PBXGroup;
 			children = (
 				5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */,
+				52CB41DD2CA2EC2B0071679D /* ScheduleTableViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -729,8 +734,8 @@
 			children = (
 				527A3E982C836287007FE63B /* CalendarAndEventsViewController.swift */,
 				52E99EE12CA15556007E552C /* DatePickerView */,
-				5259B0112C9FD35D006B2711 /* ScheduleTableView */,
 				52C0F8BD2C9489CC0080CA65 /* CalendarView */,
+				5259B0112C9FD35D006B2711 /* ScheduleTableView */,
 			);
 			path = CalendarViewController;
 			sourceTree = "<group>";
@@ -857,11 +862,20 @@
 		52CB0B432C7307D0002B6D20 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				52CB41E02CA2F2800071679D /* DateTimeManager */,
 				528D27C52C79F68B00178F14 /* Photos */,
 				528D27C42C79F68500178F14 /* AppleLogin */,
 				528D27C32C79F67400178F14 /* Network */,
 			);
 			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		52CB41E02CA2F2800071679D /* DateTimeManager */ = {
+			isa = PBXGroup;
+			children = (
+				52CB41E12CA2F2910071679D /* DateManager.swift */,
+			);
+			path = DateTimeManager;
 			sourceTree = "<group>";
 		};
 		52E238222C7453EC0066C9A3 /* Domain */ = {
@@ -1104,6 +1118,7 @@
 				524E33D12C804C7A004B15FC /* Validator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
 				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
+				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */,
@@ -1134,6 +1149,7 @@
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
+				52CB41DE2CA2EC2B0071679D /* ScheduleTableViewModel.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabelView.swift in Sources */,

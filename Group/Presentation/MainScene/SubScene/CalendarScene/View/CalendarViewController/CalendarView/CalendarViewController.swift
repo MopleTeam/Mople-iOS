@@ -8,14 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import RxRelay
 import FSCalendar
-
-private enum MonthType: Int {
-    case fourWeekMonth = 4
-    case fiveWeekMonth = 5
-    case sixWeekMonth = 6
-}
 
 enum ScopeType {
     case week
@@ -27,11 +20,10 @@ final class CalendarViewController: UIViewController {
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
-    private var monthType: MonthType = .fiveWeekMonth
     private var isWeekView: Bool = false
     private var selectedDate: Date?
     
-    private let currentCalendar = Calendar.current
+    private let currentCalendar = DateManager.calendar
     private let todayComponents: DateComponents
     private var eventDateComponents: [DateComponents] = []
     
@@ -69,7 +61,7 @@ final class CalendarViewController: UIViewController {
          scopeChangeObservable: Observable<Void>,
          eventObservable: Observable<[DateComponents]>,
          dateObservable: BehaviorRelay<DateComponents>) {
-        
+
         self.todayComponents = todayComponents
         
         self.heightObservable = heightObservable
@@ -92,11 +84,6 @@ final class CalendarViewController: UIViewController {
         setCalendar()
         setupUI()
         setBind()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateMonthType()
     }
     
     // MARK: - UI Setup
@@ -148,11 +135,12 @@ final class CalendarViewController: UIViewController {
     private func setBind() {
         scopeChangeObservable
             .subscribe(with: self, onNext: { vc, _ in
-                vc.changeScope()
+                vc.switchScope()
             })
             .disposed(by: disposeBag)
         
         eventObservable
+            .do(onNext: { print("eventObservable : \($0.count)") })
             .subscribe(with: self, onNext: { vc, events in
                 vc.updateEvents(with: events)
             })
@@ -171,7 +159,6 @@ final class CalendarViewController: UIViewController {
 // MARK: - DataSource
 extension CalendarViewController: FSCalendarDataSource {
     func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
-        print(#function, #line, "시점 테스트" )
         let cell = calendar.dequeueReusableCell(withIdentifier: "CustomCell", for: date, at: position) as! CustomCalendarCell
         cell.updateCell(containsEvent: checkContainsEvent(date),
                         isSelected: checkSelected(date),
@@ -190,10 +177,6 @@ extension CalendarViewController: FSCalendarDelegate {
         let date = currentCalendar.date(from: components) ?? Date()
         return currentCalendar.date(byAdding: .year, value: -10, to: date) ?? Date()
     }
-    
-    func calendar(_ calendar: FSCalendar, willDisplay cell: FSCalendarCell, for date: Date, at monthPosition: FSCalendarMonthPosition) {
-        print(#function, #line, "시점 테스트" )
-    }
 
     func maximumDate(for calendar: FSCalendar) -> Date {
         var components = todayComponents
@@ -204,7 +187,6 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        print(#function, #line, "CurrentPage Date: \(calendar.currentPage)")
         let changeDate = calendar.currentPage
         let updateComponents = currentCalendar.dateComponents([.year, .month, .day], from: changeDate)
         
@@ -214,124 +196,68 @@ extension CalendarViewController: FSCalendarDelegate {
     // 셀 선택 시
     // week 일 때 선택 한다면 옵져버로 신호 보내서 헤더 이름 바꾸기
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        print(#function, #line, "monthPosition: \(monthPosition), scope: \(calendar.scope)")
         selectedDate = date
         changeMonth(date: date, with: monthPosition)
         updateCell(date, isSelected: true)
     }
     
+    // 셀 선택 해제
     func calendar(_ calendar: FSCalendar, didDeselect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        print(#function, #line, "Didselect Date: \(date)" )
         updateCell(date, isSelected: false)
-    }
-    
-    private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
-        if calendar.scope == .month {
-            switch monthPosition {
-            case .current:
-                changeScope()
-            case .next, .previous:
-                let dateComponents = currentCalendar.dateComponents([.year, .month, .day], from: date)
-                self.moveToSelectedDate(dateComponents: dateComponents, animated: true)
-            default:
-                break
-            }
-        }
     }
     
     // 캘린더 크기 변경 발생 시 실행
     func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
-        let resultHeight = changeHeight(bounds.height)
+        let maxHeight = calendar.rowHeight * 6
         let currentScope: ScopeType = calendar.scope == .month ? .month : .week
+        let resultHeight = calendar.scope == .month ? maxHeight : bounds.height
         
         self.scopeObservable.onNext(currentScope)
         self.heightObservable.onNext(resultHeight)
-        
-        updateCalendar(resultHeight)
     }
 }
 
-// MARK: - 주간, 월간 전환 시 높이 조정
+// MARK: - 셀 선택 시 뷰 변경
 extension CalendarViewController {
-    
-    /// 캘린더 높이 변경하기
-    /// - Parameter height: 변경 높이
-    private func updateCalendar(_ height: CGFloat) {
-        calendar.snp.updateConstraints { (make) in
-            make.height.equalTo(height)
-        }
-    }
-    
-    /// 주간 뷰에서 월간 뷰로 변경 시 높이 조절하기
-    /// - Parameter height: FSCalendar 조정 높이
-    /// - Returns: Custom 조정 높이
-    private func changeHeight(_ height: CGFloat) -> CGFloat {
-        guard isWeekView else { return height }
-        
-        // viewType 초기화
-        isWeekView = false
-        
-        return heightOfMonthType()
-    }
-    
-    /// 주 갯수에 따라서 높이 변경
-    private func heightOfMonthType() -> CGFloat {
-        let rowHeight = calendar.rowHeight
-        switch monthType {
-        case .fourWeekMonth:
-            return rowHeight * CGFloat(monthType.rawValue) + 10
-        case .fiveWeekMonth:
-            return rowHeight * CGFloat(monthType.rawValue) + 5
-        case .sixWeekMonth:
-            return rowHeight * CGFloat(monthType.rawValue)
+    private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
+        guard calendar.scope == .month else { return }
+        switch monthPosition {
+        case .current:
+            switchScope()
+        case .next, .previous:
+            let dateComponents = currentCalendar.dateComponents([.year, .month, .day], from: date)
+            self.moveToSelectedDate(dateComponents: dateComponents, animated: true)
+        default:
+            break
         }
     }
 }
 
-// MARK: - 달력 상태 업데이트
+// MARK: - 스코프 업데이트
 extension CalendarViewController {
+    
+    /// 스코프 변경
+    private func switchScope() {
+        setScope()
+        updateIsWeekViewFlag(scope: calendar.scope)
+        updateWhenMonthScope()
+    }
+    
+    /// 스코프 셋팅
+    private func setScope() {
+        let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
+        calendar.setScope(changeScope, animated: true)
+    }
+    
     /// 현재 Scope 상태를 Boolean로 저장
     private func updateIsWeekViewFlag(scope: FSCalendarScope) {
         isWeekView = scope == .week
     }
     
-    /// 주간 달력인 경우에는 저장하지 않기 위해 scope가 month인 경우에만 monthType 업데이트
-    private func updateMonthType() {
-        if calendar.scope == .month {
-            let calendarHeight = calendar.frame.height
-            monthType = filterMonthType(height: calendarHeight)
-        }
-    }
-    
-    /// 현재 달력의 높이에 따라서 6주 or 5주로 변경
-    /// - Parameters:
-    ///   - height: 현재 달력의 높이
-    ///   - tolerance: 오차 범위
-    private func filterMonthType(height: CGFloat, tolerance: CGFloat = 20) -> MonthType {
-        let currentHeight = height + tolerance // 현재 높이
-        
-        let sixWeekMonthHeight = calendar.rowHeight * 6
-        let fiveWeeMonthkHeight = calendar.rowHeight * 5
-        
-        switch currentHeight {
-        case ..<fiveWeeMonthkHeight:
-            return .fourWeekMonth
-        case ..<sixWeekMonthHeight:
-            return .fiveWeekMonth
-        default:
-            return .sixWeekMonth
-        }
-    }
-}
-
-// MARK: - 셀 업데이트
-extension CalendarViewController {
-    
     /// 주간에서 월간으로 변경될 때 표시할 값 계산
     private func updateWhenMonthScope() {
-        if calendar.scope == .month {
-            dateObservable.accept(getDisplayableDateComponents())
-        }
+        guard calendar.scope == .month else { return }
+        dateObservable.accept(getDisplayableDateComponents())
     }
     
     /// 화면에 표시할 날짜 필터링
@@ -344,20 +270,10 @@ extension CalendarViewController {
         let currentDate = activeDates.contains { $0 == selectedDate } ? selectedDate! : calendar.currentPage
         return currentCalendar.dateComponents([.year, .month, .day], from: currentDate)
     }
-    
-    /// 스코프 변경
-    private func changeScope() {
-        let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
-        calendar.setScope(changeScope, animated: true)
-        updateIsWeekViewFlag(scope: calendar.scope)
-        updateWhenMonthScope()
-    }
-    
-    /// 일정이 있는 날인지 체크
-    private func checkContainsEvent(_ date: Date) -> Bool {
-        let dateComponent = currentCalendar.dateComponents([.year, .month, .day], from: date)
-        return eventDateComponents.contains { $0 == dateComponent }
-    }
+}
+
+// MARK: - 셀 업데이트
+extension CalendarViewController {
     
     /// 이벤트 업데이트
     /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
@@ -365,7 +281,8 @@ extension CalendarViewController {
         self.eventDateComponents = dateComponents
         calendar.reloadData()
     }
-    
+
+
     /// 선택 여부에 따라서 셀 컬러 변경
     /// - Parameters:
     ///   - date: 선택된 날짜
@@ -377,11 +294,16 @@ extension CalendarViewController {
                         isToday: checkToday(date))
     }
     
+    /// 일정이 있는 날인지 체크
+    private func checkContainsEvent(_ date: Date) -> Bool {
+        let dateComponent = currentCalendar.dateComponents([.year, .month, .day], from: date)
+        return eventDateComponents.contains { $0 == dateComponent }
+    }
+    
+    
     /// 셀 그릴 때 선택된 셀 구분
     /// - Parameter date: 그릴려고 하는 날짜
     private func checkSelected(_ date: Date) -> Bool {
-        
-        
         return selectedDate == date
     }
     

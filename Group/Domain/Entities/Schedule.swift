@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Schedule {
+struct Schedule: Hashable, Equatable {
     let id: UUID?
     let group: Group?
     let title: String?
@@ -34,20 +34,12 @@ struct Schedule {
     }
     
     var stringDate: String? {
-        let dateFormatter: DateFormatter = {
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "ko_KR")
-            dateFormatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
-            
-            return dateFormatter
-        }()
-        
         guard let date = self.date else { return nil }
-        return dateFormatter.string(from: date)
+        return DateManager.fullDateTimeFormatter.string(from: date)
     }
 }
 
-struct Group {
+struct Group: Hashable, Equatable {
     let thumbnailPath: String?
     let name: String?
     let memberCount: Int?
@@ -59,7 +51,7 @@ struct Group {
     }
 }
 
-struct Participant {
+struct Participant: Hashable, Equatable {
     let id: UUID?
     let name: String?
     let imagePath: String?
@@ -71,7 +63,7 @@ struct Participant {
     }
 }
 
-struct WeatherInfo {
+struct WeatherInfo: Hashable, Equatable {
     let imagePath: String?
     let temperature: Int?
 }

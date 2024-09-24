@@ -13,12 +13,21 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
     var groupCount: Int = 1
     
     func getEvents() -> [Schedule] {
-        return [
-            .init(group: getGroup(), eventName: "모임 1 일정", location: "서울시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 1)), weather: getWeather()),
-            .init(group: getGroup(), eventName: "모임 2 일정", location: "성남시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 2)), weather: getWeather()),
-            .init(group: getGroup(), eventName: "모임 3 일정", location: "구리시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 3)), weather: getWeather()),
-            .init(group: getGroup(), eventName: "모임 4 일정", location: "구미시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 4)), weather: getWeather()),
-            .init(group: getGroup(), eventName: "모임 5 일정", location: "제주시 어딘가", participants: getUser(), date: Date().addingTimeInterval(3600 * (24 * 5)), weather: getWeather())]
+        var scheduleArray: [Schedule] = []
+        
+        for i in 0...20 {
+            
+            let schedule = Schedule(group: getGroup(),
+                                    eventName: "모임 \(i)",
+                                    location: "장소를 나타냅니다.",
+                                    participants: getUser(),
+                                    date: Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 0...100)))),
+                                    weather: getWeather())
+            
+            scheduleArray.append(schedule)
+        }
+        
+        return scheduleArray
     }
     
     func getGroup() -> Group {

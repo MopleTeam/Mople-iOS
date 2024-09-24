@@ -18,26 +18,24 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
-    private let currentCalendar = Calendar.current
-    
+    private let currentCalendar = DateManager.calendar
     private lazy var todayComponents = {
-        var components = self.currentCalendar.dateComponents([.year, .month, .day], from: Date())
+        var components = currentCalendar.dateComponents([.year, .month, .day], from: Date())
         return components
     }()
     
     // MARK: - Observable
-    
     // Calendar
     private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
     private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
     private let calendarScopeChangeObservable: PublishSubject<Void> = .init()
-    private let eventObservable: BehaviorRelay<[DateComponents]> = .init(value: [])
+    private let eventObservable: PublishSubject<[DateComponents]> = .init()
     
     // Clendar & DatePicker
     private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
     
     // ScheduleTableView
-    private let scheduleListObservable: BehaviorRelay<[Schedule]> = .init(value: [])
+    private let scheduleListObservable: PublishSubject<[ScheduleTableModel]> = .init()
     
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -166,16 +164,17 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     // MARK: - Selectors
     func bind(reactor: CalendarViewReactor) {
-        reactor.state
-            .map { $0.dates }
-            .asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { vc, dates in
-                let components = dates.map { vc.currentCalendar.dateComponents([.year, .month, .day], from: $0) }
-                vc.eventObservable.accept(components)
-            })
+        self.rx.viewDidLoad
+            .map { _ in Reactor.Action.fetchData }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$ScheduleList)
+        reactor.pulse(\.$dateComponentsArray)
+            .do(onNext: { print($0.count) })
+            .bind(to: eventObservable)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$scheduleArray)
             .bind(to: scheduleListObservable)
             .disposed(by: disposeBag)
     }
@@ -200,9 +199,6 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         calendarDateObservable
-            .do(onNext: { dateComponents in
-                print(#function, #line, "dateComponets : \(dateComponents)" )
-            })
             .subscribe(with: self, onNext: { vc, date in
                 let year = date.year ?? 2024
                 let monty = date.month ?? 1

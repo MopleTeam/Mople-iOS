@@ -10,36 +10,32 @@ import UIKit
 
 final class CalendarViewReactor: Reactor {
     enum Action {
-        case fetchScheduleList
+        case fetchData
     }
     
     enum Mutation {
-        case fetchScheduleList(scheduleList: [Schedule])
+        case fetchScheduleList(scheduleList: [ScheduleTableModel])
+        case parseScheduleDateComponents(componentsArray: [DateComponents])
     }
     
     struct State {
-        @Pulse var ScheduleList: [Schedule] = []
-        
-        var dates: [Date] {
-            ScheduleList.compactMap {
-                return $0.date
-            }
-        }
+        @Pulse var scheduleArray: [ScheduleTableModel] = []
+        @Pulse var dateComponentsArray: [DateComponents] = []
     }
         
+    private let currentCalendar = DateManager.calendar
     private let fetchUseCase: FetchRecentSchedule
 
     var initialState: State = State()
     
     init(fetchUseCase: FetchRecentSchedule) {
         self.fetchUseCase = fetchUseCase
-        action.onNext(.fetchScheduleList)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .fetchScheduleList:
-            return fetchScheduleList()
+        case .fetchData:
+            return fetchData()
         }
     }
     
@@ -49,7 +45,9 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case .fetchScheduleList(let scheduleList):
-            newState.ScheduleList = scheduleList
+            newState.scheduleArray = scheduleList
+        case .parseScheduleDateComponents(let componentsArray):
+            newState.dateComponentsArray = componentsArray
         }
         
         return newState
@@ -57,12 +55,22 @@ final class CalendarViewReactor: Reactor {
 }
 
 extension CalendarViewReactor {
-    private func fetchScheduleList() -> Observable<Mutation> {
+    private func fetchData() -> Observable<Mutation> {
+        let fetchData = fetchUseCase.fetchRecent().asObservable()
         
-        let fetchData = fetchUseCase.fetchRecent()
-            .asObservable()
+        let fetchScheduleList = fetchData
+            .map { Dictionary(grouping: $0) { schedule in
+                return self.currentCalendar.dateComponents([.year, .month, .day], from: schedule.date ?? Date())
+            }}
+            .map { $0.map { return ScheduleTableModel(dateComponents: $0.key, items: $0.value) } }
             .map { Mutation.fetchScheduleList(scheduleList: $0) }
         
-        return fetchData
+        let parseDateComponents = fetchData
+            .map { $0.compactMap { $0.date } }
+            .map { Set($0.map { self.currentCalendar.dateComponents([.year, .month, .day], from: $0) } ) }
+            .map({ Array($0) })
+            .map { Mutation.parseScheduleDateComponents(componentsArray: $0) }
+                    
+        return Observable.concat([fetchScheduleList, parseDateComponents])
     }
 }

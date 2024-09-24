@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import RxSwift
+import RxRelay
 import RxCocoa
 
 final class DatePickViewController: UIViewController {
@@ -18,16 +19,11 @@ final class DatePickViewController: UIViewController {
     private let dateObservable: BehaviorRelay<DateComponents>
     
     // MARK: - Variables
-    private let currentCalendar = Calendar.current
     private let todayComponents: DateComponents
     private lazy var selectedDate: DateComponents = todayComponents
     
     private lazy var currentYear: Int = {
         todayComponents.year ?? 2024
-    }()
-    
-    private lazy var currentMonth: Int = {
-        todayComponents.month ?? 1
     }()
     
     private lazy var years: [Int] = {
@@ -55,9 +51,7 @@ final class DatePickViewController: UIViewController {
                              configure: AppDesign.DatePicker.pickerComplete)
         return btn
     }()
-    
-    private let emptyView = UIView()
-        
+            
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [navigationView, datePicker, completeButton])
         sv.axis = .vertical
@@ -91,13 +85,18 @@ final class DatePickViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        setDatePicker()
         setupUI()
-        setNavigationView()
         setupBinding()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
+        setLayout()
+        setNavigationView()
+    }
+    
+    private func setLayout() {
         view.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
@@ -121,25 +120,21 @@ final class DatePickViewController: UIViewController {
         navigationView.setRightItem(item: rightBarButton)
     }
     
-    private func setDatePicker(month: Int, year: Int) {
+    private func setDatePicker() {
         datePicker.dataSource = self
         datePicker.delegate = self
         
-        let monthIndex = months.firstIndex(of: month) ?? 0
-        let yearIndex = years.firstIndex(of: year) ?? 0
+        guard let year = todayComponents.year,
+              let month = todayComponents.month else { return }
         
-        datePicker.selectRow(monthIndex, inComponent: 0, animated: false)
-        datePicker.selectRow(yearIndex, inComponent: 1, animated: false)
+        setSelectRow(month: month, year: year)
     }
     
-    // MARK: - Selectors
+    // MARK: - Bind
     private func setupBinding() {
         dateObservable
             .subscribe(with: self, onNext: { vc, date in
-                vc.selectedDate = date
-                let month = date.month ?? 1
-                let year = date.year ?? 2024
-                vc.setDatePicker(month: month, year: year)
+                vc.updateSelectRow(newDate: date)
             })
             .disposed(by: disposeBag)
         
@@ -155,6 +150,26 @@ final class DatePickViewController: UIViewController {
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Select Row
+extension DatePickViewController {
+    private func setSelectRow(month: Int, year: Int) {
+        let monthIndex = months.firstIndex(of: month) ?? 0
+        let yearIndex = years.firstIndex(of: year) ?? 0
+        
+        datePicker.selectRow(monthIndex, inComponent: 0, animated: false)
+        datePicker.selectRow(yearIndex, inComponent: 1, animated: false)
+    }
+    
+    private func updateSelectRow(newDate: DateComponents) {
+        selectedDate = newDate
+        
+        guard let year = newDate.year,
+              let month = newDate.month else { return }
+
+        setSelectRow(month: month, year: year)
     }
 }
 
@@ -174,6 +189,7 @@ extension DatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int,
                     reusing view: UIView?) -> UIView {
+        
         let label = UILabel()
         label.textAlignment = .center
         label.textColor = .black
