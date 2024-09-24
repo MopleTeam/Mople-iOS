@@ -13,7 +13,6 @@ final class SchedulTableHeaderView: UITableViewHeaderFooterView {
     private let titleLabel: BaseLabel = {
         let label = BaseLabel(configure: AppDesign.SchedeleTable.header)
         label.textAlignment = .center
-        label.backgroundColor = .systemMint
         return label
     }()
     

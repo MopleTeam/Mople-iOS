@@ -200,6 +200,9 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         calendarDateObservable
+            .do(onNext: { dateComponents in
+                print(#function, #line, "dateComponets : \(dateComponents)" )
+            })
             .subscribe(with: self, onNext: { vc, date in
                 let year = date.year ?? 2024
                 let monty = date.month ?? 1
@@ -256,7 +259,7 @@ extension CalendarAndEventsViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
+        UIView.animate(withDuration: 0.2, delay: 0, options: .allowUserInteraction) {
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)

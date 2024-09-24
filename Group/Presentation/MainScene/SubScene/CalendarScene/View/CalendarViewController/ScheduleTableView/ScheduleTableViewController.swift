@@ -17,11 +17,17 @@ final class ScheduleTableViewController: UIViewController {
     private let eventObservable: Observable<[Schedule]>
     
     private let tableView: UITableView = {
-        let table = UITableView()
+        
+        #warning("섹션 헤더 sticky 되는 현상 막기")
+        let table = UITableView(frame: .zero, style: .grouped)
         table.separatorStyle = .none
-        table.backgroundColor = .systemYellow
+        table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
-        table.sectionHeaderHeight = 0
+        
+        #warning("15버전 Issue")
+        // 15버전 부터 테이블 뷰 상단에 padding이 나옴
+        table.sectionHeaderTopPadding = 0.0
+        
         table.contentInset = .init(top: 28, left: 0, bottom: 50, right: 0)
         table.clipsToBounds = true
         return table
@@ -51,7 +57,9 @@ final class ScheduleTableViewController: UIViewController {
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.top.equalTo(self.view.snp.bottom)
         }
     }
     
@@ -79,7 +87,6 @@ final class ScheduleTableViewController: UIViewController {
                 make.horizontalEdges.equalToSuperview()
                 make.bottom.equalToSuperview()
                 make.top.equalTo(self.view.snp.bottom)
-                
             }
         } else {
             tableView.snp.remakeConstraints { make in
@@ -105,7 +112,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        return 36
     }
 }
 
