@@ -36,7 +36,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     private let pageChangeNotificationObserver: PublishSubject<DateComponents> = .init()
     
     // Calendar & ScheduleTable
-    private let dateObservable: PublishRelay<DateComponents> = .init()
+    private let dateObservable: PublishSubject<DateComponents> = .init()
+    private let foucsObservable: PublishSubject<DateComponents> = .init()
     
     // ScheduleTableView
     private let scheduleListObservable: PublishSubject<[ScheduleTableModel]> = .init()
@@ -66,7 +67,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         let calendarView = CalendarViewController(todayComponents: todayComponents,
                                                   heightObservable: calendarHeightObservable.asObserver(),
                                                   scopeObservable: calendarScopeObservable.asObserver(),
-                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObserver(),
+                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObserver(), foucsChangeNotificationObserver: foucsObservable.asObserver(),
                                                   scopeChangeObservable: calendarScopeChangeObservable,
                                                   eventArrayObservable: eventArrayObservable.asObservable(),
                                                   pageChangeRequestObserver: pageChangeRequestObserver,
@@ -83,7 +84,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     private lazy var scheduleListTableView: ScheduleTableViewController = {
         let scheduleListTableView = ScheduleTableViewController(fetchDataObservable: scheduleListObservable.asObservable(),
-                                                                dateObservable: dateObservable)
+                                                                dateObservable: dateObservable.asObserver(), foucsCellObservable: foucsObservable.asObserver())
         return scheduleListTableView
     }()
     
@@ -104,7 +105,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
          setObservable()
      }
     
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         pageChangeNotificationObserver.onNext(todayComponents)
     }
     
@@ -210,7 +211,6 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         pageChangeNotificationObserver
-            .do(onNext: { print(#function, #line, "date : \($0)" ) })
             .subscribe(with: self, onNext: { vc, date in
                 let year = date.year ?? 2024
                 let monty = date.month ?? 1

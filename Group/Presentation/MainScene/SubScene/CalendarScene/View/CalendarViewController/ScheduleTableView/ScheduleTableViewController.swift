@@ -17,8 +17,21 @@ final class ScheduleTableViewController: UIViewController {
     
     var disposeBag = DisposeBag()
     
+    var isDragging = false
+    
+    private var systemIsDragging = false {
+        didSet {
+            guard systemIsDragging else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50), execute: {
+                self.systemIsDragging = false
+            })
+        }
+    }
+    
     private let fetchDataObservable: Observable<[ScheduleTableModel]>
-    private let dateObervable: PublishRelay<DateComponents>
+    private let dateObervable: AnyObserver<DateComponents>
+    private let foucsCellObservable: Observable<DateComponents>
+    
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
     
     private var visibleHeaders: [UIView] = []
@@ -40,9 +53,11 @@ final class ScheduleTableViewController: UIViewController {
     }()
     
     init(fetchDataObservable: Observable<[ScheduleTableModel]>,
-         dateObservable: PublishRelay<DateComponents>) {
+         dateObservable: AnyObserver<DateComponents>,
+         foucsCellObservable: Observable<DateComponents>) {
         self.fetchDataObservable = fetchDataObservable
         self.dateObervable = dateObservable
+        self.foucsCellObservable = foucsCellObservable
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -94,18 +109,17 @@ final class ScheduleTableViewController: UIViewController {
             .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
-        #warning("달력 이동 테스트")
-        tableView.rx.itemSelected
-            .subscribe(with: self, onNext: { vc, test in
-                var testComponents = DateComponents()
-                testComponents.year = 2030
-                testComponents.month = 1
-                testComponents.day = Int.random(in: 1...25)
-                print(#function, #line, "index row : \(test.row)" )
-                vc.dateObervable.accept(testComponents)
+        foucsCellObservable
+            .delay(.milliseconds(350), scheduler: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, foucsDate in
+                guard let models = vc.dataSource?.sectionModels else { return }
+                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else { return }
+                vc.systemIsDragging = true
+                vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
             })
             .disposed(by: disposeBag)
     }
+    
     
     public func hideView(isHide: Bool) {
         if isHide {
@@ -153,23 +167,44 @@ extension ScheduleTableViewController: UITableViewDelegate {
 }
 
 extension ScheduleTableViewController: UIScrollViewDelegate {
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard let firstView = visibleHeaders.first else { return }
+        let viewHeight = self.view.frame.height
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let tabHeight = self.tabBarController?.tabBar.frame.height
+        let maxY = offsetY + viewHeight
         
-        // 현재 뷰(self.view)에서 특정 view의 위치를 파악하는 법
-        guard let headerFrame = firstView.superview?.convert(firstView.frame, to: self.view) else { return }
-        
-        var centerPoint = self.view.frame.height / 2
-        
-        if let tabHeight = self.tabBarController?.tabBar.frame.height {
-            centerPoint -= tabHeight
+        if !systemIsDragging {
+            
+            // 구현해야 함
+            if contentHeight < maxY {
+                print("마지막 셀이야!!!")
+            }
+            
+            guard let firstView = visibleHeaders.first else { return }
+            notifyIfCrossedCenterLine(center: centerPoint(), view: firstView)
         }
+    }
+}
+
+// MARK: - Helper
+extension ScheduleTableViewController {
+    private func centerPoint() -> CGFloat {
+        let centerPoint = self.view.frame.height / 2
+        let tabHeight = self.tabBarController?.tabBar.frame.height ?? 0
+        return centerPoint - tabHeight
+    }
+    
+    private func notifyIfCrossedCenterLine(center: CGFloat, view: UIView) {
         
-        if centerPoint > headerFrame.origin.y {
+        
+        guard let viewFrame = view.superview?.convert(view.frame, to: self.view) else { return }
+        
+        if center > viewFrame.origin.y {
             guard let dataSource = dataSource else { return }
-            let components = dataSource[firstView.tag].dateComponents
-            print("다시 보냅니다. \(components)")
-            dateObervable.accept(components)
+            let components = dataSource[view.tag].dateComponents
+            dateObervable.onNext(components)
         }
     }
 }

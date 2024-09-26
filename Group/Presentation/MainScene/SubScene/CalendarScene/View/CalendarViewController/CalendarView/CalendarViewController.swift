@@ -34,6 +34,7 @@ final class CalendarViewController: UIViewController {
     private let heightObservable: AnyObserver<CGFloat>
     private let scopeObservable: AnyObserver<ScopeType>
     private let pageChangeNotificationObserver: AnyObserver<DateComponents>
+    private let foucsChangeNotificationObserver: AnyObserver<DateComponents>
     
     // Input
     private let scopeChangeObservable: Observable<Void>
@@ -43,7 +44,7 @@ final class CalendarViewController: UIViewController {
     private let pageChangeRequestObserver: PublishSubject<DateComponents>
     
     // Input/Output
-    private let dateObservable: PublishRelay<DateComponents>
+    private let dateObservable: Observable<DateComponents>
     
     // MARK: - UI Components
     private let calendar: FSCalendar = {
@@ -65,15 +66,17 @@ final class CalendarViewController: UIViewController {
          heightObservable: AnyObserver<CGFloat>,
          scopeObservable: AnyObserver<ScopeType>,
          pageChangeNotificationObserver: AnyObserver<DateComponents>,
+         foucsChangeNotificationObserver: AnyObserver<DateComponents>,
          scopeChangeObservable: Observable<Void>,
          eventArrayObservable: Observable<[DateComponents]>,
          pageChangeRequestObserver: PublishSubject<DateComponents>,
-         dateObservable: PublishRelay<DateComponents>) {
+         dateObservable: Observable<DateComponents>) {
 
         self.todayComponents = todayComponents
         self.heightObservable = heightObservable
         self.scopeObservable = scopeObservable
         self.pageChangeNotificationObserver = pageChangeNotificationObserver
+        self.foucsChangeNotificationObserver = foucsChangeNotificationObserver
         self.scopeChangeObservable = scopeChangeObservable
         self.eventArrayObservable = eventArrayObservable
         self.pageChangeRequestObserver = pageChangeRequestObserver
@@ -169,7 +172,10 @@ final class CalendarViewController: UIViewController {
             .disposed(by: disposeBag)
         
         calendarFocusDateObservable
-            .delay(.milliseconds(400), scheduler: MainScheduler.instance)
+            .do(onNext: {
+                self.foucsChangeNotificationObserver.onNext($0)
+            })
+            .delay(.milliseconds(360), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.moveToFoucsDate(date)
             })
@@ -357,7 +363,8 @@ extension CalendarViewController {
     
     private func moveToFoucsDate(_ date: DateComponents) {
         guard let focusDate = DateManager.convertDate(date) else { return }
-        calendar.select(focusDate, scrollToDate: true)
+        calendar.select(focusDate, scrollToDate: false)
+        moveToPage(dateComponents: date, animated: false)
         calendar.reloadData()
     }
 }
