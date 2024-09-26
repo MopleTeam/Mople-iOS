@@ -17,8 +17,11 @@ final class ScheduleTableViewController: UIViewController {
     
     var disposeBag = DisposeBag()
     
-    private let eventObservable: Observable<[ScheduleTableModel]>
+    private let fetchDataObservable: Observable<[ScheduleTableModel]>
+    private let dateObervable: PublishRelay<DateComponents>
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
+    
+    private var visibleHeaders: [UIView] = []
     
     private let tableView: UITableView = {
         
@@ -36,8 +39,10 @@ final class ScheduleTableViewController: UIViewController {
         return table
     }()
     
-    init(eventObservable: Observable<[ScheduleTableModel]>) {
-        self.eventObservable = eventObservable
+    init(fetchDataObservable: Observable<[ScheduleTableModel]>,
+         dateObservable: PublishRelay<DateComponents>) {
+        self.fetchDataObservable = fetchDataObservable
+        self.dateObervable = dateObservable
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -84,9 +89,21 @@ final class ScheduleTableViewController: UIViewController {
             }
         )
         
-        eventObservable
+        fetchDataObservable
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
+        
+        #warning("달력 이동 테스트")
+        tableView.rx.itemSelected
+            .subscribe(with: self, onNext: { vc, test in
+                var testComponents = DateComponents()
+                testComponents.year = 2030
+                testComponents.month = 1
+                testComponents.day = Int.random(in: 1...25)
+                print(#function, #line, "index row : \(test.row)" )
+                vc.dateObervable.accept(testComponents)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -116,12 +133,44 @@ extension ScheduleTableViewController: UITableViewDelegate {
         }
         
         let headerText = dataSource?[section].headerText
+        header.tag = section
         header.setText(headerText)
         return header
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 36
+    }
+
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        self.visibleHeaders.append(view)
+        self.visibleHeaders.sort { $0.tag < $1.tag }
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
+        self.visibleHeaders.removeAll { $0.tag == view.tag }
+    }
+}
+
+extension ScheduleTableViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let firstView = visibleHeaders.first else { return }
+        
+        // 현재 뷰(self.view)에서 특정 view의 위치를 파악하는 법
+        guard let headerFrame = firstView.superview?.convert(firstView.frame, to: self.view) else { return }
+        
+        var centerPoint = self.view.frame.height / 2
+        
+        if let tabHeight = self.tabBarController?.tabBar.frame.height {
+            centerPoint -= tabHeight
+        }
+        
+        if centerPoint > headerFrame.origin.y {
+            guard let dataSource = dataSource else { return }
+            let components = dataSource[firstView.tag].dateComponents
+            print("다시 보냅니다. \(components)")
+            dateObervable.accept(components)
+        }
     }
 }
 

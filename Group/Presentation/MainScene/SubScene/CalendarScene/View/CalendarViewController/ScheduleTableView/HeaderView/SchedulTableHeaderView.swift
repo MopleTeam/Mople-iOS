@@ -36,7 +36,8 @@ final class SchedulTableHeaderView: UITableViewHeaderFooterView {
     }
     
     public func setText(_ text: String?) {
-        titleLabel.text = text
+        guard let text = text else { return }
+        titleLabel.text = text + "tag: \(tag)"
     }
     
 }

@@ -16,7 +16,12 @@ final class DatePickViewController: UIViewController {
     var disposeBag: DisposeBag = DisposeBag()
     
     // MARK: - Observable
-    private let dateObservable: BehaviorRelay<DateComponents>
+    
+    // Output
+    private let pageChangeRequestObserver: AnyObserver<DateComponents>
+    
+    // Input
+    private let pageChangeNotificationObserver: Observable<DateComponents>
     
     // MARK: - Variables
     private let todayComponents: DateComponents
@@ -68,10 +73,12 @@ final class DatePickViewController: UIViewController {
     // MARK: - LifeCycle
     init(title: String?,
          todayComponents: DateComponents,
-         dateObservable: BehaviorRelay<DateComponents>) {
+         pageChangeRequestObserver: AnyObserver<DateComponents>,
+         pageChangeNotificationObserver: Observable<DateComponents>) {
         
         self.todayComponents = todayComponents
-        self.dateObservable = dateObservable
+        self.pageChangeRequestObserver = pageChangeRequestObserver
+        self.pageChangeNotificationObserver = pageChangeNotificationObserver
         
         defer {
             setTitle(title)
@@ -132,7 +139,7 @@ final class DatePickViewController: UIViewController {
     
     // MARK: - Bind
     private func setupBinding() {
-        dateObservable
+        pageChangeNotificationObserver
             .subscribe(with: self, onNext: { vc, date in
                 vc.updateSelectRow(newDate: date)
             })
@@ -146,7 +153,7 @@ final class DatePickViewController: UIViewController {
         
         completeButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
-                vc.dateObservable.accept(vc.selectedDate)
+                vc.pageChangeRequestObserver.onNext(vc.selectedDate)
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)

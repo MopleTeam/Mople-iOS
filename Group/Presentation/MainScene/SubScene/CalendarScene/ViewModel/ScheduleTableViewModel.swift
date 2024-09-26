@@ -9,6 +9,7 @@ import Foundation
 import Differentiator
 
 struct ScheduleTableModel: SectionModelType {
+    
     var dateComponents: DateComponents
     var items: [Item] = []
     

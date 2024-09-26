@@ -29,14 +29,18 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
     private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
     private let calendarScopeChangeObservable: PublishSubject<Void> = .init()
-    private let eventObservable: PublishSubject<[DateComponents]> = .init()
+    private let eventArrayObservable: PublishSubject<[DateComponents]> = .init()
+        
+    // Clendar & DatePicker & MainView
+    private let pageChangeRequestObserver: PublishSubject<DateComponents> = .init()
+    private let pageChangeNotificationObserver: PublishSubject<DateComponents> = .init()
     
-    // Clendar & DatePicker
-    private lazy var calendarDateObservable: BehaviorRelay<DateComponents> = .init(value: todayComponents)
+    // Calendar & ScheduleTable
+    private let dateObservable: PublishRelay<DateComponents> = .init()
     
     // ScheduleTableView
     private let scheduleListObservable: PublishSubject<[ScheduleTableModel]> = .init()
-    
+        
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
         let btn = UIButton()
@@ -62,9 +66,11 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         let calendarView = CalendarViewController(todayComponents: todayComponents,
                                                   heightObservable: calendarHeightObservable.asObserver(),
                                                   scopeObservable: calendarScopeObservable.asObserver(),
+                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObserver(),
                                                   scopeChangeObservable: calendarScopeChangeObservable,
-                                                  eventObservable: eventObservable.asObservable(),
-                                                  dateObservable: calendarDateObservable)
+                                                  eventArrayObservable: eventArrayObservable.asObservable(),
+                                                  pageChangeRequestObserver: pageChangeRequestObserver,
+                                                  dateObservable: dateObservable)
         
         
         calendarView.view.layer.cornerRadius = 16
@@ -76,7 +82,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     private let scheduleListContainer = UIView()
     
     private lazy var scheduleListTableView: ScheduleTableViewController = {
-        let scheduleListTableView = ScheduleTableViewController(eventObservable: scheduleListObservable.asObservable())
+        let scheduleListTableView = ScheduleTableViewController(fetchDataObservable: scheduleListObservable.asObservable(),
+                                                                dateObservable: dateObservable)
         return scheduleListTableView
     }()
     
@@ -96,6 +103,10 @@ final class CalendarAndEventsViewController: BaseViewController, View {
          setupUI()
          setObservable()
      }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        pageChangeNotificationObserver.onNext(todayComponents)
+    }
     
     // MARK: - UI Setup
     private func setupUI() {
@@ -171,7 +182,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         
         reactor.pulse(\.$dateComponentsArray)
             .do(onNext: { print($0.count) })
-            .bind(to: eventObservable)
+            .bind(to: eventArrayObservable)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$scheduleArray)
@@ -198,7 +209,8 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             })
             .disposed(by: disposeBag)
         
-        calendarDateObservable
+        pageChangeNotificationObserver
+            .do(onNext: { print(#function, #line, "date : \($0)" ) })
             .subscribe(with: self, onNext: { vc, date in
                 let year = date.year ?? 2024
                 let monty = date.month ?? 1
@@ -230,7 +242,8 @@ extension CalendarAndEventsViewController {
     private func presentDatePicker() {
         let datePickView = DatePickViewController(title: "날짜 선택",
                                                   todayComponents: todayComponents,
-                                                  dateObservable: calendarDateObservable)
+                                                  pageChangeRequestObserver: pageChangeRequestObserver.asObserver(),
+                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObservable())
         
         datePickView.modalPresentationStyle = .pageSheet
         
@@ -255,7 +268,7 @@ extension CalendarAndEventsViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        UIView.animate(withDuration: 0.2, delay: 0, options: .allowUserInteraction) {
+        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)

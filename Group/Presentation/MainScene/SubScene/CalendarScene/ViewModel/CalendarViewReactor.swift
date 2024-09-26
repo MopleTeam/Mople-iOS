@@ -45,9 +45,9 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case .fetchScheduleList(let scheduleList):
-            newState.scheduleArray = scheduleList
+            newState.scheduleArray = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
         case .parseScheduleDateComponents(let componentsArray):
-            newState.dateComponentsArray = componentsArray
+            newState.dateComponentsArray = componentsArray.sorted(by: { $0 < $1 })
         }
         
         return newState
@@ -60,7 +60,7 @@ extension CalendarViewReactor {
         
         let fetchScheduleList = fetchData
             .map { Dictionary(grouping: $0) { schedule in
-                return self.currentCalendar.dateComponents([.year, .month, .day], from: schedule.date ?? Date())
+                return self.currentCalendar.dateComponents([.year, .month, .day], from: schedule.date)
             }}
             .map { $0.map { return ScheduleTableModel(dateComponents: $0.key, items: $0.value) } }
             .map { Mutation.fetchScheduleList(scheduleList: $0) }

@@ -13,7 +13,7 @@ struct Schedule: Hashable, Equatable {
     let title: String?
     let place: String?
     let participants: [Participant]?
-    let date: Date?
+    let date: Date
     let weather: WeatherInfo?
     
     init(id: UUID = UUID(),
@@ -21,7 +21,7 @@ struct Schedule: Hashable, Equatable {
          eventName: String,
          location: String,
          participants: [Participant],
-         date: Date,
+         date: Date = Date(),
          weather: WeatherInfo) {
         
         self.id = id
@@ -34,7 +34,6 @@ struct Schedule: Hashable, Equatable {
     }
     
     var stringDate: String? {
-        guard let date = self.date else { return nil }
         return DateManager.fullDateTimeFormatter.string(from: date)
     }
 }

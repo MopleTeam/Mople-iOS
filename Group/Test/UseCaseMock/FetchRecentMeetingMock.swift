@@ -21,7 +21,7 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
                                     eventName: "모임 \(i)",
                                     location: "장소를 나타냅니다.",
                                     participants: getUser(),
-                                    date: Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 0...100)))),
+                                    date: Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 1...500)))),
                                     weather: getWeather())
             
             scheduleArray.append(schedule)
