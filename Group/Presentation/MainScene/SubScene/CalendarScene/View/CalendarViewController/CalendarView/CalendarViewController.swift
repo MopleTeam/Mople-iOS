@@ -99,16 +99,13 @@ final class CalendarViewController: UIViewController {
     // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = AppDesign.defaultWihte
-        
         self.view.addSubview(calendar)
         
         calendar.addSubview(weekContainerView)
-        
         weekContainerView.addSubview(calendar.calendarWeekdayView)
         
         calendar.snp.makeConstraints { make in
             let calendarMaxHeight = calendar.weekdayHeight + (calendar.rowHeight * 6)
-            
             make.top.horizontalEdges.equalToSuperview()
             make.height.equalTo(calendarMaxHeight)
         }
@@ -164,7 +161,7 @@ final class CalendarViewController: UIViewController {
         dateObservable
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .pairwise()
-            .filter(areDatesDistinct)
+            .filter({ $0 != $1 })
             .compactMap({ Optional(tuple: $0) })
             .subscribe(with: self, onNext: { vc, datePair  in
                 vc.moveToCurrentDate(datePair)
@@ -241,7 +238,6 @@ extension CalendarViewController: FSCalendarDelegate {
 // MARK: - 셀 선택 시 액션
 extension CalendarViewController {
     
-    
     private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
         guard calendar.scope == .month else { return }
         switch monthPosition {
@@ -255,7 +251,6 @@ extension CalendarViewController {
         }
     }
     
-    
     /// 스케줄 테이블 반영
     private func notifySelectedDate(_ date: Date) {
         let date = DateManager.convertDateComponents(date)
@@ -268,8 +263,7 @@ extension CalendarViewController {
     /// 스코프 변경
     private func switchScope() {
         changeScope()
-        updateWhenMonthScope()
-        updateWhenWeekScope()
+        syncDataWithCalendarScope()
     }
 
     /// 스코프 셋팅
@@ -278,8 +272,21 @@ extension CalendarViewController {
         calendar.setScope(changeScope, animated: true)
     }
     
+    /// scope에 맞춰서 표시할 데이터 동기화
+    private func syncDataWithCalendarScope() {
+        switch calendar.scope {
+        case .month:
+            updateWhenMonthScope()
+        case .week:
+            updateWhenWeekScope()
+        @unknown default:
+            break
+        }
+    }
+    
     /// 주간에서 월간으로 변경될 때
-    /// 선택된 값이 있는지 판단 후 표시할 값 리턴
+    /// 선택된 날짜가 있다면 해당 날짜로 이동
+    /// 선택된 날짜가 없다면 현재 페이지 Main(Header), DatePicker 에게 알리기
     private func updateWhenMonthScope() {
         guard calendar.scope == .month else { return }
         
@@ -298,7 +305,6 @@ extension CalendarViewController {
         if hasSelectedDateInCurrentView() {
             guard let selectedDate = selectedDate() else { return }
             calendarFocusDateObservable.onNext(selectedDate)
-
         } else {
             guard let firstEvent = currentPageFirstEventDateComponents() else { return }
             calendarFocusDateObservable.onNext(firstEvent)
@@ -328,7 +334,7 @@ extension CalendarViewController {
     
     /// 일정이 있는 날인지 체크
     private func checkContainsEvent(_ date: Date) -> Bool {
-        let dateComponent = currentCalendar.dateComponents([.year, .month, .day], from: date)
+        let dateComponent = DateManager.convertDateComponents(date)
         return eventDateComponents.contains { $0 == dateComponent }
     }
     
@@ -342,8 +348,7 @@ extension CalendarViewController {
     /// 선택된 셀이 오늘인지 확인
     /// - Parameter date: 선택된 날짜
     private func checkToday(_ date: Date) -> Bool {
-        let targetComponents = currentCalendar.dateComponents([.year, .month, .day], from: date)
-        
+        let targetComponents = DateManager.convertDateComponents(date)
         return targetComponents == todayComponents
     }
 }
@@ -351,9 +356,8 @@ extension CalendarViewController {
 // MARK: - 특정 위치로 이동
 extension CalendarViewController {
     private func moveToPage(dateComponents: DateComponents, animated: Bool = false) {
-        if let date = currentCalendar.date(from: dateComponents) {
-            self.calendar.setCurrentPage(date, animated: animated)
-        }
+        guard let date = DateManager.convertDate(dateComponents) else { return }
+        self.calendar.setCurrentPage(date, animated: animated)
     }
     
     private func moveToCurrentDate(_ datePair: (DateComponents, DateComponents)) {
@@ -381,14 +385,7 @@ extension CalendarViewController {
 
 // MARK: - Helper
 extension CalendarViewController {
-    /// previousDate와 currentDate가 다른지 확인
-    private func areDatesDistinct(previousDate: DateComponents, currentDate: DateComponents) -> Bool {
-        guard let previousDate = currentCalendar.date(from: previousDate),
-              let currentDate = currentCalendar.date(from: currentDate) else { return false }
-        
-        return previousDate != currentDate
-    }
-    
+
     /// 현재 캘린더 뷰에서 선택된 날짜가 있는지 체크
     private func hasSelectedDateInCurrentView() -> Bool {
         guard let selectedDate = calendar.selectedDate else { return false }
@@ -414,7 +411,7 @@ extension CalendarViewController {
     /// 선택된 날짜 Components
     private func selectedDate() -> DateComponents? {
         guard let selectedDate = calendar.selectedDate else { return nil }
-        let components = currentCalendar.dateComponents([.year, .month, .day], from: selectedDate)
+        let components = DateManager.convertDateComponents(selectedDate)
         return components
     }
     
@@ -431,7 +428,7 @@ extension CalendarViewController {
     
     /// 현재 달력의 첫번째 날짜
     private func currentPageDateComponents() -> DateComponents {
-        let components = currentCalendar.dateComponents([.year, .month, .day], from: calendar.currentPage)
+        let components = DateManager.convertDateComponents(calendar.currentPage)
         return components
     }
 }

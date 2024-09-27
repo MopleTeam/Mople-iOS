@@ -17,18 +17,17 @@ final class ScheduleTableViewController: UIViewController {
     
     var disposeBag = DisposeBag()
     
-    var isDragging = false
-    
+    // MARK: - Variables
     private var systemIsDragging = false
+    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
+    private var visibleHeaders: [UIView] = []
     
+    // MARK: - Observable
     private let fetchDataObservable: Observable<[ScheduleTableModel]>
     private let dateObervable: AnyObserver<DateComponents>
     private let foucsCellObservable: Observable<DateComponents>
     
-    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
-    
-    private var visibleHeaders: [UIView] = []
-    
+    // MARK: - UI Components
     private let tableView: UITableView = {
         
         #warning("섹션 헤더 sticky 되는 현상 막기")
@@ -37,14 +36,11 @@ final class ScheduleTableViewController: UIViewController {
         table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
         table.sectionFooterHeight = 8
-    
-        let headerView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
-        table.tableHeaderView = headerView
-        
-        table.clipsToBounds = true
+        table.tableHeaderView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
         return table
     }()
     
+    // MARK: - LifeCycle
     init(fetchDataObservable: Observable<[ScheduleTableModel]>,
          dateObservable: AnyObserver<DateComponents>,
          foucsCellObservable: Observable<DateComponents>) {
@@ -63,6 +59,7 @@ final class ScheduleTableViewController: UIViewController {
         setBinding()
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         setLayout()
         setupTableView()
@@ -73,9 +70,8 @@ final class ScheduleTableViewController: UIViewController {
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.top.equalTo(self.view.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
+            make.top.equalTo(view.snp.bottom)
         }
     }
     
@@ -85,6 +81,7 @@ final class ScheduleTableViewController: UIViewController {
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
     
+    // MARK: - Bind
     private func setBinding() {
         dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableModel>(
             configureCell: { dataSource, tableView, indexPath, item in
@@ -112,21 +109,6 @@ final class ScheduleTableViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
-    
-    public func hideView(isHide: Bool) {
-        if isHide {
-            tableView.snp.remakeConstraints { make in
-                make.horizontalEdges.equalToSuperview()
-                make.bottom.equalToSuperview()
-                make.top.equalTo(self.view.snp.bottom)
-            }
-        } else {
-            tableView.snp.remakeConstraints { make in
-                make.edges.equalToSuperview()
-            }
-        }
-    }
 }
 
 extension ScheduleTableViewController: UITableViewDelegate {
@@ -139,9 +121,8 @@ extension ScheduleTableViewController: UITableViewDelegate {
             return nil
         }
         
-        let headerText = dataSource?[section].headerText
-        header.tag = section
-        header.setText(headerText)
+        let title = dataSource?[section].title
+        header.setTitle(title: title, tag: section)
         return header
     }
     
@@ -159,6 +140,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - Delegate
 extension ScheduleTableViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -167,51 +149,64 @@ extension ScheduleTableViewController: UIScrollViewDelegate {
         let contentHeight = scrollView.contentSize.height
         
         if checkNearBottom(offsetY: offsetY, contentHeight: contentHeight) {
-            guard let lastComponents = dataSource?.sectionModels.last?.dateComponents else { return }
-            dateObervable.onNext(lastComponents)
+            notifyIfLastContent()
         } else {
-            guard let firstView = visibleHeaders.first else { return }
-            notifyIfCrossedCenterLine(center: centerPoint(), view: firstView)
+            notifyIfCrossedCenterLine()
         }
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         systemIsDragging = false
     }
-    
-    private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 50) -> Bool {
+}
+
+// MARK: - 테이블 뷰 화면 표시
+extension ScheduleTableViewController {
+    public func hideView(isHide: Bool) {
+        if isHide {
+            tableView.snp.remakeConstraints { make in
+                make.horizontalEdges.equalToSuperview()
+                make.bottom.equalToSuperview()
+                make.top.equalTo(self.view.snp.bottom)
+            }
+        } else {
+            tableView.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        }
+    }
+}
+
+// MARK: - Point Check
+extension ScheduleTableViewController {
+    private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 0) -> Bool {
         let bottomEdge = offsetY + self.view.frame.height + threshold
         
         return bottomEdge > contentHeight
     }
-}
-
-// MARK: - Helper
-extension ScheduleTableViewController {
+    
     private func centerPoint() -> CGFloat {
         let centerPoint = self.view.frame.height / 2
         let tabHeight = self.tabBarController?.tabBar.frame.height ?? 0
         return centerPoint - tabHeight
     }
+}
+
+// MARK: - Notify Calendar
+extension ScheduleTableViewController {
     
-    private func notifyIfCrossedCenterLine(center: CGFloat, view: UIView) {
-        guard let viewFrame = view.superview?.convert(view.frame, to: self.view) else { return }
+    private func notifyIfCrossedCenterLine() {
+        guard let topHeader = visibleHeaders.first,
+              let topHeaderFrame = topHeader.superview?.convert(topHeader.frame, to: self.view),
+              centerPoint() > topHeaderFrame.origin.y,
+              let dataSource = dataSource else { return }
         
-        if center > viewFrame.origin.y {
-            guard let dataSource = dataSource else { return }
-            let components = dataSource[view.tag].dateComponents
-            dateObervable.onNext(components)
-        }
+        let components = dataSource[topHeader.tag].dateComponents
+        dateObervable.onNext(components)
+    }
+    
+    private func notifyIfLastContent() {
+        guard let lastComponents = dataSource?.sectionModels.last?.dateComponents else { return }
+        dateObervable.onNext(lastComponents)
     }
 }
-
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct CalendarAndEventsViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        CalendarAndEventsViewController(title: "일정관리", reactor: CalendarViewReactor(fetchUseCase: fetchRecentScheduleMock())).showPreview()
-    }
-}
-#endif

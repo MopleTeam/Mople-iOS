@@ -118,24 +118,3 @@ extension UIStackView {
         stackedViews.reversed().forEach(addArrangedSubview(_:))
     }
 }
-
-
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//@available(iOS 13.0, *)
-//struct IconLabelView_Preview: PreviewProvider {
-//    static var previews: some View {
-//        let headerLabel: IconLabelView = {
-//            let label = IconLabelView(iconSize: 24,
-//                                      configure: AppDesign.Calendar.header,
-//                                      iconAligment: .right)
-//            label.setText("2024년 9월")
-//            label.backgroundColor = .systemYellow
-//            return label
-//        }()
-//        
-//        headerLabel.showPreview().frame(width: 200, height: 40)
-//    }
-//}
-//#endif

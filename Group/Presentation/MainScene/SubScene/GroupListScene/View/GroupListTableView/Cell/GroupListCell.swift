@@ -67,15 +67,3 @@ final class GroupListCell: UITableViewCell {
         thumbnailView.configure(with: viewModel)
     }
 }
-
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct GroupListViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        GroupListViewController(title: "모임",
-                                reactor: GroupListViewReactor(fetchUseCase: FetchGroupListMock())).showPreview()
-    }
-}
-#endif

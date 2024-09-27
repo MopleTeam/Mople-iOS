@@ -45,19 +45,6 @@ final class ScheduleCollectionCell: UICollectionViewCell {
     }
 }
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-@available(iOS 13, *)
-struct HeaderView_Preview: PreviewProvider {
-    static var previews: some View {
-        HomeViewController(reactor: ScheduleViewReactor(fetchUseCase: fetchRecentScheduleMock(), logOutAction: LogOutAction(logOut: {
-            
-        }))).showPreview()
-    }
-}
-#endif
-
 
 
 

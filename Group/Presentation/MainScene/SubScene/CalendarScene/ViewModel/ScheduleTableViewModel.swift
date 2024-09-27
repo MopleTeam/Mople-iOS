@@ -13,7 +13,7 @@ struct ScheduleTableModel: SectionModelType {
     var dateComponents: DateComponents
     var items: [Item] = []
     
-    var headerText: String? {
+    var title: String? {
         guard let date = DateManager.calendar.date(from: dateComponents) else { return nil }
         
         return DateManager.simpleDateFormatter.string(from: date)
