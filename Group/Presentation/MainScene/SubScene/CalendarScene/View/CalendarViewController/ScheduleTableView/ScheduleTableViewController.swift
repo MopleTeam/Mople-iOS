@@ -19,14 +19,7 @@ final class ScheduleTableViewController: UIViewController {
     
     var isDragging = false
     
-    private var systemIsDragging = false {
-        didSet {
-            guard systemIsDragging else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50), execute: {
-                self.systemIsDragging = false
-            })
-        }
-    }
+    private var systemIsDragging = false
     
     private let fetchDataObservable: Observable<[ScheduleTableModel]>
     private let dateObervable: AnyObserver<DateComponents>
@@ -109,8 +102,8 @@ final class ScheduleTableViewController: UIViewController {
             .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
+        #warning("시스템이 스크롤하는 것과 유저가 스크롤 하는 것 구분 하는 법 정리하기")
         foucsCellObservable
-            .delay(.milliseconds(350), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
                 guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else { return }
@@ -169,22 +162,27 @@ extension ScheduleTableViewController: UITableViewDelegate {
 extension ScheduleTableViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let viewHeight = self.view.frame.height
+        guard !systemIsDragging else { return }
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
-        let tabHeight = self.tabBarController?.tabBar.frame.height
-        let maxY = offsetY + viewHeight
         
-        if !systemIsDragging {
-            
-            // 구현해야 함
-            if contentHeight < maxY {
-                print("마지막 셀이야!!!")
-            }
-            
+        if checkNearBottom(offsetY: offsetY, contentHeight: contentHeight) {
+            guard let lastComponents = dataSource?.sectionModels.last?.dateComponents else { return }
+            dateObervable.onNext(lastComponents)
+        } else {
             guard let firstView = visibleHeaders.first else { return }
             notifyIfCrossedCenterLine(center: centerPoint(), view: firstView)
         }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        systemIsDragging = false
+    }
+    
+    private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 50) -> Bool {
+        let bottomEdge = offsetY + self.view.frame.height + threshold
+        
+        return bottomEdge > contentHeight
     }
 }
 
@@ -197,8 +195,6 @@ extension ScheduleTableViewController {
     }
     
     private func notifyIfCrossedCenterLine(center: CGFloat, view: UIView) {
-        
-        
         guard let viewFrame = view.superview?.convert(view.frame, to: self.view) else { return }
         
         if center > viewFrame.origin.y {

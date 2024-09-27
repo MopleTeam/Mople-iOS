@@ -172,10 +172,10 @@ final class CalendarViewController: UIViewController {
             .disposed(by: disposeBag)
         
         calendarFocusDateObservable
+            .debounce(.milliseconds(335), scheduler: MainScheduler.instance)
             .do(onNext: {
                 self.foucsChangeNotificationObserver.onNext($0)
             })
-            .delay(.milliseconds(360), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.moveToFoucsDate(date)
             })
@@ -219,6 +219,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        notifySelectedDate(date)
         changeMonth(date: date, with: monthPosition)
         updateCell(date, isSelected: true)
     }
@@ -237,8 +238,10 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 }
 
-// MARK: - 셀 선택 시 뷰 변경
+// MARK: - 셀 선택 시 액션
 extension CalendarViewController {
+    
+    
     private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
         guard calendar.scope == .month else { return }
         switch monthPosition {
@@ -250,6 +253,13 @@ extension CalendarViewController {
         default:
             break
         }
+    }
+    
+    
+    /// 스케줄 테이블 반영
+    private func notifySelectedDate(_ date: Date) {
+        let date = DateManager.convertDateComponents(date)
+        foucsChangeNotificationObserver.onNext(date)
     }
 }
 
