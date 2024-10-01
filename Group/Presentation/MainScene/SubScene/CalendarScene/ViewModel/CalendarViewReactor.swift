@@ -49,7 +49,6 @@ final class CalendarViewReactor: Reactor {
         case .parseScheduleDateComponents(let componentsArray):
             newState.dateComponentsArray = componentsArray.sorted(by: { $0 < $1 })
         }
-        
         return newState
     }
 }
