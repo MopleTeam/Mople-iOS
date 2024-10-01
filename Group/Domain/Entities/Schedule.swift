@@ -17,12 +17,12 @@ struct Schedule: Hashable, Equatable {
     let weather: WeatherInfo?
     
     init(id: UUID = UUID(),
-         group: Group,
-         eventName: String,
-         location: String,
-         participants: [Participant],
+         group: Group? = nil,
+         eventName: String? = nil,
+         location: String? = nil,
+         participants: [Participant] = [],
          date: Date = Date(),
-         weather: WeatherInfo) {
+         weather: WeatherInfo? = nil) {
         
         self.id = id
         self.group = group

@@ -14,12 +14,12 @@ final class CalendarViewReactor: Reactor {
     }
     
     enum Mutation {
-        case fetchScheduleList(scheduleList: [ScheduleTableModel])
+        case fetchScheduleList(scheduleList: [ScheduleTableSectionModel])
         case parseScheduleDateComponents(componentsArray: [DateComponents])
     }
     
     struct State {
-        @Pulse var scheduleArray: [ScheduleTableModel] = []
+        @Pulse var scheduleArray: [ScheduleTableSectionModel] = []
         @Pulse var dateComponentsArray: [DateComponents] = []
     }
         
@@ -62,7 +62,7 @@ extension CalendarViewReactor {
             .map { Dictionary(grouping: $0) { schedule in
                 return self.currentCalendar.dateComponents([.year, .month, .day], from: schedule.date)
             }}
-            .map { $0.map { return ScheduleTableModel(dateComponents: $0.key, items: $0.value) } }
+            .map { $0.map { return ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) } }
             .map { Mutation.fetchScheduleList(scheduleList: $0) }
         
         let parseDateComponents = fetchData

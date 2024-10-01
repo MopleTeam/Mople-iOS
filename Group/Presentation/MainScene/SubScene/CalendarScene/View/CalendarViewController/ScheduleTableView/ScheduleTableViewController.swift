@@ -19,13 +19,18 @@ final class ScheduleTableViewController: UIViewController {
     
     // MARK: - Variables
     private var systemIsDragging = false
-    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableModel>?
+    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
+    private var sectionModels: [ScheduleTableSectionModel] = []
     private var visibleHeaders: [UIView] = []
     
     // MARK: - Observable
-    private let fetchDataObservable: Observable<[ScheduleTableModel]>
-    private let dateObervable: AnyObserver<DateComponents>
-    private let foucsCellObservable: Observable<DateComponents>
+    
+    // Input
+    private let scheduleObserver: Observable<[ScheduleTableSectionModel]>
+    private let dateSelectionObserver: Observable<DateComponents>
+    
+    // Output
+    private let focusDateObserver: AnyObserver<DateComponents>
     
     // MARK: - UI Components
     private let tableView: UITableView = {
@@ -41,12 +46,12 @@ final class ScheduleTableViewController: UIViewController {
     }()
     
     // MARK: - LifeCycle
-    init(fetchDataObservable: Observable<[ScheduleTableModel]>,
-         dateObservable: AnyObserver<DateComponents>,
-         foucsCellObservable: Observable<DateComponents>) {
-        self.fetchDataObservable = fetchDataObservable
-        self.dateObervable = dateObservable
-        self.foucsCellObservable = foucsCellObservable
+    init(scheduleObserver: Observable<[ScheduleTableSectionModel]>,
+         focusDateObserver: AnyObserver<DateComponents>,
+         dateSelectionObserver: Observable<DateComponents>) {
+        self.scheduleObserver = scheduleObserver
+        self.focusDateObserver = focusDateObserver
+        self.dateSelectionObserver = dateSelectionObserver
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -78,34 +83,60 @@ final class ScheduleTableViewController: UIViewController {
     private func setupTableView() {
         self.tableView.delegate = self
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
+        self.tableView.register(TestCell.self, forCellReuseIdentifier: TestCell.reuseIdentifier)
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
     
     // MARK: - Bind
     private func setBinding() {
-        dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableModel>(
+        dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as? ScheduleTableViewCell else { return UITableViewCell() }
                 
-                cell.configure(viewModel: .init(schedule: item))
-                cell.selectionStyle = .none
+                let cell: UITableViewCell
+                
+                if item.group == nil {
+                    let sampleCell = tableView.dequeueReusableCell(withIdentifier: TestCell.reuseIdentifier) as! TestCell
+                    cell = sampleCell
+                } else {
+                    let defaultCell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
+                    defaultCell.configure(viewModel: .init(schedule: item))
+                    defaultCell.selectionStyle = .none
+                    
+                    cell = defaultCell
+                }
                 
                 return cell
             }
         )
         
-        fetchDataObservable
+        scheduleObserver
+            .do(onNext: { self.sectionModels = $0 })
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
         #warning("시스템이 스크롤하는 것과 유저가 스크롤 하는 것 구분 하는 법 정리하기")
-        foucsCellObservable
+        dateSelectionObserver
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
-                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else { return }
+                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else {
+                    print("없는 날짜 에용")
+                    return
+                }
                 vc.systemIsDragging = true
                 vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.itemSelected
+            .subscribe(with: self, onNext: { vc, indexPath in
+                var test = vc.dataSource?.sectionModels
+//                let testDateComponents = DateComponents(year: 2030, month: 1, day: 1)
+//                guard let date = DateManager.convertDate(testDateComponents) else { return }
+//                let testSchedule = Schedule(date: date)
+//                let testSection = ScheduleTableModel(dateComponents: testDateComponents, items: [testSchedule])
+//                currentList.insert(testSection, at: currentList.endIndex)
+//                vc.scheduleObserver.accept(currentList)
             })
             .disposed(by: disposeBag)
     }
@@ -117,10 +148,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SchedulTableHeaderView.reuseIdentifier) as? SchedulTableHeaderView else {
-            return nil
-        }
-        
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SchedulTableHeaderView.reuseIdentifier) as! SchedulTableHeaderView
         let title = dataSource?[section].title
         header.setTitle(title: title, tag: section)
         return header
@@ -146,6 +174,7 @@ extension ScheduleTableViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard !systemIsDragging else { return }
         let offsetY = scrollView.contentOffset.y
+        
         let contentHeight = scrollView.contentSize.height
         
         if checkNearBottom(offsetY: offsetY, contentHeight: contentHeight) {
@@ -179,9 +208,9 @@ extension ScheduleTableViewController {
 
 // MARK: - Point Check
 extension ScheduleTableViewController {
-    private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 0) -> Bool {
-        let bottomEdge = offsetY + self.view.frame.height + threshold
-        
+    private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 50) -> Bool {
+        let tabbarHeight = self.tabBarController?.tabBar.frame.height ?? 0
+        let bottomEdge = offsetY + self.view.frame.height - tabbarHeight + threshold
         return bottomEdge > contentHeight
     }
     
@@ -202,11 +231,19 @@ extension ScheduleTableViewController {
               let dataSource = dataSource else { return }
         
         let components = dataSource[topHeader.tag].dateComponents
-        dateObervable.onNext(components)
+        focusDateObserver.onNext(components)
     }
     
     private func notifyIfLastContent() {
-        guard let lastComponents = dataSource?.sectionModels.last?.dateComponents else { return }
-        dateObervable.onNext(lastComponents)
+        guard let lastComponents = dataSource?.sectionModels.last?.dateComponents,
+              let sectionCount = dataSource?.sectionModels.count else { return }
+        
+        switch sectionCount {
+        case ...2:
+            guard self.visibleHeaders.count <= 1 else { break }
+            focusDateObserver.onNext(lastComponents)
+        default:
+            focusDateObserver.onNext(lastComponents)
+        }
     }
 }

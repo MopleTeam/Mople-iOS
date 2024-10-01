@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CalendarAndEventsViewController: BaseViewController, View {
+final class CalendarScheduleViewController: BaseViewController, View {
     
     typealias Reactor = CalendarViewReactor
     
@@ -26,21 +26,21 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     // MARK: - Observable
     // Calendar
-    private let calendarHeightObservable: PublishSubject<CGFloat> = .init()
-    private let calendarScopeObservable: PublishSubject<ScopeType> = .init()
-    private let calendarScopeChangeObservable: PublishSubject<Void> = .init()
-    private let eventArrayObservable: PublishSubject<[DateComponents]> = .init()
+    private let calendarHeightObserver: PublishSubject<CGFloat> = .init()
+    private let calendarScopeObserver: PublishSubject<ScopeType> = .init()
+    private let calendarScopeChangeObserver: PublishSubject<Void> = .init()
+    private let eventObserver: PublishSubject<[DateComponents]> = .init()
         
     // Clendar & DatePicker & MainView
     private let pageChangeRequestObserver: PublishSubject<DateComponents> = .init()
-    private let pageChangeNotificationObserver: PublishSubject<DateComponents> = .init()
+    private lazy var pageObserver: BehaviorSubject<DateComponents> = .init(value: todayComponents)
     
     // Calendar & ScheduleTable
-    private let dateObservable: PublishSubject<DateComponents> = .init()
-    private let foucsObservable: PublishSubject<DateComponents> = .init()
+    private let focusDateObserver: PublishSubject<DateComponents> = .init()
+    private let dateSelectionObserver: PublishSubject<DateComponents> = .init()
     
     // ScheduleTableView
-    private let scheduleListObservable: PublishSubject<[ScheduleTableModel]> = .init()
+    private let scheduleObserver: BehaviorRelay<[ScheduleTableSectionModel]> = .init(value: [])
         
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -65,14 +65,14 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(todayComponents: todayComponents,
-                                                  heightObservable: calendarHeightObservable.asObserver(),
-                                                  scopeObservable: calendarScopeObservable.asObserver(),
-                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObserver(), foucsChangeNotificationObserver: foucsObservable.asObserver(),
-                                                  scopeChangeObservable: calendarScopeChangeObservable,
-                                                  eventArrayObservable: eventArrayObservable.asObservable(),
+                                                  heightObserver: calendarHeightObserver.asObserver(),
+                                                  scopeObserver: calendarScopeObserver.asObserver(),
+                                                  pageObserver: pageObserver.asObserver(),
+                                                  dateSelectionObserver: dateSelectionObserver.asObserver(),
+                                                  scopeChangeObserver: calendarScopeChangeObserver,
+                                                  eventObserver: eventObserver.asObservable(),
                                                   pageChangeRequestObserver: pageChangeRequestObserver,
-                                                  dateObservable: dateObservable)
-        
+                                                  inputFocusDateObserver: focusDateObserver)
         
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -83,8 +83,10 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     private let scheduleListContainer = UIView()
     
     private lazy var scheduleListTableView: ScheduleTableViewController = {
-        let scheduleListTableView = ScheduleTableViewController(fetchDataObservable: scheduleListObservable.asObservable(),
-                                                                dateObservable: dateObservable.asObserver(), foucsCellObservable: foucsObservable.asObserver())
+        
+        let scheduleListTableView = ScheduleTableViewController(scheduleObserver:scheduleObserver.asObservable(),
+                                                                focusDateObserver: focusDateObserver.asObserver(),
+                                                                dateSelectionObserver: dateSelectionObserver.asObserver())
         return scheduleListTableView
     }()
     
@@ -106,7 +108,7 @@ final class CalendarAndEventsViewController: BaseViewController, View {
      }
     
     override func viewWillAppear(_ animated: Bool) {
-        pageChangeNotificationObserver.onNext(todayComponents)
+//        pageObserver.onNext(todayComponents)
     }
     
     // MARK: - UI Setup
@@ -183,11 +185,11 @@ final class CalendarAndEventsViewController: BaseViewController, View {
         
         reactor.pulse(\.$dateComponentsArray)
             .do(onNext: { print($0.count) })
-            .bind(to: eventArrayObservable)
+            .bind(to: eventObserver)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$scheduleArray)
-            .bind(to: scheduleListObservable)
+            .bind(to: scheduleObserver)
             .disposed(by: disposeBag)
     }
     
@@ -197,20 +199,20 @@ final class CalendarAndEventsViewController: BaseViewController, View {
     }
     
     private func setBinding() {
-        calendarHeightObservable
+        calendarHeightObserver
             .subscribe(with: self, onNext: { vc, height in
                 vc.updateCalendarView(height)
             })
             .disposed(by: disposeBag)
         
-        calendarScopeObservable
+        calendarScopeObserver
             .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, scope in
                 vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
         
-        pageChangeNotificationObserver
+        pageObserver
             .subscribe(with: self, onNext: { vc, date in
                 let year = date.year ?? 2024
                 let monty = date.month ?? 1
@@ -220,11 +222,11 @@ final class CalendarAndEventsViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         rightButtonObservable
-            .bind(to: calendarScopeChangeObservable)
+            .bind(to: calendarScopeChangeObserver)
             .disposed(by: disposeBag)
         
         leftButtonObservable
-            .bind(to: calendarScopeChangeObservable)
+            .bind(to: calendarScopeChangeObserver)
             .disposed(by: disposeBag)
     }
     
@@ -238,12 +240,12 @@ final class CalendarAndEventsViewController: BaseViewController, View {
 }
 
 // MARK: - Date Picker
-extension CalendarAndEventsViewController {
+extension CalendarScheduleViewController {
     private func presentDatePicker() {
         let datePickView = DatePickViewController(title: "날짜 선택",
                                                   todayComponents: todayComponents,
                                                   pageChangeRequestObserver: pageChangeRequestObserver.asObserver(),
-                                                  pageChangeNotificationObserver: pageChangeNotificationObserver.asObservable())
+                                                  pageObserver: pageObserver.asObservable())
         
         datePickView.modalPresentationStyle = .pageSheet
         
@@ -256,7 +258,7 @@ extension CalendarAndEventsViewController {
 }
 
 // MARK: - UI Update
-extension CalendarAndEventsViewController {
+extension CalendarScheduleViewController {
     private func updateCalendarView(_ height: CGFloat) {
         UIView.animate(withDuration: 0.33) {
             self.calendarContainer.snp.updateConstraints { make in

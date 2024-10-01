@@ -8,7 +8,7 @@
 import Foundation
 import Differentiator
 
-struct ScheduleTableModel: SectionModelType {
+struct ScheduleTableSectionModel: SectionModelType {
     
     var dateComponents: DateComponents
     var items: [Item] = []
@@ -20,11 +20,11 @@ struct ScheduleTableModel: SectionModelType {
     }
 }
 
-extension ScheduleTableModel {
+extension ScheduleTableSectionModel {
     
     typealias Item = Schedule
     
-    init(original: ScheduleTableModel, items: [Schedule]) {
+    init(original: ScheduleTableSectionModel, items: [Schedule]) {
         self = original
         self.items = items
     }

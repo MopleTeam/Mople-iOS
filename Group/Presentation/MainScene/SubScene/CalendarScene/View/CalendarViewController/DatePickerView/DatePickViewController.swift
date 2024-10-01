@@ -21,7 +21,7 @@ final class DatePickViewController: UIViewController {
     private let pageChangeRequestObserver: AnyObserver<DateComponents>
     
     // Input
-    private let pageChangeNotificationObserver: Observable<DateComponents>
+    private let pageObserver: Observable<DateComponents>
     
     // MARK: - Variables
     private let todayComponents: DateComponents
@@ -74,11 +74,11 @@ final class DatePickViewController: UIViewController {
     init(title: String?,
          todayComponents: DateComponents,
          pageChangeRequestObserver: AnyObserver<DateComponents>,
-         pageChangeNotificationObserver: Observable<DateComponents>) {
+         pageObserver: Observable<DateComponents>) {
         
         self.todayComponents = todayComponents
         self.pageChangeRequestObserver = pageChangeRequestObserver
-        self.pageChangeNotificationObserver = pageChangeNotificationObserver
+        self.pageObserver = pageObserver
         
         defer {
             setTitle(title)
@@ -139,7 +139,10 @@ final class DatePickViewController: UIViewController {
     
     // MARK: - Bind
     private func setupBinding() {
-        pageChangeNotificationObserver
+        pageObserver
+            .do(onNext: {
+                print("값이 들어왔어 : \($0)")
+            })
             .subscribe(with: self, onNext: { vc, date in
                 vc.updateSelectRow(newDate: date)
             })
@@ -176,6 +179,7 @@ extension DatePickViewController {
         guard let year = newDate.year,
               let month = newDate.month else { return }
 
+        print("year: \(year), month: \(month)")
         setSelectRow(month: month, year: year)
     }
 }

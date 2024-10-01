@@ -45,3 +45,15 @@ extension DateManager {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .weekOfYear)
     }
 }
+
+extension Date {
+    public func getComponents() -> DateComponents {
+        return DateManager.convertDateComponents(self)
+    }
+}
+
+extension DateComponents {
+    public func getDate() -> Date? {
+        return DateManager.convertDate(self)
+    }
+}
