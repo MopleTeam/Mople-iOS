@@ -19,7 +19,6 @@ final class CalendarViewReactor: Reactor {
         case dateSelected(date: DateComponents)
         case focusDateInWeekView(date: DateComponents)
         case sharedTableViewDate(date: DateComponents)
-        case filterOutEmptySchedule
     }
     
     enum Mutation {
@@ -31,7 +30,7 @@ final class CalendarViewReactor: Reactor {
         case switchScope
         case notifyChangedScope(_ scope: ScopeType)
         case notifyChangedPage(_ page: DateComponents)
-        case notifySelectdDate(_ date: DateComponents)
+        case notifySelectdDate(_ date: DateComponents?)
         case notifyFocusDateInWeekView(_ date: DateComponents)
         case notifyTableViewDate(_ date: DateComponents)
     }
@@ -68,7 +67,7 @@ final class CalendarViewReactor: Reactor {
         case .requestPageSwitch(let date):
             return .just(.switchPage(date))
         case .requestScopeSwitch :
-            return .just(.switchScope)
+            return changeScope()
         case .scopeChanged(let scope):
             return .just(.notifyChangedScope(scope))
         case .pageChanged(let page):
@@ -79,8 +78,6 @@ final class CalendarViewReactor: Reactor {
             return .just(.notifyFocusDateInWeekView(date))
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
-        case .filterOutEmptySchedule:
-            return filterOutEmptySchedule()
         }
     }
     
@@ -141,20 +138,12 @@ extension CalendarViewReactor {
         guard !isSameAsPreviousDate(on: dateComponents) else {
             return Observable.just(Mutation.notifySelectdDate(dateComponents))
         }
-        
+
         if hasEvent(on: dateComponents) {
             return selectedNonEmptySchedule(on: dateComponents)
         } else {
             return selectedEmptySchedule(on: dateComponents)
         }
-    }
-    
-    private func filterOutEmptySchedule() -> Observable<Mutation> {
-        let scheduleList = Observable.just(())
-            .filter { _ in self.hasEmptySchedule() }
-            .map { _ in Mutation.loadScheduleList(scheduleList: self.getNonEmptySchedules()) }
-        
-        return scheduleList
     }
     
     private func selectedNonEmptySchedule(on date: DateComponents) -> Observable<Mutation> {
@@ -171,6 +160,18 @@ extension CalendarViewReactor {
         
         let presentEmptyDate = Observable.just(Mutation.notifySelectdDate(date))
         return Observable.concat([scheduleListWithEmpty, presentEmptyDate])
+    }
+    
+    private func changeScope() -> Observable<Mutation> {
+        let resetSelected = Observable.just(Mutation.notifySelectdDate(nil))
+        
+        let scheduleList = Observable.just(())
+            .filter { _ in self.hasEmptySchedule() && self.currentState.scope == .month }
+            .map { _ in Mutation.loadScheduleList(scheduleList: self.getNonEmptySchedules()) }
+        
+        let scopeSwitch = Observable.just(Mutation.switchScope)
+        
+        return Observable.concat([resetSelected, scheduleList, scopeSwitch])
     }
 }
 

@@ -113,7 +113,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
         calendarContainer.snp.makeConstraints { make in
             make.top.equalTo(headerContainerView.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(1) // 최소 높이 설정 (Calender 생성 시 높이 update)
+            make.height.equalTo(360) // 최소 높이 설정 (Calender 생성 시 높이 update)
         }
         
         scheduleListContainer.snp.makeConstraints { make in

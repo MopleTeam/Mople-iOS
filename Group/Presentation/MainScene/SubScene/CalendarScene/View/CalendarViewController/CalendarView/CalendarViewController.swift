@@ -17,6 +17,11 @@ enum ScopeType {
     case month
 }
 
+private enum ScopeUpdateType {
+    case buttonTap
+    case calendarScopeChange
+}
+
 final class CalendarViewController: UIViewController, View {
         
     typealias Reactor = CalendarViewReactor
@@ -145,11 +150,12 @@ final class CalendarViewController: UIViewController, View {
     }
     
     private func inputBind(_ reactor: Reactor) {
+        
         reactor.pulse(\.$switchScope)
             .skip(1)
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, _ in
-                vc.switchScope()
+                vc.switchScope(updateType: .buttonTap)
             })
             .disposed(by: disposeBag)
         
@@ -261,7 +267,7 @@ extension CalendarViewController {
         guard calendar.scope == .month else { return }
         switch monthPosition {
         case .current:
-            switchScope()
+            switchScope(updateType: .calendarScopeChange)
         case .next, .previous:
             let dateComponents = DateManager.convertDateComponents(date)
             self.moveToPage(dateComponents: dateComponents, animated: true)
@@ -281,10 +287,10 @@ extension CalendarViewController {
 extension CalendarViewController {
     /// scope에 맞춰서 표시할 데이터 동기화
     /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
-    private func switchScope() {
+    private func switchScope(updateType: ScopeUpdateType) {
         switch calendar.scope {
         case .month:
-            updateWhenMonthScope()
+            updateWhenMonthScope(updateType)
         case .week:
             updateWhenWeekScope()
         @unknown default:
@@ -299,13 +305,14 @@ extension CalendarViewController {
     }
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
-    private func updateWhenMonthScope() {
-        if hasSelectedDateInCurrentView() {
-            guard let selectedDate = selectedDate() else { return }
-            focusDateInWeekObserver.accept(selectedDate)
-        } else {
+    private func updateWhenMonthScope(_ updateType: ScopeUpdateType) {
+        switch updateType {
+            case .buttonTap:
             let pageDate = currentPageFirstEventDate() ?? currentPageDate()
             focusDateInWeekObserver.accept(pageDate)
+        case .calendarScopeChange:
+            guard let selectedDate = selectedDate() else { return }
+            focusDateInWeekObserver.accept(selectedDate)
         }
     }
 }
@@ -377,17 +384,24 @@ extension CalendarViewController {
         calendar.select(focusDate, scrollToDate: false)
         calendar.setScope(.week, animated: true)
     }
+    
+    private func scrollToPage(direction: Int) {
+        var currentPage = calendar.currentPage.getComponents()
+        guard let month = currentPage.month else { return }
+        currentPage.month = month + direction
+        moveToPage(dateComponents: currentPage, animated: true)
+    }
 }
 
 // MARK: - Helper
 extension CalendarViewController {
 
-    /// 현재 캘린더 뷰에서 선택된 날짜가 있는지 체크
-    private func hasSelectedDateInCurrentView() -> Bool {
-        guard let selectedDate = calendar.selectedDate else { return false }
-        let activeDates = activeDates()
-        return activeDates.contains { $0 == selectedDate }
-    }
+//    /// 현재 캘린더 뷰에서 선택된 날짜가 있는지 체크
+//    private func hasSelectedDateInCurrentView() -> Bool {
+//        guard let selectedDate = calendar.selectedDate else { return false }
+//        let activeDates = activeDates()
+//        return activeDates.contains { $0 == selectedDate }
+//    }
     
     /// 현재 달력에서 Active 상태인 [Date] 가져오기
     private func activeDates() -> [Date] {

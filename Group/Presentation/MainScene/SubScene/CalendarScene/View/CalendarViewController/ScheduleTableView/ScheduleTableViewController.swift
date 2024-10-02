@@ -109,7 +109,7 @@ final class ScheduleTableViewController: UIViewController, View {
             .map { Reactor.Action.sharedTableViewDate(date: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+ 
         reactor.pulse(\.$schedules)
             .observe(on: MainScheduler.instance)
             .do(onNext: { print(#function, #line, "schedule Count : \($0.count)" ) })
