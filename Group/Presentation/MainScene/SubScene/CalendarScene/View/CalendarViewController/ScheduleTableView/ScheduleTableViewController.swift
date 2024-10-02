@@ -7,13 +7,14 @@
 
 import UIKit
 import RxSwift
-import RxRelay
 import RxCocoa
+import ReactorKit
 import RxDataSources
 
-final class ScheduleTableViewController: UIViewController {
+final class ScheduleTableViewController: UIViewController, View {
     
-    typealias Section = SectionModel<DateComponents, Schedule>
+    typealias Reactor = CalendarViewReactor
+    typealias Section = SectionModel<DateComponents, DateProviding>
     
     var disposeBag = DisposeBag()
     
@@ -24,13 +25,7 @@ final class ScheduleTableViewController: UIViewController {
     private var visibleHeaders: [UIView] = []
     
     // MARK: - Observable
-    
-    // Input
-    private let scheduleObserver: Observable<[ScheduleTableSectionModel]>
-    private let dateSelectionObserver: Observable<DateComponents>
-    
-    // Output
-    private let focusDateObserver: AnyObserver<DateComponents>
+    private let dateSyncObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
     private let tableView: UITableView = {
@@ -46,12 +41,8 @@ final class ScheduleTableViewController: UIViewController {
     }()
     
     // MARK: - LifeCycle
-    init(scheduleObserver: Observable<[ScheduleTableSectionModel]>,
-         focusDateObserver: AnyObserver<DateComponents>,
-         dateSelectionObserver: Observable<DateComponents>) {
-        self.scheduleObserver = scheduleObserver
-        self.focusDateObserver = focusDateObserver
-        self.dateSelectionObserver = dateSelectionObserver
+    init(reactor: Reactor) {
+        defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -61,7 +52,6 @@ final class ScheduleTableViewController: UIViewController {
     
     override func viewDidLoad() {
         setupUI()
-        setBinding()
     }
     
     // MARK: - UI Setup
@@ -87,36 +77,50 @@ final class ScheduleTableViewController: UIViewController {
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
     
-    // MARK: - Bind
-    private func setBinding() {
+    private func setupDataSource() {
         dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
                 
-                let cell: UITableViewCell
-                
-                if item.group == nil {
-                    let sampleCell = tableView.dequeueReusableCell(withIdentifier: TestCell.reuseIdentifier) as! TestCell
-                    cell = sampleCell
-                } else {
-                    let defaultCell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
-                    defaultCell.configure(viewModel: .init(schedule: item))
-                    defaultCell.selectionStyle = .none
+                switch item {
+                case is Schedule:
+                    let schedule = item as! Schedule
+                    let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
+                    cell.configure(viewModel: .init(schedule: schedule))
+                    cell.selectionStyle = .none
+                    return cell
                     
-                    cell = defaultCell
+                case is EmptySchedule:
+                    let cell = tableView.dequeueReusableCell(withIdentifier: TestCell.reuseIdentifier) as! TestCell
+                    return cell
+                    
+                default:
+                    return UITableViewCell()
                 }
-                
-                return cell
             }
         )
+    }
+    
+    // MARK: - Bind
+    func bind(reactor: CalendarViewReactor) {
+        setupDataSource()
         
-        scheduleObserver
-            .do(onNext: { self.sectionModels = $0 })
+        self.dateSyncObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.sharedTableViewDate(date: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$schedules)
+            .observe(on: MainScheduler.instance)
+            .do(onNext: { print(#function, #line, "schedule Count : \($0.count)" ) })
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
-        #warning("시스템이 스크롤하는 것과 유저가 스크롤 하는 것 구분 하는 법 정리하기")
-        dateSelectionObserver
+        reactor.pulse(\.$selectedDate)
+            .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
+            .compactMap { $0 }
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
                 guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else {
@@ -124,21 +128,12 @@ final class ScheduleTableViewController: UIViewController {
                     return
                 }
                 vc.systemIsDragging = true
+                
+                
                 vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
             })
             .disposed(by: disposeBag)
         
-        tableView.rx.itemSelected
-            .subscribe(with: self, onNext: { vc, indexPath in
-                var test = vc.dataSource?.sectionModels
-//                let testDateComponents = DateComponents(year: 2030, month: 1, day: 1)
-//                guard let date = DateManager.convertDate(testDateComponents) else { return }
-//                let testSchedule = Schedule(date: date)
-//                let testSection = ScheduleTableModel(dateComponents: testDateComponents, items: [testSchedule])
-//                currentList.insert(testSection, at: currentList.endIndex)
-//                vc.scheduleObserver.accept(currentList)
-            })
-            .disposed(by: disposeBag)
     }
 }
 
@@ -231,7 +226,7 @@ extension ScheduleTableViewController {
               let dataSource = dataSource else { return }
         
         let components = dataSource[topHeader.tag].dateComponents
-        focusDateObserver.onNext(components)
+        dateSyncObserver.accept(components)
     }
     
     private func notifyIfLastContent() {
@@ -241,9 +236,9 @@ extension ScheduleTableViewController {
         switch sectionCount {
         case ...2:
             guard self.visibleHeaders.count <= 1 else { break }
-            focusDateObserver.onNext(lastComponents)
+            dateSyncObserver.accept(lastComponents)
         default:
-            focusDateObserver.onNext(lastComponents)
+            dateSyncObserver.accept(lastComponents)
         }
     }
 }

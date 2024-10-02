@@ -8,30 +8,25 @@
 import UIKit
 import SnapKit
 import RxSwift
-import RxRelay
 import RxCocoa
+import ReactorKit
 
-final class DatePickViewController: UIViewController {
+final class DatePickViewController: UIViewController, View {
+    
+    typealias Reactor = CalendarViewReactor
     
     var disposeBag: DisposeBag = DisposeBag()
     
     // MARK: - Observable
-    
-    // Output
-    private let pageChangeRequestObserver: AnyObserver<DateComponents>
-    
-    // Input
-    private let pageObserver: Observable<DateComponents>
+    private let pageChangeRequestObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - Variables
-    private let todayComponents: DateComponents
-    private lazy var selectedDate: DateComponents = todayComponents
-    
-    private lazy var currentYear: Int = {
-        todayComponents.year ?? 2024
-    }()
+    private lazy var today = reactor!.todayComponents
+    private lazy var selectedDate: DateComponents = today
     
     private lazy var years: [Int] = {
+        let currentYear = today.year ?? 2024
+        
         let startYear = currentYear - 10
         let endYear = currentYear + 10
         return Array(startYear...endYear)
@@ -40,7 +35,11 @@ final class DatePickViewController: UIViewController {
     private var months: [Int] = Array(1...12)
     
     // MARK: - UI Components
-    private let navigationView = CustomNavigationBar()
+    private let navigationView: CustomNavigationBar = {
+        let bar = CustomNavigationBar()
+        bar.titleLable.text = "날짜 선택"
+        return bar
+    }()
     
     private let rightBarButton: UIButton = {
         let button = UIButton()
@@ -71,19 +70,8 @@ final class DatePickViewController: UIViewController {
     }()
     
     // MARK: - LifeCycle
-    init(title: String?,
-         todayComponents: DateComponents,
-         pageChangeRequestObserver: AnyObserver<DateComponents>,
-         pageObserver: Observable<DateComponents>) {
-        
-        self.todayComponents = todayComponents
-        self.pageChangeRequestObserver = pageChangeRequestObserver
-        self.pageObserver = pageObserver
-        
-        defer {
-            setTitle(title)
-        }
-        
+    init(reactor: Reactor ) {
+        defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -94,7 +82,7 @@ final class DatePickViewController: UIViewController {
     override func viewDidLoad() {
         setDatePicker()
         setupUI()
-        setupBinding()
+        setupAction()
     }
     
     // MARK: - UI Setup
@@ -119,10 +107,6 @@ final class DatePickViewController: UIViewController {
         }
     }
     
-    private func setTitle(_ title: String?) {
-        navigationView.titleLable.text = title
-    }
-    
     private func setNavigationView() {
         navigationView.setRightItem(item: rightBarButton)
     }
@@ -130,24 +114,27 @@ final class DatePickViewController: UIViewController {
     private func setDatePicker() {
         datePicker.dataSource = self
         datePicker.delegate = self
-        
-        guard let year = todayComponents.year,
-              let month = todayComponents.month else { return }
-        
-        setSelectRow(month: month, year: year)
+        setSelectRow(date: selectedDate ?? today)
     }
     
     // MARK: - Bind
-    private func setupBinding() {
-        pageObserver
-            .do(onNext: {
-                print("값이 들어왔어 : \($0)")
-            })
-            .subscribe(with: self, onNext: { vc, date in
-                vc.updateSelectRow(newDate: date)
-            })
+    func bind(reactor: CalendarViewReactor) {
+        pageChangeRequestObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestPageSwitch(date: $0) }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$changedPage)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
+            .subscribe(with: self, onNext: { vc, date in
+                vc.selectedDate = date
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupAction() {
         rightBarButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.dismiss(animated: true)
@@ -155,8 +142,11 @@ final class DatePickViewController: UIViewController {
             .disposed(by: disposeBag)
         
         completeButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.pageChangeRequestObserver.onNext(vc.selectedDate)
+            .map({ _ in
+                self.selectedDate
+            })
+            .subscribe(with: self, onNext: { vc, date in
+                vc.pageChangeRequestObserver.accept(date)
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
@@ -165,22 +155,15 @@ final class DatePickViewController: UIViewController {
 
 // MARK: - Select Row
 extension DatePickViewController {
-    private func setSelectRow(month: Int, year: Int) {
+    private func setSelectRow(date: DateComponents) {
+        guard let year = date.year,
+              let month = date.month else { return }
+        
         let monthIndex = months.firstIndex(of: month) ?? 0
         let yearIndex = years.firstIndex(of: year) ?? 0
         
         datePicker.selectRow(monthIndex, inComponent: 0, animated: false)
         datePicker.selectRow(yearIndex, inComponent: 1, animated: false)
-    }
-    
-    private func updateSelectRow(newDate: DateComponents) {
-        selectedDate = newDate
-        
-        guard let year = newDate.year,
-              let month = newDate.month else { return }
-
-        print("year: \(year), month: \(month)")
-        setSelectRow(month: month, year: year)
     }
 }
 

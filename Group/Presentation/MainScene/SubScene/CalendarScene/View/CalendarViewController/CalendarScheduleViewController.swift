@@ -20,27 +20,9 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // MARK: - Variables
     private let currentCalendar = DateManager.calendar
     private lazy var todayComponents = {
-        var components = currentCalendar.dateComponents([.year, .month, .day], from: Date())
+        var components = Date().getComponents()
         return components
     }()
-    
-    // MARK: - Observable
-    // Calendar
-    private let calendarHeightObserver: PublishSubject<CGFloat> = .init()
-    private let calendarScopeObserver: PublishSubject<ScopeType> = .init()
-    private let calendarScopeChangeObserver: PublishSubject<Void> = .init()
-    private let eventObserver: PublishSubject<[DateComponents]> = .init()
-        
-    // Clendar & DatePicker & MainView
-    private let pageChangeRequestObserver: PublishSubject<DateComponents> = .init()
-    private lazy var pageObserver: BehaviorSubject<DateComponents> = .init(value: todayComponents)
-    
-    // Calendar & ScheduleTable
-    private let focusDateObserver: PublishSubject<DateComponents> = .init()
-    private let dateSelectionObserver: PublishSubject<DateComponents> = .init()
-    
-    // ScheduleTableView
-    private let scheduleObserver: BehaviorRelay<[ScheduleTableSectionModel]> = .init(value: [])
         
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -64,15 +46,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     private let calendarContainer = UIView()
     
     private lazy var calendarView: CalendarViewController = {
-        let calendarView = CalendarViewController(todayComponents: todayComponents,
-                                                  heightObserver: calendarHeightObserver.asObserver(),
-                                                  scopeObserver: calendarScopeObserver.asObserver(),
-                                                  pageObserver: pageObserver.asObserver(),
-                                                  dateSelectionObserver: dateSelectionObserver.asObserver(),
-                                                  scopeChangeObserver: calendarScopeChangeObserver,
-                                                  eventObserver: eventObserver.asObservable(),
-                                                  pageChangeRequestObserver: pageChangeRequestObserver,
-                                                  inputFocusDateObserver: focusDateObserver)
+        let calendarView = CalendarViewController(reactor: reactor!)
         
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -84,9 +58,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     private lazy var scheduleListTableView: ScheduleTableViewController = {
         
-        let scheduleListTableView = ScheduleTableViewController(scheduleObserver:scheduleObserver.asObservable(),
-                                                                focusDateObserver: focusDateObserver.asObserver(),
-                                                                dateSelectionObserver: dateSelectionObserver.asObserver())
+        let scheduleListTableView = ScheduleTableViewController(reactor: reactor!)
         return scheduleListTableView
     }()
     
@@ -104,18 +76,15 @@ final class CalendarScheduleViewController: BaseViewController, View {
      override func viewDidLoad() {
          super.viewDidLoad()
          setupUI()
-         setObservable()
+         setAction()
      }
-    
-    override func viewWillAppear(_ animated: Bool) {
-//        pageObserver.onNext(todayComponents)
-    }
     
     // MARK: - UI Setup
     private func setupUI() {
         setupNavi()
         setLayout()
         setContainer()
+        setHeaderDate()
     }
     
     private func setupNavi() {
@@ -176,6 +145,11 @@ final class CalendarScheduleViewController: BaseViewController, View {
         }
     }
     
+    private func setHeaderDate() {
+        let today = reactor!.todayComponents
+        setHeaderLabel(date: today)
+    }
+    
     // MARK: - Selectors
     func bind(reactor: CalendarViewReactor) {
         self.rx.viewDidLoad
@@ -183,50 +157,40 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$dateComponentsArray)
-            .do(onNext: { print($0.count) })
-            .bind(to: eventObserver)
+        self.rightButtonObservable
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$scheduleArray)
-            .bind(to: scheduleObserver)
+        self.leftButtonObservable
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    private func setObservable() {
-        setBinding()
-        setAction()
-    }
-    
-    private func setBinding() {
-        calendarHeightObserver
+        
+        reactor.pulse(\.$calendarHeight)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
             .subscribe(with: self, onNext: { vc, height in
                 vc.updateCalendarView(height)
             })
             .disposed(by: disposeBag)
         
-        calendarScopeObserver
-            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
+        reactor.pulse(\.$scope)
+            .observe(on: MainScheduler.instance)
+            .compactMap { $0 }
             .subscribe(with: self, onNext: { vc, scope in
                 vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
         
-        pageObserver
+        reactor.pulse(\.$changedPage)
+            .observe(on: MainScheduler.instance)
+            .compactMap { $0 }
             .subscribe(with: self, onNext: { vc, date in
-                let year = date.year ?? 2024
-                let monty = date.month ?? 1
-                
-                vc.headerLabel.setText("\(year)년 \(monty)월")
+                vc.setHeaderLabel(date: date)
             })
-            .disposed(by: disposeBag)
-        
-        rightButtonObservable
-            .bind(to: calendarScopeChangeObserver)
-            .disposed(by: disposeBag)
-        
-        leftButtonObservable
-            .bind(to: calendarScopeChangeObserver)
             .disposed(by: disposeBag)
     }
     
@@ -242,10 +206,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
 // MARK: - Date Picker
 extension CalendarScheduleViewController {
     private func presentDatePicker() {
-        let datePickView = DatePickViewController(title: "날짜 선택",
-                                                  todayComponents: todayComponents,
-                                                  pageChangeRequestObserver: pageChangeRequestObserver.asObserver(),
-                                                  pageObserver: pageObserver.asObservable())
+        let datePickView = DatePickViewController(reactor: reactor!)
         
         datePickView.modalPresentationStyle = .pageSheet
         
@@ -270,13 +231,10 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        UIView.animate(withDuration: 0.33, delay: 0, options: .allowUserInteraction) {
-            self.updateHeaderView(scope: scope)
-            self.updateBackgroundColor(scope: scope)
-            self.naviItemChange(scope: scope)
-            self.hideScheduleListTableView(scope: scope)
-            self.view.layoutIfNeeded()
-        }
+        self.updateHeaderView(scope: scope)
+        self.updateBackgroundColor(scope: scope)
+        self.naviItemChange(scope: scope)
+        self.hideScheduleListTableView(scope: scope)
     }
     
     private func updateHeaderView(scope: ScopeType) {
@@ -291,7 +249,7 @@ extension CalendarScheduleViewController {
         scheduleListTableView.hideView(isHide: scope == .month)
     }
     
-#warning("참고")
+    #warning("참고")
     // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
     private func updateBackgroundColor(scope: ScopeType) {
         let views: [UIView] = [self.calendarContainer, self.scheduleListContainer]
@@ -307,6 +265,13 @@ extension CalendarScheduleViewController {
         
         hideRightButton(isHidden: !isScopeMonth)
         hideLeftButton(isHidden: isScopeMonth)
+    }
+    
+    private func setHeaderLabel(date: DateComponents) {
+        let year = date.year ?? 2024
+        let monty = date.month ?? 1
+        
+        headerLabel.setText("\(year)년 \(monty)월")
     }
 }
 

@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxRelay
+import ReactorKit
 import FSCalendar
 
 enum ScopeType {
@@ -16,35 +17,22 @@ enum ScopeType {
     case month
 }
 
-final class CalendarViewController: UIViewController {
+final class CalendarViewController: UIViewController, View {
         
+    typealias Reactor = CalendarViewReactor
+    
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
     private let currentCalendar = DateManager.calendar
-    private let todayComponents: DateComponents
     private var eventDateComponents: [DateComponents] = []
     
     // MARK: - Observable
-    
-    // Internal State Observable
-    private let internalFocusDateObserver: PublishSubject<DateComponents> = .init()
-    
-    // Output
-    private let heightObserver: AnyObserver<CGFloat>
-    private let scopeObserver: AnyObserver<ScopeType>
-    private let pageObserver: AnyObserver<DateComponents>
-    private let dateSelectionObserver: AnyObserver<DateComponents>
-    
-    // Input
-    private let scopeChangeObserver: Observable<Void>
-    private let eventObserver: Observable<[DateComponents]>
-    
-    // Input Internal
-    private let pageChangeRequestObserver: PublishSubject<DateComponents>
-    
-    // Input/Output
-    private let inputFocusDateObserver: Observable<DateComponents>
+    private let heightObserver: PublishRelay<CGFloat> = .init()
+    private let scopeObserver: PublishRelay<ScopeType> = .init()
+    private let pageObserver: PublishRelay<DateComponents> = .init()
+    private let dateSelectionObserver: PublishRelay<DateComponents> = .init()
+    private let focusDateInWeekObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
     private let calendar: FSCalendar = {
@@ -62,26 +50,8 @@ final class CalendarViewController: UIViewController {
     private let weekContainerView = UIView()
     
     // MARK: - LifeCycle
-    init(todayComponents: DateComponents,
-         heightObserver: AnyObserver<CGFloat>,
-         scopeObserver: AnyObserver<ScopeType>,
-         pageObserver: AnyObserver<DateComponents>,
-         dateSelectionObserver: AnyObserver<DateComponents>,
-         scopeChangeObserver: Observable<Void>,
-         eventObserver: Observable<[DateComponents]>,
-         pageChangeRequestObserver: PublishSubject<DateComponents>,
-         inputFocusDateObserver: Observable<DateComponents>) {
-
-        self.todayComponents = todayComponents
-        self.heightObserver = heightObserver
-        self.scopeObserver = scopeObserver
-        self.pageObserver = pageObserver
-        self.dateSelectionObserver = dateSelectionObserver
-        self.scopeChangeObserver = scopeChangeObserver
-        self.eventObserver = eventObserver
-        self.pageChangeRequestObserver = pageChangeRequestObserver
-        self.inputFocusDateObserver = inputFocusDateObserver
-        
+    init(reactor: CalendarViewReactor) {
+        defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -93,7 +63,6 @@ final class CalendarViewController: UIViewController {
         super.viewDidLoad()
         setCalendar()
         setupUI()
-        setBind()
     }
     
     // MARK: - UI Setup
@@ -138,27 +107,69 @@ final class CalendarViewController: UIViewController {
     }
     
     // MARK: - Binding
-    private func setBind() {
-        scopeChangeObserver
+    func bind(reactor: CalendarViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        heightObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.calendarHeightChanged(height: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        scopeObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.scopeChanged(scope: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        pageObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.pageChanged(page: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        dateSelectionObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.dateSelected(date: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        focusDateInWeekObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.focusDateInWeekView(date: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$switchScope)
+            .skip(1)
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.switchScope()
             })
             .disposed(by: disposeBag)
         
-        eventObserver
+        reactor.pulse(\.$eventDates)
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, events in
                 vc.updateEvents(with: events)
             })
             .disposed(by: disposeBag)
         
-        pageChangeRequestObserver
+        reactor.pulse(\.$switchPage)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
             .subscribe(with: self, onNext: { vc, dateComponents in
                 vc.moveToPage(dateComponents: dateComponents)
-                vc.pageObserver.onNext(dateComponents)
             })
             .disposed(by: disposeBag)
         
-        inputFocusDateObserver
+        reactor.pulse(\.$tableViewDate)
+            .observe(on: MainScheduler.instance)
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .pairwise()
             .filter({ $0 != $1 })
@@ -168,12 +179,11 @@ final class CalendarViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        internalFocusDateObserver
-            .debounce(.milliseconds(335), scheduler: MainScheduler.instance)
-            .do(onNext: {
-                self.dateSelectionObserver.onNext($0)
-            })
+        reactor.pulse(\.$focusDateInWeekView)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
             .subscribe(with: self, onNext: { vc, date in
+                vc.dateSelectionObserver.accept(date)
                 vc.moveToFoucsDate(date)
             })
             .disposed(by: disposeBag)
@@ -195,7 +205,7 @@ extension CalendarViewController: FSCalendarDataSource {
 extension CalendarViewController: FSCalendarDelegate {
     
     func minimumDate(for calendar: FSCalendar) -> Date {
-        var components = todayComponents
+        var components = reactor!.todayComponents
         components.month = 1
         components.day = 1
         let date = DateManager.convertDate(components) ?? Date()
@@ -203,7 +213,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func maximumDate(for calendar: FSCalendar) -> Date {
-        var components = todayComponents
+        var components = reactor!.todayComponents
         components.month = 12
         components.day = 31
         let date = DateManager.convertDate(components) ?? Date()
@@ -212,12 +222,11 @@ extension CalendarViewController: FSCalendarDelegate {
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         let updateComponents = DateManager.convertDateComponents(calendar.currentPage)
-        pageObserver.onNext(updateComponents)
+        pageObserver.accept(updateComponents)
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        notifySelectedDate(date)
-        changeMonth(date: date, with: monthPosition)
+        updateFocus(on: date, with: monthPosition)
         updateCell(date, isSelected: true)
     }
     
@@ -229,16 +238,26 @@ extension CalendarViewController: FSCalendarDelegate {
         let maxHeight = calendar.rowHeight * 6
         let currentScope: ScopeType = calendar.scope == .month ? .month : .week
         let resultHeight = calendar.scope == .month ? maxHeight : bounds.height
-        
-        self.scopeObserver.onNext(currentScope)
-        self.heightObserver.onNext(resultHeight)
+        self.scopeObserver.accept(currentScope)
+        self.heightObserver.accept(resultHeight)
     }
 }
 
 // MARK: - 셀 선택 시 액션
 extension CalendarViewController {
     
-    private func changeMonth(date: Date, with monthPosition: FSCalendarMonthPosition) {
+    private func updateFocus(on date: Date, with position: FSCalendarMonthPosition) {
+        switch calendar.scope {
+        case .month:
+            changeMonth(on: date, with: position)
+        case .week:
+            notifySelectedDate(on: date)
+        @unknown default:
+            break
+        }
+    }
+    
+    private func changeMonth(on date: Date, with monthPosition: FSCalendarMonthPosition) {
         guard calendar.scope == .month else { return }
         switch monthPosition {
         case .current:
@@ -252,28 +271,17 @@ extension CalendarViewController {
     }
     
     /// 스케줄 테이블 반영
-    private func notifySelectedDate(_ date: Date) {
+    private func notifySelectedDate(on date: Date) {
         let date = DateManager.convertDateComponents(date)
-        dateSelectionObserver.onNext(date)
+        dateSelectionObserver.accept(date)
     }
 }
 
 // MARK: - 스코프 업데이트
 extension CalendarViewController {
-    /// 스코프 변경
-    private func switchScope() {
-        changeScope()
-        syncDataWithCalendarScope()
-    }
-
-    /// 스코프 셋팅
-    private func changeScope() {
-        let changeScope: FSCalendarScope = self.calendar.scope == .month ? .week : .month
-        calendar.setScope(changeScope, animated: true)
-    }
-    
     /// scope에 맞춰서 표시할 데이터 동기화
-    private func syncDataWithCalendarScope() {
+    /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
+    private func switchScope() {
         switch calendar.scope {
         case .month:
             updateWhenMonthScope()
@@ -284,32 +292,20 @@ extension CalendarViewController {
         }
     }
     
-    /// 주간에서 월간으로 변경될 때
-    /// 선택된 날짜가 있다면 해당 날짜로 이동
-    /// 선택된 날짜가 없다면 현재 페이지 Main(Header), DatePicker 에게 알리기
-    private func updateWhenMonthScope() {
-        guard calendar.scope == .month else { return }
-        
-        if hasSelectedDateInCurrentView() {
-            guard let selectedDate = selectedDate() else { return }
-            pageChangeRequestObserver.onNext(selectedDate)
-        } else {
-            pageObserver.onNext(currentPageDateComponents())
-        }
+    /// 주간에서 월갑으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
+    private func updateWhenWeekScope() {
+        calendar.setScope(.month, animated: true)
+        pageObserver.accept(currentPageDate())
     }
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
-    private func updateWhenWeekScope() {
-        guard calendar.scope == .week else { return }
-        
+    private func updateWhenMonthScope() {
         if hasSelectedDateInCurrentView() {
             guard let selectedDate = selectedDate() else { return }
-            internalFocusDateObserver.onNext(selectedDate)
-            print(#function, #line, "selectedDate : \(selectedDate)" )
+            focusDateInWeekObserver.accept(selectedDate)
         } else {
-            let firstEvent = currentPageFirstEventDateComponents()
-            internalFocusDateObserver.onNext(firstEvent)
-            print(#function, #line, "deSelectedDate : \(firstEvent)" )
+            let pageDate = currentPageFirstEventDate() ?? currentPageDate()
+            focusDateInWeekObserver.accept(pageDate)
         }
     }
 }
@@ -351,7 +347,7 @@ extension CalendarViewController {
     /// - Parameter date: 선택된 날짜
     private func checkToday(_ date: Date) -> Bool {
         let targetComponents = DateManager.convertDateComponents(date)
-        return targetComponents == todayComponents
+        return targetComponents == reactor!.todayComponents
     }
 }
 
@@ -367,7 +363,6 @@ extension CalendarViewController {
               let currentDate = DateManager.convertDate(datePair.1) else { return }
         
         guard let focusDate = currentCalendar.date(from: datePair.1) else { return }
-        
         calendar.select(focusDate, scrollToDate: false)
         
         if DateManager.isSameWeek(previousDate, currentDate) {
@@ -380,8 +375,7 @@ extension CalendarViewController {
     private func moveToFoucsDate(_ date: DateComponents) {
         guard let focusDate = DateManager.convertDate(date) else { return }
         calendar.select(focusDate, scrollToDate: false)
-        moveToPage(dateComponents: date, animated: false)
-        calendar.reloadData()
+        calendar.setScope(.week, animated: true)
     }
 }
 
@@ -404,12 +398,6 @@ extension CalendarViewController {
         }
     }
     
-    /// 현재 달력에 표시된 모든 Date 가져오기
-    private func currentPageDates() -> [Date] {
-        return calendar.visibleCells()
-            .compactMap { calendar.date(for: $0) }
-    }
-    
     /// 선택된 날짜 Components
     private func selectedDate() -> DateComponents? {
         guard let selectedDate = calendar.selectedDate else { return nil }
@@ -418,24 +406,23 @@ extension CalendarViewController {
     }
     
     /// 현재 페이지에서 첫번째 이벤트
-    private func currentPageFirstEventDateComponents() -> DateComponents {
-        let currentPageDetes = currentPageDates()
+    private func currentPageFirstEventDate() -> DateComponents? {
+        let currentPageDetes = activeDates()
             .map { DateManager.convertDateComponents($0) }
         
         let currentEvents = eventDateComponents.filter { event in
             currentPageDetes.contains { $0 == event }
         }
 
-        return currentEvents.first ?? currentPageDateComponents()
+        return currentEvents.first
     }
     
     /// 현재 달력의 첫번째 날짜
-    private func currentPageDateComponents() -> DateComponents {
-        var currentPageDate = calendar.currentPage.getComponents()
-        currentPageDate.day = 1
-        return currentPageDate
+    private func currentPageDate() -> DateComponents {
+        return calendar.currentPage.getComponents()
     }
 }
+
 
 
 
