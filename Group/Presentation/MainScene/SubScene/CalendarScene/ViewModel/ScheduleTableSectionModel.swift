@@ -30,10 +30,7 @@ extension ScheduleTableSectionModel {
     }
 }
 
-struct EmptySchedule: DateProviding {
-    
-    var date: Date
-}
+
 
 //struct EmptyScheduleTableSectionModel: SectionModelType {
 //    

@@ -45,9 +45,9 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // 캘린더
     private let calendarContainer = UIView()
     
+    
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(reactor: reactor!)
-        
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         return calendarView
@@ -61,6 +61,9 @@ final class CalendarScheduleViewController: BaseViewController, View {
         let scheduleListTableView = ScheduleTableViewController(reactor: reactor!)
         return scheduleListTableView
     }()
+    
+    // 구분선
+    private let borderView = UIView()
     
     // MARK: - LifeCycle
     init(title: String,
@@ -97,6 +100,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
         self.view.addSubview(headerContainerView)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
+        self.view.addSubview(borderView)
                 
         headerContainerView.addSubview(headerLabel)
         
@@ -113,11 +117,17 @@ final class CalendarScheduleViewController: BaseViewController, View {
         calendarContainer.snp.makeConstraints { make in
             make.top.equalTo(headerContainerView.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(360) // 최소 높이 설정 (Calender 생성 시 높이 update)
+            make.height.equalTo(360) 
+        }
+        
+        borderView.snp.makeConstraints { make in
+            make.top.equalTo(calendarContainer.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(1)
         }
         
         scheduleListContainer.snp.makeConstraints { make in
-            make.top.equalTo(calendarContainer.snp.bottom)
+            make.top.equalTo(borderView.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
     }
@@ -252,7 +262,7 @@ extension CalendarScheduleViewController {
     #warning("참고")
     // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
     private func updateBackgroundColor(scope: ScopeType) {
-        let views: [UIView] = [self.calendarContainer, self.scheduleListContainer]
+        let views: [UIView] = [self.calendarContainer, self.scheduleListContainer, self.borderView]
         
         views.forEach {
             let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor

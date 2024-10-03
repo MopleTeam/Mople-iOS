@@ -19,7 +19,7 @@ enum ScopeType {
 
 private enum ScopeUpdateType {
     case buttonTap
-    case calendarScopeChange
+    case cellTap
 }
 
 final class CalendarViewController: UIViewController, View {
@@ -103,12 +103,13 @@ final class CalendarViewController: UIViewController, View {
     }
     
     private func setCalendarAppearance() {
-        calendar.appearance.weekdayTextColor = UIColor(hexCode: "999999")
-        calendar.appearance.titleTodayColor = .black
-        calendar.appearance.titleSelectionColor = .black
+        calendar.appearance.weekdayTextColor = AppDesign.Calendar.weekTextColor
+        calendar.appearance.titleTodayColor = AppDesign.defaultBlack
+        calendar.appearance.titleSelectionColor = AppDesign.defaultBlack
         calendar.appearance.todayColor = .clear
         calendar.appearance.selectionColor = .clear
-        calendar.appearance.titleWeekendColor = .systemRed
+        calendar.appearance.titleFont = AppDesign.Calendar.dayFont
+        calendar.appearance.weekdayFont = AppDesign.Calendar.weekFont
     }
     
     // MARK: - Binding
@@ -214,7 +215,7 @@ extension CalendarViewController: FSCalendarDelegate {
         var components = reactor!.todayComponents
         components.month = 1
         components.day = 1
-        let date = DateManager.convertDate(components) ?? Date()
+        let date = components.getDate() ?? Date()
         return currentCalendar.date(byAdding: .year, value: -10, to: date) ?? Date()
     }
 
@@ -222,13 +223,12 @@ extension CalendarViewController: FSCalendarDelegate {
         var components = reactor!.todayComponents
         components.month = 12
         components.day = 31
-        let date = DateManager.convertDate(components) ?? Date()
+        let date = components.getDate() ?? Date()
         return currentCalendar.date(byAdding: .year, value: 10, to: date) ?? Date()
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        let updateComponents = DateManager.convertDateComponents(calendar.currentPage)
-        pageObserver.accept(updateComponents)
+        pageObserver.accept(calendar.currentPage.getComponents())
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
@@ -267,9 +267,9 @@ extension CalendarViewController {
         guard calendar.scope == .month else { return }
         switch monthPosition {
         case .current:
-            switchScope(updateType: .calendarScopeChange)
+            switchScope(updateType: .cellTap)
         case .next, .previous:
-            let dateComponents = DateManager.convertDateComponents(date)
+            let dateComponents = date.getComponents()
             self.moveToPage(dateComponents: dateComponents, animated: true)
         default:
             break
@@ -278,7 +278,7 @@ extension CalendarViewController {
     
     /// 스케줄 테이블 반영
     private func notifySelectedDate(on date: Date) {
-        let date = DateManager.convertDateComponents(date)
+        let date = date.getComponents()
         dateSelectionObserver.accept(date)
     }
 }
@@ -307,10 +307,9 @@ extension CalendarViewController {
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func updateWhenMonthScope(_ updateType: ScopeUpdateType) {
         switch updateType {
-            case .buttonTap:
-            let pageDate = currentPageFirstEventDate() ?? currentPageDate()
-            focusDateInWeekObserver.accept(pageDate)
-        case .calendarScopeChange:
+        case .buttonTap:
+            focusDateInWeekObserver.accept(currentPageEvnetDate())
+        case .cellTap:
             guard let selectedDate = selectedDate() else { return }
             focusDateInWeekObserver.accept(selectedDate)
         }
@@ -339,7 +338,7 @@ extension CalendarViewController {
     
     /// 일정이 있는 날인지 체크
     private func checkContainsEvent(_ date: Date) -> Bool {
-        let dateComponent = DateManager.convertDateComponents(date)
+        let dateComponent = date.getComponents()
         return eventDateComponents.contains { $0 == dateComponent }
     }
     
@@ -353,7 +352,7 @@ extension CalendarViewController {
     /// 선택된 셀이 오늘인지 확인
     /// - Parameter date: 선택된 날짜
     private func checkToday(_ date: Date) -> Bool {
-        let targetComponents = DateManager.convertDateComponents(date)
+        let targetComponents = date.getComponents()
         return targetComponents == reactor!.todayComponents
     }
 }
@@ -361,13 +360,13 @@ extension CalendarViewController {
 // MARK: - 특정 위치로 이동
 extension CalendarViewController {
     private func moveToPage(dateComponents: DateComponents, animated: Bool = false) {
-        guard let date = DateManager.convertDate(dateComponents) else { return }
+        guard let date = dateComponents.getDate() else { return }
         self.calendar.setCurrentPage(date, animated: animated)
     }
     
     private func moveToCurrentDate(_ datePair: (DateComponents, DateComponents)) {
-        guard let previousDate = DateManager.convertDate(datePair.0),
-              let currentDate = DateManager.convertDate(datePair.1) else { return }
+        guard let previousDate = datePair.0.getDate(),
+              let currentDate = datePair.1.getDate() else { return }
         
         guard let focusDate = currentCalendar.date(from: datePair.1) else { return }
         calendar.select(focusDate, scrollToDate: false)
@@ -379,8 +378,8 @@ extension CalendarViewController {
         }
     }
     
-    private func moveToFoucsDate(_ date: DateComponents) {
-        guard let focusDate = DateManager.convertDate(date) else { return }
+    private func moveToFoucsDate(_ dateComponents: DateComponents) {
+        guard let focusDate = dateComponents.getDate() else { return }
         calendar.select(focusDate, scrollToDate: false)
         calendar.setScope(.week, animated: true)
     }
@@ -395,13 +394,22 @@ extension CalendarViewController {
 
 // MARK: - Helper
 extension CalendarViewController {
+    
+    /// 현재 페이지에서 선택된 이벤트가 없다면 첫번째 이벤트를 return
+    private func currentPageEvnetDate() -> DateComponents {
+        if hasSelectedDateInCurrentView() {
+            return selectedDate() ?? currentPageDate()
+        } else {
+            return currentPageFirstEventDate() ?? currentPageDate()
+        }
+    }
 
-//    /// 현재 캘린더 뷰에서 선택된 날짜가 있는지 체크
-//    private func hasSelectedDateInCurrentView() -> Bool {
-//        guard let selectedDate = calendar.selectedDate else { return false }
-//        let activeDates = activeDates()
-//        return activeDates.contains { $0 == selectedDate }
-//    }
+    /// 현재 캘린더 뷰에서 선택된 날짜가 있는지 체크
+    private func hasSelectedDateInCurrentView() -> Bool {
+        guard let selectedDate = calendar.selectedDate else { return false }
+        let activeDates = activeDates()
+        return activeDates.contains { $0 == selectedDate }
+    }
     
     /// 현재 달력에서 Active 상태인 [Date] 가져오기
     private func activeDates() -> [Date] {
@@ -415,14 +423,14 @@ extension CalendarViewController {
     /// 선택된 날짜 Components
     private func selectedDate() -> DateComponents? {
         guard let selectedDate = calendar.selectedDate else { return nil }
-        let components = DateManager.convertDateComponents(selectedDate)
+        let components = selectedDate.getComponents()
         return components
     }
     
     /// 현재 페이지에서 첫번째 이벤트
     private func currentPageFirstEventDate() -> DateComponents? {
         let currentPageDetes = activeDates()
-            .map { DateManager.convertDateComponents($0) }
+            .map { $0.getComponents() }
         
         let currentEvents = eventDateComponents.filter { event in
             currentPageDetes.contains { $0 == event }

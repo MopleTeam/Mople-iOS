@@ -31,6 +31,13 @@ class GroupListViewController: BaseViewController, View {
     
     private lazy var groupListTableView = GroupListTableViewController(reactor: reactor!)
     
+    private let borderView: UIView = {
+        let view = UIView()
+        view.layer.makeLine(width: 1)
+        
+        return view
+    }()
+    
     init(title: String?,
          reactor: GroupListViewReactor) {
         super.init(title: title)
@@ -49,6 +56,8 @@ class GroupListViewController: BaseViewController, View {
 
     func setupUI() {
         self.view.addSubview(containerView)
+        self.view.addSubview(borderView)
+        
         self.containerView.addSubview(emptyView)
 
         containerView.snp.makeConstraints { make in
@@ -58,6 +67,12 @@ class GroupListViewController: BaseViewController, View {
         
         emptyView.snp.makeConstraints { make in
             make.center.equalTo(self.view)
+        }
+        
+        borderView.snp.makeConstraints { make in
+            make.top.equalTo(titleViewBottom)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(1)
         }
     }
     

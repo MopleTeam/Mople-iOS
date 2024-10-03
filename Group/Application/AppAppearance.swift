@@ -21,7 +21,10 @@ final class AppAppearance {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
-
+        
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.init(hexCode: "3E3F40"), .font: UIFont.pretendard(type: .semiBold, size: 10)]
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.font: UIFont.pretendard(type: .semiBold, size: 10)]
+        
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
@@ -35,13 +38,6 @@ final class AppAppearance {
         
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
-    }
-
-}
-
-extension UINavigationController {
-    @objc override open var preferredStatusBarStyle: UIStatusBarStyle {
-        return .darkContent
     }
 }
 

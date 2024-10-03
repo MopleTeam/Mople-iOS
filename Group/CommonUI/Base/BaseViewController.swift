@@ -49,12 +49,12 @@ class BaseViewController: UIViewController {
     }
     
     private func setupUI() {
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = AppDesign.defaultWihte
         self.view.addSubview(navigationView)
         
         navigationView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide)
-            make.horizontalEdges.equalToSuperview().inset(20)
+            make.horizontalEdges.equalToSuperview()
             make.height.equalTo(56)
         }
     }

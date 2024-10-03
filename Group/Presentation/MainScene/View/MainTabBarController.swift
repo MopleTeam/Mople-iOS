@@ -13,26 +13,18 @@ final class MainTabBarController: UITabBarController {
         super.viewDidLoad()
         setupUI()
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         updateTabBarFrame()
     }
 
     private func setupUI() {
-        tabBar.backgroundColor = .white
-        tabBar.isTranslucent = true
-        
-        tabBar.layer.cornerRadius = 18
-        tabBar.layer.borderWidth = 1
-        tabBar.layer.borderColor = UIColor(hexCode: "F2F2F2").cgColor
-        
-        tabBar.layer.shadowOpacity = 0.05
-        tabBar.layer.shadowRadius = 24
-        tabBar.layer.shadowColor = UIColor.black.cgColor
-        tabBar.layer.shadowOffset = CGSize(width: 0, height: -4)
-        tabBar.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        
+        tabBar.backgroundColor = AppDesign.defaultWihte
+        tabBar.layer.makeLine(width: 1)
+        tabBar.layer.makeCornes(radius: 18, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        tabBar.layer.makeShadow(CGSize(width: 0, height: -4))
+        tabBar.tintColor = AppDesign.TabBar.tintColor
         tabBar.items?.forEach({ $0.titlePositionAdjustment = UIOffset(horizontal: 0.0, vertical: -5.0) })
     }
     

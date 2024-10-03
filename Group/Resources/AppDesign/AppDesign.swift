@@ -32,15 +32,12 @@ struct AppDesign {
     static let defaultWihte = UIColor(hexCode: "FFFFFF")
     static let defaultBlue = UIColor(hexCode: "3366FF")
     static let defaultGray = UIColor(hexCode: "666666")
-    static let defaultGray2 = UIColor(hexCode: "888888")
-    static let defaultGray3 = UIColor(hexCode: "F6F7FA")
-    static let defaultGray4 = UIColor(hexCode: "555555")
 }
 
 // MARK: - App Design
 extension AppDesign {
     
-    enum Main: UIConstructive {
+    enum Navi: UIConstructive {
         case NaviView
         
         var itemConfig: ItemConfigure {
@@ -49,6 +46,16 @@ extension AppDesign {
                 return makeUIConfigure(font: .pretendard(type: .bold, size: 18))
             }
         }
+    }
+    
+    enum TabBar {
+        static let titleFont = UIFont.pretendard(type: .semiBold, size: 10)
+        static let tintColor = UIColor.init(hexCode: "3E3F40")
+    }
+    
+    enum Layer {
+        static let lineColor = UIColor(hexCode: "F2F2F2")
+        static let shadowColor = AppDesign.defaultBlack
     }
 }
 
@@ -175,7 +182,7 @@ extension AppDesign {
             switch self {
             case .group:
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 12),
-                                       color: defaultGray2)
+                                       color: .init(hexCode: "888888"))
             case .title:
                 return makeUIConfigure(font: .pretendard(type: .bold, size: 20),
                                        color: AppDesign.defaultBlack)
@@ -197,7 +204,7 @@ extension AppDesign {
             case .moreSchedule:
                 return makeUIConfigure(text: "더보기",
                                        font: .pretendard(type: .bold, size: 16),
-                                       color: AppDesign.defaultGray4,
+                                       color: .init(hexCode: "555555"),
                                        image: .plus)
             }
         }
@@ -208,7 +215,7 @@ extension AppDesign {
 extension AppDesign {
     
     enum Weather: UIConstructive {
-        static let backColor = AppDesign.defaultGray3
+        static let backColor = UIColor.init(hexCode: "F6F7FA")
         
         case temperature
         case city
@@ -220,7 +227,7 @@ extension AppDesign {
                                        color: AppDesign.defaultBlack)
             case .city:
                 return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
-                                       color: AppDesign.defaultGray2)
+                                       color: .init(hexCode: "888888"))
             }
         }
     }
@@ -230,7 +237,7 @@ extension AppDesign {
 extension AppDesign {
     
     enum Group: UIConstructive {
-        static let scheduleBack = AppDesign.defaultGray3
+        static let scheduleBack = UIColor.init(hexCode: "F6F7FA")
         
         case title
         case empty
@@ -251,12 +258,12 @@ extension AppDesign {
                                        image: .init(named: "emptyGroup"))
             case .member:
                 return makeUIConfigure(font: .pretendard(type: .medium, size: 12),
-                                       color: AppDesign.defaultGray2,
+                                       color: .init(hexCode: "888888"),
                                        image: .init(named: "member"))
            
             case .schedule:
                 return makeUIConfigure(font: .pretendard(type: .medium, size: 14),
-                                       color: AppDesign.defaultGray2)
+                                       color: .init(hexCode: "888888"))
             case .arrow:
                 return makeUIConfigure(image: .init(named: "listArrow"))
             }
@@ -270,10 +277,12 @@ extension AppDesign {
     enum Calendar: UIConstructive {
         
         static let headerColor: UIColor = .init(hexCode: "FAFAFA")
+        static let weekTextColor: UIColor = .init(hexCode: "999999")
+        static let dayFont: UIFont = .pretendard(type: .semiBold, size: 16)
+        static let weekFont: UIFont = .pretendard(type: .medium, size: 14)
+        
         
         case header
-        case pickerCompleteButton
-        
         
         var itemConfig: ItemConfigure {
             switch self {
@@ -282,11 +291,7 @@ extension AppDesign {
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
                                        color: AppDesign.defaultBlack,
                                        image: UIImage(named: "arrow"))
-                
-            case .pickerCompleteButton:
-                return makeUIConfigure(text: "완료",
-                                       font: .pretendard(type: .semiBold, size: 16),
-                                       color: AppDesign.defaultWihte)
+
             }
         }
     }

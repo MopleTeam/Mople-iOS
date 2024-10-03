@@ -73,7 +73,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private func setupTableView() {
         self.tableView.delegate = self
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
-        self.tableView.register(TestCell.self, forCellReuseIdentifier: TestCell.reuseIdentifier)
+        self.tableView.register(EmptyScheduleCell.self, forCellReuseIdentifier: EmptyScheduleCell.reuseIdentifier)
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
     
@@ -90,7 +90,8 @@ final class ScheduleTableViewController: UIViewController, View {
                     return cell
                     
                 case is EmptySchedule:
-                    let cell = tableView.dequeueReusableCell(withIdentifier: TestCell.reuseIdentifier) as! TestCell
+                    let cell = tableView.dequeueReusableCell(withIdentifier: EmptyScheduleCell.reuseIdentifier) as! EmptyScheduleCell
+                    cell.setLabel(on: item.date)
                     return cell
                     
                 default:
@@ -124,12 +125,9 @@ final class ScheduleTableViewController: UIViewController, View {
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
                 guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else {
-                    print("없는 날짜 에용")
                     return
                 }
                 vc.systemIsDragging = true
-                
-                
                 vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
             })
             .disposed(by: disposeBag)

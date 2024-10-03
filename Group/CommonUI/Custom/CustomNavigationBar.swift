@@ -11,7 +11,7 @@ import SnapKit
 final class CustomNavigationBar: UIView {
     
     let titleLable: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Main.NaviView)
+        let label = BaseLabel(configure: AppDesign.Navi.NaviView)
         label.textAlignment = .center
         return label
     }()
@@ -41,7 +41,8 @@ final class CustomNavigationBar: UIView {
         addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.verticalEdges.equalToSuperview()
         }
                 
         leftButtonContainerView.snp.makeConstraints { make in

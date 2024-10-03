@@ -95,7 +95,7 @@
 		52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */; };
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
-		52C6521E2CA705BB0041E78C /* TestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C6521D2CA705BB0041E78C /* TestCell.swift */; };
+		52C6521E2CA705BB0041E78C /* EmptyScheduleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C6521D2CA705BB0041E78C /* EmptyScheduleCell.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
 		52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E8B2C4FBD6400CFF329 /* SceneDelegate.swift */; };
 		52C72E932C4FBD6500CFF329 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E922C4FBD6500CFF329 /* Assets.xcassets */; };
@@ -104,6 +104,7 @@
 		52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA02C4FBE4100CFF329 /* RxRelay */; };
 		52C72EA32C4FBE4100CFF329 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA22C4FBE4100CFF329 /* RxSwift */; };
 		52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA52C4FBE5900CFF329 /* SnapKit */; };
+		52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */; };
 		52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */; };
 		52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B442C730816002B6D20 /* NetworkConfig.swift */; };
 		52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B462C7308A8002B6D20 /* Endpoint.swift */; };
@@ -214,7 +215,7 @@
 		52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+CustomFont.swift"; sourceTree = "<group>"; };
 		52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCalendarCell.swift; sourceTree = "<group>"; };
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
-		52C6521D2CA705BB0041E78C /* TestCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCell.swift; sourceTree = "<group>"; };
+		52C6521D2CA705BB0041E78C /* EmptyScheduleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyScheduleCell.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Group.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Group.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C72E892C4FBD6400CFF329 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52C72E8B2C4FBD6400CFF329 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -222,6 +223,7 @@
 		52C72E952C4FBD6500CFF329 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		52C72E972C4FBD6500CFF329 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52C72EA72C4FBF6300CFF329 /* Group.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Group.entitlements; sourceTree = "<group>"; };
+		52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CALayer+Ext.swift"; sourceTree = "<group>"; };
 		52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		52CB0B442C730816002B6D20 /* NetworkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConfig.swift; sourceTree = "<group>"; };
 		52CB0B462C7308A8002B6D20 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
@@ -430,7 +432,7 @@
 			isa = PBXGroup;
 			children = (
 				5259B01C2CA038AA006B2711 /* ScheduleTableViewCell.swift */,
-				52C6521D2CA705BB0041E78C /* TestCell.swift */,
+				52C6521D2CA705BB0041E78C /* EmptyScheduleCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -677,6 +679,7 @@
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */,
 				52AC9B772CA5416900DD224B /* Optional+Tuple.swift */,
+				52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1160,7 +1163,7 @@
 				527A3E9D2C83641F007FE63B /* GroupListSceneDIContainer.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */,
-				52C6521E2CA705BB0041E78C /* TestCell.swift in Sources */,
+				52C6521E2CA705BB0041E78C /* EmptyScheduleCell.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
 				52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
@@ -1187,6 +1190,7 @@
 				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
 				527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */,
 				523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */,
+				52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */,
 				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
 				527A3E9F2C83642C007FE63B /* CalendarSceneDIContainer.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
