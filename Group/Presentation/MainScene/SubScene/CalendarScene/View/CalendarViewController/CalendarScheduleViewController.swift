@@ -23,6 +23,9 @@ final class CalendarScheduleViewController: BaseViewController, View {
         var components = Date().getComponents()
         return components
     }()
+    
+    // MARK: - Observer
+    private let scopeObserver: PublishSubject<Void> = .init()
         
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -65,12 +68,33 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // 구분선
     private let borderView = UIView()
     
+    // MARK: - Gesture
+    private lazy var scopeGesture: UIPanGestureRecognizer = {
+        [unowned self] in
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleScopeGesture(_:)))
+        panGesture.delegate = self
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        return panGesture
+    }()
+    
+    @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
+        print("제스처 전환 실행")
+        self.scopeObserver.onNext(())
+        calendarView.calendar.handleScopeGesture(gesture)
+    }
+    
+    private func setGesture() {
+        self.view.addGestureRecognizer(scopeGesture)
+        self.scheduleListTableView.tableView.panGestureRecognizer.require(toFail: scopeGesture)
+    }
+    
     // MARK: - LifeCycle
     init(title: String,
          reactor: CalendarViewReactor) {
-         super.init(title: title)
+        super.init(title: title)
         self.reactor = reactor
-     }
+    }
      
      required init?(coder: NSCoder) {
          fatalError("init(coder:) has not been implemented")
@@ -80,6 +104,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
          super.viewDidLoad()
          setupUI()
          setAction()
+         setGesture()
      }
     
     // MARK: - UI Setup
@@ -163,19 +188,29 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // MARK: - Selectors
     func bind(reactor: CalendarViewReactor) {
         self.rx.viewDidLoad
+            .do(onNext: { _ in
+                print("몇번 불려?")
+            })
             .map { _ in Reactor.Action.fetchData }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.scopeObserver
+            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch(type: .gesture) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.rightButtonObservable
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch }
+            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.leftButtonObservable
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch }
+            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -213,6 +248,30 @@ final class CalendarScheduleViewController: BaseViewController, View {
     }
 }
 
+extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let tableTop = scheduleListTableView.checkTop()
+        let monthScope = reactor!.currentState.scope == .month
+        let shouldBegin = tableTop || monthScope
+        if shouldBegin {
+            return shouldAllowScopeChangeGesture()
+        }
+        return shouldBegin
+    }
+    
+    /// 스코프의 상태와 제스처의 방향에 따라서 스코프 변경여부 결정
+    private func shouldAllowScopeChangeGesture() -> Bool {
+        guard let scope = reactor!.currentState.scope else { return false }
+        let velocity = self.scopeGesture.velocity(in: self.view)
+        switch scope {
+        case .month:
+            return velocity.y < 0
+        case .week:
+            return velocity.y > 0
+        }
+    }
+}
+
 // MARK: - Date Picker
 extension CalendarScheduleViewController {
     private func presentDatePicker() {
@@ -241,10 +300,11 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        self.updateHeaderView(scope: scope)
-        self.updateBackgroundColor(scope: scope)
-        self.naviItemChange(scope: scope)
-        self.hideScheduleListTableView(scope: scope)
+            self.updateHeaderView(scope: scope)
+            self.updateBackgroundColor(scope: scope)
+            self.naviItemChange(scope: scope)
+            self.hideScheduleListTableView(scope: scope)
+        
     }
     
     private func updateHeaderView(scope: ScopeType) {

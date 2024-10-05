@@ -29,27 +29,3 @@ extension ScheduleTableSectionModel {
         self.items = items
     }
 }
-
-
-
-//struct EmptyScheduleTableSectionModel: SectionModelType {
-//    
-//    var dateComponents: DateComponents
-//    var items: [EmptySchedule] = []
-//    
-//    var title: String? {
-//        guard let date = DateManager.calendar.date(from: dateComponents) else { return nil }
-//        
-//        return DateManager.simpleDateFormatter.string(from: date)
-//    }
-//}
-//
-//extension EmptyScheduleTableSectionModel {
-//    
-//    typealias Item = EmptySchedule
-//    
-//    init(original: EmptyScheduleTableSectionModel, items: [EmptySchedule]) {
-//        self = original
-//        self.items = items
-//    }
-//}

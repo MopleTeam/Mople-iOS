@@ -15,7 +15,7 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
     func getEvents() -> [Schedule] {
         var scheduleArray: [Schedule] = []
         
-        for i in 0...50 {
+        for i in 0...2 {
             
             let schedule = Schedule(group: getGroup(),
                                     eventName: "모임 \(i)",

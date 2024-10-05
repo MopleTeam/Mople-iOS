@@ -41,8 +41,16 @@ extension DateManager {
         return calendar.date(from: dateComponents)
     }
     
+    static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
+        return calendar.isDate(date1, equalTo: date2, toGranularity: .day)
+    }
+    
     static func isSameWeek(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .weekOfYear)
+    }
+    
+    static func isSameMonth(_ date1: Date, _ date2: Date) -> Bool {
+        return calendar.isDate(date1, equalTo: date2, toGranularity: .month)
     }
 }
 

@@ -270,6 +270,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5207C9112CB1E10400BB27A6 /* SectionModel */ = {
+			isa = PBXGroup;
+			children = (
+				52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */,
+			);
+			path = SectionModel;
+			sourceTree = "<group>";
+		};
 		5211F8F42C84233A00403980 /* Zone */ = {
 			isa = PBXGroup;
 			children = (
@@ -422,6 +430,7 @@
 			isa = PBXGroup;
 			children = (
 				5259B00C2C9FD316006B2711 /* ScheduleTableViewController.swift */,
+				5207C9112CB1E10400BB27A6 /* SectionModel */,
 				52E99EE72CA1B3C5007E552C /* HeaderView */,
 				5259B01B2CA03897006B2711 /* Cell */,
 			);
@@ -600,7 +609,6 @@
 			isa = PBXGroup;
 			children = (
 				5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */,
-				52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";

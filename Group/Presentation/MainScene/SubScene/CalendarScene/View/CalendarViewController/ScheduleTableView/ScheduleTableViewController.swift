@@ -28,7 +28,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private let dateSyncObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
-    private let tableView: UITableView = {
+    public let tableView: UITableView = {
         
         #warning("섹션 헤더 sticky 되는 현상 막기")
         let table = UITableView(frame: .zero, style: .grouped)
@@ -107,13 +107,12 @@ final class ScheduleTableViewController: UIViewController, View {
         
         self.dateSyncObserver
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.sharedTableViewDate(date: $0) }
+            .map { Reactor.Action.sharedTableViewDate(dateComponents: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
  
         reactor.pulse(\.$schedules)
             .observe(on: MainScheduler.instance)
-            .do(onNext: { print(#function, #line, "schedule Count : \($0.count)" ) })
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
@@ -238,5 +237,12 @@ extension ScheduleTableViewController {
         default:
             dateSyncObserver.accept(lastComponents)
         }
+    }
+}
+
+// MARK: - Helper
+extension ScheduleTableViewController {
+    public func checkTop() -> Bool {
+        return self.tableView.contentOffset.y <= self.tableView.contentInset.top
     }
 }

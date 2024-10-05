@@ -12,13 +12,13 @@ final class CalendarViewReactor: Reactor {
     enum Action {
         case fetchData
         case calendarHeightChanged(height: CGFloat)
-        case requestPageSwitch(date: DateComponents)
-        case requestScopeSwitch
+        case requestPageSwitch(dateComponents: DateComponents)
+        case requestScopeSwitch(type: ScopeChangeType)
         case scopeChanged(scope: ScopeType)
         case pageChanged(page: DateComponents)
-        case dateSelected(date: DateComponents)
-        case focusDateInWeekView(date: DateComponents)
-        case sharedTableViewDate(date: DateComponents)
+        case dateSelected(dateComponents: DateComponents)
+        case focusDateInWeekView(dateComponents: DateComponents)
+        case sharedTableViewDate(dateComponents: DateComponents)
     }
     
     enum Mutation {
@@ -26,13 +26,13 @@ final class CalendarViewReactor: Reactor {
         case loadScheduleListWithEmptySchedule(scheduleList: [ScheduleTableSectionModel])
         case loadEventList(componentsArray: [DateComponents])
         case setCalendarHeight(_ height: CGFloat)
-        case switchPage(_ date: DateComponents)
-        case switchScope
+        case switchPage(_ dateComponents: DateComponents)
+        case switchScope(_ type: ScopeChangeType)
         case notifyChangedScope(_ scope: ScopeType)
         case notifyChangedPage(_ page: DateComponents)
-        case notifySelectdDate(_ date: DateComponents?)
-        case notifyFocusDateInWeekView(_ date: DateComponents)
-        case notifyTableViewDate(_ date: DateComponents)
+        case notifySelectdDate(_ dateComponents: DateComponents?)
+        case notifyFocusDateInWeekView(_ dateComponents: DateComponents)
+        case notifyTableViewDate(_ dateComponents: DateComponents)
     }
     
     struct State {
@@ -40,7 +40,7 @@ final class CalendarViewReactor: Reactor {
         @Pulse var eventDates: [DateComponents] = []
         @Pulse var calendarHeight: CGFloat?
         @Pulse var switchPage: DateComponents?
-        @Pulse var switchScope: Void? = nil
+        @Pulse var switchScope: ScopeChangeType? = nil
         @Pulse var scope: ScopeType?
         @Pulse var changedPage: DateComponents?
         @Pulse var selectedDate: DateComponents?
@@ -48,11 +48,11 @@ final class CalendarViewReactor: Reactor {
         @Pulse var tableViewDate: DateComponents?
     }
         
-    private let currentCalendar = DateManager.calendar
     private let fetchUseCase: FetchRecentSchedule
 
     var initialState: State = State()
     var todayComponents = Date().getComponents()
+    var models: [ScheduleTableSectionModel] = []
     
     init(fetchUseCase: FetchRecentSchedule) {
         self.fetchUseCase = fetchUseCase
@@ -66,16 +66,16 @@ final class CalendarViewReactor: Reactor {
             return .just(.setCalendarHeight(height))
         case .requestPageSwitch(let date):
             return .just(.switchPage(date))
-        case .requestScopeSwitch :
-            return changeScope()
+        case .requestScopeSwitch(let type) :
+            return .just(.switchScope(type))
         case .scopeChanged(let scope):
             return .just(.notifyChangedScope(scope))
         case .pageChanged(let page):
             return .just(.notifyChangedPage(page))
         case .dateSelected(let date):
-            return presentDate(date)
+            return presentTableDate(on: date)
         case .focusDateInWeekView(let date):
-            return .just(.notifyFocusDateInWeekView(date))
+            return focusData(on: date)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
         }
@@ -96,8 +96,8 @@ final class CalendarViewReactor: Reactor {
             newState.calendarHeight = height
         case .switchPage(let date):
             newState.switchPage = date
-        case .switchScope:
-            newState.switchScope = ()
+        case .switchScope(let type):
+            newState.switchScope = type
         case .notifyChangedScope(let scope):
             newState.scope = scope
         case .notifyChangedPage(let page):
@@ -114,31 +114,45 @@ final class CalendarViewReactor: Reactor {
 }
 
 extension CalendarViewReactor {
+    
+    
+    /// 스케줄 데이터 및 이벤트 목록 얻기
     private func fetchData() -> Observable<Mutation> {
         let fetchData = fetchUseCase.fetchRecent().asObservable()
         
-        let fetchScheduleList = fetchData
+        let scheduleArray = fetchData
             .map { Dictionary(grouping: $0) { schedule in
                 return schedule.date.getComponents()
             }}
             .map { $0.map { return ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) } }
+            .do(onNext: { self.models = $0 })
             .map { Mutation.loadScheduleList(scheduleList: $0) }
         
-        let parseDateComponents = fetchData
+        let eventArray = fetchData
             .map { $0.compactMap { $0.date } }
-            .map { Set($0.map { self.currentCalendar.dateComponents([.year, .month, .day], from: $0) } ) }
+            .map { Set($0.map { $0.getComponents() } ) }
             .map({ Array($0) })
             .map { Mutation.loadEventList(componentsArray: $0) }
                     
-        return Observable.concat([fetchScheduleList, parseDateComponents])
+        return Observable.concat([scheduleArray, eventArray])
     }
     
-    private func presentDate(_ dateComponents: DateComponents) -> Observable<Mutation> {
+    /// 캘린더 월 -> 주 변경 시 표시할 날짜 동기화
+    private func focusData(on date: DateComponents) -> Observable<Mutation> {
+        let tableDate = presentTableDate(on: date)
+        
+        let calendarDate = Observable.just(Mutation.notifyFocusDateInWeekView(date))
+        
+        return Observable.concat([tableDate, calendarDate])
+    }
+    
+    /// 캘린더 날짜 선택 or 월 -> 주 변경 시 테이블에게 표시할 날짜 알려주기
+    private func presentTableDate(on dateComponents: DateComponents) -> Observable<Mutation> {
         
         guard !isSameAsPreviousDate(on: dateComponents) else {
             return Observable.just(Mutation.notifySelectdDate(dateComponents))
         }
-
+        
         if hasEvent(on: dateComponents) {
             return selectedNonEmptySchedule(on: dateComponents)
         } else {
@@ -146,46 +160,41 @@ extension CalendarViewReactor {
         }
     }
     
+    /// 현재 테이블뷰에서 빈 스케줄이 있다면 제거하기
+    /// 빈 스케줄 : 이벤트가 없는 날짜 선택 시 없음을 알려주는 셀 타입의 모델
     private func selectedNonEmptySchedule(on date: DateComponents) -> Observable<Mutation> {
         let scheduleList = Observable.just(())
             .filter { _ in self.hasEmptySchedule() }
-            .map { _ in Mutation.loadScheduleList(scheduleList: self.getNonEmptySchedules()) }
+            .map { _ in Mutation.loadScheduleList(scheduleList: self.models) }
             
         let presentDate = Observable.just(Mutation.notifySelectdDate(date))
         return Observable.concat([scheduleList, presentDate])
     }
     
+    /// 빈 스케줄 생성하기
     private func selectedEmptySchedule(on date: DateComponents) -> Observable<Mutation> {
-        let scheduleListWithEmpty = Observable.just(Mutation.loadScheduleListWithEmptySchedule(scheduleList: getSchedulesWithEmpty(on: date)))
+        let scheduleListWithEmpty = Observable
+            .just(Mutation.loadScheduleListWithEmptySchedule(scheduleList: getSchedulesWithEmpty(on: date)))
         
         let presentEmptyDate = Observable.just(Mutation.notifySelectdDate(date))
         return Observable.concat([scheduleListWithEmpty, presentEmptyDate])
     }
-    
-    private func changeScope() -> Observable<Mutation> {
-        let resetSelected = Observable.just(Mutation.notifySelectdDate(nil))
-        
-        let scheduleList = Observable.just(())
-            .filter { _ in self.hasEmptySchedule() && self.currentState.scope == .month }
-            .map { _ in Mutation.loadScheduleList(scheduleList: self.getNonEmptySchedules()) }
-        
-        let scopeSwitch = Observable.just(Mutation.switchScope)
-        
-        return Observable.concat([resetSelected, scheduleList, scopeSwitch])
-    }
 }
 
 extension CalendarViewReactor {
+    
+    /// 현재 선택된 날짜와 같은 날짜인지 구별하기
     private func isSameAsPreviousDate(on currentDate: DateComponents) -> Bool {
         guard let selectedDate = currentState.selectedDate else { return false }
         return selectedDate == currentDate
     }
     
+    /// 선택된 날짜가 스케줄 날짜에 포함되어 있는지 구별하기
     private func hasEvent(on date: DateComponents) -> Bool {
-        let nonEmptySchedules = getNonEmptySchedules()
-        return nonEmptySchedules.contains { $0.dateComponents == date }
+        return self.models.contains { $0.dateComponents == date }
     }
     
+    /// 표시되고 있는 스케줄에서 빈 스케줄이 있는지 구별하기
     private func hasEmptySchedule() -> Bool {
         currentState.schedules.contains { schedule in
             schedule.items.contains { event in
@@ -193,19 +202,11 @@ extension CalendarViewReactor {
             }
         }
     }
-    
-    private func getNonEmptySchedules() -> [ScheduleTableSectionModel] {
-        var currentScheduleList = currentState.schedules
-        currentScheduleList.removeAll { sectionModel in
-            sectionModel.items.contains { $0 is EmptySchedule }
-        }
-        
-        return currentScheduleList
-    }
-    
+
+    /// 표시되고 있는 스케줄에 빈 스케줄 추가하기
     private func getSchedulesWithEmpty(on date: DateComponents) -> [ScheduleTableSectionModel] {
         guard let emptyDate = date.getDate() else { return [] }
-        var nonEmptyScheduleList = getNonEmptySchedules()
+        var nonEmptyScheduleList = self.models
         let emptyItem = EmptySchedule(date: emptyDate)
         let emptyModel = ScheduleTableSectionModel(dateComponents: date, items: [emptyItem])
         nonEmptyScheduleList.append(emptyModel)

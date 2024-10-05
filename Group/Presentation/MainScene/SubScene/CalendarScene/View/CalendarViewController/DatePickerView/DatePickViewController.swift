@@ -121,7 +121,7 @@ final class DatePickViewController: UIViewController, View {
     func bind(reactor: CalendarViewReactor) {
         pageChangeRequestObserver
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestPageSwitch(date: $0) }
+            .map { Reactor.Action.requestPageSwitch(dateComponents: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
