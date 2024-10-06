@@ -134,7 +134,7 @@ final class ScheduleView: UIView {
         self.placeInfoLabel.setText(viewModel.place)
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
-        self.weatherView.configure(with: viewModel.weather)
+        self.weatherView.configure(with: .init(weather: viewModel.weather))
     }
 }
 

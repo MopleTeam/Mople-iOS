@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
+#warning("향후 메모리 성능을 향상시키기 위해서 페이징 처리를 생각해보면 좋을 것 같음")
 final class fetchRecentScheduleMock: FetchRecentSchedule {
     
     var groupCount: Int = 1
@@ -53,7 +54,8 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
     
     func getWeather() -> WeatherInfo {
         return WeatherInfo(imagePath: "https://openweathermap.org/img/wn/0\(Int.random(in: 1...4))d@2x.png",
-                           temperature: Int.random(in: 20...30))
+                           temperature: Int.random(in: 20...30),
+                           pop: Bool.random() ? nil : Double.random(in: 0.01 ... 1))
     }
     
     func fetchRecent() -> Single<[Schedule]> {

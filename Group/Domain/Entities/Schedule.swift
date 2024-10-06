@@ -69,4 +69,5 @@ struct Participant: Hashable, Equatable {
 struct WeatherInfo: Hashable, Equatable {
     let imagePath: String?
     let temperature: Int?
+    let pop: Double?
 }

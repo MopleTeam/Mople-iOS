@@ -179,6 +179,7 @@ extension AppDesign {
         case date
         case place
         case moreSchedule
+        case pop
         
         var itemConfig: ItemConfigure {
             switch self {
@@ -208,6 +209,10 @@ extension AppDesign {
                                        font: .pretendard(type: .bold, size: 16),
                                        color: .init(hexCode: "555555"),
                                        image: .plus)
+            case .pop:
+                return makeUIConfigure(font: .pretendard(type: .bold, size: 12),
+                                       color: .init(hexCode: "668CFF"),
+                                       image: .pop)
             }
         }
     }

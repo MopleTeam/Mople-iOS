@@ -104,6 +104,11 @@ final class IconLabelView: UIView {
     public func setText(_ text: String?) {
         self.infoLabel.text = text
     }
+    
+    public func setMargin(_ margin: UIEdgeInsets) {
+        mainStackView.isLayoutMarginsRelativeArrangement = true
+        mainStackView.layoutMargins = margin
+    }
 }
 
 extension UIStackView {
