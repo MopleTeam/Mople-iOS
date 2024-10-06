@@ -39,7 +39,6 @@ final class ThumbnailTitleView: UIView {
     private let thumbnailView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
-        view.layer.cornerRadius = 12
         view.clipsToBounds = true
         return view
     }()
@@ -106,7 +105,7 @@ final class ThumbnailTitleView: UIView {
     private func infoConfigure() {
         switch viewType {
         case .simple:
-            setThumbnail(size: 28, radius: 8)
+            setThumbnail(size: 28, radius: 6)
             groupTitleLabel.setType(configure: AppDesign.Schedule.group)
         case .detail:
             setThumbnail(size: 56, radius: 12)

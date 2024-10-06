@@ -50,7 +50,9 @@ extension AppDesign {
     
     enum TabBar {
         static let titleFont = UIFont.pretendard(type: .semiBold, size: 10)
-        static let tintColor = UIColor.init(hexCode: "3E3F40")
+        static let titleColor = UIColor.init(hexCode: "999999")
+        static let normalColor = UIColor.init(hexCode: "E1E3E5")
+        static let selectedColor = UIColor.init(hexCode: "3E3F40")
     }
     
     enum Layer {

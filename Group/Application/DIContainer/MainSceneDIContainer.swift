@@ -41,10 +41,10 @@ extension MainSceneDIContainer {
     // MARK: - 홈
     private func makeHomeCoordinator() -> BaseCoordinator {
         let homeDI = HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
-        
+//        UIImage(systemName: "newspaper")?.withAlignmentRectInsets(UIEdgeInsets(top: 8.5, left: 0, bottom: -8.5, right: 0)), tag: 0)
         let navigationController = UINavigationController()
         navigationController.tabBarItem = .init(title: "홈",
-                                                image: UIImage(systemName: "house.fill"),
+                                                image: .home,
                                                 selectedImage: nil)
           
         return homeDI.makeHomeFlowCoordinator(navigationController: navigationController)
@@ -56,7 +56,7 @@ extension MainSceneDIContainer {
         
         let navigationController = UINavigationController()
         navigationController.tabBarItem = .init(title: "모임",
-                                                image: UIImage(systemName: "list.bullet"),
+                                                image: .people,
                                                 selectedImage: nil)
         
         return groupDI.makeGroupListFlowCoordinator(navigationController: navigationController)
@@ -67,8 +67,8 @@ extension MainSceneDIContainer {
         let calendarDI = CalendarSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
         let navigationController = UINavigationController()
-        navigationController.tabBarItem = .init(title: "홈",
-                                                image: UIImage(systemName: "calendar"),
+        navigationController.tabBarItem = .init(title: "일정관리",
+                                                image: .tabBarCalendar,
                                                 selectedImage: nil)
         
         return calendarDI.makeCalendarFlowCoordinator(navigationController: navigationController)
@@ -79,8 +79,8 @@ extension MainSceneDIContainer {
         let profileDI = ProfileSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
         let navigationController = UINavigationController()
-        navigationController.tabBarItem = .init(title: "홈",
-                                                image: UIImage(systemName: "person.crop.circle"),
+        navigationController.tabBarItem = .init(title: "프로필",
+                                                image: .person,
                                                 selectedImage: nil)
         
         return profileDI.makeProfileFlowCoordinator(navigationController: navigationController)

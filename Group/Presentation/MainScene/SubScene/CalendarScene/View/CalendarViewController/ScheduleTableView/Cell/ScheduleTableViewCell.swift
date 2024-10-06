@@ -9,12 +9,15 @@ import UIKit
 import SnapKit
 
 final class ScheduleTableViewCell: UITableViewCell {
-
+ 
+    // MARK: - UI Components
     private let scheduleView: SimpleScheduleView = {
         let view = SimpleScheduleView()
         return view
     }()
     
+    
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -24,6 +27,8 @@ final class ScheduleTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    // MARK: - UI Setup
     private func setupUI() {
         setLayout()
         setRadius()

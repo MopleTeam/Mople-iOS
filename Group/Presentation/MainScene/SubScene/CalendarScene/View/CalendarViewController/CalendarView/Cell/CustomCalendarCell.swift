@@ -10,9 +10,11 @@ import SnapKit
 import FSCalendar
 
 final class CustomCalendarCell: FSCalendarCell {
-    
+    // MARK: - Variables
     private var isCornerRadiusSet = false
     
+    
+    // MARK: - UI Components
     private let dotContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -28,6 +30,8 @@ final class CustomCalendarCell: FSCalendarCell {
     
     private let indicatorView = UIView()
     
+    
+    // MARK: - LifeCycle
     override init!(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -49,6 +53,8 @@ final class CustomCalendarCell: FSCalendarCell {
         }
     }
     
+    
+    // MARK: - UI Setup
     private func setupViews() {
         contentView.addSubview(indicatorView)
         indicatorView.addSubview(dotContainer)

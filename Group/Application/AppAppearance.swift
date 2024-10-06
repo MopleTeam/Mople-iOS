@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-#warning("custom 네비로 사용하지 않음")
+#warning("custom 네비로 사용하지 않음 네비 부분 삭제 예정")
 final class AppAppearance {
     
     static func setupAppearance() {
@@ -22,8 +22,12 @@ final class AppAppearance {
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.init(hexCode: "3E3F40"), .font: UIFont.pretendard(type: .semiBold, size: 10)]
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.font: UIFont.pretendard(type: .semiBold, size: 10)]
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.titleColor, .font: AppDesign.TabBar.titleFont]
+        appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -5)
+        appearance.stackedLayoutAppearance.normal.iconColor = AppDesign.TabBar.normalColor
+        
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.selectedColor, .font: AppDesign.TabBar.titleFont]
+        appearance.stackedLayoutAppearance.selected.iconColor = AppDesign.TabBar.selectedColor
         
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
@@ -40,4 +44,6 @@ final class AppAppearance {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
 }
+
+
 

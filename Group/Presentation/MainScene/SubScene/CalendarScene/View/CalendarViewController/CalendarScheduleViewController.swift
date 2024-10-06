@@ -78,17 +78,6 @@ final class CalendarScheduleViewController: BaseViewController, View {
         return panGesture
     }()
     
-    @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
-        print("제스처 전환 실행")
-        self.scopeObserver.onNext(())
-        calendarView.calendar.handleScopeGesture(gesture)
-    }
-    
-    private func setGesture() {
-        self.view.addGestureRecognizer(scopeGesture)
-        self.scheduleListTableView.tableView.panGestureRecognizer.require(toFail: scopeGesture)
-    }
-    
     // MARK: - LifeCycle
     init(title: String,
          reactor: CalendarViewReactor) {
@@ -185,35 +174,13 @@ final class CalendarScheduleViewController: BaseViewController, View {
         setHeaderLabel(date: today)
     }
     
-    // MARK: - Selectors
+    // MARK: - Binding
     func bind(reactor: CalendarViewReactor) {
-        self.rx.viewDidLoad
-            .do(onNext: { _ in
-                print("몇번 불려?")
-            })
-            .map { _ in Reactor.Action.fetchData }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        self.scopeObserver
-            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .gesture) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        self.rightButtonObservable
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        self.leftButtonObservable
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         reactor.pulse(\.$calendarHeight)
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
@@ -239,12 +206,50 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .disposed(by: disposeBag)
     }
     
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .map { _ in Reactor.Action.fetchData }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.scopeObserver
+            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch(type: .gesture) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.rightButtonObservable
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.leftButtonObservable
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Action
     private func setAction() {
         headerContainerView.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.presentDatePicker()
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Gesture Setup
+    @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
+        self.scopeObserver.onNext(())
+        calendarView.calendar.handleScopeGesture(gesture)
+    }
+    
+    private func setGesture() {
+        self.view.addGestureRecognizer(scopeGesture)
+        self.scheduleListTableView.tableView.panGestureRecognizer.require(toFail: scopeGesture)
     }
 }
 

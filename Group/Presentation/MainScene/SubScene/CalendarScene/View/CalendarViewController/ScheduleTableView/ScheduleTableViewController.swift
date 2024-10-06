@@ -29,7 +29,6 @@ final class ScheduleTableViewController: UIViewController, View {
     
     // MARK: - UI Components
     public let tableView: UITableView = {
-        
         #warning("섹션 헤더 sticky 되는 현상 막기")
         let table = UITableView(frame: .zero, style: .grouped)
         table.separatorStyle = .none
@@ -134,6 +133,7 @@ final class ScheduleTableViewController: UIViewController, View {
     }
 }
 
+// MARK: - Table Delegate
 extension ScheduleTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 203
@@ -160,7 +160,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
     }
 }
 
-// MARK: - Delegate
+// MARK: - Scroll Delegate
 extension ScheduleTableViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

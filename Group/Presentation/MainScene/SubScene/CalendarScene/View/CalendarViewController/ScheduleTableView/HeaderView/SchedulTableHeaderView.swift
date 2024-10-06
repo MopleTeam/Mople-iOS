@@ -9,13 +9,16 @@ import UIKit
 import SnapKit
 
 final class SchedulTableHeaderView: UITableViewHeaderFooterView {
-    
+
+    // MARK: - UI Components
     private let titleLabel: BaseLabel = {
         let label = BaseLabel(configure: AppDesign.SchedeleTable.header)
         label.textAlignment = .center
         return label
     }()
     
+    
+    // MARK: - LifeCycle
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -25,6 +28,8 @@ final class SchedulTableHeaderView: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    // MARK: - UI Setup
     private func setupUI() {
         addSubview(titleLabel)
         

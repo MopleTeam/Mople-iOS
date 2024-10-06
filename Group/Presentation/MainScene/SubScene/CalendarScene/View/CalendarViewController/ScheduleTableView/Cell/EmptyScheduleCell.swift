@@ -14,6 +14,7 @@ struct EmptySchedule: DateProviding {
 
 final class EmptyScheduleCell: UITableViewCell {
 
+    // MARK: - UI Components
     private let emptyView: UIView = {
         let view = UIView()
         view.backgroundColor = AppDesign.defaultWihte
@@ -21,7 +22,9 @@ final class EmptyScheduleCell: UITableViewCell {
     }()
     
     private let label = UILabel()
+
     
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -31,6 +34,7 @@ final class EmptyScheduleCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         setLayout()
         setRadius()

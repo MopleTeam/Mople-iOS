@@ -114,7 +114,7 @@ final class DatePickViewController: UIViewController, View {
     private func setDatePicker() {
         datePicker.dataSource = self
         datePicker.delegate = self
-        setSelectRow(date: selectedDate ?? today)
+        setSelectRow(date: selectedDate)
     }
     
     // MARK: - Bind
@@ -134,6 +134,7 @@ final class DatePickViewController: UIViewController, View {
             .disposed(by: disposeBag)
     }
     
+    // MARK: - Action
     private func setupAction() {
         rightBarButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in

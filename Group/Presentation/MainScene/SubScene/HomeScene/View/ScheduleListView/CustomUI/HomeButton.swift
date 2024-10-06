@@ -11,7 +11,11 @@ import SwiftUI
 
 final class HomeButton: UIButton {
     
-    private let buttonImage = UIImageView()
+    private let buttonImage: UIImageView = {
+        let view = UIImageView()
+        view.contentMode = .scaleAspectFill
+        return view
+    }()
     
     private let buttonTitle:UILabel = {
         let label = UILabel()
@@ -45,6 +49,12 @@ final class HomeButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        print("buttonImage size: \(buttonImage.frame.size)")
+    }
+    
     private func setBackGroundColor(_ color: UIColor?) {
         backgroundColor = color
     }
@@ -63,6 +73,10 @@ final class HomeButton: UIButton {
         
         buttonTitle.snp.makeConstraints { make in
             make.width.equalToSuperview().inset(16)
+        }
+        
+        buttonImage.snp.makeConstraints { make in
+            make.size.equalTo(40)
         }
     }
     
