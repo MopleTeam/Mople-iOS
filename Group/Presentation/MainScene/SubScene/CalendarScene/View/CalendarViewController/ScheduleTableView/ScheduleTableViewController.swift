@@ -28,7 +28,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private let dateSyncObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
-    public let tableView: UITableView = {
+    private let tableView: UITableView = {
         #warning("섹션 헤더 sticky 되는 현상 막기")
         let table = UITableView(frame: .zero, style: .grouped)
         table.separatorStyle = .none
@@ -129,7 +129,6 @@ final class ScheduleTableViewController: UIViewController, View {
                 vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
             })
             .disposed(by: disposeBag)
-        
     }
 }
 
@@ -237,6 +236,13 @@ extension ScheduleTableViewController {
         default:
             dateSyncObserver.accept(lastComponents)
         }
+    }
+}
+
+// MARK: - Gesture
+extension ScheduleTableViewController {
+    public func panGestureRequire(_ gesture: UIPanGestureRecognizer) {
+        self.tableView.panGestureRecognizer.require(toFail: gesture)
     }
 }
 

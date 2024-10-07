@@ -35,6 +35,7 @@ extension WeatherViewModel {
         self.pop = weather.pop
     }
     
+    #warning("round는 정수를 return 정리하기")
     private func getPopPercent(pop: Double) -> Int? {
         switch pop {
         case ..<0.05: return nil

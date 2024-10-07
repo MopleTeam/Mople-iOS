@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-protocol FetchGroupList {
+protocol FetchGroup {
     func fetchGroupList() -> Single<[Group]>
 }
 

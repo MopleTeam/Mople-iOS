@@ -20,10 +20,10 @@ final class GroupListViewReactor: Reactor {
         @Pulse var groupList: [Group] = []
     }
     
-    private let fetchUseCase: FetchGroupList
+    private let fetchUseCase: FetchGroup
     var initialState: State = State()
     
-    init(fetchUseCase: FetchGroupList) {
+    init(fetchUseCase: FetchGroup) {
         self.fetchUseCase = fetchUseCase
         action.onNext(.fetchGroupList)
     }

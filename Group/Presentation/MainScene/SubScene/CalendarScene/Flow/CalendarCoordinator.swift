@@ -23,6 +23,6 @@ final class CalendarCoordinator: BaseCoordinator {
     override func start() {
         let vc = dependencies.makeCalendarViewController()
         
-        navigationController.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: false)
     }
 }

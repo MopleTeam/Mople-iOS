@@ -23,6 +23,6 @@ final class ProfileCoordinator: BaseCoordinator {
     override func start() {
         let vc = dependencies.makeProfileViewController()
         
-        navigationController.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: false)
     }
 }

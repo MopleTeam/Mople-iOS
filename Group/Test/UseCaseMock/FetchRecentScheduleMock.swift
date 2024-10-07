@@ -8,15 +8,14 @@
 import Foundation
 import RxSwift
 
-#warning("향후 메모리 성능을 향상시키기 위해서 페이징 처리를 생각해보면 좋을 것 같음")
-final class fetchRecentScheduleMock: FetchRecentSchedule {
+final class FetchRecentScheduleMock: FetchRecentSchedule {
     
     var groupCount: Int = 1
     
     func getEvents() -> [Schedule] {
         var scheduleArray: [Schedule] = []
         
-        for i in 0...100 {
+        for i in 0...4 {
             
             let schedule = Schedule(group: getGroup(),
                                     eventName: "모임 \(i)",
@@ -58,7 +57,7 @@ final class fetchRecentScheduleMock: FetchRecentSchedule {
                            pop: Bool.random() ? nil : Double.random(in: 0.01 ... 1))
     }
     
-    func fetchRecent() -> Single<[Schedule]> {
+    func fetchRecentSchedule() -> Single<[Schedule]> {
         return Single.just(getEvents())
     }
 }

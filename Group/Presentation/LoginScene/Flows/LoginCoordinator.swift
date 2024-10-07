@@ -44,7 +44,6 @@ extension LoginCoordinator {
         }
     }
     
-    
     private func clearScene() {
         self.navigationController.viewControllers = []
         self.parentCoordinator?.didFinish(coordinator: self)

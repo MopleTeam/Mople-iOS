@@ -16,8 +16,13 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     typealias Reactor = ScheduleViewReactor
     typealias Section = SectionModel<Void, Schedule>
     
+    // MARK: - Variables
     var disposeBag = DisposeBag()
     
+    // MARK: - Observer
+    private let footerTapObserver: PublishSubject<Void> = .init()
+    
+    // MARK: - UI Components
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -27,6 +32,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         return collectionView
     }()
     
+    // MARK: - LifeCycle
     init(reactor: ScheduleViewReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -42,6 +48,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         setCollectionView()
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         view.addSubview(collectionView)
         
@@ -58,6 +65,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
                                 withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
     }
     
+    // MARK: - DataSource
     private func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<Section> {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
@@ -68,7 +76,10 @@ final class ScheduleListCollectionViewController: UIViewController, View {
              },
              configureSupplementaryView: { _, collectionView, kind, indexPath in
                  if kind == UICollectionView.elementKindSectionFooter {
-                     return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier, for: indexPath) as! ScheduleListReuseFooterView
+                     let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier, for: indexPath) as! ScheduleListReuseFooterView
+                     
+                     footer.setTapAction(on: self.footerTapObserver.asObserver())
+                     return footer
                  } else {
                      return UICollectionReusableView()
                  }
@@ -76,10 +87,15 @@ final class ScheduleListCollectionViewController: UIViewController, View {
          )
         return dataSource
     }
-    
-    #warning("학습 필요")
+
+    // MARK: - Binding
     func bind(reactor: ScheduleViewReactor) {
         let dataSource = configureDataSource()
+        
+        footerTapObserver
+            .map({ _ in Reactor.Action.presentCalendaer })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$schedules)
             .map { [Section(model: (), items: $0)] }
@@ -110,7 +126,7 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         let fullHeight = collectionView.bounds.height
         
-        return CGSize(width: 89, height: fullHeight)
+        return CGSize(width: 109, height: fullHeight)
     }
     
     #warning("참고")

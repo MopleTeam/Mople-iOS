@@ -13,7 +13,7 @@ import RxCocoa
 final class ScheduleListReuseFooterView: UICollectionReusableView {
     
     var disposeBag = DisposeBag()
-    
+        
     private let label: BaseButton = {
         let label = BaseButton(backColor: AppDesign.defaultWihte,
                                radius: 12,
@@ -25,7 +25,6 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
-        setAction()
     }
     
     required init?(coder: NSCoder) {
@@ -36,15 +35,16 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
         self.addSubview(label)
         
         label.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.verticalEdges.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview().inset(20)
         }
     }
     
-    private func setAction() {
+    public func setTapAction(on tapObserver: AnyObserver<Void>) {
         label.rx.controlEvent(.touchUpInside)
-            .subscribe(onNext: { _ in
-                print("터치 됨")
-            })
+            .map({ _ in })
+            .bind(to: tapObserver)
             .disposed(by: disposeBag)
     }
 }

@@ -29,6 +29,10 @@ final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
 }
 
 extension MainSceneDIContainer {
+    func makeTabBarController() -> UITabBarController {
+        return MainTabBarController()
+    }
+    
     func getMainFlowCoordinator() -> [BaseCoordinator] {
         return [makeHomeCoordinator(),
                 makeGroupListCoordinator(),
@@ -41,7 +45,6 @@ extension MainSceneDIContainer {
     // MARK: - 홈
     private func makeHomeCoordinator() -> BaseCoordinator {
         let homeDI = HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
-//        UIImage(systemName: "newspaper")?.withAlignmentRectInsets(UIEdgeInsets(top: 8.5, left: 0, bottom: -8.5, right: 0)), tag: 0)
         let navigationController = UINavigationController()
         navigationController.tabBarItem = .init(title: "홈",
                                                 image: .home,

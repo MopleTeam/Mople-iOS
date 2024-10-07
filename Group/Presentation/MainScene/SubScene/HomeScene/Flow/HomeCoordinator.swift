@@ -8,7 +8,7 @@
 import UIKit
 
 protocol HomeCoordinatorDependencies {
-    func makeHomeViewController(action: LogOutAction) -> HomeViewController
+    func makeHomeViewController(action: HomeViewAction) -> HomeViewController
 }
 
 final class HomeCoordinator: BaseCoordinator {
@@ -22,13 +22,19 @@ final class HomeCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let action = LogOutAction(logOut: logOut)
+        let action = HomeViewAction(logOut: logOut,
+                                    presentCalendar: presentCalender)
+        
         let vc = dependencies.makeHomeViewController(action: action)
         
-        navigationController.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: false)
     }
     
     private func logOut() {
         (self.parentCoordinator as? SignOut)?.singOut()
+    }
+    
+    private func presentCalender() {
+        (self.parentCoordinator as? PresentCalendar)?.presentCalendar()
     }
 }

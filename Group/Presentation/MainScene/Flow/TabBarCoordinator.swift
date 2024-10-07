@@ -11,32 +11,36 @@ protocol SignOut {
     func singOut()
 }
 
+protocol PresentCalendar {
+    func presentCalendar()
+}
+
 protocol TabBarCoordinaotorDependencies {
+    func makeTabBarController() -> UITabBarController
     func getMainFlowCoordinator() -> [BaseCoordinator]
 }
 
 final class TabBarCoordinator: BaseCoordinator {
     
     private let dependencies: TabBarCoordinaotorDependencies
-    private let tabBarController: UITabBarController
+    private var tabBarController: UITabBarController?
  
     init(navigationController: UINavigationController,
          dependencies: TabBarCoordinaotorDependencies) {
         self.dependencies = dependencies
-        self.tabBarController = MainTabBarController()
         super.init(navigationController: navigationController)
     }
     
     override func start() {
+        tabBarController = dependencies.makeTabBarController()
         let coordinators = dependencies.getMainFlowCoordinator()
         coordinators.forEach {
             $0.navigationController.navigationBar.isHidden = true
             self.start(coordinator: $0)
         }
         let viewControllers = coordinators.map { $0.navigationController }
-        tabBarController.setViewControllers(viewControllers, animated: true)
-        
-        navigationController.pushViewController(tabBarController, animated: true)
+        tabBarController!.setViewControllers(viewControllers, animated: false)
+        navigationController.pushViewController(tabBarController!, animated: true)
     }
 }
 
@@ -56,7 +60,7 @@ extension TabBarCoordinator: SignOut {
         }
         
         self.childCoordinators.removeAll()
-        self.tabBarController.viewControllers?.removeAll()
+        self.tabBarController!.viewControllers?.removeAll()
         
         self.navigationController.viewControllers = []
         self.parentCoordinator?.didFinish(coordinator: self)
@@ -64,3 +68,29 @@ extension TabBarCoordinator: SignOut {
     }
 }
 
+extension TabBarCoordinator: PresentCalendar {
+    func presentCalendar() {
+        // 탭바 컨트롤러s에는 Navigation View Controller가 들어있음
+        
+        guard let calendarIndex = getCalendarIndex(),
+              let calendarVC = getCalendarFormTabBar(index: calendarIndex) else { return }
+        
+        tabBarController!.selectedIndex = calendarIndex
+    }
+    
+    private func getCalendarIndex() -> Int? {
+        return tabBarController?.viewControllers?.firstIndex(where: { navi in
+            guard let navi = navi as? UINavigationController else { return false }
+            return navi.viewControllers.contains { vc in
+                return vc is CalendarScheduleViewController
+            }
+        })
+    }
+    
+    private func getCalendarFormTabBar(index: Int) -> CalendarScheduleViewController? {
+        guard let calendarNavi = tabBarController?.viewControllers?[index] as? UINavigationController,
+              let calendarVC = calendarNavi.viewControllers.first as? CalendarScheduleViewController else { return nil }
+        
+        return calendarVC
+    }
+}

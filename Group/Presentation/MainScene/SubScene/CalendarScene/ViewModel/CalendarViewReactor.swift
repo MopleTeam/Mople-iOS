@@ -17,7 +17,6 @@ final class CalendarViewReactor: Reactor {
         case scopeChanged(scope: ScopeType)
         case pageChanged(page: DateComponents)
         case dateSelected(dateComponents: DateComponents)
-        case focusDateInWeekView(dateComponents: DateComponents)
         case sharedTableViewDate(dateComponents: DateComponents)
     }
     
@@ -31,7 +30,6 @@ final class CalendarViewReactor: Reactor {
         case notifyChangedScope(_ scope: ScopeType)
         case notifyChangedPage(_ page: DateComponents)
         case notifySelectdDate(_ dateComponents: DateComponents?)
-        case notifyFocusDateInWeekView(_ dateComponents: DateComponents)
         case notifyTableViewDate(_ dateComponents: DateComponents)
     }
     
@@ -44,17 +42,16 @@ final class CalendarViewReactor: Reactor {
         @Pulse var scope: ScopeType?
         @Pulse var changedPage: DateComponents?
         @Pulse var selectedDate: DateComponents?
-        @Pulse var focusDateInWeekView: DateComponents?
         @Pulse var tableViewDate: DateComponents?
     }
         
-    private let fetchUseCase: FetchRecentSchedule
+    private let fetchUseCase: FetchSchedule
 
     var initialState: State = State()
     var todayComponents = Date().getComponents()
     var models: [ScheduleTableSectionModel] = []
     
-    init(fetchUseCase: FetchRecentSchedule) {
+    init(fetchUseCase: FetchSchedule) {
         self.fetchUseCase = fetchUseCase
     }
     
@@ -74,8 +71,6 @@ final class CalendarViewReactor: Reactor {
             return .just(.notifyChangedPage(page))
         case .dateSelected(let date):
             return presentTableDate(on: date)
-        case .focusDateInWeekView(let date):
-            return focusData(on: date)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
         }
@@ -104,8 +99,6 @@ final class CalendarViewReactor: Reactor {
             newState.changedPage = page
         case .notifySelectdDate(let date):
             newState.selectedDate = date
-        case .notifyFocusDateInWeekView(let date):
-            newState.focusDateInWeekView = date
         case .notifyTableViewDate(let date):
             newState.tableViewDate = date
         }
@@ -118,7 +111,7 @@ extension CalendarViewReactor {
     
     /// 스케줄 데이터 및 이벤트 목록 얻기
     private func fetchData() -> Observable<Mutation> {
-        let fetchData = fetchUseCase.fetchRecent().asObservable()
+        let fetchData = fetchUseCase.fetchScheduleList().asObservable()
         
         let scheduleArray = fetchData
             .map { Dictionary(grouping: $0) { schedule in
@@ -135,15 +128,6 @@ extension CalendarViewReactor {
             .map { Mutation.loadEventList(componentsArray: $0) }
                     
         return Observable.concat([scheduleArray, eventArray])
-    }
-    
-    /// 캘린더 월 -> 주 변경 시 표시할 날짜 동기화
-    private func focusData(on date: DateComponents) -> Observable<Mutation> {
-        let tableDate = presentTableDate(on: date)
-        
-        let calendarDate = Observable.just(Mutation.notifyFocusDateInWeekView(date))
-        
-        return Observable.concat([tableDate, calendarDate])
     }
     
     /// 캘린더 날짜 선택 or 월 -> 주 변경 시 테이블에게 표시할 날짜 알려주기

@@ -27,7 +27,7 @@ final class CalendarSceneDIContainer: CalendarCoordinatorDependencies {
     }
 
     private func makeCalendarViewReactor() -> CalendarViewReactor {
-        return CalendarViewReactor(fetchUseCase: fetchRecentScheduleMock())
+        return CalendarViewReactor(fetchUseCase: FetchScheduleMock())
     }
     
 }

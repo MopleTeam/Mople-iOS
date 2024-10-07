@@ -7,14 +7,16 @@
 
 import ReactorKit
 
-struct LogOutAction {
+struct HomeViewAction {
     var logOut: () -> Void
+    var presentCalendar: () -> Void
 }
 
 final class ScheduleViewReactor: Reactor {
     enum Action {
         case fetchRecentSchedule
         case logOutTest
+        case presentCalendaer
     }
     
     enum Mutation {
@@ -26,14 +28,14 @@ final class ScheduleViewReactor: Reactor {
     }
     
     private let fetchUseCase: FetchRecentSchedule
-    private let logOutAction: LogOutAction
+    private let homeViewAction: HomeViewAction
     
     var initialState: State = State()
     
     init(fetchUseCase: FetchRecentSchedule,
-         logOutAction: LogOutAction) {
+         logOutAction: HomeViewAction) {
         self.fetchUseCase = fetchUseCase
-        self.logOutAction = logOutAction
+        self.homeViewAction = logOutAction
         action.onNext(.fetchRecentSchedule)
     }
     
@@ -42,7 +44,10 @@ final class ScheduleViewReactor: Reactor {
         case .fetchRecentSchedule:
             return fetchRecentSchedules()
         case .logOutTest:
-            logOutAction.logOut()
+            homeViewAction.logOut()
+            return Observable.empty()
+        case .presentCalendaer:
+            homeViewAction.presentCalendar()
             return Observable.empty()
         }
     }
@@ -72,7 +77,7 @@ final class ScheduleViewReactor: Reactor {
 extension ScheduleViewReactor {
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
-        let fetchSchedules = fetchUseCase.fetchRecent()
+        let fetchSchedules = fetchUseCase.fetchRecentSchedule()
             .asObservable()
             .map { Mutation.fetchRecentScehdule(schedules: $0) }
         

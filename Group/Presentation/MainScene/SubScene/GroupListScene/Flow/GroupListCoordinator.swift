@@ -23,6 +23,6 @@ final class GroupListCoordinator: BaseCoordinator {
     override func start() {
         let vc = dependencies.makeGroupListViewController()
         
-        navigationController.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: false)
     }
 }

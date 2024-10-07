@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */; };
+		5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */; };
 		520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520805162C69E0770015F6E0 /* LoginViewController.swift */; };
 		5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */; };
 		5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */; };
@@ -26,9 +28,9 @@
 		5236452B2C8EC5AD009E0784 /* NavigationBarExtendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452A2C8EC5AD009E0784 /* NavigationBarExtendable.swift */; };
 		5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* BaseViewController.swift */; };
 		523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* BaseEmptyView.swift */; };
-		523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroupList.swift */; };
+		523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroup.swift */; };
 		523645352C8FFE5B009E0784 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645342C8FFE5B009E0784 /* Schedule.swift */; };
-		523645372C8FFE9F009E0784 /* FetchRecentMeetingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentMeetingMock.swift */; };
+		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
 		5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */; };
 		5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453E2C900E12009E0784 /* GroupListCell.swift */; };
@@ -55,7 +57,7 @@
 		527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E672C82C905007FE63B /* ProfileSetupMock.swift */; };
 		527A3E6A2C82C965007FE63B /* UserToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E692C82C965007FE63B /* UserToken.swift */; };
 		527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */; };
-		527A3E722C8302AA007FE63B /* FetchRecentMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentMeeting.swift */; };
+		527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */; };
 		527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E752C8324CE007FE63B /* HomeCoordinator.swift */; };
 		527A3E792C834A12007FE63B /* TabBarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E782C834A12007FE63B /* TabBarCoordinator.swift */; };
 		527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7A2C834BAD007FE63B /* GroupListCoordinator.swift */; };
@@ -132,6 +134,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchScheduleMock.swift; sourceTree = "<group>"; };
+		5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchSchedule.swift; sourceTree = "<group>"; };
 		520805162C69E0770015F6E0 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+hexCode.swift"; sourceTree = "<group>"; };
 		5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewController.swift; sourceTree = "<group>"; };
@@ -150,9 +154,9 @@
 		5236452A2C8EC5AD009E0784 /* NavigationBarExtendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarExtendable.swift; sourceTree = "<group>"; };
 		5236452C2C8EDCEF009E0784 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* BaseEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseEmptyView.swift; sourceTree = "<group>"; };
-		523645322C8FFDEB009E0784 /* FetchGroupList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupList.swift; sourceTree = "<group>"; };
+		523645322C8FFDEB009E0784 /* FetchGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroup.swift; sourceTree = "<group>"; };
 		523645342C8FFE5B009E0784 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
-		523645362C8FFE9F009E0784 /* FetchRecentMeetingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentMeetingMock.swift; sourceTree = "<group>"; };
+		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
 		5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableViewController.swift; sourceTree = "<group>"; };
 		5236453E2C900E12009E0784 /* GroupListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListCell.swift; sourceTree = "<group>"; };
@@ -177,7 +181,7 @@
 		527A3E672C82C905007FE63B /* ProfileSetupMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupMock.swift; sourceTree = "<group>"; };
 		527A3E692C82C965007FE63B /* UserToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserToken.swift; sourceTree = "<group>"; };
 		527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLoginUseCaseMock.swift; sourceTree = "<group>"; };
-		527A3E712C8302AA007FE63B /* FetchRecentMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentMeeting.swift; sourceTree = "<group>"; };
+		527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentSchedule.swift; sourceTree = "<group>"; };
 		527A3E752C8324CE007FE63B /* HomeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
 		527A3E782C834A12007FE63B /* TabBarCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCoordinator.swift; sourceTree = "<group>"; };
 		527A3E7A2C834BAD007FE63B /* GroupListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListCoordinator.swift; sourceTree = "<group>"; };
@@ -469,7 +473,8 @@
 			children = (
 				527A3E672C82C905007FE63B /* ProfileSetupMock.swift */,
 				527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */,
-				523645362C8FFE9F009E0784 /* FetchRecentMeetingMock.swift */,
+				523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */,
+				5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */,
 				523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */,
 			);
 			path = UseCaseMock;
@@ -956,8 +961,9 @@
 			children = (
 				52E238312C74BFB00066C9A3 /* UserLogin.swift */,
 				5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */,
-				527A3E712C8302AA007FE63B /* FetchRecentMeeting.swift */,
-				523645322C8FFDEB009E0784 /* FetchGroupList.swift */,
+				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
+				523645322C8FFDEB009E0784 /* FetchGroup.swift */,
+				5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -1161,7 +1167,7 @@
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
 				527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */,
 				5236452B2C8EC5AD009E0784 /* NavigationBarExtendable.swift in Sources */,
-				523645372C8FFE9F009E0784 /* FetchRecentMeetingMock.swift in Sources */,
+				523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */,
 				52E238372C76530D0066C9A3 /* LoginViewReacotr.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileCoordinator.swift in Sources */,
 				52E238482C7733320066C9A3 /* GroupRepository.swift in Sources */,
@@ -1187,17 +1193,18 @@
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
+				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
 				5211E8BC2C7C4DAF00EAB613 /* ProfileSetupRepository.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */,
 				527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* CustomNavigationBar.swift in Sources */,
-				527A3E722C8302AA007FE63B /* FetchRecentMeeting.swift in Sources */,
+				527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
 				527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */,
-				523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */,
+				523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */,
 				52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */,
 				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
 				527A3E9F2C83642C007FE63B /* CalendarSceneDIContainer.swift in Sources */,
@@ -1222,6 +1229,7 @@
 				52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
+				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
 				523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */,

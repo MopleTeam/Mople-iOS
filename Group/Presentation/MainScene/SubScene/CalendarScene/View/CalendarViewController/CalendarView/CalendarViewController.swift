@@ -34,14 +34,14 @@ final class CalendarViewController: UIViewController, View {
     private var selectedDay: Date?
     
     // MARK: - Observable
+    private let gestureObserver: Observable<UIPanGestureRecognizer>
     private let heightObserver: PublishRelay<CGFloat> = .init()
     private let scopeObserver: PublishRelay<ScopeType> = .init()
     private let pageObserver: PublishRelay<DateComponents> = .init()
     private let dateSelectionObserver: PublishRelay<DateComponents> = .init()
-    private let focusDateInWeekObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
-    public let calendar: FSCalendar = {
+    private let calendar: FSCalendar = {
         let calendar = FSCalendar()
         calendar.scrollDirection = .horizontal
         calendar.adjustsBoundingRectWhenChangingMonths = true
@@ -56,7 +56,9 @@ final class CalendarViewController: UIViewController, View {
     private let weekContainerView = UIView()
     
     // MARK: - LifeCycle
-    init(reactor: CalendarViewReactor) {
+    init(reactor: CalendarViewReactor,
+         gestureObserver: Observable<UIPanGestureRecognizer>) {
+        self.gestureObserver = gestureObserver
         defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
@@ -69,6 +71,7 @@ final class CalendarViewController: UIViewController, View {
         super.viewDidLoad()
         setCalendar()
         setupUI()
+        setGestureObserver()
     }
     
     // MARK: - UI Setup
@@ -143,12 +146,6 @@ final class CalendarViewController: UIViewController, View {
             .map { Reactor.Action.dateSelected(dateComponents: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        focusDateInWeekObserver
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.focusDateInWeekView(dateComponents: $0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
     }
     
     private func inputBind(_ reactor: Reactor) {
@@ -196,12 +193,13 @@ final class CalendarViewController: UIViewController, View {
                 vc.moveToCurrentDate(datePair)
             })
             .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$focusDateInWeekView)
-            .observe(on: MainScheduler.instance)
-            .compactMap({ $0 })
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.changeWeekScope()
+    }
+    
+    // MARK: - Gesture
+    private func setGestureObserver() {
+        self.gestureObserver
+            .subscribe(with: self, onNext: { vc, gesture in
+                vc.calendar.handleScopeGesture(gesture)
             })
             .disposed(by: disposeBag)
     }
@@ -283,7 +281,7 @@ extension CalendarViewController {
         guard calendar.scope == .month else { return }
         switch monthPosition {
         case .current:
-            switchScopeWhenTap()
+            switchScope(type: .tap)
         case .next, .previous:
             let dateComponents = date.getComponents()
             self.moveToPage(dateComponents: dateComponents, animated: true)
@@ -314,63 +312,41 @@ extension CalendarViewController {
     /// 스코프 전환
     /// - Parameter type: Gesture Or Tap
     private func switchScope(type: ScopeChangeType) {
-        switch type {
-            case .gesture:
-            switchScopeWhenGesture()
-        case .tap:
-            switchScopeWhenTap()
+        if type == .tap {
+            changeScope()
         }
+        scopeSync()
     }
     
     /// scope에 맞춰서 표시할 데이터 동기화
     /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
-    private func switchScopeWhenGesture() {
+    private func scopeSync() {
         switch calendar.scope {
         case .month:
-            changeMonthScopeByGesture()
+            changeMonthScope()
         case .week:
-            changeWeekScopeByGesture()
+            changeWeekScope()
         @unknown default:
             break
         }
     }
     
-    private func changeMonthScopeByGesture() {
+    /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
+    private func changeMonthScope() {
         pageObserver.accept(currentPageDate())
     }
     
-    private func changeWeekScopeByGesture() {
+    /// 월간에서 주간으로 변경될 때 표시할 값 계산
+    private func changeWeekScope() {
         guard let selectedDate = selectedDate() else { return }
         selectedDay = selectedDate.getDate()
         dateSelectionObserver.accept(selectedDate)
     }
     
-    
-    /// scope에 맞춰서 표시할 데이터 동기화
-    /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
-    private func switchScopeWhenTap() {
-        switch calendar.scope {
-        case .month:
-            changeMonthScopeByTap()
-        case .week:
-            changeWeekScopeByTap()
-        @unknown default:
-            break
-        }
-    }
-    
-    /// 월간에서 주간으로 변경될 때 표시할 값 계산
-    private func changeMonthScopeByTap() {
-        guard let selectedDate = selectedDate() else { return }
-        selectedDay = selectedDate.getDate()
-        focusDateInWeekObserver.accept(selectedDate)
-    }
-    
-    /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
-    private func changeWeekScopeByTap() {
-        print(#function, #line)
-        calendar.setScope(.month, animated: true)
-        pageObserver.accept(currentPageDate())
+    /// 스코프 변경하기
+    private func changeScope() {
+        let scope: FSCalendarScope = calendar.scope == .month ? .week : .month
+        calendar.setScope(scope, animated: true)
     }
 }
 
@@ -436,11 +412,6 @@ extension CalendarViewController {
         } else {
             moveToPage(dateComponents: datePair.1, animated: true)
         }
-    }
-    
-    /// 월 -> 주 변경 시 포커
-    private func changeWeekScope() {
-        calendar.setScope(.week, animated: true)
     }
 }
 
@@ -519,3 +490,9 @@ extension CalendarViewController {
 
 
 
+extension CalendarViewController {
+    public func test(gesture: UIPanGestureRecognizer) {
+        print(#function, #line, "실행한다!!!" )
+        calendar.handleScopeGesture(gesture)
+    }
+}

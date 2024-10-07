@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class FetchGroupListMock: FetchGroupList {
+final class FetchGroupListMock: FetchGroup {
     
     private var randomThumnail: String {
         return "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"

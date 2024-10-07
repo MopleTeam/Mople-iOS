@@ -26,6 +26,10 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
+    
+    #warning("reactor외의 용도로 만드는 이유")
+    // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
+    private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
     private let headerContainerView: UIButton = {
@@ -48,9 +52,10 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // 캘린더
     private let calendarContainer = UIView()
     
-    
     private lazy var calendarView: CalendarViewController = {
-        let calendarView = CalendarViewController(reactor: reactor!)
+        let calendarView = CalendarViewController(reactor: reactor!,
+                                                  gestureObserver: gestureObserver)
+        
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         return calendarView
@@ -244,12 +249,12 @@ final class CalendarScheduleViewController: BaseViewController, View {
     // MARK: - Gesture Setup
     @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
         self.scopeObserver.onNext(())
-        calendarView.calendar.handleScopeGesture(gesture)
+        self.gestureObserver.onNext(gesture)
     }
     
     private func setGesture() {
         self.view.addGestureRecognizer(scopeGesture)
-        self.scheduleListTableView.tableView.panGestureRecognizer.require(toFail: scopeGesture)
+        self.scheduleListTableView.panGestureRequire(scopeGesture)
     }
 }
 
