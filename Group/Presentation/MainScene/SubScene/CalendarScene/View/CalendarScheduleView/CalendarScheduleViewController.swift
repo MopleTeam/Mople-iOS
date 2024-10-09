@@ -26,6 +26,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
+    private let presentNextEvent: BehaviorRelay<Int?> = .init(value: nil)
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
@@ -95,11 +96,18 @@ final class CalendarScheduleViewController: BaseViewController, View {
      }
      
      override func viewDidLoad() {
+         print(#function, #line)
          super.viewDidLoad()
          setupUI()
          setAction()
          setGesture()
      }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        print(#function, #line)
+        super.viewWillDisappear(animated)
+        resetPresentDate()
+    }
     
     // MARK: - UI Setup
     private func setupUI() {
@@ -187,29 +195,41 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     private func inputBind(_ reactor: Reactor) {
         reactor.pulse(\.$calendarHeight)
-            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, height in
                 vc.updateCalendarView(height)
             })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$scope)
-            .observe(on: MainScheduler.instance)
             .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, scope in
                 vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$changedPage)
-            .observe(on: MainScheduler.instance)
             .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.setHeaderLabel(date: date)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, isLoading in
+                vc.animationIndicator(isLoading)
+                vc.checkIsPresent(isLoading)
+            })
+            .disposed(by: disposeBag)
     }
+    
+
+    
+    
     
     private func outputBind(_ reactor: Reactor) {
         self.rx.viewDidLoad
@@ -233,6 +253,14 @@ final class CalendarScheduleViewController: BaseViewController, View {
         self.leftButtonObservable
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .tap) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.presentNextEvent
+            .do(onNext: { print(#function, #line, "recentCount : \($0)" ) })
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
+            .map { Reactor.Action.requestNextEvent(recentEventCount: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -310,11 +338,13 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
+        UIView.animate(withDuration: 0.33) {
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)
             self.hideScheduleListTableView(scope: scope)
-        
+            self.view.layoutIfNeeded()
+        }
     }
     
     private func updateHeaderView(scope: ScopeType) {
@@ -355,8 +385,26 @@ extension CalendarScheduleViewController {
     }
 }
 
-
-
+// MARK: - Home View에서 넘어왔을 때의 액션
+extension CalendarScheduleViewController {
+    
+    /// 표시할 데이터가 있는 상태 : 홈뷰에서 표시한 이벤트 갯수 넘기기
+    public func presentNextEvent(recentEventCount: Int) {
+        self.presentNextEvent.accept(recentEventCount)
+    }
+    
+    /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
+    private func checkIsPresent(_ isLoading: Bool) {
+        guard !isLoading,
+              let recentEventCount = presentNextEvent.value else { return }
+        presentNextEvent.accept(recentEventCount)
+    }
+    
+    private func resetPresentDate() {
+        guard presentNextEvent.value == nil else { return }
+        presentNextEvent.accept(nil)
+    }
+}
 
 
 

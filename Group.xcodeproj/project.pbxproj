@@ -131,6 +131,7 @@
 		52E8E4522CA44D4E007A5447 /* DateComponents+Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */; };
 		52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */; };
 		52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */; };
+		52FB36D62CB5E24D008563FF /* BaseLoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -251,6 +252,7 @@
 		52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+Comparable.swift"; sourceTree = "<group>"; };
 		52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleView.swift; sourceTree = "<group>"; };
 		52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulTableHeaderView.swift; sourceTree = "<group>"; };
+		52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLoadingOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -379,6 +381,7 @@
 				52E2381E2C7405820066C9A3 /* BaseLabel.swift */,
 				52E238202C743C0E0066C9A3 /* BaseTextField.swift */,
 				5236452C2C8EDCEF009E0784 /* BaseViewController.swift */,
+				52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -605,7 +608,7 @@
 		527A3E922C836229007FE63B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				52C0F8B92C9479980080CA65 /* CalendarViewController */,
+				52C0F8B92C9479980080CA65 /* CalendarScheduleView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -757,7 +760,7 @@
 			path = Font;
 			sourceTree = "<group>";
 		};
-		52C0F8B92C9479980080CA65 /* CalendarViewController */ = {
+		52C0F8B92C9479980080CA65 /* CalendarScheduleView */ = {
 			isa = PBXGroup;
 			children = (
 				527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */,
@@ -765,7 +768,7 @@
 				52C0F8BD2C9489CC0080CA65 /* CalendarView */,
 				5259B0112C9FD35D006B2711 /* ScheduleTableView */,
 			);
-			path = CalendarViewController;
+			path = CalendarScheduleView;
 			sourceTree = "<group>";
 		};
 		52C0F8BA2C9479AF0080CA65 /* Cell */ = {
@@ -1234,6 +1237,7 @@
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
 				523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */,
 				5211F9002C86B37B00403980 /* HomeButton.swift in Sources */,
+				52FB36D62CB5E24D008563FF /* BaseLoadingOverlay.swift in Sources */,
 				524E33D42C80508C004B15FC /* Alertable.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
 				520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */,

@@ -53,6 +53,11 @@ class GroupListViewController: BaseViewController, View {
         setupUI()
         addScheduleListCollectionView()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print(#function, #line)
+    }
 
     func setupUI() {
         self.view.addSubview(containerView)

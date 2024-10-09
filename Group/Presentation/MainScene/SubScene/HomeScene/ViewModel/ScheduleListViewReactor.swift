@@ -9,7 +9,7 @@ import ReactorKit
 
 struct HomeViewAction {
     var logOut: () -> Void
-    var presentCalendar: () -> Void
+    var presentNextEvent: (Int) -> Void
 }
 
 final class ScheduleViewReactor: Reactor {
@@ -47,7 +47,7 @@ final class ScheduleViewReactor: Reactor {
             homeViewAction.logOut()
             return Observable.empty()
         case .presentCalendaer:
-            homeViewAction.presentCalendar()
+            homeViewAction.presentNextEvent(currentState.schedules.count)
             return Observable.empty()
         }
     }

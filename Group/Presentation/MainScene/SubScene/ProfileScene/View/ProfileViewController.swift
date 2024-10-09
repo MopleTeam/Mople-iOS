@@ -12,4 +12,9 @@ final class ProfileViewController: BaseViewController {
         super.viewDidLoad()
 //        self.view.backgroundColor = .systemGray
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print(#function, #line)
+    }
 }

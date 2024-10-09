@@ -69,12 +69,12 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     private func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<Section> {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
-             configureCell: { test, collectionView, indexPath, item in
+             configureCell: { _, collectionView, indexPath, item in
                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleCollectionCell.reuseIdentifier, for: indexPath) as! ScheduleCollectionCell
                  cell.configure(with: ScheduleViewModel(schedule: item))
                  return cell
              },
-             configureSupplementaryView: { _, collectionView, kind, indexPath in
+             configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
                  if kind == UICollectionView.elementKindSectionFooter {
                      let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier, for: indexPath) as! ScheduleListReuseFooterView
                      
@@ -102,6 +102,8 @@ final class ScheduleListCollectionViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        
     }
 }
 
@@ -125,7 +127,6 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         let fullHeight = collectionView.bounds.height
-        
         return CGSize(width: 109, height: fullHeight)
     }
     

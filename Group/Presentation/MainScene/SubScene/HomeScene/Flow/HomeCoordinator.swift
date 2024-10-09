@@ -23,7 +23,7 @@ final class HomeCoordinator: BaseCoordinator {
     
     override func start() {
         let action = HomeViewAction(logOut: logOut,
-                                    presentCalendar: presentCalender)
+                                    presentNextEvent: presentNextEvent(recentEventCount:))
         
         let vc = dependencies.makeHomeViewController(action: action)
         
@@ -34,7 +34,7 @@ final class HomeCoordinator: BaseCoordinator {
         (self.parentCoordinator as? SignOut)?.singOut()
     }
     
-    private func presentCalender() {
-        (self.parentCoordinator as? PresentCalendar)?.presentCalendar()
+    private func presentNextEvent(recentEventCount: Int) {
+        (self.parentCoordinator as? PresentCalendar)?.presentNextEvent(recentEventCount: recentEventCount)
     }
 }

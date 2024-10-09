@@ -18,12 +18,12 @@ final class CalendarViewReactor: Reactor {
         case pageChanged(page: DateComponents)
         case dateSelected(dateComponents: DateComponents)
         case sharedTableViewDate(dateComponents: DateComponents)
+        case requestNextEvent(recentEventCount: Int)
     }
     
     enum Mutation {
         case loadScheduleList(scheduleList: [ScheduleTableSectionModel])
         case loadScheduleListWithEmptySchedule(scheduleList: [ScheduleTableSectionModel])
-        case loadEventList(componentsArray: [DateComponents])
         case setCalendarHeight(_ height: CGFloat)
         case switchPage(_ dateComponents: DateComponents)
         case switchScope(_ type: ScopeChangeType)
@@ -31,6 +31,8 @@ final class CalendarViewReactor: Reactor {
         case notifyChangedPage(_ page: DateComponents)
         case notifySelectdDate(_ dateComponents: DateComponents?)
         case notifyTableViewDate(_ dateComponents: DateComponents)
+        case notifyNextEvent(_ dateComponents: DateComponents?)
+        case notifyLoadingState(_ isLoading: Bool)
     }
     
     struct State {
@@ -43,6 +45,8 @@ final class CalendarViewReactor: Reactor {
         @Pulse var changedPage: DateComponents?
         @Pulse var selectedDate: DateComponents?
         @Pulse var tableViewDate: DateComponents?
+        @Pulse var presentDate: DateComponents?
+        @Pulse var isLoading: Bool = false
     }
         
     private let fetchUseCase: FetchSchedule
@@ -50,6 +54,7 @@ final class CalendarViewReactor: Reactor {
     var initialState: State = State()
     var todayComponents = Date().getComponents()
     var models: [ScheduleTableSectionModel] = []
+    var events: [DateComponents] = []
     
     init(fetchUseCase: FetchSchedule) {
         self.fetchUseCase = fetchUseCase
@@ -73,6 +78,8 @@ final class CalendarViewReactor: Reactor {
             return presentTableDate(on: date)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
+        case .requestNextEvent(let recentEventCount):
+            return presentNextDate(count: recentEventCount)
         }
     }
     
@@ -82,11 +89,12 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case .loadScheduleList(let scheduleList):
-            newState.schedules = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
+            self.models = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
+            self.events = self.models.map({ $0.dateComponents })
+            newState.schedules = self.models
+            newState.eventDates = self.events
         case .loadScheduleListWithEmptySchedule(let scheduleList):
             newState.schedules = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
-        case .loadEventList(let componentsArray):
-            newState.eventDates = componentsArray.sorted(by: { $0 < $1 })
         case .setCalendarHeight(let height):
             newState.calendarHeight = height
         case .switchPage(let date):
@@ -101,6 +109,10 @@ final class CalendarViewReactor: Reactor {
             newState.selectedDate = date
         case .notifyTableViewDate(let date):
             newState.tableViewDate = date
+        case .notifyNextEvent(let date):
+            newState.presentDate = date
+        case .notifyLoadingState(let isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }
@@ -108,26 +120,21 @@ final class CalendarViewReactor: Reactor {
 
 extension CalendarViewReactor {
     
-    
     /// 스케줄 데이터 및 이벤트 목록 얻기
     private func fetchData() -> Observable<Mutation> {
-        let fetchData = fetchUseCase.fetchScheduleList().asObservable()
-        
-        let scheduleArray = fetchData
+        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
+
+        let scheduleArray = fetchUseCase.fetchScheduleList()
+            .asObservable()
             .map { Dictionary(grouping: $0) { schedule in
                 return schedule.date.getComponents()
             }}
             .map { $0.map { return ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) } }
-            .do(onNext: { self.models = $0 })
             .map { Mutation.loadScheduleList(scheduleList: $0) }
         
-        let eventArray = fetchData
-            .map { $0.compactMap { $0.date } }
-            .map { Set($0.map { $0.getComponents() } ) }
-            .map({ Array($0) })
-            .map { Mutation.loadEventList(componentsArray: $0) }
-                    
-        return Observable.concat([scheduleArray, eventArray])
+        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
+        
+        return Observable.concat([loadingStart, scheduleArray, loadingStop])
     }
     
     /// 캘린더 날짜 선택 or 월 -> 주 변경 시 테이블에게 표시할 날짜 알려주기
@@ -163,8 +170,30 @@ extension CalendarViewReactor {
         let presentEmptyDate = Observable.just(Mutation.notifySelectdDate(date))
         return Observable.concat([scheduleListWithEmpty, presentEmptyDate])
     }
+    
+    private func presentNextDate(count recentEventCount: Int) -> Observable<Mutation> {
+        var presentDate: DateComponents?
+        
+        // 같은 경우
+        // 더 큰 경우
+        // 작은 경우
+        switch recentEventCount {
+        case events.count:
+            presentDate = events.last
+        case ..<events.count:
+            presentDate = events[recentEventCount]
+        default:
+            print(#function, #line, "데이터가 들어오지 않은 상태" )
+            return Observable.empty()
+        }
+        
+        print(#function, #line, "presnetDate : \(presentDate)" )
+        
+        return Observable.just(Mutation.notifyNextEvent(presentDate))
+    }
 }
 
+// MARK: - Helper
 extension CalendarViewReactor {
     
     /// 현재 선택된 날짜와 같은 날짜인지 구별하기
@@ -194,6 +223,6 @@ extension CalendarViewReactor {
         let emptyItem = EmptySchedule(date: emptyDate)
         let emptyModel = ScheduleTableSectionModel(dateComponents: date, items: [emptyItem])
         nonEmptyScheduleList.append(emptyModel)
-        return nonEmptyScheduleList
+        return nonEmptyScheduleList.sorted { $0.dateComponents < $1.dateComponents }
     }
 }

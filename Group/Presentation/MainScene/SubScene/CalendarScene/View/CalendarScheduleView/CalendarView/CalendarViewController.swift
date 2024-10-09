@@ -38,7 +38,7 @@ final class CalendarViewController: UIViewController, View {
     private let heightObserver: PublishRelay<CGFloat> = .init()
     private let scopeObserver: PublishRelay<ScopeType> = .init()
     private let pageObserver: PublishRelay<DateComponents> = .init()
-    private let dateSelectionObserver: PublishRelay<DateComponents> = .init()
+    private let dateSelectionObserver: PublishRelay<DateComponents?> = .init()
     
     // MARK: - UI Components
     private let calendar: FSCalendar = {
@@ -68,12 +68,13 @@ final class CalendarViewController: UIViewController, View {
     }
     
     override func viewDidLoad() {
+        print(#function, #line)
         super.viewDidLoad()
         setCalendar()
         setupUI()
         setGestureObserver()
     }
-    
+
     // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = AppDesign.defaultWihte
@@ -143,6 +144,7 @@ final class CalendarViewController: UIViewController, View {
         
         dateSelectionObserver
             .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
             .map { Reactor.Action.dateSelected(dateComponents: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -151,16 +153,16 @@ final class CalendarViewController: UIViewController, View {
     private func inputBind(_ reactor: Reactor) {
         
         reactor.pulse(\.$calendarHeight)
-            .observe(on: MainScheduler.instance)
             .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, height in
                 vc.updateHeight(height)
             })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$switchScope)
-            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, type in
                 vc.switchScope(type: type)
             })
@@ -176,8 +178,8 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$switchPage)
-            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, dateComponents in
                 vc.moveToPage(dateComponents: dateComponents)
             })
@@ -193,9 +195,20 @@ final class CalendarViewController: UIViewController, View {
                 vc.moveToCurrentDate(datePair)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$presentDate)
+            .compactMap({ $0 })
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, date in
+                vc.presentNextDate(on: date)
+                
+            })
+            .disposed(by: disposeBag)
     }
     
-    // MARK: - Gesture
+    // MARK: - Set Observer
+    
+    /// 상위뷰에서 제스처 동작이 들어온 경우
     private func setGestureObserver() {
         self.gestureObserver
             .subscribe(with: self, onNext: { vc, gesture in
@@ -237,9 +250,9 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        print(#function, #line)
         pageObserver.accept(calendar.currentPage.getComponents())
         selectedFirstEvent()
-        calendar.reloadData()
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
@@ -402,10 +415,9 @@ extension CalendarViewController {
     private func moveToCurrentDate(_ datePair: (DateComponents, DateComponents)) {
         guard let previousDate = datePair.0.getDate(),
               let currentDate = datePair.1.getDate() else { return }
-        
-        guard let focusDate = currentCalendar.date(from: datePair.1) else { return }
-        self.selectedDay = focusDate
-        calendar.select(focusDate, scrollToDate: false)
+
+        self.selectedDay = currentDate
+        calendar.select(self.selectedDay, scrollToDate: false)
         
         if DateManager.isSameWeek(previousDate, currentDate) {
             calendar.reloadData()
@@ -413,7 +425,21 @@ extension CalendarViewController {
             moveToPage(dateComponents: datePair.1, animated: true)
         }
     }
+    
+    /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
+    /// Home에서 표시한 마지막 Event 다음 표시
+    private func presentNextDate(on date: DateComponents) {
+        print(#function, #line)
+
+        selectedDay = date.getDate()
+        self.calendar.setScope(.week, animated: false)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50), execute: { self.calendar.select(self.selectedDay, scrollToDate: true)
+            self.dateSelectionObserver.accept(date)
+        })
+    }
 }
+
 
 // MARK: - Helper
 extension CalendarViewController {
@@ -447,8 +473,10 @@ extension CalendarViewController {
         return components
     }
     
-    // 현재 달력에서 selectedDay가 있는지 구별
     /// 현재 달력에서 표시할 날짜 구하기
+    /// 첫 이벤트가 있는 경우 첫 이벤트 return
+    /// 이벤트가 없고 이번달인 경우 today return
+    /// 그 외 1일 return
     private func getPresentDate() -> DateComponents {
         if let firstEvent = currentPageFirstEventDate() {
             return firstEvent
@@ -484,15 +512,5 @@ extension CalendarViewController {
     private func setDefaultDate() {
         guard let defaultDate = getPresentDate().getDate() else { return }
         calendar.select(defaultDate, scrollToDate: false)
-    }
-}
-
-
-
-
-extension CalendarViewController {
-    public func test(gesture: UIPanGestureRecognizer) {
-        print(#function, #line, "실행한다!!!" )
-        calendar.handleScopeGesture(gesture)
     }
 }

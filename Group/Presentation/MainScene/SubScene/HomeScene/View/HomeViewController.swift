@@ -112,6 +112,11 @@ final class HomeViewController: UIViewController, View {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print(#function, #line)
+    }
+    
     private func setupUI() {
         self.view.backgroundColor = AppDesign.mainBackColor
         

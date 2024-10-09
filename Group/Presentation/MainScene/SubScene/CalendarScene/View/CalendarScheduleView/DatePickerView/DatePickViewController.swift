@@ -126,8 +126,8 @@ final class DatePickViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$changedPage)
-            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
+            .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.selectedDate = date
             })

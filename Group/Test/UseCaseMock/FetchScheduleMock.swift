@@ -16,13 +16,13 @@ final class FetchScheduleMock: FetchSchedule {
     func getEvents() -> [Schedule] {
         var scheduleArray: [Schedule] = []
         
-        for i in 0...100 {
+        for i in 0...3 {
             
             let schedule = Schedule(group: getGroup(),
                                     eventName: "모임 \(i)",
                                     location: "장소를 나타냅니다.",
                                     participants: getUser(),
-                                    date: Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 1...500)))),
+                                    date: Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 1...1000)))),
                                     weather: getWeather())
             
             scheduleArray.append(schedule)
@@ -59,6 +59,11 @@ final class FetchScheduleMock: FetchSchedule {
     }
     
     func fetchScheduleList() -> Single<[Schedule]> {
-        return Single.just(getEvents())
+        print(#function, #line)
+        
+        return Observable.just(getEvents())
+            .delay(.milliseconds(50), scheduler: MainScheduler.instance)
+            .asSingle()
     }
 }
+

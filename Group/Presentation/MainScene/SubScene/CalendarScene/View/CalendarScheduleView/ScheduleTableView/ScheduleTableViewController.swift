@@ -117,9 +117,9 @@ final class ScheduleTableViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDate)
+            .compactMap { $0 }
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .observe(on: MainScheduler.instance)
-            .compactMap { $0 }
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
                 guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else {

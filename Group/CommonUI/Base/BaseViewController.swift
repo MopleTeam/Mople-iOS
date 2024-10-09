@@ -11,7 +11,12 @@ import RxCocoa
 import SnapKit
 
 class BaseViewController: UIViewController {
+    // MARK: - Variables
+    public var titleViewBottom: ConstraintItem {
+        return navigationView.snp.bottom
+    }
     
+    // MARK: - Observer
     public var rightButtonObservable: Observable<Void> {
         return rightButton.rx.controlEvent(.touchUpInside)
             .asObservable()
@@ -22,10 +27,7 @@ class BaseViewController: UIViewController {
             .asObservable()
     }
     
-    public var titleViewBottom: ConstraintItem {
-        return navigationView.snp.bottom
-    }
-    
+    // MARK: - UI Components
     private let navigationView: CustomNavigationBar = {
         let navi = CustomNavigationBar()
         return navi
@@ -34,6 +36,9 @@ class BaseViewController: UIViewController {
     private let rightButton = UIButton()
     private let leftButton = UIButton()
     
+    private let indicator = BaseLoadingOverlay()
+    
+    // MARK: - LifeCycle
     init(title: String?) {
         super.init(nibName: nil, bundle: nil)
         setTitle(title)
@@ -48,14 +53,20 @@ class BaseViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = AppDesign.defaultWihte
         self.view.addSubview(navigationView)
-        
+        self.view.addSubview(indicator)
+
         navigationView.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(56)
+        }
+                
+        indicator.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
@@ -64,6 +75,7 @@ class BaseViewController: UIViewController {
     }
 }
 
+// MARK: - 네비게이션 아이템 설정
 extension BaseViewController {
     public func addRightButton(setImage: UIImage?) {
         navigationView.rightButtonContainerView.addSubview(rightButton)
@@ -91,5 +103,13 @@ extension BaseViewController {
     
     public func hideLeftButton(isHidden: Bool) {
         leftButton.isHidden = isHidden
+    }
+}
+
+// MARK: - Indicator 설정
+extension BaseViewController {
+    public func animationIndicator(_ isLoading: Bool) {
+        print(#function, #line, "isLoading : \(isLoading)" )
+        indicator.animatedIndicator(isLoading)
     }
 }

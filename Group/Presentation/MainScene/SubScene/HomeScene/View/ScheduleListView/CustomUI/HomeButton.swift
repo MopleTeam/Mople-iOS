@@ -48,13 +48,7 @@ final class HomeButton: UIButton {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        
-        print("buttonImage size: \(buttonImage.frame.size)")
-    }
-    
+
     private func setBackGroundColor(_ color: UIColor?) {
         backgroundColor = color
     }
