@@ -31,7 +31,11 @@ final class CalendarViewController: UIViewController, View {
     // MARK: - Variables
     private let currentCalendar = DateManager.calendar
     private var eventDateComponents: [DateComponents] = []
-    private var selectedDay: Date?
+    private var selectedDay: Date? {
+        didSet {
+            print("\(oldValue)에서 \(selectedDay)로 바꼈어요")
+        }
+    }
     
     // MARK: - Observable
     private let gestureObserver: Observable<UIPanGestureRecognizer>
@@ -190,9 +194,8 @@ final class CalendarViewController: UIViewController, View {
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .pairwise()
             .filter({ $0 != $1 })
-            .compactMap({ Optional(tuple: $0) })
             .subscribe(with: self, onNext: { vc, datePair  in
-                vc.moveToCurrentDate(datePair)
+                vc.moveToTableDate(datePair)
             })
             .disposed(by: disposeBag)
         
@@ -201,7 +204,6 @@ final class CalendarViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.presentNextDate(on: date)
-                
             })
             .disposed(by: disposeBag)
     }
@@ -250,7 +252,6 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        print(#function, #line)
         pageObserver.accept(calendar.currentPage.getComponents())
         selectedFirstEvent()
     }
@@ -336,21 +337,21 @@ extension CalendarViewController {
     private func scopeSync() {
         switch calendar.scope {
         case .month:
-            changeMonthScope()
+            updateWhenMonthScope()
         case .week:
-            changeWeekScope()
+            updateWhenWeekScope()
         @unknown default:
             break
         }
     }
     
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
-    private func changeMonthScope() {
+    private func updateWhenMonthScope() {
         pageObserver.accept(currentPageDate())
     }
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
-    private func changeWeekScope() {
+    private func updateWhenWeekScope() {
         guard let selectedDate = selectedDate() else { return }
         selectedDay = selectedDate.getDate()
         dateSelectionObserver.accept(selectedDate)
@@ -360,6 +361,25 @@ extension CalendarViewController {
     private func changeScope() {
         let scope: FSCalendarScope = calendar.scope == .month ? .week : .month
         calendar.setScope(scope, animated: true)
+    }
+    
+    /// Month인 경우에만 Week으로 전환
+    private func changeWeekScope(animated: Bool) {
+        guard calendar.scope == .month else { return }
+        calendar.setScope(.week, animated: animated)
+    }
+    
+    /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
+    /// Home에서 표시한 마지막 Event 표시
+    private func presentNextDate(on date: DateComponents) {
+        print(#function, #line)
+        let delay: Int = calendar.scope == .month ? 200 : 0
+        selectedDay = date.getDate()
+        changeWeekScope(animated: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay), execute: {
+            self.selectedPresnetDate(on: date)
+            self.dateSelectionObserver.accept(date)
+        })
     }
 }
 
@@ -377,7 +397,9 @@ extension CalendarViewController {
     ///   - date: 선택된 날짜
     ///   - isSelected: 선택 or 선택됐던 셀
     private func updateCell(_ date: Date, isSelected: Bool) {
-        guard let cell = calendar.cell(for: date, at: .current) as? CustomCalendarCell else { return }
+        guard let cell = calendar.cell(for: date, at: .current) as? CustomCalendarCell else {
+            return
+        }
         cell.updateCell(containsEvent: checkContainsEvent(date),
                         isSelected: isSelected,
                         isToday: checkToday(date))
@@ -412,31 +434,24 @@ extension CalendarViewController {
     }
     
     /// 테이블뷰에서 표시하는 날짜와 표시되는 날짜 동기화
-    private func moveToCurrentDate(_ datePair: (DateComponents, DateComponents)) {
-        guard let previousDate = datePair.0.getDate(),
-              let currentDate = datePair.1.getDate() else { return }
-
-        self.selectedDay = currentDate
-        calendar.select(self.selectedDay, scrollToDate: false)
-        
-        if DateManager.isSameWeek(previousDate, currentDate) {
-            calendar.reloadData()
-        } else {
-            moveToPage(dateComponents: datePair.1, animated: true)
-        }
+    private func moveToTableDate(_ datePair: (DateComponents?, DateComponents?)) {
+        let dates = [datePair.0, datePair.1].compactMap { $0 }
+        guard let tableDateComponents = dates.last,
+              let tableDate = tableDateComponents.getDate() else { return }
+        self.selectedDay = tableDate
+        selectedPresnetDate(on: tableDateComponents)
     }
     
-    /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
-    /// Home에서 표시한 마지막 Event 다음 표시
-    private func presentNextDate(on date: DateComponents) {
-        print(#function, #line)
-
-        selectedDay = date.getDate()
-        self.calendar.setScope(.week, animated: false)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50), execute: { self.calendar.select(self.selectedDay, scrollToDate: true)
-            self.dateSelectionObserver.accept(date)
-        })
+    /// 선택할 날짜가 현재 캘린더의 날짜에 포함되어 있다면 reloadData
+    /// 선택되어 있지 않다면 scrollToDate
+    private func selectedPresnetDate(on dateComponents: DateComponents) {
+        guard let date = dateComponents.getDate() else { return }
+        if DateManager.isSameWeek(date, calendar.currentPage) {
+            self.calendar.select(date, scrollToDate: false)
+            self.calendar.reloadData()
+        } else {
+            self.calendar.select(date, scrollToDate: true)
+        }
     }
 }
 

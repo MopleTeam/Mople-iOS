@@ -5,11 +5,12 @@
 //  Created by CatSlave on 9/3/24.
 //
 
+import UIKit
 import ReactorKit
 
 struct HomeViewAction {
     var logOut: () -> Void
-    var presentNextEvent: (Int) -> Void
+    var presentNextEvent: (Date) -> Void
 }
 
 final class ScheduleViewReactor: Reactor {
@@ -47,7 +48,7 @@ final class ScheduleViewReactor: Reactor {
             homeViewAction.logOut()
             return Observable.empty()
         case .presentCalendaer:
-            homeViewAction.presentNextEvent(currentState.schedules.count)
+            presentNextEvent()
             return Observable.empty()
         }
     }
@@ -58,7 +59,7 @@ final class ScheduleViewReactor: Reactor {
         
         switch mutation {
         case .fetchRecentScehdule(let schedules):
-            newState.schedules = schedules
+            newState.schedules = schedules.sorted(by: { $0.date < $1.date })
             
             return newState
         }
@@ -82,5 +83,12 @@ extension ScheduleViewReactor {
             .map { Mutation.fetchRecentScehdule(schedules: $0) }
         
         return fetchSchedules
+    }
+    
+    private func presentNextEvent() {
+        guard !currentState.schedules.isEmpty,
+              let lastDate = currentState.schedules.last?.date else { return }
+        
+        homeViewAction.presentNextEvent(lastDate)
     }
 }

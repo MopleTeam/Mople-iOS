@@ -122,9 +122,8 @@ final class ScheduleTableViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, foucsDate in
                 guard let models = vc.dataSource?.sectionModels else { return }
-                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else {
-                    return
-                }
+                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else { return }
+                
                 vc.systemIsDragging = true
                 vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
             })
@@ -165,7 +164,6 @@ extension ScheduleTableViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard !systemIsDragging else { return }
         let offsetY = scrollView.contentOffset.y
-        
         let contentHeight = scrollView.contentSize.height
         
         if checkNearBottom(offsetY: offsetY, contentHeight: contentHeight) {
@@ -200,6 +198,7 @@ extension ScheduleTableViewController {
 // MARK: - Point Check
 extension ScheduleTableViewController {
     private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 50) -> Bool {
+        
         let tabbarHeight = self.tabBarController?.tabBar.frame.height ?? 0
         let bottomEdge = offsetY + self.view.frame.height - tabbarHeight + threshold
         return bottomEdge > contentHeight

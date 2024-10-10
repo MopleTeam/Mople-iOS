@@ -18,11 +18,12 @@ final class CalendarViewReactor: Reactor {
         case pageChanged(page: DateComponents)
         case dateSelected(dateComponents: DateComponents)
         case sharedTableViewDate(dateComponents: DateComponents)
-        case requestNextEvent(recentEventCount: Int)
+        case requestNextEvent(lastRecentDate: Date)
     }
     
     enum Mutation {
         case loadScheduleList(scheduleList: [ScheduleTableSectionModel])
+        case loadEventDateList(eventDateList: [DateComponents])
         case loadScheduleListWithEmptySchedule(scheduleList: [ScheduleTableSectionModel])
         case setCalendarHeight(_ height: CGFloat)
         case switchPage(_ dateComponents: DateComponents)
@@ -54,10 +55,11 @@ final class CalendarViewReactor: Reactor {
     var initialState: State = State()
     var todayComponents = Date().getComponents()
     var models: [ScheduleTableSectionModel] = []
-    var events: [DateComponents] = []
+    var eventDates: [DateComponents] = []
     
     init(fetchUseCase: FetchSchedule) {
         self.fetchUseCase = fetchUseCase
+        action.onNext(.fetchData)
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -78,8 +80,8 @@ final class CalendarViewReactor: Reactor {
             return presentTableDate(on: date)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
-        case .requestNextEvent(let recentEventCount):
-            return presentNextDate(count: recentEventCount)
+        case .requestNextEvent(let lastRecentDate):
+            return presentNextDate(on: lastRecentDate)
         }
     }
     
@@ -90,9 +92,10 @@ final class CalendarViewReactor: Reactor {
         switch mutation {
         case .loadScheduleList(let scheduleList):
             self.models = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
-            self.events = self.models.map({ $0.dateComponents })
             newState.schedules = self.models
-            newState.eventDates = self.events
+        case .loadEventDateList(let eventDates):
+            self.eventDates = eventDates.sorted(by: { $0 < $1 })
+            newState.eventDates = self.eventDates
         case .loadScheduleListWithEmptySchedule(let scheduleList):
             newState.schedules = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
         case .setCalendarHeight(let height):
@@ -124,17 +127,41 @@ extension CalendarViewReactor {
     private func fetchData() -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
 
-        let scheduleArray = fetchUseCase.fetchScheduleList()
+        let fetchAndProcess = fetchUseCase.fetchScheduleList()
             .asObservable()
-            .map { Dictionary(grouping: $0) { schedule in
-                return schedule.date.getComponents()
-            }}
-            .map { $0.map { return ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) } }
-            .map { Mutation.loadScheduleList(scheduleList: $0) }
+             .map { schedules -> (scheduleList: [ScheduleTableSectionModel], eventDateList: [DateComponents]) in
+                 let grouped = Dictionary(grouping: schedules) { $0.date.getComponents() }
+                 let scheduleList = grouped.map { ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) }
+                 let eventDateList = Array(grouped.keys)
+                 return (scheduleList, eventDateList)
+             }
+             .flatMap { result -> Observable<Mutation> in
+                 let scheduleListMutation = Mutation.loadScheduleList(scheduleList: result.scheduleList)
+                 let eventDateListMutation = Mutation.loadEventDateList(eventDateList: result.eventDateList)
+                 return Observable.of(scheduleListMutation, eventDateListMutation)
+             }
         
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
         
-        return Observable.concat([loadingStart, scheduleArray, loadingStop])
+        return Observable.concat([loadingStart, fetchAndProcess, loadingStop])
+    }
+    
+    func tsettest() {
+        let observable1 = Observable.of(1, 2, 3)
+        
+        let test = observable1.map { return "Number: \($0)" }
+        
+        let flatMapped = observable1.flatMap { number -> Observable<String> in
+            return Observable.of("Number: \(number)")
+        }
+
+        test.subscribe(onNext: { value in
+            print(value)
+        })
+        
+        flatMapped.subscribe(onNext: { value in
+            print(value)
+        })
     }
     
     /// 캘린더 날짜 선택 or 월 -> 주 변경 시 테이블에게 표시할 날짜 알려주기
@@ -171,25 +198,17 @@ extension CalendarViewReactor {
         return Observable.concat([scheduleListWithEmpty, presentEmptyDate])
     }
     
-    private func presentNextDate(count recentEventCount: Int) -> Observable<Mutation> {
-        var presentDate: DateComponents?
+    // 홈뷰에서 표시된 마지막 날짜가 넘어옴
+    //
+    private func presentNextDate(on lastRecentDate: Date) -> Observable<Mutation> {
+        guard !eventDates.isEmpty else { return Observable.empty() }
         
-        // 같은 경우
-        // 더 큰 경우
-        // 작은 경우
-        switch recentEventCount {
-        case events.count:
-            presentDate = events.last
-        case ..<events.count:
-            presentDate = events[recentEventCount]
-        default:
-            print(#function, #line, "데이터가 들어오지 않은 상태" )
-            return Observable.empty()
-        }
+        guard let lastRecentDate = eventDates.filter({
+            let lastRecentDate = lastRecentDate.getComponents()
+            return $0 == lastRecentDate
+        }).first else { return Observable.empty() }
         
-        print(#function, #line, "presnetDate : \(presentDate)" )
-        
-        return Observable.just(Mutation.notifyNextEvent(presentDate))
+        return Observable.just(Mutation.notifyNextEvent(lastRecentDate))
     }
 }
 

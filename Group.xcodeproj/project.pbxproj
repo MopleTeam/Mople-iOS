@@ -82,7 +82,6 @@
 		529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
-		52AC9B782CA5416900DD224B /* Optional+Tuple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AC9B772CA5416900DD224B /* Optional+Tuple.swift */; };
 		52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* LoginRepository.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
 		52B87E302C6B2A460026B601 /* Pretendard-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */; };
@@ -205,7 +204,6 @@
 		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewReactor.swift; sourceTree = "<group>"; };
 		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
-		52AC9B772CA5416900DD224B /* Optional+Tuple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Tuple.swift"; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -694,7 +692,6 @@
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */,
-				52AC9B772CA5416900DD224B /* Optional+Tuple.swift */,
 				52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */,
 			);
 			path = Extension;
@@ -1221,7 +1218,6 @@
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Comparable.swift in Sources */,
 				523645352C8FFE5B009E0784 /* Schedule.swift in Sources */,
-				52AC9B782CA5416900DD224B /* Optional+Tuple.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,

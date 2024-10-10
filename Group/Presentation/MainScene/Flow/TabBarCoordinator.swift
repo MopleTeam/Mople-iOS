@@ -12,7 +12,7 @@ protocol SignOut {
 }
 
 protocol PresentCalendar {
-    func presentNextEvent(recentEventCount: Int)
+    func presentNextEvent(lastRecentDate: Date)
 }
 
 protocol TabBarCoordinaotorDependencies {
@@ -69,13 +69,13 @@ extension TabBarCoordinator: SignOut {
 }
 
 extension TabBarCoordinator: PresentCalendar {
-    func presentNextEvent(recentEventCount: Int) {
-        // 탭바 컨트롤러s에는 Navigation View Controller가 들어있음
+    func presentNextEvent(lastRecentDate: Date) {
+        // 탭바 컨트롤러에는 각 VC의 상위 Navigation View Controller가 들어있음
         
         guard let calendarIndex = getCalendarIndex(),
               let calendarVC = getCalendarFormTabBar(index: calendarIndex) else { return }
         
-        calendarVC.presentNextEvent(recentEventCount: recentEventCount)
+        calendarVC.presentNextEvent(on: lastRecentDate)
         tabBarController!.selectedIndex = calendarIndex
     }
         

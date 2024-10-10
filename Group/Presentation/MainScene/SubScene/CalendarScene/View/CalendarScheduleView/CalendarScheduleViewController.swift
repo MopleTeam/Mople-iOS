@@ -26,7 +26,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
-    private let presentNextEvent: BehaviorRelay<Int?> = .init(value: nil)
+    private let presentNextEvent: BehaviorRelay<Date?> = .init(value: nil)
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
@@ -227,15 +227,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .disposed(by: disposeBag)
     }
     
-
-    
-    
-    
     private func outputBind(_ reactor: Reactor) {
-        self.rx.viewDidLoad
-            .map { _ in Reactor.Action.fetchData }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
         
         self.scopeObserver
             .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
@@ -257,10 +249,9 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         self.presentNextEvent
-            .do(onNext: { print(#function, #line, "recentCount : \($0)" ) })
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
-            .map { Reactor.Action.requestNextEvent(recentEventCount: $0) }
+            .map { Reactor.Action.requestNextEvent(lastRecentDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -290,6 +281,7 @@ extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let tableTop = scheduleListTableView.checkTop()
         let monthScope = reactor!.currentState.scope == .month
+        print(#function, #line, "currentState Scope : \(reactor!.currentState.scope), or top : \(tableTop)" )
         let shouldBegin = tableTop || monthScope
         if shouldBegin {
             return shouldAllowScopeChangeGesture()
@@ -389,8 +381,8 @@ extension CalendarScheduleViewController {
 extension CalendarScheduleViewController {
     
     /// 표시할 데이터가 있는 상태 : 홈뷰에서 표시한 이벤트 갯수 넘기기
-    public func presentNextEvent(recentEventCount: Int) {
-        self.presentNextEvent.accept(recentEventCount)
+    public func presentNextEvent(on lastRecentDate: Date) {
+        self.presentNextEvent.accept(lastRecentDate)
     }
     
     /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
