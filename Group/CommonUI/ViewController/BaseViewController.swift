@@ -17,12 +17,12 @@ class BaseViewController: UIViewController {
     }
     
     // MARK: - Observer
-    public var rightButtonObservable: Observable<Void> {
+    private var rightItemEvent: Observable<Void> {
         return rightButton.rx.controlEvent(.touchUpInside)
             .asObservable()
     }
     
-    public var leftButtonObservable: Observable<Void> {
+    private var leftItemEvent: Observable<Void> {
         return leftButton.rx.controlEvent(.touchUpInside)
             .asObservable()
     }
@@ -77,7 +77,7 @@ class BaseViewController: UIViewController {
 
 // MARK: - 네비게이션 아이템 설정
 extension BaseViewController {
-    public func addRightButton(setImage: UIImage?) {
+    public func addRightButton(setImage: UIImage?) -> Observable<Void> {
         navigationView.rightButtonContainerView.addSubview(rightButton)
         
         rightButton.setImage(setImage, for: .normal)
@@ -85,9 +85,11 @@ extension BaseViewController {
         rightButton.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        return rightItemEvent
     }
     
-    public func addLeftButton(setImage: UIImage?) {
+    public func addLeftButton(setImage: UIImage?) -> Observable<Void> {
         navigationView.leftButtonContainerView.addSubview(leftButton)
         
         leftButton.setImage(setImage, for: .normal)
@@ -95,6 +97,8 @@ extension BaseViewController {
         leftButton.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        return leftItemEvent
     }
     
     public func hideRightButton(isHidden: Bool) {
@@ -110,6 +114,6 @@ extension BaseViewController {
 extension BaseViewController {
     public func animationIndicator(_ isLoading: Bool) {
         print(#function, #line, "isLoading : \(isLoading)" )
-        indicator.animatedIndicator(isLoading)
+        indicator.animating(isLoading)
     }
 }

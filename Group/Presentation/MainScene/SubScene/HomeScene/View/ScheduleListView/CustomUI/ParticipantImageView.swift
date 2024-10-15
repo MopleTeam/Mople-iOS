@@ -29,13 +29,7 @@ final class ParticipantImageView: UIImageView {
     }
     
     private func setImage(_ path: String?) {
-        guard let path = path else { return }
-        let imageUrl = URL(string: path)
-        task = self.kf.setImage(
-            with: imageUrl,
-            placeholder: AppDesign.Profile.defaultImage,
-            options: [.transition(.fade(0.2))]
-        )
+        task = self.kfSetimage(path)
     }
     
     deinit {

@@ -27,7 +27,7 @@ final class FetchScheduleMock: FetchSchedule {
         print(#function, #line)
         
         return Observable.just(getEvents())
-            .delay(.milliseconds(2000), scheduler: MainScheduler.instance)
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .asSingle()
     }
 }

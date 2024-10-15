@@ -26,6 +26,8 @@ final class BaseLoadingOverlay: UIView {
     }
     
     private func setupUI() {
+        isHidden = true
+        
         self.backgroundColor = .black.withAlphaComponent(0.3)
         self.addSubview(indicator)
         self.layer.zPosition = 2
@@ -35,7 +37,7 @@ final class BaseLoadingOverlay: UIView {
         }
     }
     
-    public func animatedIndicator(_ isLoading: Bool) {
+    public func animating(_ isLoading: Bool) {
         isLoading ? indicator.startAnimating() : indicator.stopAnimating()
         isHidden = !isLoading
     }

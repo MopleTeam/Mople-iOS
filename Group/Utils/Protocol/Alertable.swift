@@ -7,10 +7,13 @@
 
 import UIKit
 
-
-protocol Alertable: AnyObject { }
-
-extension Alertable where Self: UIViewController {
+final class AlertManager {
+    
+    static let shared = AlertManager()
+    
+    private init() { }
+    
+    private var currentVC: UIViewController? = UIApplication.shared.topViewController
     
     func showAlert(
         title: String = "",
@@ -20,7 +23,7 @@ extension Alertable where Self: UIViewController {
     ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: preferredStyle)
         alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-        self.present(alert, animated: true, completion: completion)
+        currentVC?.present(alert, animated: true, completion: completion)
     }
     
     
@@ -34,11 +37,11 @@ extension Alertable where Self: UIViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredStyle)
         actions.forEach { alert.addAction($0) }
         alert.addAction(UIAlertAction(title: "취소", style: .cancel))
-        self.present(alert, animated: true, completion: completion)
+        currentVC?.present(alert, animated: true, completion: completion)
     }
 }
 
-extension Alertable {
+extension AlertManager {
     func makeAction(
         title: String,
         style: UIAlertAction.Style = .default,

@@ -26,30 +26,23 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
-    private let presentNextEvent: BehaviorRelay<Date?> = .init(value: nil)
+    private let presentEvent: BehaviorRelay<Date?> = .init(value: nil)
+    private lazy var rightItemObserver = addRightButton(setImage: .calendar)
+    private lazy var leftItemObserver = addLeftButton(setImage: .arrowBack)
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
     private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
-    private let headerContainerView: UIButton = {
-        let btn = UIButton()
+    private let headerButton: IconLabelButton = {
+        let btn = IconLabelButton(configure: AppDesign.Calendar.header)
         btn.backgroundColor = AppDesign.Calendar.headerColor
         btn.clipsToBounds = true
         btn.layer.cornerRadius = 10
         return btn
     }()
-    
-    private let headerLabel: IconLabelView = {
-        let label = IconLabelView(iconSize: 24,
-                                  configure: AppDesign.Calendar.header,
-                                  iconAligment: .right)
-        label.isUserInteractionEnabled = false
-        
-        return label
-    }()
-    
+
     // 캘린더
     private let calendarContainer = UIView()
     
@@ -118,31 +111,23 @@ final class CalendarScheduleViewController: BaseViewController, View {
     }
     
     private func setupNavi() {
-        addRightButton(setImage: .calendar)
-        addLeftButton(setImage: .close)
         hideLeftButton(isHidden: true)
     }
     
     private func setLayout() {
-        self.view.addSubview(headerContainerView)
+        self.view.addSubview(headerButton)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
         self.view.addSubview(borderView)
-                
-        headerContainerView.addSubview(headerLabel)
-        
-        headerContainerView.snp.makeConstraints { make in
+                        
+        headerButton.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(56)
         }
         
-        headerLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
-        
         calendarContainer.snp.makeConstraints { make in
-            make.top.equalTo(headerContainerView.snp.bottom).offset(16)
+            make.top.equalTo(headerButton.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(360) 
         }
@@ -183,8 +168,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     }
     
     private func setHeaderDate() {
-        let today = reactor!.todayComponents
-        setHeaderLabel(date: today)
+        setHeaderLabel(date: Date().getComponents())
     }
     
     // MARK: - Binding
@@ -236,29 +220,29 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.rightButtonObservable
+        self.rightItemObserver
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .tap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.leftButtonObservable
+        self.leftItemObserver
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .tap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.presentNextEvent
+        self.presentEvent
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
-            .map { Reactor.Action.requestNextEvent(lastRecentDate: $0) }
+            .map { Reactor.Action.requestPresentEvent(lastRecentDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
     // MARK: - Action
     private func setAction() {
-        headerContainerView.rx.controlEvent(.touchUpInside)
+        headerButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.presentDatePicker()
             })
@@ -342,7 +326,7 @@ extension CalendarScheduleViewController {
     private func updateHeaderView(scope: ScopeType) {
         let height = scope == .month ? 56 : 0
         
-        self.headerContainerView.snp.updateConstraints { make in
+        self.headerButton.snp.updateConstraints { make in
             make.height.equalTo(height)
         }
     }
@@ -373,7 +357,7 @@ extension CalendarScheduleViewController {
         let year = date.year ?? 2024
         let monty = date.month ?? 1
         
-        headerLabel.setText("\(year)년 \(monty)월")
+        headerButton.setText("\(year)년 \(monty)월")
     }
 }
 
@@ -381,20 +365,21 @@ extension CalendarScheduleViewController {
 extension CalendarScheduleViewController {
     
     /// 표시할 데이터가 있는 상태 : 홈뷰에서 표시한 이벤트 갯수 넘기기
-    public func presentNextEvent(on lastRecentDate: Date) {
-        self.presentNextEvent.accept(lastRecentDate)
+    public func presentEvent(on lastRecentDate: Date?) {
+        self.presentEvent.accept(lastRecentDate)
     }
     
     /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
     private func checkIsPresent(_ isLoading: Bool) {
         guard !isLoading,
-              let recentEventCount = presentNextEvent.value else { return }
-        presentNextEvent.accept(recentEventCount)
+              let recentEventCount = presentEvent.value else { return }
+        presentEvent.accept(recentEventCount)
     }
     
+    /// 화면을 벗어날 때 설정값 지우기
     private func resetPresentDate() {
-        guard presentNextEvent.value == nil else { return }
-        presentNextEvent.accept(nil)
+        guard presentEvent.value == nil else { return }
+        presentEvent.accept(nil)
     }
 }
 

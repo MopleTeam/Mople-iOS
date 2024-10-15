@@ -5,13 +5,13 @@
 //  Created by CatSlave on 8/25/24.
 //
 
-import Foundation
+import UIKit
 import ReactorKit
 import RxSwift
 import RxRelay
 
-struct SignInAction {
-    var completedSignIn: () -> Void
+struct ProfileSetupAction {
+    var completed: () -> Void
 }
 
 enum ProfileSetupFacingError: Error {
@@ -46,69 +46,58 @@ enum ProfileSetupFacingError: Error {
     }
 }
 
+
+
 final class ProfileSetupViewReactor: Reactor {
 
     enum Action {
         case getRandomNickname
-        case checkNickname(name: String)
-        case selectedImage(image: Data)
-        case enterNickName(nickName: String)
-        case makeProfile
+        case checkNickname(name: String, tag: Int)
+        case setProfile(profile: Profile, tag: Int)
     }
     
     enum Mutation {
+        case setLoading(isLoad: Bool)
         case getRandomNickname(name: String?)
         case nameCheck(isOverlap: Bool?)
-        case setSelectedImage(image: Data)
-        case setNickName(name : String)
         case madeProfile
         case catchError(err: Error)
-        case setLoading(isLoad: Bool, type: ButtonType)
-    }
-    
-    enum ButtonType {
-        case check
-        case next
+        case setButtonLoading(isLoad: Bool, tag: Int)
     }
     
     struct State {
-        @Pulse var isLoading: (status: Bool, type: ButtonType)?
+        @Pulse var randomName: String?
         @Pulse var nameOverlap: Bool?
         @Pulse var errorMessage: String?
         @Pulse var madeProfile: Void?
-        @Pulse var profileImageData: Data?
-        @Pulse var profileNickName: String?
-        @Pulse var randomName: String?
+        @Pulse var isLoading: Bool?
+        @Pulse var buttonLoading: (status: Bool, tag: Int)?
     }
     
     private let profileSetupUseCase: ProfileSetup
-    private let signInAction: SignInAction
+    private let completedAction: ProfileSetupAction
     
     var initialState: State = State()
     
-    init(profileSetupUseCase: ProfileSetup, signInAction: SignInAction) {
+    init(profileSetupUseCase: ProfileSetup,
+         completedAction: ProfileSetupAction) {
         self.profileSetupUseCase = profileSetupUseCase
-        self.signInAction = signInAction
-        action.onNext(.getRandomNickname)
+        self.completedAction = completedAction
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         
-        if let isLoading = currentState.isLoading {
+        if let isLoading = currentState.buttonLoading {
             guard !isLoading.status else { return Observable.empty() }
         }
 
         switch action {
         case .getRandomNickname:
             return getRandomNickname()
-        case .checkNickname(let name):
-            return overlapCheck(name: name)
-        case .makeProfile :
-            return makeProfile()
-        case .selectedImage(let image):
-            return Observable.just(.setSelectedImage(image: image))
-        case .enterNickName(let nickName):
-            return Observable.just(.setNickName(name: nickName))
+        case .checkNickname(let name, let tag):
+            return overlapCheck(name: name, tag: tag)
+        case .setProfile(let profile, let tag) :
+            return makeProfile(profile, tag: tag)
         }
     }
     
@@ -117,20 +106,18 @@ final class ProfileSetupViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .setLoading(let isLoad, let type):
-            newState.isLoading = (isLoad, type)
+        case .setLoading(let isLoad):
+            newState.isLoading = isLoad
+        case .setButtonLoading(let isLoad, let type):
+            newState.buttonLoading = (isLoad, type)
         case .getRandomNickname(let name):
             newState.randomName = name
         case .nameCheck(let isOverlap):
             newState.nameOverlap = isOverlap
         case .catchError(err: let err):
             newState = handleError(state: newState, err: err)
-        case .setSelectedImage(let image):
-            newState.profileImageData = image
-        case .setNickName(let name):
-            newState.profileNickName = name
         case .madeProfile:
-            signInAction.completedSignIn()
+            completedAction.completed()
         }
         
         return newState
@@ -188,48 +175,48 @@ extension ProfileSetupViewReactor {
 extension ProfileSetupViewReactor {
     
     private func getRandomNickname() -> Observable<Mutation> {
+        let loadStart = Observable.just(Mutation.setLoading(isLoad: true))
+        
         let randomName = profileSetupUseCase.getRandomNickname()
             .asObservable()
             .map { Mutation.getRandomNickname(name: $0) }
+        
+        let loadEnd = Observable.just(Mutation.setLoading(isLoad: false))
             
-        return randomName
+        return Observable.concat([loadStart,
+                                  randomName,
+                                  loadEnd])
     }
     
-    private func overlapCheck(name: String) -> Observable<Mutation> {
+    private func overlapCheck(name: String, tag: Int) -> Observable<Mutation> {
         
-        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true, type: .check))
-        
-        let enterNickName = Observable.just(Mutation.setNickName(name: name))
-        
+        let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
+                
         let nameOverlap = profileSetupUseCase.checkNickName(name: name)
-            .do(onSuccess: { print("중복 여부 : \($0)") })
             .asObservable()
             .map { Mutation.nameCheck(isOverlap: $0)}
             .catch { Observable.just(Mutation.catchError(err: $0)) }
         
-        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false, type: .check))
+        let loadingOff = Observable.just(Mutation.setButtonLoading(isLoad: false, tag: tag))
             
         return Observable.concat([loadingOn,
-                                  enterNickName,
                                   nameOverlap,
                                   loadingOff])
     }
     
-    private func makeProfile() -> Observable<Mutation> {
-        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true, type: .next))
+    private func makeProfile(_ profile: Profile, tag: Int) -> Observable<Mutation> {
+        guard let nickname = profile.name else { return .empty() }
+  
+        let image = profile.image?.jpegData(compressionQuality: 0.5) ?? getDefaultImageData()
         
-        let image = currentState.profileImageData ?? getDefaultImageData()
+        let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
         
-        guard let nickName = currentState.profileNickName else {
-            return Observable.just(Mutation.catchError(err: ProfileSetupFacingError.retryEnter))
-        }
-        
-        let makeProfile = profileSetupUseCase.makeProfile(image: image, nickName: nickName)
+        let makeProfile = profileSetupUseCase.makeProfile(image: image, nickName: nickname)
             .asObservable()
             .map({ _ in Mutation.madeProfile })
             .catch { Observable.just(Mutation.catchError(err: $0)) }
         
-        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false, type: .next))
+        let loadingOff = Observable.just(Mutation.setButtonLoading(isLoad: false, tag: tag))
             
         return Observable.concat([loadingOn,
                                   makeProfile,

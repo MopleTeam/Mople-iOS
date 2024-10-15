@@ -155,13 +155,7 @@ extension WeatherView {
     
     
     private func setImage(_ path: String?) {
-        guard let path = path else { return }
-        let imageUrl = URL(string: path)
-        task = self.imageView.kf.setImage(
-            with: imageUrl,
-            placeholder: AppDesign.Profile.defaultImage,
-            options: [.transition(.fade(0.2))]
-        )
+        task = imageView.kfSetimage(path)
     }
     
     private func setTemperatureLabel(_ temperatureText: String?) {
@@ -173,3 +167,5 @@ extension WeatherView {
         popLabel.setText(popText)
     }
 }
+
+

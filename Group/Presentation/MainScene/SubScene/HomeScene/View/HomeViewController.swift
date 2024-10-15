@@ -97,12 +97,6 @@ final class HomeViewController: UIViewController, View {
         return sv
     }()
     
-    override func viewDidLoad() {
-        print(#function, #line)
-        super.viewDidLoad()
-        setupUI()
-        addScheduleListCollectionView()
-    }
     
     init(reactor: ScheduleViewReactor) {
         super.init(nibName: nil, bundle: nil)
@@ -113,6 +107,25 @@ final class HomeViewController: UIViewController, View {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        print(#function, #line)
+        super.viewDidLoad()
+        setupUI()
+        addScheduleListCollectionView()
+        
+        #warning("적절한 위치로 조정하기")
+        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
+            print(#function, #line, "granted : \(granted)" )
+            if granted {
+                DispatchQueue.main.async {
+                    // Apple Push Notification service(APNs)에 등록 요청
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         print(#function, #line)

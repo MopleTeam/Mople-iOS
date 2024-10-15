@@ -15,6 +15,10 @@ enum IconAlignment {
 
 final class IconLabelView: UIView {
     
+    public var text: String? {
+        return infoLabel.text
+    }
+    
     private var configure: UIConstructive
     private var iconSize: CGFloat
     
@@ -90,7 +94,7 @@ final class IconLabelView: UIView {
         
         infoLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalToSuperview().inset(2)
+            make.top.equalToSuperview().inset(3)
             make.bottom.lessThanOrEqualToSuperview()
         }
     }

@@ -27,8 +27,8 @@ struct APIEndpoints {
 // MARK: - Token Refresh
 extension APIEndpoints {
     static func reissueToken() throws -> Endpoint<String> {
-        let (authHeader, refreshParameters) = try (getAccessTokenParameters()
-                                                   , getRefreshTokenParameters())
+        let (authHeader, refreshParameters) = try (getAccessTokenParameters(),
+                                                   getRefreshTokenParameters())
         
         let headerParameters = ["Content-Type":"application/json"].merging(authHeader) { current, _ in current }
         

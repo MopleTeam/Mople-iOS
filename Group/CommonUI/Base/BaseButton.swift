@@ -31,13 +31,14 @@ class BaseButton: UIButton {
     
     init(backColor: UIColor? = nil,
          radius: CGFloat? = nil,
+         imagePlacement: NSDirectionalRectEdge = .trailing,
          configure: UIConstructive) {
         
         super.init(frame: .zero)
         configuration = .filled()
         self.setupUI()
         self.setBackgroundColor(color: backColor)
-        self.setItemConfigrue(configure)
+        self.setItemConfigrue(setValues: configure, imagePlacement: imagePlacement)
         self.setRadius(radius: radius)
 
     }
@@ -59,13 +60,13 @@ class BaseButton: UIButton {
         configuration?.background.backgroundColor = color
     }
     
-    private func setItemConfigrue(_ setValues: UIConstructive) {
+    private func setItemConfigrue(setValues: UIConstructive, imagePlacement: NSDirectionalRectEdge) {
         let config = setValues.itemConfig
         
         defaultTitle = config.text
         configuration?.title = config.text
         configuration?.image = config.image
-        configuration?.imagePlacement = .top
+        configuration?.imagePlacement = imagePlacement
         
         let transformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming

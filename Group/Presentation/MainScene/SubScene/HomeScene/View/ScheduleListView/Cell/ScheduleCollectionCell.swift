@@ -46,5 +46,3 @@ final class ScheduleCollectionCell: UICollectionViewCell {
 }
 
 
-
-

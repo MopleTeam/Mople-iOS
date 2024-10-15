@@ -134,9 +134,7 @@ final class ThumbnailTitleView: UIView {
     }
 
     private func loadImage(_ path: String?) {
-        guard let path = path else { return }
-        let imageUrl = URL(string: path)
-        thumbnailView.kf.setImage(with: imageUrl)
+        _ = thumbnailView.kfSetimage(path)
     }
 }
 

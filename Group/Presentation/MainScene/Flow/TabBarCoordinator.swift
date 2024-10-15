@@ -11,13 +11,12 @@ protocol SignOut {
     func singOut()
 }
 
-protocol PresentCalendar {
-    func presentNextEvent(lastRecentDate: Date)
+protocol KeepTabBarNavigation {
+    func pushCalendarView(lastRecentDate: Date?)
 }
 
-protocol TabBarCoordinaotorDependencies {
-    func makeTabBarController() -> UITabBarController
-    func getMainFlowCoordinator() -> [BaseCoordinator]
+protocol HideTabBarNavigation {
+    
 }
 
 final class TabBarCoordinator: BaseCoordinator {
@@ -68,30 +67,48 @@ extension TabBarCoordinator: SignOut {
     }
 }
 
-extension TabBarCoordinator: PresentCalendar {
-    func presentNextEvent(lastRecentDate: Date) {
-        // 탭바 컨트롤러에는 각 VC의 상위 Navigation View Controller가 들어있음
+
+
+// MARK: - 탭바 유지한 상태로 Push
+extension TabBarCoordinator: KeepTabBarNavigation {
+    
+    /// 캘린더 뷰로 이동하기
+    /// - Parameter lastRecentDate: 이동시 표시할 데이트
+    func pushCalendarView(lastRecentDate: Date? = nil) {
+        guard let index = getNaviIndexFromTabBar(destination: .calendar),
+              let destinationNavi = getDestinationFormNavi(index: index),
+              let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
         
-        guard let calendarIndex = getCalendarIndex(),
-              let calendarVC = getCalendarFormTabBar(index: calendarIndex) else { return }
-        
-        calendarVC.presentNextEvent(on: lastRecentDate)
-        tabBarController!.selectedIndex = calendarIndex
+        calendarVC.presentEvent(on: lastRecentDate)
+        tabBarController!.selectedIndex = index
     }
+}
+
+// MARK: - 탭바를 사용하지 않는 상태로 Push
+extension TabBarCoordinator: HideTabBarNavigation {
+    func pushEditProfileView() {
         
-    private func getCalendarIndex() -> Int? {
+    }
+}
+
+// MARK: - Helper
+extension TabBarCoordinator {
+    
+    #warning("메타타입 비교하기, Claude 타입과 메타타입 참고")
+    /// 이동하려고 하는 뷰의 Navi Index 찾기
+    private func getNaviIndexFromTabBar(destination: Route) -> Int? {
         return tabBarController?.viewControllers?.firstIndex(where: { navi in
             guard let navi = navi as? UINavigationController else { return false }
             return navi.viewControllers.contains { vc in
-                return vc is CalendarScheduleViewController
+                return vc.isKind(of: destination.type)
             }
         })
     }
     
-    private func getCalendarFormTabBar(index: Int) -> CalendarScheduleViewController? {
-        guard let calendarNavi = tabBarController?.viewControllers?[index] as? UINavigationController,
-              let calendarVC = calendarNavi.viewControllers.first as? CalendarScheduleViewController else { return nil }
-        
-        return calendarVC
+    /// 이동하려고 하는 뷰 찾기
+    private func getDestinationFormNavi(index: Int) -> UIViewController? {
+        guard let destinationNavi = tabBarController?.viewControllers?[index] as? UINavigationController else { return nil }
+        return destinationNavi.viewControllers.first
     }
 }
+

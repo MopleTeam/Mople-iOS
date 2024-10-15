@@ -9,51 +9,6 @@ import Foundation
 import RxSwift
 import AuthenticationServices
 
-//protocol AppleLoginServiceProtocol {
-//    func setPresentationContextProvider(_ provider: ASAuthorizationControllerPresentationContextProviding)
-//    func startAppleLogin()
-//}
-//
-//class AppleLoginService: NSObject, AppleLoginServiceProtocol {
-//    
-//    let loginObservable: PublishSubject<String> = .init()
-//    
-//    private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
-//
-//    func setPresentationContextProvider(_ provider: ASAuthorizationControllerPresentationContextProviding) {
-//        self.presentationContextProvider = provider
-//    }
-//
-//    func startAppleLogin() {
-//        
-//        
-//        let appleIDProvider = ASAuthorizationAppleIDProvider()
-//        let request = appleIDProvider.createRequest()
-//        request.requestedScopes = [.fullName, .email]
-//
-//        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-//        authorizationController.delegate = self
-//        authorizationController.presentationContextProvider = presentationContextProvider
-//        authorizationController.performRequests()
-//    }
-//}
-//
-//extension AppleLoginService: ASAuthorizationControllerDelegate {
-//    
-//    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-//        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-//           let authorizationCode = appleIDCredential.authorizationCode {
-//            let codeString = String(decoding: authorizationCode, as: UTF8.self)
-//            
-//            self.loginObservable.onNext(codeString)
-//        }
-//    }
-//
-//    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-//        
-//        self.loginObservable.onError(error)
-//    }
-//}
 protocol AppleLoginService {
     func setPresentationContextProvider(_ view: UIViewController)
     func startAppleLogin() -> Single<String>
@@ -67,31 +22,30 @@ enum LoginError: Error {
 class DefaultAppleLoginService: NSObject, AppleLoginService {
     
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
-
+    private var singleObserver: ((SingleEvent<String>) -> Void)?
+    
     func setPresentationContextProvider(_ view: UIViewController) {
         let loginView = view as? ASAuthorizationControllerPresentationContextProviding
         self.presentationContextProvider = loginView
     }
-
+    
     func startAppleLogin() -> Single<String> {
         return Single.create { single in
-
+            
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
-
+            
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
             authorizationController.delegate = self
             authorizationController.presentationContextProvider = self.presentationContextProvider
             authorizationController.performRequests()
-
+            
             self.singleObserver = single
-
+            
             return Disposables.create()
         }
     }
-
-    private var singleObserver: ((SingleEvent<String>) -> Void)?
 }
 
 extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {

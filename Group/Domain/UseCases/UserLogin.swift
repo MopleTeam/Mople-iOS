@@ -30,6 +30,7 @@ final class UserLoginImpl: UserLogin {
             let task = self.appleLoginService.startAppleLogin()
                 .flatMap { self.repository.userLogin(authCode: $0)}
                 .subscribe(onSuccess: { code in
+                    print("login apple code: \(code)")
                     emitter(.success(()))
                 }, onFailure: { err in
                     emitter(.failure(err))

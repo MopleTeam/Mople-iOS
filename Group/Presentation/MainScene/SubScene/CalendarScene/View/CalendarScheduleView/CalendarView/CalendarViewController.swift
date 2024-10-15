@@ -31,11 +31,7 @@ final class CalendarViewController: UIViewController, View {
     // MARK: - Variables
     private let currentCalendar = DateManager.calendar
     private var eventDateComponents: [DateComponents] = []
-    private var selectedDay: Date? {
-        didSet {
-            print("\(oldValue)에서 \(selectedDay)로 바꼈어요")
-        }
-    }
+    private var selectedDay: Date? 
     
     // MARK: - Observable
     private let gestureObserver: Observable<UIPanGestureRecognizer>
@@ -172,9 +168,10 @@ final class CalendarViewController: UIViewController, View {
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$eventDates)
+        reactor.pulse(\.$schedules)
             .filter({ !$0.isEmpty })
             .observe(on: MainScheduler.instance)
+            .map({ $0.map { $0.dateComponents } })
             .subscribe(with: self, onNext: { vc, events in
                 vc.updateEvents(with: events)
                 vc.setDefaultDate()
@@ -203,7 +200,7 @@ final class CalendarViewController: UIViewController, View {
             .compactMap({ $0 })
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
-                vc.presentNextDate(on: date)
+                vc.presentDate(on: date)
             })
             .disposed(by: disposeBag)
     }
@@ -236,7 +233,7 @@ extension CalendarViewController: FSCalendarDataSource {
 extension CalendarViewController: FSCalendarDelegate {
     
     func minimumDate(for calendar: FSCalendar) -> Date {
-        var components = reactor!.todayComponents
+        var components = Date().getComponents()
         components.month = 1
         components.day = 1
         let date = components.getDate() ?? Date()
@@ -244,7 +241,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func maximumDate(for calendar: FSCalendar) -> Date {
-        var components = reactor!.todayComponents
+        var components = Date().getComponents()
         components.month = 12
         components.day = 31
         let date = components.getDate() ?? Date()
@@ -257,12 +254,14 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        print(#function, #line)
         selectedDay = date
         updateFocus(on: date, with: monthPosition)
         updateCell(date, isSelected: true)
     }
     
     func calendar(_ calendar: FSCalendar, didDeselect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        print(#function, #line)
         updateCell(date, isSelected: false)
     }
     
@@ -371,7 +370,7 @@ extension CalendarViewController {
     
     /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
     /// Home에서 표시한 마지막 Event 표시
-    private func presentNextDate(on date: DateComponents) {
+    private func presentDate(on date: DateComponents) {
         print(#function, #line)
         let delay: Int = calendar.scope == .month ? 200 : 0
         selectedDay = date.getDate()
@@ -420,7 +419,7 @@ extension CalendarViewController {
     /// 오늘 날짜 셀 구분
     private func checkToday(_ date: Date) -> Bool {
         let targetComponents = date.getComponents()
-        return targetComponents == reactor!.todayComponents
+        return targetComponents == Date().getComponents()
     }
 }
 
@@ -496,7 +495,7 @@ extension CalendarViewController {
         if let firstEvent = currentPageFirstEventDate() {
             return firstEvent
         } else {
-            return isCurrentMonth() ? reactor!.todayComponents : currentPageDate()
+            return isCurrentMonth() ? Date().getComponents() : currentPageDate()
         }
     }
     
@@ -512,7 +511,7 @@ extension CalendarViewController {
     
     /// 현재 페이지가 이번 달인지 체크
     private func isCurrentMonth() -> Bool {
-        guard let today = reactor!.todayComponents.getDate() else { return false }
+        guard let today = Date().getComponents().getDate() else { return false }
         let currentPage = calendar.currentPage
         
         return DateManager.isSameMonth(today, currentPage)

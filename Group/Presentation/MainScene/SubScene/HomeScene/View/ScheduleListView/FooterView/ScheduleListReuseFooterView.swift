@@ -17,6 +17,7 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     private let label: BaseButton = {
         let label = BaseButton(backColor: AppDesign.defaultWihte,
                                radius: 12,
+                               imagePlacement: .top,
                                configure: AppDesign.Schedule.moreSchedule)
         
         return label

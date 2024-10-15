@@ -59,14 +59,13 @@ extension LoginSceneDIContainer {
 
 // MARK: - Profile Setup
 extension LoginSceneDIContainer {
-    func makeProfileSetupViewController(action: SignInAction) -> ProfileSetupViewController {
-        return ProfileSetupViewController(photoManager: PhotoManager(),
-                                          reactor: makeProfileSetupReactor(action))
+    func makeProfileSetupViewController(action: ProfileSetupAction) -> ProfileSetupViewController {
+        return ProfileSetupViewController(reactor: makeProfileSetupReactor(action))
     }
     
-    private func makeProfileSetupReactor(_ action: SignInAction) -> ProfileSetupViewReactor {
+    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileSetupViewReactor {
         return ProfileSetupViewReactor(profileSetupUseCase: ProfileSetupMock(),
-                                       signInAction: action
+                                       completedAction: action
         )
     }
     

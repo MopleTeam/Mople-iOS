@@ -23,9 +23,9 @@ final class GroupRepository {
 // MARK: - Retry Request
 #warning("만료 에러코드 작업필요")
 extension GroupRepository {
+    
     private func reissueToken() -> Single<Void> {
         return Single.create { emitter in
-            print("토큰 재발급 요청")
             do {
                 let endpoint = try APIEndpoints.reissueToken()
                 

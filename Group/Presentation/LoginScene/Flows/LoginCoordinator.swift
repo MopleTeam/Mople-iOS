@@ -9,7 +9,7 @@ import UIKit
 
 protocol LoginCoordinaotorDependencies {
     func makeLoginViewController(action: LoginAction) -> LoginViewController
-    func makeProfileSetupViewController(action: SignInAction) -> ProfileSetupViewController
+    func makeProfileSetupViewController(action: ProfileSetupAction) -> ProfileSetupViewController
 }
 
 final class LoginCoordinator: BaseCoordinator {
@@ -30,7 +30,7 @@ final class LoginCoordinator: BaseCoordinator {
     }
     
     private func showProfileView() {
-        let action = SignInAction(completedSignIn: SignIn)
+        let action = ProfileSetupAction(completed: completedSignIn)
         let vc = self.dependencies.makeProfileSetupViewController(action: action)
         self.navigationController.pushViewController(vc, animated: true)
     }
@@ -38,7 +38,7 @@ final class LoginCoordinator: BaseCoordinator {
 
 // MARK: - 로그인 -> 메인 뷰로 들어가기
 extension LoginCoordinator {
-    private func SignIn() {
+    private func completedSignIn() {
         fadeOut { [weak self] in
             self?.clearScene()
         }

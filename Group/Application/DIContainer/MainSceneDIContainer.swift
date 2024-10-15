@@ -7,6 +7,11 @@
 
 import UIKit
 
+protocol TabBarCoordinaotorDependencies {
+    func makeTabBarController() -> UITabBarController
+    func getMainFlowCoordinator() -> [BaseCoordinator]
+}
+
 final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
     
     let apiDataTransferService: DataTransferService
@@ -45,7 +50,7 @@ extension MainSceneDIContainer {
     // MARK: - 홈
     private func makeHomeCoordinator() -> BaseCoordinator {
         let homeDI = HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
-        let navigationController = UINavigationController()
+        let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "홈",
                                                 image: .home,
                                                 selectedImage: nil)
@@ -57,7 +62,7 @@ extension MainSceneDIContainer {
     private func makeGroupListCoordinator() -> BaseCoordinator {
         let groupDI = GroupListSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
-        let navigationController = UINavigationController()
+        let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "모임",
                                                 image: .people,
                                                 selectedImage: nil)
@@ -69,7 +74,7 @@ extension MainSceneDIContainer {
     private func makeCalendarCoordinator() -> BaseCoordinator {
         let calendarDI = CalendarSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
-        let navigationController = UINavigationController()
+        let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "일정관리",
                                                 image: .tabBarCalendar,
                                                 selectedImage: nil)
@@ -81,7 +86,7 @@ extension MainSceneDIContainer {
     private func makeProfileCoordinator() -> BaseCoordinator {
         let profileDI = ProfileSceneDIContainer(apiDataTransferService: apiDataTransferService)
         
-        let navigationController = UINavigationController()
+        let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "프로필",
                                                 image: .person,
                                                 selectedImage: nil)

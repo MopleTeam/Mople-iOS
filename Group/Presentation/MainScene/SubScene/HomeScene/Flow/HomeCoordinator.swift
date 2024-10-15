@@ -35,6 +35,6 @@ final class HomeCoordinator: BaseCoordinator {
     }
     
     private func presentNextEvent(lastRecentDate: Date) {
-        (self.parentCoordinator as? PresentCalendar)?.presentNextEvent(lastRecentDate: lastRecentDate)
+        (self.parentCoordinator as? KeepTabBarNavigation)?.pushCalendarView(lastRecentDate: lastRecentDate)
     }
 }

@@ -21,7 +21,7 @@ final class DatePickViewController: UIViewController, View {
     private let pageChangeRequestObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - Variables
-    private lazy var today = reactor!.todayComponents
+    private lazy var today = Date().getComponents()
     private lazy var selectedDate: DateComponents = today
     
     private lazy var years: [Int] = {

@@ -8,20 +8,21 @@
 import Foundation
 import UIKit
 import PhotosUI
+import RxSwift
 
-protocol PhotoService {
-    typealias Delegate = UIViewController & PHPickerViewControllerDelegate
-    
-    func requestPhotoLibraryPermission(delegate: Delegate)
-}
 
-final class PhotoManager: PhotoService {
+final class PhotoManager {
+   
+    var delegate: UIViewController
+    var imageObserver: AnyObserver<UIImage?>
     
-    private var delegate: Delegate?
-    
-    func requestPhotoLibraryPermission(delegate: Delegate) {
+    init(delegate: UIViewController,
+         imageObserver: AnyObserver<UIImage?>) {
         self.delegate = delegate
-        
+        self.imageObserver = imageObserver
+    }
+    
+    public func requestPhotoLibraryPermission() {
         PHPhotoLibrary.requestAuthorization { [weak self] status in
             guard let self = self else { return }
             DispatchQueue.main.async {
@@ -31,10 +32,7 @@ final class PhotoManager: PhotoService {
                     self.configureImagePicker()
                 case .denied, .restricted:
                     print("사진 라이브러리 접근 권한이 거부되었습니다.")
-                    // 사용자에게 설정에서 권한을 허용하도록 안내합니다.
-                case .notDetermined:
-                    print("사진 라이브러리 접근 권한이 아직 결정되지 않았습니다.")
-                @unknown default:
+                default:
                     break
                 }
             }
@@ -46,7 +44,25 @@ final class PhotoManager: PhotoService {
         configuration.selectionLimit = 1
         configuration.filter = .images
         let pickerViewController = PHPickerViewController(configuration: configuration)
-        pickerViewController.delegate = delegate
-        delegate?.present(pickerViewController, animated: true)
+        pickerViewController.delegate = self
+        delegate.present(pickerViewController, animated: true)
+    }
+}
+
+// MARK: - Photos
+extension PhotoManager: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let itemprovider = results.first?.itemProvider,
+              itemprovider.canLoadObject(ofClass: UIImage.self) else { return }
+        
+        itemprovider.loadObject(ofClass: UIImage.self) { [weak self] image , error  in
+            if let error = error {
+                print("사진선택 오류 발생")
+            }
+            guard let self = self,
+                  let image = image as? UIImage else { return }
+            self.imageObserver.onNext(image)
+        }
     }
 }

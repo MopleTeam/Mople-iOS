@@ -20,6 +20,7 @@ final class GroupListTableViewController: UIViewController, View {
         table.separatorStyle = .none
         table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
+        table.tableHeaderView = UIView.init(frame: .init(x: 0, y: 0, width: table.frame.width, height: 10))
         table.contentInset = .init(top: 28, left: 0, bottom: 50, right: 0)
         table.clipsToBounds = false
         return table
@@ -41,7 +42,6 @@ final class GroupListTableViewController: UIViewController, View {
         setAction()
     }
     
-    
     private func setupUI() {
         view.addSubview(tableView)
         
@@ -58,7 +58,9 @@ final class GroupListTableViewController: UIViewController, View {
     private func setAction() {
         tableView.rx.itemSelected
             .subscribe(with: self, onNext: { vc, _ in
-                print("셀 선택 됨")
+                let testVC = TestVC()
+                testVC.hidesBottomBarWhenPushed = true
+                vc.navigationController?.pushViewController(testVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -81,3 +83,17 @@ extension GroupListTableViewController: UITableViewDelegate {
     }
 }
 
+class TestVC: UIViewController {
+    
+    override func viewDidLoad() {
+        
+        view.backgroundColor = .systemMint
+    }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        print(#function, #line)
+//        super.viewWillDisappear(animated)
+//        
+//        self.tabBarController?.tabBar.isHidden = false
+//    }
+}
