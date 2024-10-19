@@ -13,7 +13,9 @@ final class AlertManager {
     
     private init() { }
     
-    private var currentVC: UIViewController? = UIApplication.shared.topViewController
+    private var currentVC: UIViewController? {
+        UIApplication.shared.topViewController
+    }
     
     func showAlert(
         title: String = "",

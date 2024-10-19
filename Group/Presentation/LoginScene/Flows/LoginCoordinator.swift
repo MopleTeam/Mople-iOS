@@ -38,6 +38,7 @@ final class LoginCoordinator: BaseCoordinator {
 
 // MARK: - 로그인 -> 메인 뷰로 들어가기
 extension LoginCoordinator {
+    
     private func completedSignIn() {
         fadeOut { [weak self] in
             self?.clearScene()

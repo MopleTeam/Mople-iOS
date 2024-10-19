@@ -27,7 +27,8 @@ class ProfileSetupViewController: UIViewController, View {
     private let profileContainerView = UIView()
     
     private lazy var profileSetupView: BaseProfileViewController = {
-        let viewController = BaseProfileViewController(reactor: reactor!)
+        let viewController = BaseProfileViewController(type: .create,
+                                                       reactor: reactor!)
         return viewController
     }()
     

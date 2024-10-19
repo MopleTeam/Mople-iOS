@@ -11,5 +11,5 @@ import RxSwift
 protocol ProfileSetupRepository {
     func getRandomNickname() -> Single<Data>
     func checkNickname(name: String) -> Single<Bool>
-    func makeProfile(image: Data, nickNmae: String) -> Single<Void>
+    func makeProfile(image: Data, nickNmae: String) -> Single<ProfileResponseDTO>
 }

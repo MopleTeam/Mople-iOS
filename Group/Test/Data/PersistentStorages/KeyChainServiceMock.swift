@@ -13,7 +13,7 @@ struct KeyChainServiceMock: KeyChainService {
         
     }
     
-    func getToken() -> TokenInfo? {
+    func getToken() -> TokenDTO? {
         return nil
     }
     

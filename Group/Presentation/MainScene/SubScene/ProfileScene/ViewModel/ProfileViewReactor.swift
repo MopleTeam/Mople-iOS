@@ -9,14 +9,14 @@ import UIKit
 import ReactorKit
 
 struct accountAction {
-    var editProfile: (Profile) -> Void
+    var presentEditView: (ProfileUpdateModel) -> Void
 }
 
 final class ProfileViewReactor: Reactor {
     
     enum Action {
         case fetchProfile
-        case editProfile(_ profile: Profile)
+        case editProfile(updatedModel: ProfileUpdateModel)
         case notifyManagement
         case personalInfo
         case logout
@@ -47,8 +47,8 @@ final class ProfileViewReactor: Reactor {
         switch action {
         case .fetchProfile:
             return self.getProfile()
-        case .editProfile(let profile):
-            return presentEditView(profile)
+        case .editProfile(let updateModel):
+            return presentEditView(updatedModel: updateModel)
         case .notifyManagement:
             return Observable.empty()
         case .personalInfo:
@@ -80,8 +80,8 @@ extension ProfileViewReactor {
             .map { Mutation.loadedProfile(profile: $0) }
     }
     
-    private func presentEditView(_ profile: Profile) -> Observable<Mutation> {
-        accountAction.editProfile(profile)
+    private func presentEditView(updatedModel: ProfileUpdateModel) -> Observable<Mutation> {
+        accountAction.presentEditView(updatedModel)
         
         return Observable.empty()
     }

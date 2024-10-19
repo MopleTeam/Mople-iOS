@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TokenInfo: Codable {
+struct TokenDTO: Codable {
     var accessToken: String?
     var refreshToken: String?
     

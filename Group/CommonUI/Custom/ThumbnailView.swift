@@ -48,7 +48,8 @@ final class ThumbnailTitleView: UIView {
     private lazy var memberCountView: IconLabelView = {
         let view = IconLabelView(iconSize: 20,
                                  configure: AppDesign.Group.member,
-                                 contentSpacing: 4)
+                                 contentSpacing: 4,
+                                 titleTopPadding: 3)
         return view
     }()
     
@@ -80,11 +81,7 @@ final class ThumbnailTitleView: UIView {
     
     init(type: ViewType) {
         self.viewType = type
-        
-        defer {
-            setupUI()
-        }
-        
+        defer { setupUI() }
         super.init(frame: .zero)
     }
 
@@ -106,10 +103,10 @@ final class ThumbnailTitleView: UIView {
         switch viewType {
         case .simple:
             setThumbnail(size: 28, radius: 6)
-            groupTitleLabel.setType(configure: AppDesign.Schedule.group)
+            groupTitleLabel.setConfigure(configure: AppDesign.Schedule.group)
         case .detail:
             setThumbnail(size: 56, radius: 12)
-            groupTitleLabel.setType(configure: AppDesign.Group.title)
+            groupTitleLabel.setConfigure(configure: AppDesign.Group.title)
             makeDetail()
         }
     }

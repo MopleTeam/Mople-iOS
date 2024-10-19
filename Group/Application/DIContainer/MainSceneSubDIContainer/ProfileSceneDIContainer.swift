@@ -22,15 +22,12 @@ final class ProfileSceneDIContainer: ProfileCoordinatorDependencies {
     }
     
     func makeProfileViewController(action: accountAction) -> ProfileViewController {
-        return ProfileViewController(title: "마이페이지",
-                                     reactor: makeProfileViewReactor(action: action))
+        return ProfileViewController(reactor: makeProfileViewReactor(action: action))
     }
     
-    func makeProfileEditViewController(profile: Profile,
-                                       action: ProfileSetupAction) -> ProfileEditViewController {
-        return ProfileEditViewController(profile: profile,
-                                         title: "프로필 수정",
-                                         reactor: makeProfileEditViewReactor(action: action))
+    func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController {
+        return ProfileEditViewController(profile: updateModel.currentProfile,
+                                         reactor: makeProfileEditViewReactor(action: updateModel.completedAction))
     }
     
     private func makeProfileViewReactor(action: accountAction) -> ProfileViewReactor {

@@ -11,18 +11,18 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-enum ButtonType {
-    case check
-    case next
-}
-
 final class BaseProfileViewController: UIViewController, View {
+    
+    enum ViewType {
+        case create
+        case edit
+    }
     
     typealias Reactor = ProfileSetupViewReactor
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Variables
+    // MARK: - Manager
     private lazy var photoManager: PhotoManager = {
         let photoManager = PhotoManager(delegate: self,
                                         imageObserver: imageObserver.asObserver())
@@ -31,24 +31,34 @@ final class BaseProfileViewController: UIViewController, View {
     
     private lazy var alertManager = AlertManager.shared
     
+    // MARK: - Variables
+    private var previousProfile: ProfileBuilder?
+    private var viewType: ViewType?
+    
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
+    private let validNameObserver: BehaviorSubject<Bool?> = .init(value: nil)
     
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()
     private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
-    private let imageContainerView : UIView = {
-        let view = UIView()
-        return view
-    }()
+    private let imageContainerView = UIView()
     
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = AppDesign.Profile.selectImage
+        imageView.image = AppDesign.Profile.defaultImage
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    private let profileEditIcon: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = .editCircle
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
 
@@ -64,11 +74,12 @@ final class BaseProfileViewController: UIViewController, View {
     
     private let nameTextField = BaseTextField(configure: AppDesign.Profile.nameText)
     
-    private let nameCheckButton: BaseButton = {
+    private let overlapButton: BaseButton = {
         let button = BaseButton(backColor: AppDesign.Profile.checkButtonBackColor,
                                 radius: 6,
                                 configure: AppDesign.Profile.checkButton)
         button.tag = 0
+        button.isEnabled = false
         return button
     }()
     
@@ -78,7 +89,7 @@ final class BaseProfileViewController: UIViewController, View {
         return view
     }()
     
-    private let nameCheckLabel = BaseLabel(configure: AppDesign.Profile.checkTitle)
+    private let nameCheckLabel = OverlapCheckLabel()
     
     private var nextButton: BaseButton = {
         let button = BaseButton(backColor: AppDesign.Profile.nextButtonBackColor,
@@ -108,8 +119,12 @@ final class BaseProfileViewController: UIViewController, View {
     }()
 
     // MARK: - LifeCycle
-    init(reactor: ProfileSetupViewReactor) {
-        defer { self.reactor = reactor }
+    init(type: ViewType,
+         reactor: ProfileSetupViewReactor) {
+        defer {
+            self.reactor = reactor
+            self.viewType = type
+        }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -119,19 +134,21 @@ final class BaseProfileViewController: UIViewController, View {
     
     override func viewDidLoad() {
         setupUI()
-        setupAction()
+        setBind()
     }
 
     // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
         setupTextField()
+        setNextButtonTitle(type: viewType)
     }
     
     private func setupLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainStackView)
         self.imageContainerView.addSubview(profileImageView)
+        self.imageContainerView.addSubview(profileEditIcon)
         self.nameTextFieldContainer.addSubview(nameTextField)
         self.nameCheckContanierView.addSubview(nameCheckLabel)
 
@@ -146,6 +163,11 @@ final class BaseProfileViewController: UIViewController, View {
         }
         
         profileImageView.layer.cornerRadius = 40
+        
+        profileEditIcon.snp.makeConstraints { make in
+            make.size.equalTo(24)
+            make.trailing.bottom.equalTo(profileImageView)
+        }
 
         nameTextFieldContainer.snp.makeConstraints { make in
             make.height.equalTo(56)
@@ -167,22 +189,22 @@ final class BaseProfileViewController: UIViewController, View {
     
     private func setupTextField() {
          self.nameTextField.rightViewMode = .always
-         self.nameTextField.rightView = nameCheckButton
+         self.nameTextField.rightView = overlapButton
          self.nameTextField.delegate = self
      }
     
-    // MARK: - Binding
+    // MARK: - 외부 바인딩
     func bind(reactor: ProfileSetupViewReactor) {
         setInput(reactor: reactor)
         setOutput(reactor: reactor)
     }
     
     private func setInput(reactor: Reactor) {
-        self.nameCheckButton.rx.controlEvent(.touchUpInside)
+        self.overlapButton.rx.controlEvent(.touchUpInside)
             .filter({ _ in self.checkNicknameValidator() })
             .compactMap({ _ in self.nameTextField.text })
             .map { Reactor.Action.checkNickname(name: $0,
-                                                tag: self.nameCheckButton.tag) }
+                                                tag: self.overlapButton.tag) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -198,19 +220,19 @@ final class BaseProfileViewController: UIViewController, View {
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, name in
-                vc.nameTextField.text = name
+                vc.overlapButton.isEnabled = true
+                vc.nameTextField.rx.text.onNext(name)
             })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$nameOverlap)
             .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: true)
-            .drive(with: self, onNext: { vc, isOverlap in
-                vc.checkNickName(isOverlap: isOverlap)
-            })
+            .map({ !$0 })
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.validNameObserver)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$errorMessage)
+        reactor.pulse(\.$message)
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
@@ -227,18 +249,94 @@ final class BaseProfileViewController: UIViewController, View {
             .disposed(by: disposeBag)
     }
     
-    // MARK: - Action
-    private func setupAction() {
-        self.view.addGestureRecognizer(backTapGesture)
-        self.profileImageView.addGestureRecognizer(imageTapGesture)
-
+    // MARK: - 내부 바인딩
+    private func setBind() {
+        setValidBind()
+        setEditNameBind()
+        setEditImageBind()
+        setGeestureBind()
+    }
+    
+    private func setValidBind() {
+        let imageChanged = imageObserver
+            .map { _ in }
+        
+        Observable.combineLatest(imageChanged, validNameObserver)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0.1 ?? !self.isChangedName() })
+            .asDriver(onErrorJustReturn: false)
+            .drive(nextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        validNameObserver
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isValid in
+                vc.overlapButton.rx.isEnabled.onNext(false)
+                vc.nameCheckLabel.rx.isOverlap.onNext(!isValid)
+                vc.nameTextField.rx.isResign.onNext(isValid)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // 이미지 변경
+    private func setEditImageBind() {
         imageObserver
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: AppDesign.Profile.defaultImage)
-            .drive(with: self, onNext: { vc, image in
-                vc.setImageView(image: image)
+            .drive(profileImageView.rx.image)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setEditNameBind() {
+        switch viewType {
+        case .create:
+            setEditNameBindWhenCreate()
+        case .edit:
+            setEditNameBindWhenEdit()
+        case nil:
+            break
+        }
+    }
+    
+    private func setEditNameBindWhenCreate() {
+        nameTextField.rx.controlEvent(.editingChanged)
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                vc.validNameObserver.onNext(nil)
+                vc.overlapButton.rx.isEnabled.onNext(true)
+                vc.nameCheckLabel.rx.isHidden.onNext(true)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // 닉네임 변경
+    private func setEditNameBindWhenEdit() {
+        let nameEdit = nameTextField.rx.controlEvent(.editingChanged)
+            .observe(on: MainScheduler.instance)
+            .filter({ _ in self.previousProfile?.name != nil })
+            .do(onNext: { _ in
+                self.nameCheckLabel.isHidden = true
+                self.validNameObserver.onNext(nil)
+            })
+            .share(replay: 1)
+            .asDriver(onErrorJustReturn: ())
+        
+        nameEdit
+            .map({ _ in self.isChangedName() })
+            .drive(overlapButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        nameEdit
+            .map({ _ in !self.isChangedName() && self.isChangedImage() })
+            .drive(nextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+    }
+    
+    // 제스처
+    private func setGeestureBind() {
+        self.view.addGestureRecognizer(backTapGesture)
+        self.profileImageView.addGestureRecognizer(imageTapGesture)
         
         backTapGesture.rx.event
             .asDriver()
@@ -256,36 +354,28 @@ final class BaseProfileViewController: UIViewController, View {
     }
 }
 
+// MARK: - 입력 제한
 extension BaseProfileViewController : UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-
-        let currentText = textField.text ?? ""
+        guard let currentText = textField.text else { return true }
 
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        
         return newText.count <= 10
-    }
-    
-    
-    /// 완료버튼 활성화 후 텍스트 입력 시 설정값 초기화
-    func textFieldDidChangeSelection(_ textField: UITextField) {
-        if nextButton.isEnabled {
-            resetCheck()
-        }
     }
 }
 
 // MARK: - 프로필 생성 및 적용
 extension BaseProfileViewController {
-    private func makeProfile() -> Profile {
+    private func makeProfile() -> ProfileBuilder {
         let nickName = nameTextField.text
         let image = try? imageObserver.value()
         return .init(name: nickName, image: image)
     }
     
-    public func setProfile(_ profile: Profile) {
-        self.setImageView(image: profile.image)
+    public func setEditProfile(_ profile: ProfileBuilder) {
+        self.previousProfile = profile
+        self.profileImageView.image = profile.image
         self.nameTextField.text = profile.name
     }
 }
@@ -304,13 +394,17 @@ extension BaseProfileViewController {
     }
     
     private func setDefaultImage() {
-        self.profileImageView.image = AppDesign.Profile.defaultImage
+        imageObserver.onNext(AppDesign.Profile.defaultImage)
     }
-    
-    private func setImageView(image: UIImage?) {
-        print(#function, #line)
-        self.profileImageView.clipsToBounds = true
-        profileImageView.image = image
+}
+
+// MARK: - 프로필 변경여부
+extension BaseProfileViewController {
+    private func isChangedName() -> Bool {
+        return nameTextField.text != previousProfile?.name
+    }
+    private func isChangedImage() -> Bool {
+        return (try? imageObserver.value() ?? nil) != nil
     }
 }
 
@@ -323,7 +417,7 @@ extension BaseProfileViewController {
         
         switch tag {
         case 0:
-                self.nameCheckButton.loading(status: isLoading)
+                self.overlapButton.loading(status: isLoading)
                 self.nameTextField.updateLayout()
         case 1:
             nextButton.loading(status: isLoading)
@@ -331,24 +425,7 @@ extension BaseProfileViewController {
             break
         }
     }
-    
-    private func checkNickName(isOverlap: Bool) {
-        nameCheckLabel.isOverlapCheck = isOverlap
-        nextButton.isEnabled = !isOverlap
-        endEditNameTextField(isOverlap: isOverlap)
-    }
-    
-    private func resetCheck() {
-        nameCheckLabel.isOverlapCheck = false
-        nextButton.isEnabled = false
-    }
-    
-    private func endEditNameTextField(isOverlap: Bool?) {
-        if !(isOverlap ?? false) {
-            self.nameTextField.resignFirstResponder()
-        }
-    }
-    
+
     private func checkNicknameValidator() -> Bool {
         let valid = Validator.checkNickname(name: self.nameTextField.text)
         
@@ -361,3 +438,16 @@ extension BaseProfileViewController {
         }
     }
 }
+
+extension BaseProfileViewController {
+    private func setNextButtonTitle(type: ViewType?) {
+        guard let type = type else { return }
+        switch type {
+        case .create:
+            self.nextButton.configuration?.title = "서비스명 시작하기"
+        case .edit:
+            self.nextButton.configuration?.title = "저장"
+        }
+    }
+}
+

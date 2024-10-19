@@ -93,13 +93,15 @@ extension AppDesign {
         static let textFieldBackColor = UIColor(hexCode: "F6F8FA")
         static let checkButtonBackColor = UIColor(hexCode: "3E3F40")
         static let nextButtonBackColor = AppDesign.defaultBlue
-        
+
         // Text
         case main
         case nameTitle
         case nameText
         case checkButton
-        case checkTitle
+        case checkLabel
+        case overlapTitle
+        case nonOverlapTitle
         case nextButton
         
         var itemConfig: ItemConfigure {
@@ -121,14 +123,22 @@ extension AppDesign {
                 return makeUIConfigure(text: "중복확인",
                                        font: .pretendard(type: .semiBold, size: 14),
                                        color: AppDesign.defaultWihte)
-            case .checkTitle:
-                return makeUIConfigure(text: "이미 사용중인 닉네임입니다.",
-                                       font: .pretendard(type: .reqular, size: 14),
-                                       color: .clear)
+                
+            case .checkLabel:
+                return makeUIConfigure(font: .pretendard(type: .reqular, size: 14))
+                
+                
+            case .overlapTitle:
+                return makeUIConfigure(text: "이미 사용중인 닉네임 입니다.",
+                                       color: .init(hexCode: "FF3B30"))
+                
+            case .nonOverlapTitle:
+                return makeUIConfigure(text: "사용 가능한 닉네임 입니다.",
+                                       color: AppDesign.defaultBlack)
+                
             case .nextButton:
                 
-                return makeUIConfigure(text: "프로필 생성하기",
-                                       font: .pretendard(type: .semiBold, size: 16),
+                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
                                        color: AppDesign.defaultWihte)
             }
         }
@@ -361,7 +371,7 @@ extension AppDesign {
             case .edit:
                 return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
                                        color: AppDesign.defaultBlack,
-                                       image: .edit)
+                                       image: .editPan)
             case .notify:
                 return makeUIConfigure(text: "알림 관리",
                                        font: .pretendard(type: .medium, size: 16),

@@ -14,7 +14,12 @@ struct ProfileSetupAction {
     var completed: () -> Void
 }
 
-enum ProfileSetupFacingError: Error {
+struct ProfileBuilder {
+    var name: String?
+    var image: UIImage?
+}
+
+enum ProfileSetupFacingMessage: Error {
     case noTokenError
     case completedError
     case networkError
@@ -46,14 +51,12 @@ enum ProfileSetupFacingError: Error {
     }
 }
 
-
-
 final class ProfileSetupViewReactor: Reactor {
 
     enum Action {
         case getRandomNickname
         case checkNickname(name: String, tag: Int)
-        case setProfile(profile: Profile, tag: Int)
+        case setProfile(profile: ProfileBuilder, tag: Int)
     }
     
     enum Mutation {
@@ -68,14 +71,14 @@ final class ProfileSetupViewReactor: Reactor {
     struct State {
         @Pulse var randomName: String?
         @Pulse var nameOverlap: Bool?
-        @Pulse var errorMessage: String?
-        @Pulse var madeProfile: Void?
+        @Pulse var message: String?
         @Pulse var isLoading: Bool?
         @Pulse var buttonLoading: (status: Bool, tag: Int)?
+        @Pulse var setupCompleted: Void?
     }
     
     private let profileSetupUseCase: ProfileSetup
-    private let completedAction: ProfileSetupAction
+    private var completedAction: ProfileSetupAction
     
     var initialState: State = State()
     
@@ -117,6 +120,7 @@ final class ProfileSetupViewReactor: Reactor {
         case .catchError(err: let err):
             newState = handleError(state: newState, err: err)
         case .madeProfile:
+            newState.setupCompleted = ()
             completedAction.completed()
         }
         
@@ -129,25 +133,25 @@ final class ProfileSetupViewReactor: Reactor {
         switch err {
         case let err as DataTransferError:
             let dataError = mapDataErrorToFacingError(err: err)
-            newState.errorMessage = dataError.info
+            newState.message = dataError.info
         case let err as TokenError:
             let tokenError = mapTokenErrorToFacingError(err: err)
-            newState.errorMessage = tokenError.info
-        case let err as ProfileSetupFacingError:
-            newState.errorMessage = err.info
+            newState.message = tokenError.info
+        case let err as ProfileSetupFacingMessage:
+            newState.message = err.info
         default:
-            newState.errorMessage = ProfileSetupFacingError.unknownError(err: err).info
+            newState.message = ProfileSetupFacingMessage.unknownError(err: err).info
         }
         return newState
     }
 }
 
 extension ProfileSetupViewReactor {
-    private func mapTokenErrorToFacingError(err : TokenError) -> ProfileSetupFacingError {
+    private func mapTokenErrorToFacingError(err : TokenError) -> ProfileSetupFacingMessage {
         return .noTokenError
     }
     
-    private func mapDataErrorToFacingError(err : DataTransferError) -> ProfileSetupFacingError {
+    private func mapDataErrorToFacingError(err : DataTransferError) -> ProfileSetupFacingMessage {
         switch err {
         case .parsing(_): .parsingError
         case .noResponse: .completedError
@@ -162,7 +166,7 @@ extension ProfileSetupViewReactor {
         }
     }
     
-    private func mapServerErrorToFacingError(err: ServerError) -> ProfileSetupFacingError {
+    private func mapServerErrorToFacingError(err: ServerError) -> ProfileSetupFacingMessage {
         switch err {
         case .httpRespon(_):
             return .serverError
@@ -192,6 +196,7 @@ extension ProfileSetupViewReactor {
         
         let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
                 
+        #warning("서버에서 중복 결과를 true, false 뭘로 주는지 물어보기, 현재는 true")
         let nameOverlap = profileSetupUseCase.checkNickName(name: name)
             .asObservable()
             .map { Mutation.nameCheck(isOverlap: $0)}
@@ -204,7 +209,8 @@ extension ProfileSetupViewReactor {
                                   loadingOff])
     }
     
-    private func makeProfile(_ profile: Profile, tag: Int) -> Observable<Mutation> {
+    #warning("사용처에 따라서 다른 API 요청 : 프로필 생성 or 프로필 편집 defer 이용하면 될 듯!")
+    private func makeProfile(_ profile: ProfileBuilder, tag: Int) -> Observable<Mutation> {
         guard let nickname = profile.name else { return .empty() }
   
         let image = profile.image?.jpegData(compressionQuality: 0.5) ?? getDefaultImageData()

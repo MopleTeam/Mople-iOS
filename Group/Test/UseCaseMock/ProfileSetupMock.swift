@@ -5,7 +5,7 @@
 //  Created by CatSlave on 8/31/24.
 //
 
-import Foundation
+import UIKit
 import RxSwift
 
 #warning("랜덤 닉네임 로그인 화면으로 옮기기")
@@ -21,8 +21,10 @@ final class ProfileSetupMock: ProfileSetup {
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }
     
-    func makeProfile(image: Data, nickName: String) -> Single<Void> {
-        return Single.just(())
+    func makeProfile(image: Data, nickName: String) -> Single<ProfileInfo> {
+        return Single.just(.init(name: nickName,
+                                 imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"))
+        
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }
 }

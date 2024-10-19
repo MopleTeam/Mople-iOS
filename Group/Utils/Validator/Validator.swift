@@ -39,7 +39,7 @@ struct Validator {
         }
         
         switch name {
-        case _ where name.contains(where: { $0.isWhitespace }) && !name.checkValidator():
+        case _ where name.contains(where: { $0.isWhitespace }) || !name.checkValidator():
             return .strange
         case _ where name.count <= 1:
             return .countUnder

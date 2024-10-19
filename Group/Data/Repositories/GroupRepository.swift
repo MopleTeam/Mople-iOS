@@ -5,7 +5,7 @@
 //  Created by CatSlave on 8/22/24.
 //
 
-import Foundation
+import UIKit
 import RxSwift
 
 final class GroupRepository {
@@ -147,8 +147,8 @@ extension GroupRepository: ProfileSetupRepository {
         })
     }
     
-    func makeProfile(image: Data, nickNmae: String) -> Single<Void> {
-        return requestWithRetry { () throws -> Endpoint<Void> in
+    func makeProfile(image: Data, nickNmae: String) -> Single<ProfileResponseDTO> {
+        return requestWithRetry { () throws -> Endpoint<ProfileResponseDTO> in
             try APIEndpoints.setupProfile(image: image, nickName: nickNmae)
         }
     }

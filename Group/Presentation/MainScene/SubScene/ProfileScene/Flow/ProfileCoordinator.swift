@@ -9,8 +9,7 @@ import UIKit
 
 protocol ProfileCoordinatorDependencies {
     func makeProfileViewController(action: accountAction) -> ProfileViewController
-    func makeProfileEditViewController(profile: Profile,
-                                       action: ProfileSetupAction) -> ProfileEditViewController
+    func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController
 }
 
 final class ProfileCoordinator: BaseCoordinator {
@@ -23,24 +22,19 @@ final class ProfileCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let vc = dependencies.makeProfileViewController(action: accountAction(editProfile: presentEditView(profile:)))
+        let vc = dependencies.makeProfileViewController(action: accountAction(presentEditView: presentEditView(updateModel:)))
         
         navigationController.pushViewController(vc, animated: false)
     }
 }
 
 extension ProfileCoordinator {
-    private func presentEditView(profile: Profile) {
+    private func presentEditView(updateModel: ProfileUpdateModel) {
         guard let customNavi = navigationController as? MainNavigationController else { return }
-        let profileSetupView = dependencies.makeProfileEditViewController(profile: profile,
-                                                                          action: .init(completed: editCompleted))
+        let profileSetupView = dependencies.makeProfileEditViewController(updateModel: updateModel)
         profileSetupView.modalPresentationStyle = .custom
         profileSetupView.transitioningDelegate = customNavi
         customNavi.present(profileSetupView, animated: true, completion: nil)
-    }
-    
-    private func editCompleted() {
-        
     }
 }
 

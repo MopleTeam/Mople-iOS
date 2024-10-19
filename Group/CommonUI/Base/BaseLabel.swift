@@ -9,13 +9,6 @@ import UIKit
 
 class BaseLabel: UILabel {
     
-    var isOverlapCheck: Bool = false {
-        didSet {
-            let color: UIColor = isOverlapCheck ? .init(hexCode: "FF3B30") : .clear
-            textColor = color
-        }
-    }
-    
     private var padding: UIEdgeInsets
     
     override func drawText(in rect: CGRect) {
@@ -35,7 +28,7 @@ class BaseLabel: UILabel {
         self.padding = padding
         super.init(frame: .zero)
         
-        setType(configure: configure)
+        setConfigure(configure: configure)
         setBackground(color: backColor, radius: radius)
     }
     
@@ -44,7 +37,7 @@ class BaseLabel: UILabel {
         super.init(coder: coder)
     }
     
-    public func setType(configure: UIConstructive?) {
+    public func setConfigure(configure: UIConstructive?) {
         text = configure?.itemConfig.text
         font = configure?.itemConfig.font
         textColor = configure?.itemConfig.color

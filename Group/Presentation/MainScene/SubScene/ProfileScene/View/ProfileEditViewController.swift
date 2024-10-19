@@ -17,6 +17,9 @@ class ProfileEditViewController: BaseViewController, View {
     
     var disposeBag = DisposeBag()
     
+    // MARK: - Variables
+    let previousProfile: ProfileBuilder
+    
     // MARK: - Observer
     private lazy var leftButtonObserver = addLeftButton(setImage: .arrowBack)
     
@@ -24,19 +27,17 @@ class ProfileEditViewController: BaseViewController, View {
     private let profileContainerView = UIView()
     
     private lazy var profileSetupView: BaseProfileViewController = {
-        let viewController = BaseProfileViewController(reactor: reactor!)
+        let viewController = BaseProfileViewController(type: .edit,
+                                                       reactor: reactor!)
         return viewController
     }()
 
     // MARK: - LifeCycle
-    init(profile: Profile,
-         title: String?,
+    init(profile: ProfileBuilder,
          reactor: ProfileSetupViewReactor) {
-        defer {
-            self.reactor = reactor
-            self.setProfile(profile)
-        }
-        super.init(title: title)
+        self.previousProfile = profile
+        defer { self.reactor = reactor }
+        super.init(title: "프로필 수정")
     }
     
     required init?(coder: NSCoder) {
@@ -44,7 +45,6 @@ class ProfileEditViewController: BaseViewController, View {
     }
     
     override func viewDidLoad() {
-        print("ViewDidLoad 시점")
         super.viewDidLoad()
         setupUI()
     }
@@ -54,6 +54,7 @@ class ProfileEditViewController: BaseViewController, View {
         setupLayout()
         addProfileSetupView()
         setNavi()
+        setProfile()
     }
 
     private func setupLayout() {
@@ -79,14 +80,21 @@ class ProfileEditViewController: BaseViewController, View {
         self.leftButtonObserver = addLeftButton(setImage: .arrowBack)
     }
     
-    private func setProfile(_ profile: Profile) {
-        profileSetupView.setProfile(profile)
+    private func setProfile() {
+        profileSetupView.setEditProfile(previousProfile)
     }
     
     // MARK: - Binding
     func bind(reactor: ProfileSetupViewReactor) {
         leftButtonObserver
             .subscribe(with: self, onNext: { vc, _ in
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$setupCompleted)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, _ in
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)

@@ -30,8 +30,8 @@ final class CalendarViewController: UIViewController, View {
     
     // MARK: - Variables
     private let currentCalendar = DateManager.calendar
-    private var eventDateComponents: [DateComponents] = []
-    private var selectedDay: Date? 
+    private var events: [Date] = []
+    private var selectedDay: Date?
     
     // MARK: - Observable
     private let gestureObserver: Observable<UIPanGestureRecognizer>
@@ -45,7 +45,7 @@ final class CalendarViewController: UIViewController, View {
         let calendar = FSCalendar()
         calendar.scrollDirection = .horizontal
         calendar.adjustsBoundingRectWhenChangingMonths = true
-        calendar.placeholderType = .fillHeadTail
+        calendar.placeholderType = .none
         calendar.headerHeight = 0
         calendar.rowHeight = 60
         calendar.collectionViewLayout.sectionInsets = .init(top: 5, left: 24, bottom: 5, right: 24)
@@ -103,18 +103,18 @@ final class CalendarViewController: UIViewController, View {
     private func setCalendar() {
         setCalendarAppearance()
         calendar.delegate = self
-        calendar.dataSource = self
-        calendar.register(CustomCalendarCell.self, forCellReuseIdentifier: "CustomCell")
     }
     
     private func setCalendarAppearance() {
         calendar.appearance.weekdayTextColor = AppDesign.Calendar.weekTextColor
-        calendar.appearance.titleTodayColor = AppDesign.defaultBlack
-        calendar.appearance.titleSelectionColor = AppDesign.defaultBlack
+        calendar.appearance.titleTodayColor = .init(hexCode: "DDDDDD")
+        calendar.appearance.titleSelectionColor = .init(hexCode: "222222")
+        calendar.appearance.titleDefaultColor = .init(hexCode: "DDDDDD")
         calendar.appearance.todayColor = .clear
         calendar.appearance.selectionColor = .clear
         calendar.appearance.titleFont = AppDesign.Calendar.dayFont
         calendar.appearance.weekdayFont = AppDesign.Calendar.weekFont
+        
     }
     
     // MARK: - Binding
@@ -168,10 +168,9 @@ final class CalendarViewController: UIViewController, View {
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$schedules)
+        reactor.pulse(\.$events)
             .filter({ !$0.isEmpty })
             .observe(on: MainScheduler.instance)
-            .map({ $0.map { $0.dateComponents } })
             .subscribe(with: self, onNext: { vc, events in
                 vc.updateEvents(with: events)
                 vc.setDefaultDate()
@@ -217,18 +216,6 @@ final class CalendarViewController: UIViewController, View {
     }
 }
 
-// MARK: - DataSource
-extension CalendarViewController: FSCalendarDataSource {
-    func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
-        let cell = calendar.dequeueReusableCell(withIdentifier: "CustomCell", for: date, at: position) as! CustomCalendarCell
-
-        cell.updateCell(containsEvent: checkContainsEvent(date),
-                        isSelected: checkSelected(on: date, at: position),
-                        isToday: checkToday(date))
-        return cell
-    }
-}
-
 // MARK: - Delegate
 extension CalendarViewController: FSCalendarDelegate {
     
@@ -271,6 +258,16 @@ extension CalendarViewController: FSCalendarDelegate {
         let resultHeight = calendar.scope == .month ? maxHeight : bounds.height
         self.scopeObserver.accept(currentScope)
         self.heightObserver.accept(resultHeight)
+    }
+}
+
+extension CalendarViewController: FSCalendarDelegateAppearance {
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
+        guard events.contains(where: { DateManager.isSameDay($0, date) }) else { return .init(hexCode: "999999") }
+        print("이벤트 : \(date)")
+        return AppDesign.defaultBlack
+        
+//        return .darkGray//events.contains(date) ? AppDesign.defaultBlack : nil
     }
 }
 
@@ -346,14 +343,14 @@ extension CalendarViewController {
     
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
     private func updateWhenMonthScope() {
-        pageObserver.accept(currentPageDate())
+        pageObserver.accept(calendar.currentPage.getComponents())
     }
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func updateWhenWeekScope() {
-        guard let selectedDate = selectedDate() else { return }
-        selectedDay = selectedDate.getDate()
-        dateSelectionObserver.accept(selectedDate)
+        guard let selectedDate = calendar.selectedDate else { return }
+        selectedDay = selectedDate
+        dateSelectionObserver.accept(selectedDate.getComponents())
     }
     
     /// 스코프 변경하기
@@ -386,8 +383,8 @@ extension CalendarViewController {
 extension CalendarViewController {
     /// 이벤트 업데이트
     /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
-    private func updateEvents(with dateComponents: [DateComponents]) {
-        self.eventDateComponents = dateComponents
+    private func updateEvents(with events: [Date]) {
+        self.events = events
         calendar.reloadData()
     }
 
@@ -406,8 +403,7 @@ extension CalendarViewController {
     
     /// 이벤트 셀 구분
     private func checkContainsEvent(_ date: Date) -> Bool {
-        let dateComponent = date.getComponents()
-        return eventDateComponents.contains { $0 == dateComponent }
+        return events.contains { $0 == date }
     }
     
     /// 선택된 셀 구분
@@ -460,15 +456,14 @@ extension CalendarViewController {
     
     /// 월 단위에서 페이지 이동 시 셀 선택하기
     private func selectedFirstEvent() {
-        guard calendar.scope == .month,
-              let day = currentPagePresentDate().getDate() else { return }
-        calendar.select(day, scrollToDate: false)
+        guard calendar.scope == .month else { return }
+        calendar.select(currentPagePresentDate(), scrollToDate: false)
     }
     
     /// 현재 페이지에서 선택된 날짜 및 첫 이벤트
-    private func currentPagePresentDate() -> DateComponents {
+    private func currentPagePresentDate() -> Date {
         if hasSelectedDateInCurrentView() {
-            return selectedDate() ?? currentPageDate()
+            return calendar.selectedDate ?? calendar.currentPage
         } else {
             return getPresentDate()
         }
@@ -480,30 +475,21 @@ extension CalendarViewController {
         return DateManager.isSameMonth(calendar.currentPage, selectedDate)
     }
     
-    /// 선택된 날짜 Components
-    private func selectedDate() -> DateComponents? {
-        guard let selectedDate = calendar.selectedDate else { return nil }
-        let components = selectedDate.getComponents()
-        return components
-    }
-    
     /// 현재 달력에서 표시할 날짜 구하기
     /// 첫 이벤트가 있는 경우 첫 이벤트 return
     /// 이벤트가 없고 이번달인 경우 today return
     /// 그 외 1일 return
-    private func getPresentDate() -> DateComponents {
+    private func getPresentDate() -> Date {
         if let firstEvent = currentPageFirstEventDate() {
             return firstEvent
         } else {
-            return isCurrentMonth() ? Date().getComponents() : currentPageDate()
+            return isCurrentMonth() ? Date() : calendar.currentPage
         }
     }
     
     /// 현재 달력에서 첫번째 이벤트
-    private func currentPageFirstEventDate() -> DateComponents? {
-        let currentPage = calendar.currentPage.getComponents()
-        
-        let currentPageEvnet = eventDateComponents.filter { $0.month == currentPage.month && $0.year == currentPage.year }
+    private func currentPageFirstEventDate() -> Date? {
+        let currentPageEvnet = events.filter { DateManager.isSameMonth($0, self.calendar.currentPage) }
         
         guard let firstEvent = currentPageEvnet.first else { return nil }
         return firstEvent
@@ -511,20 +497,11 @@ extension CalendarViewController {
     
     /// 현재 페이지가 이번 달인지 체크
     private func isCurrentMonth() -> Bool {
-        guard let today = Date().getComponents().getDate() else { return false }
-        let currentPage = calendar.currentPage
-        
-        return DateManager.isSameMonth(today, currentPage)
-    }
-    
-    /// 현재 달력의 첫번째 날짜
-    private func currentPageDate() -> DateComponents {
-        return calendar.currentPage.getComponents()
+        return DateManager.isSameMonth(Date(), calendar.currentPage)
     }
     
     /// 첫 진입 시 선택할 날짜
     private func setDefaultDate() {
-        guard let defaultDate = getPresentDate().getDate() else { return }
-        calendar.select(defaultDate, scrollToDate: false)
+        calendar.select(getPresentDate(), scrollToDate: false)
     }
 }

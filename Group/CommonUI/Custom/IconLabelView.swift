@@ -15,12 +15,11 @@ enum IconAlignment {
 
 final class IconLabelView: UIView {
     
-    public var text: String? {
-        return infoLabel.text
-    }
+    public var text: String? { return infoLabel.text }
     
     private var configure: UIConstructive
     private var iconSize: CGFloat
+    private var titleTopPadding: CGFloat
     
     private let imageContainerView: UIView = {
         let view = UIView()
@@ -56,10 +55,11 @@ final class IconLabelView: UIView {
     init(iconSize: CGFloat,
          configure: UIConstructive,
          contentSpacing: CGFloat = 0,
-         iconAligment: IconAlignment = .left) {
+         iconAligment: IconAlignment = .left,
+         titleTopPadding: CGFloat = 2) {
         self.configure = configure
         self.iconSize = iconSize
-        
+        self.titleTopPadding = titleTopPadding
         defer {
             setupUI()
             mainStackView.spacing = contentSpacing
@@ -94,7 +94,7 @@ final class IconLabelView: UIView {
         
         infoLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalToSuperview().inset(3)
+            make.top.equalToSuperview().inset(titleTopPadding)
             make.bottom.lessThanOrEqualToSuperview()
         }
     }

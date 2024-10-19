@@ -10,7 +10,7 @@ import Security
 
 protocol KeyChainService {
     func saveToken(_ token: Data)
-    func getToken() -> TokenInfo?
+    func getToken() -> TokenDTO?
     func deleteToken()
     func hasToken() -> Bool
     func reissueToken(accessToken: String)
@@ -18,7 +18,7 @@ protocol KeyChainService {
 
 final class KeyChainServiceImpl: KeyChainService {
     
-    private(set) static var cachedToken: TokenInfo?
+    private(set) static var cachedToken: TokenDTO?
     
     enum Key: String {
         case service = "com.Side.GroupManager"
@@ -43,14 +43,14 @@ final class KeyChainServiceImpl: KeyChainService {
         let status = SecItemAdd(query as CFDictionary, nil)
         
         guard status == errSecSuccess,
-              let token = try? JSONDecoder().decode(TokenInfo.self, from: tokens) else {
+              let token = try? JSONDecoder().decode(TokenDTO.self, from: tokens) else {
             return
         }
         
         Self.cachedToken = token
     }
     
-    func getToken() -> TokenInfo? {
+    func getToken() -> TokenDTO? {
         if let token = Self.cachedToken {
             return token
         }
@@ -67,7 +67,7 @@ final class KeyChainServiceImpl: KeyChainService {
         
         guard status == errSecSuccess,
               let data = item as? Data,
-              let token = try? JSONDecoder().decode(TokenInfo.self, from: data) else {
+              let token = try? JSONDecoder().decode(TokenDTO.self, from: data) else {
             return nil
         }
         

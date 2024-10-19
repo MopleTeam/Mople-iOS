@@ -6,14 +6,21 @@
 //
 
 import UIKit
+import RxSwift
 import ReactorKit
+
+struct ProfileUpdateModel {
+    var currentProfile: ProfileBuilder
+    var completedAction: ProfileSetupAction
+}
 
 final class ProfileViewController: BaseViewController, View {
     typealias Reactor = ProfileViewReactor
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Variables
+    // MARK: - Observer
+    private let fetchObserver: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let imageContainer = UIView()
@@ -100,11 +107,9 @@ final class ProfileViewController: BaseViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(title: String?,
-         reactor: ProfileViewReactor) {
-        
-        super.init(title: title)
-        self.reactor = reactor
+    init(reactor: ProfileViewReactor) {
+        defer { self.reactor = reactor }
+        super.init(title: "마이페이지")
     }
     
     required init?(coder: NSCoder) {
@@ -114,9 +119,6 @@ final class ProfileViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
-        
-        
-        
     }
 
     // MARK: - UI Setup
@@ -157,8 +159,17 @@ final class ProfileViewController: BaseViewController, View {
     
     // MARK: - Binding
     func bind(reactor: Reactor) {
+        fetchObserver
+            .map { _ in Reactor.Action.fetchProfile }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         profileNameButton.rx.controlEvent(.touchUpInside)
-            .map({ _ in Reactor.Action.editProfile(self.makeProfile()) })
+            .compactMap { [weak self] () -> ProfileUpdateModel? in
+                guard let self = self else { return nil }
+                return makeUpdateModel()
+            }
+            .map { Reactor.Action.editProfile(updatedModel: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -172,21 +183,33 @@ final class ProfileViewController: BaseViewController, View {
     }
 }
 
-// MARK: - 프로필 만들기
+// MARK: - 프로필 빌더 생성 및 적용
 extension ProfileViewController {
-    private func makeProfile() -> Profile {
+    private func makeProfile() -> ProfileBuilder {
         let image = self.profileImageView.image
         let nickName = profileNameButton.text
         
         return .init(name: nickName, image: image)
     }
-}
-
-extension ProfileViewController {
+    
     private func setProfile(_ profile: ProfileInfo) {
         profileNameButton.setText(profile.name)
         _ = profileImageView.kfSetimage(profile.imagePath)
     }
 }
 
+extension ProfileViewController {
+    
+    
+    /// 프로필 편집 뷰로 현재 프로필과 편집 완료 액션 전달
+    private func makeUpdateModel() -> ProfileUpdateModel {
+        return ProfileUpdateModel(currentProfile: makeProfile(),
+                                  completedAction: .init(completed: reloadProfile))
+    }
+    
+    /// 편집 완료 시 프로필 뷰의 프로필을 리롣,
+    private func reloadProfile() {
+        fetchObserver.onNext(())
+    }
+}
 

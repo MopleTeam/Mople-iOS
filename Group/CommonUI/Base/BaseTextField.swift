@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class BaseTextField: UITextField {
-    
+
     init(configure: UIConstructive) {
         super.init(frame: .zero)
         backgroundColor = .clear
@@ -28,5 +30,14 @@ class BaseTextField: UITextField {
     
     func updateLayout() {
         self.setNeedsLayout()
+    }
+}
+extension Reactive where Base: BaseTextField {
+    var isResign: Binder<Bool> {
+        return Binder(self.base) { textField, isResign in
+            if isResign {
+                textField.resignFirstResponder()
+            }
+        }
     }
 }

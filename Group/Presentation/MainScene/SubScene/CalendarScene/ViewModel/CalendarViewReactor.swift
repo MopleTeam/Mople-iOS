@@ -23,6 +23,7 @@ final class CalendarViewReactor: Reactor {
     
     enum Mutation {
         case loadScheduleList(scheduleList: [ScheduleTableSectionModel])
+        case loadEventDateList(eventDateList: [Date])
         case setCalendarHeight(_ height: CGFloat)
         case switchPage(_ dateComponents: DateComponents)
         case switchScope(_ type: ScopeChangeType)
@@ -36,6 +37,7 @@ final class CalendarViewReactor: Reactor {
     
     struct State {
         @Pulse var schedules: [ScheduleTableSectionModel] = []
+        @Pulse var events: [Date] = []
         @Pulse var calendarHeight: CGFloat?
         @Pulse var switchPage: DateComponents?
         @Pulse var switchScope: ScopeChangeType? = nil
@@ -86,6 +88,8 @@ final class CalendarViewReactor: Reactor {
         switch mutation {
         case .loadScheduleList(let scheduleList):
             newState.schedules = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
+        case .loadEventDateList(let eventList):
+            newState.events = eventList
         case .setCalendarHeight(let height):
             newState.calendarHeight = height
         case .switchPage(let date):
@@ -117,13 +121,16 @@ extension CalendarViewReactor {
 
         let fetchAndProcess = fetchUseCase.fetchScheduleList()
             .asObservable()
-            .map {
-                let grouped = Dictionary(grouping: $0) { schedule in
-                    schedule.date.getComponents()
-                }
-                
-                let models = grouped.map { ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) }
-                return Mutation.loadScheduleList(scheduleList: models)
+            .map { schedules -> (scheduleList: [ScheduleTableSectionModel], eventDateList: [Date]) in
+                let grouped = Dictionary(grouping: schedules) { $0.date.getComponents() }
+                let scheduleList = grouped.map { ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) }
+                let eventDateList = schedules.map { $0.date }
+                return (scheduleList, eventDateList)
+            }
+            .flatMap { result -> Observable<Mutation> in
+                let scheduleListMutation = Mutation.loadScheduleList(scheduleList: result.scheduleList)
+                let eventDateListMutation = Mutation.loadEventDateList(eventDateList: result.eventDateList)
+                return Observable.of(scheduleListMutation, eventDateListMutation)
             }
     
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))

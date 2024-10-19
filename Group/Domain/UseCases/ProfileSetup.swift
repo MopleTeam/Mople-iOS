@@ -11,7 +11,7 @@ import RxSwift
 protocol ProfileSetup {
     func getRandomNickname() -> Single<String?>
     func checkNickName(name: String) -> Single<Bool>
-    func makeProfile(image: Data, nickName: String) -> Single<Void>
+    func makeProfile(image: Data, nickName: String) -> Single<ProfileInfo>
 }
 
 final class ProfileSetupImpl: ProfileSetup {
@@ -42,9 +42,10 @@ final class ProfileSetupImpl: ProfileSetup {
         }
     }
     
-    func makeProfile(image: Data, nickName: String) -> Single<Void> {
+    func makeProfile(image: Data, nickName: String) -> Single<ProfileInfo> {
         return Single.deferred {
             self.repository.makeProfile(image: image, nickNmae: nickName)
+                .map { $0.toDomain() }
         }
     }
 }

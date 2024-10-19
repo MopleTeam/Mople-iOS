@@ -12,9 +12,4 @@ struct ProfileInfo {
     var imagePath: String?
 }
 
-struct Profile {
-    var name: String?
-    var image: UIImage?
-}
-
 
