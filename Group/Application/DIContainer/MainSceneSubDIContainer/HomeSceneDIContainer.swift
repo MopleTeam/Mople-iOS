@@ -9,10 +9,10 @@ import UIKit
 
 final class HomeSceneDIContainer: HomeCoordinatorDependencies {
     
-    let apiDataTransferService: DataTransferService
+    let appNetworkService: AppNetWorkService
 
-    init(apiDataTransferService: DataTransferService) {
-        self.apiDataTransferService = apiDataTransferService
+    init(appNetworkService: AppNetWorkService) {
+        self.appNetworkService = appNetworkService
     }
     
     func makeHomeFlowCoordinator(navigationController: UINavigationController) -> HomeCoordinator {
@@ -26,7 +26,7 @@ final class HomeSceneDIContainer: HomeCoordinatorDependencies {
     }
     
     private func makeHomeViewReactor(_ action: HomeViewAction) -> ScheduleViewReactor {
-        return ScheduleViewReactor(fetchUseCase: FetchRecentScheduleMock(),
-                                   logOutAction: action)
+        return ScheduleViewReactor(fetchRecentSchedule: FetchRecentScheduleMock(),
+                                   viewAction: action)
     }
 }

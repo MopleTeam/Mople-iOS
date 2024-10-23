@@ -13,6 +13,7 @@ import ReactorKit
 import AuthenticationServices
 
 final class LoginViewController: UIViewController, View {
+    
     typealias Reactor = LoginViewReacotr
     
     // MARK: - Variables
@@ -112,6 +113,12 @@ final class LoginViewController: UIViewController, View {
                 print("로그인 에러 발생 : \(message)")
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
     }
 }
 

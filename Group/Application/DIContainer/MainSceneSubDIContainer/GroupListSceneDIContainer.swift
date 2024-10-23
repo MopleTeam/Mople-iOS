@@ -9,10 +9,10 @@ import UIKit
 
 final class GroupListSceneDIContainer: GroupListCoordinatorDependencies {
     
-    let apiDataTransferService: DataTransferService
+    let appNetworkService: AppNetWorkService
 
-    init(apiDataTransferService: DataTransferService) {
-        self.apiDataTransferService = apiDataTransferService
+    init(appNetworkService: AppNetWorkService) {
+        self.appNetworkService = appNetworkService
     }
     
     func makeGroupListFlowCoordinator(navigationController: UINavigationController) -> GroupListCoordinator {

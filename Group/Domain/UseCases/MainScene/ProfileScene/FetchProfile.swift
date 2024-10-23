@@ -8,9 +8,7 @@
 import Foundation
 import RxSwift
 
-protocol EditProfile {
-    
+protocol FetchProfile {
     func fetchProfile() -> Single<ProfileInfo>
-    func logoutAccount() -> Single<Void>
-    func deleteAccount() -> Single<Void>
 }
+

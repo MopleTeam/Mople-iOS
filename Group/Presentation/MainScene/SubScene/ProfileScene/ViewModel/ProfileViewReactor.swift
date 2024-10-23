@@ -8,8 +8,12 @@
 import UIKit
 import ReactorKit
 
-struct accountAction {
+struct ProfileViewAction {
     var presentEditView: (ProfileUpdateModel) -> Void
+    var presentNotifyView: () -> Void
+    var presentPolicyView: () -> Void
+    var logout: () -> Void
+    var deleteAccount: () -> Void
 }
 
 final class ProfileViewReactor: Reactor {
@@ -17,8 +21,8 @@ final class ProfileViewReactor: Reactor {
     enum Action {
         case fetchProfile
         case editProfile(updatedModel: ProfileUpdateModel)
-        case notifyManagement
-        case personalInfo
+        case presentNotifyView
+        case presentPolicyView
         case logout
         case deleteAccount
     }
@@ -33,13 +37,13 @@ final class ProfileViewReactor: Reactor {
     
     var initialState = State()
     
-    var editProfileUseCase: EditProfile
-    var accountAction: accountAction
+    var fetchProfileImpl: FetchProfile
+    var viewAction: ProfileViewAction
     
-    init(editProfileUseCase: EditProfile,
-         accountAction: accountAction) {
-        self.editProfileUseCase = editProfileUseCase
-        self.accountAction = accountAction
+    init(editProfileUseCase: FetchProfile,
+         viewAction: ProfileViewAction) {
+        self.fetchProfileImpl = editProfileUseCase
+        self.viewAction = viewAction
         action.onNext(.fetchProfile)
     }
     
@@ -49,12 +53,12 @@ final class ProfileViewReactor: Reactor {
             return self.getProfile()
         case .editProfile(let updateModel):
             return presentEditView(updatedModel: updateModel)
-        case .notifyManagement:
+        case .presentNotifyView:
             return Observable.empty()
-        case .personalInfo:
+        case .presentPolicyView:
             return Observable.empty()
         case .logout:
-            return Observable.empty()
+            return self.logout()
         case .deleteAccount:
             return Observable.empty()
         }
@@ -75,14 +79,22 @@ final class ProfileViewReactor: Reactor {
 
 extension ProfileViewReactor {
     private func getProfile() -> Observable<Mutation> {
-        return editProfileUseCase.fetchProfile()
+        return fetchProfileImpl.fetchProfile()
             .asObservable()
             .map { Mutation.loadedProfile(profile: $0) }
     }
     
     private func presentEditView(updatedModel: ProfileUpdateModel) -> Observable<Mutation> {
-        accountAction.presentEditView(updatedModel)
+        viewAction.presentEditView(updatedModel)
         
+        return Observable.empty()
+    }
+    
+    
+    /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
+    private func logout() -> Observable<Mutation> {
+        KeyChainServiceImpl.shared.deleteToken()
+        viewAction.logout()
         return Observable.empty()
     }
 }

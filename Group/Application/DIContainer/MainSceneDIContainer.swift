@@ -14,16 +14,10 @@ protocol TabBarCoordinaotorDependencies {
 
 final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
     
-    let apiDataTransferService: DataTransferService
-    let tokenKeyChainService: KeyChainService
+    let appNetworkService: AppNetWorkService
     
-    private lazy var groupRepository: GroupRepository = .init(dataTransferService: apiDataTransferService,
-                                                              tokenKeyCahinService: tokenKeyChainService)
-    
-    init(apiDataTransferService: DataTransferService,
-         tokenKeyChainService: KeyChainService) {
-        self.apiDataTransferService = apiDataTransferService
-        self.tokenKeyChainService = tokenKeyChainService
+    init(appNetworkService: AppNetWorkService) {
+        self.appNetworkService = appNetworkService
     }
     
     func makeMainFlowCoordinator(navigationController: UINavigationController) -> TabBarCoordinator {
@@ -49,7 +43,7 @@ extension MainSceneDIContainer {
 extension MainSceneDIContainer {
     // MARK: - 홈
     private func makeHomeCoordinator() -> BaseCoordinator {
-        let homeDI = HomeSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        let homeDI = HomeSceneDIContainer(appNetworkService: appNetworkService)
         let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "홈",
                                                 image: .home,
@@ -60,7 +54,7 @@ extension MainSceneDIContainer {
     
     // MARK: - 모임 리스트
     private func makeGroupListCoordinator() -> BaseCoordinator {
-        let groupDI = GroupListSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        let groupDI = GroupListSceneDIContainer(appNetworkService: appNetworkService)
         
         let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "모임",
@@ -72,7 +66,7 @@ extension MainSceneDIContainer {
     
     // MARK: - 캘린더
     private func makeCalendarCoordinator() -> BaseCoordinator {
-        let calendarDI = CalendarSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        let calendarDI = CalendarSceneDIContainer(appNetworkService: appNetworkService)
         
         let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "일정관리",
@@ -84,7 +78,7 @@ extension MainSceneDIContainer {
     
     // MARK: - 프로필
     private func makeProfileCoordinator() -> BaseCoordinator {
-        let profileDI = ProfileSceneDIContainer(apiDataTransferService: apiDataTransferService)
+        let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService)
         
         let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "프로필",

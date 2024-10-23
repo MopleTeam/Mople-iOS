@@ -8,15 +8,11 @@
 import Foundation
 import Security
 
-protocol KeyChainService {
-    func saveToken(_ token: Data)
-    func getToken() -> TokenDTO?
-    func deleteToken()
-    func hasToken() -> Bool
-    func reissueToken(accessToken: String)
-}
-
-final class KeyChainServiceImpl: KeyChainService {
+final class KeyChainServiceImpl {
+    
+    static let shared = KeyChainServiceImpl()
+    
+    private init() {}
     
     private(set) static var cachedToken: TokenDTO?
     
@@ -84,7 +80,6 @@ final class KeyChainServiceImpl: KeyChainService {
         ]
 
         let status = SecItemDelete(query as CFDictionary)
-
         if status == errSecSuccess {
             print("Tokens deleted successfully")
         } else {

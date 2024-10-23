@@ -54,7 +54,7 @@ extension APIEndpoints {
 // MARK: - Profile
 extension APIEndpoints {
 
-    static func setupProfile(image: Data, nickName: String) throws -> Endpoint<ProfileResponseDTO> {
+    static func setupProfile(image: Data, nickName: String) throws -> Endpoint<Void> {
         let token = try getAccessTokenParameters()
         
         return Endpoint(path: "user/me",

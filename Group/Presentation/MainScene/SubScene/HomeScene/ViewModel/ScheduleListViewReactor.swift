@@ -28,15 +28,15 @@ final class ScheduleViewReactor: Reactor {
         @Pulse var schedules: [Schedule] = []
     }
     
-    private let fetchUseCase: FetchRecentSchedule
+    private let fetchRecentScheduleImpl: FetchRecentSchedule
     private let homeViewAction: HomeViewAction
     
     var initialState: State = State()
     
-    init(fetchUseCase: FetchRecentSchedule,
-         logOutAction: HomeViewAction) {
-        self.fetchUseCase = fetchUseCase
-        self.homeViewAction = logOutAction
+    init(fetchRecentSchedule: FetchRecentSchedule,
+         viewAction: HomeViewAction) {
+        self.fetchRecentScheduleImpl = fetchRecentSchedule
+        self.homeViewAction = viewAction
         action.onNext(.fetchRecentSchedule)
     }
     
@@ -78,7 +78,7 @@ final class ScheduleViewReactor: Reactor {
 extension ScheduleViewReactor {
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
-        let fetchSchedules = fetchUseCase.fetchRecentSchedule()
+        let fetchSchedules = fetchRecentScheduleImpl.fetchRecentSchedule()
             .asObservable()
             .map { Mutation.fetchRecentScehdule(schedules: $0) }
         

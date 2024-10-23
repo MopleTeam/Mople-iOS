@@ -9,10 +9,10 @@ import UIKit
 
 final class CalendarSceneDIContainer: CalendarCoordinatorDependencies {
    
-    let apiDataTransferService: DataTransferService
+    let appNetworkService: AppNetWorkService
 
-    init(apiDataTransferService: DataTransferService) {
-        self.apiDataTransferService = apiDataTransferService
+    init(appNetworkService: AppNetWorkService) {
+        self.appNetworkService = appNetworkService
     }
     
     func makeCalendarFlowCoordinator(navigationController: UINavigationController) -> CalendarCoordinator {

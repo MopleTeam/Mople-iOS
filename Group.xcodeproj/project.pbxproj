@@ -23,8 +23,7 @@
 		5208C1832CBEBAEF006272E8 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1822CBEBAEF006272E8 /* Token.swift */; };
 		5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */; };
 		5208C1872CBF7DED006272E8 /* DotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1862CBF7DED006272E8 /* DotView.swift */; };
-		5211E8BC2C7C4DAF00EAB613 /* ProfileSetupRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BB2C7C4DAF00EAB613 /* ProfileSetupRepository.swift */; };
-		5211E8BE2C7C515500EAB613 /* ProfileSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */; };
+		5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */; };
 		5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* MainTabBarController.swift */; };
 		5211F9002C86B37B00403980 /* HomeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FF2C86B37B00403980 /* HomeButton.swift */; };
 		5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */; };
@@ -38,11 +37,10 @@
 		52266BF02CBCE86E007D03EB /* RouteType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BEF2CBCE86E007D03EB /* RouteType.swift */; };
 		52266BF22CBCF605007D03EB /* BaseProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF12CBCF604007D03EB /* BaseProfileViewController.swift */; };
 		52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */; };
-		52266BFA2CBD474D007D03EB /* EditProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* EditProfile.swift */; };
-		52266BFC2CBD482F007D03EB /* EditProfileMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* EditProfileMock.swift */; };
+		52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* FetchProfile.swift */; };
+		52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */; };
 		5228A27F2CC10D22004956F7 /* OverlapCheckLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */; };
 		523645292C8E522A009E0784 /* IconLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645282C8E522A009E0784 /* IconLabelView.swift */; };
-		5236452B2C8EC5AD009E0784 /* NavigationBarExtendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452A2C8EC5AD009E0784 /* NavigationBarExtendable.swift */; };
 		5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* BaseViewController.swift */; };
 		523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* BaseEmptyView.swift */; };
 		523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroup.swift */; };
@@ -68,10 +66,12 @@
 		5259B01D2CA038AA006B2711 /* ScheduleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B01C2CA038AA006B2711 /* ScheduleTableViewCell.swift */; };
 		5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */; };
 		525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 525AA90B2C915C6D0087913F /* FSCalendar */; };
+		525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCEA2CC8D47B00835312 /* DefaultLoginRepository.swift */; };
+		525DFCED2CC8E95500835312 /* DefaultProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCEC2CC8E95500835312 /* DefaultProfileRepository.swift */; };
+		525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */; };
 		526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */; };
-		527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E672C82C905007FE63B /* ProfileSetupMock.swift */; };
 		527A3E6A2C82C965007FE63B /* TokenDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E692C82C965007FE63B /* TokenDTO.swift */; };
 		527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */; };
 		527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */; };
@@ -80,7 +80,6 @@
 		527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7A2C834BAD007FE63B /* GroupListCoordinator.swift */; };
 		527A3E7D2C834BC1007FE63B /* CalendarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7C2C834BC1007FE63B /* CalendarCoordinator.swift */; };
 		527A3E7F2C834BEE007FE63B /* ProfileCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7E2C834BEE007FE63B /* ProfileCoordinator.swift */; };
-		527A3E892C834E10007FE63B /* KeyChainServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E882C834E10007FE63B /* KeyChainServiceMock.swift */; };
 		527A3E8B2C83610F007FE63B /* HomeSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E8A2C83610F007FE63B /* HomeSceneDIContainer.swift */; };
 		527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E8E2C836192007FE63B /* HomeViewController.swift */; };
 		527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E962C83627C007FE63B /* GroupListViewController.swift */; };
@@ -142,7 +141,7 @@
 		52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */; };
 		52E2383F2C76E8C00066C9A3 /* LoginCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2383E2C76E8C00066C9A3 /* LoginCoordinator.swift */; };
 		52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */; };
-		52E238482C7733320066C9A3 /* GroupRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238472C7733320066C9A3 /* GroupRepository.swift */; };
+		52E238482C7733320066C9A3 /* AppNetWorkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238472C7733320066C9A3 /* AppNetWorkService.swift */; };
 		52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */; };
 		52E8E4522CA44D4E007A5447 /* DateComponents+Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */; };
 		52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */; };
@@ -167,8 +166,7 @@
 		5208C1822CBEBAEF006272E8 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResponseDTO.swift; sourceTree = "<group>"; };
 		5208C1862CBF7DED006272E8 /* DotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotView.swift; sourceTree = "<group>"; };
-		5211E8BB2C7C4DAF00EAB613 /* ProfileSetupRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupRepository.swift; sourceTree = "<group>"; };
-		5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetup.swift; sourceTree = "<group>"; };
+		5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepository.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		5211F8FF2C86B37B00403980 /* HomeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButton.swift; sourceTree = "<group>"; };
 		5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListCollectionViewController.swift; sourceTree = "<group>"; };
@@ -181,11 +179,10 @@
 		52266BEF2CBCE86E007D03EB /* RouteType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteType.swift; sourceTree = "<group>"; };
 		52266BF12CBCF604007D03EB /* BaseProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseProfileViewController.swift; sourceTree = "<group>"; };
 		52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewReactor.swift; sourceTree = "<group>"; };
-		52266BF92CBD474D007D03EB /* EditProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfile.swift; sourceTree = "<group>"; };
-		52266BFB2CBD482F007D03EB /* EditProfileMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileMock.swift; sourceTree = "<group>"; };
+		52266BF92CBD474D007D03EB /* FetchProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchProfile.swift; sourceTree = "<group>"; };
+		52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchProfileMock.swift; sourceTree = "<group>"; };
 		5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapCheckLabel.swift; sourceTree = "<group>"; };
 		523645282C8E522A009E0784 /* IconLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabelView.swift; sourceTree = "<group>"; };
-		5236452A2C8EC5AD009E0784 /* NavigationBarExtendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarExtendable.swift; sourceTree = "<group>"; };
 		5236452C2C8EDCEF009E0784 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* BaseEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseEmptyView.swift; sourceTree = "<group>"; };
 		523645322C8FFDEB009E0784 /* FetchGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroup.swift; sourceTree = "<group>"; };
@@ -209,10 +206,12 @@
 		5259B0172CA028C2006B2711 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
 		5259B01C2CA038AA006B2711 /* ScheduleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewCell.swift; sourceTree = "<group>"; };
 		5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewReactor.swift; sourceTree = "<group>"; };
+		525DFCEA2CC8D47B00835312 /* DefaultLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultLoginRepository.swift; sourceTree = "<group>"; };
+		525DFCEC2CC8E95500835312 /* DefaultProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultProfileRepository.swift; sourceTree = "<group>"; };
+		525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepositoryMock.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEvent.swift; sourceTree = "<group>"; };
 		526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Ext.swift"; sourceTree = "<group>"; };
-		527A3E672C82C905007FE63B /* ProfileSetupMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupMock.swift; sourceTree = "<group>"; };
 		527A3E692C82C965007FE63B /* TokenDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenDTO.swift; sourceTree = "<group>"; };
 		527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLoginUseCaseMock.swift; sourceTree = "<group>"; };
 		527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentSchedule.swift; sourceTree = "<group>"; };
@@ -221,7 +220,6 @@
 		527A3E7A2C834BAD007FE63B /* GroupListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListCoordinator.swift; sourceTree = "<group>"; };
 		527A3E7C2C834BC1007FE63B /* CalendarCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCoordinator.swift; sourceTree = "<group>"; };
 		527A3E7E2C834BEE007FE63B /* ProfileCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCoordinator.swift; sourceTree = "<group>"; };
-		527A3E882C834E10007FE63B /* KeyChainServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainServiceMock.swift; sourceTree = "<group>"; };
 		527A3E8A2C83610F007FE63B /* HomeSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3E8E2C836192007FE63B /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		527A3E962C83627C007FE63B /* GroupListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListViewController.swift; sourceTree = "<group>"; };
@@ -279,7 +277,7 @@
 		52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCoordinator.swift; sourceTree = "<group>"; };
 		52E2383E2C76E8C00066C9A3 /* LoginCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginCoordinator.swift; sourceTree = "<group>"; };
 		52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
-		52E238472C7733320066C9A3 /* GroupRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupRepository.swift; sourceTree = "<group>"; };
+		52E238472C7733320066C9A3 /* AppNetWorkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNetWorkService.swift; sourceTree = "<group>"; };
 		52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObservableType+Pairwise.swift"; sourceTree = "<group>"; };
 		52E8E4512CA44D4E007A5447 /* DateComponents+Comparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+Comparable.swift"; sourceTree = "<group>"; };
 		52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleView.swift; sourceTree = "<group>"; };
@@ -525,6 +523,73 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
+		525DFCE92CC624C100835312 /* SubView */ = {
+			isa = PBXGroup;
+			children = (
+				5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */,
+			);
+			path = SubView;
+			sourceTree = "<group>";
+		};
+		525DFCEE2CC8F01A00835312 /* LoginScene */ = {
+			isa = PBXGroup;
+			children = (
+				52E238312C74BFB00066C9A3 /* UserLogin.swift */,
+			);
+			path = LoginScene;
+			sourceTree = "<group>";
+		};
+		525DFCF22CC8F53400835312 /* RepositoryMock */ = {
+			isa = PBXGroup;
+			children = (
+				525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */,
+			);
+			path = RepositoryMock;
+			sourceTree = "<group>";
+		};
+		525DFCF52CC8FB1100835312 /* MainScene */ = {
+			isa = PBXGroup;
+			children = (
+				525DFCF62CC8FB2300835312 /* InfoScene */,
+				525DFCF72CC8FB2500835312 /* GroupListScene */,
+				525DFCF82CC8FB2700835312 /* CalendarScene */,
+				525DFCF92CC8FB2800835312 /* ProfileScene */,
+			);
+			path = MainScene;
+			sourceTree = "<group>";
+		};
+		525DFCF62CC8FB2300835312 /* InfoScene */ = {
+			isa = PBXGroup;
+			children = (
+				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
+			);
+			path = InfoScene;
+			sourceTree = "<group>";
+		};
+		525DFCF72CC8FB2500835312 /* GroupListScene */ = {
+			isa = PBXGroup;
+			children = (
+				523645322C8FFDEB009E0784 /* FetchGroup.swift */,
+			);
+			path = GroupListScene;
+			sourceTree = "<group>";
+		};
+		525DFCF82CC8FB2700835312 /* CalendarScene */ = {
+			isa = PBXGroup;
+			children = (
+				5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */,
+			);
+			path = CalendarScene;
+			sourceTree = "<group>";
+		};
+		525DFCF92CC8FB2800835312 /* ProfileScene */ = {
+			isa = PBXGroup;
+			children = (
+				52266BF92CBD474D007D03EB /* FetchProfile.swift */,
+			);
+			path = ProfileScene;
+			sourceTree = "<group>";
+		};
 		526F45022C96001A00C347C7 /* UIView */ = {
 			isa = PBXGroup;
 			children = (
@@ -546,12 +611,11 @@
 		527A3E662C82C8E5007FE63B /* UseCaseMock */ = {
 			isa = PBXGroup;
 			children = (
-				527A3E672C82C905007FE63B /* ProfileSetupMock.swift */,
 				527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */,
 				523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */,
 				5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */,
 				523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */,
-				52266BFB2CBD482F007D03EB /* EditProfileMock.swift */,
+				52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */,
 			);
 			path = UseCaseMock;
 			sourceTree = "<group>";
@@ -600,6 +664,7 @@
 				527A3E852C834C22007FE63B /* Flow */,
 				527A3E942C836236007FE63B /* ViewModel */,
 				527A3E952C836236007FE63B /* View */,
+				525DFCE92CC624C100835312 /* SubView */,
 			);
 			path = ProfileScene;
 			sourceTree = "<group>";
@@ -631,17 +696,8 @@
 		527A3E862C834DEF007FE63B /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				527A3E872C834DF8007FE63B /* PersistentStorages */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		527A3E872C834DF8007FE63B /* PersistentStorages */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E882C834E10007FE63B /* KeyChainServiceMock.swift */,
-			);
-			path = PersistentStorages;
 			sourceTree = "<group>";
 		};
 		527A3E8C2C83617F007FE63B /* View */ = {
@@ -706,7 +762,6 @@
 			isa = PBXGroup;
 			children = (
 				527A3E9A2C836290007FE63B /* ProfileViewController.swift */,
-				5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -734,6 +789,7 @@
 		528D27C32C79F67400178F14 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				52E238472C7733320066C9A3 /* AppNetWorkService.swift */,
 				52CB0B482C732186002B6D20 /* DataTransferService.swift */,
 				52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */,
 				52CB0B462C7308A8002B6D20 /* Endpoint.swift */,
@@ -781,7 +837,6 @@
 			isa = PBXGroup;
 			children = (
 				526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */,
-				5236452A2C8EC5AD009E0784 /* NavigationBarExtendable.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -806,7 +861,7 @@
 			isa = PBXGroup;
 			children = (
 				52B6F63A2C77655200DA2D75 /* LoginRepository.swift */,
-				5211E8BB2C7C4DAF00EAB613 /* ProfileSetupRepository.swift */,
+				5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -887,9 +942,9 @@
 				52C72E972C4FBD6500CFF329 /* Info.plist */,
 				52CB0B382C72A564002B6D20 /* Application */,
 				52E238272C7455C80066C9A3 /* Presentation */,
-				52CB0B432C7307D0002B6D20 /* Infrastructure */,
 				52CB0B3E2C72AAA9002B6D20 /* Data */,
 				52E238222C7453EC0066C9A3 /* Domain */,
+				52CB0B432C7307D0002B6D20 /* Infrastructure */,
 				52E238262C7454FD0066C9A3 /* Utils */,
 				52CB0B3C2C72AA1F002B6D20 /* CommonUI */,
 				52CB0B392C72A8E3002B6D20 /* Resources */,
@@ -924,6 +979,7 @@
 		52CB0B3A2C72A961002B6D20 /* Test */ = {
 			isa = PBXGroup;
 			children = (
+				525DFCF22CC8F53400835312 /* RepositoryMock */,
 				5211F8F42C84233A00403980 /* Zone */,
 				527A3E862C834DEF007FE63B /* Data */,
 				527A3E662C82C8E5007FE63B /* UseCaseMock */,
@@ -1041,12 +1097,8 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
-				52E238312C74BFB00066C9A3 /* UserLogin.swift */,
-				5211E8BD2C7C515500EAB613 /* ProfileSetup.swift */,
-				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
-				523645322C8FFDEB009E0784 /* FetchGroup.swift */,
-				5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */,
-				52266BF92CBD474D007D03EB /* EditProfile.swift */,
+				525DFCEE2CC8F01A00835312 /* LoginScene */,
+				525DFCF52CC8FB1100835312 /* MainScene */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -1099,7 +1151,8 @@
 		52E238462C772EFA0066C9A3 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				52E238472C7733320066C9A3 /* GroupRepository.swift */,
+				525DFCEA2CC8D47B00835312 /* DefaultLoginRepository.swift */,
+				525DFCEC2CC8E95500835312 /* DefaultProfileRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -1234,7 +1287,6 @@
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
-				527A3E682C82C905007FE63B /* ProfileSetupMock.swift in Sources */,
 				5208C17D2CBEAC60006272E8 /* PresentTransition.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
 				529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */,
@@ -1252,11 +1304,10 @@
 				5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */,
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
 				527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */,
-				5236452B2C8EC5AD009E0784 /* NavigationBarExtendable.swift in Sources */,
 				523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */,
 				52E238372C76530D0066C9A3 /* LoginViewReacotr.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileCoordinator.swift in Sources */,
-				52E238482C7733320066C9A3 /* GroupRepository.swift in Sources */,
+				52E238482C7733320066C9A3 /* AppNetWorkService.swift in Sources */,
 				5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */,
 				52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */,
 				52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */,
@@ -1266,7 +1317,7 @@
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */,
 				52C6521E2CA705BB0041E78C /* EmptyScheduleCell.swift in Sources */,
-				52266BFC2CBD482F007D03EB /* EditProfileMock.swift in Sources */,
+				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
 				52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
@@ -1274,7 +1325,6 @@
 				523645292C8E522A009E0784 /* IconLabelView.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
-				527A3E892C834E10007FE63B /* KeyChainServiceMock.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
@@ -1285,13 +1335,15 @@
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
+				525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
-				5211E8BC2C7C4DAF00EAB613 /* ProfileSetupRepository.swift in Sources */,
+				5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */,
 				5208C1832CBEBAEF006272E8 /* Token.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */,
 				527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* CustomNavigationBar.swift in Sources */,
 				5208C1812CBEACF5006272E8 /* MainNavigationController.swift in Sources */,
+				525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */,
 				5208C1712CBD59D4006272E8 /* IconLabelButton.swift in Sources */,
@@ -1303,12 +1355,13 @@
 				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
 				527A3E9F2C83642C007FE63B /* CalendarSceneDIContainer.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
+				525DFCED2CC8E95500835312 /* DefaultProfileRepository.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */,
 				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
 				527A3E6A2C82C965007FE63B /* TokenDTO.swift in Sources */,
 				5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
-				52266BFA2CBD474D007D03EB /* EditProfile.swift in Sources */,
+				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
 				5211F9052C86E71500403980 /* ScheduleListViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
@@ -1342,7 +1395,6 @@
 				52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */,
 				527A3E792C834A12007FE63B /* TabBarCoordinator.swift in Sources */,
 				5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */,
-				5211E8BE2C7C515500EAB613 /* ProfileSetup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

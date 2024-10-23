@@ -77,14 +77,14 @@ final class ProfileSetupViewReactor: Reactor {
         @Pulse var setupCompleted: Void?
     }
     
-    private let profileSetupUseCase: ProfileSetup
+    private let profileRepository: ProfileRepository
     private var completedAction: ProfileSetupAction
     
     var initialState: State = State()
     
-    init(profileSetupUseCase: ProfileSetup,
+    init(profileRepository: ProfileRepository,
          completedAction: ProfileSetupAction) {
-        self.profileSetupUseCase = profileSetupUseCase
+        self.profileRepository = profileRepository
         self.completedAction = completedAction
     }
     
@@ -181,9 +181,11 @@ extension ProfileSetupViewReactor {
     private func getRandomNickname() -> Observable<Mutation> {
         let loadStart = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let randomName = profileSetupUseCase.getRandomNickname()
+        let randomName = profileRepository.getRandomNickname()
+            .map({ String(data: $0, encoding: .utf8) })
             .asObservable()
             .map { Mutation.getRandomNickname(name: $0) }
+            .catch { Observable.just(Mutation.catchError(err: $0)) }
         
         let loadEnd = Observable.just(Mutation.setLoading(isLoad: false))
             
@@ -197,7 +199,7 @@ extension ProfileSetupViewReactor {
         let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
                 
         #warning("서버에서 중복 결과를 true, false 뭘로 주는지 물어보기, 현재는 true")
-        let nameOverlap = profileSetupUseCase.checkNickName(name: name)
+        let nameOverlap = profileRepository.checkNickname(name: name)
             .asObservable()
             .map { Mutation.nameCheck(isOverlap: $0)}
             .catch { Observable.just(Mutation.catchError(err: $0)) }
@@ -217,7 +219,7 @@ extension ProfileSetupViewReactor {
         
         let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
         
-        let makeProfile = profileSetupUseCase.makeProfile(image: image, nickName: nickname)
+        let makeProfile = profileRepository.makeProfile(image: image, nickname: nickname)
             .asObservable()
             .map({ _ in Mutation.madeProfile })
             .catch { Observable.just(Mutation.catchError(err: $0)) }

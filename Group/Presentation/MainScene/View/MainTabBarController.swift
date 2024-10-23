@@ -27,10 +27,17 @@ final class MainTabBarController: UITabBarController {
     }
     
     private func updateTabBarFrame() {
+        guard UIScreen.isNotch() else { return }
         let newHeight: CGFloat = tabBar.frame.height + 10
         var tabFrame = tabBar.frame
         tabFrame.size.height = newHeight
         tabBar.frame = tabFrame
+    }
+}
+
+fileprivate extension UIScreen {
+    static func isNotch() -> Bool {
+        return (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0) > 0
     }
 }
 

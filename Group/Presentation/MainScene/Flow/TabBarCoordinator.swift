@@ -7,16 +7,12 @@
 
 import UIKit
 
-protocol SignOut {
-    func singOut()
+protocol AccountAction {
+    func signOut()
 }
 
-protocol KeepTabBarNavigation {
+protocol PresentAction {
     func pushCalendarView(lastRecentDate: Date?)
-}
-
-protocol HideTabBarNavigation {
-    
 }
 
 final class TabBarCoordinator: BaseCoordinator {
@@ -44,14 +40,33 @@ final class TabBarCoordinator: BaseCoordinator {
 }
 
 // MARK: - 로그아웃 -> 로그인 뷰로 돌아가기
-extension TabBarCoordinator: SignOut {
+extension TabBarCoordinator: AccountAction {
     
-    func singOut() {
+    /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
+    func signOut() {
         fadeOut { [weak self] in
             self?.clearScene()
         }
     }
+}
+
+extension TabBarCoordinator: PresentAction {
+    /// 캘린더 뷰로 이동하기
+    /// - Parameter lastRecentDate: 이동시 표시할 데이트
+    func pushCalendarView(lastRecentDate: Date? = nil) {
+        guard let index = getNaviIndexFromTabBar(destination: .calendar),
+              let destinationNavi = getDestinationFormNavi(index: index),
+              let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
+        
+        calendarVC.presentEvent(on: lastRecentDate)
+        tabBarController!.selectedIndex = index
+    }
+}
+
+// MARK: - Helper
+extension TabBarCoordinator {
     
+    /// 로그아웃, 회원탈퇴 시 자식 뷰 지우기
     private func clearScene() {
         self.childCoordinators.forEach {
             $0.navigationController.viewControllers = []
@@ -65,34 +80,6 @@ extension TabBarCoordinator: SignOut {
         self.parentCoordinator?.didFinish(coordinator: self)
         (self.parentCoordinator as? SignOutListener)?.signOut()
     }
-}
-
-
-
-// MARK: - 탭바 유지한 상태로 Push
-extension TabBarCoordinator: KeepTabBarNavigation {
-    
-    /// 캘린더 뷰로 이동하기
-    /// - Parameter lastRecentDate: 이동시 표시할 데이트
-    func pushCalendarView(lastRecentDate: Date? = nil) {
-        guard let index = getNaviIndexFromTabBar(destination: .calendar),
-              let destinationNavi = getDestinationFormNavi(index: index),
-              let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
-        
-        calendarVC.presentEvent(on: lastRecentDate)
-        tabBarController!.selectedIndex = index
-    }
-}
-
-// MARK: - 탭바를 사용하지 않는 상태로 Push
-extension TabBarCoordinator: HideTabBarNavigation {
-    func pushEditProfileView() {
-        
-    }
-}
-
-// MARK: - Helper
-extension TabBarCoordinator {
     
     #warning("메타타입 비교하기, Claude 타입과 메타타입 참고")
     /// 이동하려고 하는 뷰의 Navi Index 찾기
@@ -111,4 +98,5 @@ extension TabBarCoordinator {
         return destinationNavi.viewControllers.first
     }
 }
+
 

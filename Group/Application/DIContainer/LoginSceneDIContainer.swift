@@ -9,19 +9,12 @@ import UIKit
 
 final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
     
-    let apiDataTransferService: DataTransferService
-    let appleLoginService: AppleLoginService
-    let tokenKeyChainService: KeyChainService
+    let appleLoginService = DefaultAppleLoginService()
     
-    private lazy var groupRepository: GroupRepository = .init(dataTransferService: apiDataTransferService,
-                                                              tokenKeyCahinService: tokenKeyChainService)
+    let appNetworkService: AppNetWorkService
     
-    init(apiDataTransferService: DataTransferService,
-         appleLoginService: AppleLoginService,
-         tokenKeyChainService: KeyChainService) {
-        self.apiDataTransferService = apiDataTransferService
-        self.appleLoginService = appleLoginService
-        self.tokenKeyChainService = tokenKeyChainService
+    init(appNetworkService: AppNetWorkService) {
+        self.appNetworkService = appNetworkService
     }
     
     func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
@@ -31,7 +24,7 @@ final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
     }
 }
 
-// MARK: - Apple Login
+// MARK: - Login
 extension LoginSceneDIContainer {
     
     func makeLoginViewController(action: LoginAction) -> LoginViewController {
@@ -47,9 +40,13 @@ extension LoginSceneDIContainer {
                                 loginAction: action)
     }
     
-    private func makeLoginUseCase() -> UserLogin {
+    private func makeUserLoginImpl() -> UserLogin {
         return UserLoginImpl(appleLoginService: appleLoginService,
-                                   userRepository: groupRepository)
+                                   userRepository: makeLoginRepository())
+    }
+    
+    private func makeLoginRepository() -> LoginRepository {
+        return DefaultLoginRepository(networkService: appNetworkService)
     }
     
     private func setAppleLoginProvider(_ view: UIViewController) {
@@ -63,13 +60,14 @@ extension LoginSceneDIContainer {
         return ProfileSetupViewController(reactor: makeProfileSetupReactor(action))
     }
     
-    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileSetupViewReactor {
-        return ProfileSetupViewReactor(profileSetupUseCase: ProfileSetupMock(),
-                                       completedAction: action
-        )
-    }
     
-    private func makeProfileSetup() -> ProfileSetup {
-        return ProfileSetupImpl(repository: groupRepository)
+    /// Profile Setup 과정에서는 추가로 필요한 비즈니스 로직이 없음으로 ViewModel이 Repository를 직접 사용
+    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileSetupViewReactor {
+        return ProfileSetupViewReactor(profileRepository: ProfileRepositoryMock(),
+                                       completedAction: action)
+    }
+
+    private func makeProfileRepository() -> ProfileRepository {
+        return DefaultProfileRepository(networkService: appNetworkService)
     }
 }

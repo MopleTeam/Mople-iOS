@@ -56,9 +56,11 @@ final class ProfileViewController: BaseViewController, View {
         return label
     }()
     
-    private let logoutLabel = BaseLabel(configure: AppDesign.ProfileManagement.logout)
+    private let logoutLabel = IconLabelButton(configure: AppDesign.ProfileManagement.logout,
+                                              labelAligment: .fill)
     
-    private let resignLabel = BaseLabel(configure: AppDesign.ProfileManagement.resign)
+    private let resignLabel = IconLabelButton(configure: AppDesign.ProfileManagement.resign,
+                                         labelAligment: .fill)
     
     private lazy var profileStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageContainer, profileNameButton])
@@ -161,6 +163,11 @@ final class ProfileViewController: BaseViewController, View {
     func bind(reactor: Reactor) {
         fetchObserver
             .map { _ in Reactor.Action.fetchProfile }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        logoutLabel.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.logout }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

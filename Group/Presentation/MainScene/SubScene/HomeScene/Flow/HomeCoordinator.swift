@@ -31,10 +31,10 @@ final class HomeCoordinator: BaseCoordinator {
     }
     
     private func logOut() {
-        (self.parentCoordinator as? SignOut)?.singOut()
+        (self.parentCoordinator as? AccountAction)?.signOut()
     }
     
     private func presentNextEvent(lastRecentDate: Date) {
-        (self.parentCoordinator as? KeepTabBarNavigation)?.pushCalendarView(lastRecentDate: lastRecentDate)
+        (self.parentCoordinator as? PresentAction)?.pushCalendarView(lastRecentDate: lastRecentDate)
     }
 }

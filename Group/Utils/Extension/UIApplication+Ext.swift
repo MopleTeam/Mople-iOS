@@ -16,6 +16,7 @@ extension UIApplication {
     }
 }
 
+#warning("현재 표시되는 뷰 컨트롤러 찾기")
 extension UIApplication {
     var topViewController: UIViewController? {
         return topViewController()

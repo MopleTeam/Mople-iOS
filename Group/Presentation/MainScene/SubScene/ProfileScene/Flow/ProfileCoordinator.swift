@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ProfileCoordinatorDependencies {
-    func makeProfileViewController(action: accountAction) -> ProfileViewController
+    func makeProfileViewController(action: ProfileViewAction) -> ProfileViewController
     func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController
 }
 
@@ -22,13 +22,21 @@ final class ProfileCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let vc = dependencies.makeProfileViewController(action: accountAction(presentEditView: presentEditView(updateModel:)))
+        let vc = dependencies.makeProfileViewController(action: getAccountAction())
         
         navigationController.pushViewController(vc, animated: false)
     }
 }
 
 extension ProfileCoordinator {
+    private func getAccountAction() -> ProfileViewAction {
+        .init(presentEditView: presentEditView(updateModel:),
+              presentNotifyView: presentNotifyView,
+              presentPolicyView: presentPolicyView,
+              logout: logout,
+              deleteAccount: deleteAccount)
+    }
+    
     private func presentEditView(updateModel: ProfileUpdateModel) {
         guard let customNavi = navigationController as? MainNavigationController else { return }
         let profileSetupView = dependencies.makeProfileEditViewController(updateModel: updateModel)
@@ -36,6 +44,23 @@ extension ProfileCoordinator {
         profileSetupView.transitioningDelegate = customNavi
         customNavi.present(profileSetupView, animated: true, completion: nil)
     }
+    
+    private func presentNotifyView() {
+        
+    }
+    
+    private func presentPolicyView() {
+        
+    }
+    
+    private func logout() {
+        (self.parentCoordinator as? AccountAction)?.signOut()
+    }
+    
+    private func deleteAccount() {
+        
+    }
+    
 }
 
 
