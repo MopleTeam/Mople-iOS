@@ -69,6 +69,11 @@
 		525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCEA2CC8D47B00835312 /* DefaultLoginRepository.swift */; };
 		525DFCED2CC8E95500835312 /* DefaultProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCEC2CC8E95500835312 /* DefaultProfileRepository.swift */; };
 		525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */; };
+		525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCFD2CCA13A900835312 /* PolicyViewController.swift */; };
+		525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCFF2CCA13B000835312 /* NotifyViewController.swift */; };
+		525DFD032CCB640000835312 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD022CCB640000835312 /* KakaoSDKAuth */; };
+		525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD042CCB640000835312 /* KakaoSDKCommon */; };
+		525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD062CCB640000835312 /* KakaoSDKUser */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */; };
 		526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */; };
@@ -209,6 +214,8 @@
 		525DFCEA2CC8D47B00835312 /* DefaultLoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultLoginRepository.swift; sourceTree = "<group>"; };
 		525DFCEC2CC8E95500835312 /* DefaultProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultProfileRepository.swift; sourceTree = "<group>"; };
 		525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepositoryMock.swift; sourceTree = "<group>"; };
+		525DFCFD2CCA13A900835312 /* PolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyViewController.swift; sourceTree = "<group>"; };
+		525DFCFF2CCA13B000835312 /* NotifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyViewController.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEvent.swift; sourceTree = "<group>"; };
 		526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Ext.swift"; sourceTree = "<group>"; };
@@ -294,8 +301,11 @@
 				52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */,
 				5211F91A2C89E39600403980 /* Kingfisher in Frameworks */,
 				529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */,
+				525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */,
 				524A50C92C68735000862AD6 /* MultipartForm in Frameworks */,
 				52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */,
+				525DFD032CCB640000835312 /* KakaoSDKAuth in Frameworks */,
+				525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */,
 				525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */,
 				52E2383A2C765A2D0066C9A3 /* ReactorKit in Frameworks */,
 				529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */,
@@ -526,7 +536,9 @@
 		525DFCE92CC624C100835312 /* SubView */ = {
 			isa = PBXGroup;
 			children = (
-				5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */,
+				525DFCFC2CCA136400835312 /* PolicyView */,
+				525DFCFB2CCA135500835312 /* NotifyView */,
+				525DFCFA2CCA134300835312 /* ProfileEditView */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -588,6 +600,30 @@
 				52266BF92CBD474D007D03EB /* FetchProfile.swift */,
 			);
 			path = ProfileScene;
+			sourceTree = "<group>";
+		};
+		525DFCFA2CCA134300835312 /* ProfileEditView */ = {
+			isa = PBXGroup;
+			children = (
+				5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */,
+			);
+			path = ProfileEditView;
+			sourceTree = "<group>";
+		};
+		525DFCFB2CCA135500835312 /* NotifyView */ = {
+			isa = PBXGroup;
+			children = (
+				525DFCFF2CCA13B000835312 /* NotifyViewController.swift */,
+			);
+			path = NotifyView;
+			sourceTree = "<group>";
+		};
+		525DFCFC2CCA136400835312 /* PolicyView */ = {
+			isa = PBXGroup;
+			children = (
+				525DFCFD2CCA13A900835312 /* PolicyViewController.swift */,
+			);
+			path = PolicyView;
 			sourceTree = "<group>";
 		};
 		526F45022C96001A00C347C7 /* UIView */ = {
@@ -1200,6 +1236,9 @@
 				525AA90B2C915C6D0087913F /* FSCalendar */,
 				529A26092C96AE3E009F4CFA /* Differentiator */,
 				529A260B2C96AE3E009F4CFA /* RxDataSources */,
+				525DFD022CCB640000835312 /* KakaoSDKAuth */,
+				525DFD042CCB640000835312 /* KakaoSDKCommon */,
+				525DFD062CCB640000835312 /* KakaoSDKUser */,
 			);
 			productName = Group;
 			productReference = 52C72E862C4FBD6400CFF329 /* Group.app */;
@@ -1240,6 +1279,7 @@
 				5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */,
 				529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 			);
 			productRefGroup = 52C72E872C4FBD6400CFF329 /* Products */;
 			projectDirPath = "";
@@ -1336,6 +1376,7 @@
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */,
+				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
 				5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */,
 				5208C1832CBEBAEF006272E8 /* Token.swift in Sources */,
@@ -1368,6 +1409,7 @@
 				52E8E4522CA44D4E007A5447 /* DateComponents+Comparable.swift in Sources */,
 				5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */,
 				523645352C8FFE5B009E0784 /* Schedule.swift in Sources */,
+				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
@@ -1550,7 +1592,9 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				KAKAO_NATIVE_APP_KEY = 72b95832d0237fce2c5c7eb82d4a6a7a;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1588,7 +1632,9 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				KAKAO_NATIVE_APP_KEY = 72b95832d0237fce2c5c7eb82d4a6a7a;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1655,6 +1701,14 @@
 				minimumVersion = 2.8.4;
 			};
 		};
+		525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.23.0;
+			};
+		};
 		529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
@@ -1704,6 +1758,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
+		};
+		525DFD022CCB640000835312 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		525DFD042CCB640000835312 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		525DFD062CCB640000835312 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
 		};
 		529A26092C96AE3E009F4CFA /* Differentiator */ = {
 			isa = XCSwiftPackageProductDependency;

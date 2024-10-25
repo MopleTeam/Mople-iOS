@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import KakaoSDKAuth
+
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -75,6 +77,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Url Scheme
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        if (AuthApi.isKakaoTalkLoginUrl(url)) {
+            _ = AuthController.handleOpenUrl(url: url)
+        }
     }
     
     
@@ -143,7 +149,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.sound, .banner, .badge])
+        completionHandler([.sound, .banner])
         
         guard let mainNavi =  window?.rootViewController as? UINavigationController,
         let mainTab = mainNavi.viewControllers.filter({ $0 is MainTabBarController }).first as? MainTabBarController else { return }
@@ -162,7 +168,9 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
      - 앱 내에서 알림표시에 숫자 업데이트
      - 알림 클릭 시 앱 아이콘 숫자 초기화, 앱 내 알림 숫자 초기화, 서버로 badge 초기화된 횟수 전송
      */
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
         print("Received notification: \(response.notification.request.content)")
             print("Action identifier: \(response.actionIdentifier)")
         
@@ -173,7 +181,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
            let alert = apsArray["alert"] as? [String:String],
            let body = alert["body"],
            let title = alert["title"] {
-            print("\(body.decoded)")
+            print("\(body)")
             print("\(title.decoded)")
         }
         

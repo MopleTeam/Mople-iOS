@@ -114,7 +114,7 @@ final class HomeViewController: UIViewController, View {
         addScheduleListCollectionView()
         
         #warning("적절한 위치로 조정하기")
-        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+        let options: UNAuthorizationOptions = [.alert, .sound]
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
             print(#function, #line, "granted : \(granted)" )
             if granted {

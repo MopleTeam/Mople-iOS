@@ -43,10 +43,11 @@ extension APIEndpoints {
 extension APIEndpoints {
     static func login(code: String) -> Endpoint<Data> {
         
-        return Endpoint(path: "auth/apple/login",
+        return Endpoint(path: "auth/sign-up",
                         method: .get,
-                        queryParameters: ["code": code],
-                        responseDecoder: RawDataResponseDecoder())
+                        bodyParameters: ["socialProvider": "APPLE",
+                                         "providerToken": code,
+                                         "deviceType": "IOS"])
     }
 }
 

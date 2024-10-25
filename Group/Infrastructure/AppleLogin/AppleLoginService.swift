@@ -52,10 +52,17 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
-           let authorizationCode = appleIDCredential.authorizationCode {
-            let codeString = String(decoding: authorizationCode, as: UTF8.self)
+           let authorizationCode = appleIDCredential.authorizationCode,
+           let identityToken = appleIDCredential.identityToken {
+
+            let authCode = String(decoding: authorizationCode, as: UTF8.self)
+            let authCodeBase = authorizationCode.base64EncodedString()
             
-            singleObserver?(.success(codeString))
+            let identityCode = String(decoding: identityToken, as: UTF8.self)
+            let identityCodeBase = identityToken.base64EncodedString()
+
+            print(#function, #line, "apple login code, \n authCode(UTF8) : \(authCode) \n authBase: \(authCodeBase) \n identityCode(UTF8) : \(identityCode) \n identityBase: \(identityCodeBase)" )
+            singleObserver?(.success(identityCode))
         } else {
             singleObserver?(.failure(LoginError.noAuthCode))
         }
@@ -65,3 +72,9 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
         singleObserver?(.failure(LoginError.completeError))
     }
 }
+
+
+//if let jsonData = try? JSONSerialization.data(withJSONObject: authData),
+//       let jsonString = String(data: jsonData, encoding: .utf8) {
+//        print(#function, #line, "apple login data: \(jsonString)")
+

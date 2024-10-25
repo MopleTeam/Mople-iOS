@@ -10,6 +10,8 @@ import UIKit
 protocol ProfileCoordinatorDependencies {
     func makeProfileViewController(action: ProfileViewAction) -> ProfileViewController
     func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController
+    func makeNotifyViewController() -> NotifyViewController
+    func makePolicyViewController() -> PolicyViewController
 }
 
 final class ProfileCoordinator: BaseCoordinator {
@@ -33,36 +35,39 @@ extension ProfileCoordinator {
         .init(presentEditView: presentEditView(updateModel:),
               presentNotifyView: presentNotifyView,
               presentPolicyView: presentPolicyView,
-              logout: logout,
-              deleteAccount: deleteAccount)
+              logout: logout)
     }
     
     private func presentEditView(updateModel: ProfileUpdateModel) {
-        guard let customNavi = navigationController as? MainNavigationController else { return }
         let profileSetupView = dependencies.makeProfileEditViewController(updateModel: updateModel)
-        profileSetupView.modalPresentationStyle = .custom
-        profileSetupView.transitioningDelegate = customNavi
-        customNavi.present(profileSetupView, animated: true, completion: nil)
+        self.presentView(view: profileSetupView)
     }
     
     private func presentNotifyView() {
-        
+        let notifyView = dependencies.makeNotifyViewController()
+        self.presentView(view: notifyView)
     }
     
     private func presentPolicyView() {
-        
+        let policyView = dependencies.makePolicyViewController()
+        self.presentView(view: policyView)
     }
     
     private func logout() {
         (self.parentCoordinator as? AccountAction)?.signOut()
     }
-    
-    private func deleteAccount() {
-        
-    }
-    
 }
 
-
+// MARK: - Helper
+extension ProfileCoordinator {
+    
+    // 커스텀 present로 이동하기 (탭바가 없는 상태로 이동하기 위해서)
+    private func presentView(view: UIViewController) {
+        guard let customNavi = navigationController as? MainNavigationController else { return }
+        view.modalPresentationStyle = .custom
+        view.transitioningDelegate = customNavi
+        customNavi.present(view, animated: true, completion: nil)
+    }
+}
 
 

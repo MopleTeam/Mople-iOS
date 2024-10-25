@@ -36,7 +36,7 @@ extension LoginSceneDIContainer {
     
     #warning("Mock")
     private func makeLoginViewReacotr(_ action: LoginAction) -> LoginViewReacotr {
-        return LoginViewReacotr(loginUseCase: UserLoginMock(),
+        return LoginViewReacotr(loginUseCase: makeUserLoginImpl(),
                                 loginAction: action)
     }
     

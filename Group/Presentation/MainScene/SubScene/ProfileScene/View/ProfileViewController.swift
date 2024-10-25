@@ -43,7 +43,7 @@ final class ProfileViewController: BaseViewController, View {
     private let notifyLabel = IconLabelButton(configure: AppDesign.ProfileManagement.notify,
                                               labelAligment: .fill)
     
-    private let personalLabel = IconLabelButton(configure: AppDesign.ProfileManagement.presonalInfo,
+    private let policyLabel = IconLabelButton(configure: AppDesign.ProfileManagement.presonalInfo,
                                                 labelAligment: .fill)
         
     
@@ -75,7 +75,7 @@ final class ProfileViewController: BaseViewController, View {
     }()
 
     private lazy var menuStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [notifyLabel, personalLabel, versionTitleLabel])
+        let sv = UIStackView(arrangedSubviews: [notifyLabel, policyLabel, versionTitleLabel])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fillEqually
@@ -152,7 +152,7 @@ final class ProfileViewController: BaseViewController, View {
             make.trailing.equalToSuperview()
         }
         
-        [notifyLabel, personalLabel, versionTitleLabel, logoutLabel, resignLabel].forEach {
+        [notifyLabel, policyLabel, versionTitleLabel, logoutLabel, resignLabel].forEach {
             $0.snp.makeConstraints { make in
                 make.height.equalTo(56)
             }
@@ -163,6 +163,16 @@ final class ProfileViewController: BaseViewController, View {
     func bind(reactor: Reactor) {
         fetchObserver
             .map { _ in Reactor.Action.fetchProfile }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        notifyLabel.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.presentNotifyView }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        policyLabel.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.presentPolicyView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

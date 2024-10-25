@@ -10,9 +10,12 @@ import Foundation
 struct TokenDTO: Codable {
     var accessToken: String?
     var refreshToken: String?
+    var grantType: String?
+    
     
     enum CodingKeys: String, CodingKey {
         case accessToken
         case refreshToken
+        case grantType
     }
 }

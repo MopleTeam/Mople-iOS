@@ -46,3 +46,17 @@ extension ProfileSceneDIContainer {
                      completedAction: action)
     }
 }
+
+// MARK: - 알림관리 Flow
+extension ProfileSceneDIContainer {
+    func makeNotifyViewController() -> NotifyViewController {
+        return NotifyViewController()
+    }
+}
+
+// MARK: - 개인정보 처리방침 Flow
+extension ProfileSceneDIContainer {
+    func makePolicyViewController() -> PolicyViewController {
+        return PolicyViewController()
+    }
+}

@@ -28,7 +28,7 @@ final class UserLoginImpl: UserLogin {
         return Single.create { emitter in
 
             let task = self.appleLoginService.startAppleLogin()
-                .flatMap { self.repository.userLogin(authCode: $0)}
+//                .flatMap { self.repository.userLogin(authCode: $0)}
                 .subscribe(onSuccess: { code in
                     print("login apple code: \(code)")
                     emitter(.success(()))

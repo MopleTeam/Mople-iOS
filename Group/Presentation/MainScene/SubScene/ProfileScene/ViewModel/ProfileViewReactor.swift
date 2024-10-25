@@ -13,7 +13,6 @@ struct ProfileViewAction {
     var presentNotifyView: () -> Void
     var presentPolicyView: () -> Void
     var logout: () -> Void
-    var deleteAccount: () -> Void
 }
 
 final class ProfileViewReactor: Reactor {
@@ -54,9 +53,9 @@ final class ProfileViewReactor: Reactor {
         case .editProfile(let updateModel):
             return presentEditView(updatedModel: updateModel)
         case .presentNotifyView:
-            return Observable.empty()
+            return presentNotifyView()
         case .presentPolicyView:
-            return Observable.empty()
+            return presentPolicyView()
         case .logout:
             return self.logout()
         case .deleteAccount:
@@ -90,6 +89,18 @@ extension ProfileViewReactor {
         return Observable.empty()
     }
     
+    
+    /// 코디네이터에게 알림관리 뷰로 이동요청
+    private func presentNotifyView() -> Observable<Mutation> {
+        viewAction.presentNotifyView()
+        return Observable.empty()
+    }
+    
+    /// 코디네이터에게 개인정보 처리방침 뷰로 이동요청
+    private func presentPolicyView() -> Observable<Mutation> {
+        viewAction.presentPolicyView()
+        return Observable.empty()
+    }
     
     /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
     private func logout() -> Observable<Mutation> {

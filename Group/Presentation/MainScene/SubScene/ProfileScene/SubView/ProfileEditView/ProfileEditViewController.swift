@@ -53,7 +53,6 @@ class ProfileEditViewController: BaseViewController, View {
     private func setupUI() {
         setupLayout()
         addProfileSetupView()
-        setNavi()
         setProfile()
     }
 
@@ -75,11 +74,7 @@ class ProfileEditViewController: BaseViewController, View {
             make.horizontalEdges.equalToSuperview().inset(20)
         }
     }
-    
-    private func setNavi() {
-        self.leftButtonObserver = addLeftButton(setImage: .arrowBack)
-    }
-    
+
     private func setProfile() {
         profileSetupView.setEditProfile(previousProfile)
     }

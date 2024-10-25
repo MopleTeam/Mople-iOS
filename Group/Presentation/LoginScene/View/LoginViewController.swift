@@ -11,6 +11,7 @@ import RxCocoa
 import SnapKit
 import ReactorKit
 import AuthenticationServices
+import KakaoSDKUser
 
 final class LoginViewController: UIViewController, View {
     
@@ -44,7 +45,9 @@ final class LoginViewController: UIViewController, View {
         return sv
     }()
     
-    private let loginButton = {
+    private let kakaoLoginButton = UIButton(configuration: .filled())
+    
+    private let appleLoginButton = {
         let loginBtn = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
         loginBtn.setContentHuggingPriority(.defaultHigh, for: .vertical)
         loginBtn.cornerRadius = 8
@@ -52,7 +55,7 @@ final class LoginViewController: UIViewController, View {
     }()
     
     private lazy var loginStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleContainerView, loginButton])
+        let sv = UIStackView(arrangedSubviews: [titleContainerView, appleLoginButton, kakaoLoginButton])
         sv.axis = .vertical
         sv.spacing = 24
         sv.alignment = .fill
@@ -75,6 +78,24 @@ final class LoginViewController: UIViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        kakaoLoginButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                if (UserApi.isKakaoTalkLoginAvailable()) {
+                    UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+                        if let error = error {
+                            print(error)
+                        }
+                        else {
+                            print("loginWithKakaoTalk() success. \(oauthToken?.idToken)")
+
+                            // 성공 시 동작 구현
+                            _ = oauthToken
+                        }
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
 
     // MARK: - UI Setup
@@ -95,14 +116,18 @@ final class LoginViewController: UIViewController, View {
             make.center.equalTo(titleContainerView)
         }
         
-        loginButton.snp.makeConstraints { make in
+        appleLoginButton.snp.makeConstraints { make in
+            make.height.equalTo(56)
+        }
+        
+        kakaoLoginButton.snp.makeConstraints { make in
             make.height.equalTo(56)
         }
     }
     
     // MARK: - Selectors
     func bind(reactor: LoginViewReacotr) {
-        self.loginButton.rx.controlEvent(.touchUpInside)
+        self.appleLoginButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.executeLogin }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
