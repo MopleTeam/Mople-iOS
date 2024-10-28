@@ -27,7 +27,7 @@
 		5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* MainTabBarController.swift */; };
 		5211F9002C86B37B00403980 /* HomeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FF2C86B37B00403980 /* HomeButton.swift */; };
 		5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */; };
-		5211F9052C86E71500403980 /* ScheduleListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */; };
+		5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9042C86E71500403980 /* HomeViewReactor.swift */; };
 		5211F9082C86F2DB00403980 /* ScheduleCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9072C86F2DB00403980 /* ScheduleCollectionCell.swift */; };
 		5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */; };
 		5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */; };
@@ -95,6 +95,7 @@
 		527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */; };
 		527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */; };
 		527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA82C837B29007FE63B /* AppAppearance.swift */; };
+		5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */; };
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
 		528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484172C6B8CA100D50C6A /* AppDesign.swift */; };
 		5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* KeyChainService.swift */; };
@@ -175,7 +176,7 @@
 		5211F8F52C84234800403980 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		5211F8FF2C86B37B00403980 /* HomeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButton.swift; sourceTree = "<group>"; };
 		5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListCollectionViewController.swift; sourceTree = "<group>"; };
-		5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewReactor.swift; sourceTree = "<group>"; };
+		5211F9042C86E71500403980 /* HomeViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewReactor.swift; sourceTree = "<group>"; };
 		5211F9072C86F2DB00403980 /* ScheduleCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleCollectionCell.swift; sourceTree = "<group>"; };
 		5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AddChild.swift"; sourceTree = "<group>"; };
 		5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Snaping.swift"; sourceTree = "<group>"; };
@@ -237,6 +238,7 @@
 		527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA82C837B29007FE63B /* AppAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAppearance.swift; sourceTree = "<group>"; };
+		5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginService.swift; sourceTree = "<group>"; };
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
 		528484172C6B8CA100D50C6A /* AppDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDesign.swift; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
@@ -748,7 +750,7 @@
 		527A3E8D2C836189007FE63B /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				5211F9042C86E71500403980 /* ScheduleListViewReactor.swift */,
+				5211F9042C86E71500403980 /* HomeViewReactor.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -834,12 +836,13 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
-		528D27C42C79F68500178F14 /* AppleLogin */ = {
+		528D27C42C79F68500178F14 /* LoginPlatform */ = {
 			isa = PBXGroup;
 			children = (
 				52E2382E2C74601D0066C9A3 /* AppleLoginService.swift */,
+				5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */,
 			);
-			path = AppleLogin;
+			path = LoginPlatform;
 			sourceTree = "<group>";
 		};
 		528D27C52C79F68B00178F14 /* Photos */ = {
@@ -1066,7 +1069,7 @@
 				5208C17B2CBEAC43006272E8 /* Transition */,
 				52CB41E02CA2F2800071679D /* DateManager */,
 				528D27C52C79F68B00178F14 /* Photos */,
-				528D27C42C79F68500178F14 /* AppleLogin */,
+				528D27C42C79F68500178F14 /* LoginPlatform */,
 				528D27C32C79F67400178F14 /* Network */,
 			);
 			path = Infrastructure;
@@ -1353,6 +1356,7 @@
 				52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */,
 				5208C17A2CBE72A8006272E8 /* UIApplication+Ext.swift in Sources */,
 				527A3E9D2C83641F007FE63B /* GroupListSceneDIContainer.swift in Sources */,
+				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				52266BF02CBCE86E007D03EB /* RouteType.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */,
@@ -1403,7 +1407,7 @@
 				5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
-				5211F9052C86E71500403980 /* ScheduleListViewReactor.swift in Sources */,
+				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Comparable.swift in Sources */,

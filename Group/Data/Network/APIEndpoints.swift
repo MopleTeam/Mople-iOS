@@ -11,6 +11,24 @@ enum TokenError: Error {
     case noTokenError
 }
 
+enum HTTPHeader {
+    case accept
+    case content
+    case both
+    
+    var headers: [String: String] {
+        switch self {
+        case .accept:
+            return ["Accept": "application/json"]
+        case .content:
+            return ["Content-Type": "application/json"]
+        case .both:
+            return ["Accept": "application/json",
+                   "Content-Type": "application/json"]
+        }
+    }
+}
+
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
@@ -41,16 +59,16 @@ extension APIEndpoints {
 
 // MARK: - Login
 extension APIEndpoints {
-    static func login(code: String) -> Endpoint<Data> {
-        
+    static func executeLogin(platform: LoginPlatform, code: String) -> Endpoint<Data> {
         return Endpoint(path: "auth/sign-up",
-                        method: .get,
-                        bodyParameters: ["socialProvider": "APPLE",
+                        method: .post,
+                        headerParameters: HTTPHeader.both.headers,
+                        bodyParameters: ["socialProvider": platform.rawValue,
                                          "providerToken": code,
-                                         "deviceType": "IOS"])
+                                         "deviceType": "IOS"],
+                        responseDecoder: RawDataResponseDecoder())
     }
 }
-
 
 // MARK: - Profile
 extension APIEndpoints {
@@ -61,8 +79,7 @@ extension APIEndpoints {
         return Endpoint(path: "user/me",
                         method: .patch,
                         headerParameters: token,
-                        bodyParameters: ["profileImg" : image, "nickname" : nickName],
-                        bodyEncoder: MultipartFormEncoder())
+                        bodyParameters: ["profileImg" : image, "nickname" : nickName])
     }
     
     static func checkNickname(name: String) throws -> Endpoint<Bool> {

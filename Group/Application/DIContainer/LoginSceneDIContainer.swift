@@ -10,6 +10,7 @@ import UIKit
 final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
     
     let appleLoginService = DefaultAppleLoginService()
+    let kakaoLoginService = DefaultKakaoLoginService()
     
     let appNetworkService: AppNetWorkService
     
@@ -42,7 +43,8 @@ extension LoginSceneDIContainer {
     
     private func makeUserLoginImpl() -> UserLogin {
         return UserLoginImpl(appleLoginService: appleLoginService,
-                                   userRepository: makeLoginRepository())
+                             kakaoLoginService: kakaoLoginService,
+                             userRepository: makeLoginRepository())
     }
     
     private func makeLoginRepository() -> LoginRepository {

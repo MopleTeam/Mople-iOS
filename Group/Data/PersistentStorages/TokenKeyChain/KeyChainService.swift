@@ -43,6 +43,9 @@ final class KeyChainServiceImpl {
             return
         }
         
+        let dataString = String(data: tokens, encoding: .utf8)
+        print(#function, #line, "token : \(token), data: \(dataString)" )
+        
         Self.cachedToken = token
     }
     

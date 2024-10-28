@@ -11,7 +11,6 @@ import RxCocoa
 import SnapKit
 import ReactorKit
 import AuthenticationServices
-import KakaoSDKUser
 
 final class LoginViewController: UIViewController, View {
     
@@ -78,24 +77,6 @@ final class LoginViewController: UIViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        
-        kakaoLoginButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                if (UserApi.isKakaoTalkLoginAvailable()) {
-                    UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-                        if let error = error {
-                            print(error)
-                        }
-                        else {
-                            print("loginWithKakaoTalk() success. \(oauthToken?.idToken)")
-
-                            // 성공 시 동작 구현
-                            _ = oauthToken
-                        }
-                    }
-                }
-            })
-            .disposed(by: disposeBag)
     }
 
     // MARK: - UI Setup
@@ -128,7 +109,12 @@ final class LoginViewController: UIViewController, View {
     // MARK: - Selectors
     func bind(reactor: LoginViewReacotr) {
         self.appleLoginButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.executeLogin }
+            .map { _ in Reactor.Action.appleLogin }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.kakaoLoginButton.rx.controlEvent(.touchUpInside)
+            .map { _ in Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -146,6 +132,7 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
         return self.view.window!
     }
 }
+
 
 
 

@@ -42,7 +42,8 @@ enum LoginFacingError: Error {
 final class LoginViewReacotr: Reactor {
     
     enum Action {
-        case executeLogin
+        case appleLogin
+        case kakaoLogin
     }
     
     enum Mutation {
@@ -81,8 +82,10 @@ final class LoginViewReacotr: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         
         switch action {
-        case .executeLogin:
-            self.executeLogin()
+        case .appleLogin:
+            self.executeLogin(.apple)
+        case .kakaoLogin:
+            self.executeLogin(.kakao)
         }
     }
     
@@ -127,8 +130,8 @@ extension LoginViewReacotr {
 
 // MARK: - Execute
 extension LoginViewReacotr {
-    private func executeLogin() -> Observable<Mutation> {
-        let loginTask = userLoginUseCase.login()
+    private func executeLogin(_ platform: LoginPlatform) -> Observable<Mutation> {
+        let loginTask = userLoginUseCase.login(platform)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .map { _ in Mutation.showProfileView }

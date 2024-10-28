@@ -40,20 +40,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func reqeustRemoteNotifications() {
         print(#function, #line)
-        let center = UNUserNotificationCenter.current()
-        
-        center.delegate = self
-        
-        let options: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
-            print(#function, #line, "granted : \(granted)" )
-            if granted {
-                DispatchQueue.main.async {
-                    // Apple Push Notification service(APNs)에 등록 요청
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
+        UNUserNotificationCenter.current().delegate = self
     }
     
     private func filterUrl(enterType: UIScene.ConnectionOptions) -> String? {
@@ -143,25 +130,17 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
      Foreground인 경우 아래 설정과 같이 표시됨
      앱에 접속된 상태인데 표시하는 이유
      이벤트 발생 여부 확인
-     클릭 시 해당 페이지로 이동
-     향후 앱 내의 알림센터에 접속해야만 초기화 시킬 것 (현재는 앱에 접속만 하면 badge 초기화)
     */
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.sound, .banner])
-        
-        guard let mainNavi =  window?.rootViewController as? UINavigationController,
-        let mainTab = mainNavi.viewControllers.filter({ $0 is MainTabBarController }).first as? MainTabBarController else { return }
-        
-        mainTab.selectedIndex = 2
-        
+        completionHandler([.sound, .banner, .badge])
     }
     
     
     /*
      https://ios-development.tistory.com/264
-     알림을 클릭해서 Background -> Foregorund 로 넘어온 경우
+     알림을 클릭한 경우
      해야하는 것
      서버 : badge (미확인 한 알림을 확인하여 앱 아이콘에 표시)
      앱
@@ -171,6 +150,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+        print(#function, #line, "point")
         print("Received notification: \(response.notification.request.content)")
             print("Action identifier: \(response.actionIdentifier)")
         

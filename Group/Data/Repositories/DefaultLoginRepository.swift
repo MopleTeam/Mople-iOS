@@ -16,8 +16,8 @@ final class DefaultLoginRepository: LoginRepository {
         self.networkService = networkService
     }
     
-    func userLogin(authCode: String) -> Single<Void> {
-        let endpoint = APIEndpoints.login(code: authCode)
+    func userLogin(platForm: LoginPlatform, authCode: String) -> Single<Void> {
+        let endpoint = APIEndpoints.executeLogin(platform: platForm, code: authCode)
         
         return Single.create { emitter in
             

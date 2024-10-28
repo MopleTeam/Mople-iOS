@@ -73,10 +73,7 @@ extension DefaultDataTransferService: DataTransferService {
         return Single.create { single in
             
             self.networkService.request(endpoint: endpoint)
-                .flatMap {
-                    let result: Single<T> = self.decode(data: $0, decoder: endpoint.responseDecoder)
-                    return result
-                }
+                .flatMap { self.decode(data: $0, decoder: endpoint.responseDecoder) }
                 .subscribe(onSuccess: { response in
                     single(.success(response))
                 }, onFailure: { err in

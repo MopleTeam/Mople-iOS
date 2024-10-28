@@ -13,7 +13,7 @@ import RxDataSources
 
 final class ScheduleListCollectionViewController: UIViewController, View {
     
-    typealias Reactor = ScheduleViewReactor
+    typealias Reactor = HomeViewReactor
     typealias Section = SectionModel<Void, Schedule>
     
     // MARK: - Variables
@@ -33,7 +33,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: ScheduleViewReactor) {
+    init(reactor: HomeViewReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -89,7 +89,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     }
 
     // MARK: - Binding
-    func bind(reactor: ScheduleViewReactor) {
+    func bind(reactor: HomeViewReactor) {
         let dataSource = configureDataSource()
         
         footerTapObserver

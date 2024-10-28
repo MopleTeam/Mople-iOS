@@ -11,7 +11,7 @@ import Kingfisher
 
 final class HomeViewController: UIViewController, View {
  
-    typealias Reactor = ScheduleViewReactor
+    typealias Reactor = HomeViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -98,7 +98,7 @@ final class HomeViewController: UIViewController, View {
     }()
     
     
-    init(reactor: ScheduleViewReactor) {
+    init(reactor: HomeViewReactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -112,18 +112,6 @@ final class HomeViewController: UIViewController, View {
         super.viewDidLoad()
         setupUI()
         addScheduleListCollectionView()
-        
-        #warning("적절한 위치로 조정하기")
-        let options: UNAuthorizationOptions = [.alert, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
-            print(#function, #line, "granted : \(granted)" )
-            if granted {
-                DispatchQueue.main.async {
-                    // Apple Push Notification service(APNs)에 등록 요청
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -164,15 +152,12 @@ final class HomeViewController: UIViewController, View {
         }
     }
     
-    private func setAction() {
-        self.notifyButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-//                vc.scheduleListCollectionView.collectionView.scrollRectToVisible(.init(x: 1000, y: 0, width: 0, height: 0), animated: true)
-            })
+    func bind(reactor: HomeViewReactor) {
+        rx.viewWillAppear
+            .map { _ in Reactor.Action.checkNotificationPermission }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    func bind(reactor: ScheduleViewReactor) {
+        
         self.makeScheduleButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.logOutTest }
             .bind(to: reactor.action)

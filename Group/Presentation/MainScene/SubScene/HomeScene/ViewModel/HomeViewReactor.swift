@@ -13,8 +13,9 @@ struct HomeViewAction {
     var presentNextEvent: (Date) -> Void
 }
 
-final class ScheduleViewReactor: Reactor {
+final class HomeViewReactor: Reactor {
     enum Action {
+        case checkNotificationPermission
         case fetchRecentSchedule
         case logOutTest
         case presentCalendaer
@@ -43,13 +44,13 @@ final class ScheduleViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchRecentSchedule:
-            return fetchRecentSchedules()
+            fetchRecentSchedules()
         case .logOutTest:
-            homeViewAction.logOut()
-            return Observable.empty()
+            Observable.empty()
         case .presentCalendaer:
             presentNextEvent()
-            return Observable.empty()
+        case .checkNotificationPermission:
+            checkNotificationPermission()
         }
     }
     
@@ -75,7 +76,21 @@ final class ScheduleViewReactor: Reactor {
 }
     
 
-extension ScheduleViewReactor {
+extension HomeViewReactor {
+    
+    private func checkNotificationPermission() -> Observable<Mutation> {
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
+            if granted {
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
+        
+        return Observable.empty()
+    }
+    
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
         let fetchSchedules = fetchRecentScheduleImpl.fetchRecentSchedule()
@@ -85,10 +100,12 @@ extension ScheduleViewReactor {
         return fetchSchedules
     }
     
-    private func presentNextEvent() {
+    private func presentNextEvent() -> Observable<Mutation> {
         guard !currentState.schedules.isEmpty,
-              let lastDate = currentState.schedules.last?.date else { return }
+              let lastDate = currentState.schedules.last?.date else { return Observable.empty() }
         
         homeViewAction.presentNextEvent(lastDate)
+        
+        return Observable.empty()
     }
 }

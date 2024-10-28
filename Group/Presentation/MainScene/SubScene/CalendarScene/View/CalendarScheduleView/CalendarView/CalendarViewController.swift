@@ -101,8 +101,10 @@ final class CalendarViewController: UIViewController, View {
     }
     
     private func setCalendar() {
-        setCalendarAppearance()
         calendar.delegate = self
+        calendar.dataSource = self
+        calendar.register(CustomCalendarCell.self, forCellReuseIdentifier: CustomCalendarCell.reuseIdentifier)
+        setCalendarAppearance()
     }
     
     private func setCalendarAppearance() {
@@ -114,7 +116,6 @@ final class CalendarViewController: UIViewController, View {
         calendar.appearance.selectionColor = .clear
         calendar.appearance.titleFont = AppDesign.Calendar.dayFont
         calendar.appearance.weekdayFont = AppDesign.Calendar.weekFont
-        
     }
     
     // MARK: - Binding
@@ -216,6 +217,17 @@ final class CalendarViewController: UIViewController, View {
     }
 }
 
+extension CalendarViewController: FSCalendarDataSource {
+    
+    func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
+        let cell = calendar.dequeueReusableCell(withIdentifier: CustomCalendarCell.reuseIdentifier, for: date, at: position) as! CustomCalendarCell
+        cell.updateCell(containsEvent: checkContainsEvent(date),
+                        isSelected: checkSelected(on: date, at: position),
+                        isToday: checkToday(date))
+        return cell
+    }
+}
+
 // MARK: - Delegate
 extension CalendarViewController: FSCalendarDelegate {
     
@@ -238,6 +250,10 @@ extension CalendarViewController: FSCalendarDelegate {
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         pageObserver.accept(calendar.currentPage.getComponents())
         selectedFirstEvent()
+    }
+    
+    func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        return events.contains { DateManager.isSameDay($0, date) }
     }
     
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
@@ -461,11 +477,11 @@ extension CalendarViewController {
     }
     
     /// 현재 페이지에서 선택된 날짜 및 첫 이벤트
-    private func currentPagePresentDate() -> Date {
+    private func currentPagePresentDate() -> Date? {
         if hasSelectedDateInCurrentView() {
-            return calendar.selectedDate ?? calendar.currentPage
+            return calendar.selectedDate
         } else {
-            return getPresentDate()
+            return currentPageFirstEventDate()
         }
     }
     
@@ -479,7 +495,7 @@ extension CalendarViewController {
     /// 첫 이벤트가 있는 경우 첫 이벤트 return
     /// 이벤트가 없고 이번달인 경우 today return
     /// 그 외 1일 return
-    private func getPresentDate() -> Date {
+    private func getPresentDate() -> Date? {
         if let firstEvent = currentPageFirstEventDate() {
             return firstEvent
         } else {
