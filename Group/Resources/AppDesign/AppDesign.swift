@@ -17,6 +17,8 @@ protocol UIConstructive {
 }
 
 extension UIConstructive {
+    var itemConfig: ItemConfigure { ItemConfigure(text: nil, font: nil, color: nil, image: nil) }
+    
     func makeUIConfigure(text: String? = nil,
                          font: UIFont? = nil,
                          color: UIColor? = nil,
@@ -297,20 +299,9 @@ extension AppDesign {
         static let weekTextColor: UIColor = .init(hexCode: "999999")
         static let dayFont: UIFont = .pretendard(type: .semiBold, size: 16)
         static let weekFont: UIFont = .pretendard(type: .medium, size: 14)
-        
-        
-        case header
-        
-        var itemConfig: ItemConfigure {
-            switch self {
-                
-            case .header:
-                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
-                                       color: AppDesign.defaultBlack,
-                                       image: UIImage(named: "arrow"))
-
-            }
-        }
+        static let eventTextColor: UIColor = AppDesign.defaultBlack
+        static let dayTextColor: UIColor = .init(hexCode: "DDDDDD")
+        static let selectedDayTextColor: UIColor = AppDesign.defaultBlue
     }
 }
 
@@ -321,11 +312,17 @@ extension AppDesign {
         static let completeButtonColor: UIColor = AppDesign.defaultBlue
         static let closeImage = UIImage(named: "close")
         
+        case header
         case pickerComplete
-        
+    
         var itemConfig: ItemConfigure {
             switch self {
                 
+            case .header:
+                return makeUIConfigure(font: .pretendard(type: .semiBold, size: 16),
+                                       color: AppDesign.defaultBlack,
+                                       image: UIImage(named: "arrow"))
+        
             case .pickerComplete:
                 return makeUIConfigure(text: "완료",
                                        font: .pretendard(type: .semiBold, size: 16),

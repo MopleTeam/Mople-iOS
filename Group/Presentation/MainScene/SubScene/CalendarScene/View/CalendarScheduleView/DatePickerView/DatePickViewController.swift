@@ -62,7 +62,8 @@ final class DatePickViewController: UIViewController, View {
         sv.spacing = 20
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.layer.cornerRadius = 8
+        sv.layer.cornerRadius = 13
+        sv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sv.backgroundColor = AppDesign.defaultWihte
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)

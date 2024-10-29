@@ -89,7 +89,7 @@ final class CalendarViewReactor: Reactor {
         case .loadScheduleList(let scheduleList):
             newState.schedules = scheduleList.sorted { $0.dateComponents < $1.dateComponents }
         case .loadEventDateList(let eventList):
-            newState.events = eventList
+            newState.events = eventList.sorted()
         case .setCalendarHeight(let height):
             newState.calendarHeight = height
         case .switchPage(let date):
@@ -122,9 +122,8 @@ extension CalendarViewReactor {
         let fetchAndProcess = fetchUseCase.fetchScheduleList()
             .asObservable()
             .map { schedules -> (scheduleList: [ScheduleTableSectionModel], eventDateList: [Date]) in
-                let grouped = Dictionary(grouping: schedules) { $0.date.getComponents() }
-                let scheduleList = grouped.map { ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) }
-                let eventDateList = schedules.map { $0.date }
+                let scheduleList = self.makeTableSectionModels(schedules)
+                let eventDateList = self.makeEventList(schedules)
                 return (scheduleList, eventDateList)
             }
             .flatMap { result -> Observable<Mutation> in
@@ -187,6 +186,22 @@ extension CalendarViewReactor {
 
 // MARK: - Helper
 extension CalendarViewReactor {
+    
+    
+    /// 서버로부터 전달된 일정 데이터를 테이블뷰 모델로 전환
+    /// - Parameter schedules: 서버에서 받아온 일정 데이터
+    /// - Returns: 일정 데이터를 일정별로 나누어서 리턴
+    private func makeTableSectionModels(_ schedules: [Schedule]) -> [ScheduleTableSectionModel] {
+        let grouped = Dictionary(grouping: schedules) { $0.date.getComponents() }
+        return grouped.map { ScheduleTableSectionModel(dateComponents: $0.key, items: $0.value) }
+    }
+    
+    #warning("날짜 중복검사 시에는 날짜의 시작시간으로 초기화하는 것이 옳다. (startOfDay)")
+    /// 서버로부터 전달된 일정 데이터에서 이벤트만 추출
+    /// - Returns: 중복값을 제거 후 전달
+    private func makeEventList(_ schedules: [Schedule]) -> [Date] {
+        return Array(Set(schedules.map({ DateManager.calendar.startOfDay(for: $0.date) })))
+    }
     
     /// 현재 선택된 날짜와 같은 날짜인지 구별하기
     private func isSameAsPreviousDate(on currentDate: DateComponents) -> Bool {

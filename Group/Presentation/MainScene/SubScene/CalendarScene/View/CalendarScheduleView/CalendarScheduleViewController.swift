@@ -36,7 +36,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
         
     // MARK: - UI Components
     private let headerButton: IconLabelButton = {
-        let btn = IconLabelButton(configure: AppDesign.Calendar.header)
+        let btn = IconLabelButton(configure: AppDesign.DatePicker.header)
         btn.backgroundColor = AppDesign.Calendar.headerColor
         btn.clipsToBounds = true
         btn.layer.cornerRadius = 10
@@ -222,13 +222,13 @@ final class CalendarScheduleViewController: BaseViewController, View {
         
         self.rightItemObserver
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
+            .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.leftItemObserver
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .tap) }
+            .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -265,7 +265,6 @@ extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let tableTop = scheduleListTableView.checkTop()
         let monthScope = reactor!.currentState.scope == .month
-        print(#function, #line, "currentState Scope : \(reactor!.currentState.scope), or top : \(tableTop)" )
         let shouldBegin = tableTop || monthScope
         if shouldBegin {
             return shouldAllowScopeChangeGesture()

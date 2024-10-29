@@ -15,7 +15,7 @@ final class FetchScheduleMock: FetchSchedule {
         print(#function, #line)
         var scheduleArray = Schedule.getEvents()
         
-        for i in 1...10 {
+        for _ in 1...100 {
             let randomSchedule = Schedule.getRandomSchedule()
             scheduleArray.append(randomSchedule)
         }
