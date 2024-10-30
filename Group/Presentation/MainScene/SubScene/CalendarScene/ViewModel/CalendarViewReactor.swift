@@ -9,6 +9,9 @@ import ReactorKit
 import UIKit
 
 final class CalendarViewReactor: Reactor {
+    
+    typealias SelectDate = CalendarViewController.SelectDate
+    
     enum Action {
         case fetchData
         case calendarHeightChanged(height: CGFloat)
@@ -16,7 +19,7 @@ final class CalendarViewReactor: Reactor {
         case requestScopeSwitch(type: ScopeChangeType)
         case scopeChanged(scope: ScopeType)
         case pageChanged(page: DateComponents)
-        case dateSelected(dateComponents: DateComponents)
+        case dateSelected(selectDate: SelectDate)
         case sharedTableViewDate(dateComponents: DateComponents)
         case requestPresentEvent(lastRecentDate: Date)
     }
@@ -29,7 +32,7 @@ final class CalendarViewReactor: Reactor {
         case switchScope(_ type: ScopeChangeType)
         case notifyChangedScope(_ scope: ScopeType)
         case notifyChangedPage(_ page: DateComponents)
-        case notifySelectdDate(_ dateComponents: DateComponents?)
+        case notifySelectdDate(_ selectDate: SelectDate?)
         case notifyTableViewDate(_ dateComponents: DateComponents)
         case notifyPresentEvent(_ dateComponents: DateComponents?)
         case notifyLoadingState(_ isLoading: Bool)
@@ -43,7 +46,7 @@ final class CalendarViewReactor: Reactor {
         @Pulse var switchScope: ScopeChangeType? = nil
         @Pulse var scope: ScopeType?
         @Pulse var changedPage: DateComponents?
-        @Pulse var selectedDate: DateComponents?
+        @Pulse var selectedDate: SelectDate?
         @Pulse var tableViewDate: DateComponents?
         @Pulse var presentDate: DateComponents?
         @Pulse var isLoading: Bool = false
@@ -72,8 +75,8 @@ final class CalendarViewReactor: Reactor {
             return .just(.notifyChangedScope(scope))
         case .pageChanged(let page):
             return .just(.notifyChangedPage(page))
-        case .dateSelected(let date):
-            return presentTableDate(on: date)
+        case .dateSelected(let selectDate):
+            return presentTableDate(on: selectDate)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
         case .requestPresentEvent(let lastRecentDate):
@@ -100,8 +103,8 @@ final class CalendarViewReactor: Reactor {
             newState.scope = scope
         case .notifyChangedPage(let page):
             newState.changedPage = page
-        case .notifySelectdDate(let date):
-            newState.selectedDate = date
+        case .notifySelectdDate(let selectDate):
+            newState.selectedDate = selectDate
         case .notifyTableViewDate(let date):
             newState.tableViewDate = date
         case .notifyPresentEvent(let date):
@@ -137,44 +140,14 @@ extension CalendarViewReactor {
         return Observable.concat([loadingStart, fetchAndProcess, loadingStop])
     }
     
-    /// 캘린더 날짜 선택 or 월 -> 주 변경 시 테이블에게 표시할 날짜 알려주기
-    private func presentTableDate(on dateComponents: DateComponents) -> Observable<Mutation> {
+    /// 캘린더 선택 날짜 일정 테이블뷰로 공유
+    private func presentTableDate(on selectDate: SelectDate) -> Observable<Mutation> {
+        guard let date = selectDate.selectedDate,
+              !isSameAsPreviousDate(on: date) else { return Observable.empty() }
         
-        guard !isSameAsPreviousDate(on: dateComponents) else {
-            return Observable.just(Mutation.notifySelectdDate(dateComponents))
-        }
-        
-        if hasEvent(on: dateComponents) {
-            return selectedNonEmptySchedule(on: dateComponents)
-        } else {
-            return selectedEmptySchedule(on: dateComponents)
-        }
+        return Observable.just(Mutation.notifySelectdDate(selectDate))
     }
-    
-    /// 현재 테이블뷰에서 빈 스케줄이 있다면 제거하기
-    /// 빈 스케줄 : 이벤트가 없는 날짜 선택 시 없음을 알려주는 셀 타입의 모델
-    private func selectedNonEmptySchedule(on date: DateComponents) -> Observable<Mutation> {
-        let scheduleList = Observable.just(())
-            .filter { _ in self.hasEmptySchedule() }
-            .map { _ in Mutation.loadScheduleList(scheduleList: self.cleanUpEmptyModel()) }
-        
-        let presentDate = Observable.just(Mutation.notifySelectdDate(date))
-        return Observable.concat([scheduleList, presentDate])
-    }
-    
-    /// 빈 스케줄 생성하기
-    private func selectedEmptySchedule(on date: DateComponents) -> Observable<Mutation> {
-        let scheduleListWithEmpty = Observable.just(())
-            .map { _ in self.hasEmptySchedule() }
-            .map {
-                let schedule = self.getSchedulesWithEmpty(on: date, hasEmptyModel: $0)
-                return Mutation.loadScheduleList(scheduleList: schedule)
-            }
-        
-        let presentEmptyDate = Observable.just(Mutation.notifySelectdDate(date))
-        return Observable.concat([scheduleListWithEmpty, presentEmptyDate])
-    }
-    
+
     // 홈뷰에서 표시된 마지막 날짜가 넘어옴
     private func presentDate(on lastRecentDate: DateComponents) -> Observable<Mutation> {
         guard !currentState.schedules.isEmpty,
@@ -205,42 +178,8 @@ extension CalendarViewReactor {
     
     /// 현재 선택된 날짜와 같은 날짜인지 구별하기
     private func isSameAsPreviousDate(on currentDate: DateComponents) -> Bool {
-        guard let selectedDate = currentState.selectedDate else { return false }
+        guard let selectedDate = currentState.selectedDate?.selectedDate else { return false }
         return selectedDate == currentDate
-    }
-    
-    /// 선택된 날짜가 스케줄 날짜에 포함되어 있는지 구별하기
-    private func hasEvent(on date: DateComponents) -> Bool {
-        return currentState.schedules.contains { $0.dateComponents == date }
-    }
-    
-    /// 표시되고 있는 스케줄에서 빈 스케줄이 있는지 구별하기
-    private func hasEmptySchedule() -> Bool {
-        currentState.schedules.contains { schedule in
-            schedule.items.contains { event in
-                event is EmptySchedule
-            }
-        }
-    }
-
-    /// 스케줄 리스트에 빈 스케줄 추가하기
-    /// - Parameters:
-    ///   - date: 추가할 빈 스케줄 날짜
-    ///   - hasEmptyModel: 현재 스케줄 리스트에 빈 스케줄이 있는지
-    private func getSchedulesWithEmpty(on date: DateComponents, hasEmptyModel: Bool) -> [ScheduleTableSectionModel] {
-        guard let emptyDate = date.getDate() else { return [] }
-        let emptyItem = EmptySchedule(date: emptyDate)
-        let emptyModel = ScheduleTableSectionModel(dateComponents: date, items: [emptyItem])
-        var schedules = hasEmptyModel ? cleanUpEmptyModel() : currentState.schedules
-        schedules.append(emptyModel)
-        return schedules
-    }
-    
-    /// 빈 스케줄 비우기
-    private func cleanUpEmptyModel() -> [ScheduleTableSectionModel] {
-        var presentList = currentState.schedules
-        presentList.removeAll { $0.items.contains { $0 is EmptySchedule } }
-        return presentList
     }
 }
 

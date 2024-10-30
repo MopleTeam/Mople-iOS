@@ -14,12 +14,13 @@ import RxDataSources
 final class ScheduleTableViewController: UIViewController, View {
     
     typealias Reactor = CalendarViewReactor
-    typealias Section = SectionModel<DateComponents, DateProviding>
+    typealias Section = SectionModel<DateComponents, Schedule>
     
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
-    private var systemIsDragging = false
+    private var isSystemDragging = false
+    private var isUserDragging = false
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
     private var sectionModels: [ScheduleTableSectionModel] = []
     private var visibleHeaders: [UIView] = []
@@ -72,7 +73,6 @@ final class ScheduleTableViewController: UIViewController, View {
     private func setupTableView() {
         self.tableView.delegate = self
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
-        self.tableView.register(EmptyScheduleCell.self, forCellReuseIdentifier: EmptyScheduleCell.reuseIdentifier)
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
     
@@ -80,22 +80,10 @@ final class ScheduleTableViewController: UIViewController, View {
         dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
                 
-                switch item {
-                case is Schedule:
-                    let schedule = item as! Schedule
-                    let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
-                    cell.configure(viewModel: .init(schedule: schedule))
-                    cell.selectionStyle = .none
-                    return cell
-                    
-                case is EmptySchedule:
-                    let cell = tableView.dequeueReusableCell(withIdentifier: EmptyScheduleCell.reuseIdentifier) as! EmptyScheduleCell
-                    cell.setLabel(on: item.date)
-                    return cell
-                    
-                default:
-                    return UITableViewCell()
-                }
+                let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
+                cell.configure(viewModel: .init(schedule: item))
+                cell.selectionStyle = .none
+                return cell
             }
         )
     }
@@ -117,15 +105,12 @@ final class ScheduleTableViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDate)
+            .filter({ _ in !self.isUserDragging })
             .compactMap { $0 }
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vc, foucsDate in
-                guard let models = vc.dataSource?.sectionModels else { return }
-                guard let headerIndex = models.firstIndex(where: { $0.dateComponents == foucsDate }) else { return }
-                
-                vc.systemIsDragging = true
-                vc.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
+            .subscribe(with: self, onNext: { vc, selectDate in
+                vc.scrollSelectedDate(selectDate)
             })
             .disposed(by: disposeBag)
     }
@@ -162,7 +147,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
 extension ScheduleTableViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard !systemIsDragging else { return }
+        guard !isSystemDragging else { return }
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         
@@ -174,7 +159,12 @@ extension ScheduleTableViewController: UIScrollViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        systemIsDragging = false
+        isSystemDragging = false
+        isUserDragging = true
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isUserDragging = false
     }
 }
 
@@ -192,6 +182,22 @@ extension ScheduleTableViewController {
                 make.edges.equalToSuperview()
             }
         }
+    }
+}
+
+// MARK: - 테이블뷰 IndexPath 조정
+extension ScheduleTableViewController {
+    
+    /// 캘린더에서 선택된 날짜에 맞추어 테이블뷰의 IndexPath 조정
+    /// - Parameter selectDate: 캘린더에서 넘어온 날짜 및 IndexPath로 Scroll시 Animate 유무
+    private func scrollSelectedDate(_ selectDate: CalendarViewController.SelectDate) {
+        guard let models = dataSource?.sectionModels else { return }
+        guard let headerIndex = models.firstIndex(where: { $0.dateComponents == selectDate.selectedDate }) else { return }
+        
+        print(#function, #line, "테이블뷰 스크롤 애니메이션 : \(selectDate.isScroll)" )
+        
+        isSystemDragging = true
+        tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: selectDate.isScroll)
     }
 }
 

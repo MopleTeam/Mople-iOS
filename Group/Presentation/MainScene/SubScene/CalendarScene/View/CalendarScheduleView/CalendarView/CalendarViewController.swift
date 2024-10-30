@@ -26,24 +26,25 @@ enum ScopeChangeType {
 final class CalendarViewController: UIViewController, View {
     
     typealias Reactor = CalendarViewReactor
+    typealias SelectDate = (selectedDate: DateComponents?, isScroll: Bool)
     
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
+    
+    /// UI에 표시됨을 방지하기 위해 임시로 선택된 날짜
+    private var preSelectedDate: Date?
+    
     private let currentCalendar = DateManager.calendar
     private var events: [Date] = []
-    private var preSelectedDate: Date? {
-        didSet {
-            print("기존 날짜 :\(oldValue)에서 선택 날짜 :\(preSelectedDate)로 변경됨")
-        }
-    }
+    private var isSystemDragging: Bool = false
     
     // MARK: - Observable
     private let gestureObserver: Observable<UIPanGestureRecognizer>
     private let heightObserver: PublishRelay<CGFloat> = .init()
     private let scopeObserver: PublishRelay<ScopeType> = .init()
     private let pageObserver: PublishRelay<DateComponents> = .init()
-    private let dateSelectionObserver: PublishRelay<DateComponents?> = .init()
+    private let dateSelectionObserver: PublishRelay<SelectDate> = .init()
     
     // MARK: - UI Components
     private let calendar: FSCalendar = {
@@ -129,8 +130,10 @@ final class CalendarViewController: UIViewController, View {
     
     private func outputBind(_ reactor: Reactor) {
         heightObserver
+            .pairwise()
+            .filter({ $0 != $1 })
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.calendarHeightChanged(height: $0) }
+            .map { Reactor.Action.calendarHeightChanged(height: $1) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -149,7 +152,8 @@ final class CalendarViewController: UIViewController, View {
         dateSelectionObserver
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
-            .map { Reactor.Action.dateSelected(dateComponents: $0) }
+            .do(onNext: { print(#function, #line, "선택된 날짜 : \($0)" ) })
+            .map { Reactor.Action.dateSelected(selectDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -191,11 +195,11 @@ final class CalendarViewController: UIViewController, View {
         
         reactor.pulse(\.$tableViewDate)
             .observe(on: MainScheduler.instance)
-            .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .pairwise()
             .filter({ $0 != $1 })
             .compactMap({ $1?.getDate() })
             .subscribe(with: self, onNext: { vc, date  in
+                vc.isSystemDragging = true
                 vc.selectedPresnetDate(on: date)
             })
             .disposed(by: disposeBag)
@@ -204,6 +208,7 @@ final class CalendarViewController: UIViewController, View {
             .compactMap({ $0?.getDate() })
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
+                vc.isSystemDragging = true
                 vc.presentDate(on: date)
             })
             .disposed(by: disposeBag)
@@ -217,8 +222,9 @@ final class CalendarViewController: UIViewController, View {
             .subscribe(with: self, onNext: { vc, gesture in
                 vc.setFoucsDate()
                 vc.calendar.handleScopeGesture(gesture)
-                vc.testTwo()
+                vc.handleEmptyMonthEvent()
             })
+        
             .disposed(by: disposeBag)
     }
 }
@@ -253,7 +259,9 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        test()
+        guard !isSystemDragging else { return }
+        setPreSelectedDateWhenMonth()
+        setSelectedDateWhenWeek()
         pageObserver.accept(calendar.currentPage.getComponents())
     }
     
@@ -312,7 +320,8 @@ extension CalendarViewController {
     
     /// 스케줄 테이블 반영
     private func notifySelectedDate(on date: Date) {
-        dateSelectionObserver.accept(date.getComponents())
+        print(#function, #line)
+        dateSelectionObserver.accept((date.getComponents(), true))
     }
 }
 
@@ -324,8 +333,6 @@ extension CalendarViewController {
         calendar.snp.updateConstraints { make in
             make.height.equalTo(height)
         }
-        
-        view.layoutIfNeeded()
     }
     
     /// 버튼으로 탭하는 경우 : 날짜 선택, 스코프 전환, 테이블뷰에게 알리기
@@ -361,12 +368,13 @@ extension CalendarViewController {
     
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
     private func updateWhenMonthScope() {
+        setPreSelectedDateWhenMonth()
         pageObserver.accept(calendar.currentPage.getComponents())
     }
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func updateWhenWeekScope() {
-        dateSelectionObserver.accept(preSelectedDate?.getComponents())
+        dateSelectionObserver.accept((preSelectedDate?.getComponents(), false))
     }
     
     /// 스코프 변경하기
@@ -384,12 +392,11 @@ extension CalendarViewController {
     /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
     /// Home에서 표시한 마지막 Event 표시
     private func presentDate(on date: Date) {
-        print(#function, #line)
         let delay: Int = calendar.scope == .month ? 200 : 0
         changeWeekScope(animated: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay), execute: {
             self.selectedPresnetDate(on: date)
-            self.dateSelectionObserver.accept(date.getComponents())
+            self.dateSelectionObserver.accept((date.getComponents(), false))
         })
     }
 }
@@ -438,14 +445,14 @@ extension CalendarViewController {
     /// 선택할 날짜가 현재 캘린더의 날짜에 포함되어 있다면 reloadData
     /// 선택되어 있지 않다면 scrollToDate
     private func selectedPresnetDate(on date: Date) {
-        
         self.preSelectedDate = date
+        self.calendar.select(date, scrollToDate: false)
         if DateManager.isSameWeek(date, calendar.currentPage) {
-            self.calendar.select(date, scrollToDate: false)
             self.calendar.reloadData()
         } else {
-            self.calendar.select(date, scrollToDate: true)
+            self.calendar.setCurrentPage(date, animated: false)
         }
+        self.isSystemDragging = false
     }
 }
 
@@ -456,20 +463,29 @@ extension CalendarViewController {
     
     /// !isCurrentMonth(on: calendar.selectedDate) : 선택된 날짜가 이번달이 아니거나 nil이라면 통과
     /// let firstEvent = currentPageFirstEventDate() : 현재 달력에서 첫번째 이벤트 return
-    private func test() {
+    private func setPreSelectedDateWhenMonth() {
         guard calendar.scope == .month,
               let firstEvent = currentPageFirstEventDate() else { return }
 
-        preSelectedDate = checkCurrentMonth(on: calendar.selectedDate) ?? firstEvent
+        preSelectedDate = hasSelectedDateInCurrentMonth() ?? firstEvent
+    }
+    
+    private func setSelectedDateWhenWeek() {
+        guard calendar.scope == .week,
+              let firstEvent = currentWeekFirstEvent() else { return }
+        
+        preSelectedDate = hasSelectedDateInCurrentWeek() ?? firstEvent
+        dateSelectionObserver.accept((preSelectedDate?.getComponents(), true))
+        calendar.select(preSelectedDate, scrollToDate: false)
+        calendar.reloadData()
     }
     
     #warning("수정")
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
-    private func testTwo() {
+    private func handleEmptyMonthEvent() {
         guard calendar.scope == .week,
               let preSelectedDate = preSelectedDate,
-              !DateManager.isSameMonth(calendar.currentPage, preSelectedDate) else { return }
-        print(#function, #line, "calendar currentPage : \(calendar.currentPage)")
+              !DateManager.isSameWeek(calendar.currentPage, preSelectedDate) else { return }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(330), execute: {
             self.calendar.setCurrentPage(preSelectedDate, animated: true)
@@ -477,13 +493,27 @@ extension CalendarViewController {
     }
     
     
-    /// 현재 달력에 존재하는 날짜인지 체크
+    /// 현재 달에 존재하는 날짜인지 체크
     /// - Parameter date: 체크할 날짜
-    private func checkCurrentMonth(on date: Date?) -> Date? {
-        guard let date = date,
+    private func hasSelectedDateInCurrentMonth() -> Date? {
+        guard let date = calendar.selectedDate,
               DateManager.isSameMonth(calendar.currentPage, date) else { return nil }
         
         return date
+    }
+    
+    /// 현재 주에 존재하는 날짜인지 체크
+    /// - Parameter date: 체크할 날짜
+    private func hasSelectedDateInCurrentWeek() -> Date? {
+        guard let date = calendar.selectedDate,
+              DateManager.isSameWeek(calendar.currentPage, date) else { return nil }
+        return date
+    }
+    
+    private func currentWeekFirstEvent() -> Date? {
+        let currentPage = calendar.currentPage
+        let currentPageEvent = events.filter { DateManager.isSameWeek($0, currentPage) }
+        return currentPageEvent.first
     }
 
     /// calendar.selectedDate가 nil이라면 preSelectedDate 선택

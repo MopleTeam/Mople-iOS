@@ -7,11 +7,7 @@
 
 import Foundation
 
-protocol DateProviding {
-    var date: Date { get }
-}
-
-struct Schedule: Hashable, Equatable, DateProviding {
+struct Schedule: Hashable, Equatable {
     let id: UUID?
     let group: Group?
     let title: String?
