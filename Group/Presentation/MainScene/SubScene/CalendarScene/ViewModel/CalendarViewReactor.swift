@@ -22,6 +22,7 @@ final class CalendarViewReactor: Reactor {
         case dateSelected(selectDate: SelectDate)
         case sharedTableViewDate(dateComponents: DateComponents)
         case requestPresentEvent(lastRecentDate: Date)
+        case tableViewInteracting(isScroll: Bool)
     }
     
     enum Mutation {
@@ -36,6 +37,7 @@ final class CalendarViewReactor: Reactor {
         case notifyTableViewDate(_ dateComponents: DateComponents)
         case notifyPresentEvent(_ dateComponents: DateComponents?)
         case notifyLoadingState(_ isLoading: Bool)
+        case notifyTableViewInteracting(_ isScroll: Bool)
     }
     
     struct State {
@@ -50,6 +52,7 @@ final class CalendarViewReactor: Reactor {
         @Pulse var tableViewDate: DateComponents?
         @Pulse var presentDate: DateComponents?
         @Pulse var isLoading: Bool = false
+        @Pulse var isTableViewInteracting: Bool = false
     }
         
     private let fetchUseCase: FetchSchedule
@@ -76,11 +79,13 @@ final class CalendarViewReactor: Reactor {
         case .pageChanged(let page):
             return .just(.notifyChangedPage(page))
         case .dateSelected(let selectDate):
-            return presentTableDate(on: selectDate)
+            return syncDateToTable(on: selectDate)
         case .sharedTableViewDate(let date):
             return .just(.notifyTableViewDate(date))
         case .requestPresentEvent(let lastRecentDate):
-            return presentDate(on: lastRecentDate.getComponents())
+            return syncDate(on: lastRecentDate.getComponents())
+        case .tableViewInteracting(let isScroll):
+            return .just(.notifyTableViewInteracting(isScroll))
         }
     }
     
@@ -111,6 +116,8 @@ final class CalendarViewReactor: Reactor {
             newState.presentDate = date
         case .notifyLoadingState(let isLoading):
             newState.isLoading = isLoading
+        case .notifyTableViewInteracting(let Enabled):
+            newState.isTableViewInteracting = Enabled
         }
         return newState
     }
@@ -140,20 +147,19 @@ extension CalendarViewReactor {
         return Observable.concat([loadingStart, fetchAndProcess, loadingStop])
     }
     
-    /// 캘린더 선택 날짜 일정 테이블뷰로 공유
-    private func presentTableDate(on selectDate: SelectDate) -> Observable<Mutation> {
-        guard let date = selectDate.selectedDate,
-              !isSameAsPreviousDate(on: date) else { return Observable.empty() }
-        
-        return Observable.just(Mutation.notifySelectdDate(selectDate))
-    }
-
-    // 홈뷰에서 표시된 마지막 날짜가 넘어옴
-    private func presentDate(on lastRecentDate: DateComponents) -> Observable<Mutation> {
+    /// 홈뷰에서 표시된 마지막 날짜가 넘어옴
+    /// 캘린더뷰, 테이블뷰로 공유
+    private func syncDate(on lastRecentDate: DateComponents) -> Observable<Mutation> {
         guard !currentState.schedules.isEmpty,
               currentState.schedules.contains(where: { $0.dateComponents == lastRecentDate }) else { return Observable.empty()}
         
         return Observable.just(Mutation.notifyPresentEvent(lastRecentDate))
+    }
+    
+    /// 캘린더 선택 날짜 일정 테이블뷰로 공유
+    private func syncDateToTable(on selectDate: SelectDate) -> Observable<Mutation> {
+        guard !currentState.isTableViewInteracting else { return Observable.empty() }
+        return Observable.just(Mutation.notifySelectdDate(selectDate))
     }
 }
 
@@ -174,12 +180,6 @@ extension CalendarViewReactor {
     /// - Returns: 중복값을 제거 후 전달
     private func makeEventList(_ schedules: [Schedule]) -> [Date] {
         return Array(Set(schedules.map({ DateManager.calendar.startOfDay(for: $0.date) })))
-    }
-    
-    /// 현재 선택된 날짜와 같은 날짜인지 구별하기
-    private func isSameAsPreviousDate(on currentDate: DateComponents) -> Bool {
-        guard let selectedDate = currentState.selectedDate?.selectedDate else { return false }
-        return selectedDate == currentDate
     }
 }
 

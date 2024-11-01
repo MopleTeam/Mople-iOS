@@ -8,9 +8,9 @@
 import Foundation
 import Security
 
-final class KeyChainServiceImpl {
+final class KeyChainService {
     
-    static let shared = KeyChainServiceImpl()
+    static let shared = KeyChainService()
     
     private init() {}
     

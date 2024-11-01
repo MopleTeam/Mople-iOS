@@ -23,7 +23,7 @@ final class DefaultLoginRepository: LoginRepository {
             
             return self.networkService.basicRequest(endpoint: endpoint)
                 .subscribe(with: self) { repo, token in
-                    KeyChainServiceImpl.shared.saveToken(token)
+                    KeyChainService.shared.saveToken(token)
                     emitter(.success(()))
                 } onFailure: { _, err in
                     emitter(.failure(err))

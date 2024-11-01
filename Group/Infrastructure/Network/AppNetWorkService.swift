@@ -122,7 +122,7 @@ extension DefaultAppNetWorkService {
     
                 return self.dataTransferService.request(with: endpoint)
                     .subscribe(onSuccess: { accessToken in
-                        KeyChainServiceImpl.shared.reissueToken(accessToken: accessToken)
+                        KeyChainService.shared.reissueToken(accessToken: accessToken)
                         emitter(.success(()))
                     }, onFailure: { err in
                         emitter(.failure(err))

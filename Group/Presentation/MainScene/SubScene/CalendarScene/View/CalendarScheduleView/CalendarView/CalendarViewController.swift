@@ -150,15 +150,21 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         dateSelectionObserver
+            .do(onNext: { print(#function, #line, "dateSelection : \($0)" ) })
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
-            .do(onNext: { print(#function, #line, "선택된 날짜 : \($0)" ) })
             .map { Reactor.Action.dateSelected(selectDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        
+        reactor.pulse(\.$isTableViewInteracting)
+            .map({ !$0 })
+            .asDriver(onErrorJustReturn: false)
+            .drive(calendar.rx.isUserInteractionEnabled)
+            .disposed(by: disposeBag)
         
         reactor.pulse(\.$calendarHeight)
             .compactMap { $0 }
@@ -196,9 +202,10 @@ final class CalendarViewController: UIViewController, View {
         reactor.pulse(\.$tableViewDate)
             .observe(on: MainScheduler.instance)
             .pairwise()
-            .filter({ $0 != $1 })
+            .filter({ $0 != $1 && self.calendar.scope == .week })
             .compactMap({ $1?.getDate() })
             .subscribe(with: self, onNext: { vc, date  in
+                print(#function, #line, "테이블뷰에서 전달받은 데이터 : \(date)" )
                 vc.isSystemDragging = true
                 vc.selectedPresnetDate(on: date)
             })
@@ -460,16 +467,16 @@ extension CalendarViewController {
 // MARK: - Helper
 extension CalendarViewController {
     
-    
-    /// !isCurrentMonth(on: calendar.selectedDate) : 선택된 날짜가 이번달이 아니거나 nil이라면 통과
-    /// let firstEvent = currentPageFirstEventDate() : 현재 달력에서 첫번째 이벤트 return
+    /// 이번달의 선택된 날짜또는 첫번째 이벤트 PreSelected로 설정
     private func setPreSelectedDateWhenMonth() {
         guard calendar.scope == .month,
               let firstEvent = currentPageFirstEventDate() else { return }
 
         preSelectedDate = hasSelectedDateInCurrentMonth() ?? firstEvent
+        print(#function, #line, "테이블뷰에서 : \(preSelectedDate)" )
     }
     
+    /// 주간의 선택된 날짜 또는 첫번째 이벤트 선택
     private func setSelectedDateWhenWeek() {
         guard calendar.scope == .week,
               let firstEvent = currentWeekFirstEvent() else { return }
@@ -480,7 +487,6 @@ extension CalendarViewController {
         calendar.reloadData()
     }
     
-    #warning("수정")
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
     private func handleEmptyMonthEvent() {
         guard calendar.scope == .week,
@@ -492,8 +498,7 @@ extension CalendarViewController {
         })
     }
     
-    
-    /// 현재 달에 존재하는 날짜인지 체크
+    /// 이번달에 존재하는 날짜인지 체크
     /// - Parameter date: 체크할 날짜
     private func hasSelectedDateInCurrentMonth() -> Date? {
         guard let date = calendar.selectedDate,
@@ -502,24 +507,29 @@ extension CalendarViewController {
         return date
     }
     
-    /// 현재 주에 존재하는 날짜인지 체크
-    /// - Parameter date: 체크할 날짜
+    /// 주간에 존재하는 날짜인지 체크
     private func hasSelectedDateInCurrentWeek() -> Date? {
         guard let date = calendar.selectedDate,
               DateManager.isSameWeek(calendar.currentPage, date) else { return nil }
         return date
     }
     
+    /// 달력에서 첫번째 이벤트
+    private func currentPageFirstEventDate() -> Date? {
+        
+        let currentPageEvnet = events.filter { DateManager.isSameMonth($0, self.calendar.currentPage) }
+        return currentPageEvnet.first
+    }
+    
+    /// 주간에서 첫번째 이벤트
     private func currentWeekFirstEvent() -> Date? {
-        let currentPage = calendar.currentPage
-        let currentPageEvent = events.filter { DateManager.isSameWeek($0, currentPage) }
+        let currentPageEvent = events.filter { DateManager.isSameWeek($0, calendar.currentPage) }
         return currentPageEvent.first
     }
 
     /// calendar.selectedDate가 nil이라면 preSelectedDate 선택
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
-                
         guard calendar.scope == .month,
               let preSelectedDate = preSelectedDate,
               calendar.selectedDate == nil || !DateManager.isSameMonth(calendar.selectedDate!, preSelectedDate) else { return }
@@ -533,14 +543,9 @@ extension CalendarViewController {
         return DateManager.isSameMonth(calendar.currentPage, date)
     }
     
-    /// 현재 달력에서 첫번째 이벤트
-    private func currentPageFirstEventDate() -> Date? {
-        
-        let currentPageEvnet = events.filter { DateManager.isSameMonth($0, self.calendar.currentPage) }
-        return currentPageEvnet.first
-    }
-    
+    /// 기본값으로 첫 이벤트 preSelectedDate에 할당
     private func setDefaulsePreDate() {
         preSelectedDate = events.first
     }
 }
+

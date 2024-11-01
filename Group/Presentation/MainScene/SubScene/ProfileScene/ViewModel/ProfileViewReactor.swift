@@ -104,7 +104,7 @@ extension ProfileViewReactor {
     
     /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
     private func logout() -> Observable<Mutation> {
-        KeyChainServiceImpl.shared.deleteToken()
+        KeyChainService.shared.deleteToken()
         viewAction.logout()
         return Observable.empty()
     }

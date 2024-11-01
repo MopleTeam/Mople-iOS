@@ -49,6 +49,11 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
            let identityToken = appleIDCredential.identityToken {
             let identityCode = String(decoding: identityToken, as: UTF8.self)
+            
+            
+            // 애플 로그인 후 이메일 필터링
+            
+            print(#function, #line, "email : \(appleIDCredential.email)" )//appleIDCredential.email
             singleObserver?(.success(identityCode))
         } else {
             singleObserver?(.failure(LoginError.noAuthCode))

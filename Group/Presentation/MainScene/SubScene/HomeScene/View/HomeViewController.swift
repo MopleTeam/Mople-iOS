@@ -112,6 +112,7 @@ final class HomeViewController: UIViewController, View {
         super.viewDidLoad()
         setupUI()
         addScheduleListCollectionView()
+        testAction()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -170,6 +171,23 @@ final class HomeViewController: UIViewController, View {
                     vc.collectionContainerView.isHidden = schedules.isEmpty
                 })
                 .disposed(by: disposeBag)
+    }
+    
+
+    func testAction() {
+        makeGroupButton.rx.controlEvent(.touchUpInside)
+            .subscribe { _ in
+                let accessToken = KeyChainService.cachedToken?.accessToken
+                UIPasteboard.general.string = accessToken
+            }
+            .disposed(by: disposeBag)
+        
+        makeScheduleButton.rx.controlEvent(.touchUpInside)
+            .subscribe { _ in
+                let refreshToken = KeyChainService.cachedToken?.refreshToken
+                UIPasteboard.general.string = refreshToken
+            }
+            .disposed(by: disposeBag)
     }
 }
 

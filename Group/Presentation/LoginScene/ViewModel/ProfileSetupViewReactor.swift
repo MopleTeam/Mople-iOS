@@ -211,12 +211,11 @@ extension ProfileSetupViewReactor {
                                   loadingOff])
     }
     
-    #warning("사용처에 따라서 다른 API 요청 : 프로필 생성 or 프로필 편집 defer 이용하면 될 듯!")
     private func makeProfile(_ profile: ProfileBuilder, tag: Int) -> Observable<Mutation> {
         guard let nickname = profile.name else { return .empty() }
   
-        let image = profile.image?.jpegData(compressionQuality: 0.5) ?? getDefaultImageData()
-        
+        let image = profile.image?.jpegData(compressionQuality: 0.7) ?? getDefaultImageData()
+        print(#function, #line, "image Size : \(image)" )
         let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
         
         let makeProfile = profileRepository.makeProfile(image: image, nickname: nickname)

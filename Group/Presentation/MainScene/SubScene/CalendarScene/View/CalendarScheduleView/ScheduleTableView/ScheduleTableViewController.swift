@@ -20,13 +20,13 @@ final class ScheduleTableViewController: UIViewController, View {
     
     // MARK: - Variables
     private var isSystemDragging = false
-    private var isUserDragging = false
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
     private var sectionModels: [ScheduleTableSectionModel] = []
     private var visibleHeaders: [UIView] = []
     
     // MARK: - Observable
     private let dateSyncObserver: PublishRelay<DateComponents> = .init()
+    private let userInteractingObserver: BehaviorRelay<Bool> = .init(value: false)
     
     // MARK: - UI Components
     private let tableView: UITableView = {
@@ -51,7 +51,13 @@ final class ScheduleTableViewController: UIViewController, View {
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         setupUI()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopTableviewScroll()
     }
     
     // MARK: - UI Setup
@@ -71,7 +77,9 @@ final class ScheduleTableViewController: UIViewController, View {
     }
     
     private func setupTableView() {
-        self.tableView.delegate = self
+        #warning("rx delegate 차이점 기록하기")
+//        tableView.rx.setDelegate(self).disposed(by: disposeBag) // rx만 사용
+        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false) // 기본과 rx 모두 사용
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
@@ -91,13 +99,38 @@ final class ScheduleTableViewController: UIViewController, View {
     // MARK: - Bind
     func bind(reactor: CalendarViewReactor) {
         setupDataSource()
-        
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         self.dateSyncObserver
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.sharedTableViewDate(dateComponents: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
- 
+        
+        self.userInteractingObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.tableViewInteracting(isScroll: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.tableView.rx.willBeginDragging
+            .do(onNext: { _ in self.isSystemDragging = false })
+            .map({ _ in true })
+            .asDriver(onErrorJustReturn: true)
+            .drive(userInteractingObserver)
+            .disposed(by: disposeBag)
+        
+        self.tableView.rx.didEndDecelerating
+            .map({ _ in false })
+            .asDriver(onErrorJustReturn: false)
+            .drive(userInteractingObserver)
+            .disposed(by: disposeBag)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         reactor.pulse(\.$schedules)
             .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: [])
@@ -105,7 +138,6 @@ final class ScheduleTableViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDate)
-            .filter({ _ in !self.isUserDragging })
             .compactMap { $0 }
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .observe(on: MainScheduler.instance)
@@ -144,8 +176,8 @@ extension ScheduleTableViewController: UITableViewDelegate {
 }
 
 // MARK: - Scroll Delegate
-extension ScheduleTableViewController: UIScrollViewDelegate {
-    
+extension ScheduleTableViewController {
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard !isSystemDragging else { return }
         let offsetY = scrollView.contentOffset.y
@@ -158,20 +190,14 @@ extension ScheduleTableViewController: UIScrollViewDelegate {
         }
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        isSystemDragging = false
-        isUserDragging = true
-    }
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        isUserDragging = false
-    }
 }
 
 // MARK: - 테이블 뷰 화면 표시
 extension ScheduleTableViewController {
     public func hideView(isHide: Bool) {
         if isHide {
+            self.stopTableviewScroll()
             tableView.snp.remakeConstraints { make in
                 make.horizontalEdges.equalToSuperview()
                 make.bottom.equalToSuperview()
@@ -193,9 +219,6 @@ extension ScheduleTableViewController {
     private func scrollSelectedDate(_ selectDate: CalendarViewController.SelectDate) {
         guard let models = dataSource?.sectionModels else { return }
         guard let headerIndex = models.firstIndex(where: { $0.dateComponents == selectDate.selectedDate }) else { return }
-        
-        print(#function, #line, "테이블뷰 스크롤 애니메이션 : \(selectDate.isScroll)" )
-        
         isSystemDragging = true
         tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: selectDate.isScroll)
     }
@@ -256,4 +279,21 @@ extension ScheduleTableViewController {
     public func checkTop() -> Bool {
         return self.tableView.contentOffset.y <= self.tableView.contentInset.top
     }
+    
+    private func stopTableviewScroll() {
+        self.userInteractingObserver.accept(false)
+        guard tableView.isDragging else { return }
+        print(#function, #line, "드래그 멈출게요!" )
+        let currentOffset = tableView.contentOffset
+        tableView.setContentOffset(currentOffset, animated: false)
+        
+        
+        
+    }
 }
+
+//extension Reactive where Base: UIScrollView {
+//    var isDragging: Observable<Bool> {
+//        return self.base.rx.isDragging
+//    }
+//}

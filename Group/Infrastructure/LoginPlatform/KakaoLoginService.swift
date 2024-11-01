@@ -15,6 +15,7 @@ protocol KakaoLoginService {
 
 final class DefaultKakaoLoginService: KakaoLoginService {
     
+    #warning("정리하기")
     func startKakaoLogin() -> Single<String> {
         return Single.create { single in
             guard UserApi.isKakaoTalkLoginAvailable() else { return  Disposables.create() }
@@ -24,6 +25,22 @@ final class DefaultKakaoLoginService: KakaoLoginService {
                 guard error == nil else {
                     single(.failure(LoginError.completeError))
                     return
+                }
+                
+                
+                UserApi.shared.me() {(user, error) in
+                    if let error = error {
+                        print(error)
+                    }
+                    else {
+                        print("me() success.")
+                        if let user = user {
+                            let email = user.kakaoAccount?.email
+                            print(#function, #line, "email : \(email)" )
+                        }
+                        // 성공 시 동작 구현
+                        _ = user
+                    }
                 }
                 
                 if let idToken = oauthToken?.idToken {

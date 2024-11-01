@@ -17,7 +17,7 @@ final class ProfileRepositoryMock: ProfileRepository {
     }
     
     func checkNickname(name: String) -> Single<Bool> {
-        let randomBoolean = Bool.random()
+        let randomBoolean = false//Bool.random()
         return Single.just(randomBoolean)
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }

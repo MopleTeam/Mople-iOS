@@ -6,7 +6,7 @@
 //
 import RxSwift
 import RxCocoa
-import Foundation
+import UIKit
 
 final class OverlapCheckLabel: BaseLabel {
     

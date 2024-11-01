@@ -22,7 +22,6 @@
 		5208C1812CBEACF5006272E8 /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1802CBEACF5006272E8 /* MainNavigationController.swift */; };
 		5208C1832CBEBAEF006272E8 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1822CBEBAEF006272E8 /* Token.swift */; };
 		5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */; };
-		5208C1872CBF7DED006272E8 /* DotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1862CBF7DED006272E8 /* DotView.swift */; };
 		5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */; };
 		5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* MainTabBarController.swift */; };
 		5211F9002C86B37B00403980 /* HomeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FF2C86B37B00403980 /* HomeButton.swift */; };
@@ -170,7 +169,6 @@
 		5208C1802CBEACF5006272E8 /* MainNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNavigationController.swift; sourceTree = "<group>"; };
 		5208C1822CBEBAEF006272E8 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResponseDTO.swift; sourceTree = "<group>"; };
-		5208C1862CBF7DED006272E8 /* DotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DotView.swift; sourceTree = "<group>"; };
 		5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepository.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		5211F8FF2C86B37B00403980 /* HomeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButton.swift; sourceTree = "<group>"; };
@@ -471,7 +469,6 @@
 				5259B0152CA013A8006B2711 /* WeatherView.swift */,
 				5259B0172CA028C2006B2711 /* ScheduleView.swift */,
 				52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */,
-				5208C1862CBF7DED006272E8 /* DotView.swift */,
 				5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */,
 			);
 			path = Custom;
@@ -1370,7 +1367,6 @@
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
-				5208C1872CBF7DED006272E8 /* DotView.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
