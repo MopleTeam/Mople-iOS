@@ -10,12 +10,20 @@ import UIKit
 
 extension UICollectionView {
     
-    private var contentWidth: CGFloat {
+    var contentWidth: CGFloat {
         return self.contentSize.width
     }
     
-    private var boundsWidth: CGFloat {
+    var boundsWidth: CGFloat {
         return self.bounds.size.width
+    }
+    
+    var offsetMinX: CGFloat {
+        return self.contentOffset.x
+    }
+    
+    var offsetMaxX: CGFloat {
+        return self.offsetMinX + self.boundsWidth
     }
 }
 
@@ -42,10 +50,7 @@ extension UICollectionView {
     }
     
     private func checkTopOrBottom(threshold: CGFloat = 50) -> Bool {
-        let contentMinOffsetX = self.contentOffset.x
-        let contentMaxOffsetX = contentMinOffsetX + boundsWidth
-        
-        return contentMinOffsetX > 0 && contentMaxOffsetX < contentWidth
+        return offsetMinX > 0 && offsetMaxX < contentWidth
     }
     
     private func checkLastItem(indexPath: IndexPath,
@@ -74,7 +79,7 @@ extension UICollectionView {
             indexPath.item += 1
         } else if velocity.x == 0 {
             let cell = self.cellForItem(at: indexPath)!
-            let position = self.contentOffset.x - cell.frame.origin.x
+            let position = offsetMinX - cell.frame.origin.x
             if position > cell.frame.size.width / 2 {
                 indexPath.item += 1
             }

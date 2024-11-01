@@ -23,10 +23,12 @@ final class HomeViewReactor: Reactor {
     
     enum Mutation {
         case fetchRecentScehdule(schedules: [Schedule])
+        case presentCompleted
     }
     
     struct State {
         @Pulse var schedules: [Schedule] = []
+        @Pulse var presentCompleted: Void?
     }
     
     private let fetchRecentScheduleImpl: FetchRecentSchedule
@@ -61,9 +63,10 @@ final class HomeViewReactor: Reactor {
         switch mutation {
         case .fetchRecentScehdule(let schedules):
             newState.schedules = schedules.sorted(by: { $0.date < $1.date })
-            
-            return newState
+        case .presentCompleted:
+            newState.presentCompleted = ()
         }
+        return newState
     }
     
     func handleError(state: State, err: Error) -> State {
@@ -105,7 +108,6 @@ extension HomeViewReactor {
               let lastDate = currentState.schedules.last?.date else { return Observable.empty() }
         
         homeViewAction.presentNextEvent(lastDate)
-        
-        return Observable.empty()
+        return .just(Mutation.presentCompleted)
     }
 }

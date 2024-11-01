@@ -48,6 +48,11 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         setCollectionView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        moveToLastCell()
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
         view.addSubview(collectionView)
@@ -102,8 +107,11 @@ final class ScheduleListCollectionViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-        
-        
+    }
+    
+    private func moveToLastCell() {
+        let firstSection = self.collectionView.numberOfItems(inSection: 0)
+        self.collectionView.scrollToItem(at: .init(item: firstSection-1, section: 0), at: .centeredHorizontally, animated: false)
     }
 }
 
@@ -138,6 +146,22 @@ extension ScheduleListCollectionViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 8
+    }
+}
+
+// MARK: - 컨텐츠 위치 체크
+extension ScheduleListCollectionViewController {
+    
+    private func hasReachedBottom() -> Bool {
+        guard collectionView.contentWidth != 0 else { return false }
+        return collectionView.offsetMaxX == collectionView.contentWidth
+    }
+    
+    private func moveToLastItem() {
+        guard hasReachedBottom(),
+              let lastItem = collectionView.indexPathsForVisibleItems.last else { return }
+        
+        collectionView.selectItem(at: lastItem, animated: false, scrollPosition: .centeredHorizontally)
     }
 }
 
