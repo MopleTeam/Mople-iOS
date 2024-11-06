@@ -10,16 +10,19 @@ import Foundation
 struct ProfileResponseDTO: Decodable {
     var name: String?
     var imagePath: String?
+    var badgeCount: Int?
     
     private enum CodingKeys: String, CodingKey {
-        case name
-        case imagePath
+        case name = "nickName"
+        case imagePath = "image"
+        case badgeCount
     }
 }
 
 extension ProfileResponseDTO {
     func toDomain() -> ProfileInfo {
         return .init(name: name,
-                     imagePath: imagePath)
+                     imagePath: imagePath,
+                     badgeCount: badgeCount)
     }
 }

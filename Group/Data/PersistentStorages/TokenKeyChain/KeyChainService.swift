@@ -14,16 +14,12 @@ final class KeyChainService {
     
     private init() {}
     
-    private(set) static var cachedToken: TokenDTO?
+    private(set) static var cachedToken: Token?
     
     enum Key: String {
         case service = "com.Side.GroupManager"
         case account = "userToken"
     }
-    
-    private let service = "com.yourapp.tokens"
-    
-    private let account = "userTokens"
 
     func saveToken(_ tokens: Data) {
         
@@ -39,17 +35,14 @@ final class KeyChainService {
         let status = SecItemAdd(query as CFDictionary, nil)
         
         guard status == errSecSuccess,
-              let token = try? JSONDecoder().decode(TokenDTO.self, from: tokens) else {
+              let token = try? JSONDecoder().decode(TokenResponseDTO.self, from: tokens) else {
             return
         }
-        
-        let dataString = String(data: tokens, encoding: .utf8)
-        print(#function, #line, "token : \(token), data: \(dataString)" )
-        
-        Self.cachedToken = token
+                
+        Self.cachedToken = token.toDomain()
     }
     
-    func getToken() -> TokenDTO? {
+    func getToken() -> Token? {
         if let token = Self.cachedToken {
             return token
         }
@@ -66,7 +59,7 @@ final class KeyChainService {
         
         guard status == errSecSuccess,
               let data = item as? Data,
-              let token = try? JSONDecoder().decode(TokenDTO.self, from: data) else {
+              let token = try? JSONDecoder().decode(Token.self, from: data) else {
             return nil
         }
         
@@ -81,13 +74,7 @@ final class KeyChainService {
             kSecAttrService as String: Key.service.rawValue,
             kSecAttrAccount as String: Key.account.rawValue
         ]
-
-        let status = SecItemDelete(query as CFDictionary)
-        if status == errSecSuccess {
-            print("Tokens deleted successfully")
-        } else {
-            print("Tokens Failed to delete tokens: \(status)")
-        }
+        SecItemDelete(query as CFDictionary)
     }
 
     func hasToken() -> Bool {

@@ -14,7 +14,7 @@ import RxDataSources
 final class ScheduleListCollectionViewController: UIViewController, View {
     
     typealias Reactor = HomeViewReactor
-    typealias Section = SectionModel<Void, Schedule>
+    typealias Section = SectionModel<Void, Plan>
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -50,7 +50,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        moveToLastCell()
+        moveToLastItem()
     }
     
     // MARK: - UI Setup
@@ -107,11 +107,6 @@ final class ScheduleListCollectionViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
-    }
-    
-    private func moveToLastCell() {
-        let firstSection = self.collectionView.numberOfItems(inSection: 0)
-        self.collectionView.scrollToItem(at: .init(item: firstSection-1, section: 0), at: .centeredHorizontally, animated: false)
     }
 }
 

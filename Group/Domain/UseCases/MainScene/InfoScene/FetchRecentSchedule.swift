@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol FetchRecentSchedule {
-    func fetchRecentSchedule() -> Single<[Schedule]>
+    func fetchRecentSchedule() -> Single<[Plan]>
 }
 
 

@@ -144,9 +144,7 @@ final class DatePickViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         completeButton.rx.controlEvent(.touchUpInside)
-            .map({ _ in
-                self.selectedDate
-            })
+            .map({ _ in self.selectedDate })
             .subscribe(with: self, onNext: { vc, date in
                 vc.pageChangeRequestObserver.accept(date)
                 vc.dismiss(animated: true)

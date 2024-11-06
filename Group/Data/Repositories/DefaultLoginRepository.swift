@@ -17,7 +17,7 @@ final class DefaultLoginRepository: LoginRepository {
     }
     
     func userLogin(platForm: LoginPlatform, authCode: String) -> Single<Void> {
-        let endpoint = APIEndpoints.executeLogin(platform: platForm, code: authCode)
+        let endpoint = APIEndpoints.executeSignUp(platform: platForm, code: authCode)
         
         return Single.create { emitter in
             

@@ -26,7 +26,7 @@ enum ScopeChangeType {
 final class CalendarViewController: UIViewController, View {
     
     typealias Reactor = CalendarViewReactor
-    typealias SelectDate = (selectedDate: DateComponents?, isScroll: Bool)
+    typealias SelectDate = (selectedDate: Date?, isScroll: Bool)
     
     var disposeBag = DisposeBag()
     
@@ -150,7 +150,6 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         dateSelectionObserver
-            .do(onNext: { print(#function, #line, "dateSelection : \($0)" ) })
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
             .map { Reactor.Action.dateSelected(selectDate: $0) }
@@ -203,16 +202,15 @@ final class CalendarViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .pairwise()
             .filter({ $0 != $1 && self.calendar.scope == .week })
-            .compactMap({ $1?.getDate() })
+            .compactMap({ $1 })
             .subscribe(with: self, onNext: { vc, date  in
-                print(#function, #line, "테이블뷰에서 전달받은 데이터 : \(date)" )
                 vc.isSystemDragging = true
                 vc.selectedPresnetDate(on: date)
             })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$presentDate)
-            .compactMap({ $0?.getDate() })
+            .compactMap({ $0 })
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
                 vc.isSystemDragging = true
@@ -328,7 +326,7 @@ extension CalendarViewController {
     /// 스케줄 테이블 반영
     private func notifySelectedDate(on date: Date) {
         print(#function, #line)
-        dateSelectionObserver.accept((date.getComponents(), true))
+        dateSelectionObserver.accept((date, true))
     }
 }
 
@@ -381,7 +379,7 @@ extension CalendarViewController {
     
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func updateWhenWeekScope() {
-        dateSelectionObserver.accept((preSelectedDate?.getComponents(), false))
+        dateSelectionObserver.accept((preSelectedDate, false))
     }
     
     /// 스코프 변경하기
@@ -403,7 +401,7 @@ extension CalendarViewController {
         changeWeekScope(animated: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay), execute: {
             self.selectedPresnetDate(on: date)
-            self.dateSelectionObserver.accept((date.getComponents(), false))
+            self.dateSelectionObserver.accept((date, false))
         })
     }
 }
@@ -473,7 +471,6 @@ extension CalendarViewController {
               let firstEvent = currentPageFirstEventDate() else { return }
 
         preSelectedDate = hasSelectedDateInCurrentMonth() ?? firstEvent
-        print(#function, #line, "테이블뷰에서 : \(preSelectedDate)" )
     }
     
     /// 주간의 선택된 날짜 또는 첫번째 이벤트 선택
@@ -482,7 +479,7 @@ extension CalendarViewController {
               let firstEvent = currentWeekFirstEvent() else { return }
         
         preSelectedDate = hasSelectedDateInCurrentWeek() ?? firstEvent
-        dateSelectionObserver.accept((preSelectedDate?.getComponents(), true))
+        dateSelectionObserver.accept((preSelectedDate, true))
         calendar.select(preSelectedDate, scrollToDate: false)
         calendar.reloadData()
     }

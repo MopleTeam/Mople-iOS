@@ -53,7 +53,8 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
             
             // 애플 로그인 후 이메일 필터링
             
-            print(#function, #line, "email : \(appleIDCredential.email)" )//appleIDCredential.email
+            print(#function, #line, "login Test Apple : \(appleIDCredential.email)" )
+            print(#function, #line, "login Test Apple : \(identityCode)" )
             singleObserver?(.success(identityCode))
         } else {
             singleObserver?(.failure(LoginError.noAuthCode))

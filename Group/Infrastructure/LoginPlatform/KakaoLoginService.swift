@@ -33,10 +33,9 @@ final class DefaultKakaoLoginService: KakaoLoginService {
                         print(error)
                     }
                     else {
-                        print("me() success.")
                         if let user = user {
                             let email = user.kakaoAccount?.email
-                            print(#function, #line, "email : \(email)" )
+                            print(#function, #line, "login Test : \(email)" )
                         }
                         // 성공 시 동작 구현
                         _ = user

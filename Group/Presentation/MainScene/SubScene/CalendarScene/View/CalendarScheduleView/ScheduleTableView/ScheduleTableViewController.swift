@@ -14,7 +14,6 @@ import RxDataSources
 final class ScheduleTableViewController: UIViewController, View {
     
     typealias Reactor = CalendarViewReactor
-    typealias Section = SectionModel<DateComponents, Schedule>
     
     var disposeBag = DisposeBag()
     
@@ -25,7 +24,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private var visibleHeaders: [UIView] = []
     
     // MARK: - Observable
-    private let dateSyncObserver: PublishRelay<DateComponents> = .init()
+    private let dateSyncObserver: PublishRelay<Date?> = .init()
     private let userInteractingObserver: BehaviorRelay<Bool> = .init(value: false)
     
     // MARK: - UI Components
@@ -93,6 +92,7 @@ final class ScheduleTableViewController: UIViewController, View {
                 cell.selectionStyle = .none
                 return cell
             }
+            
         )
     }
     
@@ -105,8 +105,9 @@ final class ScheduleTableViewController: UIViewController, View {
     
     private func outputBind(_ reactor: Reactor) {
         self.dateSyncObserver
+            .compactMap({ $0 })
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.sharedTableViewDate(dateComponents: $0) }
+            .map { Reactor.Action.sharedTableViewDate(date: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -218,7 +219,7 @@ extension ScheduleTableViewController {
     /// - Parameter selectDate: 캘린더에서 넘어온 날짜 및 IndexPath로 Scroll시 Animate 유무
     private func scrollSelectedDate(_ selectDate: CalendarViewController.SelectDate) {
         guard let models = dataSource?.sectionModels else { return }
-        guard let headerIndex = models.firstIndex(where: { $0.dateComponents == selectDate.selectedDate }) else { return }
+        guard let headerIndex = models.firstIndex(where: { $0.date == selectDate.selectedDate }) else { return }
         isSystemDragging = true
         tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: selectDate.isScroll)
     }
@@ -233,10 +234,11 @@ extension ScheduleTableViewController {
         return bottomEdge > contentHeight
     }
     
-    private func centerPoint() -> CGFloat {
-        let centerPoint = self.view.frame.height / 2
+    private func centerPoint(targetPoint: Double) -> Bool {
+        let center = self.view.frame.height / 2
         let tabHeight = self.tabBarController?.tabBar.frame.height ?? 0
-        return centerPoint - tabHeight
+        let contentCenter = center - tabHeight
+        return contentCenter > targetPoint
     }
 }
 
@@ -246,15 +248,14 @@ extension ScheduleTableViewController {
     private func notifyIfCrossedCenterLine() {
         guard let topHeader = visibleHeaders.first,
               let topHeaderFrame = topHeader.superview?.convert(topHeader.frame, to: self.view),
-              centerPoint() > topHeaderFrame.origin.y,
-              let dataSource = dataSource else { return }
+              centerPoint(targetPoint: topHeaderFrame.origin.y) else { return }
         
-        let components = dataSource[topHeader.tag].dateComponents
-        dateSyncObserver.accept(components)
+        let foucsDate = dataSource?[topHeader.tag].date
+        dateSyncObserver.accept(foucsDate)
     }
     
     private func notifyIfLastContent() {
-        guard let lastComponents = dataSource?.sectionModels.last?.dateComponents,
+        guard let lastComponents = dataSource?.sectionModels.last?.date,
               let sectionCount = dataSource?.sectionModels.count else { return }
         
         switch sectionCount {

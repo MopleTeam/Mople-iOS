@@ -10,6 +10,7 @@ import UIKit
 struct ProfileInfo {
     var name: String?
     var imagePath: String?
+    var badgeCount: Int?
 }
 
 

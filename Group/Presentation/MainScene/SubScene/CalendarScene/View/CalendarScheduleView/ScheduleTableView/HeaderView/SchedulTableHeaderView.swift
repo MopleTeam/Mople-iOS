@@ -41,7 +41,7 @@ final class SchedulTableHeaderView: UITableViewHeaderFooterView {
     }
     
     public func setTitle(title: String?, tag: Int) {
-        titleLabel.text = title
+        titleLabel.text = title ?? "날짜 정보 없음"
         self.tag = tag
     }
 }

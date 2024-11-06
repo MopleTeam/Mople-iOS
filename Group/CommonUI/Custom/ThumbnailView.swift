@@ -20,9 +20,9 @@ extension ThumbnailViewModel {
     init?(group: Group?) {
         guard let group = group else { return nil }
         self .thumbnailPath = group.thumbnailPath
-        self.title = group.name
-        self.participantCount = group.memberCountString
-        self.date = group.lastSchedule
+        self.title = group.title
+        self.participantCount = group.memberCountText
+        self.date = group.lastSchedule?.convertDate()
     }
 }
 

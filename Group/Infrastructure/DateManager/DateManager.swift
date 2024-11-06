@@ -7,12 +7,23 @@
 
 import Foundation
 
+enum DateStringFormat {
+    case full
+    case simple
+}
+
 final class DateManager {
     
     static let calendar: Calendar = {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
         return calendar
+    }()
+    
+    static let isoFormatter: ISO8601DateFormatter = {
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return format
     }()
     
     static let fullDateTimeFormatter: DateFormatter = {
@@ -28,19 +39,12 @@ final class DateManager {
         formatter.dateFormat = "yyyy년 MM월 dd일"
         return formatter
     }()
+    
     private init() { }
 }
 
-// MARK: - 계산
+// MARK: - 비교
 extension DateManager {
-    static func convertDateComponents(_ date: Date) -> DateComponents {
-        return calendar.dateComponents([.year, .month, .day], from: date)
-    }
-    
-    static func convertDate(_ dateComponents: DateComponents) -> Date? {
-        return calendar.date(from: dateComponents)
-    }
-    
     static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .day)
     }
@@ -52,16 +56,14 @@ extension DateManager {
     static func isSameMonth(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .month)
     }
-}
-
-extension Date {
-    public func getComponents() -> DateComponents {
-        return DateManager.convertDateComponents(self)
+    
+    static func startOfDay(_ date: Date) -> Date {
+        return calendar.startOfDay(for: date)
     }
 }
 
-extension DateComponents {
-    public func getDate() -> Date? {
-        return DateManager.convertDate(self)
-    }
-}
+
+
+// MARK: - 변환
+
+

@@ -19,10 +19,12 @@ final class FetchGroupListMock: FetchGroup {
     private func getMockData() -> [Group] {
                 
         return Array(1...5).map { index in
-            Group(thumbnailPath: randomThumnail,
-                  name: "모임\(index)",
-                  memberCount: Int.random(in: 1...50),
-                  lastSchedule: Date().addingTimeInterval(-3600*(24 * Double(index))))
+            Group(id: nil,
+                  title: "모임\(index)",
+                  members: UserInfo.getUser(),
+                  thumbnailPath: randomThumnail,
+                  createdDate: nil,
+                  lastSchedule: nil)
         }
     }
     

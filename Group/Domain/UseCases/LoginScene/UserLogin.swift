@@ -43,8 +43,9 @@ final class UserLoginImpl: UserLogin {
             let loginObserver = self.handleLogin(platform)
             
             return loginObserver
-                .flatMap { self.repository.userLogin(platForm: platform, authCode: $0)}
-                .subscribe(onSuccess: { _ in
+//                .flatMap { self.repository.userLogin(platForm: platform, authCode: $0)}
+                .subscribe(onSuccess: { token in
+                    print(#function, #line, "login Teste : \(token)" )
                     emitter(.success(()))
                 }, onFailure: { err in
                     emitter(.failure(err))

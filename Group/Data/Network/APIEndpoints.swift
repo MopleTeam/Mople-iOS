@@ -59,13 +59,25 @@ extension APIEndpoints {
 
 // MARK: - Login
 extension APIEndpoints {
-    static func executeLogin(platform: LoginPlatform, code: String) -> Endpoint<Data> {
+    static func executeSignUp(platform: LoginPlatform, code: String) -> Endpoint<Data> {
         return Endpoint(path: "auth/sign-up",
                         method: .post,
                         headerParameters: HTTPHeader.both.headers,
                         bodyParameters: ["socialProvider": platform.rawValue,
                                          "providerToken": code,
                                          "deviceType": "IOS"],
+                        responseDecoder: RawDataResponseDecoder())
+    }
+
+    static func executeSignIn(platform: LoginPlatform,
+                              code: String,
+                              userEmail: String) -> Endpoint<Data> {
+        return Endpoint(path: "auth/sign-up",
+                        method: .post,
+                        headerParameters: HTTPHeader.both.headers,
+                        bodyParameters: ["socialProvider": platform.rawValue,
+                                         "providerToken": code,
+                                         "email": userEmail],
                         responseDecoder: RawDataResponseDecoder())
     }
 }

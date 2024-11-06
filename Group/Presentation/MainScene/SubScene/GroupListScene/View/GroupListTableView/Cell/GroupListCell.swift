@@ -13,8 +13,6 @@ final class GroupListCell: UITableViewCell {
     
     private let thumbnailView = ThumbnailTitleView(type: .detail)
     
-    private let containerView = UIView()
-    
     #warning("데이터 입력 필요")
     private let scheduleLabel: BaseLabel = {
         let label = BaseLabel(backColor: AppDesign.Group.scheduleBack,

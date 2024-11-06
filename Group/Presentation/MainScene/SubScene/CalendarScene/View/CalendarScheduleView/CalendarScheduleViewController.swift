@@ -26,7 +26,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
-    private let presentEvent: BehaviorRelay<Date?> = .init(value: nil)
+    private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
     private lazy var rightItemObserver = addRightButton(setImage: .calendar)
     private lazy var leftItemObserver = addLeftButton(setImage: .arrowBack)
     
@@ -232,7 +232,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.presentEvent
+        self.presentEventObserver
             .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
             .map { Reactor.Action.requestPresentEvent(lastRecentDate: $0) }
@@ -364,21 +364,21 @@ extension CalendarScheduleViewController {
 extension CalendarScheduleViewController {
     
     /// 표시할 데이터가 있는 상태 : 홈뷰에서 표시한 이벤트 갯수 넘기기
-    public func presentEvent(on lastRecentDate: Date?) {
-        self.presentEvent.accept(lastRecentDate)
+    public func presentEvent(on lastRecentDate: Date) {
+        self.presentEventObserver.accept(lastRecentDate)
     }
     
     /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
     private func checkIsPresent(_ isLoading: Bool) {
         guard !isLoading,
-              let recentEventCount = presentEvent.value else { return }
-        presentEvent.accept(recentEventCount)
+              let recentEventCount = presentEventObserver.value else { return }
+        presentEventObserver.accept(recentEventCount)
     }
     
     /// 화면을 벗어날 때 설정값 지우기
     private func resetPresentDate() {
-        guard presentEvent.value == nil else { return }
-        presentEvent.accept(nil)
+        guard presentEventObserver.value == nil else { return }
+        presentEventObserver.accept(nil)
     }
 }
 

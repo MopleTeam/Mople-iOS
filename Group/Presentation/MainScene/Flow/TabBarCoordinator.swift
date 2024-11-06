@@ -12,7 +12,7 @@ protocol AccountAction {
 }
 
 protocol PresentAction {
-    func pushCalendarView(lastRecentDate: Date?)
+    func pushCalendarView(lastRecentDate: Date)
 }
 
 final class TabBarCoordinator: BaseCoordinator {
@@ -53,7 +53,7 @@ extension TabBarCoordinator: AccountAction {
 extension TabBarCoordinator: PresentAction {
     /// 캘린더 뷰로 이동하기
     /// - Parameter lastRecentDate: 이동시 표시할 데이트
-    func pushCalendarView(lastRecentDate: Date? = nil) {
+    func pushCalendarView(lastRecentDate: Date) {
         guard let index = getNaviIndexFromTabBar(destination: .calendar),
               let destinationNavi = getDestinationFormNavi(index: index),
               let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }

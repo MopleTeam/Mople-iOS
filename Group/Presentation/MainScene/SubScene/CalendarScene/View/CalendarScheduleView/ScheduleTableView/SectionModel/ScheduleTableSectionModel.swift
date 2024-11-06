@@ -10,21 +10,20 @@ import Differentiator
 
 struct ScheduleTableSectionModel: SectionModelType {
     
-    var dateComponents: DateComponents
+    var date: Date?
     var items: [Item] = []
     
     var title: String? {
-        guard let date = DateManager.calendar.date(from: dateComponents) else { return nil }
-        
-        return DateManager.simpleDateFormatter.string(from: date)
+        guard let dateComponents = date else { return nil }
+        return DateManager.simpleDateFormatter.string(from: dateComponents)
     }
 }
 
 extension ScheduleTableSectionModel {
     
-    typealias Item = Schedule
+    typealias Item = Plan
     
-    init(original: ScheduleTableSectionModel, items: [Schedule]) {
+    init(original: ScheduleTableSectionModel, items: [Plan]) {
         self = original
         self.items = items
     }

@@ -22,12 +22,12 @@ final class HomeViewReactor: Reactor {
     }
     
     enum Mutation {
-        case fetchRecentScehdule(schedules: [Schedule])
+        case fetchRecentScehdule(schedules: [Plan])
         case presentCompleted
     }
     
     struct State {
-        @Pulse var schedules: [Schedule] = []
+        @Pulse var schedules: [Plan] = []
         @Pulse var presentCompleted: Void?
     }
     
@@ -62,7 +62,11 @@ final class HomeViewReactor: Reactor {
         
         switch mutation {
         case .fetchRecentScehdule(let schedules):
-            newState.schedules = schedules.sorted(by: { $0.date < $1.date })
+            newState.schedules = schedules.sorted(by: {
+                guard let previousDate = $0.date,
+                      let nextDate = $1.date else { return false }
+                return previousDate < nextDate
+            })
         case .presentCompleted:
             newState.presentCompleted = ()
         }
@@ -106,8 +110,8 @@ extension HomeViewReactor {
     private func presentNextEvent() -> Observable<Mutation> {
         guard !currentState.schedules.isEmpty,
               let lastDate = currentState.schedules.last?.date else { return Observable.empty() }
-        
-        homeViewAction.presentNextEvent(lastDate)
+        let startOfDay = DateManager.startOfDay(lastDate)
+        homeViewAction.presentNextEvent(startOfDay)
         return .just(Mutation.presentCompleted)
     }
 }

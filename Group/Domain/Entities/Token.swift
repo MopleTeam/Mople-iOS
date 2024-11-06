@@ -2,12 +2,12 @@
 //  Token.swift
 //  Group
 //
-//  Created by CatSlave on 10/15/24.
+//  Created by CatSlave on 11/5/24.
 //
 
 import Foundation
 
-struct Token {
+struct Token: Codable {
     var accessToken: String?
     var refreshToken: String?
 }

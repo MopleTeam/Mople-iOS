@@ -7,15 +7,19 @@
 
 import Foundation
 
-struct TokenDTO: Codable {
+struct TokenResponseDTO: Decodable {
     var accessToken: String?
     var refreshToken: String?
-    var grantType: String?
-    
-    
+        
     enum CodingKeys: String, CodingKey {
         case accessToken
         case refreshToken
-        case grantType
+    }
+}
+
+extension TokenResponseDTO {
+    func toDomain() -> Token {
+        return .init(accessToken: accessToken,
+                     refreshToken: refreshToken)
     }
 }

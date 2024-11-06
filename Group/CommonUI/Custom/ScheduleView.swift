@@ -13,7 +13,7 @@ struct ScheduleViewModel {
     let group: Group?
     let title: String?
     let date: String?
-    let place: String?
+    let location: LocationInfo?
     let participantCount: Int?
     let weather: WeatherInfo?
     
@@ -25,12 +25,12 @@ struct ScheduleViewModel {
 }
 
 extension ScheduleViewModel {
-    init(schedule: Schedule) {
+    init(schedule: Plan) {
         self.group = schedule.group
         self.title = schedule.title
-        self.place = schedule.place
+        self.location = schedule.location
         self.date = schedule.stringDate
-        self.participantCount = schedule.participants?.count
+        self.participantCount = schedule.participants.count
         self.weather = schedule.weather
     }
 }
@@ -131,7 +131,7 @@ final class ScheduleView: UIView {
         
         self.countInfoLabel.setText(viewModel.participantCountString)
         self.dateInfoLabel.setText(viewModel.date)
-        self.placeInfoLabel.setText(viewModel.place)
+        self.placeInfoLabel.setText(viewModel.location?.detailAddress)
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
         self.weatherView.configure(with: .init(weather: viewModel.weather))
