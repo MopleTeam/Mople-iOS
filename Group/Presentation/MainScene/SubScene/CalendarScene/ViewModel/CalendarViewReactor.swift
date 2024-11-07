@@ -95,11 +95,7 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case .loadScheduleList(let scheduleList):
-            newState.schedules = scheduleList.sorted(by: {
-                guard let previousDate = $0.date,
-                      let nextDate = $1.date else { return false }
-                return previousDate < nextDate
-            })
+            newState.schedules = scheduleList.sorted(by: <)
         case .loadEventDateList(let eventList):
             newState.events = eventList.sorted()
         case .setCalendarHeight(let height):
@@ -174,10 +170,9 @@ extension CalendarViewReactor {
     /// 서버로부터 전달된 일정 데이터를 테이블뷰 모델로 전환
     /// - Parameter schedules: 서버에서 받아온 일정 데이터
     /// - Returns: 일정 데이터를 일정별로 나누어서 리턴
-    private func makeTableSectionModels(_ schedules: [Plan]) -> [ScheduleTableSectionModel] {
+    private func makeTableSectionModels(_ schedules: [SimpleSchedule]) -> [ScheduleTableSectionModel] {
         let grouped = Dictionary(grouping: schedules) { schedule -> Date? in
-            guard let date = schedule.date else { return nil }
-            return DateManager.startOfDay(date)
+            return schedule.startOfDate
         }
         return grouped.map { ScheduleTableSectionModel(date: $0.key, items: $0.value) }
     }
@@ -185,10 +180,9 @@ extension CalendarViewReactor {
     #warning("날짜 중복검사 시에는 날짜의 시작시간으로 초기화하는 것이 옳다. (startOfDay)")
     /// 서버로부터 전달된 일정 데이터에서 이벤트만 추출
     /// - Returns: 중복값을 제거 후 전달
-    private func makeEventList(_ schedules: [Plan]) -> [Date] {
-        let eventArray = schedules.compactMap { $0.date }
-        let convertStartOfDay = eventArray.map { DateManager.startOfDay($0) }
-        let withOutDuplicate = Set(convertStartOfDay)
+    private func makeEventList(_ schedules: [SimpleSchedule]) -> [Date] {
+        let eventArray = schedules.compactMap { $0.startOfDate }
+        let withOutDuplicate = Set(eventArray)
         return Array(withOutDuplicate)
     }
 }

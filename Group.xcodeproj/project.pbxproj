@@ -42,7 +42,7 @@
 		5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* BaseViewController.swift */; };
 		523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* BaseEmptyView.swift */; };
 		523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroup.swift */; };
-		523645352C8FFE5B009E0784 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645342C8FFE5B009E0784 /* Plan.swift */; };
+		523645352C8FFE5B009E0784 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645342C8FFE5B009E0784 /* Schedule.swift */; };
 		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
 		5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */; };
@@ -97,9 +97,9 @@
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
 		528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484172C6B8CA100D50C6A /* AppDesign.swift */; };
 		5285E6A62CD9A63C00B855CB /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6A52CD9A63C00B855CB /* Token.swift */; };
-		5285E6AD2CD9D78B00B855CB /* GroupResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6AC2CD9D78B00B855CB /* GroupResponseDTO.swift */; };
+		5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */; };
 		5285E6B12CD9F41300B855CB /* UserInfoResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B02CD9F41300B855CB /* UserInfoResponseDTO.swift */; };
-		5285E6B42CD9F55600B855CB /* PlanResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B32CD9F55600B855CB /* PlanResponseDTO.swift */; };
+		5285E6B42CD9F55600B855CB /* SimpleScheduleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */; };
 		5285E6BA2CDA09AA00B855CB /* CommentResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */; };
 		5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6BC2CDA0BCA00B855CB /* Comment.swift */; };
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
@@ -108,6 +108,13 @@
 		5285E6D02CDB3CB300B855CB /* Date+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */; };
 		5285E6D32CDB505500B855CB /* LocationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D22CDB505500B855CB /* LocationInfo.swift */; };
 		5285E6D52CDB505F00B855CB /* WeatherInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D42CDB505F00B855CB /* WeatherInfo.swift */; };
+		5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */; };
+		5285E6DC2CDC32FD00B855CB /* CommonSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6DB2CDC32FD00B855CB /* CommonSchedule.swift */; };
+		5285E6DE2CDC340200B855CB /* SimpleSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6DD2CDC340200B855CB /* SimpleSchedule.swift */; };
+		5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6DF2CDC340A00B855CB /* DetailSchedule.swift */; };
+		5285E6E32CDCB32200B855CB /* DetailScheduleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6E22CDCB32200B855CB /* DetailScheduleDTO.swift */; };
+		5285E6E52CDCB34100B855CB /* CommonGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6E42CDCB34100B855CB /* CommonGroupDTO.swift */; };
+		5285E6E72CDCB34900B855CB /* SimpleGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6E62CDCB34900B855CB /* SimpleGroupDTO.swift */; };
 		5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* KeyChainService.swift */; };
 		528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoManager.swift */; };
 		528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */; };
@@ -199,7 +206,7 @@
 		5236452C2C8EDCEF009E0784 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* BaseEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseEmptyView.swift; sourceTree = "<group>"; };
 		523645322C8FFDEB009E0784 /* FetchGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroup.swift; sourceTree = "<group>"; };
-		523645342C8FFE5B009E0784 /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
+		523645342C8FFE5B009E0784 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
 		5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableViewController.swift; sourceTree = "<group>"; };
@@ -249,9 +256,9 @@
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
 		528484172C6B8CA100D50C6A /* AppDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDesign.swift; sourceTree = "<group>"; };
 		5285E6A52CD9A63C00B855CB /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
-		5285E6AC2CD9D78B00B855CB /* GroupResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupResponseDTO.swift; sourceTree = "<group>"; };
+		5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroupDTO.swift; sourceTree = "<group>"; };
 		5285E6B02CD9F41300B855CB /* UserInfoResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoResponseDTO.swift; sourceTree = "<group>"; };
-		5285E6B32CD9F55600B855CB /* PlanResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanResponseDTO.swift; sourceTree = "<group>"; };
+		5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleDTO.swift; sourceTree = "<group>"; };
 		5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentResponseDTO.swift; sourceTree = "<group>"; };
 		5285E6BC2CDA0BCA00B855CB /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
@@ -260,6 +267,13 @@
 		5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Convert.swift"; sourceTree = "<group>"; };
 		5285E6D22CDB505500B855CB /* LocationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfo.swift; sourceTree = "<group>"; };
 		5285E6D42CDB505F00B855CB /* WeatherInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherInfo.swift; sourceTree = "<group>"; };
+		5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonScheduleDTO.swift; sourceTree = "<group>"; };
+		5285E6DB2CDC32FD00B855CB /* CommonSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonSchedule.swift; sourceTree = "<group>"; };
+		5285E6DD2CDC340200B855CB /* SimpleSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleSchedule.swift; sourceTree = "<group>"; };
+		5285E6DF2CDC340A00B855CB /* DetailSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSchedule.swift; sourceTree = "<group>"; };
+		5285E6E22CDCB32200B855CB /* DetailScheduleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailScheduleDTO.swift; sourceTree = "<group>"; };
+		5285E6E42CDCB34100B855CB /* CommonGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonGroupDTO.swift; sourceTree = "<group>"; };
+		5285E6E62CDCB34900B855CB /* SimpleGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleGroupDTO.swift; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
 		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewReactor.swift; sourceTree = "<group>"; };
@@ -525,11 +539,11 @@
 		524E33D92C80C17A004B15FC /* DataMapping */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6B22CD9F44200B855CB /* Plan */,
-				5285E6AE2CD9F3DE00B855CB /* User */,
 				5285E6AB2CD9D75B00B855CB /* Group */,
-				5285E6A92CD9D74000B855CB /* Error */,
+				5285E6B22CD9F44200B855CB /* Schedule */,
+				5285E6AE2CD9F3DE00B855CB /* User */,
 				5285E6A72CD9D71C00B855CB /* Auth */,
+				5285E6A92CD9D74000B855CB /* Error */,
 			);
 			path = DataMapping;
 			sourceTree = "<group>";
@@ -869,7 +883,9 @@
 		5285E6AB2CD9D75B00B855CB /* Group */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6AC2CD9D78B00B855CB /* GroupResponseDTO.swift */,
+				5285E6E42CDCB34100B855CB /* CommonGroupDTO.swift */,
+				5285E6E62CDCB34900B855CB /* SimpleGroupDTO.swift */,
+				5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */,
 			);
 			path = Group;
 			sourceTree = "<group>";
@@ -891,13 +907,15 @@
 			path = User;
 			sourceTree = "<group>";
 		};
-		5285E6B22CD9F44200B855CB /* Plan */ = {
+		5285E6B22CD9F44200B855CB /* Schedule */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6BB2CDA09B500B855CB /* Plan */,
+				5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */,
+				5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */,
+				5285E6E22CDCB32200B855CB /* DetailScheduleDTO.swift */,
 				5285E6B82CDA099E00B855CB /* Comment */,
 			);
-			path = Plan;
+			path = Schedule;
 			sourceTree = "<group>";
 		};
 		5285E6B82CDA099E00B855CB /* Comment */ = {
@@ -906,14 +924,6 @@
 				5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */,
 			);
 			path = Comment;
-			sourceTree = "<group>";
-		};
-		5285E6BB2CDA09B500B855CB /* Plan */ = {
-			isa = PBXGroup;
-			children = (
-				5285E6B32CD9F55600B855CB /* PlanResponseDTO.swift */,
-			);
-			path = Plan;
 			sourceTree = "<group>";
 		};
 		5285E6C12CDA0E0200B855CB /* Auth */ = {
@@ -957,14 +967,33 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
-		5285E6D12CDB504600B855CB /* Plan */ = {
+		5285E6D12CDB504600B855CB /* Schedule */ = {
 			isa = PBXGroup;
 			children = (
-				523645342C8FFE5B009E0784 /* Plan.swift */,
+				5285E6DB2CDC32FD00B855CB /* CommonSchedule.swift */,
+				5285E6DD2CDC340200B855CB /* SimpleSchedule.swift */,
+				5285E6DF2CDC340A00B855CB /* DetailSchedule.swift */,
+				5285E6E12CDC342D00B855CB /* Components */,
+				523645342C8FFE5B009E0784 /* Schedule.swift */,
+			);
+			path = Schedule;
+			sourceTree = "<group>";
+		};
+		5285E6E12CDC342D00B855CB /* Components */ = {
+			isa = PBXGroup;
+			children = (
 				5285E6D22CDB505500B855CB /* LocationInfo.swift */,
 				5285E6D42CDB505F00B855CB /* WeatherInfo.swift */,
 			);
-			path = Plan;
+			path = Components;
+			sourceTree = "<group>";
+		};
+		5285E6E82CDCB84800B855CB /* Endpoint */ = {
+			isa = PBXGroup;
+			children = (
+				52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */,
+			);
+			path = Endpoint;
 			sourceTree = "<group>";
 		};
 		528D27C32C79F67400178F14 /* Network */ = {
@@ -1053,7 +1082,7 @@
 		52B6F63D2C77676A00DA2D75 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */,
+				5285E6E82CDCB84800B855CB /* Endpoint */,
 				524E33D92C80C17A004B15FC /* DataMapping */,
 			);
 			path = Network;
@@ -1241,7 +1270,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6D12CDB504600B855CB /* Plan */,
+				5285E6D12CDB504600B855CB /* Schedule */,
 				5285E6C62CDB332A00B855CB /* Group */,
 				5285E6C22CDB1E8500B855CB /* User */,
 				5285E6C12CDA0E0200B855CB /* Auth */,
@@ -1468,6 +1497,7 @@
 			files = (
 				5259B01D2CA038AA006B2711 /* ScheduleTableViewCell.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
+				5285E6E32CDCB32200B855CB /* DetailScheduleDTO.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* DatePickViewController.swift in Sources */,
 				5211F9082C86F2DB00403980 /* ScheduleCollectionCell.swift in Sources */,
@@ -1478,6 +1508,7 @@
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
+				5285E6E52CDCB34100B855CB /* CommonGroupDTO.swift in Sources */,
 				5208C17D2CBEAC60006272E8 /* PresentTransition.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
 				529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */,
@@ -1550,21 +1581,24 @@
 				527A3E9F2C83642C007FE63B /* CalendarSceneDIContainer.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
 				525DFCED2CC8E95500835312 /* DefaultProfileRepository.swift in Sources */,
-				5285E6B42CD9F55600B855CB /* PlanResponseDTO.swift in Sources */,
+				5285E6B42CD9F55600B855CB /* SimpleScheduleDTO.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */,
 				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
 				527A3E6A2C82C965007FE63B /* TokenResponseDTO.swift in Sources */,
 				5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */,
+				5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
+				5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */,
+				5285E6E72CDCB34900B855CB /* SimpleGroupDTO.swift in Sources */,
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
 				5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */,
-				523645352C8FFE5B009E0784 /* Plan.swift in Sources */,
+				523645352C8FFE5B009E0784 /* Schedule.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
-				5285E6AD2CD9D78B00B855CB /* GroupResponseDTO.swift in Sources */,
+				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
@@ -1580,6 +1614,7 @@
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* OverlapCheckLabel.swift in Sources */,
+				5285E6DC2CDC32FD00B855CB /* CommonSchedule.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
@@ -1597,6 +1632,7 @@
 				52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */,
 				527A3E792C834A12007FE63B /* TabBarCoordinator.swift in Sources */,
 				5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */,
+				5285E6DE2CDC340200B855CB /* SimpleSchedule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

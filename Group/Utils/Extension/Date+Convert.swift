@@ -7,20 +7,21 @@
 
 import Foundation
 
+// MARK: - 데이트 -> 컴포넌트
 extension Date {
     func getComponents() -> DateComponents {
         return DateManager.calendar.dateComponents([.year, .month, .day], from: self)
     }
 }
 
-extension Date {
-    func convertString(format: DateStringFormat) -> String {
+extension Optional where Wrapped == Date {
+    func convertString(format: DateStringFormat) -> String? {
+        guard let self else { return nil }
         switch format {
         case .full:
-            DateManager.fullDateTimeFormatter.string(from: self)
+            return DateManager.detailDateFormatter.string(from: self)
         case .simple:
-            DateManager.simpleDateFormatter.string(from: self)
+            return DateManager.simpleDateFormatter.string(from: self)
         }
     }
 }
-

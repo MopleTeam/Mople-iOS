@@ -8,14 +8,11 @@
 import Foundation
 
 struct LocationInfo: Hashable, Equatable {
-    let detailAddress: String?
     let longitude: Double?
     let latitude: Double?
     
-    init(detailAddress: String? = nil,
-         longitude: Double? = nil,
+    init(longitude: Double? = nil,
          latitude: Double? = nil) {
-        self.detailAddress = detailAddress
         self.longitude = longitude
         self.latitude = latitude
     }

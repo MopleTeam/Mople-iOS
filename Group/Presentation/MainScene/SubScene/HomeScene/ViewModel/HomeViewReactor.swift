@@ -22,12 +22,12 @@ final class HomeViewReactor: Reactor {
     }
     
     enum Mutation {
-        case fetchRecentScehdule(schedules: [Plan])
+        case fetchRecentScehdule(schedules: [SimpleSchedule])
         case presentCompleted
     }
     
     struct State {
-        @Pulse var schedules: [Plan] = []
+        @Pulse var schedules: [SimpleSchedule] = []
         @Pulse var presentCompleted: Void?
     }
     

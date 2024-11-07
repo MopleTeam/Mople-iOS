@@ -19,4 +19,10 @@ struct UserInfo: Hashable, Equatable {
         self.name = name
         self.thumbnailPath = imagePath
     }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name = "userNickname"
+        case thumbnailPath = "image_path"
+    }
 }

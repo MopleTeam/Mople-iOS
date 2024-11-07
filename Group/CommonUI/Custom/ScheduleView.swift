@@ -12,8 +12,8 @@ import SnapKit
 struct ScheduleViewModel {
     let group: Group?
     let title: String?
-    let date: String?
-    let location: LocationInfo?
+    let date: Date?
+    let detailAddress: String?
     let participantCount: Int?
     let weather: WeatherInfo?
     
@@ -25,11 +25,11 @@ struct ScheduleViewModel {
 }
 
 extension ScheduleViewModel {
-    init(schedule: Plan) {
+    init(schedule: SimpleSchedule) {
         self.group = schedule.group
         self.title = schedule.title
-        self.location = schedule.location
-        self.date = schedule.stringDate
+        self.date = schedule.date
+        self.detailAddress = nil
         self.participantCount = schedule.participants.count
         self.weather = schedule.weather
     }
@@ -130,8 +130,8 @@ final class ScheduleView: UIView {
         self.titleLabel.text = viewModel.title
         
         self.countInfoLabel.setText(viewModel.participantCountString)
-        self.dateInfoLabel.setText(viewModel.date)
-        self.placeInfoLabel.setText(viewModel.location?.detailAddress)
+        self.dateInfoLabel.setText(viewModel.date.convertString(format: .full))
+        self.placeInfoLabel.setText(viewModel.detailAddress)
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
         self.weatherView.configure(with: .init(weather: viewModel.weather))

@@ -17,13 +17,20 @@ struct ScheduleTableSectionModel: SectionModelType {
         guard let dateComponents = date else { return nil }
         return DateManager.simpleDateFormatter.string(from: dateComponents)
     }
+    
+    static func < (lhs: ScheduleTableSectionModel, rhs: ScheduleTableSectionModel) -> Bool {
+        guard let lhsDate = lhs.date,
+              let rhsDate = rhs.date else { return false }
+        
+        return lhsDate < rhsDate
+    }
 }
 
 extension ScheduleTableSectionModel {
     
-    typealias Item = Plan
+    typealias Item = SimpleSchedule
     
-    init(original: ScheduleTableSectionModel, items: [Plan]) {
+    init(original: ScheduleTableSectionModel, items: [SimpleSchedule]) {
         self = original
         self.items = items
     }

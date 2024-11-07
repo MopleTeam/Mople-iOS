@@ -14,7 +14,7 @@ import RxDataSources
 final class ScheduleListCollectionViewController: UIViewController, View {
     
     typealias Reactor = HomeViewReactor
-    typealias Section = SectionModel<Void, Plan>
+    typealias Section = SectionModel<Void, SimpleSchedule>
     
     // MARK: - Variables
     var disposeBag = DisposeBag()

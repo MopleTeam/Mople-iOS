@@ -26,7 +26,7 @@ final class DateManager {
         return format
     }()
     
-    static let fullDateTimeFormatter: DateFormatter = {
+    static let detailDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
@@ -61,9 +61,4 @@ extension DateManager {
         return calendar.startOfDay(for: date)
     }
 }
-
-
-
-// MARK: - 변환
-
 
