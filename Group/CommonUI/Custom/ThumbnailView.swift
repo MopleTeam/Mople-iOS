@@ -10,19 +10,20 @@ import SnapKit
 
 // MARK: - ViewModel
 struct ThumbnailViewModel {
+    let name: String?
     let thumbnailPath: String?
-    let title: String?
-    let participantCount: String?
-    let date: Date?
+    let memberCount: Int?
+    let lastScheduleDate: Date?
 }
 
 extension ThumbnailViewModel {
-    init?(group: Group?) {
-        guard let group = group else { return nil }
-        self .thumbnailPath = group.thumbnailPath
-        self.title = group.title
-        self.participantCount = group.memberCountText
-        self.date = group.lastSchedule?.convertDate()
+    init(group: CommonGroup?,
+         memberCount: Int? = nil,
+         lastScheduleDate: Date? = nil) {
+        self.name = group?.name
+        self.thumbnailPath = group?.thumbnailPath
+        self.memberCount = memberCount
+        self.lastScheduleDate = lastScheduleDate
     }
 }
 
@@ -123,10 +124,10 @@ final class ThumbnailTitleView: UIView {
         guard let viewModel = viewModel else { return }
         
         loadImage(viewModel.thumbnailPath)
-        groupTitleLabel.text = viewModel.title
+        groupTitleLabel.text = viewModel.name
         
         if viewType == .detail {
-            setDetailView(text: viewModel.participantCount)
+            setCountView(count: viewModel.memberCount ?? 0)
         }
     }
 
@@ -144,8 +145,7 @@ extension ThumbnailTitleView {
         }
     }
     
-    private func setDetailView(text: String?) {
-        guard let memberCount = text else { return }
-        memberCountView.setText(memberCount)
+    private func setCountView(count: Int) {
+        memberCountView.setText("\(count) 명")
     }
 }

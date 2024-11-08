@@ -37,7 +37,6 @@ struct Validator {
         guard let name = name, !name.isEmpty else {
             return .empty
         }
-        
         switch name {
         case _ where name.contains(where: { $0.isWhitespace }) || !name.checkValidator():
             return .strange

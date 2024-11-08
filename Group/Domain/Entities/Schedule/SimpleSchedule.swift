@@ -8,6 +8,8 @@
 import Foundation
 
 struct SimpleSchedule: Schedulable, Hashable, Equatable {
-    let commomScheudle: CommonSchedule?
-    let group: Group?
+    let commonScheudle: CommonSchedule?
+    let group: CommonGroup?
+    let participantsCount: Int?
+    let weatherInfo: WeatherInfo?
 }

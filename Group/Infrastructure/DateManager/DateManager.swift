@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum DateStringFormat {
-    case full
-    case simple
-}
-
 final class DateManager {
     
     static let calendar: Calendar = {
@@ -59,6 +54,19 @@ extension DateManager {
     
     static func startOfDay(_ date: Date) -> Date {
         return calendar.startOfDay(for: date)
+    }
+    
+    #warning("사용하지 않음, 정리용")
+    // 두 날짜를 미래, 과거, 같음으로 비교 가능
+    static func checkDateStatus(_ date: Date) -> ComparisonResult {
+        return  calendar.compare(date, to: .now, toGranularity: .day)
+    }
+    
+    static func numberOfDaysBetween(_ date: Date) -> Int {
+        let now = startOfDay(.now)
+        let scheduleDate = startOfDay(date)
+        let result = calendar.dateComponents([.day], from: now, to: scheduleDate)
+        return result.day ?? 0
     }
 }
 

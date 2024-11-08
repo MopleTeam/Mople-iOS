@@ -8,18 +8,16 @@
 import Foundation
 
 protocol Schedulable {
-    var commomScheudle: CommonSchedule? { get }
+    var commonScheudle: CommonSchedule? { get }
 }
 
 extension Schedulable {
-    var id: Int? { commomScheudle?.id }
-    var title: String? { commomScheudle?.title }
-    var date: Date? { commomScheudle?.date }
-    var address: String? { commomScheudle?.address }
-    var detailAddress: String? { commomScheudle?.detailAddress }
-    var participants: [UserInfo] { commomScheudle?.participants ?? [] }
-    var weather: WeatherInfo? { commomScheudle?.weather }
-    var startOfDate: Date? { commomScheudle?.startOfDate }
+    var id: Int? { commonScheudle?.id }
+    var title: String? { commonScheudle?.title }
+    var date: Date? { commonScheudle?.date }
+    var address: String? { commonScheudle?.address }
+    var detailAddress: String? { commonScheudle?.detailAddress }
+    var startOfDate: Date? { commonScheudle?.startOfDate }
 }
 
 struct CommonSchedule: Hashable, Equatable {
@@ -28,8 +26,6 @@ struct CommonSchedule: Hashable, Equatable {
     let date: Date?
     let address: String?
     let detailAddress: String?
-    let participants: [UserInfo]
-    let weather: WeatherInfo?
 }
 
 extension CommonSchedule {

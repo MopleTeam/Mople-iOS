@@ -10,9 +10,10 @@ import SnapKit
 
 // MARK: - ViewModel
 struct ScheduleViewModel {
-    let group: Group?
     let title: String?
     let date: Date?
+    let group: CommonGroup?
+    let address: String?
     let detailAddress: String?
     let participantCount: Int?
     let weather: WeatherInfo?
@@ -26,12 +27,13 @@ struct ScheduleViewModel {
 
 extension ScheduleViewModel {
     init(schedule: SimpleSchedule) {
-        self.group = schedule.group
         self.title = schedule.title
         self.date = schedule.date
-        self.detailAddress = nil
-        self.participantCount = schedule.participants.count
-        self.weather = schedule.weather
+        self.group = schedule.group
+        self.address = schedule.address
+        self.detailAddress = schedule.detailAddress
+        self.participantCount = schedule.participantsCount
+        self.weather = schedule.weatherInfo
     }
 }
 

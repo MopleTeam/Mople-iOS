@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CommentResponseDTO: Decodable {
+struct CommentDTO: Decodable {
     var id: Int?
     var writerId: Int?
     var writerName: String?
@@ -25,7 +25,7 @@ struct CommentResponseDTO: Decodable {
     }
 }
 
-extension CommentResponseDTO {
+extension CommentDTO {
     func toDomain() -> Comment {
         return .init(id: id,
                      writerId: writerId,

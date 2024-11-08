@@ -8,9 +8,10 @@
 import Foundation
 
 struct SimpleGroupDTO: Decodable {
-    let common: CommonGroupDTO?
-    let membersCount: Int?
-    let lastScheduleDate: String?
+
+    var commonDTO: CommonGroupDTO?
+    var memberCount: Int?
+    var lastScheduleDate: String?
     
     enum CodingKeys: String, CodingKey {
         case members
@@ -18,11 +19,19 @@ struct SimpleGroupDTO: Decodable {
     }
     
     init(from decoder: Decoder) throws {
-        self.common = try? CommonGroupDTO(from: decoder)
+        self.commonDTO = try? CommonGroupDTO(from: decoder)
         
         let container = try? decoder.container(keyedBy: CodingKeys.self)
         self.lastScheduleDate = try? container?.decodeIfPresent(String.self, forKey: .lastScheduleDate)
         let memberContainer = try? container?.nestedUnkeyedContainer(forKey: .members)
-        self.membersCount = memberContainer?.count
+        self.memberCount = memberContainer?.count
+    }
+}
+
+extension SimpleGroupDTO {
+    func toDomain() -> SimpleGroup {
+        return .init(commonGroup: commonDTO?.toDomain(),
+                     memberCount: memberCount,
+                     lastScheduleDate: lastScheduleDate?.convertDate())
     }
 }

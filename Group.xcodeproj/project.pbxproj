@@ -20,7 +20,7 @@
 		5208C17D2CBEAC60006272E8 /* PresentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C17C2CBEAC60006272E8 /* PresentTransition.swift */; };
 		5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C17E2CBEAC79006272E8 /* DismissTransition.swift */; };
 		5208C1812CBEACF5006272E8 /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1802CBEACF5006272E8 /* MainNavigationController.swift */; };
-		5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */; };
+		5208C1852CBEBD28006272E8 /* ProfileDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1842CBEBD28006272E8 /* ProfileDTO.swift */; };
 		5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */; };
 		5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* MainTabBarController.swift */; };
 		5211F9002C86B37B00403980 /* HomeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8FF2C86B37B00403980 /* HomeButton.swift */; };
@@ -42,7 +42,6 @@
 		5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* BaseViewController.swift */; };
 		523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* BaseEmptyView.swift */; };
 		523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroup.swift */; };
-		523645352C8FFE5B009E0784 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645342C8FFE5B009E0784 /* Schedule.swift */; };
 		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
 		5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */; };
@@ -75,7 +74,6 @@
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */; };
 		526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */; };
-		527A3E6A2C82C965007FE63B /* TokenResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E692C82C965007FE63B /* TokenResponseDTO.swift */; };
 		527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */; };
 		527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */; };
 		527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E752C8324CE007FE63B /* HomeCoordinator.swift */; };
@@ -98,12 +96,12 @@
 		528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484172C6B8CA100D50C6A /* AppDesign.swift */; };
 		5285E6A62CD9A63C00B855CB /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6A52CD9A63C00B855CB /* Token.swift */; };
 		5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */; };
-		5285E6B12CD9F41300B855CB /* UserInfoResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B02CD9F41300B855CB /* UserInfoResponseDTO.swift */; };
+		5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */; };
 		5285E6B42CD9F55600B855CB /* SimpleScheduleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */; };
-		5285E6BA2CDA09AA00B855CB /* CommentResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */; };
+		5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B92CDA09AA00B855CB /* CommentDTO.swift */; };
 		5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6BC2CDA0BCA00B855CB /* Comment.swift */; };
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
-		5285E6C82CDB333600B855CB /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C72CDB333600B855CB /* Group.swift */; };
+		5285E6C82CDB333600B855CB /* SimpleGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C72CDB333600B855CB /* SimpleGroup.swift */; };
 		5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */; };
 		5285E6D02CDB3CB300B855CB /* Date+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */; };
 		5285E6D32CDB505500B855CB /* LocationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D22CDB505500B855CB /* LocationInfo.swift */; };
@@ -121,6 +119,8 @@
 		529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
+		529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */; };
+		529D7B902CDE019A00BE77BE /* DetailGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */; };
 		52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* LoginRepository.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
 		52B87E302C6B2A460026B601 /* Pretendard-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */; };
@@ -185,7 +185,7 @@
 		5208C17C2CBEAC60006272E8 /* PresentTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentTransition.swift; sourceTree = "<group>"; };
 		5208C17E2CBEAC79006272E8 /* DismissTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissTransition.swift; sourceTree = "<group>"; };
 		5208C1802CBEACF5006272E8 /* MainNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNavigationController.swift; sourceTree = "<group>"; };
-		5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResponseDTO.swift; sourceTree = "<group>"; };
+		5208C1842CBEBD28006272E8 /* ProfileDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDTO.swift; sourceTree = "<group>"; };
 		5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepository.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		5211F8FF2C86B37B00403980 /* HomeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeButton.swift; sourceTree = "<group>"; };
@@ -206,7 +206,6 @@
 		5236452C2C8EDCEF009E0784 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* BaseEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseEmptyView.swift; sourceTree = "<group>"; };
 		523645322C8FFDEB009E0784 /* FetchGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroup.swift; sourceTree = "<group>"; };
-		523645342C8FFE5B009E0784 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
 		5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableViewController.swift; sourceTree = "<group>"; };
@@ -234,7 +233,6 @@
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardEvent.swift; sourceTree = "<group>"; };
 		526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Ext.swift"; sourceTree = "<group>"; };
-		527A3E692C82C965007FE63B /* TokenResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponseDTO.swift; sourceTree = "<group>"; };
 		527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLoginUseCaseMock.swift; sourceTree = "<group>"; };
 		527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentSchedule.swift; sourceTree = "<group>"; };
 		527A3E752C8324CE007FE63B /* HomeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
@@ -257,12 +255,12 @@
 		528484172C6B8CA100D50C6A /* AppDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDesign.swift; sourceTree = "<group>"; };
 		5285E6A52CD9A63C00B855CB /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroupDTO.swift; sourceTree = "<group>"; };
-		5285E6B02CD9F41300B855CB /* UserInfoResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoResponseDTO.swift; sourceTree = "<group>"; };
+		5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoDTO.swift; sourceTree = "<group>"; };
 		5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleDTO.swift; sourceTree = "<group>"; };
-		5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentResponseDTO.swift; sourceTree = "<group>"; };
+		5285E6B92CDA09AA00B855CB /* CommentDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDTO.swift; sourceTree = "<group>"; };
 		5285E6BC2CDA0BCA00B855CB /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
-		5285E6C72CDB333600B855CB /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		5285E6C72CDB333600B855CB /* SimpleGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleGroup.swift; sourceTree = "<group>"; };
 		5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ConvertDate.swift"; sourceTree = "<group>"; };
 		5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Convert.swift"; sourceTree = "<group>"; };
 		5285E6D22CDB505500B855CB /* LocationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfo.swift; sourceTree = "<group>"; };
@@ -278,6 +276,8 @@
 		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewReactor.swift; sourceTree = "<group>"; };
 		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
+		529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonGroup.swift; sourceTree = "<group>"; };
+		529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroup.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* LoginRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRepository.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -541,8 +541,8 @@
 			children = (
 				5285E6AB2CD9D75B00B855CB /* Group */,
 				5285E6B22CD9F44200B855CB /* Schedule */,
+				5285E6B82CDA099E00B855CB /* Comment */,
 				5285E6AE2CD9F3DE00B855CB /* User */,
-				5285E6A72CD9D71C00B855CB /* Auth */,
 				5285E6A92CD9D74000B855CB /* Error */,
 			);
 			path = DataMapping;
@@ -856,18 +856,10 @@
 			path = AppDesign;
 			sourceTree = "<group>";
 		};
-		5285E6A72CD9D71C00B855CB /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E692C82C965007FE63B /* TokenResponseDTO.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
 		5285E6A82CD9D72F00B855CB /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				5208C1842CBEBD28006272E8 /* ProfileResponseDTO.swift */,
+				5208C1842CBEBD28006272E8 /* ProfileDTO.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -902,7 +894,7 @@
 		5285E6AF2CD9F3FA00B855CB /* User */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6B02CD9F41300B855CB /* UserInfoResponseDTO.swift */,
+				5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */,
 			);
 			path = User;
 			sourceTree = "<group>";
@@ -913,7 +905,6 @@
 				5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */,
 				5285E6B32CD9F55600B855CB /* SimpleScheduleDTO.swift */,
 				5285E6E22CDCB32200B855CB /* DetailScheduleDTO.swift */,
-				5285E6B82CDA099E00B855CB /* Comment */,
 			);
 			path = Schedule;
 			sourceTree = "<group>";
@@ -921,7 +912,7 @@
 		5285E6B82CDA099E00B855CB /* Comment */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6B92CDA09AA00B855CB /* CommentResponseDTO.swift */,
+				5285E6B92CDA09AA00B855CB /* CommentDTO.swift */,
 			);
 			path = Comment;
 			sourceTree = "<group>";
@@ -946,7 +937,9 @@
 		5285E6C62CDB332A00B855CB /* Group */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6C72CDB333600B855CB /* Group.swift */,
+				529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */,
+				5285E6C72CDB333600B855CB /* SimpleGroup.swift */,
+				529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */,
 			);
 			path = Group;
 			sourceTree = "<group>";
@@ -974,7 +967,6 @@
 				5285E6DD2CDC340200B855CB /* SimpleSchedule.swift */,
 				5285E6DF2CDC340A00B855CB /* DetailSchedule.swift */,
 				5285E6E12CDC342D00B855CB /* Components */,
-				523645342C8FFE5B009E0784 /* Schedule.swift */,
 			);
 			path = Schedule;
 			sourceTree = "<group>";
@@ -1060,6 +1052,14 @@
 				529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */,
 			);
 			path = FooterView;
+			sourceTree = "<group>";
+		};
+		529D7B912CDE14BD00BE77BE /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				5285E6BC2CDA0BCA00B855CB /* Comment.swift */,
+			);
+			path = Comment;
 			sourceTree = "<group>";
 		};
 		52B6F6392C77653F00DA2D75 /* Interfaces */ = {
@@ -1270,11 +1270,11 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6D12CDB504600B855CB /* Schedule */,
 				5285E6C62CDB332A00B855CB /* Group */,
+				5285E6D12CDB504600B855CB /* Schedule */,
+				529D7B912CDE14BD00BE77BE /* Comment */,
 				5285E6C22CDB1E8500B855CB /* User */,
 				5285E6C12CDA0E0200B855CB /* Auth */,
-				5285E6BC2CDA0BCA00B855CB /* Comment.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1527,6 +1527,7 @@
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
 				527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */,
 				523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */,
+				529D7B902CDE019A00BE77BE /* DetailGroup.swift in Sources */,
 				52E238372C76530D0066C9A3 /* LoginViewReacotr.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileCoordinator.swift in Sources */,
 				5285E6D32CDB505500B855CB /* LocationInfo.swift in Sources */,
@@ -1538,7 +1539,7 @@
 				527A3E9D2C83641F007FE63B /* GroupListSceneDIContainer.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				52266BF02CBCE86E007D03EB /* RouteType.swift in Sources */,
-				5285E6BA2CDA09AA00B855CB /* CommentResponseDTO.swift in Sources */,
+				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
@@ -1559,7 +1560,7 @@
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
-				5285E6B12CD9F41300B855CB /* UserInfoResponseDTO.swift in Sources */,
+				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */,
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
@@ -1568,6 +1569,7 @@
 				527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* CustomNavigationBar.swift in Sources */,
 				5208C1812CBEACF5006272E8 /* MainNavigationController.swift in Sources */,
+				529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */,
@@ -1584,8 +1586,7 @@
 				5285E6B42CD9F55600B855CB /* SimpleScheduleDTO.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */,
 				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
-				527A3E6A2C82C965007FE63B /* TokenResponseDTO.swift in Sources */,
-				5208C1852CBEBD28006272E8 /* ProfileResponseDTO.swift in Sources */,
+				5208C1852CBEBD28006272E8 /* ProfileDTO.swift in Sources */,
 				5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
@@ -1596,7 +1597,6 @@
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
 				5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */,
-				523645352C8FFE5B009E0784 /* Schedule.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
 				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
@@ -1618,7 +1618,7 @@
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
-				5285E6C82CDB333600B855CB /* Group.swift in Sources */,
+				5285E6C82CDB333600B855CB /* SimpleGroup.swift in Sources */,
 				523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */,
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,

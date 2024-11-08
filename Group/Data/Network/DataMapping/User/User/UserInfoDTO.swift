@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserInfoResponseDTO: Decodable {
+struct UserInfoDTO: Decodable {
     let id: Int?
     let name: String?
     let thumbnailPath: String?
@@ -19,7 +19,7 @@ struct UserInfoResponseDTO: Decodable {
     }
 }
 
-extension UserInfoResponseDTO {
+extension UserInfoDTO {
     func toDomain() -> UserInfo {
         return .init(id: id,
                      name: name,

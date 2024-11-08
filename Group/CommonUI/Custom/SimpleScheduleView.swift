@@ -10,7 +10,7 @@ import SnapKit
 
 // MARK: - ViewModel
 struct SimpleScheduleViewModel {
-    let group: Group?
+    let group: CommonGroup?
     let title: String?
     let place: String?
     let participantCount: Int?

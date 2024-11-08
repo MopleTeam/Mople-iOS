@@ -13,11 +13,11 @@ final class GroupListViewReactor: Reactor {
     }
     
     enum Mutation {
-        case fetchGroupList(groupList: [Group])
+        case fetchGroupList(groupList: [SimpleGroup])
     }
     
     struct State {
-        @Pulse var groupList: [Group] = []
+        @Pulse var groupList: [SimpleGroup] = []
     }
     
     private let fetchUseCase: FetchGroup

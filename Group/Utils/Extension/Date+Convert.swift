@@ -8,6 +8,11 @@
 import Foundation
 
 // MARK: - 데이트 -> 컴포넌트
+enum DateStringFormat {
+    case full
+    case simple
+}
+
 extension Date {
     func getComponents() -> DateComponents {
         return DateManager.calendar.dateComponents([.year, .month, .day], from: self)

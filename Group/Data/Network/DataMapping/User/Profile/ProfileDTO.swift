@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ProfileResponseDTO: Decodable {
+struct ProfileDTO: Decodable {
     var name: String?
     var imagePath: String?
     var badgeCount: Int?
@@ -19,7 +19,7 @@ struct ProfileResponseDTO: Decodable {
     }
 }
 
-extension ProfileResponseDTO {
+extension ProfileDTO {
     func toDomain() -> ProfileInfo {
         return .init(name: name,
                      imagePath: imagePath,

@@ -8,13 +8,22 @@
 import Foundation
 
 struct CommonGroupDTO: Decodable {
-    let id: Int?
-    let name: String?
-    let thumbnailPath: String?
+
+    var id: Int?
+    var name: String?
+    var thumbnailPath: String?
 
     enum CodingKeys: String, CodingKey {
         case id
         case name
         case thumbnailPath = "imageUrl"
+    }
+}
+
+extension CommonGroupDTO {
+    func toDomain() -> CommonGroup {
+        return .init(id: id,
+                     name: name,
+                     thumbnailPath: thumbnailPath)
     }
 }

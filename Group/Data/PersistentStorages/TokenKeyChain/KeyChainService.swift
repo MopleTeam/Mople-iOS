@@ -35,11 +35,11 @@ final class KeyChainService {
         let status = SecItemAdd(query as CFDictionary, nil)
         
         guard status == errSecSuccess,
-              let token = try? JSONDecoder().decode(TokenResponseDTO.self, from: tokens) else {
+              let token = try? JSONDecoder().decode(Token.self, from: tokens) else {
             return
         }
                 
-        Self.cachedToken = token.toDomain()
+        Self.cachedToken = token
     }
     
     func getToken() -> Token? {

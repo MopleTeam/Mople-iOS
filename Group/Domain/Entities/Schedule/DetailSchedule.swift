@@ -8,7 +8,8 @@
 import Foundation
 
 struct DetailSchedule: Schedulable {
-    let commomScheudle: CommonSchedule?
+    let commonScheudle: CommonSchedule?
     let location: LocationInfo?
+    let participants: [UserInfo]
     let comments: [Comment]
 }
