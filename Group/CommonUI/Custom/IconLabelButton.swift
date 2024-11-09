@@ -28,8 +28,8 @@ final class IconLabelButton: UIButton {
         
         super.init(frame: .zero)
         self.setLabel(configure: configure,
-                              iconSize: iconSize,
-                              iconAligment: iconAligment)
+                      iconSize: iconSize,
+                      iconAligment: iconAligment)
         setupUI(aligment: labelAligment)
     }
     

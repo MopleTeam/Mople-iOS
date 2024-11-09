@@ -14,8 +14,8 @@ struct ProfileUpdateModel {
     var completedAction: ProfileSetupAction
 }
 
-final class ProfileViewController: BaseViewController, View {
-    typealias Reactor = ProfileViewReactor
+final class SetupViewController: BaseViewController, View {
+    typealias Reactor = SetupViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -34,32 +34,32 @@ final class ProfileViewController: BaseViewController, View {
     }()
     
     private let profileNameButton: IconLabelButton = {
-        let button = IconLabelButton(configure: AppDesign.ProfileManagement.edit,
+        let button = IconLabelButton(configure: AppDesign.Setup.edit,
                                      iconSize: 20,
                                      labelAligment: .fill)
         return button
     }()
 
-    private let notifyLabel = IconLabelButton(configure: AppDesign.ProfileManagement.notify,
+    private let notifyLabel = IconLabelButton(configure: AppDesign.Setup.notify,
                                               labelAligment: .fill)
     
-    private let policyLabel = IconLabelButton(configure: AppDesign.ProfileManagement.presonalInfo,
+    private let policyLabel = IconLabelButton(configure: AppDesign.Setup.presonalInfo,
                                                 labelAligment: .fill)
         
     
-    private let versionTitleLabel = BaseLabel(configure: AppDesign.ProfileManagement.versionInfo)
+    private let versionTitleLabel = BaseLabel(configure: AppDesign.Setup.versionInfo)
     
     private let versionLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.ProfileManagement.version)
+        let label = BaseLabel(configure: AppDesign.Setup.version)
         label.backgroundColor = AppDesign.defaultWihte
         label.text = Bundle.main.releaseVersionNumber
         return label
     }()
     
-    private let logoutLabel = IconLabelButton(configure: AppDesign.ProfileManagement.logout,
+    private let logoutLabel = IconLabelButton(configure: AppDesign.Setup.logout,
                                               labelAligment: .fill)
     
-    private let resignLabel = IconLabelButton(configure: AppDesign.ProfileManagement.resign,
+    private let resignLabel = IconLabelButton(configure: AppDesign.Setup.resign,
                                          labelAligment: .fill)
     
     private lazy var profileStackView: UIStackView = {
@@ -104,12 +104,12 @@ final class ProfileViewController: BaseViewController, View {
         sv.spacing  = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = AppDesign.ProfileManagement.borderColor
+        sv.backgroundColor = AppDesign.Setup.borderColor
         return sv
     }()
     
     // MARK: - LifeCycle
-    init(reactor: ProfileViewReactor) {
+    init(reactor: SetupViewReactor) {
         defer { self.reactor = reactor }
         super.init(title: "마이페이지")
     }
@@ -201,7 +201,7 @@ final class ProfileViewController: BaseViewController, View {
 }
 
 // MARK: - 프로필 빌더 생성 및 적용
-extension ProfileViewController {
+extension SetupViewController {
     private func makeProfile() -> ProfileBuilder {
         let image = self.profileImageView.image
         let nickName = profileNameButton.text
@@ -215,7 +215,7 @@ extension ProfileViewController {
     }
 }
 
-extension ProfileViewController {
+extension SetupViewController {
     
     
     /// 프로필 편집 뷰로 현재 프로필과 편집 완료 액션 전달

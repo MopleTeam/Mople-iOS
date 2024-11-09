@@ -78,13 +78,13 @@ extension MainSceneDIContainer {
     
     // MARK: - 프로필
     private func makeProfileCoordinator() -> BaseCoordinator {
-        let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService)
+        let profileDI = SetupSceneDIContainer(appNetworkService: appNetworkService)
         
         let navigationController = MainNavigationController()
         navigationController.tabBarItem = .init(title: "프로필",
                                                 image: .person,
                                                 selectedImage: nil)
         
-        return profileDI.makeProfileFlowCoordinator(navigationController: navigationController)
+        return profileDI.makeSetupFlowCoordinator(navigationController: navigationController)
     }
 }

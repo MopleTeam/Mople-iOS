@@ -17,7 +17,7 @@ extension UIFont {
         case extraLight = "Pretendard-ExtraLight"
         case light = "Pretendard-Light"
         case medium = "Pretendard-Medium"
-        case reqular = "Pretendard-Regular"
+        case regular = "Pretendard-Regular"
         case thin = "Pretendard-Thin"
     }
     

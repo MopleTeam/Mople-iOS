@@ -7,30 +7,30 @@
 
 import UIKit
 
-protocol ProfileCoordinatorDependencies {
-    func makeProfileViewController(action: ProfileViewAction) -> ProfileViewController
+protocol SetupCoordinatorDependencies {
+    func makeSetupController(action: ProfileViewAction) -> SetupViewController
     func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController
     func makeNotifyViewController() -> NotifyViewController
     func makePolicyViewController() -> PolicyViewController
 }
 
-final class ProfileCoordinator: BaseCoordinator {
-    private let dependencies: ProfileCoordinatorDependencies
+final class SetupCoordinator: BaseCoordinator {
+    private let dependencies: SetupCoordinatorDependencies
     
     init(navigationController: UINavigationController,
-         dependencies: ProfileCoordinatorDependencies) {
+         dependencies: SetupCoordinatorDependencies) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
     }
     
     override func start() {
-        let vc = dependencies.makeProfileViewController(action: getAccountAction())
+        let vc = dependencies.makeSetupController(action: getAccountAction())
         
         navigationController.pushViewController(vc, animated: false)
     }
 }
 
-extension ProfileCoordinator {
+extension SetupCoordinator {
     private func getAccountAction() -> ProfileViewAction {
         .init(presentEditView: presentEditView(updateModel:),
               presentNotifyView: presentNotifyView,
@@ -59,7 +59,7 @@ extension ProfileCoordinator {
 }
 
 // MARK: - Helper
-extension ProfileCoordinator {
+extension SetupCoordinator {
     
     // 커스텀 present로 이동하기 (탭바가 없는 상태로 이동하기 위해서)
     private func presentView(view: UIViewController) {

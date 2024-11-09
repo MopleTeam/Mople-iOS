@@ -22,7 +22,7 @@ enum Route {
         case .calendar:
             return CalendarScheduleViewController.self
         case .profile:
-            return ProfileViewController.self
+            return SetupViewController.self
         }
     }
 }

@@ -15,7 +15,7 @@ struct ProfileViewAction {
     var logout: () -> Void
 }
 
-final class ProfileViewReactor: Reactor {
+final class SetupViewReactor: Reactor {
     
     enum Action {
         case fetchProfile
@@ -76,7 +76,7 @@ final class ProfileViewReactor: Reactor {
     
 }
 
-extension ProfileViewReactor {
+extension SetupViewReactor {
     private func getProfile() -> Observable<Mutation> {
         return fetchProfileImpl.fetchProfile()
             .asObservable()

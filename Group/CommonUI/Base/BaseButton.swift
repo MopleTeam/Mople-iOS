@@ -60,7 +60,9 @@ class BaseButton: UIButton {
         configuration?.background.backgroundColor = color
     }
     
-    private func setItemConfigrue(setValues: UIConstructive, imagePlacement: NSDirectionalRectEdge) {
+    private func setItemConfigrue(setValues: UIConstructive,
+                                  imagePlacement: NSDirectionalRectEdge) {
+        
         let config = setValues.itemConfig
         
         defaultTitle = config.text

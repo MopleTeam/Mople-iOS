@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ProfileSceneDIContainer: ProfileCoordinatorDependencies {
+final class SetupSceneDIContainer: SetupCoordinatorDependencies {
  
     let appNetworkService: AppNetWorkService
 
@@ -15,27 +15,27 @@ final class ProfileSceneDIContainer: ProfileCoordinatorDependencies {
         self.appNetworkService = appNetworkService
     }
     
-    func makeProfileFlowCoordinator(navigationController: UINavigationController) -> ProfileCoordinator {
-        let flow = ProfileCoordinator(navigationController: navigationController,
+    func makeSetupFlowCoordinator(navigationController: UINavigationController) -> SetupCoordinator {
+        let flow = SetupCoordinator(navigationController: navigationController,
                                         dependencies: self)
         return flow
     }
 }
 
 // MARK: - 프로필 Flow
-extension ProfileSceneDIContainer {
-    func makeProfileViewController(action: ProfileViewAction) -> ProfileViewController {
-        return ProfileViewController(reactor: makeProfileViewReactor(action: action))
+extension SetupSceneDIContainer {
+    func makeSetupController(action: ProfileViewAction) -> SetupViewController {
+        return SetupViewController(reactor: makeSetupViewReactor(action: action))
     }
     
-    private func makeProfileViewReactor(action: ProfileViewAction) -> ProfileViewReactor {
-        return ProfileViewReactor(editProfileUseCase: FetchProfileMock(),
+    private func makeSetupViewReactor(action: ProfileViewAction) -> SetupViewReactor {
+        return SetupViewReactor(editProfileUseCase: FetchProfileMock(),
                                   viewAction: action)
     }
 }
 
 // MARK: - 프로필 편집 Flow
-extension ProfileSceneDIContainer {
+extension SetupSceneDIContainer {
     func makeProfileEditViewController(updateModel: ProfileUpdateModel) -> ProfileEditViewController {
         return ProfileEditViewController(profile: updateModel.currentProfile,
                                          reactor: makeProfileEditViewReactor(action: updateModel.completedAction))
@@ -48,14 +48,14 @@ extension ProfileSceneDIContainer {
 }
 
 // MARK: - 알림관리 Flow
-extension ProfileSceneDIContainer {
+extension SetupSceneDIContainer {
     func makeNotifyViewController() -> NotifyViewController {
         return NotifyViewController()
     }
 }
 
 // MARK: - 개인정보 처리방침 Flow
-extension ProfileSceneDIContainer {
+extension SetupSceneDIContainer {
     func makePolicyViewController() -> PolicyViewController {
         return PolicyViewController()
     }

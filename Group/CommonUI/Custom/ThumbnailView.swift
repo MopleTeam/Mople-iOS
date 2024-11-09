@@ -73,7 +73,6 @@ final class ThumbnailTitleView: UIView {
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [thumbnailView, groupInfoStackView, subButton])
         sv.axis = .horizontal
-        sv.spacing = 12
         sv.distribution = .fill
         sv.alignment = .center
         return sv
@@ -103,9 +102,11 @@ final class ThumbnailTitleView: UIView {
     private func infoConfigure() {
         switch viewType {
         case .simple:
+            setSpacing(8)
             setThumbnail(size: 28, radius: 6)
             groupTitleLabel.setConfigure(configure: AppDesign.Schedule.group)
         case .detail:
+            setSpacing(12)
             setThumbnail(size: 56, radius: 12)
             groupTitleLabel.setConfigure(configure: AppDesign.Group.title)
             makeDetail()
@@ -147,5 +148,9 @@ extension ThumbnailTitleView {
     
     private func setCountView(count: Int) {
         memberCountView.setText("\(count) 명")
+    }
+    
+    private func setSpacing(_ space: CGFloat) {
+        mainStackView.spacing = space
     }
 }

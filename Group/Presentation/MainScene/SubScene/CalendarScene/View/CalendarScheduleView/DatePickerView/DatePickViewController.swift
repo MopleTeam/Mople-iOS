@@ -187,7 +187,7 @@ extension DatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         let label = UILabel()
         label.textAlignment = .center
         label.textColor = .black
-        label.font = .pretendard(type: .bold, size: 22)
+        label.font = FontStyle.Heading.bold
         
         if component == 0 {
             label.text = "\(months[row]) 월"
