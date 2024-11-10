@@ -147,7 +147,7 @@ extension ThumbnailTitleView {
     }
     
     private func setCountView(count: Int) {
-        memberCountView.setText("\(count) 명")
+        memberCountView.text = "\(count) 명"
     }
     
     private func setSpacing(_ space: CGFloat) {

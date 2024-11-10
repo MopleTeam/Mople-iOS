@@ -164,7 +164,7 @@ extension WeatherView {
     
     private func setPopLabel(_ popText: String?) {
         [borderLine, popLabel].forEach { $0.isHidden = popText == nil }
-        popLabel.setText(popText)
+        popLabel.text = popText
     }
 }
 

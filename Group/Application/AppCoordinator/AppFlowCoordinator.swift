@@ -36,9 +36,9 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     private func checkEntry() {
 //        if KeyChainService.shared.hasToken() {
-            self.mainFlowStart()
+//            self.mainFlowStart()
 //        } else {
-//            self.loginFlowStart()
+            self.loginFlowStart()
 //        }
     }
     

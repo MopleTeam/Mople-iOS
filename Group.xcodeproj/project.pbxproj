@@ -145,6 +145,7 @@
 		52BBF6A52CE01B7500564F11 /* AppDesign+DatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A42CE01B7500564F11 /* AppDesign+DatePicker.swift */; };
 		52BBF6A82CE01C0200564F11 /* AppDesign+ScheduleTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A72CE01C0200564F11 /* AppDesign+ScheduleTable.swift */; };
 		52BBF6AC2CE01EA400564F11 /* AppDesign+Setup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */; };
+		52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */; };
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
@@ -314,6 +315,7 @@
 		52BBF6A42CE01B7500564F11 /* AppDesign+DatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+DatePicker.swift"; sourceTree = "<group>"; };
 		52BBF6A72CE01C0200564F11 /* AppDesign+ScheduleTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+ScheduleTable.swift"; sourceTree = "<group>"; };
 		52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Setup.swift"; sourceTree = "<group>"; };
+		52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScreen+NotchSize.swift"; sourceTree = "<group>"; };
 		52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCalendarCell.swift; sourceTree = "<group>"; };
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Group.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Group.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1049,6 +1051,7 @@
 				5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */,
 				5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */,
 				52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */,
+				52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1704,6 +1707,7 @@
 				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
 				5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */,
+				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
 				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,

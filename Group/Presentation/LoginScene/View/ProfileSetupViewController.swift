@@ -67,11 +67,11 @@ class ProfileSetupViewController: UIViewController, View {
             make.top.equalTo(self.view.safeAreaLayoutGuide).inset(28)
             make.horizontalEdges.equalToSuperview().inset(20)
         }
-        
+
         profileContainerView.snp.makeConstraints { make in
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
-            make.bottom.equalToSuperview().inset(28)
+            make.bottom.equalToSuperview().inset(UIScreen.safeBottom())
         }
 
         indicator.snp.makeConstraints { make in

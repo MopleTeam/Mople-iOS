@@ -210,7 +210,7 @@ extension SetupViewController {
     }
     
     private func setProfile(_ profile: ProfileInfo) {
-        profileNameButton.setText(profile.name)
+        profileNameButton.text = profile.name
         _ = profileImageView.kfSetimage(profile.imagePath)
     }
 }

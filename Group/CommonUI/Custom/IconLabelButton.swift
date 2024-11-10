@@ -15,21 +15,19 @@ enum LabelViewAligment {
 
 final class IconLabelButton: UIButton {
         
-    public var text: String? {
-        return headerLabel?.text
-    }
-    
     private var headerLabel: IconLabelView?
     
     init(configure: UIConstructive,
          iconSize: CGFloat = 24,
          iconAligment: IconAlignment = .right,
+         contentSpacing: CGFloat = 0,
          labelAligment: LabelViewAligment = .center) {
         
         super.init(frame: .zero)
         self.setLabel(configure: configure,
                       iconSize: iconSize,
-                      iconAligment: iconAligment)
+                      iconAligment: iconAligment,
+                      contentSpacing: contentSpacing)
         setupUI(aligment: labelAligment)
     }
     
@@ -40,7 +38,26 @@ final class IconLabelButton: UIButton {
     private func setupUI(aligment: LabelViewAligment) {
         guard let label = headerLabel else { return }
         self.addSubview(label)
+        setAligment(aligment)
+    }
+    
+    
+    
+    private func setLabel(configure: UIConstructive,
+                          iconSize: CGFloat,
+                          iconAligment: IconAlignment,
+                          contentSpacing: CGFloat) {
+        headerLabel = IconLabelView(iconSize: iconSize,
+                                    configure: configure,
+                                    contentSpacing: contentSpacing,
+                                    iconAligment: iconAligment)
         
+        headerLabel?.isUserInteractionEnabled = false
+    }
+}
+
+extension IconLabelButton {
+    private func setAligment(_ aligment: LabelViewAligment) {
         switch aligment {
         case .center:
             self.setCenterAligment()
@@ -61,16 +78,23 @@ final class IconLabelButton: UIButton {
             make.centerY.equalToSuperview()
         }
     }
-    
-    private func setLabel(configure: UIConstructive, iconSize: CGFloat, iconAligment: IconAlignment) {
-        headerLabel = IconLabelView(iconSize: iconSize,
-                                    configure: configure,
-                                    iconAligment: iconAligment)
-        
-        headerLabel?.isUserInteractionEnabled = false
+}
+
+extension IconLabelButton {
+    public var text: String? {
+        get {
+            headerLabel?.text
+        } set {
+            headerLabel?.text = newValue
+        }
     }
     
-    public func setText(_ text: String?) {
-        self.headerLabel?.setText(text)
+    public func setBackColor(_ color: UIColor?) {
+        backgroundColor = color
+    }
+    
+    public func setRadius(_ radius: CGFloat) {
+        clipsToBounds = false
+        layer.cornerRadius = radius
     }
 }

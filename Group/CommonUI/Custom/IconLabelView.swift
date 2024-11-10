@@ -15,7 +15,13 @@ enum IconAlignment {
 
 final class IconLabelView: UIView {
     
-    public var text: String? { return infoLabel.text }
+    public var text: String? {
+        get {
+            infoLabel.text
+        } set {
+            infoLabel.text = newValue
+        }
+    }
     
     private var configure: UIConstructive
     private var iconSize: CGFloat
@@ -103,10 +109,6 @@ final class IconLabelView: UIView {
         if iconAligment == .right {
             mainStackView.reverseSubviewsZIndex()
         }
-    }
-    
-    public func setText(_ text: String?) {
-        self.infoLabel.text = text
     }
     
     public func setMargin(_ margin: UIEdgeInsets) {

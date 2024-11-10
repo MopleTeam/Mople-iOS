@@ -35,9 +35,5 @@ final class MainTabBarController: UITabBarController {
     }
 }
 
-fileprivate extension UIScreen {
-    static func isNotch() -> Bool {
-        return (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0) > 0
-    }
-}
+
 

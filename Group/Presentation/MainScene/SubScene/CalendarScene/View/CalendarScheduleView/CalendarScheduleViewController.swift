@@ -356,7 +356,7 @@ extension CalendarScheduleViewController {
         let year = date.year ?? 2024
         let monty = date.month ?? 1
         
-        headerButton.setText("\(year)년 \(monty)월")
+        headerButton.text = "\(year)년 \(monty)월"
     }
 }
 

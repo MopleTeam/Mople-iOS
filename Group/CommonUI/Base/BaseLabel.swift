@@ -8,24 +8,10 @@
 import UIKit
 
 class BaseLabel: UILabel {
-    
-    private var padding: UIEdgeInsets
-    
-    override func drawText(in rect: CGRect) {
-        super.drawText(in: rect.inset(by: padding))
-    }
-    
-    override var intrinsicContentSize: CGSize {
-        let size = super.intrinsicContentSize
-        return CGSize(width: size.width + padding.left + padding.right,
-                      height: size.height + padding.bottom + padding.top)
-    }
-    
+
     init(backColor: UIColor? = nil,
          radius: CGFloat? = nil,
-         padding: UIEdgeInsets = .zero,
          configure: UIConstructive? = nil) {
-        self.padding = padding
         super.init(frame: .zero)
         
         setConfigure(configure: configure)
@@ -33,7 +19,6 @@ class BaseLabel: UILabel {
     }
     
     required init?(coder: NSCoder) {
-        self.padding = .zero
         super.init(coder: coder)
     }
     

@@ -91,7 +91,7 @@ final class BaseProfileViewController: UIViewController, View {
     
     private let nameCheckLabel = OverlapCheckLabel()
     
-    private var nextButton: BaseButton = {
+    private let nextButton: BaseButton = {
         let button = BaseButton(backColor: AppDesign.Profile.nextButtonBackColor,
                                    radius: 8,
                                    configure: AppDesign.Profile.nextButton)
@@ -316,7 +316,7 @@ final class BaseProfileViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .filter({ _ in self.previousProfile?.name != nil })
             .do(onNext: { _ in
-                self.nameCheckLabel.isHidden = true
+                self.nameCheckLabel.rx.isHidden.onNext(true)
                 self.validNameObserver.onNext(nil)
             })
             .share(replay: 1)
@@ -325,11 +325,6 @@ final class BaseProfileViewController: UIViewController, View {
         nameEdit
             .map({ _ in self.isChangedName() })
             .drive(overlapButton.rx.isEnabled)
-            .disposed(by: disposeBag)
-        
-        nameEdit
-            .map({ _ in !self.isChangedName() && self.isChangedImage() })
-            .drive(nextButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
     

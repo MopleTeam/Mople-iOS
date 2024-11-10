@@ -44,23 +44,46 @@ final class LoginViewController: UIViewController, View {
         return sv
     }()
     
-    private let kakaoLoginButton = UIButton(configuration: .filled())
+    private let kakaoLoginButton: IconLabelButton = {
+        let button = IconLabelButton(configure: AppDesign.Login.kakao,
+                                     iconSize: 22,
+                                     iconAligment: .left,
+                                     contentSpacing: 8)
+        button.setRadius(8)
+        button.setBackColor(AppDesign.Login.kakaoColor)
+        return button
+    }()
     
-    private let appleLoginButton = {
-        let loginBtn = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
-        loginBtn.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        loginBtn.cornerRadius = 8
-        return loginBtn
+    private let appleLoginButton: IconLabelButton = {
+        let button = IconLabelButton(configure: AppDesign.Login.apple,
+                                     iconSize: 22,
+                                     iconAligment: .left,
+                                     contentSpacing: 8)
+        button.setRadius(8)
+        button.setBackColor(AppDesign.Login.appleColor)
+        return button
     }()
     
     private lazy var loginStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleContainerView, appleLoginButton, kakaoLoginButton])
+        let sv = UIStackView(arrangedSubviews: [appleLoginButton, kakaoLoginButton])
         sv.axis = .vertical
-        sv.spacing = 24
+        sv.spacing = 8
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [titleContainerView, loginStackView])
+        sv.axis = .vertical
+        sv.spacing = 0
         sv.alignment = .fill
         sv.distribution = .fill
         sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 0, left: 20, bottom: 28, right: 20)
+        sv.layoutMargins = .init(top: 0,
+                                 left: 20,
+                                 bottom: UIScreen.safeBottom(),
+                                 right: 20)
         return sv
     }()
     
@@ -86,10 +109,10 @@ final class LoginViewController: UIViewController, View {
         
     private func setupLayout() {
         self.view.backgroundColor = .white
-        self.view.addSubview(loginStackView)
+        self.view.addSubview(mainStackView)
         self.titleContainerView.addSubview(titleStackView)
 
-        loginStackView.snp.makeConstraints { make in
+        mainStackView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
         

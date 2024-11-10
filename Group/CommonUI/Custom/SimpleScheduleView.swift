@@ -94,7 +94,7 @@ final class SimpleScheduleView : UIView {
         
         self.titleLabel.text = viewModel.title
         
-        self.countInfoLabel.setText(viewModel.participantCountString)
+        self.countInfoLabel.text = viewModel.participantCountString
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
         self.weatherView.configure(with: .init(weather: viewModel.weather))

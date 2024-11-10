@@ -14,6 +14,8 @@ class BaseButton: UIButton {
         didSet {
             let opacity: CGFloat = isEnabled ? 1 : 0.2
             self.configuration?.background.backgroundColor = self.activeColor?.withAlphaComponent(opacity)
+            let alpha = self.configuration?.background.backgroundColor?.cgColor.alpha
+            print(#function, #line, "alpha : \(alpha)" )
         }
     }
     

@@ -131,9 +131,9 @@ final class ScheduleView: UIView {
         
         self.titleLabel.text = viewModel.title
         
-        self.countInfoLabel.setText(viewModel.participantCountString)
-        self.dateInfoLabel.setText(viewModel.date.convertString(format: .full))
-        self.placeInfoLabel.setText(viewModel.detailAddress)
+        self.countInfoLabel.text = viewModel.participantCountString
+        self.dateInfoLabel.text = viewModel.date.convertString(format: .full)
+        self.placeInfoLabel.text = viewModel.detailAddress
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
         self.weatherView.configure(with: .init(weather: viewModel.weather))
