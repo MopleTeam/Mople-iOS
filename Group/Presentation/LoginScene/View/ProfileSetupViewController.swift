@@ -18,8 +18,11 @@ class ProfileSetupViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
-    private let mainTitle: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Profile.main)
+    private let mainTitle: UILabel = {
+        let label = UILabel()
+        label.text = TextStyle.Profile.title
+        label.font = FontStyle.Heading.bold
+        label.textColor = ColorStyle.Gray._01
         label.numberOfLines = 2
         return label
     }()
@@ -33,7 +36,11 @@ class ProfileSetupViewController: UIViewController, View {
     }()
     
     // MARK: - Indicator
-    private let indicator = BaseLoadingOverlay()
+    fileprivate let indicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
     
     // MARK: - LifeCycle
     init(reactor: ProfileSetupViewReactor) {
@@ -99,16 +106,17 @@ class ProfileSetupViewController: UIViewController, View {
         reactor.pulse(\.$isLoading)
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isLoad in
-                vc.animatingIndicator(isLoad)
-            })
+            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
 }
 
-extension ProfileSetupViewController {
-    private func animatingIndicator(_ isLoad: Bool) {
-        indicator.animating(isLoad)
+extension Reactive where Base: ProfileSetupViewController {
+    var isLoading: Binder<Bool> {
+        return Binder(self.base) { vc, isLoading in
+            isLoading ? vc.indicator.startAnimating() : vc.indicator.stopAnimating()
+            vc.view.isUserInteractionEnabled = !isLoading
+        }
     }
 }
 

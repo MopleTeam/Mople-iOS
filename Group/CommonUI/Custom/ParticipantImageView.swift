@@ -42,7 +42,7 @@ final class ParticipantImageView: UIImageView {
     }
     
     private func defaultImage() {
-        self.image = AppDesign.Profile.defaultImage
+        self.image = .defaultIProfile
         self.contentMode = .scaleAspectFill
     }
     
@@ -50,6 +50,6 @@ final class ParticipantImageView: UIImageView {
         self.clipsToBounds = true
         
         self.layer.borderWidth = 2
-        self.layer.borderColor = AppDesign.defaultWihte.cgColor
+        self.layer.borderColor = AppDesign.Layer.lineColor.cgColor
     }
 }

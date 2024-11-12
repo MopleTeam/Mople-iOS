@@ -83,7 +83,7 @@ final class CalendarViewController: UIViewController, View {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = AppDesign.defaultWihte
+        self.view.backgroundColor = ColorStyle.Default.white
         self.view.addSubview(calendar)
         
         calendar.addSubview(weekContainerView)
@@ -114,10 +114,10 @@ final class CalendarViewController: UIViewController, View {
     }
     
     private func setCalendarAppearance() {
-        calendar.appearance.weekdayTextColor = AppDesign.Calendar.weekTextColor
-        calendar.appearance.titleSelectionColor = AppDesign.Calendar.selectedDayTextColor
-        calendar.appearance.titleFont = AppDesign.Calendar.dayFont
-        calendar.appearance.weekdayFont = AppDesign.Calendar.weekFont
+        calendar.appearance.weekdayTextColor = ColorStyle.Gray._05
+        calendar.appearance.titleSelectionColor = ColorStyle.App.primary
+        calendar.appearance.titleFont = FontStyle.Title3.semiBold
+        calendar.appearance.weekdayFont = FontStyle.Body1.medium
         calendar.appearance.todayColor = .clear
         calendar.appearance.selectionColor = .clear
     }
@@ -300,9 +300,9 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
         
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return AppDesign.Calendar.eventTextColor
+            return ColorStyle.Gray._01
         default :
-            return AppDesign.Calendar.dayTextColor
+            return ColorStyle.Gray._07
         }
         
     }

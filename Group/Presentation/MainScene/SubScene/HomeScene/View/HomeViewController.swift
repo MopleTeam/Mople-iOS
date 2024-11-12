@@ -15,8 +15,11 @@ final class HomeViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
-    private let titleLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Home.title)
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = TextStyle.App.title
+        label.font = FontStyle.Title.black
+        label.textColor = ColorStyle.App.primary
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
         return label
@@ -24,7 +27,7 @@ final class HomeViewController: UIViewController, View {
     
     private let notifyButton: UIButton = {
         let btn = UIButton()
-        btn.setImage(AppDesign.Home.notifyImage, for: .normal)
+        btn.setImage(.bell, for: .normal)
         return btn
     }()
     
@@ -49,23 +52,20 @@ final class HomeViewController: UIViewController, View {
         label.textAlignment = .center
         label.layer.cornerRadius = 12
         label.clipsToBounds = true
-        label.backgroundColor = AppDesign.defaultWihte
         return label
     }()
     
     private let makeGroupButton: HomeButton = {
-        let btn = HomeButton(backColor: AppDesign.defaultWihte,
-                             radius: 12,
-                             itemConfigure: AppDesign.Home.makeGroup)
-        
+        let btn = HomeButton()
+        btn.setTitle(text: TextStyle.Home.createGroup)
+        btn.setImage(image: .makeGroup)
         return btn
     }()
     
     private let makeScheduleButton: HomeButton = {
-        let btn = HomeButton(backColor: AppDesign.defaultWihte,
-                             radius: 12,
-                             itemConfigure: AppDesign.Home.makeSchedule)
-        
+        let btn = HomeButton()
+        btn.setTitle(text: TextStyle.Home.createSchedule)
+        btn.setImage(image: .makeSchedule)
         return btn
     }()
     
@@ -121,7 +121,7 @@ final class HomeViewController: UIViewController, View {
     }
     
     private func setupUI() {
-        self.view.backgroundColor = AppDesign.mainBackColor
+        self.view.backgroundColor = ColorStyle.BG.primary
         
         self.view.addSubview(allStackView)
         self.collectionContainerView.addSubview(emptyDataView)

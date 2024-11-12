@@ -44,19 +44,21 @@ final class ThumbnailTitleView: UIView {
         return view
     }()
     
-    private let groupTitleLabel = BaseLabel()
+    private let groupTitleLabel = UILabel()
     
-    private lazy var memberCountView: IconLabelView = {
-        let view = IconLabelView(iconSize: 20,
-                                 configure: AppDesign.Group.member,
-                                 contentSpacing: 4,
-                                 titleTopPadding: 3)
-        return view
+    #warning("memberCountLabel + subButton = BaseButton으로 대체 가능한지 알아보기")
+    private lazy var memberCountLabel: IconLabel = {
+        let label = IconLabel(icon: .member, iconSize: 20)
+        label.setTitle(font: FontStyle.Body2.medium,
+                       color: ColorStyle.Gray._04)
+        label.setSpacing(4)
+        label.setTitleTopPadding(3)
+        return label
     }()
     
     private let subButton: UIButton = {
         let btn = UIButton()
-        btn.setImage(AppDesign.Group.arrow.itemConfig.image, for: .normal)
+        btn.setImage(.listArrow, for: .normal)
         return btn
     }()
     
@@ -104,13 +106,20 @@ final class ThumbnailTitleView: UIView {
         case .simple:
             setSpacing(8)
             setThumbnail(size: 28, radius: 6)
-            groupTitleLabel.setConfigure(configure: AppDesign.Schedule.group)
+            setTitleLabel(font: FontStyle.Body2.semiBold,
+                          color: ColorStyle.Gray._04)
         case .detail:
             setSpacing(12)
             setThumbnail(size: 56, radius: 12)
-            groupTitleLabel.setConfigure(configure: AppDesign.Group.title)
+            setTitleLabel(font: FontStyle.Title3.semiBold,
+                          color: ColorStyle.Gray._01)
             makeDetail()
         }
+    }
+    
+    private func setTitleLabel(font: UIFont, color: UIColor) {
+        groupTitleLabel.font = font
+        groupTitleLabel.textColor = color
     }
     
     private func setThumbnail(size: CGFloat, radius: CGFloat) {
@@ -139,15 +148,15 @@ final class ThumbnailTitleView: UIView {
 
 extension ThumbnailTitleView {
     private func makeDetail() {
-        groupInfoStackView.addArrangedSubview(memberCountView)
+        groupInfoStackView.addArrangedSubview(memberCountLabel)
         
-        memberCountView.snp.makeConstraints { make in
+        memberCountLabel.snp.makeConstraints { make in
             make.height.equalTo(20)
         }
     }
     
     private func setCountView(count: Int) {
-        memberCountView.text = "\(count) 명"
+        memberCountLabel.text = "\(count) 명"
     }
     
     private func setSpacing(_ space: CGFloat) {

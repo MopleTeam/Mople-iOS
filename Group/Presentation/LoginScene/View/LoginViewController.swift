@@ -23,13 +23,19 @@ final class LoginViewController: UIViewController, View {
     private let titleContainerView = UIView()
     
     private let mainTitle : UILabel = {
-        let label = BaseLabel(configure: AppDesign.Login.title)
+        let label = UILabel()
+        label.text = TextStyle.App.title
+        label.font = FontStyle.App.title
+        label.textColor = ColorStyle.App.primary
         label.textAlignment = .center
         return label
     }()
     
     private let subTitle: UILabel = {
-        let label = BaseLabel(configure: AppDesign.Login.subTitle)
+        let label = UILabel()
+        label.text = TextStyle.App.subTitle
+        label.font = FontStyle.Title3.regular
+        label.textColor = ColorStyle.Gray._05
         label.textAlignment = .center
         return label
     }()
@@ -44,23 +50,31 @@ final class LoginViewController: UIViewController, View {
         return sv
     }()
     
-    private let kakaoLoginButton: IconLabelButton = {
-        let button = IconLabelButton(configure: AppDesign.Login.kakao,
-                                     iconSize: 22,
-                                     iconAligment: .left,
-                                     contentSpacing: 8)
-        button.setRadius(8)
-        button.setBackColor(AppDesign.Login.kakaoColor)
+    private let kakaoLoginButton: BaseButton = {
+        let button = BaseButton()
+        button.setTitle(text: TextStyle.Login.kakao,
+                        font: FontStyle.Title3.semiBold,
+                        color: ColorStyle.Gray._01)
+        
+        button.setImage(image: .kakao,
+                        imagePlacement: .leading,
+                        contentPadding: 8)
+        button.setBgColor(ColorStyle.Default.yellow)
+        button.layer.cornerRadius = 8
         return button
     }()
     
-    private let appleLoginButton: IconLabelButton = {
-        let button = IconLabelButton(configure: AppDesign.Login.apple,
-                                     iconSize: 22,
-                                     iconAligment: .left,
-                                     contentSpacing: 8)
-        button.setRadius(8)
-        button.setBackColor(AppDesign.Login.appleColor)
+    private let appleLoginButton: BaseButton = {
+        let button = BaseButton()
+        button.setTitle(text: TextStyle.Login.apple,
+                        font: FontStyle.Title3.semiBold,
+                        color: ColorStyle.Default.white)
+        
+        button.setImage(image: .apple,
+                        imagePlacement: .leading,
+                        contentPadding: 8)
+        button.setBgColor(ColorStyle.Default.black)
+        button.layer.cornerRadius = 8
         return button
     }()
     

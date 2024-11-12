@@ -43,16 +43,17 @@ final class DatePickViewController: UIViewController, View {
     
     private let rightBarButton: UIButton = {
         let button = UIButton()
-        button.setImage(AppDesign.DatePicker.closeImage, for: .normal)
+        button.setImage(.close, for: .normal)
         return button
     }()
     
     private let datePicker = UIPickerView()
     
     private let completeButton: BaseButton = {
-        let btn = BaseButton(backColor: AppDesign.DatePicker.completeButtonColor,
-                             radius: 8,
-                             configure: AppDesign.DatePicker.pickerComplete)
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.DatePicker.completedTitle,
+                     font: FontStyle.Title3.semiBold,
+                     color: ColorStyle.Default.white)
         return btn
     }()
             
@@ -64,7 +65,7 @@ final class DatePickViewController: UIViewController, View {
         sv.distribution = .fill
         sv.layer.cornerRadius = 13
         sv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        sv.backgroundColor = AppDesign.defaultWihte
+        sv.backgroundColor = ColorStyle.Default.white
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)
         return sv

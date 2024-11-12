@@ -28,15 +28,17 @@ class BaseViewController: UIViewController {
     }
     
     // MARK: - UI Components
-    private let navigationView: CustomNavigationBar = {
-        let navi = CustomNavigationBar()
-        return navi
+    private let navigationView = CustomNavigationBar()
+    
+    private lazy var rightButton = UIButton()
+    private lazy var leftButton = UIButton()
+    
+    // MARK: - Indicator
+    fileprivate let indicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
     }()
-    
-    private let rightButton = UIButton()
-    private let leftButton = UIButton()
-    
-    private let indicator = BaseLoadingOverlay()
     
     // MARK: - LifeCycle
     init(title: String?) {
@@ -55,7 +57,7 @@ class BaseViewController: UIViewController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = AppDesign.defaultWihte
+        self.view.backgroundColor = ColorStyle.Default.white
         self.view.addSubview(navigationView)
         self.view.addSubview(indicator)
 
@@ -110,10 +112,11 @@ extension BaseViewController {
     }
 }
 
-// MARK: - Indicator 설정
-extension BaseViewController {
-    public func animationIndicator(_ isLoading: Bool) {
-        print(#function, #line, "isLoading : \(isLoading)" )
-        indicator.animating(isLoading)
+extension Reactive where Base: BaseViewController {
+    var isLoading: Binder<Bool> {
+        return Binder(self.base) { vc, isLoading in
+            isLoading ? vc.indicator.startAnimating() : vc.indicator.stopAnimating()
+            vc.view.isUserInteractionEnabled = !isLoading
+        }
     }
 }

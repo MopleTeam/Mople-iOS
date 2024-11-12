@@ -10,6 +10,8 @@ import Foundation
 extension AppDesign {
     enum Schedule: UIConstructive {
         
+        static let bgColor = ColorStyle.Default.white
+        
         case group
         case title
         case smallTitle
@@ -23,33 +25,33 @@ extension AppDesign {
             switch self {
             case .group:
                 return makeUIConfigure(font: FontStyle.Body2.semiBold,
-                                       color: .init(hexCode: "888888"))
+                                       color: ColorStyle.Gray._04)
             case .title:
                 return makeUIConfigure(font: FontStyle.Title.bold,
-                                       color: AppDesign.defaultBlack)
+                                       color: ColorStyle.Gray._01)
             case .smallTitle:
                 return makeUIConfigure(font: FontStyle.Title2.bold,
-                                       color: AppDesign.defaultBlack)
+                                       color: ColorStyle.Gray._01)
             case .count:
                 return makeUIConfigure(font: FontStyle.Body2.medium,
-                                       color: AppDesign.defaultGray,
+                                       color: ColorStyle.Gray._04,
                                        image: .member)
             case .date:
                 return makeUIConfigure(font: FontStyle.Body2.medium,
-                                       color: AppDesign.defaultGray,
+                                       color: ColorStyle.Gray._04,
                                        image: .date)
             case .place:
                 return makeUIConfigure(font: FontStyle.Body2.medium,
-                                       color: AppDesign.defaultGray,
+                                       color: ColorStyle.Gray._04,
                                        image: .place)
             case .moreSchedule:
                 return makeUIConfigure(text: "더보기",
                                        font: FontStyle.Title3.bold,
-                                       color: .init(hexCode: "555555"),
+                                       color: ColorStyle.Gray._03,
                                        image: .plus)
             case .pop:
                 return makeUIConfigure(font: FontStyle.Body2.bold,
-                                       color: .init(hexCode: "668CFF"),
+                                       color: ColorStyle.Default.blue,
                                        image: .pop)
             }
         }

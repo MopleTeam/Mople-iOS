@@ -9,20 +9,14 @@ import UIKit
 import SnapKit
 
 class BaseEmptyView: UIView {
-    
-    private var configure: UIConstructive
-    
-    private lazy var imageView: UIImageView = {
+
+    private let imageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
-        view.image = configure.itemConfig.image
         return view
     }()
     
-    private lazy var label: BaseLabel = {
-        let label = BaseLabel(configure: configure)
-        return label
-    }()
+    private let label = UILabel()
     
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageView, label])
@@ -33,10 +27,7 @@ class BaseEmptyView: UIView {
         return sv
     }()
     
-    
-    init(configure: UIConstructive) {
-        self.configure = configure
-        
+    init() {
         super.init(frame: .zero)
         setupUI()
     }
@@ -55,5 +46,19 @@ class BaseEmptyView: UIView {
         imageView.snp.makeConstraints { make in
             make.size.equalTo(80)
         }
+    }
+}
+
+extension BaseEmptyView {
+    public func setTitle(text: String? = nil,
+                         font: UIFont? = nil,
+                         color: UIColor? = nil) {
+        label.text = text
+        label.font = font
+        label.textColor = color
+    }
+    
+    public func setImage(image: UIImage?) {
+        imageView.image = image
     }
 }

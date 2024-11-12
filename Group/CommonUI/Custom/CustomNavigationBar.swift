@@ -11,7 +11,7 @@ import SnapKit
 final class CustomNavigationBar: UIView {
     
     let titleLable: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Navi.NaviView)
+        let label = BaseLabel(configure: AppDesign.Navi.header)
         label.textAlignment = .center
         return label
     }()

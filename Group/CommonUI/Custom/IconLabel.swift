@@ -13,19 +13,15 @@ enum IconAlignment {
     case right
 }
 
-final class IconLabelView: UIView {
+final class IconLabel: UIView {
     
-    public var text: String? {
-        get {
-            infoLabel.text
-        } set {
-            infoLabel.text = newValue
+    var text: String? {
+        didSet {
+            infoLabel.text = text
         }
     }
     
-    private var configure: UIConstructive
-    private var iconSize: CGFloat
-    private var titleTopPadding: CGFloat
+    private var iconSize: CGFloat?
     
     private let imageContainerView: UIView = {
         let view = UIView()
@@ -37,15 +33,14 @@ final class IconLabelView: UIView {
         return view
     }()
     
-    private lazy var imageView: UIImageView = {
+    private let imageView: UIImageView = {
         let view = UIImageView()
-        view.image = configure.itemConfig.image
         view.contentMode = .scaleAspectFill
         return view
     }()
     
-    private lazy var infoLabel: BaseLabel = {
-        let label = BaseLabel(configure: configure)
+    private let infoLabel: UILabel = {
+        let label = UILabel()
         label.numberOfLines = 2
         return label
     }()
@@ -58,25 +53,20 @@ final class IconLabelView: UIView {
         return sv
     }()
     
-    init(iconSize: CGFloat,
-         configure: UIConstructive,
-         contentSpacing: CGFloat = 0,
-         iconAligment: IconAlignment = .left,
-         titleTopPadding: CGFloat = 2) {
-        self.configure = configure
-        self.iconSize = iconSize
-        self.titleTopPadding = titleTopPadding
-        defer {
-            setupUI()
-            mainStackView.spacing = contentSpacing
-            setIconAligment(iconAligment)
-        }
-        
+    init(icon: UIImage?,
+         iconSize: CGFloat) {
         super.init(frame: .zero)
+        self.iconSize = iconSize
+        setupUI()
+        setupIcon(icon)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupIcon(_ icon: UIImage?) {
+        self.imageView.image = icon
     }
     
     private func setupUI() {
@@ -90,22 +80,42 @@ final class IconLabelView: UIView {
         }
         
         imageContainerView.snp.makeConstraints { make in
-            make.width.equalTo(iconSize)
+            make.width.equalTo(iconSize ?? 0)
         }
 
         imageView.snp.makeConstraints { make in
             make.centerX.top.equalToSuperview()
-            make.size.equalTo(iconSize)
+            make.size.equalTo(iconSize ?? 0)
         }
         
         infoLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalToSuperview().inset(titleTopPadding)
+            make.top.equalToSuperview().inset(2)
             make.bottom.lessThanOrEqualToSuperview()
         }
     }
+}
+
+extension IconLabel {
+    public func setTitle(text: String? = nil,
+                         font: UIFont? = nil,
+                         color: UIColor? = nil) {
+        infoLabel.text = text
+        infoLabel.font = font
+        infoLabel.textColor = color
+    }
     
-    private func setIconAligment(_ iconAligment: IconAlignment) {
+    public func setTitleTopPadding(_ padding: CGFloat) {
+        infoLabel.snp.updateConstraints { make in
+            make.top.equalToSuperview().inset(padding)
+        }
+    }
+    
+    public func setSpacing(_ spacing: CGFloat) {
+        mainStackView.spacing = spacing
+    }
+    
+    public func setIconAligment(_ iconAligment: IconAlignment) {
         if iconAligment == .right {
             mainStackView.reverseSubviewsZIndex()
         }
@@ -117,15 +127,4 @@ final class IconLabelView: UIView {
     }
 }
 
-extension UIStackView {
 
-    func reverseSubviewsZIndex(setNeedsLayout: Bool = true) {
-        let stackedViews = self.arrangedSubviews
-
-        stackedViews.forEach {
-            self.removeArrangedSubview($0)
-        }
-        
-        stackedViews.reversed().forEach(addArrangedSubview(_:))
-    }
-}

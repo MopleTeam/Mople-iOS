@@ -20,7 +20,7 @@ final class MainTabBarController: UITabBarController {
     }
 
     private func setupUI() {
-        tabBar.backgroundColor = AppDesign.defaultWihte
+        tabBar.backgroundColor = AppDesign.TabBar.bgColor
         tabBar.layer.makeLine(width: 1)
         tabBar.layer.makeCornes(radius: 18, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         tabBar.layer.makeShadow(CGSize(width: 0, height: -4))

@@ -47,21 +47,24 @@ final class ScheduleView: UIView {
     
     private let titleLabel = BaseLabel(configure: AppDesign.Schedule.title)
     
-    private let countInfoLabel = IconLabelView(iconSize: 18,
-                                                configure: AppDesign.Schedule.count,
-                                                contentSpacing: 4)
-    
-    private lazy var dateInfoLabel: IconLabelView = {
-        let label = IconLabelView(iconSize: 18,
-                                  configure: AppDesign.Schedule.date,
-                                  contentSpacing: 4)
+    private let countInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .member, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setSpacing(4)
         return label
     }()
     
-    private lazy var placeInfoLabel: IconLabelView = {
-        let label = IconLabelView(iconSize: 18,
-                                  configure: AppDesign.Schedule.place,
-                                  contentSpacing: 4)
+    private lazy var dateInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .date, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setSpacing(4)
+        return label
+    }()
+    
+    private lazy var placeInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .place, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setSpacing(4)
         return label
     }()
 
@@ -95,7 +98,7 @@ final class ScheduleView: UIView {
     }
     
     private func setupUI() {
-        self.backgroundColor = .white
+        self.backgroundColor = AppDesign.Schedule.bgColor
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in

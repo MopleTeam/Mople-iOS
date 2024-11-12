@@ -14,7 +14,7 @@ final class GroupListCell: UITableViewCell {
     private let thumbnailView = ThumbnailTitleView(type: .detail)
     
     private let scheduleLabel: BaseLabel = {
-        let label = BaseLabel(backColor: AppDesign.Group.scheduleBack,
+        let label = BaseLabel(backColor: AppDesign.Group.scheduleBgColor,
                               radius: 10,
                               configure: AppDesign.Group.schedule)
         label.textAlignment = .center
@@ -27,7 +27,7 @@ final class GroupListCell: UITableViewCell {
         sv.spacing = 12
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.backgroundColor = AppDesign.defaultWihte
+        sv.backgroundColor = AppDesign.Group.cellBgColor
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)

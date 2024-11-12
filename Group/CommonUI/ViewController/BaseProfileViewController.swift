@@ -16,6 +16,15 @@ final class BaseProfileViewController: UIViewController, View {
     enum ViewType {
         case create
         case edit
+        
+        var title: String {
+            switch self {
+            case .create:
+                TextStyle.Profile.createTitle
+            case .edit:
+                TextStyle.Profile.editTitle
+            }
+        }
     }
     
     typealias Reactor = ProfileSetupViewReactor
@@ -48,7 +57,7 @@ final class BaseProfileViewController: UIViewController, View {
     
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = AppDesign.Profile.defaultImage
+        imageView.image = .defaultIProfile
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
         imageView.clipsToBounds = true
@@ -62,7 +71,13 @@ final class BaseProfileViewController: UIViewController, View {
         return imageView
     }()
 
-    private let nameTitle = BaseLabel(configure: AppDesign.Profile.nameTitle)
+    private let nameTitle: UILabel = {
+        let label = UILabel()
+        label.text = TextStyle.Profile.nameTitle
+        label.font = FontStyle.Title3.semiBold
+        label.textColor = ColorStyle.Gray._01
+        return label
+    }()
     
     private let nameTextFieldContainer: UIView = {
         let view = UIView()
@@ -72,15 +87,19 @@ final class BaseProfileViewController: UIViewController, View {
         return view
     }()
     
-    private let nameTextField = BaseTextField(configure: AppDesign.Profile.nameText)
+    private let nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = FontStyle.Body1.regular
+        textField.textColor = ColorStyle.Gray._01
+        return textField
+    }()
     
-    private let overlapButton: BaseButton = {
-        let button = BaseButton(backColor: AppDesign.Profile.checkButtonBackColor,
-                                radius: 6,
-                                configure: AppDesign.Profile.checkButton)
-        button.tag = 0
-        button.isEnabled = false
-        return button
+    private let duplicateButton: DuplicateButton = {
+        let btn = DuplicateButton()
+        btn.setTitle(text: TextStyle.Profile.checkBtnTitle,
+                     font: FontStyle.Body1.semiBold,
+                     color: ColorStyle.Default.white)
+        return btn
     }()
     
     private let nameCheckContanierView: UIView = {
@@ -89,16 +108,9 @@ final class BaseProfileViewController: UIViewController, View {
         return view
     }()
     
-    private let nameCheckLabel = OverlapCheckLabel()
+    private let nameCheckLabel = DuplicateLabel()
     
-    private let nextButton: BaseButton = {
-        let button = BaseButton(backColor: AppDesign.Profile.nextButtonBackColor,
-                                   radius: 8,
-                                   configure: AppDesign.Profile.nextButton)
-        button.tag = 1
-        button.isEnabled = false
-        return button
-    }()
+    private let completionButton = CompletionButton()
     
     private lazy var nameStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameTitle, nameTextFieldContainer, nameCheckContanierView])
@@ -110,7 +122,7 @@ final class BaseProfileViewController: UIViewController, View {
     }()
 
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView, nextButton])
+        let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView, completionButton])
         sv.axis = .vertical
         sv.spacing = 24
         sv.alignment = .fill
@@ -182,14 +194,14 @@ final class BaseProfileViewController: UIViewController, View {
             make.leading.top.equalToSuperview()
         }
 
-        nextButton.snp.makeConstraints { make in
+        completionButton.snp.makeConstraints { make in
             make.height.equalTo(56)
         }
     }
     
     private func setupTextField() {
          self.nameTextField.rightViewMode = .always
-         self.nameTextField.rightView = overlapButton
+         self.nameTextField.rightView = duplicateButton
          self.nameTextField.delegate = self
      }
     
@@ -200,17 +212,15 @@ final class BaseProfileViewController: UIViewController, View {
     }
     
     private func setInput(reactor: Reactor) {
-        self.overlapButton.rx.controlEvent(.touchUpInside)
+        self.duplicateButton.rx.controlEvent(.touchUpInside)
             .filter({ _ in self.checkNicknameValidator() })
             .compactMap({ _ in self.nameTextField.text })
-            .map { Reactor.Action.checkNickname(name: $0,
-                                                tag: self.overlapButton.tag) }
+            .map { Reactor.Action.checkNickname(name: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.nextButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.setProfile(profile: self.makeProfile(),
-                                             tag: self.nextButton.tag) }
+        self.completionButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.setProfile(profile: self.makeProfile()) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -220,7 +230,7 @@ final class BaseProfileViewController: UIViewController, View {
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, name in
-                vc.overlapButton.isEnabled = true
+                vc.duplicateButton.rx.isEnabled.onNext(true)
                 vc.nameTextField.rx.text.onNext(name)
             })
             .disposed(by: disposeBag)
@@ -237,14 +247,6 @@ final class BaseProfileViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
                 vc.alertManager.showAlert(message: message)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$buttonLoading)
-            .compactMap { $0 }
-            .subscribe(on: MainScheduler.instance)
-            .bind(with: self, onNext: { vc, isLoad in
-                vc.setButtonIndicator(isLoading: isLoad.status, tag: isLoad.tag)
             })
             .disposed(by: disposeBag)
     }
@@ -265,14 +267,14 @@ final class BaseProfileViewController: UIViewController, View {
             .observe(on: MainScheduler.instance)
             .compactMap({ $0.1 ?? !self.isChangedName() })
             .asDriver(onErrorJustReturn: false)
-            .drive(nextButton.rx.isEnabled)
+            .drive(completionButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
         validNameObserver
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isValid in
-                vc.overlapButton.rx.isEnabled.onNext(false)
+                vc.duplicateButton.rx.isEnabled.onNext(false)
                 vc.nameCheckLabel.rx.isOverlap.onNext(!isValid)
                 vc.nameTextField.rx.isResign.onNext(isValid)
             })
@@ -283,7 +285,7 @@ final class BaseProfileViewController: UIViewController, View {
     private func setEditImageBind() {
         imageObserver
             .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: AppDesign.Profile.defaultImage)
+            .asDriver(onErrorJustReturn: .defaultIProfile)
             .drive(profileImageView.rx.image)
             .disposed(by: disposeBag)
     }
@@ -303,8 +305,8 @@ final class BaseProfileViewController: UIViewController, View {
         nameTextField.rx.controlEvent(.editingChanged)
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
+                vc.duplicateButton.rx.isEnabled.onNext(true)
                 vc.validNameObserver.onNext(nil)
-                vc.overlapButton.rx.isEnabled.onNext(true)
                 vc.nameCheckLabel.rx.isHidden.onNext(true)
             })
             .disposed(by: disposeBag)
@@ -324,7 +326,7 @@ final class BaseProfileViewController: UIViewController, View {
         
         nameEdit
             .map({ _ in self.isChangedName() })
-            .drive(overlapButton.rx.isEnabled)
+            .drive(duplicateButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
     
@@ -389,7 +391,7 @@ extension BaseProfileViewController {
     }
     
     private func setDefaultImage() {
-        imageObserver.onNext(AppDesign.Profile.defaultImage)
+        imageObserver.onNext(.defaultIProfile)
     }
 }
 
@@ -398,28 +400,10 @@ extension BaseProfileViewController {
     private func isChangedName() -> Bool {
         return nameTextField.text != previousProfile?.name
     }
-    private func isChangedImage() -> Bool {
-        return (try? imageObserver.value() ?? nil) != nil
-    }
 }
 
 // MARK: - Helper
 extension BaseProfileViewController {
-
-    private func setButtonIndicator(isLoading: Bool,
-                                    tag: Int) {
-        view.isUserInteractionEnabled = !isLoading
-        
-        switch tag {
-        case 0:
-                self.overlapButton.loading(status: isLoading)
-                self.nameTextField.updateLayout()
-        case 1:
-            nextButton.loading(status: isLoading)
-        default:
-            break
-        }
-    }
 
     private func checkNicknameValidator() -> Bool {
         let valid = Validator.checkNickname(name: self.nameTextField.text)
@@ -437,12 +421,7 @@ extension BaseProfileViewController {
 extension BaseProfileViewController {
     private func setNextButtonTitle(type: ViewType?) {
         guard let type = type else { return }
-        switch type {
-        case .create:
-            self.nextButton.configuration?.title = "서비스명 시작하기"
-        case .edit:
-            self.nextButton.configuration?.title = "저장"
-        }
+        completionButton.setTitle(type.title, for: .normal)
     }
 }
 

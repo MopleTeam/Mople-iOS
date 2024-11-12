@@ -10,7 +10,9 @@ import UIKit
 extension AppDesign {
     
     enum Group: UIConstructive {
-        static let scheduleBack = UIColor.init(hexCode: "F6F7FA")
+        static let bgColor = ColorStyle.BG.primary
+        static let scheduleBgColor = ColorStyle.BG.input
+        static let cellBgColor = ColorStyle.Default.white
         
         case title
         case empty
@@ -23,7 +25,7 @@ extension AppDesign {
                 
             case .title:
                 return makeUIConfigure(font: FontStyle.Title3.semiBold,
-                                       color: AppDesign.defaultBlack)
+                                       color: ColorStyle.Gray._01)
             case .empty:
                 return makeUIConfigure(text: "새로운 모임을 추가해주세요",
                                        font: FontStyle.Title3.medium,

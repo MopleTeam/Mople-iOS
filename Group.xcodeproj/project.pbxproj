@@ -37,8 +37,8 @@
 		52266BF82CBD471A007D03EB /* SetupViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF72CBD471A007D03EB /* SetupViewReactor.swift */; };
 		52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* FetchProfile.swift */; };
 		52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */; };
-		5228A27F2CC10D22004956F7 /* OverlapCheckLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */; };
-		523645292C8E522A009E0784 /* IconLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645282C8E522A009E0784 /* IconLabelView.swift */; };
+		5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */; };
+		523645292C8E522A009E0784 /* IconLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645282C8E522A009E0784 /* IconLabel.swift */; };
 		5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* BaseViewController.swift */; };
 		523645302C8EE518009E0784 /* BaseEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* BaseEmptyView.swift */; };
 		523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroup.swift */; };
@@ -50,7 +50,7 @@
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
 		524A50C92C68735000862AD6 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 524A50C82C68735000862AD6 /* MultipartForm */; };
-		524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */; };
+		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
 		524E33D12C804C7A004B15FC /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* Validator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */; };
@@ -134,18 +134,17 @@
 		52B87E382C6B2A460026B601 /* Pretendard-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E2F2C6B2A450026B601 /* Pretendard-Medium.ttf */; };
 		52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */; };
 		52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6872CDF5D3500564F11 /* FontStyle.swift */; };
-		52BBF68C2CE018E700564F11 /* AppDesign+Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF68B2CE018E700564F11 /* AppDesign+Login.swift */; };
-		52BBF68F2CE0195D00564F11 /* AppDesign+Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF68E2CE0195D00564F11 /* AppDesign+Profile.swift */; };
-		52BBF6912CE0199B00564F11 /* AppDesign+Navi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6902CE0199B00564F11 /* AppDesign+Navi.swift */; };
-		52BBF6952CE01A0500564F11 /* AppDesign+Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6942CE01A0500564F11 /* AppDesign+Home.swift */; };
 		52BBF69D2CE01AC800564F11 /* AppDesign+Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF69C2CE01AC800564F11 /* AppDesign+Schedule.swift */; };
 		52BBF69F2CE01AF200564F11 /* AppDesign+Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF69E2CE01AF200564F11 /* AppDesign+Weather.swift */; };
 		52BBF6A12CE01B1800564F11 /* AppDesign+Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */; };
-		52BBF6A32CE01B5700564F11 /* AppDesign+Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A22CE01B5700564F11 /* AppDesign+Calendar.swift */; };
-		52BBF6A52CE01B7500564F11 /* AppDesign+DatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A42CE01B7500564F11 /* AppDesign+DatePicker.swift */; };
-		52BBF6A82CE01C0200564F11 /* AppDesign+ScheduleTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A72CE01C0200564F11 /* AppDesign+ScheduleTable.swift */; };
 		52BBF6AC2CE01EA400564F11 /* AppDesign+Setup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */; };
 		52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */; };
+		52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AF2CE164D500564F11 /* ColorStyle.swift */; };
+		52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6B42CE1C77700564F11 /* TextStyle.swift */; };
+		52BBF6B72CE1EF0100564F11 /* CompletionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6B62CE1EF0100564F11 /* CompletionButton.swift */; };
+		52BBF6B92CE2301D00564F11 /* DuplicateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6B82CE2301D00564F11 /* DuplicateButton.swift */; };
+		52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6BA2CE23E1700564F11 /* Reactive+TextField.swift */; };
+		52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */; };
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
@@ -165,7 +164,6 @@
 		52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */; };
 		52CB41E22CA2F2910071679D /* DateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41E12CA2F2910071679D /* DateManager.swift */; };
 		52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2381E2C7405820066C9A3 /* BaseLabel.swift */; };
-		52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238202C743C0E0066C9A3 /* BaseTextField.swift */; };
 		52E238252C7454230066C9A3 /* ProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238242C7454230066C9A3 /* ProfileInfo.swift */; };
 		52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */; };
 		52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */; };
@@ -181,7 +179,6 @@
 		52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */; };
 		52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */; };
 		52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */; };
-		52FB36D62CB5E24D008563FF /* BaseLoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -214,8 +211,8 @@
 		52266BF72CBD471A007D03EB /* SetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupViewReactor.swift; sourceTree = "<group>"; };
 		52266BF92CBD474D007D03EB /* FetchProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchProfile.swift; sourceTree = "<group>"; };
 		52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchProfileMock.swift; sourceTree = "<group>"; };
-		5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlapCheckLabel.swift; sourceTree = "<group>"; };
-		523645282C8E522A009E0784 /* IconLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabelView.swift; sourceTree = "<group>"; };
+		5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateLabel.swift; sourceTree = "<group>"; };
+		523645282C8E522A009E0784 /* IconLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabel.swift; sourceTree = "<group>"; };
 		5236452C2C8EDCEF009E0784 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* BaseEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseEmptyView.swift; sourceTree = "<group>"; };
 		523645322C8FFDEB009E0784 /* FetchGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroup.swift; sourceTree = "<group>"; };
@@ -226,7 +223,7 @@
 		523645422C901CF7009E0784 /* GroupListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListViewReactor.swift; sourceTree = "<group>"; };
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
-		524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+Ext.swift"; sourceTree = "<group>"; };
+		524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+ViewLifeCycle.swift"; sourceTree = "<group>"; };
 		524E33D02C804C7A004B15FC /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponseDTO.swift; sourceTree = "<group>"; };
@@ -304,18 +301,17 @@
 		52B87E2F2C6B2A450026B601 /* Pretendard-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Medium.ttf"; sourceTree = "<group>"; };
 		52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+CustomFont.swift"; sourceTree = "<group>"; };
 		52BBF6872CDF5D3500564F11 /* FontStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontStyle.swift; sourceTree = "<group>"; };
-		52BBF68B2CE018E700564F11 /* AppDesign+Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Login.swift"; sourceTree = "<group>"; };
-		52BBF68E2CE0195D00564F11 /* AppDesign+Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Profile.swift"; sourceTree = "<group>"; };
-		52BBF6902CE0199B00564F11 /* AppDesign+Navi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Navi.swift"; sourceTree = "<group>"; };
-		52BBF6942CE01A0500564F11 /* AppDesign+Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Home.swift"; sourceTree = "<group>"; };
 		52BBF69C2CE01AC800564F11 /* AppDesign+Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Schedule.swift"; sourceTree = "<group>"; };
 		52BBF69E2CE01AF200564F11 /* AppDesign+Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Weather.swift"; sourceTree = "<group>"; };
 		52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Group.swift"; sourceTree = "<group>"; };
-		52BBF6A22CE01B5700564F11 /* AppDesign+Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Calendar.swift"; sourceTree = "<group>"; };
-		52BBF6A42CE01B7500564F11 /* AppDesign+DatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+DatePicker.swift"; sourceTree = "<group>"; };
-		52BBF6A72CE01C0200564F11 /* AppDesign+ScheduleTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+ScheduleTable.swift"; sourceTree = "<group>"; };
 		52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Setup.swift"; sourceTree = "<group>"; };
 		52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScreen+NotchSize.swift"; sourceTree = "<group>"; };
+		52BBF6AF2CE164D500564F11 /* ColorStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyle.swift; sourceTree = "<group>"; };
+		52BBF6B42CE1C77700564F11 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
+		52BBF6B62CE1EF0100564F11 /* CompletionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionButton.swift; sourceTree = "<group>"; };
+		52BBF6B82CE2301D00564F11 /* DuplicateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateButton.swift; sourceTree = "<group>"; };
+		52BBF6BA2CE23E1700564F11 /* Reactive+TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+TextField.swift"; sourceTree = "<group>"; };
+		52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Reverse.swift"; sourceTree = "<group>"; };
 		52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCalendarCell.swift; sourceTree = "<group>"; };
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Group.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Group.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -334,7 +330,6 @@
 		52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableSectionModel.swift; sourceTree = "<group>"; };
 		52CB41E12CA2F2910071679D /* DateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateManager.swift; sourceTree = "<group>"; };
 		52E2381E2C7405820066C9A3 /* BaseLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLabel.swift; sourceTree = "<group>"; };
-		52E238202C743C0E0066C9A3 /* BaseTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTextField.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
 		52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneDIContainer.swift; sourceTree = "<group>"; };
@@ -349,7 +344,6 @@
 		52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+Convert.swift"; sourceTree = "<group>"; };
 		52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleView.swift; sourceTree = "<group>"; };
 		52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulTableHeaderView.swift; sourceTree = "<group>"; };
-		52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLoadingOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -461,7 +455,6 @@
 				5211F9022C86E41900403980 /* ScheduleListCollectionViewController.swift */,
 				529A26042C96A776009F4CFA /* FooterView */,
 				5211F9062C86F2C700403980 /* Cell */,
-				5211F9102C89CDEB00403980 /* CustomUI */,
 			);
 			path = ScheduleListView;
 			sourceTree = "<group>";
@@ -472,15 +465,6 @@
 				5211F9072C86F2DB00403980 /* ScheduleCollectionCell.swift */,
 			);
 			path = Cell;
-			sourceTree = "<group>";
-		};
-		5211F9102C89CDEB00403980 /* CustomUI */ = {
-			isa = PBXGroup;
-			children = (
-				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
-				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
-			);
-			path = CustomUI;
 			sourceTree = "<group>";
 		};
 		52266BF52CBCF622007D03EB /* ViewController */ = {
@@ -515,8 +499,6 @@
 				5236452F2C8EE518009E0784 /* BaseEmptyView.swift */,
 				528484152C6B86F600D50C6A /* BaseButton.swift */,
 				52E2381E2C7405820066C9A3 /* BaseLabel.swift */,
-				52E238202C743C0E0066C9A3 /* BaseTextField.swift */,
-				52FB36D52CB5E24D008563FF /* BaseLoadingOverlay.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -524,14 +506,18 @@
 		523645412C901197009E0784 /* Custom */ = {
 			isa = PBXGroup;
 			children = (
-				523645282C8E522A009E0784 /* IconLabelView.swift */,
+				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
+				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
+				523645282C8E522A009E0784 /* IconLabel.swift */,
 				5208C1702CBD59D4006272E8 /* IconLabelButton.swift */,
 				5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */,
 				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
 				5259B0152CA013A8006B2711 /* WeatherView.swift */,
 				5259B0172CA028C2006B2711 /* ScheduleView.swift */,
 				52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */,
-				5228A27E2CC10D22004956F7 /* OverlapCheckLabel.swift */,
+				5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */,
+				52BBF6B82CE2301D00564F11 /* DuplicateButton.swift */,
+				52BBF6B62CE1EF0100564F11 /* CompletionButton.swift */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -548,7 +534,8 @@
 		524E33CD2C8028A4004B15FC /* RxSwift */ = {
 			isa = PBXGroup;
 			children = (
-				524E33CE2C8028B3004B15FC /* Reactive+Ext.swift */,
+				524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */,
+				52BBF6BA2CE23E1700564F11 /* Reactive+TextField.swift */,
 				52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */,
 			);
 			path = RxSwift;
@@ -1052,6 +1039,7 @@
 				5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */,
 				52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */,
 				52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */,
+				52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1125,7 +1113,10 @@
 		52BBF6892CDF6E7B00564F11 /* Design */ = {
 			isa = PBXGroup;
 			children = (
+				52BBF6AF2CE164D500564F11 /* ColorStyle.swift */,
 				52BBF6872CDF5D3500564F11 /* FontStyle.swift */,
+				52BBF6B42CE1C77700564F11 /* TextStyle.swift */,
+				528484172C6B8CA100D50C6A /* AppDesign.swift */,
 				52BBF68A2CE018C600564F11 /* AppDesign */,
 			);
 			path = Design;
@@ -1134,48 +1125,10 @@
 		52BBF68A2CE018C600564F11 /* AppDesign */ = {
 			isa = PBXGroup;
 			children = (
-				52BBF6962CE01A8F00564F11 /* Navi */,
-				52BBF6972CE01A9500564F11 /* Login */,
-				52BBF6982CE01A9B00564F11 /* Profile */,
-				52BBF6992CE01AA300564F11 /* Home */,
-				52BBF6A62CE01BB500564F11 /* Calendar */,
 				52BBF69A2CE01AB400564F11 /* CommonUI */,
 				52BBF6AA2CE01E8900564F11 /* Setup */,
-				528484172C6B8CA100D50C6A /* AppDesign.swift */,
 			);
 			path = AppDesign;
-			sourceTree = "<group>";
-		};
-		52BBF6962CE01A8F00564F11 /* Navi */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF6902CE0199B00564F11 /* AppDesign+Navi.swift */,
-			);
-			path = Navi;
-			sourceTree = "<group>";
-		};
-		52BBF6972CE01A9500564F11 /* Login */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF68B2CE018E700564F11 /* AppDesign+Login.swift */,
-			);
-			path = Login;
-			sourceTree = "<group>";
-		};
-		52BBF6982CE01A9B00564F11 /* Profile */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF68E2CE0195D00564F11 /* AppDesign+Profile.swift */,
-			);
-			path = Profile;
-			sourceTree = "<group>";
-		};
-		52BBF6992CE01AA300564F11 /* Home */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF6942CE01A0500564F11 /* AppDesign+Home.swift */,
-			);
-			path = Home;
 			sourceTree = "<group>";
 		};
 		52BBF69A2CE01AB400564F11 /* CommonUI */ = {
@@ -1186,16 +1139,6 @@
 				52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */,
 			);
 			path = CommonUI;
-			sourceTree = "<group>";
-		};
-		52BBF6A62CE01BB500564F11 /* Calendar */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF6A22CE01B5700564F11 /* AppDesign+Calendar.swift */,
-				52BBF6A42CE01B7500564F11 /* AppDesign+DatePicker.swift */,
-				52BBF6A72CE01C0200564F11 /* AppDesign+ScheduleTable.swift */,
-			);
-			path = Calendar;
 			sourceTree = "<group>";
 		};
 		52BBF6AA2CE01E8900564F11 /* Setup */ = {
@@ -1604,6 +1547,7 @@
 				5285E6E32CDCB32200B855CB /* DetailScheduleDTO.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* DatePickViewController.swift in Sources */,
+				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
 				5211F9082C86F2DB00403980 /* ScheduleCollectionCell.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
 				524E33D12C804C7A004B15FC /* Validator.swift in Sources */,
@@ -1614,6 +1558,7 @@
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				5285E6E52CDCB34100B855CB /* CommonGroupDTO.swift in Sources */,
 				5208C17D2CBEAC60006272E8 /* PresentTransition.swift in Sources */,
+				52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */,
 				527A3E9B2C836290007FE63B /* SetupViewController.swift in Sources */,
 				529A26062C96A781009F4CFA /* ScheduleListReuseFooterView.swift in Sources */,
 				527A3E992C836287007FE63B /* CalendarScheduleViewController.swift in Sources */,
@@ -1622,9 +1567,12 @@
 				52266BF22CBCF605007D03EB /* BaseProfileViewController.swift in Sources */,
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
 				5259B0182CA028C2006B2711 /* ScheduleView.swift in Sources */,
+				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
+				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
+				52BBF6B72CE1EF0100564F11 /* CompletionButton.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
 				52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */,
 				5236452D2C8EDCEF009E0784 /* BaseViewController.swift in Sources */,
@@ -1651,14 +1599,13 @@
 				52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* SetupSceneDIContainer.swift in Sources */,
-				523645292C8E522A009E0784 /* IconLabelView.swift in Sources */,
+				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
 				5285E6D52CDB505F00B855CB /* WeatherInfo.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
-				52BBF6952CE01A0500564F11 /* AppDesign+Home.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
@@ -1672,8 +1619,7 @@
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
 				5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */,
-				52BBF6A82CE01C0200564F11 /* AppDesign+ScheduleTable.swift in Sources */,
-				524E33CF2C8028B3004B15FC /* Reactive+Ext.swift in Sources */,
+				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
 				527A3E762C8324CE007FE63B /* HomeCoordinator.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* CustomNavigationBar.swift in Sources */,
 				5208C1812CBEACF5006272E8 /* MainNavigationController.swift in Sources */,
@@ -1694,7 +1640,6 @@
 				5285E6B42CD9F55600B855CB /* SimpleScheduleDTO.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */,
 				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
-				52BBF68F2CE0195D00564F11 /* AppDesign+Profile.swift in Sources */,
 				5208C1852CBEBD28006272E8 /* ProfileDTO.swift in Sources */,
 				5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
@@ -1702,13 +1647,12 @@
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
 				5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */,
-				52BBF6912CE0199B00564F11 /* AppDesign+Navi.swift in Sources */,
 				5285E6E72CDCB34900B855CB /* SimpleGroupDTO.swift in Sources */,
-				52E238212C743C0E0066C9A3 /* BaseTextField.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
 				5208C17F2CBEAC79006272E8 /* DismissTransition.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
+				52BBF6B92CE2301D00564F11 /* DuplicateButton.swift in Sources */,
 				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
@@ -1716,7 +1660,6 @@
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
 				5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */,
 				527A3E7D2C834BC1007FE63B /* CalendarCoordinator.swift in Sources */,
-				52BBF6A52CE01B7500564F11 /* AppDesign+DatePicker.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
@@ -1726,11 +1669,9 @@
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
-				52BBF68C2CE018E700564F11 /* AppDesign+Login.swift in Sources */,
-				5228A27F2CC10D22004956F7 /* OverlapCheckLabel.swift in Sources */,
+				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5285E6DC2CDC32FD00B855CB /* CommonSchedule.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
-				52BBF6A32CE01B5700564F11 /* AppDesign+Calendar.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
 				5285E6C82CDB333600B855CB /* SimpleGroup.swift in Sources */,
@@ -1738,7 +1679,6 @@
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* HomeButton.swift in Sources */,
-				52FB36D62CB5E24D008563FF /* BaseLoadingOverlay.swift in Sources */,
 				52BBF69D2CE01AC800564F11 /* AppDesign+Schedule.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
@@ -1902,8 +1842,8 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진첩 접근";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				KAKAO_NATIVE_APP_KEY = 72b95832d0237fce2c5c7eb82d4a6a7a;
@@ -1942,8 +1882,8 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진첩 접근";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				KAKAO_NATIVE_APP_KEY = 72b95832d0237fce2c5c7eb82d4a6a7a;

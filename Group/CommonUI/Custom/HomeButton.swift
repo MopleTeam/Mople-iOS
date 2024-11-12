@@ -17,7 +17,7 @@ final class HomeButton: UIButton {
         return view
     }()
     
-    private let buttonTitle:UILabel = {
+    private let buttonTitle: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
         return label
@@ -35,30 +35,24 @@ final class HomeButton: UIButton {
         return sv
     }()
     
-    init(backColor: UIColor? = nil,
-         radius: CGFloat? = nil,
-         itemConfigure: UIConstructive) {
-        
+    init() {
         super.init(frame: .zero)
-        setBackGroundColor(backColor)
-        setRadius(radius: radius)
-        setUI(itemConfigure)
+        setupUI()
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    private func setBackGroundColor(_ color: UIColor?) {
-        backgroundColor = color
-    }
     
-    private func setUI(_ setValue: UIConstructive) {
-        let config = setValue.itemConfig
-        buttonImage.image = config.image
-        buttonTitle.text = config.text
-        buttonTitle.font = config.font
-        buttonTitle.textColor = config.color
+    private func initialSetup() {
+        setRadius(radius: 12)
+        backgroundColor = ColorStyle.Default.white
+        buttonTitle.font = FontStyle.Title3.semiBold
+        buttonTitle.textColor = ColorStyle.Gray._01
+    }
+
+    private func setupUI() {
         addSubview(allStackView)
         
         allStackView.snp.makeConstraints { make in
@@ -79,6 +73,16 @@ final class HomeButton: UIButton {
         
         clipsToBounds = true
         layer.cornerRadius = radius
+    }
+}
+
+extension HomeButton {
+    public func setImage(image: UIImage?) {
+        buttonImage.image = image
+    }
+    
+    public func setTitle(text: String? = nil) {
+        buttonTitle.text = text
     }
 }
 

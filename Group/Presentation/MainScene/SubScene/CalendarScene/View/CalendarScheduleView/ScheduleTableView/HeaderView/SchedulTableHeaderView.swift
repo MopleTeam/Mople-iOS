@@ -11,8 +11,10 @@ import SnapKit
 final class SchedulTableHeaderView: UITableViewHeaderFooterView {
 
     // MARK: - UI Components
-    private let titleLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.SchedeleTable.header)
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Body1.medium
+        label.textColor = ColorStyle.Gray._05
         label.textAlignment = .center
         return label
     }()

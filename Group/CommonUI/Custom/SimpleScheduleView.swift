@@ -30,11 +30,21 @@ final class SimpleScheduleView : UIView {
         return view
     }()
     
-    private let titleLabel = BaseLabel(configure: AppDesign.Schedule.smallTitle)
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Title2.bold
+        label.textColor = ColorStyle.Gray._01
+        return label
+    }()
     
-    private let countInfoLabel = IconLabelView(iconSize: 18,
-                                                configure: AppDesign.Schedule.count,
-                                                contentSpacing: 4)
+    private let countInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .member,
+                              iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium,
+                       color: ColorStyle.Gray._04)
+        label.setSpacing(4)
+        return label
+    }()
                       
     private let weatherView = WeatherView()
     
@@ -66,7 +76,7 @@ final class SimpleScheduleView : UIView {
     }
     
     private func setupUI() {
-        self.backgroundColor = AppDesign.defaultWihte
+        self.backgroundColor = ColorStyle.Default.white
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
@@ -93,9 +103,7 @@ final class SimpleScheduleView : UIView {
     public func configure(_ viewModel: ScheduleViewModel) {
         
         self.titleLabel.text = viewModel.title
-        
         self.countInfoLabel.text = viewModel.participantCountString
-        
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
         self.weatherView.configure(with: .init(weather: viewModel.weather))
     }

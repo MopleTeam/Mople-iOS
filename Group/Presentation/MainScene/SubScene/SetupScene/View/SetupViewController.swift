@@ -29,38 +29,73 @@ final class SetupViewController: BaseViewController, View {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.image = .default
+        imageView.image = .defaultIProfile
         return imageView
     }()
     
-    private let profileNameButton: IconLabelButton = {
-        let button = IconLabelButton(configure: AppDesign.Setup.edit,
-                                     iconSize: 20,
-                                     labelAligment: .fill)
-        return button
+    private let profileNameButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(font: FontStyle.Title3.semiBold,
+                     color: ColorStyle.Gray._01)
+        btn.setImage(image: .editPan)
+        return btn
     }()
 
-    private let notifyLabel = IconLabelButton(configure: AppDesign.Setup.notify,
-                                              labelAligment: .fill)
+    private let notifyButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Setup.notifyTitle,
+                     font: FontStyle.Title3.medium,
+                     color: ColorStyle.Gray._01)
+        btn.setImage(image: .listArrow)
+        btn.setButtonAlignment(.fill)
+        return btn
+    }()
     
-    private let policyLabel = IconLabelButton(configure: AppDesign.Setup.presonalInfo,
-                                                labelAligment: .fill)
+    private let policyButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Setup.policyTitle,
+                     font: FontStyle.Title3.medium,
+                     color: ColorStyle.Gray._01)
+        btn.setImage(image: .listArrow)
+        btn.setButtonAlignment(.fill)
+        return btn
+    }()
         
     
-    private let versionTitleLabel = BaseLabel(configure: AppDesign.Setup.versionInfo)
+    private let versionLabel: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Setup.versionTitle,
+                     font: FontStyle.Title3.medium,
+                     color: ColorStyle.Gray._01)
+        btn.setButtonAlignment(.left)
+        return btn
+    }()
     
-    private let versionLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Setup.version)
-        label.backgroundColor = AppDesign.defaultWihte
-        label.text = Bundle.main.releaseVersionNumber
+    private let versionInfoLabel: UILabel = {
+        let label = UILabel()
+        label.text = TextStyle.Setup.version
+        label.font = FontStyle.Title3.medium
+        label.textColor = ColorStyle.Gray._06
         return label
     }()
     
-    private let logoutLabel = IconLabelButton(configure: AppDesign.Setup.logout,
-                                              labelAligment: .fill)
-    
-    private let resignLabel = IconLabelButton(configure: AppDesign.Setup.resign,
-                                         labelAligment: .fill)
+    private let logoutButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Setup.logoutTitle,
+                     font: FontStyle.Title3.medium,
+                     color: ColorStyle.Gray._01)
+        btn.setButtonAlignment(.left)
+        return btn
+    }()
+
+    private let resignButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Setup.resignTitle,
+                     font: FontStyle.Title3.medium,
+                     color: ColorStyle.Gray._01)
+        btn.setButtonAlignment(.left)
+        return btn
+    }()
     
     private lazy var profileStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageContainer, profileNameButton])
@@ -68,31 +103,31 @@ final class SetupViewController: BaseViewController, View {
         sv.spacing = 12
         sv.alignment = .center
         sv.distribution = .fill
-        sv.backgroundColor = AppDesign.defaultWihte
+        sv.backgroundColor = AppDesign.Setup.bgColor
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 40, left: 20, bottom: 40, right: 20)
         return sv
     }()
 
     private lazy var menuStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [notifyLabel, policyLabel, versionTitleLabel])
+        let sv = UIStackView(arrangedSubviews: [notifyButton, policyButton, versionLabel])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = AppDesign.defaultWihte
+        sv.backgroundColor = AppDesign.Setup.bgColor
         return sv
     }()
     
     private lazy var accountManageStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [logoutLabel, resignLabel])
+        let sv = UIStackView(arrangedSubviews: [logoutButton, resignButton])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = AppDesign.defaultWihte
+        sv.backgroundColor = AppDesign.Setup.bgColor
         return sv
     }()
     
@@ -129,7 +164,7 @@ final class SetupViewController: BaseViewController, View {
         print(#function, #line)
         self.view.addSubview(mainStackView)
         self.imageContainer.addSubview(profileImageView)
-        self.versionTitleLabel.addSubview(versionLabel)
+        self.versionLabel.addSubview(versionInfoLabel)
                 
         mainStackView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
@@ -147,12 +182,12 @@ final class SetupViewController: BaseViewController, View {
         }
         profileImageView.layer.cornerRadius = 40
         
-        versionLabel.snp.makeConstraints { make in
+        versionInfoLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview()
         }
         
-        [notifyLabel, policyLabel, versionTitleLabel, logoutLabel, resignLabel].forEach {
+        [notifyButton, policyButton, versionLabel, logoutButton, resignButton].forEach {
             $0.snp.makeConstraints { make in
                 make.height.equalTo(56)
             }
@@ -166,17 +201,17 @@ final class SetupViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        notifyLabel.rx.controlEvent(.touchUpInside)
+        notifyButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.presentNotifyView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        policyLabel.rx.controlEvent(.touchUpInside)
+        policyButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.presentPolicyView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        logoutLabel.rx.controlEvent(.touchUpInside)
+        logoutButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.logout }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -204,13 +239,13 @@ final class SetupViewController: BaseViewController, View {
 extension SetupViewController {
     private func makeProfile() -> ProfileBuilder {
         let image = self.profileImageView.image
-        let nickName = profileNameButton.text
+        let nickName = profileNameButton.title
         
         return .init(name: nickName, image: image)
     }
     
     private func setProfile(_ profile: ProfileInfo) {
-        profileNameButton.text = profile.name
+        profileNameButton.title = profile.name
         _ = profileImageView.kfSetimage(profile.imagePath)
     }
 }

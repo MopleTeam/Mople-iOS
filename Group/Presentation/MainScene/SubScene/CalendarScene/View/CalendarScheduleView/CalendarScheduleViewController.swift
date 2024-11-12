@@ -35,14 +35,16 @@ final class CalendarScheduleViewController: BaseViewController, View {
     private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
-    private let headerButton: IconLabelButton = {
-        let btn = IconLabelButton(configure: AppDesign.DatePicker.header)
-        btn.backgroundColor = AppDesign.Calendar.headerColor
-        btn.clipsToBounds = true
-        btn.layer.cornerRadius = 10
-        return btn
+    private let container = UIView()
+    
+    private let test: IconLabelButton = {
+        let header = IconLabelButton(icon: .arrow,
+                                     iconSize: 24)
+        header.setText(text: "asdf")
+        header.backgroundColor = .systemMint
+        return header
     }()
-
+    
     // 캘린더
     private let calendarContainer = UIView()
     
@@ -115,19 +117,19 @@ final class CalendarScheduleViewController: BaseViewController, View {
     }
     
     private func setLayout() {
-        self.view.addSubview(headerButton)
+        self.view.addSubview(test)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
         self.view.addSubview(borderView)
                         
-        headerButton.snp.makeConstraints { make in
+        test.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(56)
         }
         
         calendarContainer.snp.makeConstraints { make in
-            make.top.equalTo(headerButton.snp.bottom).offset(16)
+            make.top.equalTo(test.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(360) 
         }
@@ -205,7 +207,7 @@ final class CalendarScheduleViewController: BaseViewController, View {
         reactor.pulse(\.$isLoading)
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, isLoading in
-                vc.animationIndicator(isLoading)
+                vc.rx.isLoading.onNext(isLoading)
                 vc.checkIsPresent(isLoading)
             })
             .disposed(by: disposeBag)
@@ -242,11 +244,11 @@ final class CalendarScheduleViewController: BaseViewController, View {
     
     // MARK: - Action
     private func setAction() {
-        headerButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.presentDatePicker()
-            })
-            .disposed(by: disposeBag)
+//        test.rx.controlEvent(.touchUpInside)
+//            .subscribe(with: self, onNext: { vc, _ in
+//                vc.presentDatePicker()
+//            })
+//            .disposed(by: disposeBag)
     }
     
     // MARK: - Gesture Setup
@@ -325,7 +327,7 @@ extension CalendarScheduleViewController {
     private func updateHeaderView(scope: ScopeType) {
         let height = scope == .month ? 56 : 0
         
-        self.headerButton.snp.updateConstraints { make in
+        self.test.snp.updateConstraints { make in
             make.height.equalTo(height)
         }
     }
@@ -340,7 +342,7 @@ extension CalendarScheduleViewController {
         let views: [UIView] = [self.calendarContainer, self.scheduleListContainer, self.borderView]
         
         views.forEach {
-            let color = scope == .month ? AppDesign.defaultWihte : AppDesign.mainBackColor
+            let color = scope == .month ? ColorStyle.Default.white : ColorStyle.BG.primary
             $0.backgroundColor = color
         }
     }
@@ -355,8 +357,7 @@ extension CalendarScheduleViewController {
     private func setHeaderLabel(date: DateComponents) {
         let year = date.year ?? 2024
         let monty = date.month ?? 1
-        
-        headerButton.text = "\(year)년 \(monty)월"
+        test.setText(text: "\(year)년 \(monty)월")
     }
 }
 

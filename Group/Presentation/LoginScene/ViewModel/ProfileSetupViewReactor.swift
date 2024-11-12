@@ -55,8 +55,8 @@ final class ProfileSetupViewReactor: Reactor {
 
     enum Action {
         case getRandomNickname
-        case checkNickname(name: String, tag: Int)
-        case setProfile(profile: ProfileBuilder, tag: Int)
+        case checkNickname(name: String)
+        case setProfile(profile: ProfileBuilder)
     }
     
     enum Mutation {
@@ -65,14 +65,13 @@ final class ProfileSetupViewReactor: Reactor {
         case nameCheck(isOverlap: Bool?)
         case madeProfile
         case catchError(err: Error)
-        case setButtonLoading(isLoad: Bool, tag: Int)
     }
     
     struct State {
         @Pulse var randomName: String?
         @Pulse var nameOverlap: Bool?
         @Pulse var message: String?
-        @Pulse var isLoading: Bool?
+        @Pulse var isLoading: Bool = false
         @Pulse var buttonLoading: (status: Bool, tag: Int)?
         @Pulse var setupCompleted: Void?
     }
@@ -89,18 +88,15 @@ final class ProfileSetupViewReactor: Reactor {
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
+        guard !currentState.isLoading else { return .empty()}
         
-        if let isLoading = currentState.buttonLoading {
-            guard !isLoading.status else { return Observable.empty() }
-        }
-
         switch action {
         case .getRandomNickname:
             return getRandomNickname()
-        case .checkNickname(let name, let tag):
-            return overlapCheck(name: name, tag: tag)
-        case .setProfile(let profile, let tag) :
-            return makeProfile(profile, tag: tag)
+        case .checkNickname(let name):
+            return overlapCheck(name: name)
+        case .setProfile(let profile) :
+            return makeProfile(profile)
         }
     }
     
@@ -111,8 +107,6 @@ final class ProfileSetupViewReactor: Reactor {
         switch mutation {
         case .setLoading(let isLoad):
             newState.isLoading = isLoad
-        case .setButtonLoading(let isLoad, let type):
-            newState.buttonLoading = (isLoad, type)
         case .getRandomNickname(let name):
             newState.randomName = name
         case .nameCheck(let isOverlap):
@@ -194,9 +188,9 @@ extension ProfileSetupViewReactor {
                                   loadEnd])
     }
     
-    private func overlapCheck(name: String, tag: Int) -> Observable<Mutation> {
+    private func overlapCheck(name: String) -> Observable<Mutation> {
         
-        let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
+        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
                 
         #warning("서버에서 중복 결과를 true, false 뭘로 주는지 물어보기, 현재는 true")
         let nameOverlap = profileRepository.checkNickname(name: name)
@@ -204,26 +198,26 @@ extension ProfileSetupViewReactor {
             .map { Mutation.nameCheck(isOverlap: $0)}
             .catch { Observable.just(Mutation.catchError(err: $0)) }
         
-        let loadingOff = Observable.just(Mutation.setButtonLoading(isLoad: false, tag: tag))
+        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
             
         return Observable.concat([loadingOn,
                                   nameOverlap,
                                   loadingOff])
     }
     
-    private func makeProfile(_ profile: ProfileBuilder, tag: Int) -> Observable<Mutation> {
+    private func makeProfile(_ profile: ProfileBuilder) -> Observable<Mutation> {
         guard let nickname = profile.name else { return .empty() }
   
         let image = profile.image?.jpegData(compressionQuality: 0.7) ?? getDefaultImageData()
         print(#function, #line, "image Size : \(image)" )
-        let loadingOn = Observable.just(Mutation.setButtonLoading(isLoad: true, tag: tag))
+        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
         let makeProfile = profileRepository.makeProfile(image: image, nickname: nickname)
             .asObservable()
             .map({ _ in Mutation.madeProfile })
             .catch { Observable.just(Mutation.catchError(err: $0)) }
         
-        let loadingOff = Observable.just(Mutation.setButtonLoading(isLoad: false, tag: tag))
+        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
             
         return Observable.concat([loadingOn,
                                   makeProfile,
@@ -233,9 +227,8 @@ extension ProfileSetupViewReactor {
 
 extension ProfileSetupViewReactor {
     private func getDefaultImageData() -> Data {
-        guard let image = AppDesign.Profile.defaultImage,
-              let imageData = image.jpegData(compressionQuality: 0.5) else { return Data() }
-        
-        return imageData
+        let defaultImage: UIImage = .defaultIProfile
+        let convertData = defaultImage.jpegData(compressionQuality: 0.5)
+        return convertData ?? Data()
     }
 }

@@ -11,7 +11,8 @@ extension AppDesign {
     
     enum Setup: UIConstructive {
         
-        static let borderColor: UIColor = .init(hexCode: "F7F7F8")
+        static let bgColor = ColorStyle.Default.white
+        static let borderColor = ColorStyle.Border.primary
         
         case edit
         case notify
@@ -25,33 +26,33 @@ extension AppDesign {
             switch self {
             case .edit:
                 return makeUIConfigure(font: FontStyle.Title3.semiBold,
-                                       color: AppDesign.defaultBlack,
+                                       color: ColorStyle.Gray._01,
                                        image: .editPan)
             case .notify:
-                return makeUIConfigure(text: "알림 관리",
+                return makeUIConfigure(text: TextStyle.Setup.notifyTitle,
                                        font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "3E4145"),
+                                       color: ColorStyle.Gray._01,
                                        image: .listArrow)
             case .presonalInfo:
-                return makeUIConfigure(text: "개인정보 처리방침",
+                return makeUIConfigure(text: TextStyle.Setup.policyTitle,
                                        font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "3E4145"),
+                                       color: ColorStyle.Gray._01,
                                        image: .listArrow)
             case .versionInfo:
-                return makeUIConfigure(text: "버전정보",
+                return makeUIConfigure(text: TextStyle.Setup.versionTitle,
                                        font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "3E4145"))
+                                       color: ColorStyle.Gray._01)
             case .version:
                 return makeUIConfigure(font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "CCCCCC"))
+                                       color: ColorStyle.Gray._06)
             case .logout:
-                return makeUIConfigure(text: "로그아웃",
+                return makeUIConfigure(text: TextStyle.Setup.logoutTitle,
                                        font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "3E4145"))
+                                       color: ColorStyle.Gray._01)
             case .resign:
-                return makeUIConfigure(text: "회원탈퇴",
+                return makeUIConfigure(text: TextStyle.Setup.resignTitle,
                                        font: FontStyle.Title3.medium,
-                                       color: .init(hexCode: "3E4145"))
+                                       color: ColorStyle.Gray._01)
             }
         }
     }

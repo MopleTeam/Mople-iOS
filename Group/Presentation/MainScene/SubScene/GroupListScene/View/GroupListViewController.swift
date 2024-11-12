@@ -18,13 +18,17 @@ class GroupListViewController: BaseViewController, View {
     var disposeBag = DisposeBag()
 
     private let emptyView: BaseEmptyView = {
-        let view = BaseEmptyView(configure: AppDesign.Group.empty)
+        let view = BaseEmptyView()
+        view.setTitle(text: TextStyle.GroupList.emptyTitle,
+                      font: FontStyle.Body1.medium,
+                      color: ColorStyle.Gray._06)
+        view.setImage(image: .emptyGroup)
         return view
     }()
 
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = AppDesign.mainBackColor
+        view.backgroundColor = AppDesign.Group.bgColor
         view.clipsToBounds = true
         return view
     }()

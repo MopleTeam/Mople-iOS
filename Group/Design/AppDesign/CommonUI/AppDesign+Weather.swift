@@ -19,7 +19,7 @@ extension AppDesign {
             switch self {
             case .temperature:
                 return makeUIConfigure(font: FontStyle.Body1.semiBold,
-                                       color: AppDesign.defaultBlack)
+                                       color: ColorStyle.Gray._01)
             case .city:
                 return makeUIConfigure(font: FontStyle.Body2.medium,
                                        color: .init(hexCode: "888888"))

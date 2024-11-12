@@ -10,87 +10,72 @@ import RxSwift
 
 class BaseButton: UIButton {
     
-    override var isEnabled: Bool {
-        didSet {
-            let opacity: CGFloat = isEnabled ? 1 : 0.2
-            self.configuration?.background.backgroundColor = self.activeColor?.withAlphaComponent(opacity)
-            let alpha = self.configuration?.background.backgroundColor?.cgColor.alpha
-            print(#function, #line, "alpha : \(alpha)" )
-        }
+    enum ContentAlignment {
+        case fill
+        case left
     }
     
-    private let loadingIndicator: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .medium)
-        view.hidesWhenStopped = true
-        view.color = .white
-        return view
-    }()
-        
+    var title: String? {
+        get { configuration?.title }
+        set { configuration?.title = newValue }
+    }
     
-    /// 비활성화 색
-    private var activeColor: UIColor?
-    private var defaultTitle: String?
-    
-    init(backColor: UIColor? = nil,
-         radius: CGFloat? = nil,
-         imagePlacement: NSDirectionalRectEdge = .trailing,
-         configure: UIConstructive) {
-        
+    init() {
         super.init(frame: .zero)
-        configuration = .filled()
-        self.setupUI()
-        self.setBackgroundColor(color: backColor)
-        self.setItemConfigrue(setValues: configure, imagePlacement: imagePlacement)
-        self.setRadius(radius: radius)
-
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupUI() {
-        self.addSubview(loadingIndicator)
-        
-        loadingIndicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+    private func initialSetup() {
+        configuration = .filled()
+        setBgColor(.clear)
+    }
+}
+
+extension BaseButton {
+    
+    public func setButtonAlignment(_ alignment: ContentAlignment) {
+        configuration?.contentInsets = .zero
+        switch alignment {
+        case .fill:
+            self.contentHorizontalAlignment = .fill
+        case .left:
+            self.contentHorizontalAlignment = .left
         }
     }
     
-    private func setBackgroundColor(color: UIColor?) {
-        self.activeColor = color
+    public func setImage(image: UIImage?,
+                         imagePlacement: NSDirectionalRectEdge = .trailing,
+                         contentPadding: CGFloat = 0) {
+        configuration?.image = image
+        configuration?.imagePlacement = imagePlacement
+        configuration?.imagePadding = contentPadding
+        
+    }
+    
+    public func setBgColor(_ color: UIColor?) {
         configuration?.background.backgroundColor = color
     }
     
-    private func setItemConfigrue(setValues: UIConstructive,
-                                  imagePlacement: NSDirectionalRectEdge) {
+    public func setTitle(text: String? = nil,
+                         font: UIFont? = nil,
+                         color: UIColor? = nil) {
         
-        let config = setValues.itemConfig
-        
-        defaultTitle = config.text
-        configuration?.title = config.text
-        configuration?.image = config.image
-        configuration?.imagePlacement = imagePlacement
-        
+        configuration?.title = text
+        setFont(font, color)
+    }
+    
+    private func setFont(_ font: UIFont?,_ color: UIColor?) {
         let transformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
-            outgoing.foregroundColor = config.color
-            outgoing.font = config.font
+            outgoing.foregroundColor = color
+            outgoing.font = font
             return outgoing
         }
         
         configuration?.titleTextAttributesTransformer = transformer
-    }
-    
-    private func setRadius(radius: CGFloat?) {
-        guard let radius = radius else { return }
-        
-        clipsToBounds = true
-        layer.cornerRadius = radius
-    }
-    
-    func loading(status: Bool) {
-        configuration?.showsActivityIndicator = status
-        configuration?.title = status ? nil : defaultTitle
     }
 }

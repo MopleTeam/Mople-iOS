@@ -14,12 +14,15 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     
     var disposeBag = DisposeBag()
         
-    private let label: BaseButton = {
-        let label = BaseButton(backColor: AppDesign.defaultWihte,
-                               radius: 12,
-                               imagePlacement: .top,
-                               configure: AppDesign.Schedule.moreSchedule)
-        
+    private let moreButton: BaseButton = {
+        let label = BaseButton()
+        label.setTitle(text: TextStyle.Home.moreBtnTitle,
+                       font: FontStyle.Title3.semiBold,
+                       color: ColorStyle.Gray._01)
+        label.setBgColor(ColorStyle.Default.white)
+        label.setImage(image: .plus,
+                       imagePlacement: .top)
+        label.layer.cornerRadius = 12
         return label
     }()
     
@@ -33,9 +36,9 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     }
     
     private func setupUI() {
-        self.addSubview(label)
+        self.addSubview(moreButton)
         
-        label.snp.makeConstraints { make in
+        moreButton.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview()
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview().inset(20)
@@ -43,7 +46,7 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     }
     
     public func setTapAction(on tapObserver: AnyObserver<Void>) {
-        label.rx.controlEvent(.touchUpInside)
+        moreButton.rx.controlEvent(.touchUpInside)
             .map({ _ in })
             .bind(to: tapObserver)
             .disposed(by: disposeBag)

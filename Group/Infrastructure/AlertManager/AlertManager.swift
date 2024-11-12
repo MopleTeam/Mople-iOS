@@ -44,11 +44,9 @@ final class AlertManager {
 }
 
 extension AlertManager {
-    func makeAction(
-        title: String,
-        style: UIAlertAction.Style = .default,
-        completion: (() -> Void)? = nil
-    ) -> UIAlertAction {
+    func makeAction(title: String,
+                    style: UIAlertAction.Style = .default,
+                    completion: (() -> Void)? = nil) -> UIAlertAction {
         return .init(title: title, style: style) { _ in
             completion?()
         }

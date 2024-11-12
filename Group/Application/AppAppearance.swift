@@ -22,11 +22,11 @@ final class AppAppearance {
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.titleColor, .font: AppDesign.TabBar.titleFont]
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.titleColor, .font: AppDesign.TabBar.font]
         appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -5)
         appearance.stackedLayoutAppearance.normal.iconColor = AppDesign.TabBar.normalColor
         
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.selectedColor, .font: AppDesign.TabBar.titleFont]
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: AppDesign.TabBar.selectedColor, .font: AppDesign.TabBar.font]
         appearance.stackedLayoutAppearance.selected.iconColor = AppDesign.TabBar.selectedColor
         
         UITabBar.appearance().standardAppearance = appearance
