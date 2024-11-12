@@ -28,7 +28,7 @@ class GroupListViewController: BaseViewController, View {
 
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = AppDesign.Group.bgColor
+        view.backgroundColor = ColorStyle.BG.primary
         view.clipsToBounds = true
         return view
     }()

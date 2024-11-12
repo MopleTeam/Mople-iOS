@@ -50,6 +50,6 @@ final class ParticipantImageView: UIImageView {
         self.clipsToBounds = true
         
         self.layer.borderWidth = 2
-        self.layer.borderColor = AppDesign.Layer.lineColor.cgColor
+        self.layer.borderColor = ColorStyle.App.stroke.cgColor
     }
 }

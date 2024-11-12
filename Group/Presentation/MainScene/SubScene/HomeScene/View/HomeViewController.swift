@@ -15,6 +15,14 @@ final class HomeViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
+    private let scrollView: UIScrollView = {
+        let view = UIScrollView()
+        view.showsVerticalScrollIndicator = false
+        return view
+    }()
+    
+    private let contentView = UIView()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = TextStyle.App.title
@@ -122,12 +130,23 @@ final class HomeViewController: UIViewController, View {
     
     private func setupUI() {
         self.view.backgroundColor = ColorStyle.BG.primary
-        
-        self.view.addSubview(allStackView)
+        self.view.addSubview(scrollView)
+        self.scrollView.addSubview(contentView)
+        self.contentView.addSubview(allStackView)
         self.collectionContainerView.addSubview(emptyDataView)
         
-        allStackView.snp.makeConstraints { make in
+        scrollView.snp.makeConstraints { make in
             make.edges.equalTo(self.view.safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(scrollView.contentLayoutGuide)
+            make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
+        }
+        
+        allStackView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().inset(50)
         }
         
         collectionContainerView.snp.makeConstraints { make in

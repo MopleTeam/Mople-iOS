@@ -23,6 +23,14 @@ final class SetupViewController: BaseViewController, View {
     private let fetchObserver: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
+    private let scrollView: UIScrollView = {
+        let view = UIScrollView()
+        view.showsVerticalScrollIndicator = false
+        return view
+    }()
+    
+    private let contentView = UIView()
+    
     private let imageContainer = UIView()
         
     private let profileImageView: UIImageView = {
@@ -103,7 +111,7 @@ final class SetupViewController: BaseViewController, View {
         sv.spacing = 12
         sv.alignment = .center
         sv.distribution = .fill
-        sv.backgroundColor = AppDesign.Setup.bgColor
+        sv.backgroundColor = ColorStyle.Default.white
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 40, left: 20, bottom: 40, right: 20)
         return sv
@@ -116,7 +124,7 @@ final class SetupViewController: BaseViewController, View {
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = AppDesign.Setup.bgColor
+        sv.backgroundColor = ColorStyle.Default.white
         return sv
     }()
     
@@ -127,7 +135,7 @@ final class SetupViewController: BaseViewController, View {
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = AppDesign.Setup.bgColor
+        sv.backgroundColor = ColorStyle.Default.white
         return sv
     }()
     
@@ -139,7 +147,7 @@ final class SetupViewController: BaseViewController, View {
         sv.spacing  = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = AppDesign.Setup.borderColor
+        sv.backgroundColor = ColorStyle.Border.primary
         return sv
     }()
     
@@ -162,13 +170,25 @@ final class SetupViewController: BaseViewController, View {
     
     private func setupLayout() {
         print(#function, #line)
-        self.view.addSubview(mainStackView)
+        self.view.addSubview(scrollView)
+        self.scrollView.addSubview(contentView)
+        self.contentView.addSubview(mainStackView)
         self.imageContainer.addSubview(profileImageView)
         self.versionLabel.addSubview(versionInfoLabel)
                 
-        mainStackView.snp.makeConstraints { make in
+        scrollView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
-            make.horizontalEdges.equalToSuperview()
+            make.bottom.horizontalEdges.equalTo(self.view.safeAreaLayoutGuide)
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(scrollView.contentLayoutGuide)
+            make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
+        }
+        
+        mainStackView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().inset(50)
         }
         
         imageContainer.snp.makeConstraints { make in

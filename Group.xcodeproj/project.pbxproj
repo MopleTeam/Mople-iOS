@@ -12,7 +12,6 @@
 		520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520805162C69E0770015F6E0 /* LoginViewController.swift */; };
 		5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */; };
 		5208051D2C69FE700015F6E0 /* ProfileSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */; };
-		5208C1712CBD59D4006272E8 /* IconLabelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1702CBD59D4006272E8 /* IconLabelButton.swift */; };
 		5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1732CBE2B24006272E8 /* Kingfisher+LoadImage.swift */; };
 		5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */; };
 		5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */; };
@@ -93,7 +92,6 @@
 		527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA82C837B29007FE63B /* AppAppearance.swift */; };
 		5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */; };
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
-		528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484172C6B8CA100D50C6A /* AppDesign.swift */; };
 		5285E6A62CD9A63C00B855CB /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6A52CD9A63C00B855CB /* Token.swift */; };
 		5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */; };
 		5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */; };
@@ -134,10 +132,6 @@
 		52B87E382C6B2A460026B601 /* Pretendard-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E2F2C6B2A450026B601 /* Pretendard-Medium.ttf */; };
 		52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */; };
 		52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6872CDF5D3500564F11 /* FontStyle.swift */; };
-		52BBF69D2CE01AC800564F11 /* AppDesign+Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF69C2CE01AC800564F11 /* AppDesign+Schedule.swift */; };
-		52BBF69F2CE01AF200564F11 /* AppDesign+Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF69E2CE01AF200564F11 /* AppDesign+Weather.swift */; };
-		52BBF6A12CE01B1800564F11 /* AppDesign+Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */; };
-		52BBF6AC2CE01EA400564F11 /* AppDesign+Setup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */; };
 		52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */; };
 		52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6AF2CE164D500564F11 /* ColorStyle.swift */; };
 		52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6B42CE1C77700564F11 /* TextStyle.swift */; };
@@ -163,7 +157,6 @@
 		52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */; };
 		52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */; };
 		52CB41E22CA2F2910071679D /* DateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41E12CA2F2910071679D /* DateManager.swift */; };
-		52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2381E2C7405820066C9A3 /* BaseLabel.swift */; };
 		52E238252C7454230066C9A3 /* ProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238242C7454230066C9A3 /* ProfileInfo.swift */; };
 		52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */; };
 		52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */; };
@@ -187,7 +180,6 @@
 		520805162C69E0770015F6E0 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+hexCode.swift"; sourceTree = "<group>"; };
 		5208051C2C69FE700015F6E0 /* ProfileSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewController.swift; sourceTree = "<group>"; };
-		5208C1702CBD59D4006272E8 /* IconLabelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabelButton.swift; sourceTree = "<group>"; };
 		5208C1732CBE2B24006272E8 /* Kingfisher+LoadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Kingfisher+LoadImage.swift"; sourceTree = "<group>"; };
 		5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewController.swift; sourceTree = "<group>"; };
@@ -262,7 +254,6 @@
 		527A3EA82C837B29007FE63B /* AppAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAppearance.swift; sourceTree = "<group>"; };
 		5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginService.swift; sourceTree = "<group>"; };
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
-		528484172C6B8CA100D50C6A /* AppDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDesign.swift; sourceTree = "<group>"; };
 		5285E6A52CD9A63C00B855CB /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		5285E6AC2CD9D78B00B855CB /* DetailGroupDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroupDTO.swift; sourceTree = "<group>"; };
 		5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoDTO.swift; sourceTree = "<group>"; };
@@ -301,10 +292,6 @@
 		52B87E2F2C6B2A450026B601 /* Pretendard-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Medium.ttf"; sourceTree = "<group>"; };
 		52B87E392C6B2D440026B601 /* UIFont+CustomFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+CustomFont.swift"; sourceTree = "<group>"; };
 		52BBF6872CDF5D3500564F11 /* FontStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontStyle.swift; sourceTree = "<group>"; };
-		52BBF69C2CE01AC800564F11 /* AppDesign+Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Schedule.swift"; sourceTree = "<group>"; };
-		52BBF69E2CE01AF200564F11 /* AppDesign+Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Weather.swift"; sourceTree = "<group>"; };
-		52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Group.swift"; sourceTree = "<group>"; };
-		52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDesign+Setup.swift"; sourceTree = "<group>"; };
 		52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScreen+NotchSize.swift"; sourceTree = "<group>"; };
 		52BBF6AF2CE164D500564F11 /* ColorStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorStyle.swift; sourceTree = "<group>"; };
 		52BBF6B42CE1C77700564F11 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
@@ -329,7 +316,6 @@
 		52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableSectionModel.swift; sourceTree = "<group>"; };
 		52CB41E12CA2F2910071679D /* DateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateManager.swift; sourceTree = "<group>"; };
-		52E2381E2C7405820066C9A3 /* BaseLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseLabel.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
 		52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneDIContainer.swift; sourceTree = "<group>"; };
@@ -493,33 +479,18 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		523645402C901190009E0784 /* Base */ = {
+		523645402C901190009E0784 /* View */ = {
 			isa = PBXGroup;
 			children = (
 				5236452F2C8EE518009E0784 /* BaseEmptyView.swift */,
-				528484152C6B86F600D50C6A /* BaseButton.swift */,
-				52E2381E2C7405820066C9A3 /* BaseLabel.swift */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
-		523645412C901197009E0784 /* Custom */ = {
-			isa = PBXGroup;
-			children = (
-				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
-				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
-				523645282C8E522A009E0784 /* IconLabel.swift */,
-				5208C1702CBD59D4006272E8 /* IconLabelButton.swift */,
-				5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */,
-				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
-				5259B0152CA013A8006B2711 /* WeatherView.swift */,
-				5259B0172CA028C2006B2711 /* ScheduleView.swift */,
 				52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */,
-				5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */,
-				52BBF6B82CE2301D00564F11 /* DuplicateButton.swift */,
-				52BBF6B62CE1EF0100564F11 /* CompletionButton.swift */,
+				5259B0152CA013A8006B2711 /* WeatherView.swift */,
+				5259B0092C9C5C81006B2711 /* CustomNavigationBar.swift */,
+				5259B0172CA028C2006B2711 /* ScheduleView.swift */,
+				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
+				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
 			);
-			path = Custom;
+			path = View;
 			sourceTree = "<group>";
 		};
 		523645472C90B703009E0784 /* PreView */ = {
@@ -1116,37 +1087,28 @@
 				52BBF6AF2CE164D500564F11 /* ColorStyle.swift */,
 				52BBF6872CDF5D3500564F11 /* FontStyle.swift */,
 				52BBF6B42CE1C77700564F11 /* TextStyle.swift */,
-				528484172C6B8CA100D50C6A /* AppDesign.swift */,
-				52BBF68A2CE018C600564F11 /* AppDesign */,
 			);
 			path = Design;
 			sourceTree = "<group>";
 		};
-		52BBF68A2CE018C600564F11 /* AppDesign */ = {
+		52BBF6BE2CE376F500564F11 /* Button */ = {
 			isa = PBXGroup;
 			children = (
-				52BBF69A2CE01AB400564F11 /* CommonUI */,
-				52BBF6AA2CE01E8900564F11 /* Setup */,
+				528484152C6B86F600D50C6A /* BaseButton.swift */,
+				5211F8FF2C86B37B00403980 /* HomeButton.swift */,
+				52BBF6B82CE2301D00564F11 /* DuplicateButton.swift */,
+				52BBF6B62CE1EF0100564F11 /* CompletionButton.swift */,
 			);
-			path = AppDesign;
+			path = Button;
 			sourceTree = "<group>";
 		};
-		52BBF69A2CE01AB400564F11 /* CommonUI */ = {
+		52BBF6BF2CE3772600564F11 /* Label */ = {
 			isa = PBXGroup;
 			children = (
-				52BBF69C2CE01AC800564F11 /* AppDesign+Schedule.swift */,
-				52BBF69E2CE01AF200564F11 /* AppDesign+Weather.swift */,
-				52BBF6A02CE01B1800564F11 /* AppDesign+Group.swift */,
+				523645282C8E522A009E0784 /* IconLabel.swift */,
+				5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */,
 			);
-			path = CommonUI;
-			sourceTree = "<group>";
-		};
-		52BBF6AA2CE01E8900564F11 /* Setup */ = {
-			isa = PBXGroup;
-			children = (
-				52BBF6AB2CE01EA400564F11 /* AppDesign+Setup.swift */,
-			);
-			path = Setup;
+			path = Label;
 			sourceTree = "<group>";
 		};
 		52C0F8B92C9479980080CA65 /* CalendarScheduleView */ = {
@@ -1250,8 +1212,9 @@
 			isa = PBXGroup;
 			children = (
 				52266BF52CBCF622007D03EB /* ViewController */,
-				523645412C901197009E0784 /* Custom */,
-				523645402C901190009E0784 /* Base */,
+				523645402C901190009E0784 /* View */,
+				52BBF6BF2CE3772600564F11 /* Label */,
+				52BBF6BE2CE376F500564F11 /* Button */,
 			);
 			path = CommonUI;
 			sourceTree = "<group>";
@@ -1542,7 +1505,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5259B01D2CA038AA006B2711 /* ScheduleTableViewCell.swift in Sources */,
-				52BBF6AC2CE01EA400564F11 /* AppDesign+Setup.swift in Sources */,
 				52266BF82CBD471A007D03EB /* SetupViewReactor.swift in Sources */,
 				5285E6E32CDCB32200B855CB /* DetailScheduleDTO.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */,
@@ -1611,8 +1573,6 @@
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
-				52BBF6A12CE01B1800564F11 /* AppDesign+Group.swift in Sources */,
-				52BBF69F2CE01AF200564F11 /* AppDesign+Weather.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* UserLogin.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */,
@@ -1627,13 +1587,11 @@
 				525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */,
-				5208C1712CBD59D4006272E8 /* IconLabelButton.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
 				527A3E7B2C834BAD007FE63B /* GroupListCoordinator.swift in Sources */,
 				523645332C8FFDEB009E0784 /* FetchGroup.swift in Sources */,
 				52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */,
-				528484182C6B8CA100D50C6A /* AppDesign.swift in Sources */,
 				527A3E9F2C83642C007FE63B /* CalendarSceneDIContainer.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
 				525DFCED2CC8E95500835312 /* DefaultProfileRepository.swift in Sources */,
@@ -1663,7 +1621,6 @@
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
-				52E2381F2C7405820066C9A3 /* BaseLabel.swift in Sources */,
 				5285E6D02CDB3CB300B855CB /* Date+Convert.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
@@ -1679,7 +1636,6 @@
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* HomeButton.swift in Sources */,
-				52BBF69D2CE01AC800564F11 /* AppDesign+Schedule.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
 				520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */,

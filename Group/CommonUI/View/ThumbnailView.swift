@@ -46,7 +46,6 @@ final class ThumbnailTitleView: UIView {
     
     private let groupTitleLabel = UILabel()
     
-    #warning("memberCountLabel + subButton = BaseButton으로 대체 가능한지 알아보기")
     private lazy var memberCountLabel: IconLabel = {
         let label = IconLabel(icon: .member, iconSize: 20)
         label.setTitle(font: FontStyle.Body2.medium,

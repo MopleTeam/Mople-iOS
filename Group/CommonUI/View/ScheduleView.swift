@@ -45,7 +45,12 @@ final class ScheduleView: UIView {
         return view
     }()
     
-    private let titleLabel = BaseLabel(configure: AppDesign.Schedule.title)
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Title.bold
+        label.textColor = ColorStyle.Gray._01
+        return label
+    }()
     
     private let countInfoLabel: IconLabel = {
         let label = IconLabel(icon: .member, iconSize: 18)
@@ -98,7 +103,7 @@ final class ScheduleView: UIView {
     }
     
     private func setupUI() {
-        self.backgroundColor = AppDesign.Schedule.bgColor
+        self.backgroundColor = ColorStyle.Default.white
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in

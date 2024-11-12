@@ -62,8 +62,10 @@ final class WeatherView: UIView {
         return view
     }()
     
-    private let temperatureLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Weather.temperature)
+    private let temperatureLabel: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Body1.semiBold
+        label.textColor = ColorStyle.Gray._01
         label.setContentCompressionResistancePriority(.init(2), for: .horizontal)
         return label
     }()
@@ -86,9 +88,11 @@ final class WeatherView: UIView {
     }()
     
     #warning("데이터 입력 필요")
-    private let cityLabel: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Weather.city)
+    private let cityLabel: UILabel = {
+        let label = UILabel()
         label.text = "서울 강남구"
+        label.font = FontStyle.Body2.medium
+        label.textColor = ColorStyle.Gray._04
         label.textAlignment = .right
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
@@ -107,7 +111,7 @@ final class WeatherView: UIView {
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageView, weatherStackView, cityLabel])
         sv.layer.cornerRadius = 10
-        sv.backgroundColor = AppDesign.Weather.backColor
+        sv.backgroundColor = ColorStyle.BG.input
         sv.spacing = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 12, left: 12, bottom: 12, right: 12)

@@ -35,9 +35,6 @@ final class CalendarScheduleViewController: BaseViewController, View {
     private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
-    
-    // headerContainer 높이를 0으로 변경했지만 header는 화면에 그대로 남아 있음
-    // 해결 : headerContainer의 clipsToBounds(true)로 내부 UI가 외부로 나가는 것을 방지
     private let headerContainer: UIButton = {
         let view = UIButton()
         view.clipsToBounds = true

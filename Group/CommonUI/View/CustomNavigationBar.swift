@@ -10,8 +10,10 @@ import SnapKit
 
 final class CustomNavigationBar: UIView {
     
-    let titleLable: BaseLabel = {
-        let label = BaseLabel(configure: AppDesign.Navi.header)
+    let titleLable: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Title2.bold
+        label.textColor = ColorStyle.Gray._01
         label.textAlignment = .center
         return label
     }()
