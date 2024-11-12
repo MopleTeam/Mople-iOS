@@ -13,13 +13,14 @@ enum LabelViewAligment {
     case fill
 }
 
-final class IconLabelButton: UIView {
+final class IconLabelButton: UIButton {
     
-    private var iconLabel: UILabel = UILabel()
+    private var iconLabel: IconLabel?
     
     init(icon: UIImage?,
          iconSize: CGFloat) {
         super.init(frame: .zero)
+        iconLabel = .init(icon: icon, iconSize: iconSize)
         setupUI()
     }
     
@@ -28,7 +29,9 @@ final class IconLabelButton: UIView {
     }
     
     private func setupUI() {
+        guard let iconLabel else { return }
         iconLabel.backgroundColor = .systemYellow
+        iconLabel.isUserInteractionEnabled = false
         self.addSubview(iconLabel)
         iconLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -38,90 +41,68 @@ final class IconLabelButton: UIView {
 
 extension IconLabelButton {
     public func setText(text: String?) {
-        iconLabel.text = text
+        iconLabel?.text = text
     }
 }
-//
-//    private var headerLabel: IconLabel?
-//    
-//    init(configure: UIConstructive,
-//         iconSize: CGFloat = 24,
-//         iconAligment: IconAlignment = .right,
-//         contentSpacing: CGFloat = 0,
-//         labelAligment: LabelViewAligment = .center) {
-//        
-//        super.init(frame: .zero)
+
+final class TestIconLabelButton: UIButton {
+        
+    public var text: String? {
+        return headerLabel.text
+    }
+    
+    private var headerLabel: UILabel = .init()
+    
+    init(iconSize: CGFloat = 24,
+         iconAligment: IconAlignment = .right,
+         labelAligment: LabelViewAligment = .center) {
+        
+        super.init(frame: .zero)
+        headerLabel.font = .systemFont(ofSize: 16)
+        self.clipsToBounds = true
 //        self.setLabel(configure: configure,
-//                      iconSize: iconSize,
-//                      iconAligment: iconAligment,
-//                      contentSpacing: contentSpacing)
-//        setupUI(aligment: labelAligment)
-//    }
-//    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//    
-//    private func setupUI(aligment: LabelViewAligment) {
-//        guard let label = headerLabel else { return }
-//        self.addSubview(label)
-//        setAligment(aligment)
-//    }
-//    
-//    
-//    
-//    private func setLabel(configure: UIConstructive,
-//                          iconSize: CGFloat,
-//                          iconAligment: IconAlignment,
-//                          contentSpacing: CGFloat) {
-//        headerLabel = IconLabel(iconSize: iconSize,
+//                              iconSize: iconSize,
+//                              iconAligment: iconAligment)
+        setupUI(aligment: labelAligment)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupUI(aligment: LabelViewAligment) {
+        self.addSubview(headerLabel)
+        
+        switch aligment {
+        case .center:
+            self.setCenterAligment()
+        case .fill:
+            self.setFillAligment()
+        }
+    }
+    
+    private func setCenterAligment() {
+        headerLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+    
+    private func setFillAligment() {
+        headerLabel.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.centerY.equalToSuperview()
+        }
+    }
+    
+    private func setLabel(configure: UIConstructive, iconSize: CGFloat, iconAligment: IconAlignment) {
+//        headerLabel = IconLabelView(iconSize: iconSize,
 //                                    configure: configure,
-//                                    contentSpacing: contentSpacing,
 //                                    iconAligment: iconAligment)
-//        
-//        headerLabel?.isUserInteractionEnabled = false
-//    }
-//}
 //
-//extension IconLabelButton {
-//    private func setAligment(_ aligment: LabelViewAligment) {
-//        switch aligment {
-//        case .center:
-//            self.setCenterAligment()
-//        case .fill:
-//            self.setFillAligment()
-//        }
-//    }
-//    
-//    private func setCenterAligment() {
-//        headerLabel?.snp.makeConstraints { make in
-//            make.center.equalToSuperview()
-//        }
-//    }
-//    
-//    private func setFillAligment() {
-//        headerLabel?.snp.makeConstraints { make in
-//            make.horizontalEdges.equalToSuperview()
-//            make.centerY.equalToSuperview()
-//        }
-//    }
-//}
-//
-//extension IconLabelButton {
-//    public var text: String? {
-//        get {
-//            headerLabel?.text
-//        } set {
-//            headerLabel?.text = newValue
-//        }
-//    }
-//    
-//    public func setBackColor(_ color: UIColor?) {
-//        backgroundColor = color
-//    }
-//    
-//    public func setRadius(_ radius: CGFloat) {
-//        clipsToBounds = false
-//        layer.cornerRadius = radius
-//    }
-//}
+        headerLabel.isUserInteractionEnabled = false
+    }
+    
+    public func setText(_ text: String?) {
+        self.headerLabel.text = text
+    }
+}

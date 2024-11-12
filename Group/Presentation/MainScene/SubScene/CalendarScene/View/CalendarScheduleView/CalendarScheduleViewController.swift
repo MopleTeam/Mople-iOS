@@ -35,13 +35,22 @@ final class CalendarScheduleViewController: BaseViewController, View {
     private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
-    private let container = UIView()
     
-    private let test: IconLabelButton = {
-        let header = IconLabelButton(icon: .arrow,
-                                     iconSize: 24)
-        header.setText(text: "asdf")
-        header.backgroundColor = .systemMint
+    // headerContainer 높이를 0으로 변경했지만 header는 화면에 그대로 남아 있음
+    // 해결 : headerContainer의 clipsToBounds(true)로 내부 UI가 외부로 나가는 것을 방지
+    private let headerContainer: UIButton = {
+        let view = UIButton()
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 10
+        view.backgroundColor = ColorStyle.BG.primary
+        return view
+    }()
+    
+    private let header: IconLabel = {
+        let header = IconLabel(icon: .arrow, iconSize: 24)
+        header.setTitle(font: FontStyle.Title3.semiBold,
+                        color: ColorStyle.Gray._01)
+        header.setIconAligment(.right)
         return header
     }()
     
@@ -117,19 +126,24 @@ final class CalendarScheduleViewController: BaseViewController, View {
     }
     
     private func setLayout() {
-        self.view.addSubview(test)
+        self.view.addSubview(headerContainer)
+        self.headerContainer.addSubview(header)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
         self.view.addSubview(borderView)
                         
-        test.snp.makeConstraints { make in
+        headerContainer.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(56)
         }
         
+        header.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
         calendarContainer.snp.makeConstraints { make in
-            make.top.equalTo(test.snp.bottom).offset(16)
+            make.top.equalTo(headerContainer.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(360) 
         }
@@ -327,7 +341,7 @@ extension CalendarScheduleViewController {
     private func updateHeaderView(scope: ScopeType) {
         let height = scope == .month ? 56 : 0
         
-        self.test.snp.updateConstraints { make in
+        self.headerContainer.snp.updateConstraints { make in
             make.height.equalTo(height)
         }
     }
@@ -357,7 +371,7 @@ extension CalendarScheduleViewController {
     private func setHeaderLabel(date: DateComponents) {
         let year = date.year ?? 2024
         let monty = date.month ?? 1
-        test.setText(text: "\(year)년 \(monty)월")
+        header.text = "\(year)년 \(monty)월"
     }
 }
 
