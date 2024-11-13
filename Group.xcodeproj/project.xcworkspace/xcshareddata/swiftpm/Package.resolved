@@ -1,5 +1,5 @@
 {
-  "originHash" : "8b3bbef3a44738716c87b5078123782eb78a1b0f6275e67f25ffe9d12d203468",
+  "originHash" : "c633bee2c87865319fb8d80ce8ee26b165201ae294cdf6c2c60daa27d70e48df",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -35,15 +35,6 @@
       "state" : {
         "revision" : "2ef543ee21d63734e1c004ad6c870255e8716c50",
         "version" : "7.12.0"
-      }
-    },
-    {
-      "identity" : "multipartform",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davbeck/MultipartForm",
-      "state" : {
-        "revision" : "c91979ea956a360bf84f0cc480afbcc7c946c753",
-        "version" : "0.1.0"
       }
     },
     {

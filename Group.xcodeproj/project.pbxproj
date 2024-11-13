@@ -48,7 +48,6 @@
 		523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645422C901CF7009E0784 /* GroupListViewReactor.swift */; };
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
-		524A50C92C68735000862AD6 /* MultipartForm in Frameworks */ = {isa = PBXBuildFile; productRef = 524A50C82C68735000862AD6 /* MultipartForm */; };
 		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
 		524E33D12C804C7A004B15FC /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* Validator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
@@ -342,7 +341,6 @@
 				5211F91A2C89E39600403980 /* Kingfisher in Frameworks */,
 				529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */,
 				525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */,
-				524A50C92C68735000862AD6 /* MultipartForm in Frameworks */,
 				52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */,
 				525DFD032CCB640000835312 /* KakaoSDKAuth in Frameworks */,
 				525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */,
@@ -1418,7 +1416,6 @@
 				52C72EA02C4FBE4100CFF329 /* RxRelay */,
 				52C72EA22C4FBE4100CFF329 /* RxSwift */,
 				52C72EA52C4FBE5900CFF329 /* SnapKit */,
-				524A50C82C68735000862AD6 /* MultipartForm */,
 				52E238392C765A2D0066C9A3 /* ReactorKit */,
 				5211F9192C89E39600403980 /* Kingfisher */,
 				525AA90B2C915C6D0087913F /* FSCalendar */,
@@ -1462,7 +1459,6 @@
 			packageReferences = (
 				52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				52C72EA42C4FBE5900CFF329 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */,
 				5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */,
@@ -1893,14 +1889,6 @@
 				minimumVersion = 7.12.0;
 			};
 		};
-		524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davbeck/MultipartForm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
-			};
-		};
 		525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WenchaoD/FSCalendar.git";
@@ -1956,11 +1944,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
-		};
-		524A50C82C68735000862AD6 /* MultipartForm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 524A50C72C68735000862AD6 /* XCRemoteSwiftPackageReference "MultipartForm" */;
-			productName = MultipartForm;
 		};
 		525AA90B2C915C6D0087913F /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
