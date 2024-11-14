@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
+final class LoginSceneDIContainer: LoginSceneDependencies {
     
     let appleLoginService = DefaultAppleLoginService()
     let kakaoLoginService = DefaultKakaoLoginService()
@@ -18,8 +18,8 @@ final class LoginSceneDIContainer: LoginCoordinaotorDependencies {
         self.appNetworkService = appNetworkService
     }
     
-    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginCoordinator {
-        let flow = LoginCoordinator(navigationController: navigationController,
+    func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginSceneCoordinator {
+        let flow = LoginSceneCoordinator(navigationController: navigationController,
                                         dependencies: self)
         return flow
     }
@@ -58,14 +58,14 @@ extension LoginSceneDIContainer {
 
 // MARK: - Profile Setup
 extension LoginSceneDIContainer {
-    func makeProfileSetupViewController(action: ProfileSetupAction) -> ProfileSetupViewController {
-        return ProfileSetupViewController(reactor: makeProfileSetupReactor(action))
+    func makeProfileCreateViewController(action: ProfileSetupAction) -> ProfileCreateViewController {
+        return ProfileCreateViewController(reactor: makeProfileSetupReactor(action))
     }
     
     
     /// Profile Setup 과정에서는 추가로 필요한 비즈니스 로직이 없음으로 ViewModel이 Repository를 직접 사용
-    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileSetupViewReactor {
-        return ProfileSetupViewReactor(profileRepository: ProfileRepositoryMock(),
+    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileFormViewReactor {
+        return ProfileFormViewReactor(profileRepository: ProfileRepositoryMock(),
                                        completedAction: action)
     }
 

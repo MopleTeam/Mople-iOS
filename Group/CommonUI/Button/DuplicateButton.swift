@@ -24,7 +24,6 @@ final class DuplicateButton: BaseButton {
     }
     
     fileprivate func updateColor(_ isEnabled: Bool) {
-        print(#function, #line, "isEnabled : \(isEnabled)" )
         configuration?.background.backgroundColor = isEnabled ?
         ColorStyle.App.secondary :
         ColorStyle.App.secondary.withAlphaComponent(0.2)

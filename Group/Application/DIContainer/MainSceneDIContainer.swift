@@ -7,12 +7,17 @@
 
 import UIKit
 
-protocol TabBarCoordinaotorDependencies {
+protocol MainSceneDependencies {
     func makeTabBarController() -> UITabBarController
-    func getMainFlowCoordinator() -> [BaseCoordinator]
+    func makeHomeViewController(action: HomeViewAction) -> HomeViewController
+    func makeGroupListViewController() -> GroupListViewController
+    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
+    func makeSetupSceneCoordinator() -> BaseCoordinator
+    func makeProfileEditViewController(previousProfile: ProfileInfo,
+                                       action: ProfileSetupAction) -> ProfileEditViewController
 }
 
-final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
+final class MainSceneDIContainer: MainSceneDependencies {
     
     let appNetworkService: AppNetWorkService
     
@@ -20,8 +25,8 @@ final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
         self.appNetworkService = appNetworkService
     }
     
-    func makeMainFlowCoordinator(navigationController: UINavigationController) -> TabBarCoordinator {
-        let flow = TabBarCoordinator(navigationController: navigationController,
+    func makeMainFlowCoordinator(navigationController: UINavigationController) -> MainSceneCoordinator {
+        let flow = MainSceneCoordinator(navigationController: navigationController,
                                      dependencies: self)
         return flow
     }
@@ -29,62 +34,68 @@ final class MainSceneDIContainer: TabBarCoordinaotorDependencies {
 
 extension MainSceneDIContainer {
     func makeTabBarController() -> UITabBarController {
-        return MainTabBarController()
-    }
-    
-    func getMainFlowCoordinator() -> [BaseCoordinator] {
-        return [makeHomeCoordinator(),
-                makeGroupListCoordinator(),
-                makeCalendarCoordinator(),
-                makeProfileCoordinator()]
+        return DefaultTabBarController()
     }
 }
 
 extension MainSceneDIContainer {
     // MARK: - 홈
-    private func makeHomeCoordinator() -> BaseCoordinator {
-        let homeDI = HomeSceneDIContainer(appNetworkService: appNetworkService)
-        let navigationController = MainNavigationController()
-        navigationController.tabBarItem = .init(title: "홈",
-                                                image: .home,
-                                                selectedImage: nil)
-          
-        return homeDI.makeHomeFlowCoordinator(navigationController: navigationController)
+    func makeHomeViewController(action: HomeViewAction) -> HomeViewController {
+        let homeVC = HomeViewController(reactor: makeHomeViewReactor(action))
+        homeVC.tabBarItem = .init(title: "홈", image: .home, selectedImage: nil)
+        return homeVC
+    }
+    
+    private func makeHomeViewReactor(_ action: HomeViewAction) -> HomeViewReactor {
+        return HomeViewReactor(fetchRecentSchedule: FetchRecentScheduleMock(),
+                                   viewAction: action)
     }
     
     // MARK: - 모임 리스트
-    private func makeGroupListCoordinator() -> BaseCoordinator {
-        let groupDI = GroupListSceneDIContainer(appNetworkService: appNetworkService)
-        
-        let navigationController = MainNavigationController()
-        navigationController.tabBarItem = .init(title: "모임",
-                                                image: .people,
-                                                selectedImage: nil)
-        
-        return groupDI.makeGroupListFlowCoordinator(navigationController: navigationController)
+    func makeGroupListViewController() -> GroupListViewController {
+        let groupListVC = GroupListViewController(title: "모임",
+                                                  reactor: makeGroupListViewReactor())
+        groupListVC.tabBarItem = .init(title: "모임", image: .people, selectedImage: nil)
+        return groupListVC
+    }
+    
+    private func makeGroupListViewReactor() -> GroupListViewReactor {
+        return GroupListViewReactor(fetchUseCase: FetchGroupListMock())
     }
     
     // MARK: - 캘린더
-    private func makeCalendarCoordinator() -> BaseCoordinator {
-        let calendarDI = CalendarSceneDIContainer(appNetworkService: appNetworkService)
-        
-        let navigationController = MainNavigationController()
-        navigationController.tabBarItem = .init(title: "일정관리",
-                                                image: .tabBarCalendar,
-                                                selectedImage: nil)
-        
-        return calendarDI.makeCalendarFlowCoordinator(navigationController: navigationController)
+    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController {
+        let calendarScheduleVC = CalendarScheduleViewController(title: "일정관리",
+                                                                reactor: makeCalendarViewReactor())
+        calendarScheduleVC.tabBarItem = .init(title: "일정관리", image: .tabBarCalendar, selectedImage: nil)
+        return calendarScheduleVC
     }
-    
+
+    private func makeCalendarViewReactor() -> CalendarViewReactor {
+        return CalendarViewReactor(fetchUseCase: FetchScheduleMock())
+    }
+
     // MARK: - 프로필
-    private func makeProfileCoordinator() -> BaseCoordinator {
-        let profileDI = SetupSceneDIContainer(appNetworkService: appNetworkService)
+    func makeSetupSceneCoordinator() -> BaseCoordinator {
+        let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService)
         
-        let navigationController = MainNavigationController()
+        let navigationController = UINavigationController()
+        navigationController.isNavigationBarHidden = true
         navigationController.tabBarItem = .init(title: "프로필",
                                                 image: .person,
                                                 selectedImage: nil)
         
         return profileDI.makeSetupFlowCoordinator(navigationController: navigationController)
+    }
+    
+    // MARK: - 프로필 편집
+    func makeProfileEditViewController(previousProfile: ProfileInfo, action: ProfileSetupAction) -> ProfileEditViewController {
+        return .init(profile: previousProfile,
+                     reactor: makeProfileEditViewReactor(action))
+    }
+    
+    private func makeProfileEditViewReactor(_ action: ProfileSetupAction) -> ProfileFormViewReactor {
+        return .init(profileRepository: ProfileRepositoryMock(),
+                     completedAction: action)
     }
 }
