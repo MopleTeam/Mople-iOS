@@ -20,7 +20,7 @@ class ProfileCreateViewController: UIViewController, View {
     // MARK: - UI Components
     private let mainTitle: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.Profile.title
+        label.text = TextStyle.ProfileSetup.title
         label.font = FontStyle.Heading.bold
         label.textColor = ColorStyle.Gray._01
         label.numberOfLines = 2
@@ -78,7 +78,7 @@ class ProfileCreateViewController: UIViewController, View {
         profileContainerView.snp.makeConstraints { make in
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
-            make.bottom.equalToSuperview().inset(UIScreen.safeBottom())
+            make.bottom.equalToSuperview().inset(UIScreen.hasNotch() ? 0 : 28)
         }
 
         indicator.snp.makeConstraints { make in

@@ -7,16 +7,6 @@
 
 import UIKit
 
-protocol MainSceneDependencies {
-    func makeTabBarController() -> UITabBarController
-    func makeHomeViewController(action: HomeViewAction) -> HomeViewController
-    func makeGroupListViewController() -> GroupListViewController
-    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
-    func makeSetupSceneCoordinator() -> BaseCoordinator
-    func makeProfileEditViewController(previousProfile: ProfileInfo,
-                                       action: ProfileSetupAction) -> ProfileEditViewController
-}
-
 final class MainSceneDIContainer: MainSceneDependencies {
     
     let appNetworkService: AppNetWorkService

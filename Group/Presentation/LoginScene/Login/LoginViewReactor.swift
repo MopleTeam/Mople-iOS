@@ -39,7 +39,7 @@ enum LoginFacingError: Error {
     }
 }
 
-final class LoginViewReacotr: Reactor {
+final class LoginViewReactor: Reactor {
     
     enum Action {
         case appleLogin
@@ -108,7 +108,7 @@ final class LoginViewReacotr: Reactor {
 }
 
 // MARK: - Error Handler
-extension LoginViewReacotr {
+extension LoginViewReactor {
     private func mapLoginErrorToFacingError(err : LoginError) -> LoginFacingError {
         switch err {
         case .noAuthCode:
@@ -129,7 +129,7 @@ extension LoginViewReacotr {
 }
 
 // MARK: - Execute
-extension LoginViewReacotr {
+extension LoginViewReactor {
     private func executeLogin(_ platform: LoginPlatform) -> Observable<Mutation> {
         let loginTask = userLoginUseCase.login(platform)
             .asObservable()

@@ -18,7 +18,7 @@ struct TextStyle {
         static let apple = "Apple로 시작하기"
     }
     
-    enum Profile {
+    enum ProfileSetup {
         static let title = "자신을 나타낼\n프로필을 설정해주세요"
         static let nameTitle = "닉네임"
         static let checkBtnTitle = "중복확인"
@@ -34,15 +34,20 @@ struct TextStyle {
         static let createSchedule = "새로운\n일정 만들기"
     }
     
+    enum GroupList {
+        static let emptyTitle = "새로운 모임을 추가해주세요"
+    }
+    
+    enum Calendar {
+        static let emptyTitle = "새로운 일정을 추가해주세요"
+    }
+    
     enum DatePicker {
+        static let header = "날짜선택"
         static let completedTitle = "완료"
     }
-    
-    enum GroupList {
-        static let emptyTitle = "새로운 모임을 추가해주세요."
-    }
-    
-    enum Setup {
+
+    enum Profile {
         static let version = Bundle.main.releaseVersionNumber ?? "0.0"
         static let notifyTitle = "알림 관리"
         static let policyTitle = "개인정보 처리방침"

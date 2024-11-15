@@ -35,9 +35,9 @@ final class DatePickViewController: UIViewController, View {
     private var months: [Int] = Array(1...12)
     
     // MARK: - UI Components
-    private let navigationView: CustomNavigationBar = {
-        let bar = CustomNavigationBar()
-        bar.titleLable.text = "날짜 선택"
+    private let navigationView: DefaultNavigationBar = {
+        let bar = DefaultNavigationBar()
+        bar.titleLable.text = TextStyle.DatePicker.header
         return bar
     }()
     

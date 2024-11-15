@@ -35,7 +35,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
-    private let headerContainer: UIButton = {
+    private let headerButton: UIButton = {
         let view = UIButton()
         view.clipsToBounds = true
         view.layer.cornerRadius = 10
@@ -123,13 +123,13 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     }
     
     private func setLayout() {
-        self.view.addSubview(headerContainer)
-        self.headerContainer.addSubview(header)
+        self.view.addSubview(headerButton)
+        self.headerButton.addSubview(header)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
         self.view.addSubview(borderView)
                         
-        headerContainer.snp.makeConstraints { make in
+        headerButton.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(56)
@@ -140,7 +140,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         }
         
         calendarContainer.snp.makeConstraints { make in
-            make.top.equalTo(headerContainer.snp.bottom).offset(16)
+            make.top.equalTo(headerButton.snp.bottom)//.offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(360) 
         }
@@ -255,11 +255,11 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     
     // MARK: - Action
     private func setAction() {
-//        test.rx.controlEvent(.touchUpInside)
-//            .subscribe(with: self, onNext: { vc, _ in
-//                vc.presentDatePicker()
-//            })
-//            .disposed(by: disposeBag)
+        headerButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.presentDatePicker()
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Gesture Setup
@@ -338,13 +338,13 @@ extension CalendarScheduleViewController {
     private func updateHeaderView(scope: ScopeType) {
         let height = scope == .month ? 56 : 0
         
-        self.headerContainer.snp.updateConstraints { make in
+        self.headerButton.snp.updateConstraints { make in
             make.height.equalTo(height)
         }
     }
     
     private func hideScheduleListTableView(scope: ScopeType) {
-        scheduleListTableView.hideView(isHide: scope == .month)
+        scheduleListTableView.remakeConstraints(isHide: scope == .month)
     }
     
     #warning("참고")

@@ -27,7 +27,7 @@ final class DefaultTabBarController: UITabBarController {
     }
     
     private func updateTabBarFrame() {
-        guard UIScreen.isNotch() else { return }
+        guard UIScreen.hasNotch() else { return }
         let newHeight: CGFloat = tabBar.frame.height + 10
         var tabFrame = tabBar.frame
         tabFrame.size.height = newHeight

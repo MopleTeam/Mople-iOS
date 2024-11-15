@@ -8,11 +8,7 @@
 import UIKit
 
 extension UIScreen {
-    static func isNotch() -> Bool {
+    static func hasNotch() -> Bool {
         return (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0) > 0
-    }
-    
-    static func safeBottom() -> CGFloat {
-        isNotch() ? 0 : 28
     }
 }

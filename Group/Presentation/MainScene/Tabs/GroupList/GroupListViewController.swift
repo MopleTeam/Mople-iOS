@@ -17,11 +17,9 @@ class GroupListViewController: DefaultViewController, View {
     
     var disposeBag = DisposeBag()
 
-    private let emptyView: BaseEmptyView = {
-        let view = BaseEmptyView()
-        view.setTitle(text: TextStyle.GroupList.emptyTitle,
-                      font: FontStyle.Body1.medium,
-                      color: ColorStyle.Gray._06)
+    private let emptyView: DefaultEmptyView = {
+        let view = DefaultEmptyView()
+        view.setTitle(text: TextStyle.GroupList.emptyTitle)
         view.setImage(image: .emptyGroup)
         return view
     }()

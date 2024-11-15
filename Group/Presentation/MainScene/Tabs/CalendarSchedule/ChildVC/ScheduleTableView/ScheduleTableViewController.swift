@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -31,12 +32,20 @@ final class ScheduleTableViewController: UIViewController, View {
     private let tableView: UITableView = {
         #warning("섹션 헤더 sticky 되는 현상 막기")
         let table = UITableView(frame: .zero, style: .grouped)
-        table.separatorStyle = .none
         table.backgroundColor = .clear
+        table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
         table.sectionFooterHeight = 8
         table.tableHeaderView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
         return table
+    }()
+    
+    private let emptyScheduleView: DefaultEmptyView = {
+        let view = DefaultEmptyView()
+        view.setTitle(text: TextStyle.Calendar.emptyTitle)
+        view.setImage(image: .emptySchedule)
+        view.clipsToBounds = true
+        return view
     }()
     
     // MARK: - LifeCycle
@@ -68,17 +77,16 @@ final class ScheduleTableViewController: UIViewController, View {
     private func setLayout() {
         self.view.backgroundColor = .clear
         view.addSubview(tableView)
+        view.addSubview(emptyScheduleView)
         
-        tableView.snp.makeConstraints { make in
+        emptyScheduleView.snp.makeConstraints { make in
             make.horizontalEdges.bottom.equalToSuperview()
-            make.top.equalTo(view.snp.bottom)
+            make.top.equalTo(self.view.snp.bottom)
         }
     }
     
     private func setupTableView() {
-        #warning("rx delegate 차이점 기록하기")
-//        tableView.rx.setDelegate(self).disposed(by: disposeBag) // rx만 사용
-        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false) // 기본과 rx 모두 사용
+        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
         self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
     }
@@ -92,7 +100,6 @@ final class ScheduleTableViewController: UIViewController, View {
                 cell.selectionStyle = .none
                 return cell
             }
-            
         )
     }
     
@@ -133,9 +140,18 @@ final class ScheduleTableViewController: UIViewController, View {
     
     private func inputBind(_ reactor: Reactor) {
         reactor.pulse(\.$schedules)
-            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$schedules)
+            .map({ $0.isEmpty })
+            .observe(on: MainScheduler.instance)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isEmpty in
+                vc.tableView.isHidden = isEmpty
+                vc.emptyScheduleView.isHidden = !isEmpty
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDate)
@@ -196,19 +212,38 @@ extension ScheduleTableViewController {
 
 // MARK: - 테이블 뷰 화면 표시
 extension ScheduleTableViewController {
-    public func hideView(isHide: Bool) {
-        if isHide {
-            self.stopTableviewScroll()
-            tableView.snp.remakeConstraints { make in
-                make.horizontalEdges.equalToSuperview()
-                make.bottom.equalToSuperview()
-                make.top.equalTo(self.view.snp.bottom)
-            }
+    public func remakeConstraints(isHide: Bool) {
+        if !tableView.isHidden {
+            remakeTableView(isHide)
         } else {
-            tableView.snp.remakeConstraints { make in
-                make.edges.equalToSuperview()
-            }
+            remakeEmptyView(isHide)
         }
+    }
+    
+    private func remakeTableView(_ isHide: Bool) {
+        guard !tableView.isHidden else { return }
+        tableView.snp.remakeConstraints(isHide ? hideView(_:) : showTableView(_:))
+    }
+    
+    private func remakeEmptyView(_ isHide: Bool) {
+        guard !emptyScheduleView.isHidden else { return }
+        emptyScheduleView.snp.remakeConstraints(isHide ? hideView(_:) : showEmptyView(_:))
+    }
+    
+    private func hideView(_ make: ConstraintMaker) {
+        make.horizontalEdges.equalToSuperview()
+        make.bottom.equalToSuperview()
+        make.top.equalTo(self.view.snp.bottom)
+    }
+    
+    private func showTableView(_ make: ConstraintMaker) {
+        make.edges.equalToSuperview()
+    }
+    
+    private func showEmptyView(_ make: ConstraintMaker) {
+        make.horizontalEdges.equalToSuperview()
+        make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+        make.top.equalTo(self.view.snp.top)
     }
 }
 
@@ -284,17 +319,7 @@ extension ScheduleTableViewController {
     private func stopTableviewScroll() {
         self.userInteractingObserver.accept(false)
         guard tableView.isDragging else { return }
-        print(#function, #line, "드래그 멈출게요!" )
         let currentOffset = tableView.contentOffset
         tableView.setContentOffset(currentOffset, animated: false)
-        
-        
-        
     }
 }
-
-//extension Reactive where Base: UIScrollView {
-//    var isDragging: Observable<Bool> {
-//        return self.base.rx.isDragging
-//    }
-//}

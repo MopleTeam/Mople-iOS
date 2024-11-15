@@ -7,6 +7,16 @@
 
 import UIKit
 
+protocol MainSceneDependencies {
+    func makeTabBarController() -> UITabBarController
+    func makeHomeViewController(action: HomeViewAction) -> HomeViewController
+    func makeGroupListViewController() -> GroupListViewController
+    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
+    func makeSetupSceneCoordinator() -> BaseCoordinator
+    func makeProfileEditViewController(previousProfile: ProfileInfo,
+                                       action: ProfileSetupAction) -> ProfileEditViewController
+}
+
 protocol AccountAction {
     func signOut()
     func editProfile(_ editModel: ProfileUpdateModel)
@@ -100,10 +110,9 @@ extension MainSceneCoordinator {
     /// 캘린더 뷰로 이동하기
     /// - Parameter lastRecentDate: 이동시 표시할 데이트
     func pushCalendarView(lastRecentDate: Date) {
-        guard let index = getNaviIndexFromTabBar(destination: .calendar),
-              let destinationNavi = getDestinationFormNavi(index: index),
+        guard let index = getIndexFromTabBar(destination: .calendar),
+              let destinationNavi = getDestinationVC(index: index),
               let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
-        
         calendarVC.presentEvent(on: lastRecentDate)
         tabBarController!.selectedIndex = index
     }
@@ -129,19 +138,15 @@ extension MainSceneCoordinator {
     
     #warning("메타타입 비교하기, Claude 타입과 메타타입 참고")
     /// 이동하려고 하는 뷰의 Navi Index 찾기
-    private func getNaviIndexFromTabBar(destination: Route) -> Int? {
-        return tabBarController?.viewControllers?.firstIndex(where: { navi in
-            guard let navi = navi as? UINavigationController else { return false }
-            return navi.viewControllers.contains { vc in
-                return vc.isKind(of: destination.type)
-            }
+    private func getIndexFromTabBar(destination: Route) -> Int? {
+        return tabBarController?.viewControllers?.firstIndex(where: { vc in
+            return vc.isKind(of: destination.type)
         })
     }
     
     /// 이동하려고 하는 뷰 찾기
-    private func getDestinationFormNavi(index: Int) -> UIViewController? {
-        guard let destinationNavi = tabBarController?.viewControllers?[index] as? UINavigationController else { return nil }
-        return destinationNavi.viewControllers.first
+    private func getDestinationVC(index: Int) -> UIViewController? {
+        return tabBarController?.viewControllers?[index]
     }
 }
 

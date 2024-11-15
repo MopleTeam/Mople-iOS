@@ -28,7 +28,7 @@ class DefaultViewController: UIViewController {
     }
     
     // MARK: - UI Components
-    private let navigationView = CustomNavigationBar()
+    private let navigationView = DefaultNavigationBar()
     
     private lazy var rightButton = UIButton()
     private lazy var leftButton = UIButton()

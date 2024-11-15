@@ -24,7 +24,7 @@ final class DuplicateLabel: UILabel {
     }
     
     fileprivate func updateText(_ isOverlap: Bool) {
-        text = isOverlap ? TextStyle.Profile.duplicateText : TextStyle.Profile.validateTitle
+        text = isOverlap ? TextStyle.ProfileSetup.duplicateText : TextStyle.ProfileSetup.validateTitle
         textColor = isOverlap ? ColorStyle.Default.red : ColorStyle.Default.green
     }
 }

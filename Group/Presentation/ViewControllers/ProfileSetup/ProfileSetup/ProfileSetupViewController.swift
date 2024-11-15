@@ -21,9 +21,9 @@ final class ProfileSetupViewController: UIViewController, View {
         var title: String {
             switch self {
             case .create:
-                TextStyle.Profile.createTitle
+                TextStyle.ProfileSetup.createTitle
             case .edit:
-                TextStyle.Profile.editTitle
+                TextStyle.ProfileSetup.editTitle
             }
         }
     }
@@ -42,8 +42,8 @@ final class ProfileSetupViewController: UIViewController, View {
     private lazy var alertManager = AlertManager.shared
     
     // MARK: - Variables
-    private var previousProfile: ProfileInfo?
-    private var viewType: ViewType?
+    private let previousProfile: ProfileInfo?
+    private let viewType: ViewType?
     
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
@@ -74,7 +74,7 @@ final class ProfileSetupViewController: UIViewController, View {
 
     private let nameTitle: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.Profile.nameTitle
+        label.text = TextStyle.ProfileSetup.nameTitle
         label.font = FontStyle.Title3.semiBold
         label.textColor = ColorStyle.Gray._01
         return label
@@ -97,7 +97,7 @@ final class ProfileSetupViewController: UIViewController, View {
     
     private let duplicateButton: DuplicateButton = {
         let btn = DuplicateButton()
-        btn.setTitle(text: TextStyle.Profile.checkBtnTitle,
+        btn.setTitle(text: TextStyle.ProfileSetup.checkBtnTitle,
                      font: FontStyle.Body1.semiBold,
                      color: ColorStyle.Default.white)
         return btn
@@ -125,7 +125,7 @@ final class ProfileSetupViewController: UIViewController, View {
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView, completionButton])
         sv.axis = .vertical
-        sv.spacing = 24
+        sv.spacing = viewType == .create ? 24 : 0
         sv.alignment = .fill
         sv.distribution = .fill
         return sv
@@ -133,12 +133,12 @@ final class ProfileSetupViewController: UIViewController, View {
 
     // MARK: - LifeCycle
     init(type: ViewType,
+         previousProfile: ProfileInfo? = nil,
          reactor: ProfileFormViewReactor) {
-        defer {
-            self.reactor = reactor
-            self.viewType = type
-        }
+        self.viewType = type
+        self.previousProfile = previousProfile
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -155,6 +155,7 @@ final class ProfileSetupViewController: UIViewController, View {
         setupLayout()
         setupTextField()
         setNextButtonTitle(type: viewType)
+        setPreviousProfile()
     }
     
     private func setupLayout() {
@@ -371,10 +372,10 @@ extension ProfileSetupViewController {
         return (nickName, image)
     }
     
-    public func setEditProfile(_ profile: ProfileInfo) {
-        self.previousProfile = profile
-        _ = self.profileImageView.kfSetimage(profile.imagePath)
-        self.nameTextField.text = profile.name
+    private func setPreviousProfile() {
+        guard let previousProfile else { return }
+        _ = self.profileImageView.kfSetimage(previousProfile.imagePath)
+        self.nameTextField.text = previousProfile.name
     }
 }
 

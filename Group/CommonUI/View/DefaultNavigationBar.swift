@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class CustomNavigationBar: UIView {
+final class DefaultNavigationBar: UIView {
     
     let titleLable: UILabel = {
         let label = UILabel()
@@ -58,7 +58,7 @@ final class CustomNavigationBar: UIView {
 }
 
 // MARK: - Set Item
-extension CustomNavigationBar {
+extension DefaultNavigationBar {
     
     public func setRightItem(item: UIButton) {
         rightButtonContainerView.addSubview(item)

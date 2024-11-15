@@ -14,7 +14,7 @@ import AuthenticationServices
 
 final class LoginViewController: UIViewController, View {
     
-    typealias Reactor = LoginViewReacotr
+    typealias Reactor = LoginViewReactor
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -89,6 +89,7 @@ final class LoginViewController: UIViewController, View {
     
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [titleContainerView, loginStackView])
+        sv.backgroundColor = .systemYellow
         sv.axis = .vertical
         sv.spacing = 0
         sv.alignment = .fill
@@ -96,13 +97,13 @@ final class LoginViewController: UIViewController, View {
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 0,
                                  left: 20,
-                                 bottom: UIScreen.safeBottom(),
+                                 bottom: UIScreen.hasNotch() ? 0 : 28,
                                  right: 20)
         return sv
     }()
     
     // MARK: - LifeCycle
-    init(reactor: LoginViewReacotr) {
+    init(reactor: LoginViewReactor) {
         defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
@@ -113,7 +114,6 @@ final class LoginViewController: UIViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "asdfasdf"
         setupUI()
     }
 
@@ -128,7 +128,7 @@ final class LoginViewController: UIViewController, View {
         self.titleContainerView.addSubview(titleStackView)
 
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+            make.edges.equalToSuperview()
         }
         
         titleStackView.snp.makeConstraints { make in
@@ -144,8 +144,8 @@ final class LoginViewController: UIViewController, View {
         }
     }
     
-    // MARK: - Selectors
-    func bind(reactor: LoginViewReacotr) {
+    // MARK: - Binding
+    func bind(reactor: LoginViewReactor) {
         self.appleLoginButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
@@ -170,9 +170,3 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
         return self.view.window!
     }
 }
-
-
-
-
-
-

@@ -28,7 +28,8 @@ class ProfileEditViewController: DefaultViewController, View {
     
     private lazy var profileSetupView: ProfileSetupViewController = {
         let viewController = ProfileSetupViewController(type: .edit,
-                                                       reactor: reactor!)
+                                                        previousProfile: previousProfile,
+                                                        reactor: reactor!)
         return viewController
     }()
 
@@ -53,7 +54,6 @@ class ProfileEditViewController: DefaultViewController, View {
     private func setupUI() {
         setupLayout()
         addProfileSetupView()
-        setProfile()
     }
 
     private func setupLayout() {
@@ -75,10 +75,6 @@ class ProfileEditViewController: DefaultViewController, View {
         }
     }
 
-    private func setProfile() {
-        profileSetupView.setEditProfile(previousProfile)
-    }
-    
     // MARK: - Binding
     func bind(reactor: ProfileFormViewReactor) {
         leftButtonObserver

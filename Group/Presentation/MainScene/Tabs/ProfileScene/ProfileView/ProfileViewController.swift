@@ -48,7 +48,7 @@ final class ProfileViewController: DefaultViewController, View {
 
     private let notifyButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Setup.notifyTitle,
+        btn.setTitle(text: TextStyle.Profile.notifyTitle,
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
@@ -58,7 +58,7 @@ final class ProfileViewController: DefaultViewController, View {
     
     private let policyButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Setup.policyTitle,
+        btn.setTitle(text: TextStyle.Profile.policyTitle,
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
@@ -69,7 +69,7 @@ final class ProfileViewController: DefaultViewController, View {
     
     private let versionLabel: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Setup.versionTitle,
+        btn.setTitle(text: TextStyle.Profile.versionTitle,
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
@@ -78,7 +78,7 @@ final class ProfileViewController: DefaultViewController, View {
     
     private let versionInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.Setup.version
+        label.text = TextStyle.Profile.version
         label.font = FontStyle.Title3.medium
         label.textColor = ColorStyle.Gray._06
         return label
@@ -86,7 +86,7 @@ final class ProfileViewController: DefaultViewController, View {
     
     private let logoutButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Setup.logoutTitle,
+        btn.setTitle(text: TextStyle.Profile.logoutTitle,
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
@@ -95,7 +95,7 @@ final class ProfileViewController: DefaultViewController, View {
 
     private let resignButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Setup.resignTitle,
+        btn.setTitle(text: TextStyle.Profile.resignTitle,
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)

@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class BaseEmptyView: UIView {
+class DefaultEmptyView: UIView {
 
     private let imageView: UIImageView = {
         let view = UIImageView()
@@ -16,12 +16,16 @@ class BaseEmptyView: UIView {
         return view
     }()
     
-    private let label = UILabel()
+    private let label: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Title3.medium
+        label.textColor = ColorStyle.Gray._06
+        return label
+    }()
     
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageView, label])
         sv.axis = .vertical
-        sv.spacing = 20
         sv.alignment = .center
         sv.distribution = .fill
         return sv
@@ -49,13 +53,9 @@ class BaseEmptyView: UIView {
     }
 }
 
-extension BaseEmptyView {
-    public func setTitle(text: String? = nil,
-                         font: UIFont? = nil,
-                         color: UIColor? = nil) {
+extension DefaultEmptyView {
+    public func setTitle(text: String? = nil) {
         label.text = text
-        label.font = font
-        label.textColor = color
     }
     
     public func setImage(image: UIImage?) {
