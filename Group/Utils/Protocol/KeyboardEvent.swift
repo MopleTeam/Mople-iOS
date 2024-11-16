@@ -1,9 +1,10 @@
-import Foundation
+
 import UIKit
+import SnapKit
 
 protocol KeyboardEvent: AnyObject {
-    var transformView: UIView { get }
     var contentView: UIView { get }
+    var bottomConstraints: Constraint? { get set }
     func setupKeyboardEvent()
     func removeKeyboardObserver()
 }
@@ -30,45 +31,34 @@ extension KeyboardEvent where Self: UIViewController {
     }
     
     private func handleKeyboardShow(_ sender: Notification) {
-        print(#fileID, #function, #line, "- sender: \(sender)")
-        
         if let keyboardSize = sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
            let duration = sender.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
            let curve = sender.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
         {
-            
-            let keyboardHeight = keyboardSize.height
+            let threshold: CGFloat = 10
+            let keyboardHeight = keyboardSize.height + threshold
             let animationOptions = UIView.AnimationOptions(rawValue: curve)
-            
-            UIView.animate(withDuration: duration,
-                           delay: 0,
-                           options: animationOptions,
-                           animations: {
-                self.contentView.snp.updateConstraints { make in
-                    make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(keyboardHeight + 10)
-                }
-                self.view.layoutIfNeeded()
-            })
+            let newInset = keyboardHeight - UIScreen.safeInsetBottom()
+            updateBottomInset(duration, animationOptions, newInset)
         }
     }
     
     private func handleKeyboardHide(_ sender: Notification) {
-        print(#fileID, #function, #line, "- sender: \(sender)")
-        
         if let duration = sender.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
            let curve = sender.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
         {
             let animationOptions = UIView.AnimationOptions(rawValue: curve)
-            
-            UIView.animate(withDuration: duration,
-                           delay: 0,
-                           options: animationOptions,
-                           animations: {
-                self.contentView.snp.updateConstraints { make in
-                    make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset((UIScreen.hasNotch() ? 0 : 28))
-                }
-                self.view.layoutIfNeeded()
-            })
+            let defaultInset: CGFloat = UIScreen.hasNotch() ? 0 : 28
+            updateBottomInset(duration, animationOptions, defaultInset)
         }
     }
+    
+    private func updateBottomInset(_ duration: CGFloat,_ option: UIView.AnimationOptions,_ inset: CGFloat) {
+        UIView.animate(withDuration: duration, delay: 0, options: option, animations: {
+
+            self.bottomConstraints?.update(inset: inset)
+            self.view.layoutIfNeeded()
+        })
+    }
 }
+

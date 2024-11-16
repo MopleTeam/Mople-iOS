@@ -6,16 +6,20 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 import ReactorKit
 
+
+
 final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
-    var transformView: UIView { self.view }
-    
-    var contentView: UIView { self.completionButton }
     
     var disposeBag = DisposeBag()
+    
+    // MARK: - Handle KeyboardEvent
+    var contentView: UIView { self.completionButton }
+    var bottomConstraints: Constraint?
     
     // MARK: - Manager
     private lazy var photoManager: PhotoManager = {
@@ -139,8 +143,10 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
         }
         
         completionButton.snp.makeConstraints { make in
+            bottomConstraints = make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.hasNotch() ? 0 : 28).constraint
+            
             make.horizontalEdges.equalTo(mainStackView)
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.hasNotch() ? 0 : 28)
+            
             make.height.equalTo(56)
         }
 
