@@ -11,6 +11,7 @@ import RxCocoa
 import SnapKit
 
 class DefaultViewController: UIViewController {
+    
     // MARK: - Variables
     public var titleViewBottom: ConstraintItem {
         return navigationView.snp.bottom
@@ -26,6 +27,8 @@ class DefaultViewController: UIViewController {
         return leftButton.rx.controlEvent(.touchUpInside)
             .asObservable()
     }
+    
+    private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
     private let navigationView = DefaultNavigationBar()
@@ -101,7 +104,7 @@ extension DefaultViewController {
         return rightItemEvent
     }
     
-    public func addLeftButton(setImage: UIImage?) -> Observable<Void> {
+    public func addLeftButton(setImage: UIImage? = .arrowBack) -> Observable<Void> {
         navigationView.leftButtonContainerView.addSubview(leftButton)
         
         leftButton.setImage(setImage, for: .normal)

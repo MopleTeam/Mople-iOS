@@ -9,7 +9,7 @@ import UIKit
 import ReactorKit
 
 struct HomeViewAction {
-    var logOut: () -> Void
+    var presentCreateGroupView: () -> Void
     var presentNextEvent: (Date) -> Void
 }
 
@@ -17,7 +17,7 @@ final class HomeViewReactor: Reactor {
     enum Action {
         case checkNotificationPermission
         case fetchRecentSchedule
-        case logOutTest
+        case createGroup
         case presentCalendaer
     }
     
@@ -47,8 +47,8 @@ final class HomeViewReactor: Reactor {
         switch action {
         case .fetchRecentSchedule:
             fetchRecentSchedules()
-        case .logOutTest:
-            Observable.empty()
+        case .createGroup:
+            presentCreateGroupView()
         case .presentCalendaer:
             presentNextEvent()
         case .checkNotificationPermission:
@@ -113,5 +113,10 @@ extension HomeViewReactor {
         let startOfDay = DateManager.startOfDay(lastDate)
         homeViewAction.presentNextEvent(startOfDay)
         return .just(Mutation.presentCompleted)
+    }
+    
+    private func presentCreateGroupView() -> Observable<Mutation> {
+        homeViewAction.presentCreateGroupView()
+        return .empty()
     }
 }

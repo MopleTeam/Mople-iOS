@@ -8,7 +8,7 @@
 import UIKit
 
 final class MainSceneDIContainer: MainSceneDependencies {
-    
+
     let appNetworkService: AppNetWorkService
     
     init(appNetworkService: AppNetWorkService) {
@@ -31,8 +31,10 @@ extension MainSceneDIContainer {
 extension MainSceneDIContainer {
     // MARK: - 홈
     func makeHomeViewController(action: HomeViewAction) -> HomeViewController {
+        let title = TextStyle.Tabbar.home
+        
         let homeVC = HomeViewController(reactor: makeHomeViewReactor(action))
-        homeVC.tabBarItem = .init(title: "홈", image: .home, selectedImage: nil)
+        homeVC.tabBarItem = .init(title: title, image: .home, selectedImage: nil)
         return homeVC
     }
     
@@ -43,9 +45,11 @@ extension MainSceneDIContainer {
     
     // MARK: - 모임 리스트
     func makeGroupListViewController() -> GroupListViewController {
-        let groupListVC = GroupListViewController(title: "모임",
+        let titel = TextStyle.Tabbar.group
+        
+        let groupListVC = GroupListViewController(title: titel,
                                                   reactor: makeGroupListViewReactor())
-        groupListVC.tabBarItem = .init(title: "모임", image: .people, selectedImage: nil)
+        groupListVC.tabBarItem = .init(title: titel, image: .people, selectedImage: nil)
         return groupListVC
     }
     
@@ -55,9 +59,11 @@ extension MainSceneDIContainer {
     
     // MARK: - 캘린더
     func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController {
-        let calendarScheduleVC = CalendarScheduleViewController(title: "일정관리",
+        let title = TextStyle.Tabbar.calendar
+        
+        let calendarScheduleVC = CalendarScheduleViewController(title: title,
                                                                 reactor: makeCalendarViewReactor())
-        calendarScheduleVC.tabBarItem = .init(title: "일정관리", image: .tabBarCalendar, selectedImage: nil)
+        calendarScheduleVC.tabBarItem = .init(title: title, image: .tabBarCalendar, selectedImage: nil)
         return calendarScheduleVC
     }
 
@@ -66,12 +72,13 @@ extension MainSceneDIContainer {
     }
 
     // MARK: - 프로필
-    func makeSetupSceneCoordinator() -> BaseCoordinator {
+    func makeProfileSceneCoordinator() -> BaseCoordinator {
+        
         let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService)
         
         let navigationController = UINavigationController()
         navigationController.isNavigationBarHidden = true
-        navigationController.tabBarItem = .init(title: "프로필",
+        navigationController.tabBarItem = .init(title: TextStyle.Tabbar.profile,
                                                 image: .person,
                                                 selectedImage: nil)
         
@@ -87,5 +94,12 @@ extension MainSceneDIContainer {
     private func makeProfileEditViewReactor(_ action: ProfileSetupAction) -> ProfileFormViewReactor {
         return .init(profileRepository: ProfileRepositoryMock(),
                      completedAction: action)
+    }
+    
+    
+    // MARK: - 그룹 생성 화면
+    func makeCreateGroupViewController() -> GroupCreateViewController {
+        let title = TextStyle.CreateGroup.title
+        return .init(title: title)
     }
 }

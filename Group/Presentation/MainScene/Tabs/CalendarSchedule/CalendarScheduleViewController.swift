@@ -28,7 +28,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     private let scopeObserver: PublishSubject<Void> = .init()
     private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
     private lazy var rightItemObserver = addRightButton(setImage: .calendar)
-    private lazy var leftItemObserver = addLeftButton(setImage: .arrowBack)
+    private lazy var leftItemObserver = addLeftButton()
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
@@ -48,6 +48,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         header.setTitle(font: FontStyle.Title3.semiBold,
                         color: ColorStyle.Gray._01)
         header.setIconAligment(.right)
+        header.isUserInteractionEnabled = false
         return header
     }()
     

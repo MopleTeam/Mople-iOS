@@ -21,7 +21,7 @@ class ProfileEditViewController: DefaultViewController, View {
     let previousProfile: ProfileInfo
     
     // MARK: - Observer
-    private lazy var leftButtonObserver = addLeftButton(setImage: .arrowBack)
+    private lazy var leftButtonObserver = addLeftButton()
     
     // MARK: - UI Components
     private let profileContainerView = UIView()
@@ -38,7 +38,7 @@ class ProfileEditViewController: DefaultViewController, View {
          reactor: ProfileFormViewReactor) {
         self.previousProfile = profile
         defer { self.reactor = reactor }
-        super.init(title: "프로필 수정")
+        super.init(title: TextStyle.ProfileEdit.title)
     }
     
     required init?(coder: NSCoder) {

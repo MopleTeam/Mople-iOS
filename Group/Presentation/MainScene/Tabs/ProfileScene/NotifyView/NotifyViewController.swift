@@ -12,7 +12,7 @@ final class NotifyViewController: DefaultViewController {
     
     var disposeBag = DisposeBag()
     
-    private lazy var leftButtonObserver = addLeftButton(setImage: .arrowBack)
+    private lazy var leftButtonObserver = addLeftButton()
 
     init() {
         super.init(title: "알림 관리 뷰")

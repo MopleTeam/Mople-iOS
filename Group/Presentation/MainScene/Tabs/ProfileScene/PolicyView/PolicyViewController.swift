@@ -12,7 +12,7 @@ final class PolicyViewController: DefaultViewController {
     
     var disposeBag = DisposeBag()
     
-    private lazy var leftButtonObserver = addLeftButton(setImage: .arrowBack)
+    private lazy var leftButtonObserver = addLeftButton()
 
     init() {
         super.init(title: "개인정보 처리방침")

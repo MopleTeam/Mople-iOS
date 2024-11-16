@@ -12,9 +12,10 @@ protocol MainSceneDependencies {
     func makeHomeViewController(action: HomeViewAction) -> HomeViewController
     func makeGroupListViewController() -> GroupListViewController
     func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
-    func makeSetupSceneCoordinator() -> BaseCoordinator
+    func makeProfileSceneCoordinator() -> BaseCoordinator
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileSetupAction) -> ProfileEditViewController
+    func makeCreateGroupViewController() -> GroupCreateViewController
 }
 
 protocol AccountAction {
@@ -55,35 +56,62 @@ final class MainSceneCoordinator: BaseCoordinator {
         tabBarController!.setViewControllers(getTabs(), animated: false)
         navigationController.pushViewController(tabBarController!, animated: true)
     }
-}
-
-// MARK: - Main Views 생성
-extension MainSceneCoordinator {
+    
     private func getTabs() -> [UIViewController] {
         return [getHomeViewController(),
                 getGroupListViewController(),
                 getCalendarScheduleViewController(),
-                getSetupViewController()]
+                getProfileViewController()]
     }
-    
+}
+
+// MARK: - HomeView
+extension MainSceneCoordinator {
     private func getHomeViewController() -> HomeViewController {
-        let action = HomeViewAction(logOut: signOut,
+        let action = HomeViewAction(presentCreateGroupView: pushCreateGroupView,
                                     presentNextEvent: pushCalendarView(lastRecentDate:))
         return dependencies.makeHomeViewController(action: action)
     }
     
+    /// 캘린더 뷰로 이동하기
+    /// - Parameter lastRecentDate: 이동시 표시할 데이트
+    private func pushCalendarView(lastRecentDate: Date) {
+        guard let index = getIndexFromTabBar(destination: .calendar),
+              let destinationNavi = getDestinationVC(index: index),
+              let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
+        calendarVC.presentEvent(on: lastRecentDate)
+        tabBarController!.selectedIndex = index
+    }
+}
+
+// MARK: - Group List
+extension MainSceneCoordinator {
     private func getGroupListViewController() -> GroupListViewController {
         return dependencies.makeGroupListViewController()
     }
-    
+}
+
+// MARK: - Calendar
+extension MainSceneCoordinator {
     private func getCalendarScheduleViewController() -> CalendarScheduleViewController {
         return dependencies.makeCalendarScheduleViewcontroller()
     }
-    
-    private func getSetupViewController() -> UINavigationController {
-        let childCoordinator = dependencies.makeSetupSceneCoordinator()
+}
+
+// MARK: - Profile
+extension MainSceneCoordinator {
+    private func getProfileViewController() -> UINavigationController {
+        let childCoordinator = dependencies.makeProfileSceneCoordinator()
         self.start(coordinator: childCoordinator)
         return childCoordinator.navigationController
+    }
+}
+
+// MARK: - Create Group
+extension MainSceneCoordinator {
+    private func pushCreateGroupView() {
+        let createGroupView = dependencies.makeCreateGroupViewController()
+        self.navigationController.pushViewController(createGroupView, animated: true)
     }
 }
 
@@ -103,18 +131,6 @@ extension MainSceneCoordinator: AccountAction {
         fadeOut { [weak self] in
             self?.clearScene()
         }
-    }
-}
-
-extension MainSceneCoordinator {
-    /// 캘린더 뷰로 이동하기
-    /// - Parameter lastRecentDate: 이동시 표시할 데이트
-    func pushCalendarView(lastRecentDate: Date) {
-        guard let index = getIndexFromTabBar(destination: .calendar),
-              let destinationNavi = getDestinationVC(index: index),
-              let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
-        calendarVC.presentEvent(on: lastRecentDate)
-        tabBarController!.selectedIndex = index
     }
 }
 

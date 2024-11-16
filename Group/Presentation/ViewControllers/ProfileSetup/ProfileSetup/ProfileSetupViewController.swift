@@ -6,11 +6,9 @@
 //
 
 import UIKit
-import PhotosUI
 import RxSwift
 import RxCocoa
 import ReactorKit
-import Kingfisher
 
 final class ProfileSetupViewController: UIViewController, View {
     
@@ -18,12 +16,12 @@ final class ProfileSetupViewController: UIViewController, View {
         case create
         case edit
         
-        var title: String {
+        var completedTitle: String {
             switch self {
             case .create:
-                TextStyle.ProfileSetup.createTitle
+                TextStyle.ProfileCreate.completedTitle
             case .edit:
-                TextStyle.ProfileSetup.editTitle
+                TextStyle.ProfileEdit.completedTitle
             }
         }
     }
@@ -72,7 +70,7 @@ final class ProfileSetupViewController: UIViewController, View {
         return imageView
     }()
 
-    private let nameTitle: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.text = TextStyle.ProfileSetup.nameTitle
         label.font = FontStyle.Title3.semiBold
@@ -90,6 +88,7 @@ final class ProfileSetupViewController: UIViewController, View {
     
     private let nameTextField: UITextField = {
         let textField = UITextField()
+        
         textField.font = FontStyle.Body1.regular
         textField.textColor = ColorStyle.Gray._01
         return textField
@@ -114,7 +113,7 @@ final class ProfileSetupViewController: UIViewController, View {
     private let completionButton = CompletionButton()
     
     private lazy var nameStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [nameTitle, nameTextFieldContainer, nameCheckContanierView])
+        let sv = UIStackView(arrangedSubviews: [nameLabel, nameTextFieldContainer, nameCheckContanierView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -167,7 +166,8 @@ final class ProfileSetupViewController: UIViewController, View {
         self.nameCheckContanierView.addSubview(nameCheckLabel)
 
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.hasNotch() ? 0 : 28)
         }
 
         profileImageView.snp.makeConstraints { make in
@@ -423,7 +423,7 @@ extension ProfileSetupViewController {
 extension ProfileSetupViewController {
     private func setNextButtonTitle(type: ViewType?) {
         guard let type = type else { return }
-        completionButton.setTitle(type.title, for: .normal)
+        completionButton.setTitle(type.completedTitle, for: .normal)
     }
 }
 

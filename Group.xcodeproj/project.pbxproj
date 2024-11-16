@@ -79,6 +79,8 @@
 		527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */; };
 		527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */; };
 		527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA82C837B29007FE63B /* AppAppearance.swift */; };
+		527DBE2C2CE87861008BB20E /* CreateGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527DBE2B2CE87861008BB20E /* CreateGroup.swift */; };
+		527DBE2F2CE8965A008BB20E /* GroupCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527DBE2E2CE8965A008BB20E /* GroupCreateViewController.swift */; };
 		5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */; };
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
 		5285E6A62CD9A63C00B855CB /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6A52CD9A63C00B855CB /* Token.swift */; };
@@ -231,6 +233,8 @@
 		527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA82C837B29007FE63B /* AppAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAppearance.swift; sourceTree = "<group>"; };
+		527DBE2B2CE87861008BB20E /* CreateGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroup.swift; sourceTree = "<group>"; };
+		527DBE2E2CE8965A008BB20E /* GroupCreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupCreateViewController.swift; sourceTree = "<group>"; };
 		5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginService.swift; sourceTree = "<group>"; };
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
 		5285E6A52CD9A63C00B855CB /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
@@ -450,6 +454,7 @@
 		520C9E612CE5A5E300778558 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				527DBE2D2CE89360008BB20E /* GroupCreate */,
 				520C9E562CE54C4000778558 /* ProfileSetup */,
 			);
 			path = ViewControllers;
@@ -621,7 +626,7 @@
 		525DFCF52CC8FB1100835312 /* MainScene */ = {
 			isa = PBXGroup;
 			children = (
-				525DFCF62CC8FB2300835312 /* InfoScene */,
+				525DFCF62CC8FB2300835312 /* HomeScene */,
 				525DFCF72CC8FB2500835312 /* GroupListScene */,
 				525DFCF82CC8FB2700835312 /* CalendarScene */,
 				525DFCF92CC8FB2800835312 /* ProfileScene */,
@@ -629,12 +634,13 @@
 			path = MainScene;
 			sourceTree = "<group>";
 		};
-		525DFCF62CC8FB2300835312 /* InfoScene */ = {
+		525DFCF62CC8FB2300835312 /* HomeScene */ = {
 			isa = PBXGroup;
 			children = (
 				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
+				527DBE2B2CE87861008BB20E /* CreateGroup.swift */,
 			);
-			path = InfoScene;
+			path = HomeScene;
 			sourceTree = "<group>";
 		};
 		525DFCF72CC8FB2500835312 /* GroupListScene */ = {
@@ -731,6 +737,14 @@
 				5236453A2C900D57009E0784 /* GroupListTableView */,
 			);
 			path = ChildVC;
+			sourceTree = "<group>";
+		};
+		527DBE2D2CE89360008BB20E /* GroupCreate */ = {
+			isa = PBXGroup;
+			children = (
+				527DBE2E2CE8965A008BB20E /* GroupCreateViewController.swift */,
+			);
+			path = GroupCreate;
 			sourceTree = "<group>";
 		};
 		5285E6A82CD9D72F00B855CB /* Profile */ = {
@@ -1415,6 +1429,7 @@
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
+				527DBE2C2CE87861008BB20E /* CreateGroup.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
 				52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */,
@@ -1489,6 +1504,7 @@
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* HomeButton.swift in Sources */,
+				527DBE2F2CE8965A008BB20E /* GroupCreateViewController.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
 				520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */,

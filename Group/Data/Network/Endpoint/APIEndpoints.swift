@@ -85,12 +85,13 @@ extension APIEndpoints {
 // MARK: - Profile
 extension APIEndpoints {
 
-    static func setupProfile(image: Data, nickName: String) throws -> Endpoint<Void> {
-        let token = try getAccessTokenParameters()
+    #warning("테스트 진행 중")
+    static func setupProfile(image: Data, nickName: String) -> Endpoint<Void> {
+//        let token = try getAccessTokenParameters()
         
         return Endpoint(path: "user/me",
                         method: .patch,
-                        headerParameters: token,
+//                        headerParameters: token,
                         bodyParameters: ["profileImg" : image, "nickname" : nickName])
     }
     

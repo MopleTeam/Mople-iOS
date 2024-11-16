@@ -3,23 +3,24 @@ import UIKit
 
 protocol KeyboardEvent: AnyObject {
     var transformView: UIView { get }
-    var transformScrollView: UIScrollView { get }
     var contentView: UIView { get }
     func setupKeyboardEvent()
+    func removeKeyboardObserver()
 }
 
+#warning("contentView와 겹치는 부분이 발생하는 경우 대비")
 extension KeyboardEvent where Self: UIViewController {
     func setupKeyboardEvent() {
         
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
                                                object: nil,
                                                queue: .main) { [weak self] notification in
-            self?.keyboardWillAppear(notification)
+            self?.handleKeyboardShow(notification)
         }
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
                                                object: nil,
                                                queue: .main) { [weak self] notification in
-            self?.keyboardWillDisappear(notification)
+            self?.handleKeyboardHide(notification)
         }
     }
     
@@ -28,28 +29,46 @@ extension KeyboardEvent where Self: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    private func keyboardWillAppear(_ sender: Notification) {
-
-        guard let keyboardFrame = sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+    private func handleKeyboardShow(_ sender: Notification) {
+        print(#fileID, #function, #line, "- sender: \(sender)")
         
-        transformScrollView.alwaysBounceVertical = true
-        let convertedTextFieldFrame = transformView.convert(contentView.frame,
-                                                  from: transformScrollView)
-        
-        let contentBottomY = convertedTextFieldFrame.maxY
-        let keyboardTopY = keyboardFrame.cgRectValue.origin.y
-        
-        if contentBottomY > keyboardTopY {
-            let newFrame = contentBottomY - keyboardTopY
-            self.transformScrollView.contentOffset.y = newFrame + 20
+        if let keyboardSize = sender.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+           let duration = sender.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+           let curve = sender.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
+        {
+            
+            let keyboardHeight = keyboardSize.height
+            let animationOptions = UIView.AnimationOptions(rawValue: curve)
+            
+            UIView.animate(withDuration: duration,
+                           delay: 0,
+                           options: animationOptions,
+                           animations: {
+                self.contentView.snp.updateConstraints { make in
+                    make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(keyboardHeight + 10)
+                }
+                self.view.layoutIfNeeded()
+            })
         }
     }
     
-    private func keyboardWillDisappear(_ sender: Notification) {
-        transformScrollView.alwaysBounceVertical = false
+    private func handleKeyboardHide(_ sender: Notification) {
+        print(#fileID, #function, #line, "- sender: \(sender)")
         
-        if self.transformScrollView.contentOffset.y != 0 {
-            self.transformScrollView.contentOffset.y = 0
+        if let duration = sender.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
+           let curve = sender.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
+        {
+            let animationOptions = UIView.AnimationOptions(rawValue: curve)
+            
+            UIView.animate(withDuration: duration,
+                           delay: 0,
+                           options: animationOptions,
+                           animations: {
+                self.contentView.snp.updateConstraints { make in
+                    make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset((UIScreen.hasNotch() ? 0 : 28))
+                }
+                self.view.layoutIfNeeded()
+            })
         }
     }
 }

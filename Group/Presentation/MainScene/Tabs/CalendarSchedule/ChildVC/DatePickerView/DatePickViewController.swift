@@ -54,6 +54,7 @@ final class DatePickViewController: UIViewController, View {
         btn.setTitle(text: TextStyle.DatePicker.completedTitle,
                      font: FontStyle.Title3.semiBold,
                      color: ColorStyle.Default.white)
+        btn.setBgColor(ColorStyle.App.primary)
         return btn
     }()
             

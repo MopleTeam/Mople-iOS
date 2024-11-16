@@ -13,6 +13,13 @@ struct TextStyle {
         static let subTitle = "모임부터 약속까지 간편한 관리"
     }
     
+    enum Tabbar {
+        static let home = "홈"
+        static let group = "모임"
+        static let calendar = "일정관리"
+        static let profile = "프로필"
+    }
+    
     enum Login {
         static let kakao = "카카오로 시작하기"
         static let apple = "Apple로 시작하기"
@@ -24,8 +31,15 @@ struct TextStyle {
         static let checkBtnTitle = "중복확인"
         static let duplicateText = "이미 사용중인 닉네임 입니다."
         static let validateTitle = "사용 가능한 닉네임 입니다."
-        static let editTitle = "수정"
-        static let createTitle = "서비스 시작하기"
+    }
+    
+    enum ProfileCreate {
+        static let completedTitle = "서비스 시작하기"
+    }
+    
+    enum ProfileEdit {
+        static let title = "프로필 수정"
+        static let completedTitle = "수정"
     }
     
     enum Home {
@@ -35,10 +49,12 @@ struct TextStyle {
     }
     
     enum GroupList {
+        static let title = "모임"
         static let emptyTitle = "새로운 모임을 추가해주세요"
     }
     
     enum Calendar {
+        static let title = "일정관리"
         static let emptyTitle = "새로운 일정을 추가해주세요"
     }
     
@@ -48,11 +64,19 @@ struct TextStyle {
     }
 
     enum Profile {
+        static let title = "마이페이지"
         static let version = Bundle.main.releaseVersionNumber ?? "0.0"
         static let notifyTitle = "알림 관리"
         static let policyTitle = "개인정보 처리방침"
         static let versionTitle = "버전정보"
         static let logoutTitle = "로그아웃"
         static let resignTitle = "회원탈퇴"
+    }
+    
+    enum CreateGroup {
+        static let title = "모임 생성하기"
+        static let groupTitle = "모임 이름"
+        static let placeHolder = "모임 이름을 입력해주세요"
+        static let completedTitle = "생성하기"
     }
 }

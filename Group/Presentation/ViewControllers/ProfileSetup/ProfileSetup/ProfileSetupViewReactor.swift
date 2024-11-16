@@ -202,9 +202,10 @@ extension ProfileFormViewReactor {
     
     private func makeProfile(_ name: String?,_ image: UIImage?) -> Observable<Mutation> {
         guard let name else { return .empty() }
-  
         let image = image?.jpegData(compressionQuality: 0.7) ?? getDefaultImageData()
-        print(#function, #line, "image Size : \(image)" )
+        
+        let imageString = image.base64EncodedString()
+
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
         let makeProfile = profileRepository.makeProfile(image: image, nickname: name)

@@ -149,9 +149,10 @@ final class ProfileViewController: DefaultViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: ProfileViewReactor) {
+    init(title: String,
+         reactor: ProfileViewReactor) {
         defer { self.reactor = reactor }
-        super.init(title: "마이페이지")
+        super.init(title: title)
     }
     
     required init?(coder: NSCoder) {

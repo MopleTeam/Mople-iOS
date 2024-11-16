@@ -26,7 +26,7 @@ final class DefaultNavigationBar: UIView {
         let sv = UIStackView(arrangedSubviews: [leftButtonContainerView, titleLable, rightButtonContainerView])
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.alignment = .fill
+        sv.alignment = .center
         return sv
     }()
     
@@ -48,11 +48,11 @@ final class DefaultNavigationBar: UIView {
         }
                 
         leftButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(mainStackView.snp.height)
+            make.width.equalTo(40)
         }
         
         rightButtonContainerView.snp.makeConstraints { make in
-            make.width.equalTo(mainStackView.snp.height)
+            make.width.equalTo(40)
         }
     }
 }

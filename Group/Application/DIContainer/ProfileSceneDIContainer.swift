@@ -25,7 +25,8 @@ final class ProfileSceneDIContainer: ProfileSceneDependencies {
 // MARK: - 프로필 Flow
 extension ProfileSceneDIContainer {
     func makeProfileViewController(action: ProfileViewAction) -> ProfileViewController {
-        return ProfileViewController(reactor: makeSetupViewReactor(action: action))
+        let title = TextStyle.Profile.title
+        return ProfileViewController(title: title, reactor: makeSetupViewReactor(action: action))
     }
     
     private func makeSetupViewReactor(action: ProfileViewAction) -> ProfileViewReactor {
