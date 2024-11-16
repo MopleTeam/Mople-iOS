@@ -130,7 +130,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         self.view.addSubview(borderView)
                         
         headerButton.snp.makeConstraints { make in
-            make.top.equalTo(titleViewBottom)
+            make.top.equalTo(titleViewBottom).offset(16)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(56)
         }
@@ -140,7 +140,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         }
         
         calendarContainer.snp.makeConstraints { make in
-            make.top.equalTo(headerButton.snp.bottom)//.offset(16)
+            make.top.equalTo(headerButton.snp.bottom).offset(16)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(360) 
         }
@@ -200,7 +200,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$scope)
-            .compactMap { $0 }
+            .skip(1)
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, scope in
                 vc.updateMainView(scope)
@@ -264,6 +264,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     
     // MARK: - Gesture Setup
     @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
+        print(#function, #line)
         self.scopeObserver.onNext(())
         self.gestureObserver.onNext(gesture)
     }
@@ -276,18 +277,19 @@ final class CalendarScheduleViewController: DefaultViewController, View {
 
 extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        print(#function, #line)
         let tableTop = scheduleListTableView.checkTop()
         let monthScope = reactor!.currentState.scope == .month
         let shouldBegin = tableTop || monthScope
-        if shouldBegin {
-            return shouldAllowScopeChangeGesture()
-        }
-        return shouldBegin
+        
+        return shouldBegin ? shouldAllowScopeChangeGesture() : false
     }
     
     /// 스코프의 상태와 제스처의 방향에 따라서 스코프 변경여부 결정
     private func shouldAllowScopeChangeGesture() -> Bool {
-        guard let scope = reactor!.currentState.scope else { return false }
+        print(#function, #line, "scope : \(reactor!.currentState.scope)" )
+        let scope = reactor!.currentState.scope
+        
         let velocity = self.scopeGesture.velocity(in: self.view)
         switch scope {
         case .month:
@@ -316,6 +318,7 @@ extension CalendarScheduleViewController {
 // MARK: - UI Update
 extension CalendarScheduleViewController {
     private func updateCalendarView(_ height: CGFloat) {
+        print(#function, #line, "height : \(height)" )
         UIView.animate(withDuration: 0.33) {
             self.calendarContainer.snp.updateConstraints { make in
                 make.height.equalTo(height)
@@ -326,12 +329,12 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
+        print(#function, #line)
         UIView.animate(withDuration: 0.33) {
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)
             self.hideScheduleListTableView(scope: scope)
-            self.view.layoutIfNeeded()
         }
     }
     

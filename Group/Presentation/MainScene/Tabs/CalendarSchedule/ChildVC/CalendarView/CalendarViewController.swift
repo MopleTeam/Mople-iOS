@@ -138,8 +138,10 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         scopeObserver
+            .pairwise()
+            .filter({ $0 != $1 })
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.scopeChanged(scope: $0) }
+            .map { Reactor.Action.scopeChanged(scope: $1) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -174,6 +176,9 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$switchScope)
+            .do(onNext: { _ in
+                print(#function, #line)
+            })
             .compactMap({ $0 })
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, type in
@@ -229,7 +234,6 @@ final class CalendarViewController: UIViewController, View {
                 vc.calendar.handleScopeGesture(gesture)
                 vc.handleEmptyMonthEvent()
             })
-        
             .disposed(by: disposeBag)
     }
 }
@@ -340,21 +344,27 @@ extension CalendarViewController {
         }
     }
     
-    /// 버튼으로 탭하는 경우 : 날짜 선택, 스코프 전환, 테이블뷰에게 알리기
-    /// 날짜 탭으로 하는 경우 : 스코프 전환, 테이블뷰에게 알리기
-    /// 제스처로 전환한 경우 : 테이블뷰에게 알리기
+    /// 스위치 방식에 따라서 처리
+    /// 포커싱 할 date ScheduleTableViewController에게 알리기
     private func switchScope(type: ScopeChangeType) {
-        print(#function, #line, "scope : \(calendar.scope)" )
-        
-        if type == .buttonTap {
+        handleSwitchType(type)
+        scopeSync()
+    }
+    
+    /// 버튼으로 탭하는 경우 : 날짜 선택, 스코프 전환, empty 이벤트인 경우 handle
+    /// 날짜 탭으로 하는 경우 : 스코프 전환
+    /// 제스처로 전환한 경우 : none
+    private func handleSwitchType(_ type: ScopeChangeType) {
+        switch type {
+        case .gesture:
+            break
+        case .buttonTap:
             setFoucsDate()
-        }
-        
-        if type != .gesture {
+            changeScope()
+            handleEmptyMonthEvent()
+        case .dateTap:
             changeScope()
         }
-        
-        scopeSync()
     }
     
     /// scope에 맞춰서 표시할 데이터 동기화
@@ -489,7 +499,6 @@ extension CalendarViewController {
         guard calendar.scope == .week,
               let preSelectedDate = preSelectedDate,
               !DateManager.isSameWeek(calendar.currentPage, preSelectedDate) else { return }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(330), execute: {
             self.calendar.setCurrentPage(preSelectedDate, animated: true)
         })
@@ -528,9 +537,9 @@ extension CalendarViewController {
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
         guard calendar.scope == .month,
-              let preSelectedDate = preSelectedDate,
-              calendar.selectedDate == nil || !DateManager.isSameMonth(calendar.selectedDate!, preSelectedDate) else { return }
-        
+              let selectedDate = calendar.selectedDate,
+              let preSelectedDate,
+              selectedDate != preSelectedDate else { return }
         calendar.select(preSelectedDate, scrollToDate: false)
     }
     

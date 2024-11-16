@@ -46,7 +46,7 @@ final class CalendarViewReactor: Reactor {
         @Pulse var calendarHeight: CGFloat?
         @Pulse var switchPage: DateComponents?
         @Pulse var switchScope: ScopeChangeType? = nil
-        @Pulse var scope: ScopeType?
+        @Pulse var scope: ScopeType = .month
         @Pulse var changedPage: DateComponents?
         @Pulse var selectedDate: SelectDate?
         @Pulse var tableViewDate: Date?

@@ -206,8 +206,6 @@ extension ScheduleTableViewController {
             notifyIfCrossedCenterLine()
         }
     }
-    
-    
 }
 
 // MARK: - 테이블 뷰 화면 표시
