@@ -94,7 +94,7 @@ final class HomeViewController: UIViewController, View {
         return view
     }()
     
-    private lazy var allStackView: UIStackView = {
+    private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [topStackView,
                                                 collectionContainerView,
                                                 buttonStackView,
@@ -131,11 +131,11 @@ final class HomeViewController: UIViewController, View {
         self.view.backgroundColor = ColorStyle.BG.primary
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
-        self.contentView.addSubview(allStackView)
+        self.contentView.addSubview(mainStackView)
         self.collectionContainerView.addSubview(emptyDataView)
         
         scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(self.view.safeAreaLayoutGuide)
+            make.edges.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -143,9 +143,9 @@ final class HomeViewController: UIViewController, View {
             make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
         }
         
-        allStackView.snp.makeConstraints { make in
+        mainStackView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview().inset(50)
+            make.bottom.equalToSuperview()
         }
         
         collectionContainerView.snp.makeConstraints { make in

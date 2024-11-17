@@ -176,7 +176,7 @@ final class ProfileViewController: DefaultViewController, View {
                 
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
-            make.bottom.horizontalEdges.equalTo(self.view.safeAreaLayoutGuide)
+            make.bottom.horizontalEdges.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -186,7 +186,7 @@ final class ProfileViewController: DefaultViewController, View {
         
         mainStackView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview().inset(50)
+            make.bottom.equalToSuperview()
         }
         
         imageContainer.snp.makeConstraints { make in
@@ -256,4 +256,5 @@ extension ProfileViewController {
         _ = profileImageView.kfSetimage(profile.imagePath)
     }
 }
+
 

@@ -20,7 +20,7 @@ final class GroupListTableViewController: UIViewController, View {
         table.separatorStyle = .none
         table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
-        table.contentInset = .init(top: 28, left: 0, bottom: 50, right: 0)
+        table.contentInset = .init(top: 28, left: 0, bottom: 10, right: 0)
         table.clipsToBounds = false
         return table
     }()

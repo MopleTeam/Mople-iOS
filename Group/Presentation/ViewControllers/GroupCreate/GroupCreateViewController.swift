@@ -14,17 +14,21 @@ import ReactorKit
 
 
 final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
-    
+
     var disposeBag = DisposeBag()
     
     // MARK: - Handle KeyboardEvent
-    var contentView: UIView { self.completionButton }
-    var bottomConstraints: Constraint?
+    var superView: UIView { self.view }
+    var floatingView: UIView { self.completionButton }
+    var scrollView: UIScrollView { self.mainView }
+    var overlappingView: UIView { self.titleTextField }
+    var floatingViewBottom: Constraint?
     
     // MARK: - Manager
     private lazy var photoManager: PhotoManager = {
         let photoManager = PhotoManager(delegate: self,
                                         imageObserver: imageObserver.asObserver())
+        
         return photoManager
     }()
     
@@ -38,6 +42,14 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
     private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
+    private let mainView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
+    
+    private let contentView = UIView()
+    
     private let imageContainerView = UIView()
     
     private let groupImageView: UIImageView = {
@@ -76,14 +88,19 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
         return textField
     }()
     
-    // asciiCapable : 영어랑 숫자만 입력가능
-    // webSearch : 기본에서 . 이 있음
-    // twitter : # 이 있음
-    // emailAddress : @
+    private let emptyView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemMint
+        return view
+    }()
     
-    private let completionButton: CompletionButton = {
-        let btn = CompletionButton()
-        btn.setTitle(TextStyle.CreateGroup.completedTitle, for: .normal)
+    private let completionButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.CreateGroup.completedTitle,
+                     font: FontStyle.Title3.semiBold,
+                     color: ColorStyle.Default.white)
+        btn.setBgColor(ColorStyle.App.primary)
+        btn.layer.contents = 8
         return btn
     }()
     
@@ -97,7 +114,7 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView])
+        let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView, emptyView])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill
@@ -132,22 +149,33 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
     
     private func setupLayout() {
         self.view.backgroundColor = ColorStyle.Default.white
-        self.view.addSubview(mainStackView)
+        self.view.addSubview(mainView)
         self.view.addSubview(completionButton)
+        self.mainView.addSubview(contentView)
+        self.contentView.addSubview(mainStackView)
         self.imageContainerView.addSubview(groupImageView)
         self.imageContainerView.addSubview(imageEditIcon)
         
-        mainStackView.snp.makeConstraints { make in
+        mainView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
+            make.bottom.horizontalEdges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalTo(mainView.contentLayoutGuide)
+            make.width.equalTo(mainView.frameLayoutGuide.snp.width)
+        }
+        
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview()
         }
         
         completionButton.snp.makeConstraints { make in
-            bottomConstraints = make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.hasNotch() ? 0 : 28).constraint
-            
-            make.horizontalEdges.equalTo(mainStackView)
-            
+            make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(56)
+            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.hasNotch() ? 0 : 28).constraint
         }
 
         imageContainerView.snp.makeConstraints { make in
