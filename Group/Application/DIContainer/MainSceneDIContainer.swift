@@ -100,6 +100,11 @@ extension MainSceneDIContainer {
     // MARK: - 그룹 생성 화면
     func makeCreateGroupViewController() -> GroupCreateViewController {
         let title = TextStyle.CreateGroup.title
-        return .init(title: title)
+        return .init(title: title,
+                     reactor: makeGroupCreateViewReactor())
+    }
+    
+    private func makeGroupCreateViewReactor() -> GroupCreateViewReactor {
+        return .init()
     }
 }

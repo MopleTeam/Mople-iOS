@@ -7,8 +7,6 @@
 
 import UIKit
 import ReactorKit
-import RxSwift
-import RxRelay
 
 struct ProfileSetupAction {
     var completed: () -> Void
@@ -59,7 +57,7 @@ final class ProfileFormViewReactor: Reactor {
         case getRandomNickname(name: String?)
         case nameCheck(isOverlap: Bool?)
         case madeProfile
-        case catchError(err: Error)
+        case notifyMessage(message: String?)
     }
     
     struct State {
@@ -89,7 +87,7 @@ final class ProfileFormViewReactor: Reactor {
         case .getRandomNickname:
             return getRandomNickname()
         case .checkNickname(let name):
-            return overlapCheck(name: name)
+            return nickNameValidCheck(name: name)
         case .setProfile(let profile) :
             return makeProfile(profile.name, profile.image)
         }
@@ -106,32 +104,31 @@ final class ProfileFormViewReactor: Reactor {
             newState.randomName = name
         case .nameCheck(let isOverlap):
             newState.nameOverlap = isOverlap
-        case .catchError(err: let err):
-            newState = handleError(state: newState, err: err)
         case .madeProfile:
             newState.setupCompleted = ()
             completedAction.completed()
+        case .notifyMessage(let message):
+            newState.message = message
         }
         
         return newState
     }
     
-    func handleError(state: State, err: Error) -> State {
+    func handleError(err: Error) -> String {
         var newState = state
 
         switch err {
         case let err as DataTransferError:
             let dataError = mapDataErrorToFacingError(err: err)
-            newState.message = dataError.info
+            return dataError.info
         case let err as TokenError:
             let tokenError = mapTokenErrorToFacingError(err: err)
-            newState.message = tokenError.info
+            return tokenError.info
         case let err as ProfileSetupFacingMessage:
-            newState.message = err.info
+            return err.info
         default:
-            newState.message = ProfileSetupFacingMessage.unknownError(err: err).info
+            return ProfileSetupFacingMessage.unknownError(err: err).info
         }
-        return newState
     }
 }
 
@@ -174,7 +171,9 @@ extension ProfileFormViewReactor {
             .map({ String(data: $0, encoding: .utf8) })
             .asObservable()
             .map { Mutation.getRandomNickname(name: $0) }
-            .catch { Observable.just(Mutation.catchError(err: $0)) }
+            .catch {
+                Observable.just(Mutation.notifyMessage(message: self.handleError(err: $0)))
+            }
         
         let loadEnd = Observable.just(Mutation.setLoading(isLoad: false))
             
@@ -183,15 +182,28 @@ extension ProfileFormViewReactor {
                                   loadEnd])
     }
     
-    private func overlapCheck(name: String) -> Observable<Mutation> {
+    private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         
+        let valid = Validator.checkNickname(name)
+        
+        switch valid {
+        case .success:
+            return nicknameDuplicateCheck(name)
+        default:
+            return Observable.just(Mutation.notifyMessage(message: valid.info))
+        }
+    }
+    
+    private func nicknameDuplicateCheck(_ name: String) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
                 
         #warning("서버에서 중복 결과를 true, false 뭘로 주는지 물어보기, 현재는 true")
         let nameOverlap = profileRepository.checkNickname(name: name)
             .asObservable()
             .map { Mutation.nameCheck(isOverlap: $0)}
-            .catch { Observable.just(Mutation.catchError(err: $0)) }
+            .catch {
+                Observable.just(Mutation.notifyMessage(message: self.handleError(err: $0)))
+            }
         
         let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
             
@@ -204,14 +216,14 @@ extension ProfileFormViewReactor {
         guard let name else { return .empty() }
         let image = image?.jpegData(compressionQuality: 0.7) ?? getDefaultImageData()
         
-        let imageString = image.base64EncodedString()
-
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
         let makeProfile = profileRepository.makeProfile(image: image, nickname: name)
             .asObservable()
             .map({ _ in Mutation.madeProfile })
-            .catch { Observable.just(Mutation.catchError(err: $0)) }
+            .catch {
+                Observable.just(Mutation.notifyMessage(message: self.handleError(err: $0)))
+            }
         
         let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
             

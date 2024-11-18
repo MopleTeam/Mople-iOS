@@ -14,16 +14,7 @@ final class ProfileSetupViewController: UIViewController, View {
     
     enum ViewType {
         case create
-        case edit
-        
-        var completedTitle: String {
-            switch self {
-            case .create:
-                TextStyle.ProfileCreate.completedTitle
-            case .edit:
-                TextStyle.ProfileEdit.completedTitle
-            }
-        }
+        case edit(_ previousProfile: ProfileInfo)
     }
     
     typealias Reactor = ProfileFormViewReactor
@@ -40,8 +31,7 @@ final class ProfileSetupViewController: UIViewController, View {
     private lazy var alertManager = AlertManager.shared
     
     // MARK: - Variables
-    private let previousProfile: ProfileInfo?
-    private let viewType: ViewType?
+    private let viewType: ViewType
     
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
@@ -124,18 +114,17 @@ final class ProfileSetupViewController: UIViewController, View {
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [imageContainerView, nameStackView, completionButton])
         sv.axis = .vertical
-        sv.spacing = viewType == .create ? 24 : 0
         sv.alignment = .fill
         sv.distribution = .fill
         return sv
     }()
+    
+
 
     // MARK: - LifeCycle
     init(type: ViewType,
-         previousProfile: ProfileInfo? = nil,
          reactor: ProfileFormViewReactor) {
         self.viewType = type
-        self.previousProfile = previousProfile
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -153,8 +142,7 @@ final class ProfileSetupViewController: UIViewController, View {
     private func setupUI() {
         setupLayout()
         setupTextField()
-        setNextButtonTitle(type: viewType)
-        setPreviousProfile()
+        configureView()
     }
     
     private func setupLayout() {
@@ -215,7 +203,6 @@ final class ProfileSetupViewController: UIViewController, View {
     
     private func setInput(reactor: Reactor) {
         self.duplicateButton.rx.controlEvent(.touchUpInside)
-            .filter({ _ in self.checkNicknameValidator() })
             .compactMap({ _ in self.nameTextField.text })
             .map { Reactor.Action.checkNickname(name: $0) }
             .bind(to: reactor.action)
@@ -256,19 +243,17 @@ final class ProfileSetupViewController: UIViewController, View {
     // MARK: - 내부 바인딩
     private func setBind() {
         setValidBind()
-        setEditNameBind()
         setEditImageBind()
+        setEditNameBind()
         setGeestureBind()
     }
     
     private func setValidBind() {
-        let imageChanged = imageObserver
-            .map { _ in }
-        
-        Observable.combineLatest(imageChanged, validNameObserver)
-            .observe(on: MainScheduler.instance)
-            .compactMap({ $0.1 ?? !self.isChangedName() })
-            .asDriver(onErrorJustReturn: false)
+        Observable.combineLatest(imageObserver, validNameObserver)
+            .do(onNext: { print(#function, #line, "valid : \($0)" ) })
+            .skip(1)
+            .asDriver(onErrorJustReturn: (nil, nil))
+            .compactMap(checkContentValid(content:))
             .drive(completionButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
@@ -293,45 +278,19 @@ final class ProfileSetupViewController: UIViewController, View {
     }
     
     private func setEditNameBind() {
-        switch viewType {
-        case .create:
-            setEditNameBindWhenCreate()
-        case .edit:
-            setEditNameBindWhenEdit()
-        case nil:
-            break
-        }
-    }
-    
-    private func setEditNameBindWhenCreate() {
         nameTextField.rx.controlEvent(.editingChanged)
             .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.duplicateButton.rx.isEnabled.onNext(true)
-                vc.validNameObserver.onNext(nil)
-                vc.nameCheckLabel.rx.isHidden.onNext(true)
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    // 닉네임 변경
-    private func setEditNameBindWhenEdit() {
-        let nameEdit = nameTextField.rx.controlEvent(.editingChanged)
-            .observe(on: MainScheduler.instance)
-            .filter({ _ in self.previousProfile?.name != nil })
             .do(onNext: { _ in
                 self.nameCheckLabel.rx.isHidden.onNext(true)
                 self.validNameObserver.onNext(nil)
             })
-            .share(replay: 1)
-            .asDriver(onErrorJustReturn: ())
-        
-        nameEdit
             .map({ _ in self.isChangedName() })
-            .drive(duplicateButton.rx.isEnabled)
+            .drive(with: self, onNext: { vc, isChanged in
+                vc.duplicateButton.rx.isEnabled.onNext(isChanged)
+            })
             .disposed(by: disposeBag)
     }
-    
+
     // 제스처
     private func setGeestureBind() {
         self.view.addGestureRecognizer(backTapGesture)
@@ -372,10 +331,9 @@ extension ProfileSetupViewController {
         return (nickName, image)
     }
     
-    private func setPreviousProfile() {
-        guard let previousProfile else { return }
-        _ = self.profileImageView.kfSetimage(previousProfile.imagePath)
-        self.nameTextField.text = previousProfile.name
+    private func setProfile(_ profile: ProfileInfo) {
+        _ = self.profileImageView.kfSetimage(profile.imagePath)
+        self.nameTextField.text = profile.name
     }
 }
 
@@ -399,31 +357,43 @@ extension ProfileSetupViewController {
 
 // MARK: - 프로필 변경여부
 extension ProfileSetupViewController {
-    private func isChangedName() -> Bool {
-        return nameTextField.text != previousProfile?.name
+    
+    /// 이미지 변경, 닉네임 중복여부에 따라서 완료버튼 활성화 유무
+    /// - 이미지가 입력된 경우
+    ///     - 닉네임 중복검사 값(nil인 경우 닉네임 변경여부)
+    /// - 이미지가 없는 경우
+    ///     - 닉네임 중복검사 값(nil인 경우 false)
+    private func checkContentValid(content: (image: UIImage?, nicknameOverlap: Bool?)) -> Bool {
+        if content.image != nil {
+            return content.nicknameOverlap ?? !self.isChangedName()
+        } else {
+            return content.nicknameOverlap ?? false
+        }
     }
-}
-
-// MARK: - Helper
-extension ProfileSetupViewController {
-
-    private func checkNicknameValidator() -> Bool {
-        let valid = Validator.checkNickname(name: self.nameTextField.text)
-        
-        switch valid {
-        case .success:
+    
+    /// 닉네임 변경여부
+    /// - 프로필 생성 뷰 타입 : 이전 값이 없음으로 true
+    /// - 프로필 편집 뷰 타입 : 이전 값과 비교해서 return
+    private func isChangedName() -> Bool {
+        switch viewType {
+        case .create:
             return true
-        default:
-            alertManager.showAlert(message: valid.info)
-            return false
+        case .edit(let previousProfile):
+            return self.nameTextField.text != previousProfile.name
         }
     }
 }
 
+// MARK: - 프로필 생성, 편집에
 extension ProfileSetupViewController {
-    private func setNextButtonTitle(type: ViewType?) {
-        guard let type = type else { return }
-        completionButton.setTitle(type.completedTitle, for: .normal)
+    private func configureView() {
+        switch viewType {
+        case .create:
+            mainStackView.spacing = 24
+            completionButton.setTitle(TextStyle.ProfileCreate.completedTitle, for: .normal)
+        case .edit(let previousProfile):
+            completionButton.setTitle(TextStyle.ProfileEdit.completedTitle, for: .normal)
+            setProfile(previousProfile)
+        }
     }
 }
-

@@ -27,8 +27,7 @@ class ProfileEditViewController: DefaultViewController, View {
     private let profileContainerView = UIView()
     
     private lazy var profileSetupView: ProfileSetupViewController = {
-        let viewController = ProfileSetupViewController(type: .edit,
-                                                        previousProfile: previousProfile,
+        let viewController = ProfileSetupViewController(type: .edit(previousProfile),
                                                         reactor: reactor!)
         return viewController
     }()

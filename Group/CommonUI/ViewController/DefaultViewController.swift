@@ -27,11 +27,9 @@ class DefaultViewController: UIViewController {
         return leftButton.rx.controlEvent(.touchUpInside)
             .asObservable()
     }
-    
-    private let backTapGesture = UITapGestureRecognizer()
-    
+        
     // MARK: - UI Components
-    private let navigationView = DefaultNavigationBar()
+    private lazy var navigationView = DefaultNavigationBar()
     
     private lazy var rightButton = UIButton()
     private lazy var leftButton = UIButton()
@@ -128,7 +126,7 @@ extension DefaultViewController {
 extension Reactive where Base: DefaultViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
-            isLoading ? vc.indicator.startAnimating() : vc.indicator.stopAnimating()
+            vc.indicator.rx.isAnimating.onNext(isLoading)
             vc.view.isUserInteractionEnabled = !isLoading
         }
     }

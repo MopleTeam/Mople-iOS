@@ -33,7 +33,7 @@ struct Validator {
     }
     
     #warning("switch 패턴 매칭 활용하기")
-    static func checkNickname(name: String?) -> result {
+    static func checkNickname(_ name: String?) -> result {
         guard let name = name, !name.isEmpty else {
             return .empty
         }

@@ -11,10 +11,10 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-
-
-final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
-
+final class GroupCreateViewController: DefaultViewController, View, KeyboardEvent {
+    
+    typealias Reactor = GroupCreateViewReactor
+    
     var disposeBag = DisposeBag()
     
     // MARK: - Handle KeyboardEvent
@@ -121,8 +121,10 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
         return sv
     }()
     
-    override init(title: String?) {
+    init(title: String?,
+         reactor: GroupCreateViewReactor) {
         super.init(title: title)
+        self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -132,7 +134,7 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bind()
+        bindtet()
         setGeestureBind()
         setupKeyboardEvent()
     }
@@ -206,7 +208,11 @@ final class GroupCreateViewController: DefaultViewController, KeyboardEvent {
     }
     
     // MARK: - Binding
-    func bind() {
+    func bind(reactor: GroupCreateViewReactor) {
+        
+    }
+    
+    func bindtet() {
         leftButtonObserver
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
