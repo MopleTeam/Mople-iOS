@@ -7,6 +7,8 @@
 
 import Foundation
 
+#warning("분류하지 않은 문구 정리하기")
+// 에러
 struct TextStyle {
     enum App {
         static let title = "모임관리"

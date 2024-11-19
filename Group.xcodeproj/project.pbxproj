@@ -46,7 +46,7 @@
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
 		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
-		524E33D12C804C7A004B15FC /* Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* Validator.swift */; };
+		524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* NickNameValidator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */; };
 		5259B0082C9C0E33006B2711 /* DatePickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0072C9C0E33006B2711 /* DatePickViewController.swift */; };
@@ -80,7 +80,6 @@
 		527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */; };
 		527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */; };
 		527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3EA82C837B29007FE63B /* AppAppearance.swift */; };
-		527DBE2C2CE87861008BB20E /* CreateGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527DBE2B2CE87861008BB20E /* CreateGroup.swift */; };
 		527DBE2F2CE8965A008BB20E /* GroupCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527DBE2E2CE8965A008BB20E /* GroupCreateViewController.swift */; };
 		5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */; };
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
@@ -149,6 +148,14 @@
 		52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */; };
 		52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */; };
 		52CB41E22CA2F2910071679D /* DateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB41E12CA2F2910071679D /* DateManager.swift */; };
+		52CE87C32CEC38D100EBD85D /* String+Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87C22CEC38D100EBD85D /* String+Validator.swift */; };
+		52CE87C52CEC38E400EBD85D /* GroupTitleValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87C42CEC38E400EBD85D /* GroupTitleValidator.swift */; };
+		52CE87C72CEC3F9200EBD85D /* CreateGroupRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87C62CEC3F9200EBD85D /* CreateGroupRepository.swift */; };
+		52CE87C92CEC3FED00EBD85D /* ImageUploadRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87C82CEC3FED00EBD85D /* ImageUploadRepository.swift */; };
+		52CE87CC2CEC40D000EBD85D /* CreateGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87CB2CEC40D000EBD85D /* CreateGroup.swift */; };
+		52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87CD2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift */; };
+		52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */; };
+		52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */; };
 		52E238252C7454230066C9A3 /* ProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238242C7454230066C9A3 /* ProfileInfo.swift */; };
 		52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */; };
 		52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */; };
@@ -205,7 +212,7 @@
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+ViewLifeCycle.swift"; sourceTree = "<group>"; };
-		524E33D02C804C7A004B15FC /* Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Validator.swift; sourceTree = "<group>"; };
+		524E33D02C804C7A004B15FC /* NickNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NickNameValidator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponseDTO.swift; sourceTree = "<group>"; };
 		5259B0072C9C0E33006B2711 /* DatePickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickViewController.swift; sourceTree = "<group>"; };
@@ -235,7 +242,6 @@
 		527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneDIContainer.swift; sourceTree = "<group>"; };
 		527A3EA82C837B29007FE63B /* AppAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAppearance.swift; sourceTree = "<group>"; };
-		527DBE2B2CE87861008BB20E /* CreateGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroup.swift; sourceTree = "<group>"; };
 		527DBE2E2CE8965A008BB20E /* GroupCreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupCreateViewController.swift; sourceTree = "<group>"; };
 		5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoLoginService.swift; sourceTree = "<group>"; };
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
@@ -301,6 +307,14 @@
 		52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		52CB41DD2CA2EC2B0071679D /* ScheduleTableSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableSectionModel.swift; sourceTree = "<group>"; };
 		52CB41E12CA2F2910071679D /* DateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateManager.swift; sourceTree = "<group>"; };
+		52CE87C22CEC38D100EBD85D /* String+Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Validator.swift"; sourceTree = "<group>"; };
+		52CE87C42CEC38E400EBD85D /* GroupTitleValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTitleValidator.swift; sourceTree = "<group>"; };
+		52CE87C62CEC3F9200EBD85D /* CreateGroupRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupRepository.swift; sourceTree = "<group>"; };
+		52CE87C82CEC3FED00EBD85D /* ImageUploadRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadRepository.swift; sourceTree = "<group>"; };
+		52CE87CB2CEC40D000EBD85D /* CreateGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroup.swift; sourceTree = "<group>"; };
+		52CE87CD2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadRepositoryMock.swift; sourceTree = "<group>"; };
+		52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupRepositoryMock.swift; sourceTree = "<group>"; };
+		52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupMock.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
 		52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneDIContainer.swift; sourceTree = "<group>"; };
@@ -573,7 +587,8 @@
 		524E33D22C804C7D004B15FC /* Validator */ = {
 			isa = PBXGroup;
 			children = (
-				524E33D02C804C7A004B15FC /* Validator.swift */,
+				524E33D02C804C7A004B15FC /* NickNameValidator.swift */,
+				52CE87C42CEC38E400EBD85D /* GroupTitleValidator.swift */,
 			);
 			path = Validator;
 			sourceTree = "<group>";
@@ -620,7 +635,9 @@
 		525DFCF22CC8F53400835312 /* RepositoryMock */ = {
 			isa = PBXGroup;
 			children = (
+				52CE87CD2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift */,
 				525DFCF32CC8F54E00835312 /* ProfileRepositoryMock.swift */,
+				52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */,
 			);
 			path = RepositoryMock;
 			sourceTree = "<group>";
@@ -640,7 +657,6 @@
 			isa = PBXGroup;
 			children = (
 				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
-				527DBE2B2CE87861008BB20E /* CreateGroup.swift */,
 			);
 			path = HomeScene;
 			sourceTree = "<group>";
@@ -711,6 +727,7 @@
 				5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */,
 				523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */,
 				52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */,
+				52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */,
 			);
 			path = UseCaseMock;
 			sourceTree = "<group>";
@@ -930,6 +947,7 @@
 				52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */,
 				52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */,
 				52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */,
+				52CE87C22CEC38D100EBD85D /* String+Validator.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -971,6 +989,8 @@
 			children = (
 				52B6F63A2C77655200DA2D75 /* LoginRepository.swift */,
 				5211E8BB2C7C4DAF00EAB613 /* ProfileRepository.swift */,
+				52CE87C62CEC3F9200EBD85D /* CreateGroupRepository.swift */,
+				52CE87C82CEC3FED00EBD85D /* ImageUploadRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -1173,6 +1193,14 @@
 			path = DateManager;
 			sourceTree = "<group>";
 		};
+		52CE87CA2CEC40B100EBD85D /* CreateGroup */ = {
+			isa = PBXGroup;
+			children = (
+				52CE87CB2CEC40D000EBD85D /* CreateGroup.swift */,
+			);
+			path = CreateGroup;
+			sourceTree = "<group>";
+		};
 		52E238222C7453EC0066C9A3 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
@@ -1229,6 +1257,7 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
+				52CE87CA2CEC40B100EBD85D /* CreateGroup */,
 				525DFCEE2CC8F01A00835312 /* LoginScene */,
 				525DFCF52CC8FB1100835312 /* MainScene */,
 			);
@@ -1390,8 +1419,9 @@
 				5259B0082C9C0E33006B2711 /* DatePickViewController.swift in Sources */,
 				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
 				5211F9082C86F2DB00403980 /* ScheduleCollectionCell.swift in Sources */,
+				52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
-				524E33D12C804C7A004B15FC /* Validator.swift in Sources */,
+				524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
 				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
@@ -1432,7 +1462,6 @@
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* LoginRepository.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
-				527DBE2C2CE87861008BB20E /* CreateGroup.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
 				52CB41DE2CA2EC2B0071679D /* ScheduleTableSectionModel.swift in Sources */,
@@ -1446,6 +1475,7 @@
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
+				52CE87CC2CEC40D000EBD85D /* CreateGroup.swift in Sources */,
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
@@ -1454,6 +1484,7 @@
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultLoginRepository.swift in Sources */,
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
+				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
 				5211E8BC2C7C4DAF00EAB613 /* ProfileRepository.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
@@ -1461,6 +1492,7 @@
 				529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* ProfileRepositoryMock.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
+				52CE87C92CEC3FED00EBD85D /* ImageUploadRepository.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentSchedule.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
@@ -1480,6 +1512,7 @@
 				5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */,
 				5285E6E72CDCB34900B855CB /* SimpleGroupDTO.swift in Sources */,
 				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
+				52CE87C52CEC38E400EBD85D /* GroupTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
 				52BBF6B92CE2301D00564F11 /* DuplicateButton.swift in Sources */,
@@ -1488,6 +1521,7 @@
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
+				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
 				5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
@@ -1497,6 +1531,7 @@
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
+				52CE87C32CEC38D100EBD85D /* String+Validator.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5285E6DC2CDC32FD00B855CB /* CommonSchedule.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
@@ -1511,6 +1546,7 @@
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
 				521917582CEB088B00696292 /* GroupCreateViewReactor.swift in Sources */,
+				52CE87C72CEC3F9200EBD85D /* CreateGroupRepository.swift in Sources */,
 				520805172C69E0770015F6E0 /* LoginViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* LoginSceneCoordinator.swift in Sources */,
 				52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */,

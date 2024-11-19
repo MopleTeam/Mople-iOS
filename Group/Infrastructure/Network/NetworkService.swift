@@ -144,6 +144,8 @@ final class DefaultNetworkSessionManager: NetworkSessionManager {
 }
 
 // MARK: - Logger
+
+#warning("실제 출시에는 제거 및 다른 Logger 시스템을 채택해야함 (개인정보 침해)")
 final class DefaultNetworkErrorLogger: NetworkErrorLogger {
     init() { }
 

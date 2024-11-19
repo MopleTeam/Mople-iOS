@@ -38,6 +38,7 @@ class DefaultViewController: UIViewController {
     fileprivate let indicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
+        indicator.layer.zPosition = 1
         return indicator
     }()
     

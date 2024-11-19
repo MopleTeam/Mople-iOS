@@ -15,12 +15,12 @@ protocol MainSceneDependencies {
     func makeProfileSceneCoordinator() -> BaseCoordinator
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileSetupAction) -> ProfileEditViewController
-    func makeCreateGroupViewController() -> GroupCreateViewController
+    func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController
 }
 
 protocol AccountAction {
     func signOut()
-    func editProfile(_ editModel: ProfileUpdateModel)
+    func editProfile(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?)
 }
 
 private enum Route {
@@ -67,9 +67,11 @@ final class MainSceneCoordinator: BaseCoordinator {
 
 // MARK: - HomeView
 extension MainSceneCoordinator {
+    
+    
     private func getHomeViewController() -> HomeViewController {
         let action = HomeViewAction(presentCreateGroupView: pushCreateGroupView,
-                                    presentNextEvent: pushCalendarView(lastRecentDate:))
+                                    presentCalendarView: pushCalendarView(lastRecentDate:))
         return dependencies.makeHomeViewController(action: action)
     }
     
@@ -80,7 +82,28 @@ extension MainSceneCoordinator {
               let destinationNavi = getDestinationVC(index: index),
               let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
         calendarVC.presentEvent(on: lastRecentDate)
-        tabBarController!.selectedIndex = index
+        tabBarController?.selectedIndex = index
+    }
+    
+    /// 그룹 생성 화면으로 이동
+    /// - Parameter completedAction: 완료 후 액션 (예시: 그룹 생성 후 그룹 리스트 reload)
+    private func pushCreateGroupView(completedAction: (() -> Void)? = nil) {
+        let action: CreateGroupAction = .init {
+            completedAction?()
+            self.switchToGroupListTap()
+            self.navigationController.popViewController(animated: true)
+        }
+        
+        let createGroupView = dependencies.makeCreateGroupViewController(action: action)
+        self.navigationController.pushViewController(createGroupView, animated: true)
+    }
+    
+    /// 새로운 그룹 생성 후 그룹 리스트 탭으로 이동
+    private func switchToGroupListTap() {
+        guard let groupListInex = getIndexFromTabBar(destination: .group),
+              self.tabBarController?.selectedIndex != groupListInex else { return }
+        
+        tabBarController?.selectedIndex = groupListInex
     }
 }
 
@@ -107,21 +130,15 @@ extension MainSceneCoordinator {
     }
 }
 
-// MARK: - Create Group
-extension MainSceneCoordinator {
-    private func pushCreateGroupView() {
-        let createGroupView = dependencies.makeCreateGroupViewController()
-        self.navigationController.pushViewController(createGroupView, animated: true)
-    }
-}
-
 // MARK: - 로그아웃 -> 로그인 뷰로 돌아가기
 extension MainSceneCoordinator: AccountAction {
-    
-    func editProfile(_ editModel: ProfileUpdateModel) {
-        let action: ProfileSetupAction = .init(completed: editModel.completedAction)
+    func editProfile(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?) {
+        let action: ProfileSetupAction = .init {
+            completedAction?()
+            self.navigationController.popViewController(animated: true)
+        }
         
-        let profileEditView = dependencies.makeProfileEditViewController(previousProfile: editModel.currentProfile,
+        let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          action: action)
         self.navigationController.pushViewController(profileEditView, animated: true)
     }

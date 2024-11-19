@@ -7,14 +7,10 @@
 
 import Foundation
 
-struct Validator {
+struct NickNameValidator {
     
     enum result {
-        case success
-        case empty
-        case countUnder
-        case countOver
-        case strange
+        case success, empty, countUnder, countOver, strange
         
         var info: String {
             switch self {
@@ -32,7 +28,6 @@ struct Validator {
         }
     }
     
-    #warning("switch 패턴 매칭 활용하기")
     static func checkNickname(_ name: String?) -> result {
         guard let name = name, !name.isEmpty else {
             return .empty
@@ -40,9 +35,9 @@ struct Validator {
         switch name {
         case _ where name.contains(where: { $0.isWhitespace }) || !name.checkValidator():
             return .strange
-        case _ where name.count <= 1:
+        case _ where name.count < 2:
             return .countUnder
-        case _ where name.count > 10:
+        case _ where name.count > 15:
             return .countOver
         default:
             return .success
@@ -50,12 +45,5 @@ struct Validator {
     }
 }
 
-extension String {
-    func checkValidator() -> Bool {
-        let inputRegEx = "^[가-힣a-zA-Z0-9]+$"
-        let inputPred = NSPredicate(format: "SELF MATCHES %@", inputRegEx)
-        
-        return inputPred.evaluate(with: self)
-    }
-}
+
 

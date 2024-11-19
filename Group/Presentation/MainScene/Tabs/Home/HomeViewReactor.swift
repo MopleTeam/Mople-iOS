@@ -9,8 +9,8 @@ import UIKit
 import ReactorKit
 
 struct HomeViewAction {
-    var presentCreateGroupView: () -> Void
-    var presentNextEvent: (Date) -> Void
+    var presentCreateGroupView: (((() -> Void)?) -> Void)
+    var presentCalendarView: (Date) -> Void
 }
 
 final class HomeViewReactor: Reactor {
@@ -23,7 +23,8 @@ final class HomeViewReactor: Reactor {
     
     enum Mutation {
         case fetchRecentScehdule(schedules: [SimpleSchedule])
-        case presentCompleted
+        case presentCalendar(date: Date)
+        case presentCreateGroupView(completedAction: (() -> Void)?)
     }
     
     struct State {
@@ -62,13 +63,11 @@ final class HomeViewReactor: Reactor {
         
         switch mutation {
         case .fetchRecentScehdule(let schedules):
-            newState.schedules = schedules.sorted(by: {
-                guard let previousDate = $0.date,
-                      let nextDate = $1.date else { return false }
-                return previousDate < nextDate
-            })
-        case .presentCompleted:
-            newState.presentCompleted = ()
+            newState.schedules = schedules.sorted(by: <)
+        case .presentCalendar(let date):
+            homeViewAction.presentCalendarView(date)
+        case .presentCreateGroupView(let completedAction):
+            homeViewAction.presentCreateGroupView(completedAction)
         }
         return newState
     }
@@ -111,12 +110,10 @@ extension HomeViewReactor {
         guard !currentState.schedules.isEmpty,
               let lastDate = currentState.schedules.last?.date else { return Observable.empty() }
         let startOfDay = DateManager.startOfDay(lastDate)
-        homeViewAction.presentNextEvent(startOfDay)
-        return .just(Mutation.presentCompleted)
+        return .just(.presentCalendar(date: startOfDay))
     }
     
     private func presentCreateGroupView() -> Observable<Mutation> {
-        homeViewAction.presentCreateGroupView()
-        return .empty()
+        return .just(.presentCreateGroupView(completedAction: nil))
     }
 }

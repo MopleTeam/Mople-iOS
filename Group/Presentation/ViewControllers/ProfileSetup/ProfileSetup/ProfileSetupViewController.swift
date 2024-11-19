@@ -317,9 +317,8 @@ extension ProfileSetupViewController : UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return true }
-
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        return newText.count <= 10
+        return newText.count <= 15
     }
 }
 
@@ -389,8 +388,8 @@ extension ProfileSetupViewController {
     private func configureView() {
         switch viewType {
         case .create:
-            mainStackView.spacing = 24
             completionButton.setTitle(TextStyle.ProfileCreate.completedTitle, for: .normal)
+            mainStackView.spacing = 24
         case .edit(let previousProfile):
             completionButton.setTitle(TextStyle.ProfileEdit.completedTitle, for: .normal)
             setProfile(previousProfile)

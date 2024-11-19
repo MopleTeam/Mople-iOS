@@ -102,6 +102,14 @@ final class LoginViewController: UIViewController, View {
         return sv
     }()
     
+    // MARK: - Indicator
+    fileprivate let indicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.layer.zPosition = 1
+        return indicator
+    }()
+    
     // MARK: - LifeCycle
     init(reactor: LoginViewReactor) {
         defer { self.reactor = reactor }
@@ -125,8 +133,9 @@ final class LoginViewController: UIViewController, View {
     private func setupLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainStackView)
+        self.view.addSubview(indicator)
         self.titleContainerView.addSubview(titleStackView)
-
+        
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -142,6 +151,10 @@ final class LoginViewController: UIViewController, View {
         kakaoLoginButton.snp.makeConstraints { make in
             make.height.equalTo(56)
         }
+        
+        indicator.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     // MARK: - Binding
@@ -156,11 +169,16 @@ final class LoginViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state
-            .compactMap { $0.errorMessage }
+        reactor.pulse(\.$errorMessage)
+            .compactMap { $0 }
             .subscribe(onNext: { message in
                 print("로그인 에러 발생 : \(message)")
             })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
 }
@@ -168,5 +186,15 @@ final class LoginViewController: UIViewController, View {
 extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return self.view.window!
+    }
+}
+
+#warning("일반 ViewController를 사용시 중복 구현, 보완필요")
+extension Reactive where Base: LoginViewController {
+    var isLoading: Binder<Bool> {
+        return Binder(self.base) { vc, isLoading in
+            vc.indicator.rx.isAnimating.onNext(isLoading)
+            vc.view.isUserInteractionEnabled = !isLoading
+        }
     }
 }

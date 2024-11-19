@@ -9,7 +9,7 @@ import UIKit
 import ReactorKit
 
 struct ProfileSetupAction {
-    var completed: () -> Void
+    var completed: (() -> Void)?
 }
 
 enum ProfileSetupFacingMessage: Error {
@@ -53,11 +53,11 @@ final class ProfileFormViewReactor: Reactor {
     }
     
     enum Mutation {
-        case setLoading(isLoad: Bool)
         case getRandomNickname(name: String?)
         case nameCheck(isOverlap: Bool?)
         case madeProfile
         case notifyMessage(message: String?)
+        case setLoading(isLoad: Bool)
     }
     
     struct State {
@@ -66,7 +66,6 @@ final class ProfileFormViewReactor: Reactor {
         @Pulse var message: String?
         @Pulse var isLoading: Bool = false
         @Pulse var buttonLoading: (status: Bool, tag: Int)?
-        @Pulse var setupCompleted: Void?
     }
     
     private let profileRepository: ProfileRepository
@@ -98,25 +97,22 @@ final class ProfileFormViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .setLoading(let isLoad):
-            newState.isLoading = isLoad
         case .getRandomNickname(let name):
             newState.randomName = name
         case .nameCheck(let isOverlap):
             newState.nameOverlap = isOverlap
         case .madeProfile:
-            newState.setupCompleted = ()
-            completedAction.completed()
+            completedAction.completed?()
         case .notifyMessage(let message):
             newState.message = message
+        case .setLoading(let isLoad):
+            newState.isLoading = isLoad
         }
         
         return newState
     }
     
     func handleError(err: Error) -> String {
-        var newState = state
-
         switch err {
         case let err as DataTransferError:
             let dataError = mapDataErrorToFacingError(err: err)
@@ -184,7 +180,7 @@ extension ProfileFormViewReactor {
     
     private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         
-        let valid = Validator.checkNickname(name)
+        let valid = NickNameValidator.checkNickname(name)
         
         switch valid {
         case .success:

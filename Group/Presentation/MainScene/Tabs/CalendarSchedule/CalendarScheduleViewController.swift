@@ -217,10 +217,10 @@ final class CalendarScheduleViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
-            .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vc, isLoading in
-                vc.rx.isLoading.onNext(isLoading)
-                vc.checkIsPresent(isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isLoad in
+                vc.rx.isLoading.onNext(isLoad)
+                vc.checkIsPresent(isLoad)
             })
             .disposed(by: disposeBag)
     }

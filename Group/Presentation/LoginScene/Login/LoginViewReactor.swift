@@ -49,10 +49,12 @@ final class LoginViewReactor: Reactor {
     enum Mutation {
         case showProfileView
         case catchError(err: Error)
+        case setLoading(isLoad: Bool)
     }
     
     struct State {
-        var errorMessage: String? = nil
+        @Pulse var errorMessage: String? = nil
+        @Pulse var isLoading: Bool = false
     }
     
     private let userLoginUseCase: UserLogin
@@ -74,6 +76,8 @@ final class LoginViewReactor: Reactor {
             loginAction.logIn()
         case .catchError(let err):
             newState = handleError(state: newState, err: err)
+        case .setLoading(let isLoad):
+            newState.isLoading = isLoad
         }
   
         return newState
@@ -131,12 +135,19 @@ extension LoginViewReactor {
 // MARK: - Execute
 extension LoginViewReactor {
     private func executeLogin(_ platform: LoginPlatform) -> Observable<Mutation> {
+        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
+                
         let loginTask = userLoginUseCase.login(platform)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .map { _ in Mutation.showProfileView }
             .catch { Observable.just(Mutation.catchError(err: $0))}
         
-        return loginTask
+        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
+      
+        
+        return Observable.concat([loadingOn,
+                                  loginTask,
+                                  loadingOff])
     }
 }

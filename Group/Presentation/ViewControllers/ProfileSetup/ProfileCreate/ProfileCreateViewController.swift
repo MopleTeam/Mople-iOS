@@ -39,6 +39,7 @@ class ProfileCreateViewController: UIViewController, View {
     fileprivate let indicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
+        indicator.layer.zPosition = 1
         return indicator
     }()
     
@@ -114,7 +115,7 @@ class ProfileCreateViewController: UIViewController, View {
 extension Reactive where Base: ProfileCreateViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
-            isLoading ? vc.indicator.startAnimating() : vc.indicator.stopAnimating()
+            vc.indicator.rx.isAnimating.onNext(isLoading)
             vc.view.isUserInteractionEnabled = !isLoading
         }
     }

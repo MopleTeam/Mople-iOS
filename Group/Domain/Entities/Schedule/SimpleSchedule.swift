@@ -12,4 +12,11 @@ struct SimpleSchedule: Schedulable, Hashable, Equatable {
     let group: CommonGroup?
     let participantsCount: Int?
     let weatherInfo: WeatherInfo?
+    
+    static func < (lhs: SimpleSchedule, rhs: SimpleSchedule) -> Bool {
+        guard let lhsDate = lhs.commonScheudle,
+              let rhsDate = rhs.commonScheudle else { return false }
+        
+        return lhsDate < rhsDate
+    }
 }

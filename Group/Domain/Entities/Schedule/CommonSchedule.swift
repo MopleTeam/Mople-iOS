@@ -26,6 +26,13 @@ struct CommonSchedule: Hashable, Equatable {
     let date: Date?
     let address: String?
     let detailAddress: String?
+    
+    static func < (lhs: CommonSchedule, rhs: CommonSchedule) -> Bool {
+        guard let lhsDate = lhs.date,
+              let rhsDate = rhs.date else { return false }
+        
+        return lhsDate < rhsDate
+    }
 }
 
 extension CommonSchedule {

@@ -37,20 +37,25 @@ final class UserLoginImpl: UserLogin {
     }
     
     func login(_ platform: LoginPlatform) -> Single<Void> {
-        
-        return Single.create { emitter in
+        return Observable.just(())
+            .delay(.seconds(3), scheduler: MainScheduler.instance)
+            .asSingle()
+            .flatMap { _ in
+                return Single.create { emitter in
 
-            let loginObserver = self.handleLogin(platform)
-            
-            return loginObserver
-//                .flatMap { self.repository.userLogin(platForm: platform, authCode: $0)}
-                .subscribe(onSuccess: { token in
-                    print(#function, #line, "login Teste : \(token)" )
-                    emitter(.success(()))
-                }, onFailure: { err in
-                    emitter(.failure(err))
-                })
-        }
+                    let loginObserver = self.handleLogin(platform)
+                    
+                    return loginObserver
+        //                .flatMap { self.repository.userLogin(platForm: platform, authCode: $0)}
+                        .subscribe(onSuccess: { token in
+                            print(#function, #line, "login Teste : \(token)" )
+                            emitter(.success(()))
+                        }, onFailure: { err in
+                            emitter(.failure(err))
+                        })
+                }
+            }
+        
     }
     
     private func handleLogin(_ platform: LoginPlatform) -> Single<String> {

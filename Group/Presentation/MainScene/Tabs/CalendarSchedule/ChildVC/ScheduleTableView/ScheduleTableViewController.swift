@@ -39,7 +39,7 @@ final class ScheduleTableViewController: UIViewController, View {
         table.tableHeaderView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
         return table
     }()
-    
+
     private let emptyScheduleView: DefaultEmptyView = {
         let view = DefaultEmptyView()
         view.setTitle(text: TextStyle.Calendar.emptyTitle)

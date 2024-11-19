@@ -47,6 +47,7 @@ class ProfileEditViewController: DefaultViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupAction()
     }
     
     // MARK: - UI Setup
@@ -76,15 +77,15 @@ class ProfileEditViewController: DefaultViewController, View {
 
     // MARK: - Binding
     func bind(reactor: ProfileFormViewReactor) {
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupAction() {
         leftButtonObserver
             .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.navigationController?.popViewController(animated: true)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$setupCompleted)
-            .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)
             })

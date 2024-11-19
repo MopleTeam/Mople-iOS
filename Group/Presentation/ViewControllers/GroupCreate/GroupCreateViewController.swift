@@ -32,6 +32,8 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
         return photoManager
     }()
     
+    private lazy var alertManager = AlertManager.shared
+    
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
     
@@ -134,8 +136,11 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bindtet()
-        setGeestureBind()
+        setupAction()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         setupKeyboardEvent()
     }
     
@@ -205,14 +210,37 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
         titleTextField.rightView = .init(frame: .init(x: 0, y: 0, width: 16, height: 0))
         titleTextField.leftViewMode = .always
         titleTextField.rightViewMode = .always
+        titleTextField.delegate = self
     }
     
     // MARK: - Binding
     func bind(reactor: GroupCreateViewReactor) {
+        self.completionButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.setGroup(group: self.makeGroup()) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$message)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
+            .drive(with: self, onNext: { vc, message in
+                vc.alertManager.showAlert(message: message)
+            })
+            .disposed(by: disposeBag)
     }
     
-    func bindtet() {
+    private func setupAction() {
+        setupButton()
+        setGesture()
+        setEditImage()
+    }
+    
+    private func setupButton() {
         leftButtonObserver
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
@@ -221,7 +249,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
             .disposed(by: disposeBag)
     }
     
-    private func setGeestureBind() {
+    private func setGesture() {
         self.view.addGestureRecognizer(backTapGesture)
         self.groupImageView.addGestureRecognizer(imageTapGesture)
         
@@ -239,11 +267,37 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
             })
             .disposed(by: disposeBag)
     }
+    
+    // 이미지 변경
+    private func setEditImage() {
+        imageObserver
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: .defaultIProfile)
+            .drive(groupImageView.rx.image)
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - 그룹 생성 및 적용
+extension GroupCreateViewController {
+    private func makeGroup() -> (String?, UIImage?) {
+        let nickName = titleTextField.text
+        let image = try? imageObserver.value()
+        return (nickName, image)
+    }
 }
 
 // MARK: - 이미지 선택
 extension GroupCreateViewController {
     private func showPhotos() {
         photoManager.requestPhotoLibraryPermission()
+    }
+}
+
+extension GroupCreateViewController : UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let currentText = textField.text else { return true }
+        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        return newText.count <= 30
     }
 }

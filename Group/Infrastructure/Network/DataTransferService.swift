@@ -68,12 +68,13 @@ final class DefaultDataTransferService {
 
 extension DefaultDataTransferService: DataTransferService {
     
-    func request<T: Decodable, E: ResponseRequestable>(with endpoint: E) -> Single<T> where E.Response == T {
-        
+    private func performBaseRequest<E: ResponseRequestable, T>(
+        endpoint: E,
+        transform: @escaping (Data?) -> Single<T>
+    ) -> Single<T> {
         return Single.create { single in
-            
-            self.networkService.request(endpoint: endpoint)
-                .flatMap { self.decode(data: $0, decoder: endpoint.responseDecoder) }
+            let task = self.networkService.request(endpoint: endpoint)
+                .flatMap(transform)
                 .subscribe(onSuccess: { response in
                     single(.success(response))
                 }, onFailure: { err in
@@ -85,29 +86,28 @@ extension DefaultDataTransferService: DataTransferService {
                         single(.failure(err))
                     }
                 })
-        }
-    }
-
-    func request<E>(with endpoint: E) -> Single<Void> where E : ResponseRequestable, E.Response == Void {
-        return Single.create { single in
-            
-            let task = self.networkService.request(endpoint: endpoint)
-                .subscribe(onSuccess: { _ in
-                    single(.success(()))
-                }, onFailure: { err in
-                    self.errorLogger.log(error: err)
-                    if let err = err as? NetworkError {
-                        let transferError = self.resolve(networkError: err)
-                        single(.failure(transferError))
-                    } else {
-                        single(.failure(err))
-                    }
-                })
-            
             return task
         }
     }
-        
+
+    /// 리턴값이 있는 요청
+    func request<E: ResponseRequestable>(
+        with endpoint: E
+    ) -> Single<E.Response> where E.Response: Decodable {
+        return performBaseRequest(endpoint: endpoint) { data in
+            self.decode(data: data, decoder: endpoint.responseDecoder)
+        }
+    }
+
+    /// 응답만 있는 요청
+    func request<E: ResponseRequestable>(
+        with endpoint: E
+    ) -> Single<Void> where E.Response == Void {
+        return performBaseRequest(endpoint: endpoint) { _ in
+            .just(())
+        }
+    }
+    
     // MARK: - Private
     private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) -> Single<T> {
         return Single.create(subscribe: { emitter in
@@ -192,6 +192,7 @@ class RawDataResponseDecoder: ResponseDecoder {
         }
     }
 }
+
 
 
 

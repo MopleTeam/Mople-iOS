@@ -28,16 +28,17 @@ final class ProfileSceneCoordinator: BaseCoordinator {
     }
 }
 
+// MARK: - 뷰 이동
 extension ProfileSceneCoordinator {
     private func getAccountAction() -> ProfileViewAction {
-        .init(presentEditView: presentEditView(updateModel:),
+        .init(presentEditView: presentEditView(previousProfile:completedAction:),
               presentNotifyView: presentNotifyView,
               presentPolicyView: presentPolicyView,
               logout: logout)
     }
     
-    private func presentEditView(updateModel: ProfileUpdateModel) {
-        (self.parentCoordinator as? AccountAction)?.editProfile(updateModel)
+    private func presentEditView(previousProfile: ProfileInfo, completedAction: (() -> Void)?) {
+        (self.parentCoordinator as? AccountAction)?.editProfile(previousProfile, completedAction)
     }
     
     private func presentNotifyView() {

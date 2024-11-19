@@ -9,7 +9,7 @@ import UIKit
 import ReactorKit
 
 struct ProfileViewAction {
-    var presentEditView: (ProfileUpdateModel) -> Void
+    var presentEditView: (_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?) -> Void
     var presentNotifyView: () -> Void
     var presentPolicyView: () -> Void
     var logout: () -> Void
@@ -90,9 +90,7 @@ extension ProfileViewReactor {
     
     private func presentEditView() -> Observable<Mutation> {
         guard let previousProfile = currentState.userProfile else { return .empty() }
-        let updatedModel = ProfileUpdateModel(currentProfile: previousProfile,
-                                              completedAction: fetchProfile)
-        viewAction.presentEditView(updatedModel)
+        viewAction.presentEditView(previousProfile, fetchProfile)
         
         return Observable.empty()
     }
