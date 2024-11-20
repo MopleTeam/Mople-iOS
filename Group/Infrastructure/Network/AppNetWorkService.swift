@@ -28,17 +28,7 @@ final class DefaultAppNetWorkService: AppNetWorkService {
     func basicRequest<T: Decodable, E: ResponseRequestable>(
         endpoint: E
     ) -> Single<T> where E.Response == T {
-        return Single.create { emitter in
-                        
-            let task = self.dataTransferService.request(with: endpoint)
-                .subscribe(onSuccess: { result in
-                    emitter(.success(result))
-                }, onFailure: { err in
-                    emitter(.failure(err))
-                })
-
-            return task
-        }
+        return self.dataTransferService.request(with: endpoint)
     }
 
     /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
