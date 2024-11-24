@@ -11,17 +11,17 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class DatePickViewController: UIViewController, View {
+final class YearMonthPickerViewController: UIViewController, View {
     
     typealias Reactor = CalendarViewReactor
     
     var disposeBag: DisposeBag = DisposeBag()
     
     // MARK: - Observable
-    private let pageChangeRequestObserver: PublishRelay<DateComponents> = .init()
+    private let selectedDateObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - Variables
-    private lazy var today = Date().getComponents()
+    private let today = DateManager.today.getComponents()
     private lazy var selectedDate: DateComponents = today
     
     private lazy var years: [Int] = {
@@ -35,45 +35,10 @@ final class DatePickViewController: UIViewController, View {
     private var months: [Int] = Array(1...12)
     
     // MARK: - UI Components
-    private let navigationView: DefaultNavigationBar = {
-        let bar = DefaultNavigationBar()
-        bar.titleLable.text = TextStyle.DatePicker.header
-        return bar
-    }()
-    
-    private let rightBarButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.close, for: .normal)
-        return button
-    }()
-    
-    private let datePicker = UIPickerView()
-    
-    private let completeButton: BaseButton = {
-        let btn = BaseButton()
-        btn.setTitle(text: TextStyle.DatePicker.completedTitle,
-                     font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary)
-        return btn
-    }()
-            
-    private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [navigationView, datePicker, completeButton])
-        sv.axis = .vertical
-        sv.spacing = 20
-        sv.alignment = .fill
-        sv.distribution = .fill
-        sv.layer.cornerRadius = 13
-        sv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        sv.backgroundColor = ColorStyle.Default.white
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)
-        return sv
-    }()
+    private let pickerView = DefaultPickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
-    init(reactor: Reactor ) {
+    init(reactor: Reactor? = nil) {
         defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
@@ -83,46 +48,43 @@ final class DatePickViewController: UIViewController, View {
     }
     
     override func viewDidLoad() {
-        setDatePicker()
+        print(#function, #line)
         setupUI()
         setupAction()
+        setDatePicker()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
         setLayout()
-        setNavigationView()
     }
     
     private func setLayout() {
-        view.addSubview(mainStackView)
+        view.addSubview(pickerView)
         
-        mainStackView.snp.makeConstraints { make in
+        pickerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        navigationView.snp.makeConstraints { make in
-            make.height.equalTo(40)
-        }
-        
-        completeButton.snp.makeConstraints { make in
-            make.height.equalTo(56)
-        }
     }
-    
-    private func setNavigationView() {
-        navigationView.setRightItem(item: rightBarButton)
-    }
-    
+
     private func setDatePicker() {
-        datePicker.dataSource = self
-        datePicker.delegate = self
+        pickerView.setDelegate(delegate: self)
         setSelectRow(date: selectedDate)
+    }
+    
+    private func dequeuePickerLabel(reusing view: UIView?) -> UILabel {
+        return (view as? UILabel) ?? {
+            let newLabel = UILabel()
+            newLabel.textAlignment = .center
+            newLabel.textColor = .black
+            newLabel.font = FontStyle.Title2.semiBold
+            return newLabel
+        }()
     }
     
     // MARK: - Bind
     func bind(reactor: CalendarViewReactor) {
-        pageChangeRequestObserver
+        selectedDateObserver
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestPageSwitch(dateComponents: $0) }
             .bind(to: reactor.action)
@@ -139,16 +101,16 @@ final class DatePickViewController: UIViewController, View {
     
     // MARK: - Action
     private func setupAction() {
-        rightBarButton.rx.controlEvent(.touchUpInside)
+        self.pickerView.closeButtonTap
             .subscribe(with: self, onNext: { vc, _ in
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
         
-        completeButton.rx.controlEvent(.touchUpInside)
+        self.pickerView.completedButtonTap
             .map({ _ in self.selectedDate })
             .subscribe(with: self, onNext: { vc, date in
-                vc.pageChangeRequestObserver.accept(date)
+                vc.selectedDateObserver.accept(date)
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
@@ -156,7 +118,7 @@ final class DatePickViewController: UIViewController, View {
 }
 
 // MARK: - Select Row
-extension DatePickViewController {
+extension YearMonthPickerViewController {
     private func setSelectRow(date: DateComponents) {
         guard let year = date.year,
               let month = date.month else { return }
@@ -164,38 +126,36 @@ extension DatePickViewController {
         let monthIndex = months.firstIndex(of: month) ?? 0
         let yearIndex = years.firstIndex(of: year) ?? 0
         
-        datePicker.selectRow(monthIndex, inComponent: 0, animated: false)
-        datePicker.selectRow(yearIndex, inComponent: 1, animated: false)
+        pickerView.selectRow(row: monthIndex, inComponent: 0, animated: false)
+        pickerView.selectRow(row: yearIndex, inComponent: 1, animated: false)
     }
 }
 
 // MARK: - DatePicker
-extension DatePickViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension YearMonthPickerViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 2
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        if component == 0 {
-            return months.count
-        } else {
-            return years.count
+        switch component {
+        case 0: months.count
+        case 1: years.count
+        default: 0
         }
     }
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int,
                     reusing view: UIView?) -> UIView {
         
-        let label = UILabel()
-        label.textAlignment = .center
-        label.textColor = .black
-        label.font = FontStyle.Heading.bold
+        let label = self.dequeuePickerLabel(reusing: view)
         
-        if component == 0 {
-            label.text = "\(months[row]) 월"
-        } else {
-            label.text = "\(years[row]) 년"
+        switch component {
+        case 0: label.text = "\(months[row]) 월"
+        case 1: label.text = "\(years[row]) 년"
+        default: break
         }
+        
         return label
     }
     

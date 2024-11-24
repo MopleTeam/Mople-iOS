@@ -12,8 +12,6 @@ final class PolicyViewController: DefaultViewController {
     
     var disposeBag = DisposeBag()
     
-    private lazy var leftButtonObserver = addLeftButton()
-
     init() {
         super.init(title: "개인정보 처리방침")
     }
@@ -25,11 +23,16 @@ final class PolicyViewController: DefaultViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        setNaviItem()
+    }
+    
+    private func setNaviItem() {
+        self.setBarItem(type: .left, image: .arrowBack)
     }
 
     // MARK: - Binding
     func bind() {
-        leftButtonObserver
+        leftItemEvent
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)

@@ -112,7 +112,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
 
 extension ScheduleListCollectionViewController: UICollectionViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        collectionView.verticalSnapToItem(targetContentOffset: targetContentOffset,
+        collectionView.horizontalSnapToItem(targetContentOffset: targetContentOffset,
                                           scrollView: scrollView,
                                           velocity: velocity)
     }

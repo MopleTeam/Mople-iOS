@@ -22,26 +22,24 @@ final class LoginViewController: UIViewController, View {
     // MARK: - UI Components
     private let titleContainerView = UIView()
     
-    private let mainTitle : UILabel = {
-        let label = UILabel()
-        label.text = TextStyle.App.title
-        label.font = FontStyle.App.title
-        label.textColor = ColorStyle.App.primary
-        label.textAlignment = .center
-        return label
+    private let appImageView: UIImageView = {
+        let view = UIImageView()
+        view.image = .launchScreenIcon
+        view.contentMode = .center
+        return view
     }()
-    
+
     private let subTitle: UILabel = {
         let label = UILabel()
         label.text = TextStyle.App.subTitle
-        label.font = FontStyle.Title3.regular
-        label.textColor = ColorStyle.Gray._05
+        label.font = FontStyle.Title3.medium
+        label.textColor = ColorStyle.Gray._03
         label.textAlignment = .center
         return label
     }()
     
     private lazy var titleStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [mainTitle, subTitle])
+        let sv = UIStackView(arrangedSubviews: [appImageView, subTitle])
         sv.axis = .vertical
         sv.spacing = 16
         sv.alignment = .fill
@@ -51,35 +49,35 @@ final class LoginViewController: UIViewController, View {
     }()
     
     private let kakaoLoginButton: BaseButton = {
-        let button = BaseButton()
-        button.setTitle(text: TextStyle.Login.kakao,
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Login.kakao,
                         font: FontStyle.Title3.semiBold,
                         color: ColorStyle.Gray._01)
         
-        button.setImage(image: .kakao,
+        btn.setImage(image: .kakao,
                         imagePlacement: .leading,
                         contentPadding: 8)
-        button.setBgColor(ColorStyle.Default.yellow)
-        button.layer.cornerRadius = 8
-        return button
+        btn.setBgColor(ColorStyle.Default.yellow)
+        btn.setRadius(8)
+        return btn
     }()
     
     private let appleLoginButton: BaseButton = {
-        let button = BaseButton()
-        button.setTitle(text: TextStyle.Login.apple,
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Login.apple,
                         font: FontStyle.Title3.semiBold,
                         color: ColorStyle.Default.white)
         
-        button.setImage(image: .apple,
+        btn.setImage(image: .apple,
                         imagePlacement: .leading,
                         contentPadding: 8)
-        button.setBgColor(ColorStyle.Default.black)
-        button.layer.cornerRadius = 8
-        return button
+        btn.setBgColor(ColorStyle.Default.black)
+        btn.setRadius(8)
+        return btn
     }()
     
     private lazy var loginStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [appleLoginButton, kakaoLoginButton])
+        let sv = UIStackView(arrangedSubviews: [kakaoLoginButton, appleLoginButton])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -89,16 +87,10 @@ final class LoginViewController: UIViewController, View {
     
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [titleContainerView, loginStackView])
-        sv.backgroundColor = .systemYellow
         sv.axis = .vertical
         sv.spacing = 0
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 0,
-                                 left: 20,
-                                 bottom: UIScreen.getAdditionalBottomInset(),
-                                 right: 20)
         return sv
     }()
     
@@ -137,11 +129,17 @@ final class LoginViewController: UIViewController, View {
         self.titleContainerView.addSubview(titleStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+                .inset(UIScreen.getAdditionalBottomInset())
         }
         
         titleStackView.snp.makeConstraints { make in
             make.center.equalTo(titleContainerView)
+            make.horizontalEdges.equalToSuperview()
+            make.top.greaterThanOrEqualToSuperview() 
+            make.bottom.lessThanOrEqualToSuperview()
         }
         
         appleLoginButton.snp.makeConstraints { make in

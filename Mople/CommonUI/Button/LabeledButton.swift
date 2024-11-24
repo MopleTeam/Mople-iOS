@@ -9,20 +9,12 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class TitleButton: UIView {
+final class LabeledButton: UIView {
     
     // MARK: - Reactive
-//    public var rx_text: ControlProperty<String?> {
-//        return inputTextField.rx.text
-//    }
-//    
-//    public var rx_editing: ControlEvent<Void> {
-//        return inputTextField.rx.controlEvent(.editingChanged)
-//    }
-//    
-//    public var rx_Resign: Binder<Bool> {
-//        return inputTextField.rx.isResign
-//    }
+    public var rx_tap: ControlEvent<Void> {
+        return button.rx.controlEvent(.touchUpInside)
+    }
     
     enum ViewMode {
         case left
@@ -37,17 +29,17 @@ final class TitleButton: UIView {
         return label
     }()
     
-    private let groupSelectView: BaseButton = {
+    private let button: BaseButton = {
         let btn = BaseButton()
         btn.setButtonAlignment(.left)
         btn.setBgColor(ColorStyle.BG.input)
-        btn.layer.cornerRadius = 8
+        btn.setRadius(8)
         btn.setLayoutMargins()
         return btn
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleLabel, groupSelectView])
+        let sv = UIStackView(arrangedSubviews: [titleLabel, button])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -81,7 +73,7 @@ final class TitleButton: UIView {
             make.height.equalTo(22)
         }
         
-        groupSelectView.snp.makeConstraints { make in
+        button.snp.makeConstraints { make in
             make.height.equalTo(56)
         }
     }
@@ -89,29 +81,29 @@ final class TitleButton: UIView {
 
 
 // MARK: - 텍스트 설정
-extension TitleButton {
+extension LabeledButton {
     private func setTitle(_ title: String) {
         titleLabel.text = title
     }
     
     /// 텍스트 필드 플레이스 홀더 설정
     private func setDefaultText(_ text: String?) {
-        groupSelectView.setTitle(text: text,
+        button.setTitle(text: text,
                      font: FontStyle.Body1.regular,
                      color: ColorStyle.Gray._05)
     }
     
     private func setIconImage(_ image: UIImage?) {
         guard let image else { return }
-        groupSelectView.setImage(image: image, imagePlacement: .leading, contentPadding: 16)
+        button.setImage(image: image, imagePlacement: .leading, contentPadding: 16)
     }
 }
 
 // MARK: - 외부 설정
-extension TitleButton {
+extension LabeledButton {
 
     public func setLayoutMargins(inset: NSDirectionalEdgeInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)) {
-        groupSelectView.setLayoutMargins(inset: inset)
+        button.setLayoutMargins(inset: inset)
     }
 }
 

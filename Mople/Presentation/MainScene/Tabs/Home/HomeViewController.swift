@@ -63,15 +63,15 @@ final class HomeViewController: UIViewController, View {
         return label
     }()
     
-    private let makeGroupButton: HomeButton = {
-        let btn = HomeButton()
+    private let makeGroupButton: CardButton = {
+        let btn = CardButton()
         btn.setTitle(text: TextStyle.Home.createGroup)
         btn.setImage(image: .makeGroup)
         return btn
     }()
     
-    private let makeScheduleButton: HomeButton = {
-        let btn = HomeButton()
+    private let makeScheduleButton: CardButton = {
+        let btn = CardButton()
         btn.setTitle(text: TextStyle.Home.createSchedule)
         btn.setImage(image: .makeSchedule)
         return btn

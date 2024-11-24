@@ -9,16 +9,14 @@ import UIKit
 import RxSwift
 
 class BaseButton: UIButton {
-    
-    enum ContentAlignment {
-        case fill
-        case left
-    }
-    
+
     var title: String? {
         get { configuration?.title }
         set { configuration?.title = newValue }
     }
+    
+    private(set) var enabledBackColor: UIColor?
+    private(set) var disabledBackColor: UIColor?
     
     init() {
         super.init(frame: .zero)
@@ -37,18 +35,12 @@ class BaseButton: UIButton {
 
 extension BaseButton {
     
-    public func setButtonAlignment(_ alignment: ContentAlignment) {
-        configuration?.contentInsets = .zero
-        switch alignment {
-        case .fill:
-            self.contentHorizontalAlignment = .fill
-        case .left:
-            self.contentHorizontalAlignment = .left
-        }
+    public func setButtonAlignment(_ alignment: UIControl.ContentHorizontalAlignment) {
+        self.contentHorizontalAlignment = alignment
     }
     
     public func setLayoutMargins(inset: NSDirectionalEdgeInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)) {
-        self.configuration?.contentInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)
+        self.configuration?.contentInsets = inset
     }
     public func setImage(image: UIImage?,
                          imagePlacement: NSDirectionalRectEdge = .trailing,
@@ -59,8 +51,10 @@ extension BaseButton {
         
     }
     
-    public func setBgColor(_ color: UIColor?) {
+    public func setBgColor(_ color: UIColor?, disabledColor: UIColor? = nil) {
         configuration?.background.backgroundColor = color
+        enabledBackColor = color
+        disabledBackColor = disabledColor
     }
     
     public func setTitle(text: String? = nil,
@@ -69,6 +63,10 @@ extension BaseButton {
         
         configuration?.title = text
         setFont(font, color)
+    }
+    
+    public func setRadius(_ radius: CGFloat) {
+        configuration?.background.cornerRadius = radius
     }
     
     private func setFont(_ font: UIFont?,_ color: UIColor?) {
@@ -80,5 +78,19 @@ extension BaseButton {
         }
         
         configuration?.titleTextAttributesTransformer = transformer
+    }
+    
+    fileprivate func updateEnabledColor(_ isEnabled: Bool) {
+        guard let enabledBackColor, let disabledBackColor else { return }
+        configuration?.background.backgroundColor = isEnabled ? enabledBackColor : disabledBackColor
+    }
+}
+
+extension Reactive where Base: BaseButton {
+    var isEnabled: Binder<Bool> {
+        return Binder(self.base) { button, isEnabled in
+            button.isEnabled = isEnabled
+            button.updateEnabledColor(isEnabled)
+        }
     }
 }

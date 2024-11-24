@@ -43,6 +43,7 @@ final class ProfileViewController: DefaultViewController, View {
         btn.setTitle(font: FontStyle.Title3.semiBold,
                      color: ColorStyle.Gray._01)
         btn.setImage(image: .editPan)
+        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
 
@@ -53,6 +54,7 @@ final class ProfileViewController: DefaultViewController, View {
                      color: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
+        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
     
@@ -63,17 +65,18 @@ final class ProfileViewController: DefaultViewController, View {
                      color: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
+        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
         
     
-    private let versionLabel: BaseButton = {
-        let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Profile.versionTitle,
-                     font: FontStyle.Title3.medium,
-                     color: ColorStyle.Gray._01)
-        btn.setButtonAlignment(.left)
-        return btn
+    private let versionLabel: UILabel = {
+        let label = UILabel()
+        label.text = TextStyle.Profile.versionTitle
+        label.font = FontStyle.Title3.medium
+        label.textColor = ColorStyle.Gray._01
+        label.textAlignment = .left
+        return label
     }()
     
     private let versionInfoLabel: UILabel = {
@@ -90,6 +93,7 @@ final class ProfileViewController: DefaultViewController, View {
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
+        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
 
@@ -99,6 +103,7 @@ final class ProfileViewController: DefaultViewController, View {
                      font: FontStyle.Title3.medium,
                      color: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
+        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
     

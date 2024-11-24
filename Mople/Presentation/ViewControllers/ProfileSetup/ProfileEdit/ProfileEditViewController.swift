@@ -19,10 +19,7 @@ class ProfileEditViewController: DefaultViewController, View {
     
     // MARK: - Variables
     let previousProfile: ProfileInfo
-    
-    // MARK: - Observer
-    private lazy var leftButtonObserver = addLeftButton()
-    
+        
     // MARK: - UI Components
     private let profileContainerView = UIView()
     
@@ -54,6 +51,7 @@ class ProfileEditViewController: DefaultViewController, View {
     private func setupUI() {
         setupLayout()
         addProfileSetupView()
+        setNaviItem()
     }
 
     private func setupLayout() {
@@ -74,6 +72,10 @@ class ProfileEditViewController: DefaultViewController, View {
             make.horizontalEdges.equalToSuperview().inset(20)
         }
     }
+    
+    private func setNaviItem() {
+        self.setBarItem(type: .left, image: .arrowBack)
+    }
 
     // MARK: - Binding
     func bind(reactor: ProfileFormViewReactor) {
@@ -84,7 +86,7 @@ class ProfileEditViewController: DefaultViewController, View {
     }
     
     private func setupAction() {
-        leftButtonObserver
+        leftItemEvent
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)

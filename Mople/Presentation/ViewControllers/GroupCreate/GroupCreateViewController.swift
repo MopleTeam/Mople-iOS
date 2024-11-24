@@ -36,9 +36,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
-    
-    private lazy var leftButtonObserver = addLeftButton()
-    
+        
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()
     private let backTapGesture = UITapGestureRecognizer()
@@ -72,11 +70,10 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
         return imageView
     }()
     
-    private let inputTextField: TitleTextField = {
-        let textField = TitleTextField(title: TextStyle.CreateGroup.groupTitle,
+    private let inputTextField: LabeledTextField = {
+        let textField = LabeledTextField(title: TextStyle.CreateGroup.groupTitle,
                                               placeholder: TextStyle.CreateGroup.placeholder,
                                               maxCount: 30)
-        textField.setLayoutMargins()
         return textField
     }()
     
@@ -85,8 +82,9 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
         btn.setTitle(text: TextStyle.CreateGroup.completedTitle,
                      font: FontStyle.Title3.semiBold,
                      color: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary)
-        btn.layer.contents = 8
+        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
+        btn.setRadius(8)
+        btn.rx.isEnabled.onNext(false)
         return btn
     }()
     
@@ -126,6 +124,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     
     private func setupUI() {
         setupLayout()
+        setNaviItem()
     }
     
     private func setupLayout() {
@@ -156,7 +155,8 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
         completionButton.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(56)
-            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.getAdditionalBottomInset()).constraint
+            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+                .inset(UIScreen.getAdditionalBottomInset()).constraint
         }
 
         imageContainerView.snp.makeConstraints { make in
@@ -195,6 +195,10 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
             .disposed(by: disposeBag)
     }
     
+    private func setNaviItem() {
+        self.setBarItem(type: .left, image: .arrowBack)
+    }
+    
     private func setupAction() {
         setupButton()
         setGesture()
@@ -202,7 +206,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     }
     
     private func setupButton() {
-        leftButtonObserver
+        leftItemEvent
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)

@@ -60,19 +60,21 @@ final class ProfileSetupViewController: UIViewController, View {
         return imageView
     }()
     
-    private let nameTextField: TitleTextField = {
-        let textField = TitleTextField(title: TextStyle.ProfileSetup.nameTitle,
+    private let nameTextField: LabeledTextField = {
+        let textField = LabeledTextField(title: TextStyle.ProfileSetup.nameTitle,
                                               placeholder: TextStyle.ProfileSetup.typingName,
                                               maxCount: 15)
-        textField.setLayoutMargins()
         return textField
     }()
     
-    private let duplicateButton: DuplicateButton = {
-        let btn = DuplicateButton()
+    private let duplicateButton: BaseButton = {
+        let btn = BaseButton()
         btn.setTitle(text: TextStyle.ProfileSetup.checkBtnTitle,
                      font: FontStyle.Body1.semiBold,
                      color: ColorStyle.Default.white)
+        btn.setBgColor(ColorStyle.App.secondary, disabledColor: ColorStyle.Primary.disable2)
+        btn.setRadius(6)
+        btn.rx.isEnabled.onNext(false)
         return btn
     }()
     
@@ -84,7 +86,16 @@ final class ProfileSetupViewController: UIViewController, View {
     
     private let nameCheckLabel = DuplicateLabel()
     
-    private let completionButton = CompletionButton()
+    private let completionButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.DatePicker.completedTitle,
+                     font: FontStyle.Title3.semiBold,
+                     color: ColorStyle.Default.white)
+        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
+        btn.setRadius(8)
+        btn.rx.isEnabled.onNext(false)
+        return btn
+    }()
     
     private lazy var nameStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameTextField, nameCheckContanierView])
@@ -358,10 +369,10 @@ extension ProfileSetupViewController {
     private func configureView() {
         switch viewType {
         case .create:
-            completionButton.setTitle(TextStyle.ProfileCreate.completedTitle, for: .normal)
+            completionButton.title = TextStyle.ProfileCreate.completedTitle
             mainStackView.spacing = 24
         case .edit(let previousProfile):
-            completionButton.setTitle(TextStyle.ProfileEdit.completedTitle, for: .normal)
+            completionButton.title = TextStyle.ProfileEdit.completedTitle
             setProfile(previousProfile)
         }
     }

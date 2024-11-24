@@ -23,7 +23,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
     private var sectionModels: [ScheduleTableSectionModel] = []
     private var visibleHeaders: [UIView] = []
-    
+
     // MARK: - Observable
     private let dateSyncObserver: PublishRelay<Date?> = .init()
     private let userInteractingObserver: BehaviorRelay<Bool> = .init(value: false)
@@ -127,6 +127,12 @@ final class ScheduleTableViewController: UIViewController, View {
         self.tableView.rx.willBeginDragging
             .do(onNext: { _ in self.isSystemDragging = false })
             .map({ _ in true })
+            .asDriver(onErrorJustReturn: true)
+            .drive(userInteractingObserver)
+            .disposed(by: disposeBag)
+        
+        self.tableView.rx.didEndDragging
+            .map({ _ in false })
             .asDriver(onErrorJustReturn: true)
             .drive(userInteractingObserver)
             .disposed(by: disposeBag)
@@ -303,6 +309,7 @@ extension ScheduleTableViewController {
 
 // MARK: - Gesture
 extension ScheduleTableViewController {
+    #warning("다시 한번 알아두기")
     public func panGestureRequire(_ gesture: UIPanGestureRecognizer) {
         self.tableView.panGestureRecognizer.require(toFail: gesture)
     }
@@ -311,6 +318,7 @@ extension ScheduleTableViewController {
 // MARK: - Helper
 extension ScheduleTableViewController {
     public func checkTop() -> Bool {
+        print(#function, #line, "top : \(self.tableView.contentOffset.y <= self.tableView.contentInset.top)" )
         return self.tableView.contentOffset.y <= self.tableView.contentInset.top
     }
     

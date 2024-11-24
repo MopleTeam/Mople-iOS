@@ -34,6 +34,7 @@ struct ColorStyle {
     
     enum Primary {
         static let disable: UIColor = .init(hexCode: "D6E0FF")
+        static let disable2: UIColor = App.secondary.withAlphaComponent(0.3)
     }
     
     enum Input {

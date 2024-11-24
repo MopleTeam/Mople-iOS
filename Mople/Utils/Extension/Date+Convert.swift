@@ -14,6 +14,10 @@ enum DateStringFormat {
 }
 
 extension Date {
+    func getHours() -> Int {
+        return DateManager.calendar.dateComponents([.hour], from: self).hour ?? 0
+    }
+    
     func getComponents() -> DateComponents {
         return DateManager.calendar.dateComponents([.year, .month, .day], from: self)
     }

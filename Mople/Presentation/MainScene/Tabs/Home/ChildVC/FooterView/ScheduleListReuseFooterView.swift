@@ -15,15 +15,15 @@ final class ScheduleListReuseFooterView: UICollectionReusableView {
     var disposeBag = DisposeBag()
         
     private let moreButton: BaseButton = {
-        let label = BaseButton()
-        label.setTitle(text: TextStyle.Home.moreBtnTitle,
+        let btn = BaseButton()
+        btn.setTitle(text: TextStyle.Home.moreBtnTitle,
                        font: FontStyle.Title3.semiBold,
                        color: ColorStyle.Gray._01)
-        label.setBgColor(ColorStyle.Default.white)
-        label.setImage(image: .plus,
+        btn.setBgColor(ColorStyle.Default.white)
+        btn.setImage(image: .plus,
                        imagePlacement: .top)
-        label.layer.cornerRadius = 12
-        return label
+        btn.setRadius(12)
+        return btn
     }()
     
     override init(frame: CGRect) {

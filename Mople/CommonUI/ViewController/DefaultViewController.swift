@@ -18,21 +18,16 @@ class DefaultViewController: UIViewController {
     }
     
     // MARK: - Observer
-    private var rightItemEvent: Observable<Void> {
-        return rightButton.rx.controlEvent(.touchUpInside)
-            .asObservable()
+    public var rightItemEvent: ControlEvent<Void> {
+        return navigationView.rightItemEvent
     }
     
-    private var leftItemEvent: Observable<Void> {
-        return leftButton.rx.controlEvent(.touchUpInside)
-            .asObservable()
+    public var leftItemEvent: ControlEvent<Void> {
+        return navigationView.leftItemEvent
     }
         
     // MARK: - UI Components
-    private lazy var navigationView = DefaultNavigationBar()
-    
-    private lazy var rightButton = UIButton()
-    private lazy var leftButton = UIButton()
+    private let navigationView = DefaultNavigationBar()
     
     // MARK: - Indicator
     fileprivate let indicator: UIActivityIndicatorView = {
@@ -85,42 +80,18 @@ class DefaultViewController: UIViewController {
     }
     
     private func setTitle(_ title: String?) {
-        self.navigationView.titleLable.text = title
+        self.navigationView.title = title
     }
 }
 
 // MARK: - 네비게이션 아이템 설정
 extension DefaultViewController {
-    public func addRightButton(setImage: UIImage?) -> Observable<Void> {
-        navigationView.rightButtonContainerView.addSubview(rightButton)
-        
-        rightButton.setImage(setImage, for: .normal)
-        
-        rightButton.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        return rightItemEvent
+    public func setBarItem(type: DefaultNavigationBar.ButtonType, image: UIImage) {
+        navigationView.setBarItem(type: type, image: image)
     }
     
-    public func addLeftButton(setImage: UIImage? = .arrowBack) -> Observable<Void> {
-        navigationView.leftButtonContainerView.addSubview(leftButton)
-        
-        leftButton.setImage(setImage, for: .normal)
-        
-        leftButton.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        return leftItemEvent
-    }
-    
-    public func hideRightButton(isHidden: Bool) {
-        rightButton.isHidden = isHidden
-    }
-    
-    public func hideLeftButton(isHidden: Bool) {
-        leftButton.isHidden = isHidden
+    public func hideBaritem(type: DefaultNavigationBar.ButtonType, isHidden: Bool) {
+        navigationView.hideBarItem(type: type, isHidden: isHidden)
     }
 }
 

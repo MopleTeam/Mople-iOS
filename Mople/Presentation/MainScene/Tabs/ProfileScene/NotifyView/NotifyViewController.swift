@@ -12,7 +12,6 @@ final class NotifyViewController: DefaultViewController {
     
     var disposeBag = DisposeBag()
     
-    private lazy var leftButtonObserver = addLeftButton()
 
     init() {
         super.init(title: "알림 관리 뷰")
@@ -25,13 +24,16 @@ final class NotifyViewController: DefaultViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        
-
+        setNaviItem()
+    }
+    
+    private func setNaviItem() {
+        self.setBarItem(type: .left, image: .arrowBack)
     }
 
     // MARK: - Binding
     func bind() {
-        leftButtonObserver
+        leftItemEvent
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)

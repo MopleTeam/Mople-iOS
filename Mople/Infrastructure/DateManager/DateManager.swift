@@ -9,6 +9,8 @@ import Foundation
 
 final class DateManager {
     
+    static let today = Date()
+    
     static let calendar: Calendar = {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
@@ -38,6 +40,25 @@ final class DateManager {
     private init() { }
 }
 
+extension DateManager {
+    static func getMinimumDate() -> Date {
+        var components = today.getComponents()
+        components.month = 1
+        components.day = 1
+        let firstDate = components.getDate() ?? Date()
+        return calendar.date(byAdding: .year, value: -10, to: firstDate) ?? Date()
+    }
+    
+    static func getMaximumDate() -> Date {
+        var components = today.getComponents()
+        components.month = 12
+        components.day = 31
+        let firstDate = components.getDate() ?? Date()
+        return calendar.date(byAdding: .year, value: 10, to: firstDate) ?? Date()
+    }
+    
+}
+
 // MARK: - 비교
 extension DateManager {
     static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
@@ -54,6 +75,14 @@ extension DateManager {
     
     static func startOfDay(_ date: Date) -> Date {
         return calendar.startOfDay(for: date)
+    }
+
+    static func isNextMonth(_ date: Date) -> Date {
+        return calendar.date(byAdding: .month, value: 1, to: date) ?? Date()
+    }
+    
+    static func isPreviousMonth(_ date: Date) -> Date {
+        return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
     }
     
     #warning("사용하지 않음, 정리용")

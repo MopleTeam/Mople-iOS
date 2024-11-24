@@ -47,7 +47,7 @@ final class CalendarViewController: UIViewController, View {
     private let dateSelectionObserver: PublishRelay<SelectDate> = .init()
     
     // MARK: - UI Components
-    private let calendar: FSCalendar = {
+    public let calendar: FSCalendar = {
         let calendar = FSCalendar()
         calendar.scrollDirection = .horizontal
         calendar.adjustsBoundingRectWhenChangingMonths = true
@@ -58,6 +58,31 @@ final class CalendarViewController: UIViewController, View {
         calendar.locale = Locale(identifier: "ko_KR")
         return calendar
     }()
+    
+    enum pageChangeType {
+        case next
+        case previous
+    }
+    
+    public func handlePageChange(_ type: pageChangeType) {
+        let current = calendar.currentPage
+
+        switch type {
+        case .next:
+            let nextDate = DateManager.isNextMonth(current)
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
+                self.calendar.setCurrentPage(nextDate, animated: false)
+                self.view.layoutIfNeeded()
+            }
+            
+        case .previous:
+            let previousDate = DateManager.isPreviousMonth(current)
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
+                self.calendar.setCurrentPage(previousDate, animated: false)
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
     
     private let weekContainerView = UIView()
     
@@ -230,6 +255,7 @@ final class CalendarViewController: UIViewController, View {
     private func setGestureObserver() {
         self.gestureObserver
             .subscribe(with: self, onNext: { vc, gesture in
+                print(#function, #line, "#3" )
                 vc.setFoucsDate()
                 vc.calendar.handleScopeGesture(gesture)
                 vc.handleEmptyMonthEvent()
@@ -252,22 +278,15 @@ extension CalendarViewController: FSCalendarDataSource {
 extension CalendarViewController: FSCalendarDelegate {
     
     func minimumDate(for calendar: FSCalendar) -> Date {
-        var components = Date().getComponents()
-        components.month = 1
-        components.day = 1
-        let date = components.getDate() ?? Date()
-        return currentCalendar.date(byAdding: .year, value: -10, to: date) ?? Date()
+        return DateManager.getMinimumDate()
     }
     
     func maximumDate(for calendar: FSCalendar) -> Date {
-        var components = Date().getComponents()
-        components.month = 12
-        components.day = 31
-        let date = components.getDate() ?? Date()
-        return currentCalendar.date(byAdding: .year, value: 10, to: date) ?? Date()
+        return DateManager.getMaximumDate()
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        print(#function, #line)
         guard !isSystemDragging else { return }
         setPreSelectedDateWhenMonth()
         setSelectedDateWhenWeek()
@@ -496,10 +515,11 @@ extension CalendarViewController {
     
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
     private func handleEmptyMonthEvent() {
+        print(#function, #line)
         guard calendar.scope == .week,
               let preSelectedDate = preSelectedDate,
               !DateManager.isSameWeek(calendar.currentPage, preSelectedDate) else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(330), execute: {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(350), execute: {
             self.calendar.setCurrentPage(preSelectedDate, animated: true)
         })
     }
@@ -537,9 +557,7 @@ extension CalendarViewController {
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
         guard calendar.scope == .month,
-              let selectedDate = calendar.selectedDate,
-              let preSelectedDate,
-              selectedDate != preSelectedDate else { return }
+              let preSelectedDate else { return }
         calendar.select(preSelectedDate, scrollToDate: false)
     }
     
@@ -551,7 +569,7 @@ extension CalendarViewController {
     
     /// 기본값으로 첫 이벤트 preSelectedDate에 할당
     private func setDefaulsePreDate() {
-        preSelectedDate = events.first
+        preSelectedDate = events.first ?? DateManager.startOfDay(Date())
     }
 }
 

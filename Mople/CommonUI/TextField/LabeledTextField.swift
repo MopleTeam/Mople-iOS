@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class TitleTextField: UIView {
+final class LabeledTextField: UIView {
     
     // MARK: - Reactive
     public var rx_text: ControlProperty<String?> {
@@ -100,7 +100,8 @@ final class TitleTextField: UIView {
         }
         
         inputTextField.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(16)
+            make.verticalEdges.equalToSuperview()
         }
     }
     
@@ -109,7 +110,7 @@ final class TitleTextField: UIView {
     }
 }
 
-extension TitleTextField : UITextFieldDelegate {
+extension LabeledTextField : UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text, let maxCount else { return true }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
@@ -118,7 +119,7 @@ extension TitleTextField : UITextFieldDelegate {
 }
 
 // MARK: - 텍스트 설정
-extension TitleTextField {
+extension LabeledTextField {
     private func setTitle(_ title: String) {
         titleLabel.text = title
     }
@@ -134,19 +135,10 @@ extension TitleTextField {
 }
 
 // MARK: - 외부 설정
-extension TitleTextField {
+extension LabeledTextField {
     
     var text: String? {
         return inputTextField.text
-    }
-    
-    public func setLayoutMargins(inset: UIEdgeInsets = .init(top: 0, left: 16, bottom: 0, right: 16)) {
-        inputTextField.snp.remakeConstraints { make in
-            make.leading.equalToSuperview().inset(inset.left)
-            make.trailing.equalToSuperview().inset(inset.right)
-            make.top.equalToSuperview().inset(inset.top)
-            make.bottom.equalToSuperview().inset(inset.bottom)
-        }
     }
     
     public func setInputTextField(view: UIView, mode: ViewMode) {

@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import SwiftUI
 
-final class HomeButton: UIButton {
+final class CardButton: UIButton {
     
     private let buttonImage: UIImageView = {
         let view = UIImageView()
@@ -76,7 +76,7 @@ final class HomeButton: UIButton {
     }
 }
 
-extension HomeButton {
+extension CardButton {
     public func setImage(image: UIImage?) {
         buttonImage.image = image
     }

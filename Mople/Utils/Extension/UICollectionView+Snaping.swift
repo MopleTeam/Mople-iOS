@@ -29,7 +29,7 @@ extension UICollectionView {
 
 extension UICollectionView {
     
-    func verticalSnapToItem(targetContentOffset: UnsafeMutablePointer<CGPoint>,
+    func horizontalSnapToItem(targetContentOffset: UnsafeMutablePointer<CGPoint>,
                             scrollView: UIScrollView,
                             velocity: CGPoint){
         
