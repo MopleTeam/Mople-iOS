@@ -25,10 +25,8 @@ final class CalendarViewController: UIViewController, View {
     var disposeBag = DisposeBag()
 
     // MARK: - Variables
-
     /// UI에 표시됨을 방지하기 위해 임시로 선택된 날짜
     private var preSelectedDate: Date?
-
     private let currentCalendar = DateManager.calendar
     private var events: [Date] = []
     private var isSystemDragging: Bool = false
@@ -40,10 +38,18 @@ final class CalendarViewController: UIViewController, View {
     private let dateSelectionObserver: PublishRelay<SelectDate> = .init()
 
     // MARK: - Gestrue
-    private let gestureObserver: Observable<UIPanGestureRecognizer> // 상위뷰에서 들어오는 제스처
-    private var startCalendarOffset: CGPoint? // 제스처 시작 시 캘린더 minX(Offset)
-    private var gestureDirection: GestureDirection? // 제스처 시작 시 방향
-    private var animationCount: Int = 0 // 가로 스크롤 시 애니메이션으로 인한 누적 초기화 방지용
+    private let gestureObserver: Observable<UIPanGestureRecognizer>
+    
+    /// 제스처 시작 시 캘린더 minX(Offset)
+    private var startCalendarOffset: CGPoint?
+    private var gestureDirection: GestureDirection? {
+        didSet {
+            print(#function, #line, "# 26 제스처 상태요! : \(gestureDirection)" )
+        }
+    }
+    
+    /// 가로 스크롤 시 애니메이션으로 인한 누적 초기화 방지용
+    private var animationCount: Int = 0
 
     // MARK: - UI Components
     public let calendar: FSCalendar = {
@@ -499,6 +505,7 @@ extension CalendarViewController {
 
     /// 세로 스크롤 핸들링
     private func handleVerticalGestrueWhenMonth(_ gesture: UIPanGestureRecognizer) {
+        guard gestureDirection != nil else { return }
         switch gesture.state {
         case .began:
             self.setFoucsDate()
@@ -516,6 +523,7 @@ extension CalendarViewController {
     /// 가로 스크롤 핸들링
     private func handleHorizontalGestrueWhenMonth(gesture: UIPanGestureRecognizer,
                                                   calendarCollectionView: UICollectionView) {
+        guard gestureDirection != nil else { return }
         let currentOffset = calendarCollectionView.contentOffset
         let velocity = gesture.velocity(in: self.parent?.view)
         let translation = gesture.translation(in: self.parent?.view)
