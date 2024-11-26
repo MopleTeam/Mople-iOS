@@ -50,6 +50,7 @@
 		524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* NickNameValidator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */; };
+		525433F62CF5D90B0074C4F5 /* backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525433F52CF5D90B0074C4F5 /* backup.swift */; };
 		5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */; };
 		5259B00A2C9C5C81006B2711 /* DefaultNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0092C9C5C81006B2711 /* DefaultNavigationBar.swift */; };
 		5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B00C2C9FD316006B2711 /* ScheduleTableViewController.swift */; };
@@ -96,7 +97,6 @@
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
 		5285E6C82CDB333600B855CB /* SimpleGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C72CDB333600B855CB /* SimpleGroup.swift */; };
 		5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */; };
-		5285E6D02CDB3CB300B855CB /* Date+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */; };
 		5285E6D32CDB505500B855CB /* LocationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D22CDB505500B855CB /* LocationInfo.swift */; };
 		5285E6D52CDB505F00B855CB /* WeatherInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D42CDB505F00B855CB /* WeatherInfo.swift */; };
 		5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */; };
@@ -170,7 +170,6 @@
 		52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */; };
 		52E238482C7733320066C9A3 /* AppNetWorkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E238472C7733320066C9A3 /* AppNetWorkService.swift */; };
 		52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */; };
-		52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */; };
 		52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */; };
 		52E99EE92CA1B3EA007E552C /* SchedulTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */; };
 /* End PBXBuildFile section */
@@ -218,6 +217,7 @@
 		524E33D02C804C7A004B15FC /* NickNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NickNameValidator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponseDTO.swift; sourceTree = "<group>"; };
+		525433F52CF5D90B0074C4F5 /* backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = backup.swift; sourceTree = "<group>"; };
 		5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthPickerViewController.swift; sourceTree = "<group>"; };
 		5259B0092C9C5C81006B2711 /* DefaultNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNavigationBar.swift; sourceTree = "<group>"; };
 		5259B00C2C9FD316006B2711 /* ScheduleTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewController.swift; sourceTree = "<group>"; };
@@ -260,7 +260,6 @@
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5285E6C72CDB333600B855CB /* SimpleGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleGroup.swift; sourceTree = "<group>"; };
 		5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ConvertDate.swift"; sourceTree = "<group>"; };
-		5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Convert.swift"; sourceTree = "<group>"; };
 		5285E6D22CDB505500B855CB /* LocationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfo.swift; sourceTree = "<group>"; };
 		5285E6D42CDB505F00B855CB /* WeatherInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherInfo.swift; sourceTree = "<group>"; };
 		5285E6D72CDC2F2C00B855CB /* CommonScheduleDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonScheduleDTO.swift; sourceTree = "<group>"; };
@@ -329,7 +328,6 @@
 		52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 		52E238472C7733320066C9A3 /* AppNetWorkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNetWorkService.swift; sourceTree = "<group>"; };
 		52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObservableType+Pairwise.swift"; sourceTree = "<group>"; };
-		52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+Convert.swift"; sourceTree = "<group>"; };
 		52E99EE52CA1A5B6007E552C /* SimpleScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleScheduleView.swift; sourceTree = "<group>"; };
 		52E99EE82CA1B3EA007E552C /* SchedulTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulTableHeaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -986,8 +984,6 @@
 				5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */,
 				5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */,
 				5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */,
-				5285E6CF2CDB3CB300B855CB /* Date+Convert.swift */,
-				52E8E4512CA44D4E007A5447 /* DateComponents+Convert.swift */,
 				52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */,
 				52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */,
 				52CE87C22CEC38D100EBD85D /* String+Validator.swift */,
@@ -1104,6 +1100,7 @@
 			isa = PBXGroup;
 			children = (
 				52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */,
+				525433F52CF5D90B0074C4F5 /* backup.swift */,
 				52C0F8BA2C9479AF0080CA65 /* Cell */,
 			);
 			path = CalendarView;
@@ -1557,7 +1554,6 @@
 				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
 				5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */,
 				5285E6E72CDCB34900B855CB /* SimpleGroupDTO.swift in Sources */,
-				52E8E4522CA44D4E007A5447 /* DateComponents+Convert.swift in Sources */,
 				52CE87C52CEC38E400EBD85D /* GroupTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
@@ -1565,6 +1561,7 @@
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */,
+				525433F62CF5D90B0074C4F5 /* backup.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
 				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
@@ -1572,7 +1569,6 @@
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
-				5285E6D02CDB3CB300B855CB /* Date+Convert.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,

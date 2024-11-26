@@ -21,7 +21,7 @@ final class YearMonthPickerViewController: UIViewController, View {
     private let selectedDateObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - Variables
-    private let today = DateManager.today.getComponents()
+    private let today = DateManager.todayComponents
     private lazy var selectedDate: DateComponents = today
     
     private lazy var years: [Int] = {

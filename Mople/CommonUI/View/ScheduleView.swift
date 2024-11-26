@@ -23,6 +23,12 @@ struct ScheduleViewModel {
         
         return "\(participantCount)명 참여"
     }
+    
+    var dateString: String? {
+        guard let date else { return nil }
+        
+        return DateManager.toString(date: date, format: .full)
+    }
 }
 
 extension ScheduleViewModel {
@@ -140,7 +146,7 @@ final class ScheduleView: UIView {
         self.titleLabel.text = viewModel.title
         
         self.countInfoLabel.text = viewModel.participantCountString
-        self.dateInfoLabel.text = viewModel.date.convertString(format: .full)
+        self.dateInfoLabel.text = viewModel.dateString
         self.placeInfoLabel.text = viewModel.detailAddress
         
         self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))

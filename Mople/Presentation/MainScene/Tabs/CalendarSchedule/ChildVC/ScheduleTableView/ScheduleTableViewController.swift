@@ -19,6 +19,7 @@ final class ScheduleTableViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
+    // isSystemDragging 주간 달력을 넘기거나, 선택 시 스크롤 애니메이션(true)로 진행되는데 이 때, 스크롤 되면서 선택되는 것을 방지하기 위함
     private var isSystemDragging = false
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
     private var sectionModels: [ScheduleTableSectionModel] = []
@@ -124,15 +125,10 @@ final class ScheduleTableViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        // 테이블뷰 스크롤 시 캘린더에서 선택되는 날짜들이 다시 테이블로 넘어오는 것을 방지
         self.tableView.rx.willBeginDragging
             .do(onNext: { _ in self.isSystemDragging = false })
             .map({ _ in true })
-            .asDriver(onErrorJustReturn: true)
-            .drive(userInteractingObserver)
-            .disposed(by: disposeBag)
-        
-        self.tableView.rx.didEndDragging
-            .map({ _ in false })
             .asDriver(onErrorJustReturn: true)
             .drive(userInteractingObserver)
             .disposed(by: disposeBag)

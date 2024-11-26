@@ -7,9 +7,17 @@
 
 import Foundation
 
+enum DateStringFormat {
+    case full
+    case simple
+}
+
 final class DateManager {
     
     static let today = Date()
+    static var todayComponents: DateComponents {
+       self.toDateComponents(today)
+    }
     
     static let calendar: Calendar = {
         var calendar = Calendar.current
@@ -42,19 +50,19 @@ final class DateManager {
 
 extension DateManager {
     static func getMinimumDate() -> Date {
-        var components = today.getComponents()
+        var components = self.todayComponents
         components.month = 1
         components.day = 1
-        let firstDate = components.getDate() ?? Date()
+        let firstDate = self.toDate(components) ?? Date()
         return calendar.date(byAdding: .year, value: -10, to: firstDate) ?? Date()
     }
     
     static func getMaximumDate() -> Date {
-        var components = today.getComponents()
+        var components = self.todayComponents
         components.month = 12
         components.day = 31
-        let firstDate = components.getDate() ?? Date()
-        return calendar.date(byAdding: .year, value: 10, to: firstDate) ?? Date()
+        let lastDate = self.toDate(components) ?? Date()
+        return calendar.date(byAdding: .year, value: 10, to: lastDate) ?? Date()
     }
     
 }
@@ -85,12 +93,6 @@ extension DateManager {
         return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
     }
     
-    #warning("사용하지 않음, 정리용")
-    // 두 날짜를 미래, 과거, 같음으로 비교 가능
-    static func checkDateStatus(_ date: Date) -> ComparisonResult {
-        return  calendar.compare(date, to: .now, toGranularity: .day)
-    }
-    
     static func numberOfDaysBetween(_ date: Date) -> Int {
         let now = startOfDay(.now)
         let scheduleDate = startOfDay(date)
@@ -98,4 +100,34 @@ extension DateManager {
         return result.day ?? 0
     }
 }
+
+// MARK: - 전환
+extension DateManager {
+    static func toDateComponents(_ date: Date) -> DateComponents {
+        return DateManager.calendar.dateComponents([.year, .month, .day], from: date)
+    }
+    
+    static func toDate(_ dateComponents: DateComponents) -> Date? {
+        return DateManager.calendar.date(from: dateComponents)
+    }
+    
+    static func toString(date: Date,
+                         format: DateStringFormat) -> String? {
+        switch format {
+        case .full:
+            return DateManager.detailDateFormatter.string(from: date)
+        case .simple:
+            return DateManager.simpleDateFormatter.string(from: date)
+        }
+    }
+}
+
+// MARK: - 추출
+extension Date {
+    func getHours() -> Int {
+        return DateManager.calendar.dateComponents([.hour], from: self).hour ?? 0
+    }
+}
+
+
 

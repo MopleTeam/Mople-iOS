@@ -25,21 +25,13 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     // MARK: - Variables
     var disposeBag = DisposeBag()
     
-    private let currentCalendar = DateManager.calendar
-    private lazy var todayComponents = {
-        var components = Date().getComponents()
-        return components
-    }()
-    
     // MARK: - Observer
     private let scopeObserver: PublishSubject<Void> = .init()
-    private let testScopeObserver: PublishSubject<Void> = .init()
-    private let gsetrueTestScopeObserver: PublishSubject<CalendarViewController.pageChangeType> = .init()
     private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
-    private let gestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
+    private let verticalGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
         
     // MARK: - UI Components
     private let headerButton: UIButton = {
@@ -64,7 +56,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(reactor: reactor!,
-                                                  gestureObserver: gestureObserver)
+                                                  verticalGestureObserver: verticalGestureObserver)
         
         calendarView.view.layer.cornerRadius = 16
         calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -86,7 +78,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     // MARK: - Gesture
     private lazy var scopeGesture: UIPanGestureRecognizer = {
         [unowned self] in
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handleScopeGesture(_:)))
+        let panGesture = UIPanGestureRecognizer()
         panGesture.delegate = self
         panGesture.minimumNumberOfTouches = 1
         panGesture.maximumNumberOfTouches = 2
@@ -123,7 +115,7 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         setupNavi()
         setLayout()
         setContainer()
-        setHeaderDate()
+        setHeaderLabel(DateManager.todayComponents)
     }
     
     private func setupNavi() {
@@ -190,10 +182,6 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         }
     }
     
-    private func setHeaderDate() {
-        setHeaderLabel(date: Date().getComponents())
-    }
-    
     // MARK: - Binding
     func bind(reactor: CalendarViewReactor) {
         inputBind(reactor)
@@ -220,8 +208,8 @@ final class CalendarScheduleViewController: DefaultViewController, View {
         reactor.pulse(\.$changedPage)
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vc, date in
-                vc.setHeaderLabel(date: date)
+            .subscribe(with: self, onNext: { vc, dateComponents in
+                vc.setHeaderLabel(dateComponents)
             })
             .disposed(by: disposeBag)
         
@@ -235,14 +223,6 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     }
     
     private func outputBind(_ reactor: Reactor) {
-        
-        self.scopeObserver
-            .debounce(.milliseconds(100), scheduler: MainScheduler.instance)
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .gesture) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         self.rightItemEvent
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
@@ -261,181 +241,20 @@ final class CalendarScheduleViewController: DefaultViewController, View {
             .map { Reactor.Action.requestPresentEvent(lastRecentDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        self.testScopeObserver
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
     private func setAction() {
-        self.gsetrueTestScopeObserver
-            .subscribe(with: self, onNext: { vc, type in
-                vc.calendarView.handlePageChange(type)
-            })
-            .disposed(by: disposeBag)
-        
         headerButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.presentDatePicker()
             })
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: - Gesture Setup
-    
-    // month
-    // - y : 0 보다 작을 때 (위로 제스처) 스코프 전환
-    // - x
-    //    제스처 시작
-    //      - 캘린더(컬렉션 뷰) contentOffset 조정
-    //    제스처 끝 (가속도)
-    //      - 0 이상이라면 다음 달
-    //      - 0 이하라면 이전 달
-    //      - 0이라면 이동거리 계산 (이동거리 절댓값 비교 후 크기의 반 이상이라면 이동)
-    // week
-    // - x
-    //    제스처 끝 (이동거리 (적절 값 계산해보기) 계산 후
-    //    가속도는 ended 지점에서 핸들링하기가 부적절
-    //    - 좌측에서 우측으로 제스처를 취했지만 때는 순간 약간 좌측으로 쏠리면 가속도가 -로 나옴
-    
-    var isHorizonGesture: Bool = false {
-        didSet {
-            print(#function, #line, "#7 가로 스크롤 중입니까? : \(isHorizonGesture)" )
-        }
-    }
-    
-    var isVerticalGesture: Bool = false {
-        didSet {
-            print(#function, #line, "#7 세로 스크롤 중입니까? : \(isVerticalGesture)" )
-        }
-    }
-    
-    var startCalendarOffset: CGPoint? {
-        didSet {
-            print(#function, #line, "캘린더 시작 위치 : \(startCalendarOffset?.x ?? 0)" )
-        }
-    }
-    
-    @objc private func handleScopeGesture(_ gesture: UIPanGestureRecognizer) {
-        print(#function, #line)
-        let velocity = self.scopeGesture.velocity(in: self.view)
-        let translation = self.scopeGesture.translation(in: self.view)
-        // 수직 스크롤 가속도가 수평 스크롤 가속도보다 높은지
-        let isPanningVertically = abs(velocity.y) > abs(velocity.x)
         
-        
-        // 수직
-//        let isVerticalDistance = abs(translation.y) > abs(translation.x)
-        
-        
-        
-        if reactor!.currentState.scope == .month {
-
-            // isPanningVertically로 수직스크롤 여부를 판단
-            // !isHorizonGesture 는 대각선으로 스크롤 시 Y값이 높아지는 순간을 방지하기 위해서 (보험 이미 수평 스크롤이라면 수직 스크롤을 막음)
-            // isVerticalGesture 는 대각선으로 스크롤 시 X값이 높아지는 순간을 방지하기 위해서 (보험, 이미 수직 스크롤이라면 수평 스크롤 로직을 막음)
-            if isVerticalGesture || !isHorizonGesture && isPanningVertically {
-                print(#function, #line, "#5 gestrue state : \(gesture.state)" )
-                if !isVerticalGesture {
-                    isVerticalGesture = true
-                }
-                self.handleMonthToWeekTransition(gesture: gesture)
-                if gesture.state == .ended {
-                    isVerticalGesture = false
-                    print(#function, #line, "#7 세로 스크롤 끝" )
-                }
-                
-            } else {
-                guard !isVerticalGesture else { return }
-                print(#function, #line, "#5 gestrue state : \(gesture.state)" )
-                let currentOffset = self.calendarView.calendar.collectionView.contentOffset
-                
-                if !isHorizonGesture {
-                    isHorizonGesture = true
-                    startCalendarOffset = currentOffset
-                }
-                
-                let destinationsOffset = CGPoint(x: currentOffset.x - translation.x, y: currentOffset.y)
-                self.calendarView.calendar.collectionView.contentOffset = destinationsOffset
-                print(#function, #line, "#7 가로 스크롤 진행중 : \(destinationsOffset.x)" )
-                scopeGesture.setTranslation(.zero, in: self.view)
-                if gesture.state == .ended {
-                    let calendar = self.calendarView.calendar.collectionView!
-                    let startOffsetX = startCalendarOffset?.x ?? 0
-                    let thresholdDistance = calendar.bounds.width * 0.5
-                    let distanceX = currentOffset.x - (startOffsetX)
-                    let velocityX = scopeGesture.velocity(in: self.view).x
-                    print(#function, #line, "#9 캘린더 너비: \(calendar.bounds.width)" )
-                    print(#function, #line, "#9 이동거리 : \(distanceX), thresholde: \(thresholdDistance)" )
-                    print(#function, #line, "#9 가속도 : \(velocityX)" )
-                    if abs(distanceX) >= thresholdDistance || abs(velocityX) > VelocityThreshold.thresholdVelocity {
-                        let paging: CalendarViewController.pageChangeType = startOffsetX < currentOffset.x ? .next : .previous
-                        gsetrueTestScopeObserver.onNext(paging)
-                        print(#function, #line, "#9 페이징 처리" )
-                    } else {
-                        print(#function, #line, "#9 : 원래페이지로 돌아가" )
-                        guard let startCalendarOffset else { return }
-                        self.calendarView.calendar.collectionView.setContentOffset(startCalendarOffset, animated: true)
-                    }
-                    
-                    isHorizonGesture = false
-//                    else {
-//                        guard abs(velocityX) > VelocityThreshold.thresholdVelocity else { return }
-//                        if velocityX > 0 {
-//                            print(#function, #line, "#9 가속도로 인한 이전 페이징" )
-//                        } else {
-//                            print(#function, #line, "#9 가속도로 인한 다음 페이징" )
-//                        }
-//                    }
-                    // 이동거리가 뷰의 반을 넘었다면 FS캘린더 내부로직으로 뷰를 넘겨줌 (자체적으로 page 셋팅해야함)
-                    // 이동거리가 반이 넘지 않았을 땐 가속도를 체크해서 0이상이면 자체적으로 뷰를 넘겨줌 (셋팅 필요 X)
-                }
-                
-                // 캘린더
-                //
-                //
-                //                    // 제스처로 인한 스크롤이 끝난 지점
-                //
-                //
-                //                    // 캘린더 가로 사이즈
-                //
-                //
-                //                    // 이동거리 파악
-                //
-                //
-                //
-                //                    print(#function, #line, "currentOffsetX : \(currentOffsetX), calendarWidth : \(calendarWidth), distanceX : \(distanceX), threshHold: \(thresholde)" )
-                //
-                //                    if abs(distanceX) > halfWidth {
-                //                        self.calendarView.handlePageChange(.current)
-                //                        if distanceX > 0 {
-                //
-                //                        }
-                //                    }
-                
-                
-                
-            }
-        } else {
-            switch gesture.state {
-            case .ended:
-                self.handleWeekToMonthTransition(translation.x)
-            default: break
-            }
-        }
-    }
-    
-    private func handleMonthToWeekTransition(gesture: UIPanGestureRecognizer) {
-        self.scopeObserver.onNext(())
-        self.gestureObserver.onNext(gesture)
-    }
-    
-    private func handleWeekToMonthTransition(_ distance: Double) {
-        guard distance > DistanceThreshold.weekToMonthDistance else { return }
-        testScopeObserver.onNext(())
+        scopeGesture.rx.event
+            .asDriver()
+            .drive(verticalGestureObserver)
+            .disposed(by: disposeBag)
     }
     
     private func setGesture() {
@@ -490,7 +309,6 @@ extension CalendarScheduleViewController {
 // MARK: - UI Update
 extension CalendarScheduleViewController {
     private func updateCalendarView(_ height: CGFloat) {
-        print(#function, #line, "height : \(height)" )
         UIView.animate(withDuration: 0.33) {
             self.calendarContainer.snp.updateConstraints { make in
                 make.height.equalTo(height)
@@ -501,12 +319,13 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        print(#function, #line)
         UIView.animate(withDuration: 0.33) {
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)
             self.hideScheduleListTableView(scope: scope)
+            
+            self.view.layoutIfNeeded()
         }
     }
     
@@ -540,9 +359,9 @@ extension CalendarScheduleViewController {
         self.hideBaritem(type: .left, isHidden: isScopeMonth)
     }
     
-    private func setHeaderLabel(date: DateComponents) {
-        let year = date.year ?? 2024
-        let monty = date.month ?? 1
+    private func setHeaderLabel(_ dateComponents: DateComponents) {
+        let year = dateComponents.year ?? 2020
+        let monty = dateComponents.month ?? 01
         header.text = "\(year)년 \(monty)월"
     }
 }
@@ -568,6 +387,7 @@ extension CalendarScheduleViewController {
         presentEventObserver.accept(nil)
     }
 }
+
 
 
 

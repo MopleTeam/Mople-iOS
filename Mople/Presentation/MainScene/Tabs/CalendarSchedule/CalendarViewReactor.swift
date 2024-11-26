@@ -11,6 +11,7 @@ import UIKit
 final class CalendarViewReactor: Reactor {
     
     typealias SelectDate = CalendarViewController.SelectDate
+    typealias ScopeChangeType = CalendarViewController.ScopeChangeType
     
     enum Action {
         case fetchData
