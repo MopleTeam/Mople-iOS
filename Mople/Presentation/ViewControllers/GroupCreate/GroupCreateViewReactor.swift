@@ -74,7 +74,7 @@ extension GroupCreateViewReactor {
         let loadStart = Observable.just(Mutation.setLoading(isLoad: true))
         
         #warning("오류 발생 시 문제 해결")
-        let makeGroup = createGroupImpl.createGroup(title: title!, image: image?.jpegData(compressionQuality: 0.7))
+        let makeGroup = createGroupImpl.createGroup(title: title!, image: image)
             .asObservable()
             .map { _ in Mutation.madeGroup }
             .catch { err in .just(.notifyMessage(message: "오류 발생")) }
@@ -87,7 +87,7 @@ extension GroupCreateViewReactor {
     }
     
     private func titleValidCheck(title: String?) -> (valid: Bool, message: String) {
-        let valid = GroupTitleValidator.checkTitle(title)
+        let valid = GroupTitleValidator.validator(title)
         
         switch valid {
         case .success:

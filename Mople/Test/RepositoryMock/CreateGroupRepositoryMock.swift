@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class CreateGroupRepositoryMock: CreateGroupRepository {
+final class CreateGroupRepositoryMock: CreateGroupRepo {
     func makeGroup(title: String, imagePath: String?) -> Single<Void> {
         return Single.just(())
     }

@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
-protocol ImageUploadRepository {
-    func uploadImage(image: Data?) -> Single<String?>
+protocol ImageUploadRepo {
+    func uploadImage(image: Data, path: ImageUploadPath) -> Single<Data>
 }
+

@@ -28,27 +28,27 @@ final class LoginSceneDIContainer: LoginSceneDependencies {
 // MARK: - Login
 extension LoginSceneDIContainer {
     
-    func makeLoginViewController(action: LoginAction) -> LoginViewController {
+    func makeLoginViewController(action: SignInAction) -> SignInViewController {
         let reacotr = makeLoginViewReacotr(action)
-        let loginView = LoginViewController(reactor: reacotr)
+        let loginView = SignInViewController(reactor: reacotr)
         setAppleLoginProvider(loginView)
         return loginView
     }
     
     #warning("Mock")
-    private func makeLoginViewReacotr(_ action: LoginAction) -> LoginViewReactor {
-        return LoginViewReactor(loginUseCase: makeUserLoginImpl(),
+    private func makeLoginViewReacotr(_ action: SignInAction) -> SignInViewReactor {
+        return SignInViewReactor(loginUseCase: makeUserLoginUseCase(),
                                 loginAction: action)
     }
     
-    private func makeUserLoginImpl() -> UserLogin {
-        return UserLoginImpl(appleLoginService: appleLoginService,
+    private func makeUserLoginUseCase() -> SignIn {
+        return SignInUseCase(appleLoginService: appleLoginService,
                              kakaoLoginService: kakaoLoginService,
-                             userRepository: makeLoginRepository())
+                             signInRepo: makeSignInRepository())
     }
     
-    private func makeLoginRepository() -> LoginRepository {
-        return DefaultLoginRepository(networkService: appNetworkService)
+    private func makeSignInRepository() -> SignInRepo {
+        return DefaultSignInRepo(networkService: appNetworkService)
     }
     
     private func setAppleLoginProvider(_ view: UIViewController) {
@@ -58,18 +58,45 @@ extension LoginSceneDIContainer {
 
 // MARK: - Profile Setup
 extension LoginSceneDIContainer {
-    func makeProfileCreateViewController(action: ProfileSetupAction) -> ProfileCreateViewController {
-        return ProfileCreateViewController(reactor: makeProfileSetupReactor(action))
+    func makeSignUpViewController(socialAccountInfo: SocialAccountInfo,
+                                         action: SignUpAction) -> SignUpViewController {
+        return SignUpViewController(profileSetupReactor: makeProfileSetupReactor(),
+                                    signUpReactor: makeSignUpReactor(socialAccountInfo: socialAccountInfo,
+                                                                     action: action))
     }
     
+    private func makeSignUpReactor(socialAccountInfo: SocialAccountInfo,
+                                   action: SignUpAction) -> SignUpViewReactor {
+        return .init(socialAccountInfo: socialAccountInfo,
+                                      signUpUseCase: makeSignUpUseCase(),
+                                      completedAction: action)
+    }
     
-    /// Profile Setup 과정에서는 추가로 필요한 비즈니스 로직이 없음으로 ViewModel이 Repository를 직접 사용
-    private func makeProfileSetupReactor(_ action: ProfileSetupAction) -> ProfileFormViewReactor {
-        return ProfileFormViewReactor(profileRepository: ProfileRepositoryMock(),
-                                       completedAction: action)
+    private func makeSignUpUseCase() -> SignUp {
+        return SignUpUseCase(imageUploadRepo: makeImageUploadRepo(),
+                             signUpRepo: makeSignUpRepo())
     }
 
-    private func makeProfileRepository() -> ProfileRepository {
-        return DefaultProfileRepository(networkService: appNetworkService)
+    private func makeImageUploadRepo() -> ImageUploadRepo {
+        return DefaultImageUploadRepo(networkServbice: appNetworkService)
+    }
+    
+    private func makeSignUpRepo() -> SignUpRepo {
+        return DefaultSignUpRepo(networkService: appNetworkService)
+    }
+}
+
+// MARK: - 프로필 셋업 Reactor
+extension LoginSceneDIContainer {
+    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
+        return .init(useCase: makeValidatorNicknameUsecase())
+    }
+    
+    private func makeValidatorNicknameUsecase() -> ValidatorNickname {
+        return ValidatorNicknameUseCase(repo: makeNicknameValidatorRepo())
+    }
+    
+    private func makeNicknameValidatorRepo() -> NicknameValidationRepo {
+        return DefaultNicknameValidationRepo(networkService: appNetworkService)
     }
 }

@@ -12,10 +12,17 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileCreateViewController: UIViewController, View {
-    typealias Reactor = ProfileFormViewReactor
+class SignUpViewController: UIViewController, View {
+    typealias Reactor = SignUpViewReactor
     
     var disposeBag = DisposeBag()
+    
+    // MARK: - Sub Reactor
+    let profileSetupReactor: ProfileSetupViewReactor
+    
+    // MARK: - Observable
+    private let completionObservable: PublishSubject<(nickname: String, image: UIImage?)> = .init()
+    private let loadingObservable: PublishSubject<Bool> = .init()
     
     // MARK: - UI Components
     private let mainTitle: UILabel = {
@@ -31,7 +38,9 @@ class ProfileCreateViewController: UIViewController, View {
     
     private lazy var profileSetupView: ProfileSetupViewController = {
         let viewController = ProfileSetupViewController(type: .create,
-                                                       reactor: reactor!)
+                                                        reactor: profileSetupReactor,
+                                                        lodingObserver: loadingObservable.asObserver(),
+                                                        completionObserver: completionObservable.asObserver())
         return viewController
     }()
     
@@ -44,8 +53,10 @@ class ProfileCreateViewController: UIViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: ProfileFormViewReactor) {
-        defer { self.reactor = reactor }
+    init(profileSetupReactor: ProfileSetupViewReactor,
+         signUpReactor: SignUpViewReactor) {
+        self.profileSetupReactor = profileSetupReactor
+        defer { self.reactor = signUpReactor }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -54,7 +65,6 @@ class ProfileCreateViewController: UIViewController, View {
     }
     
     override func viewDidLoad() {
-        print("ViewDidLoad 시점")
         super.viewDidLoad()
         setupUI()
     }
@@ -97,11 +107,28 @@ class ProfileCreateViewController: UIViewController, View {
     }
     
     // MARK: - Binding
-    func bind(reactor: ProfileFormViewReactor) {
-        
+    func bind(reactor: SignUpViewReactor) {
         rx.viewWillAppear
             .map { _ in Reactor.Action.getRandomNickname }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        loadingObservable
+            .map({ Reactor.Action.setLoading(isLoad: $0) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        completionObservable
+            .map { Reactor.Action.singUp(name: $0.nickname, image: $0.image) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$randomName)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, nickname in
+                vc.profileSetupView.setRandomNickname(nickname)
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
@@ -112,11 +139,10 @@ class ProfileCreateViewController: UIViewController, View {
     }
 }
 
-extension Reactive where Base: ProfileCreateViewController {
+extension Reactive where Base: SignUpViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
             vc.indicator.rx.isAnimating.onNext(isLoading)
-            vc.view.isUserInteractionEnabled = !isLoading
         }
     }
 }

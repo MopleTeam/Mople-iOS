@@ -17,16 +17,67 @@ final class KeyChainService {
     private(set) static var cachedToken: Token?
     
     enum Key: String {
-        case service = "com.Side.GroupManager"
-        case account = "userToken"
+        case service = "com.moim.moimtable"
+        case token = "userToken"
+        case email = "email"
     }
+}
 
+// MARK: - Apple Email 관리
+extension KeyChainService {
+    func saveEmail(_ email: String) {
+        guard let emailData = email.data(using: .utf8) else { return }
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Key.service.rawValue,
+            kSecAttrAccount as String: Key.email.rawValue,
+            kSecValueData as String: emailData,
+            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+        ]
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
+    }
+    
+    func getEmail() -> String? {
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Key.service.rawValue,
+            kSecAttrAccount as String: Key.email.rawValue,
+            kSecReturnData as String: true  // 데이터 반환 요청
+        ]
+        
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+
+        guard status == errSecSuccess,
+              let data = item as? Data,
+              let email = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+
+        return email
+    }
+    
+    func deleteEmail() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Key.service.rawValue,
+            kSecAttrAccount as String: Key.email.rawValue
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+}
+
+// MARK: - JWT 토큰 관리
+extension KeyChainService {
     func saveToken(_ tokens: Data) {
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Key.service.rawValue,
-            kSecAttrAccount as String: Key.account.rawValue,
+            kSecAttrAccount as String: Key.token.rawValue,
             kSecValueData as String: tokens
         ]
         
@@ -38,6 +89,8 @@ final class KeyChainService {
               let token = try? JSONDecoder().decode(Token.self, from: tokens) else {
             return
         }
+        
+        print(#function, #line, "token info : \(token)" )
                 
         Self.cachedToken = token
     }
@@ -50,7 +103,7 @@ final class KeyChainService {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Key.service.rawValue,
-            kSecAttrAccount as String: Key.account.rawValue,
+            kSecAttrAccount as String: Key.token.rawValue,
             kSecReturnData as String: true  // 데이터 반환 요청
         ]
         
@@ -72,7 +125,7 @@ final class KeyChainService {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Key.service.rawValue,
-            kSecAttrAccount as String: Key.account.rawValue
+            kSecAttrAccount as String: Key.token.rawValue
         ]
         SecItemDelete(query as CFDictionary)
     }

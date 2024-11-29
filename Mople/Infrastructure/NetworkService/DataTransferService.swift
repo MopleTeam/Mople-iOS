@@ -8,16 +8,11 @@
 import Foundation
 import RxSwift
 
-enum ServerError: Error {
-    case httpRespon(statusCode: Int)
-    case errRespon(message: String?)
-}
-
 enum DataTransferError: Error {
-    case noResponse
     case parsing(Error)
     case networkFailure(NetworkError)
-    case resolvedNetworkFailure(Error)
+    case httpRespon(statusCode: Int, errorResponse: ErrorResponse?)
+    case noResponse
 }
 
 protocol DataTransferService {
@@ -35,7 +30,7 @@ protocol DataTransferService {
 }
 
 protocol DataTransferErrorResolver {
-    func resolve(error: NetworkError) -> Error
+    func resolve(error: NetworkError) -> DataTransferError
 }
 
 protocol ResponseDecoder {
@@ -68,26 +63,17 @@ final class DefaultDataTransferService {
 
 extension DefaultDataTransferService: DataTransferService {
     
-    private func performBaseRequest<E: ResponseRequestable, T>(
-        endpoint: E,
-        transform: @escaping (Data?) -> Single<T>
-    ) -> Single<T> {
-        return Single.create { single in
-            let task = self.networkService.request(endpoint: endpoint)
-                .flatMap(transform)
-                .subscribe(onSuccess: { response in
-                    single(.success(response))
-                }, onFailure: { err in
-                    self.errorLogger.log(error: err)
-                    if let err = err as? NetworkError {
-                        let transferError = self.resolve(networkError: err)
-                        single(.failure(transferError))
-                    } else {
-                        single(.failure(err))
-                    }
-                })
-            return task
-        }
+    private func performBaseRequest<E: ResponseRequestable, T>(endpoint: E,
+                                                               transform: @escaping (Data?) throws -> T) -> Single<T> {
+        self.networkService.request(endpoint: endpoint)
+            .map(transform)
+            .catch { err in
+                if let err = err as? NetworkError {
+                    throw self.errorResolver.resolve(error: err)
+                } else {
+                    throw err
+                }
+            }
     }
 
     /// 리턴값이 있는 요청
@@ -95,7 +81,7 @@ extension DefaultDataTransferService: DataTransferService {
         with endpoint: E
     ) -> Single<E.Response> where E.Response: Decodable {
         return performBaseRequest(endpoint: endpoint) { data in
-            self.decode(data: data, decoder: endpoint.responseDecoder)
+            try self.decode(data: data, decoder: endpoint.responseDecoder)
         }
     }
 
@@ -103,36 +89,22 @@ extension DefaultDataTransferService: DataTransferService {
     func request<E: ResponseRequestable>(
         with endpoint: E
     ) -> Single<Void> where E.Response == Void {
-        return performBaseRequest(endpoint: endpoint) { _ in
-            .just(())
-        }
+        return performBaseRequest(endpoint: endpoint) { _ in }
     }
     
     // MARK: - Private
-    private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) -> Single<T> {
-        return Single.create(subscribe: { emitter in
-            guard let data = data else {
-                emitter(.failure(DataTransferError.noResponse))
-                return Disposables.create()
-            }
-            
-            do {
-                let result: T = try decoder.decode(data)
-                emitter(.success(result))
-            } catch {
-                self.errorLogger.log(error: error)
-                emitter(.failure(DataTransferError.parsing(error)))
-            }
-            
-            return Disposables.create()
-        })
-    }
-    
-    private func resolve(networkError error: NetworkError) -> DataTransferError {
-        let resolvedError = self.errorResolver.resolve(error: error)
-        return resolvedError is NetworkError
-        ? .networkFailure(error)
-        : .resolvedNetworkFailure(resolvedError)
+    private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) throws -> T {
+        guard let data = data, !data.isEmpty else {
+            throw DataTransferError.noResponse
+        }
+        
+        do {
+            let result: T = try decoder.decode(data)
+            return result
+        } catch {
+            self.errorLogger.log(error: error)
+            throw DataTransferError.parsing(error)
+        }
     }
 }
 
@@ -148,15 +120,13 @@ final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
 
 // MARK: - Error Resolver
 class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
-    init() { }
-    func resolve(error: NetworkError) -> Error {
+    func resolve(error: NetworkError) -> DataTransferError {
         switch error {
-        case .error(let statusCode, _):
-            return ServerError.httpRespon(statusCode: statusCode)
-        case .responseError(let err):
-            return ServerError.errRespon(message: err?.message)
-        @unknown default:
-            return error
+        case .error(let statusCode,let data):
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+            return .httpRespon(statusCode: statusCode, errorResponse: errorResponse)
+        default:
+            return .networkFailure(error)
         }
     }
 }

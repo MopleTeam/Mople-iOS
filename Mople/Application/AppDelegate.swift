@@ -7,67 +7,39 @@
 
 import UIKit
 import KakaoSDKCommon
-
+import FirebaseCore
+import KakaoSDKAuth
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        
-        if let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoKey") as? String {
-            print(#function, #line, "kakaoKey : \(appKey)" )
-            KakaoSDK.initSDK(appKey: appKey)
-        }
+        registerKakaoKey()
+        regiseterFirebase()
         return true
     }
     
-    // 서버로 디바이스 토큰을 등록
-    // User 프로필에 디바이스 토큰
-    // 디바이스 토큰이 바뀔 가능성이 있음
-    // 이를 방지하기 위해서 첫 접속시 디바이스 토큰을 같이 받아서 현재와 일치하는 지 확인
-    // 일치하지 않는다면 서버로 업데이트
+    // 알림허용 시 디바이스 토큰 발행 및 apns 서버로 업로드
+    // ios 버전 업로드, 앱 업데이트 등 디바이스 토큰 바뀌는 경우
+    // 개인 서버 사용 시 : 기존 토큰과 새로운 토큰 비교 후 변경된 경우에만 업로드
+    // 파이어베이스 사용 시 : 토큰 발행 시 자동으로 파이어베이스 업로드, 변경또한 동일
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
                 
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
         print("디바이스 토큰 확인")
         print("deviceToken:\(deviceTokenString)")
     }
-    
-
 }
 
-
-
-extension Notification.Name {
-    static let deviceTokenSaved = Notification.Name("deviceTokenSaved")
-    static let urlSaved = Notification.Name("urlSaved")
-    
-}
-
-struct TestAps: Decodable {
-    var alert: Data?
-
-    enum CodingKeys: String, CodingKey {
-        case alert
+extension AppDelegate {
+    private func registerKakaoKey() {
+        if let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoKey") as? String {
+            print(#function, #line, "kakaoKey : \(appKey)" )
+            KakaoSDK.initSDK(appKey: appKey)
+        }
     }
-}
-
-struct TestAlert: Decodable {
-    var body: String?
-    var title: String?
     
-    enum CodingKeys: String, CodingKey {
-        case body
-        case title
-    }
-}
-
-
-
-extension String {
-    var decoded: String {
-        guard let data = self.data(using: .utf8) else { return self }
-        return String(data: data, encoding: .nonLossyASCII) ?? self
+    private func regiseterFirebase() {
+        FirebaseApp.configure()
     }
 }

@@ -86,15 +86,35 @@ extension HomeViewReactor {
     
     private func checkNotificationPermission() -> Observable<Mutation> {
         
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
-            if granted {
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
+        let notificationCenter = UNUserNotificationCenter.current()
+        notificationCenter.getNotificationSettings { setting in
+            switch setting.authorizationStatus {
+            case .authorized:
+                self.registerForRemoteNotifications()
+            case .notDetermined:
+                self.requestNotificationPermission(notificationCenter)
+            default: break
             }
         }
+        requestNotificationPermission(notificationCenter)
         
         return Observable.empty()
+    }
+    
+    
+    /// 유저에게 알림 허용여부 묻기
+    private func requestNotificationPermission(_ center: UNUserNotificationCenter) {
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
+            guard granted else { return }
+            self.registerForRemoteNotifications()
+        }
+    }
+    
+    /// 앱 진입 시 디바이스 토큰 재업로드 하기
+    private func registerForRemoteNotifications() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
     }
     
     private func fetchRecentSchedules() -> Observable<Mutation> {

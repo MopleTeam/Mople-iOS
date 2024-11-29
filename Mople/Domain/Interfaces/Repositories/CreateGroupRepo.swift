@@ -8,6 +8,6 @@
 import Foundation
 import RxSwift
 
-protocol CreateGroupRepository {
+protocol CreateGroupRepo {
     func makeGroup(title: String, imagePath: String?) -> Single<Void>
 }

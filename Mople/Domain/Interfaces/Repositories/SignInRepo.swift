@@ -7,8 +7,8 @@
 import Foundation
 import RxSwift
 
-protocol LoginRepository {
-    func userLogin(platForm: LoginPlatform, authCode: String) -> Single<Void>
+protocol SignInRepo {
+    func signIn(socialAccountInfo: SocialAccountInfo) -> Single<Void>
 }
 
 

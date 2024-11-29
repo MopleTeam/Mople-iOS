@@ -9,7 +9,7 @@ import Foundation
 
 struct NickNameValidator {
     
-    enum result {
+    enum ValidatorError: Error {
         case success, empty, countUnder, countOver, strange
         
         var info: String {
@@ -28,19 +28,19 @@ struct NickNameValidator {
         }
     }
     
-    static func checkNickname(_ name: String?) -> result {
+    static func checkNickname(_ name: String?) throws {
         guard let name = name, !name.isEmpty else {
-            return .empty
+            throw ValidatorError.empty
         }
         switch name {
         case _ where name.contains(where: { $0.isWhitespace }) || !name.checkValidator():
-            return .strange
+            throw ValidatorError.strange
         case _ where name.count < 2:
-            return .countUnder
+            throw ValidatorError.countUnder
         case _ where name.count > 15:
-            return .countOver
+            throw ValidatorError.countOver
         default:
-            return .success
+            return
         }
     }
 }

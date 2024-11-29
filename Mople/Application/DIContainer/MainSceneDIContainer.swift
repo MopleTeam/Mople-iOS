@@ -86,14 +86,29 @@ extension MainSceneDIContainer {
     }
     
     // MARK: - 프로필 편집
-    func makeProfileEditViewController(previousProfile: ProfileInfo, action: ProfileSetupAction) -> ProfileEditViewController {
+    func makeProfileEditViewController(previousProfile: ProfileInfo,
+                                       action: ProfileEditAction) -> ProfileEditViewController {
         return .init(profile: previousProfile,
-                     reactor: makeProfileEditViewReactor(action))
+                     profileSetupReactor: makeProfileSetupReactor(),
+                     editProfileReactor: makeProfileEditViewReactor(action))
     }
     
-    private func makeProfileEditViewReactor(_ action: ProfileSetupAction) -> ProfileFormViewReactor {
-        return .init(profileRepository: ProfileRepositoryMock(),
+    private func makeProfileEditViewReactor(_ action: ProfileEditAction) -> ProfileEditViewReactor {
+        return .init(profileEditUseCase: makeProfileEditUseCase(),
                      completedAction: action)
+    }
+    
+    private func makeProfileEditUseCase() -> ProfileEdit {
+        return ProfileEditUseCase(imageUploadRepo: makeImageUploadRepo(),
+                                  profileEditRepo: makeProfileEditRepo())
+    }
+    
+    private func makeImageUploadRepo() -> ImageUploadRepo {
+        return DefaultImageUploadRepo(networkServbice: appNetworkService)
+    }
+    
+    private func makeProfileEditRepo() -> ProfileEditRepo {
+        return DefaultProfileEditRepo(networkService: appNetworkService)
     }
     
     
@@ -106,5 +121,20 @@ extension MainSceneDIContainer {
     
     private func makeGroupCreateViewReactor(_ action: CreateGroupAction) -> GroupCreateViewReactor {
         return .init(createGroupImpl: CreateGroupMock(), createGroupAction: action)
+    }
+}
+
+// MARK: - 프로필 셋업 Reactor
+extension MainSceneDIContainer {
+    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
+        return .init(useCase: makeValidatorNicknameUsecase())
+    }
+    
+    private func makeValidatorNicknameUsecase() -> ValidatorNickname {
+        return ValidatorNicknameUseCase(repo: makeNicknameValidatorRepo())
+    }
+    
+    private func makeNicknameValidatorRepo() -> NicknameValidationRepo {
+        return DefaultNicknameValidationRepo(networkService: appNetworkService)
     }
 }

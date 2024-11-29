@@ -38,7 +38,7 @@ extension ProfileSceneCoordinator {
     }
     
     private func presentEditView(previousProfile: ProfileInfo, completedAction: (() -> Void)?) {
-        (self.parentCoordinator as? AccountAction)?.editProfile(previousProfile, completedAction)
+        (self.parentCoordinator as? AccountAction)?.moveToProfileEditView(previousProfile, completedAction)
     }
     
     private func presentNotifyView() {

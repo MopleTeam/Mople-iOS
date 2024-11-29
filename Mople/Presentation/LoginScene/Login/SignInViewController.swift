@@ -12,9 +12,12 @@ import SnapKit
 import ReactorKit
 import AuthenticationServices
 
-final class LoginViewController: UIViewController, View {
+final class SignInViewController: UIViewController, View {
     
-    typealias Reactor = LoginViewReactor
+    typealias Reactor = SignInViewReactor
+    
+    // MARK: - Manager
+    private lazy var alertManager = AlertManager.shared
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -103,7 +106,7 @@ final class LoginViewController: UIViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: LoginViewReactor) {
+    init(reactor: SignInViewReactor) {
         defer { self.reactor = reactor }
         super.init(nibName: nil, bundle: nil)
     }
@@ -156,7 +159,7 @@ final class LoginViewController: UIViewController, View {
     }
     
     // MARK: - Binding
-    func bind(reactor: LoginViewReactor) {
+    func bind(reactor: SignInViewReactor) {
         self.appleLoginButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
@@ -167,10 +170,11 @@ final class LoginViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$errorMessage)
+        reactor.pulse(\.$message)
+            .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .subscribe(onNext: { message in
-                print("로그인 에러 발생 : \(message)")
+            .drive(with: self, onNext: { vc, message in
+                vc.alertManager.showAlert(title: "로그인 에러", message: message)
             })
             .disposed(by: disposeBag)
         
@@ -181,14 +185,14 @@ final class LoginViewController: UIViewController, View {
     }
 }
 
-extension LoginViewController: ASAuthorizationControllerPresentationContextProviding {
+extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return self.view.window!
     }
 }
 
 #warning("일반 ViewController를 사용시 중복 구현, 보완필요")
-extension Reactive where Base: LoginViewController {
+extension Reactive where Base: SignInViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
             vc.indicator.rx.isAnimating.onNext(isLoading)

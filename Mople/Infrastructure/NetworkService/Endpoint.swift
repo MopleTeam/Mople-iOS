@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import MultipartForm
 
 enum HTTPMethodType: String {
     case get     = "GET"
@@ -15,6 +16,12 @@ enum HTTPMethodType: String {
     case put     = "PUT"
     case patch   = "PATCH"
     case delete  = "DELETE"
+}
+
+enum AuthenticationType {
+    case none           // 인증 불필요
+    case accessToken    // 액세스 토큰 인증
+    case refreshToken   // 리프레시 토큰 인증
 }
 
 // Endpoint 생성 후 다른 곳으로 전달하며 사용하기에 class가 적합
@@ -34,6 +41,7 @@ class Endpoint<R>: ResponseRequestable {
     let responseDecoder: ResponseDecoder
     
     init(path: String,
+         authenticationType: AuthenticationType = .none,
          isFullPath: Bool = false,
          method: HTTPMethodType,
          headerParameters: [String: String] = [:],
@@ -42,17 +50,37 @@ class Endpoint<R>: ResponseRequestable {
          bodyParametersEncodable: Encodable? = nil,
          bodyParameters: [String: Any] = [:],
          bodyEncoder: BodyEncoder = JSONBodyEncoder(),
-         responseDecoder: ResponseDecoder = JSONResponseDecoder()) {
+         responseDecoder: ResponseDecoder = JSONResponseDecoder()) throws {
+        
         self.path = path
         self.isFullPath = isFullPath
         self.method = method
-        self.headerParameters = headerParameters
+        self.headerParameters = try Self.applyAuthentication(to: headerParameters, type: authenticationType)
         self.queryParametersEncodable = queryParametersEncodable
         self.queryParameters = queryParameters
         self.bodyParametersEncodable = bodyParametersEncodable
         self.bodyParameters = bodyParameters
         self.bodyEncoder = bodyEncoder
         self.responseDecoder = responseDecoder
+    }
+}
+
+extension Endpoint {
+    static func applyAuthentication(to headers: [String:String], type: AuthenticationType) throws -> [String:String] {
+        switch type {
+        case .none:
+            return headers
+        case .accessToken:
+            guard let token = KeyChainService.cachedToken?.accessToken else {
+                throw TokenError.noTokenError
+            }
+            let tokenHeader = ["Authorization":"Bearer \(token)"]
+            return headers.merging(tokenHeader) { current, _ in current }
+        case .refreshToken:
+            guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noTokenError }
+            let tokenHeader = ["Refresh":" \(token)"]
+            return headers.merging(tokenHeader) { current, _ in current }
+        }
     }
 }
 
@@ -129,6 +157,7 @@ extension Requestable {
         
         if !bodyParameters.isEmpty {
             urlRequest.httpBody = bodyEncoder.encode(bodyParameters)
+            print(#function, #line, "# 30 : \(urlRequest.httpBody)" )
         }
         
         urlRequest.httpMethod = method.rawValue
@@ -159,6 +188,25 @@ private extension Encodable {
 struct JSONBodyEncoder: BodyEncoder {
     func encode(_ parameters: [String: Any]) -> Data? {
         return try? JSONSerialization.data(withJSONObject: parameters)
+    }
+}
+
+struct MultipartBodyEncoder: BodyEncoder {
+    var boundary: String
+    
+    func encode(_ parameters: [String : Any]) -> Data? {
+        let parts = parameters.compactMap { (key, value) -> MultipartForm.Part? in
+            guard let data = value as? Data else { return nil }
+            return MultipartForm.Part(name: key,
+                                      data: data,
+                                      filename: "Profile",
+                                      contentType: "image/jpeg")
+        }
+        
+        let form = MultipartForm(parts: parts, boundary: boundary)
+        print(#function, #line, "# 29 form데이터 : \(form)" )
+        print(#function, #line, "# 30 formType : \(form.contentType), boundary: \(form.boundary)" )
+        return form.bodyData
     }
 }
 

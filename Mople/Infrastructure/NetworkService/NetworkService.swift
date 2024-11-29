@@ -10,11 +10,10 @@ import RxSwift
 import RxRelay
 
 enum NetworkError: Error {
-    case error(statusCode: Int, data: Data?)
     case notConnected
     case unknownError(Error?)
     case urlGeneration
-    case responseError(err: ErrorResponse?)
+    case error(statusCode: Int, data: Data)
 }
 
 protocol NetworkService {
@@ -22,9 +21,8 @@ protocol NetworkService {
 }
 
 protocol NetworkSessionManager {
-    typealias SessionResult = Single<(data: Data?,response: URLResponse?,error: Error?)>
     
-    func request(_ request: URLRequest) -> SessionResult
+    func request(_ request: URLRequest) -> Single<(response: HTTPURLResponse, data: Data)>
 }
 
 protocol NetworkErrorLogger {
@@ -38,7 +36,7 @@ protocol NetworkErrorLogger {
 final class DefaultNetworkService {
     
     // MARK: - NetworkService 기본 구성요소
-
+    
     private let config: NetworkConfigurable
     private let sessionManager: NetworkSessionManager
     private let logger: NetworkErrorLogger
@@ -54,64 +52,43 @@ final class DefaultNetworkService {
     }
     
     private func request(request: URLRequest) -> Single<Data?> {
-        
-        return Single.create { single in
-            
-            self.logger.log(request: request)
-            
-            let task = self.sessionManager.request(request)
-                .subscribe(onSuccess: { value in
-                    if let err = value.error {
-                        var error: NetworkError
-                        
-                        if let response = value.response as? HTTPURLResponse {
-                            error = .error(statusCode: response.statusCode, data: value.data)
-                        } else {
-                            error = self.resolve(error: err)
-                        }
-                        
-                        self.logger.log(error: error)
-                        single(.failure(error))
-                        return
-                    }
-                    
-                    self.logger.log(responseData: value.data)
-                    
-                    guard let httpResponse = value.response as? HTTPURLResponse else {
-                        single(.failure(NetworkError.unknownError(nil)))
-                        return
-                    }
-                    
-                    switch httpResponse.statusCode {
-                    case 400:
-                        guard let data = value.data,
-                              let responseError = try? JSONDecoder().decode(ErrorResponse.self, from: data) else {
-                            single(.failure(NetworkError.responseError(err: nil)))
-                            return
-                        }
-                        single(.failure(NetworkError.responseError(err: responseError)))
-                        return
-                    default:
-                        single(.success(value.data))
-                    }
-                })
-            
-            return task
-        }
+        self.logger.log(request: request)
+        return self.sessionManager.request(request)
+            .map { value in
+                let statusCode = value.response.statusCode
+                let data = value.data
+                switch statusCode {
+                case 200...299:
+                    return data
+                default:
+                    throw NetworkError.error(statusCode: statusCode, data: data)
+                }
+            }
+            .catch { error in
+                throw self.resolve(error: error)
+            }
     }
     
     // 응답값이 없는 경우 Error -> NetworkError 변환 후 return
     private func resolve(error: Error) -> NetworkError {
-        let code = URLError.Code(rawValue: (error as NSError).code)
-        switch code {
-        case .notConnectedToInternet: return .notConnected
-        default: return .unknownError(error)
+        switch error {
+        case let NetworkError.error(statusCode, data):
+            return .error(statusCode: statusCode, data: data)
+        case let urlError as URLError:
+            switch urlError.code {
+            case .notConnectedToInternet:
+                return .notConnected
+            default:
+                return .unknownError(error)
+            }
+        default:
+            return .unknownError(error)
         }
     }
 }
 
 extension DefaultNetworkService: NetworkService {
-
+    
     // URLRequest 생성
     func request(endpoint: Requestable) -> Single<Data?> {
         do {
@@ -127,19 +104,12 @@ extension DefaultNetworkService: NetworkService {
 final class DefaultNetworkSessionManager: NetworkSessionManager {
     
     // URLSession 생성
-    func request(_ request: URLRequest) -> SessionResult {
-        return Single.create { single in
-            
-            let task = URLSession.shared.dataTask(with: request) { data, response, err in
-                single(.success((data, response, err)))
-            }
-            
-            task.resume()
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
+    func request(_ request: URLRequest) -> Single<(response: HTTPURLResponse, data: Data)> {
+        URLSession.shared.rx.response(request: request)
+            .map({ response, data in
+                return (response, data)
+            })
+            .asSingle()
     }
 }
 
@@ -148,7 +118,7 @@ final class DefaultNetworkSessionManager: NetworkSessionManager {
 #warning("실제 출시에는 제거 및 다른 Logger 시스템을 채택해야함 (개인정보 침해)")
 final class DefaultNetworkErrorLogger: NetworkErrorLogger {
     init() { }
-
+    
     func log(request: URLRequest) {
         print("-------------")
         print("request: \(request.url!)")
@@ -159,7 +129,7 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
             printIfDebug("body: no data")
             return
         }
-                
+        
         if let jsonObject = try? JSONSerialization.jsonObject(with: httpBody, options: []) as? [String: AnyObject] {
             printIfDebug("body: \(jsonObject)")
         } else if let bodyString = String(data: httpBody, encoding: .utf8) {
@@ -168,14 +138,14 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
             printIfDebug("body: Unable to parse")
         }
     }
-
+    
     func log(responseData data: Data?) {
         guard let data = data else { return }
         if let dataDict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
             printIfDebug("responseData: \(String(describing: dataDict))")
         }
     }
-
+    
     func log(error: Error) {
         printIfDebug("\(error)")
     }
@@ -184,7 +154,7 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
 // MARK: - NetworkError extension
 
 func printIfDebug(_ string: String) {
-    #if DEBUG
+#if DEBUG
     print(string)
-    #endif
+#endif
 }

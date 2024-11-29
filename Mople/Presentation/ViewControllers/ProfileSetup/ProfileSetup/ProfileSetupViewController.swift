@@ -17,7 +17,7 @@ final class ProfileSetupViewController: UIViewController, View {
         case edit(_ previousProfile: ProfileInfo)
     }
     
-    typealias Reactor = ProfileFormViewReactor
+    typealias Reactor = ProfileSetupViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -36,7 +36,9 @@ final class ProfileSetupViewController: UIViewController, View {
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
     private let validNameObserver: BehaviorSubject<Bool?> = .init(value: nil)
-    
+    private let loadingObserver: AnyObserver<Bool>
+    private let completionObserver: AnyObserver<(nickname: String, image: UIImage?)>
+
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()
     private let backTapGesture = UITapGestureRecognizer()
@@ -113,11 +115,15 @@ final class ProfileSetupViewController: UIViewController, View {
         sv.distribution = .fill
         return sv
     }()
-
+    
     // MARK: - LifeCycle
     init(type: ViewType,
-         reactor: ProfileFormViewReactor) {
+         reactor: ProfileSetupViewReactor,
+         lodingObserver: AnyObserver<Bool>,
+         completionObserver: AnyObserver<(nickname: String, image: UIImage?)>) {
         self.viewType = type
+        self.completionObserver = completionObserver
+        self.loadingObserver = lodingObserver
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
     }
@@ -177,7 +183,7 @@ final class ProfileSetupViewController: UIViewController, View {
      }
     
     // MARK: - 외부 바인딩
-    func bind(reactor: ProfileFormViewReactor) {
+    func bind(reactor: ProfileSetupViewReactor) {
         setInput(reactor: reactor)
         setOutput(reactor: reactor)
     }
@@ -188,23 +194,9 @@ final class ProfileSetupViewController: UIViewController, View {
             .map { Reactor.Action.checkNickname(name: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        self.completionButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.setProfile(profile: self.makeProfile()) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
     }
     
     private func setOutput(reactor: Reactor) {
-        reactor.pulse(\.$randomName)
-            .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, name in
-                vc.duplicateButton.rx.isEnabled.onNext(true)
-                vc.nameTextField.rx_text.onNext(name)
-            })
-            .disposed(by: disposeBag)
-        
         reactor.pulse(\.$nameOverlap)
             .compactMap({ $0 })
             .map({ !$0 })
@@ -219,19 +211,32 @@ final class ProfileSetupViewController: UIViewController, View {
                 vc.alertManager.showAlert(message: message)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .skip(1)
+            .asDriver(onErrorJustReturn: false)
+            .drive(loadingObserver)
+            .disposed(by: disposeBag)
     }
     
     // MARK: - 내부 바인딩
     private func setBind() {
+        setAction()
         setValidBind()
         setEditImageBind()
         setEditNameBind()
         setGeestureBind()
     }
     
+    private func setAction() {
+        completionButton.rx.controlEvent(.touchUpInside)
+            .compactMap { _ in self.makeProfile() }
+            .bind(to: completionObserver)
+            .disposed(by: disposeBag)
+    }
+    
     private func setValidBind() {
         Observable.combineLatest(imageObserver, validNameObserver)
-            .do(onNext: { print(#function, #line, "valid : \($0)" ) })
             .skip(1)
             .asDriver(onErrorJustReturn: (nil, nil))
             .compactMap(checkContentValid(content:))
@@ -239,6 +244,7 @@ final class ProfileSetupViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         validNameObserver
+            .do(onNext: { print(#function, #line, "# 30 : \($0)" ) })
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isValid in
@@ -303,10 +309,21 @@ extension ProfileSetupViewController : UITextFieldDelegate {
     }
 }
 
+// MARK: - 랜덤 닉네임
+extension ProfileSetupViewController {
+    public func setRandomNickname(_ name: String) {
+        duplicateButton.rx.isEnabled.onNext(true)
+        nameTextField.rx_text.onNext(name)
+    }
+}
+
 // MARK: - 프로필 생성 및 적용
 extension ProfileSetupViewController {
-    private func makeProfile() -> (String?, UIImage?) {
-        let nickName = nameTextField.text
+    private func makeProfile() -> (String, UIImage?)? {
+        guard let nickName = nameTextField.text else {
+            alertManager.showAlert(message: "입력 정보를 확인해주세요.")
+            return nil
+        }
         let image = try? imageObserver.value()
         return (nickName, image)
     }

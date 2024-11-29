@@ -41,12 +41,12 @@ final class ProfileViewReactor: Reactor {
     
     var initialState = State()
     
-    var fetchProfileImpl: FetchProfile
+    var fetchProfileIUseCase: FetchProfile
     var viewAction: ProfileViewAction
     
-    init(editProfileUseCase: FetchProfile,
+    init(fetchProfileIUseCase: FetchProfile,
          viewAction: ProfileViewAction) {
-        self.fetchProfileImpl = editProfileUseCase
+        self.fetchProfileIUseCase = fetchProfileIUseCase
         self.viewAction = viewAction
         action.onNext(.fetchProfile)
     }
@@ -83,7 +83,7 @@ final class ProfileViewReactor: Reactor {
 
 extension ProfileViewReactor {
     private func getProfile() -> Observable<Mutation> {
-        return fetchProfileImpl.fetchProfile()
+        return fetchProfileIUseCase.fetchProfile()
             .asObservable()
             .map { Mutation.loadedProfile(profile: $0) }
     }

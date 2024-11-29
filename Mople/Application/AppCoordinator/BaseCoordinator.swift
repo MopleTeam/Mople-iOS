@@ -47,11 +47,11 @@ class BaseCoordinator: Coordinator {
 extension BaseCoordinator {
     func fadeOut(completion: (() -> Void)? = nil) {
         DispatchQueue.main.async {
-            UIView.animate(withDuration: 0.3) {
+            UIView.animate(withDuration: 0.5) {
                 UIApplication.shared.keyWindow?.layer.opacity = 0
             } completion: { _ in
                 completion?()
-                UIView.animate(withDuration: 0.3) {
+                UIView.animate(withDuration: 0.5) {
                     UIApplication.shared.keyWindow?.layer.opacity = 1
                 }
             }

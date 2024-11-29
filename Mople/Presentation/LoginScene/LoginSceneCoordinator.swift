@@ -8,8 +8,9 @@
 import UIKit
 
 protocol LoginSceneDependencies {
-    func makeLoginViewController(action: LoginAction) -> LoginViewController
-    func makeProfileCreateViewController(action: ProfileSetupAction) -> ProfileCreateViewController
+    func makeLoginViewController(action: SignInAction) -> SignInViewController
+    func makeSignUpViewController(socialAccountInfo: SocialAccountInfo,
+                                         action: SignUpAction) -> SignUpViewController
 }
 
 final class LoginSceneCoordinator: BaseCoordinator {
@@ -23,29 +24,36 @@ final class LoginSceneCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        let action = LoginAction(logIn: showProfileSetupView)
+        let action = SignInAction(toProfileSetup: showProfileSetupView,
+                                 toMain: completedSignIn)
         let vc = dependencies.makeLoginViewController(action: action)
         
         navigationController.pushViewController(vc, animated: false)
     }
-    
-    private func showProfileSetupView() {
-        let action = ProfileSetupAction(completed: completedSignIn)
-        let vc = self.dependencies.makeProfileCreateViewController(action: action)
+}
+
+// MARK: - 프로필 뷰 전환
+extension LoginSceneCoordinator {
+    private func showProfileSetupView(_ socialAccountInfo: SocialAccountInfo) {
+        let action = SignUpAction(completed: completedSignIn)
+        let vc = self.dependencies.makeSignUpViewController(socialAccountInfo: socialAccountInfo,
+                                                                   action: action)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }
 
-// MARK: - 로그인 -> 메인 뷰로 들어가기
+// MARK: - 메인 뷰 전환
 extension LoginSceneCoordinator {
     
     private func completedSignIn() {
+        print(#function, #line, "# 30 로그인 성공" )
         fadeOut { [weak self] in
             self?.clearScene()
         }
     }
     
     private func clearScene() {
+        print(#function, #line, "# 30 메인뷰로 이동" )
         self.navigationController.viewControllers = []
         self.parentCoordinator?.didFinish(coordinator: self)
         (self.parentCoordinator as? SignInListener)?.signIn()

@@ -12,20 +12,25 @@ enum TokenError: Error {
 }
 
 enum HTTPHeader {
-    case accept
-    case content
-    case both
+    static let acceptAll = ["Accept": "*/*"]
+    static let acceptJson = ["Accept": "application/json"]
+    static let contentJson = ["Content-Type": "application/json"]
     
-    var headers: [String: String] {
-        switch self {
-        case .accept:
-            return ["Accept": "application/json"]
-        case .content:
-            return ["Content-Type": "application/json"]
-        case .both:
-            return ["Accept": "application/json",
-                   "Content-Type": "application/json"]
-        }
+    static func getReceiveJsonHeader() -> [String:String] {
+        Self.acceptJson
+    }
+    
+    static func getSendAndReceiveAllHeader() -> [String:String] {
+        return Self.acceptAll.merging(Self.contentJson) { current, _ in current }
+    }
+    
+    static func getSendAndReceiveJsonHeader() -> [String:String] {
+        Self.acceptJson.merging(Self.contentJson) { current, _ in current }
+    }
+    
+    static func getMultipartFormDataHeader(_ boundary: String) -> [String:String] {
+        let multiType = ["Content-Type":"multipart/form-data; boundary=\(boundary)"]
+        return Self.acceptJson.merging(multiType) { current, _ in current }
     }
 }
 
@@ -42,73 +47,111 @@ struct APIEndpoints {
     }
 }
 
+// MARK: - FCM Token
+extension APIEndpoints {
+    static func uploadFCMToken(_ fcmToken: String) throws -> Endpoint<Void> {
+        return try Endpoint(path: "token/save",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            bodyParameters: ["token": fcmToken])
+    }
+}
+
 // MARK: - Token Refresh
 extension APIEndpoints {
-    static func reissueToken() throws -> Endpoint<String> {
-        let (authHeader, refreshParameters) = try (getAccessTokenParameters(),
-                                                   getRefreshTokenParameters())
-        
-        let headerParameters = ["Content-Type":"application/json"].merging(authHeader) { current, _ in current }
-        
-        return Endpoint(path: "auth/access-token",
-                        method: .post,
-                        headerParameters: headerParameters,
-                        bodyParameters: refreshParameters)
+    static func reissueToken() throws -> Endpoint<Data> {
+        return try Endpoint(path: "auth/recreate",
+                            authenticationType: .refreshToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            responseDecoder: RawDataResponseDecoder())
     }
 }
 
 // MARK: - Login
 extension APIEndpoints {
-    static func executeSignUp(platform: LoginPlatform, code: String) -> Endpoint<Data> {
-        return Endpoint(path: "auth/sign-up",
-                        method: .post,
-                        headerParameters: HTTPHeader.both.headers,
-                        bodyParameters: ["socialProvider": platform.rawValue,
-                                         "providerToken": code,
-                                         "deviceType": "IOS"],
-                        responseDecoder: RawDataResponseDecoder())
+    static func executeSignUp(platform: String,
+                              identityToken: String,
+                              email: String,
+                              nickname: String,
+                              imagePath: String?) -> Endpoint<Data> {
+        return try! Endpoint(path: "auth/sign-up",
+                             method: .post,
+                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                             bodyParameters: ["socialProvider": platform,
+                                              "providerToken": identityToken,
+                                              "email": email,
+                                              "nickname": nickname,
+                                              "deviceType": "IOS",
+                                              "image": imagePath ?? NSNull()],
+                             responseDecoder: RawDataResponseDecoder())
     }
-
-    static func executeSignIn(platform: LoginPlatform,
-                              code: String,
-                              userEmail: String) -> Endpoint<Data> {
-        return Endpoint(path: "auth/sign-up",
-                        method: .post,
-                        headerParameters: HTTPHeader.both.headers,
-                        bodyParameters: ["socialProvider": platform.rawValue,
-                                         "providerToken": code,
-                                         "email": userEmail],
-                        responseDecoder: RawDataResponseDecoder())
+    
+    static func executeSignIn(platform: String,
+                              identityToken: String,
+                              email: String) -> Endpoint<Data> {
+        return try! Endpoint(path: "auth/sign-in",
+                             method: .post,
+                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                             bodyParameters: ["socialProvider": platform,
+                                              "providerToken": identityToken,
+                                              "email": email],
+                             responseDecoder: RawDataResponseDecoder())
     }
 }
 
 // MARK: - Profile
 extension APIEndpoints {
+    
+    static func setupProfile(nickname: String,
+                             imagePath: String?) throws -> Endpoint<Void> {
+        return try Endpoint(path: "user/info",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["profileImg" : imagePath ?? NSNull(),
+                                             "nickname" : nickname])
+    }
+    
+    static func checkNickname(_ name: String) -> Endpoint<Data> {
+        return try! Endpoint(path: "user/nickname/duplicate",
+                             method: .get,
+                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                             queryParameters: ["nickname":name],
+                             responseDecoder: RawDataResponseDecoder())
+    }
+    
+    static func getRandomNickname() -> Endpoint<Data> {
+        return try! Endpoint(path: "user/nickname/random",
+                             method: .get,
+                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                             responseDecoder: RawDataResponseDecoder())
+    }
+}
+// MARK: - 이미지 업로드
+extension APIEndpoints {
+    static func uploadImage(_ imageData: Data, folderPath: ImageUploadPath) -> Endpoint<Data> {
+        let boundary = UUID().uuidString
+        let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
+        print(#function, #line, "# 30 초기 바운더리 : \(boundary)")
+        return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
+                             method: .post,
+                             headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
+                             bodyParameters: ["image": imageData],
+                             bodyEncoder: multipartFormEncoder,
+                             responseDecoder: RawDataResponseDecoder())
+    }
+    
+}
 
-    #warning("테스트 진행 중")
-    static func setupProfile(image: Data, nickName: String) -> Endpoint<Void> {
-//        let token = try getAccessTokenParameters()
-        
-        return Endpoint(path: "user/me",
-                        method: .patch,
-//                        headerParameters: token,
-                        bodyParameters: ["profileImg" : image, "nickname" : nickName])
-    }
-    
-    static func checkNickname(name: String) throws -> Endpoint<Bool> {
-        let token = try getAccessTokenParameters()
-        
-        return Endpoint(path: "user/nickname/\(name)/duplicated",
-                        method: .get,
-                        headerParameters: token)
-    }
-    
-    static func getRandomNickname() throws -> Endpoint<Data> {
-        let token = try getAccessTokenParameters()
-        
-        return Endpoint(path: "user/nickname/random",
-                        method: .get,
-                        headerParameters: token,
-                        responseDecoder: RawDataResponseDecoder())
+// MARK: - 파이어베이스 토큰 저장
+extension APIEndpoints {
+    static func uploadToken(fcmToken: String) throws -> Endpoint<Void> {
+        return try Endpoint(path: "token/save",
+                             authenticationType: .accessToken,
+                             method: .post,
+                             headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                             bodyParameters: ["token": fcmToken])
     }
 }

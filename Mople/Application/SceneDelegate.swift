@@ -8,7 +8,6 @@
 import UIKit
 import KakaoSDKAuth
 
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     let appDIContainer = AppDIContainer()
@@ -64,6 +63,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Url Scheme
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        print(#function, #line, "# 29" )
         guard let url = URLContexts.first?.url else { return }
         if (AuthApi.isKakaoTalkLoginUrl(url)) {
             _ = AuthController.handleOpenUrl(url: url)
@@ -114,23 +114,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 extension SceneDelegate: UNUserNotificationCenterDelegate {
-    /*
-     Background 일 때 아래의 요청과 같이 표시됨
-     "aps":{
-         "alert": {
-             "title" : "모임관리 어플",
-                  "body" : "새로운 약속이 등록되었어요!"
-         },
-         "sound":"default",
-         "badge":5
-     }
-     */
-    
-    /*
-     Foreground인 경우 아래 설정과 같이 표시됨
-     앱에 접속된 상태인데 표시하는 이유
-     이벤트 발생 여부 확인
-    */
+
+    /// Foreground(앱 실행)중 알림 수신
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -150,26 +135,19 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        print(#function, #line, "point")
-        print("Received notification: \(response.notification.request.content)")
-            print("Action identifier: \(response.actionIdentifier)")
-        
         let url = response.notification.request.content.userInfo
-        print(url)
 
-        if let apsArray = url["aps"] as? [String:Any],
-           let alert = apsArray["alert"] as? [String:String],
-           let body = alert["body"],
-           let title = alert["title"] {
-            print("\(body)")
-            print("\(title.decoded)")
-        }
-        
-        let urlString = url.reduce("Push Url") { partialResult, apsValue in
-            partialResult + "\n" + "Key : \(apsValue.key)" + "\n" + "Value : \(apsValue.value)"
-        }
+//        if let apsArray = url["aps"] as? [String:Any],
+//           let alert = apsArray["alert"] as? [String:String],
+//           let body = alert["body"],
+//           let title = alert["title"] {
+//            
+//        }
+//        
+//        let urlString = url.reduce("Push Url") { partialResult, apsValue in
+//            partialResult + "\n" + "Key : \(apsValue.key)" + "\n" + "Value : \(apsValue.value)"
+//        }
     }
 }
-
 
 

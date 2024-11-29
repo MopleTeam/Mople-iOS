@@ -1,34 +1,39 @@
 //
-//  CreateGroup.swift
-//  Group
+//  ProfileEditUseCase.swift
+//  Mople
 //
-//  Created by CatSlave on 11/19/24.
+//  Created by CatSlave on 11/28/24.
 //
 
 import UIKit
 import RxSwift
 
-protocol CreateGroup {
-    func createGroup(title: String, image: UIImage?) -> Single<Void>
+protocol ProfileEdit {
+    func editProfile(nickname: String, image: UIImage?) -> Single<Void>
 }
 
-final class CreateGroupImpl: CreateGroup {
+final class ProfileEditUseCase: ProfileEdit {
     
     let imageUploadRepo: ImageUploadRepo
-    let createGroupRepo: CreateGroupRepo
+    let profileEditRepo: ProfileEditRepo
     
     init(imageUploadRepo: ImageUploadRepo,
-         createGroupRepo: CreateGroupRepo) {
+         profileEditRepo: ProfileEditRepo) {
         self.imageUploadRepo = imageUploadRepo
-        self.createGroupRepo = createGroupRepo
+        self.profileEditRepo = profileEditRepo
     }
-    
-    func createGroup(title: String, image: UIImage?) -> Single<Void> {
+}
+
+// MARK: - Profile Edit
+extension ProfileEditUseCase {
+    func editProfile(nickname: String,
+                     image: UIImage?) -> Single<Void> {
         
         let imageData = self.convertImageToData(image)
         return self.uploadImage(imageData)
             .map { $0.isEmpty ? nil : $0 }
-            .flatMap { self.createGroupRepo.makeGroup(title: title, imagePath: $0) }
+            .flatMap { self.profileEditRepo.editProfile(nickname: nickname,
+                                                        imagePath: $0) }
     }
     
     private func uploadImage(_ data: Data?) -> Single<String> {
@@ -36,8 +41,7 @@ final class CreateGroupImpl: CreateGroup {
             guard let data else {
                 return .just("")
             }
-            
-            return self.imageUploadRepo.uploadImage(image: data, path: .meet)
+            return self.imageUploadRepo.uploadImage(image: data, path: .profile)
                 .map { String(data: $0, encoding: .utf8) ?? "" }
         }
     }

@@ -14,13 +14,13 @@ protocol MainSceneDependencies {
     func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
     func makeProfileSceneCoordinator() -> BaseCoordinator
     func makeProfileEditViewController(previousProfile: ProfileInfo,
-                                       action: ProfileSetupAction) -> ProfileEditViewController
+                                       action: ProfileEditAction) -> ProfileEditViewController
     func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController
 }
 
 protocol AccountAction {
     func signOut()
-    func editProfile(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?)
+    func moveToProfileEditView(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?)
 }
 
 private enum Route {
@@ -130,10 +130,10 @@ extension MainSceneCoordinator {
     }
 }
 
-// MARK: - 로그아웃 -> 로그인 뷰로 돌아가기
-extension MainSceneCoordinator: AccountAction {
-    func editProfile(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?) {
-        let action: ProfileSetupAction = .init {
+// MARK: - 프로필 편집화면 진입
+extension MainSceneCoordinator {
+    func moveToProfileEditView(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?) {
+        let action: ProfileEditAction = .init {
             completedAction?()
             self.navigationController.popViewController(animated: true)
         }
@@ -142,7 +142,10 @@ extension MainSceneCoordinator: AccountAction {
                                                                          action: action)
         self.navigationController.pushViewController(profileEditView, animated: true)
     }
-    
+}
+
+// MARK: - 로그아웃 -> 로그인 뷰로 돌아가기
+extension MainSceneCoordinator: AccountAction {
     /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
     func signOut() {
         fadeOut { [weak self] in

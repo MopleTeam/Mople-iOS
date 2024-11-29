@@ -42,14 +42,13 @@ final class CalendarViewController: UIViewController, View {
     
     /// 제스처 시작 시 캘린더 minX(Offset)
     private var startCalendarOffset: CGPoint?
-    private var gestureDirection: GestureDirection? {
-        didSet {
-            print(#function, #line, "# 26 제스처 상태요! : \(gestureDirection)" )
-        }
-    }
+    private var gestureDirection: GestureDirection?
     
-    /// 가로 스크롤 시 애니메이션으로 인한 누적 초기화 방지용
-    private var animationCount: Int = 0
+    /// 가로 스크롤 카운트
+    /// - 가로 스크롤 시 발생하는 0.33 애니메이션 사이에 추가로 들어오는 제스처를 제어용도
+    // 카운트는 began에서 올려줘야 함.
+    // 0.33 사이에 두번째 제스처가 들어오고 ended가 아닌 상태에서 첫번째 제스처가 끝이나면 수직 제스처가 허용되는 상황이 발생6
+    private var horizonGestureCount: Int = 0
 
     // MARK: - UI Components
     public let calendar: FSCalendar = {
@@ -198,7 +197,8 @@ final class CalendarViewController: UIViewController, View {
             .disposed(by: disposeBag)
 
         reactor.pulse(\.$switchPage)
-            .compactMap({ $0 })
+            .compactMap({ $0
+            })
             .compactMap({ DateManager.toDate($0) })
             .observe(on: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, date in
@@ -505,7 +505,6 @@ extension CalendarViewController {
 
     /// 세로 스크롤 핸들링
     private func handleVerticalGestrueWhenMonth(_ gesture: UIPanGestureRecognizer) {
-        guard gestureDirection != nil else { return }
         switch gesture.state {
         case .began:
             self.setFoucsDate()
@@ -523,13 +522,13 @@ extension CalendarViewController {
     /// 가로 스크롤 핸들링
     private func handleHorizontalGestrueWhenMonth(gesture: UIPanGestureRecognizer,
                                                   calendarCollectionView: UICollectionView) {
-        guard gestureDirection != nil else { return }
         let currentOffset = calendarCollectionView.contentOffset
         let velocity = gesture.velocity(in: self.parent?.view)
         let translation = gesture.translation(in: self.parent?.view)
 
         switch gesture.state {
         case .began:
+            horizonGestureCount += 1
             startCalendarOffset = currentOffset
         case .changed:
             handleCalendarScrollGesture(calendarCollectionView: calendarCollectionView,
@@ -586,8 +585,7 @@ extension CalendarViewController {
     /// 결과에 따라서 현재 달력으로 되돌리거나, 달력 전환을 하는 애니메이션 실행
     private func pagingResultAnimationGesture(result: PagingResult,
                                               gesture: UIPanGestureRecognizer) {
-        animationCount += 1
-        let currentCount = animationCount
+        let currentCount = horizonGestureCount
         UIView.animate(withDuration: 0.33,
                        delay: 0,
                        options: [.curveEaseOut, .allowUserInteraction],
@@ -595,9 +593,9 @@ extension CalendarViewController {
             self.handlePage(result)
             self.view.layoutIfNeeded()
         }, completion: { _ in
-            if self.animationCount == currentCount {
+            if self.horizonGestureCount == currentCount {
                 self.gestureDirection = nil
-                self.animationCount = 0
+                self.horizonGestureCount = 0
             }
         })
     }
@@ -644,7 +642,6 @@ extension CalendarViewController {
 
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
     private func handleEmptyMonthEvent() {
-        print(#function, #line)
         guard calendar.scope == .week,
               let preSelectedDate = preSelectedDate,
               !DateManager.isSameWeek(calendar.currentPage, preSelectedDate) else { return }

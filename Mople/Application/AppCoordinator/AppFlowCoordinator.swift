@@ -28,6 +28,7 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     
     override func start() {
+        _ = appDIContainer.FCMTokenManager
         self.navigationController.navigationBar.isHidden = true
         fadeOut { [weak self] in
             self?.checkEntry()
@@ -35,11 +36,11 @@ final class AppFlowCoordinator: BaseCoordinator {
     }
     
     private func checkEntry() {
-//        if KeyChainService.shared.hasToken() {
+        if KeyChainService.shared.hasToken() {
             self.mainFlowStart()
-//        } else {
-//            self.loginFlowStart()
-//        }
+        } else {
+            self.loginFlowStart()
+        }
     }
     
     private func mainFlowStart() {
@@ -63,6 +64,7 @@ extension AppFlowCoordinator: SignInListener {
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
+        KeyChainService.shared.deleteToken()
         loginFlowStart()
     }
 }

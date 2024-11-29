@@ -30,7 +30,7 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeSetupViewReactor(action: ProfileViewAction) -> ProfileViewReactor {
-        return ProfileViewReactor(editProfileUseCase: FetchProfileMock(),
+        return ProfileViewReactor(fetchProfileIUseCase: FetchProfileMock(),
                                   viewAction: action)
     }
 }

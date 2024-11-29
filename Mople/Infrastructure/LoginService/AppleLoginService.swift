@@ -11,20 +11,20 @@ import AuthenticationServices
 
 protocol AppleLoginService {
     func setPresentationContextProvider(_ view: UIViewController)
-    func startAppleLogin() -> Single<String>
+    func startAppleLogin() -> Single<SocialAccountInfo>
 }
 
 final class DefaultAppleLoginService: NSObject, AppleLoginService {
     
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
-    private var singleObserver: ((SingleEvent<String>) -> Void)?
+    private var singleObserver: ((SingleEvent<SocialAccountInfo>) -> Void)?
     
     func setPresentationContextProvider(_ view: UIViewController) {
         let loginView = view as? ASAuthorizationControllerPresentationContextProviding
         self.presentationContextProvider = loginView
     }
     
-    func startAppleLogin() -> Single<String> {
+    func startAppleLogin() -> Single<SocialAccountInfo> {
         return Single.create { [weak self] single in
             guard let self = self else { return Disposables.create() }
             let appleIDProvider = ASAuthorizationAppleIDProvider()
@@ -50,18 +50,42 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
            let identityToken = appleIDCredential.identityToken {
             let identityCode = String(decoding: identityToken, as: UTF8.self)
             
+            print(#function, #line, "# 29 : \(appleIDCredential.email)" )
             
-            // 애플 로그인 후 이메일 필터링
-            
-            print(#function, #line, "login Test Apple : \(appleIDCredential.email)" )
-            print(#function, #line, "login Test Apple : \(identityCode)" )
-            singleObserver?(.success(identityCode))
+            guard let email = fetchAppleEmail(appleIDCredential.email) else {
+                singleObserver?(.failure(LoginError.noAccount))
+                return
+            }
+
+            singleObserver?(.success(.init(platform: LoginPlatform.apple.rawValue,
+                                           identityCode: identityCode,
+                                           email: email)))
         } else {
-            singleObserver?(.failure(LoginError.noAuthCode))
+            singleObserver?(.failure(LoginError.noAccount))
         }
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         singleObserver?(.failure(LoginError.completeError))
+    }
+    
+    private func fetchAppleEmail(_ email: String?) -> String? {
+        if let email = email,
+           !email.isEmpty {
+            saveEmail(email)
+        }
+        
+        return getEmail()
+    }
+    
+    private func saveEmail(_ email: String?) {
+        guard let email,
+              !email.isEmpty else { return  }
+        
+        KeyChainService.shared.saveEmail(email)
+    }
+    
+    private func getEmail() -> String? {
+        KeyChainService.shared.getEmail()
     }
 }

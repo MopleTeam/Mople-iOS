@@ -8,8 +8,10 @@
 import Foundation
 import RxSwift
 
-final class ImageUploadRepositoryMock: ImageUploadRepository {
-    func uploadImage(image: Data?) -> Single<String?> {
-        return Single.just("https://picsum.photos/id/1/200/300")
+final class ImageUploadRepositoryMock: ImageUploadRepo {
+    func uploadImage(image: Data, path: ImageUploadPath) -> Single<Data> {
+        let photoPath = "https://picsum.photos/id/1/200/300"
+        
+        return Single.just(photoPath.data(using: .utf8) ?? Data())
     }
 }

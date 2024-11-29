@@ -83,16 +83,13 @@ extension DefaultAppNetWorkService {
     #warning("재발급 실패 로직 여기서 처리")
     private func reissueToken() -> Single<Void> {
         return Single.deferred {
-            do {
-                let endpoint = try APIEndpoints.reissueToken()
-                
-                return self.dataTransferService
-                    .request(with: endpoint)
-                    .do { KeyChainService.shared.reissueToken(accessToken: $0) }
-                    .map { _ in }
-            } catch {
-                return .error(error)
+            guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
+                return .error(TokenError.noTokenError)
             }
+            return self.dataTransferService
+                .request(with: refreshEndpoint)
+                .do { KeyChainService.shared.saveToken($0) }
+                .map { _ in }
         }
     }
 }

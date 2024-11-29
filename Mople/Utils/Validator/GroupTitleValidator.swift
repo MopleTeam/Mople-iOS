@@ -28,16 +28,16 @@ struct GroupTitleValidator {
         }
     }
     
-    static func checkTitle(_ title: String?) -> result {
-        guard let title = title, !title.isEmpty else {
+    static func validator(_ text: String?) -> result {
+        guard let text = text, !text.isEmpty else {
             return .empty
         }
-        switch title {
-        case _ where title.contains(where: { $0.isWhitespace }) || !title.checkValidator():
+        switch text {
+        case _ where text.contains(where: { $0.isWhitespace }) || !text.checkValidator():
             return .strange
-        case _ where title.count < 2:
+        case _ where text.count < 2:
             return .countUnder
-        case _ where title.count > 30:
+        case _ where text.count > 30:
             return .countOver
         default:
             return .success

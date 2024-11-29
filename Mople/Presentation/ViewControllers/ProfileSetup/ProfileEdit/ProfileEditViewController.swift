@@ -13,9 +13,16 @@ import SnapKit
 import PhotosUI
 
 class ProfileEditViewController: DefaultViewController, View {
-    typealias Reactor = ProfileFormViewReactor
+    typealias Reactor = ProfileEditViewReactor
     
     var disposeBag = DisposeBag()
+    
+    // MARK: - Sub Reactor
+    let profileSetupReactor: ProfileSetupViewReactor
+    
+    // MARK: - Observable
+    private let completionObservable: PublishSubject<(nickname: String, image: UIImage?)> = .init()
+    private let loadingObservable: PublishSubject<Bool> = .init()
     
     // MARK: - Variables
     let previousProfile: ProfileInfo
@@ -25,15 +32,19 @@ class ProfileEditViewController: DefaultViewController, View {
     
     private lazy var profileSetupView: ProfileSetupViewController = {
         let viewController = ProfileSetupViewController(type: .edit(previousProfile),
-                                                        reactor: reactor!)
+                                                        reactor: profileSetupReactor,
+                                                        lodingObserver: loadingObservable.asObserver(),
+                                                        completionObserver: completionObservable.asObserver())
         return viewController
     }()
 
     // MARK: - LifeCycle
     init(profile: ProfileInfo,
-         reactor: ProfileFormViewReactor) {
+         profileSetupReactor: ProfileSetupViewReactor,
+         editProfileReactor: ProfileEditViewReactor) {
         self.previousProfile = profile
-        defer { self.reactor = reactor }
+        self.profileSetupReactor = profileSetupReactor
+        defer { self.reactor = editProfileReactor }
         super.init(title: TextStyle.ProfileEdit.title)
     }
     
@@ -78,7 +89,17 @@ class ProfileEditViewController: DefaultViewController, View {
     }
 
     // MARK: - Binding
-    func bind(reactor: ProfileFormViewReactor) {
+    func bind(reactor: ProfileEditViewReactor) {
+        loadingObservable
+            .map({ Reactor.Action.setLoading(isLoad: $0) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        completionObservable
+            .map { Reactor.Action.editProfile(name: $0.nickname, image: $0.image) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
