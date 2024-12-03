@@ -11,7 +11,6 @@ protocol FetchRecentSchedule {
     func fetchRecentSchedule() -> Single<[SimpleSchedule]>
 }
 
-
     
 
 

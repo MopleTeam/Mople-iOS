@@ -22,10 +22,6 @@ final class AppDIContainer {
         
         return DefaultAppNetWorkService(dataTransferService: transferService)
     }()
-    
-    lazy var FCMTokenManager: FCMTokenManager = {
-        return .init(repo: DefaultFCMTokenRepo(networkService: appNetworkService))
-    }()
 }
 
 // MARK: - Make DIContainer

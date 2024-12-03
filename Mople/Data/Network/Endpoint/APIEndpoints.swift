@@ -8,7 +8,8 @@
 import Foundation
 
 enum TokenError: Error {
-    case noTokenError
+    case noJWTToken
+    case noFCMToken
 }
 
 enum HTTPHeader {
@@ -37,19 +38,20 @@ enum HTTPHeader {
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.accessToken else { throw TokenError.noTokenError }
+        guard let token = KeyChainService.cachedToken?.accessToken else { throw TokenError.noJWTToken }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noTokenError }
+        guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noJWTToken }
         return ["refreshToken": token]
     }
 }
 
 // MARK: - FCM Token
 extension APIEndpoints {
-    static func uploadFCMToken(_ fcmToken: String) throws -> Endpoint<Void> {
+    static func uploadFCMToken(_ fcmToken: String?) throws -> Endpoint<Void> {
+        guard let fcmToken else { throw TokenError.noFCMToken }
         return try Endpoint(path: "token/save",
                             authenticationType: .accessToken,
                             method: .post,

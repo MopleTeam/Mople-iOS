@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */; };
+		5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200C36D2CFF66D000C0CEFC /* Single+retry.swift */; };
 		5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */; };
 		5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */; };
 		520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520805162C69E0770015F6E0 /* SignInViewController.swift */; };
@@ -133,7 +135,6 @@
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
-		52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E8B2C4FBD6400CFF329 /* SceneDelegate.swift */; };
 		52C72E932C4FBD6500CFF329 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E922C4FBD6500CFF329 /* Assets.xcassets */; };
 		52C72E962C4FBD6500CFF329 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E952C4FBD6500CFF329 /* Base */; };
 		52C72E9F2C4FBE4100CFF329 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72E9E2C4FBE4100CFF329 /* RxCocoa */; };
@@ -194,6 +195,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshFCMToken.swift; sourceTree = "<group>"; };
+		5200C36D2CFF66D000C0CEFC /* Single+retry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Single+retry.swift"; sourceTree = "<group>"; };
 		5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchScheduleMock.swift; sourceTree = "<group>"; };
 		5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchSchedule.swift; sourceTree = "<group>"; };
 		520805162C69E0770015F6E0 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
@@ -314,7 +317,6 @@
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Mople.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mople.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C72E892C4FBD6400CFF329 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		52C72E8B2C4FBD6400CFF329 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		52C72E922C4FBD6500CFF329 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52C72E952C4FBD6500CFF329 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		52C72E972C4FBD6500CFF329 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -635,6 +637,7 @@
 				524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */,
 				52BBF6BA2CE23E1700564F11 /* Reactive+TextField.swift */,
 				52E8E44F2CA3F2AA007A5447 /* ObservableType+Pairwise.swift */,
+				5200C36D2CFF66D000C0CEFC /* Single+retry.swift */,
 			);
 			path = RxSwift;
 			sourceTree = "<group>";
@@ -717,6 +720,7 @@
 			isa = PBXGroup;
 			children = (
 				527A3E712C8302AA007FE63B /* FetchRecentSchedule.swift */,
+				5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */,
 			);
 			path = HomeScene;
 			sourceTree = "<group>";
@@ -1191,7 +1195,6 @@
 			isa = PBXGroup;
 			children = (
 				52C72E892C4FBD6400CFF329 /* AppDelegate.swift */,
-				52C72E8B2C4FBD6400CFF329 /* SceneDelegate.swift */,
 				527A3EA82C837B29007FE63B /* AppAppearance.swift */,
 				52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */,
 				52E238282C7457CC0066C9A3 /* DIContainer */,
@@ -1591,6 +1594,7 @@
 				526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButton.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
+				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				5285E6D52CDB505F00B855CB /* WeatherInfo.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
 				52EA6E142CF859F100EFD753 /* NicknameDuplicateRepository.swift in Sources */,
@@ -1611,6 +1615,7 @@
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
 				52E99EE62CA1A5B6007E552C /* SimpleScheduleView.swift in Sources */,
+				5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* DefaultNavigationBar.swift in Sources */,
 				529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */,
@@ -1681,7 +1686,6 @@
 				52CE87C72CEC3F9200EBD85D /* CreateGroupRepo.swift in Sources */,
 				520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* LoginSceneCoordinator.swift in Sources */,
-				52C72E8C2C4FBD6400CFF329 /* SceneDelegate.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */,
 				5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */,

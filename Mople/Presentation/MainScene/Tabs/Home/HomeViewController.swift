@@ -172,7 +172,7 @@ final class HomeViewController: UIViewController, View {
     }
     
     func bind(reactor: HomeViewReactor) {
-        rx.viewWillAppear
+        rx.viewDidLoad
             .map { _ in Reactor.Action.checkNotificationPermission }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

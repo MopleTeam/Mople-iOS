@@ -8,19 +8,28 @@
 import Foundation
 import FirebaseMessaging
 
-final class FCMTokenManager: NSObject, MessagingDelegate {
-    private let repo: FcmTokenUploadRepo
+protocol RefreshFCMToken {
+    func refreshFCMToken()
+}
+
+final class FCMTokenManager: NSObject, MessagingDelegate, RefreshFCMToken {
+    private let repo: FCMTokenUploadRepo
     
-    init(repo: FcmTokenUploadRepo) {
+    init(repo: FCMTokenUploadRepo) {
         self.repo = repo
         super.init()
         Messaging.messaging().delegate = self
     }
     
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print(#function, #line, "# 30 자동 업로드" )
         guard let fcmToken else { return }
-        print(#function, #line, "# 30 fcm 토큰 : \(fcmToken)" )
+        
         repo.uploadFCMToken(fcmToken)
+    }
+    
+    func refreshFCMToken() {
+        repo.uploadFCMToken(nil)
     }
 }
 

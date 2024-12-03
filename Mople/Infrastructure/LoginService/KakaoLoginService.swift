@@ -22,18 +22,19 @@ final class DefaultKakaoLoginService: KakaoLoginService {
                              identityCode: idToken,
                              email: email)
             }
+            .debug("kakao login debug test")
     }
     
     private func loginKakao() -> Single<String> {
         return Single.create { emitter in
             
             guard UserApi.isKakaoTalkLoginAvailable() else {
-                emitter(.failure(LoginError.completeError))
+                emitter(.failure(LoginError.kakaoAccountError))
                 return Disposables.create()
             }
             UserApi.shared.loginWithKakaoTalk { OAuthToken, error in
                 guard let idToken = OAuthToken?.idToken else {
-                    emitter(.failure(LoginError.completeError))
+                    emitter(.failure(LoginError.kakaoAccountError))
                     return
                 }
                 emitter(.success(idToken))
@@ -46,13 +47,14 @@ final class DefaultKakaoLoginService: KakaoLoginService {
         return Single.create { emitter in
             UserApi.shared.me() {(user, _) in
                 guard let email = user?.kakaoAccount?.email else {
-                    emitter(.success(""))
+                    emitter(.failure(LoginError.kakaoAccountError))
                     return
                 }
                 emitter(.success(email))
             }
             return Disposables.create()
         }
-        
+        .debug("kakao login debug")
+        .retryWithDelayAndCondition(retryCount: 5)
     }
 }

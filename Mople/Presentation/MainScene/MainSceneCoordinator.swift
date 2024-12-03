@@ -68,7 +68,6 @@ final class MainSceneCoordinator: BaseCoordinator {
 // MARK: - HomeView
 extension MainSceneCoordinator {
     
-    
     private func getHomeViewController() -> HomeViewController {
         let action = HomeViewAction(presentCreateGroupView: pushCreateGroupView,
                                     presentCalendarView: pushCalendarView(lastRecentDate:))

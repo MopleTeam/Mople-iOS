@@ -32,14 +32,17 @@ final class HomeViewReactor: Reactor {
         @Pulse var presentCompleted: Void?
     }
     
-    private let fetchRecentScheduleImpl: FetchRecentSchedule
+    private let fetchRecentScheduleUseCase: FetchRecentSchedule
+    private let requestRefreshFCMTokenUseCase: ReqseutRefreshFCMToken
     private let homeViewAction: HomeViewAction
     
     var initialState: State = State()
     
-    init(fetchRecentSchedule: FetchRecentSchedule,
+    init(fetchRecentScheduleUseCase: FetchRecentSchedule,
+         refreshFCMTokenUseCase: ReqseutRefreshFCMToken,
          viewAction: HomeViewAction) {
-        self.fetchRecentScheduleImpl = fetchRecentSchedule
+        self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
+        self.requestRefreshFCMTokenUseCase = refreshFCMTokenUseCase
         self.homeViewAction = viewAction
         action.onNext(.fetchRecentSchedule)
     }
@@ -87,16 +90,16 @@ extension HomeViewReactor {
     private func checkNotificationPermission() -> Observable<Mutation> {
         
         let notificationCenter = UNUserNotificationCenter.current()
-        notificationCenter.getNotificationSettings { setting in
+        notificationCenter.getNotificationSettings { [weak self] setting in
             switch setting.authorizationStatus {
             case .authorized:
-                self.registerForRemoteNotifications()
+                print(#function, #line, "# 30 몇번 호출" )
+                self?.requestRefreshFCMTokenUseCase.refreshFCMToken()
             case .notDetermined:
-                self.requestNotificationPermission(notificationCenter)
+                self?.requestNotificationPermission(notificationCenter)
             default: break
             }
         }
-        requestNotificationPermission(notificationCenter)
         
         return Observable.empty()
     }
@@ -119,7 +122,7 @@ extension HomeViewReactor {
     
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
-        let fetchSchedules = fetchRecentScheduleImpl.fetchRecentSchedule()
+        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentSchedule()
             .asObservable()
             .map { Mutation.fetchRecentScehdule(schedules: $0) }
         

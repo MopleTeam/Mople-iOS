@@ -53,7 +53,7 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
             print(#function, #line, "# 29 : \(appleIDCredential.email)" )
             
             guard let email = fetchAppleEmail(appleIDCredential.email) else {
-                singleObserver?(.failure(LoginError.noAccount))
+                singleObserver?(.failure(LoginError.appleAccountError))
                 return
             }
 
@@ -61,7 +61,7 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
                                            identityCode: identityCode,
                                            email: email)))
         } else {
-            singleObserver?(.failure(LoginError.noAccount))
+            singleObserver?(.failure(LoginError.appleAccountError))
         }
     }
 

@@ -8,8 +8,12 @@
 import UIKit
 
 final class MainSceneDIContainer: MainSceneDependencies {
+    
+    private lazy var FCMTokenManager: FCMTokenManager = {
+        return .init(repo: DefaultFCMTokenRepo(networkService: appNetworkService))
+    }()
 
-    let appNetworkService: AppNetWorkService
+    private let appNetworkService: AppNetWorkService
     
     init(appNetworkService: AppNetWorkService) {
         self.appNetworkService = appNetworkService
@@ -39,8 +43,13 @@ extension MainSceneDIContainer {
     }
     
     private func makeHomeViewReactor(_ action: HomeViewAction) -> HomeViewReactor {
-        return HomeViewReactor(fetchRecentSchedule: FetchRecentScheduleMock(),
-                                   viewAction: action)
+        return HomeViewReactor(fetchRecentScheduleUseCase: FetchRecentScheduleMock(),
+                               refreshFCMTokenUseCase: makeRefreshFCMTokenUseCase(),
+                               viewAction: action)
+    }
+    
+    private func makeRefreshFCMTokenUseCase() -> ReqseutRefreshFCMToken {
+        return RefreshFCMTokenUseCase(tokenRefreshManager: FCMTokenManager)
     }
     
     // MARK: - 모임 리스트

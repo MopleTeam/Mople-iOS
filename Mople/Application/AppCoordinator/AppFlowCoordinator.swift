@@ -28,7 +28,6 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     
     override func start() {
-        _ = appDIContainer.FCMTokenManager
         self.navigationController.navigationBar.isHidden = true
         fadeOut { [weak self] in
             self?.checkEntry()

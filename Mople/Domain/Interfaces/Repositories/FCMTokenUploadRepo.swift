@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol FcmTokenUploadRepo {
-    func uploadFCMToken(_ token: String)
+protocol FCMTokenUploadRepo {
+    func uploadFCMToken(_ token: String?)
 }

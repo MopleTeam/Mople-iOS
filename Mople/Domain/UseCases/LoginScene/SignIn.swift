@@ -28,7 +28,8 @@ enum AppError: Error {
 
 enum LoginError: Error {
     case notFoundInfo(result: SocialAccountInfo)
-    case noAccount
+    case appleAccountError
+    case kakaoAccountError
     case completeError
     case appError(error: AppError)
     
@@ -36,8 +37,10 @@ enum LoginError: Error {
         switch self {
         case .notFoundInfo(let message):
             return "회원정보를 찾을 수 없습니다."
-        case .noAccount:
+        case .appleAccountError:
             return "설정에서 Apple 로그인 연동 해제 후\n다시 시도해 주세요."
+        case .kakaoAccountError:
+            return "카카오 계정과 연동을 실패했습니다.\n다시 시도해 주세요."
         case .completeError:
             return "로그인에 실패했어요.\n다시 시도해 주세요."
         case .appError(let error):

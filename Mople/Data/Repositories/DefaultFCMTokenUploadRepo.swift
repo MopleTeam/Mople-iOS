@@ -5,10 +5,10 @@
 //  Created by CatSlave on 11/29/24.
 //
 
-import Foundation
 import RxSwift
+import FirebaseMessaging
 
-final class DefaultFCMTokenRepo: FcmTokenUploadRepo {
+final class DefaultFCMTokenRepo: FCMTokenUploadRepo {
     
     var disposeBag = DisposeBag()
     
@@ -18,18 +18,18 @@ final class DefaultFCMTokenRepo: FcmTokenUploadRepo {
         self.networkService = networkService
     }
     
-    func uploadFCMToken(_ token: String) {
-        print(#function, #line, "# 30 업로드 요청" )
+    func uploadFCMToken(_ token: String? = nil) {
+        let fcmToken = token ?? Messaging.messaging().fcmToken
+        
+        requsetUploadToken(fcmToken)
+    }
+    
+    private func requsetUploadToken(_ token: String?) {
         networkService.authenticatedRequest {
             try APIEndpoints.uploadFCMToken(token)
         }
-        .retry(2)
-        .debug("# 30")
-        .subscribe(onSuccess: { _ in
-            print(#function, #line, "# FCMToken 업로드 성공: \(token)" )
-        })
+        .debug("# 30 업로드 토큰 : \(token ?? "토큰없음")")
+        .subscribe()
         .disposed(by: disposeBag)
-        
-        
     }
 }

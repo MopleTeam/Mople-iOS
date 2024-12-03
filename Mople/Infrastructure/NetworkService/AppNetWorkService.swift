@@ -84,8 +84,12 @@ extension DefaultAppNetWorkService {
     private func reissueToken() -> Single<Void> {
         return Single.deferred {
             guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
-                return .error(TokenError.noTokenError)
+                print(#function, #line, "# 2 : 재발급 토근 없음" )
+                return .error(TokenError.noJWTToken)
             }
+            
+            print(#function, #line, "# 2 : 재발급 토근 요청" )
+            
             return self.dataTransferService
                 .request(with: refreshEndpoint)
                 .do { KeyChainService.shared.saveToken($0) }

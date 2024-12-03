@@ -19,8 +19,22 @@ final class ValidatorNicknameUseCase: ValidatorNickname {
     init(repo: NicknameValidationRepo) {
         self.repo = repo
     }
-    
-    func nickNameDuplicateCheck(_ nickname: String) -> Single<Bool> {
+        
+    func validatorNickname(_ nickname: String) -> Single<Bool> {
+        return Single.deferred {
+            do {
+                let _ = try NickNameValidator.checkNickname(nickname)
+                return self.nickNameDuplicateCheck(nickname)
+            } catch {
+                return .error(error)
+            }
+        }
+    }
+}
+
+// MARK: - Validator
+extension ValidatorNicknameUseCase {
+    private func nickNameDuplicateCheck(_ nickname: String) -> Single<Bool> {
         return repo.isNicknameExists(nickname)
             .debug("# 30")
             .map { String(data: $0, encoding: .utf8) }
@@ -31,17 +45,6 @@ final class ValidatorNicknameUseCase: ValidatorNickname {
         switch bool {
         case "true": return true
         default: return false
-        }
-    }
-    
-    func validatorNickname(_ nickname: String) -> Single<Bool> {
-        return Single.deferred {
-            do {
-                let _ = try NickNameValidator.checkNickname(nickname)
-                return self.nickNameDuplicateCheck(nickname)
-            } catch {
-                return .error(error)
-            }
         }
     }
 }

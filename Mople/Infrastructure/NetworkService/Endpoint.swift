@@ -72,12 +72,12 @@ extension Endpoint {
             return headers
         case .accessToken:
             guard let token = KeyChainService.cachedToken?.accessToken else {
-                throw TokenError.noTokenError
+                throw TokenError.noJWTToken
             }
             let tokenHeader = ["Authorization":"Bearer \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }
         case .refreshToken:
-            guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noTokenError }
+            guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noJWTToken }
             let tokenHeader = ["Refresh":" \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }
         }

@@ -14,7 +14,11 @@ final class KeyChainService {
     
     private init() {}
     
-    private(set) static var cachedToken: Token?
+    private(set) static var cachedToken: Token? {
+        didSet {
+            print(#function, #line, "# 30 캐쉬 토큰 : \(cachedToken)" )
+        }
+    }
     
     enum Key: String {
         case service = "com.moim.moimtable"
