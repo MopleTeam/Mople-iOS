@@ -12,7 +12,12 @@ final class DefaultSignInRepo: SignInRepo {
     private let networkService: AppNetWorkService
     
     init(networkService: AppNetWorkService) {
+        print(#function, #line, "LifeCycle Test DefaultSignInRepo Created" )
         self.networkService = networkService
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultSignInRepo Deinit" )
     }
     
     func signIn(socialAccountInfo: SocialAccountInfo) -> Single<Void> {
@@ -21,8 +26,6 @@ final class DefaultSignInRepo: SignInRepo {
                                                    email: socialAccountInfo.email)
         
         return self.networkService.basicRequest(endpoint: endpoint)
-            .map { token in
-                KeyChainService.shared.saveToken(token)
-            }
+            .map { KeyChainService.shared.saveToken($0) }
     }
 }

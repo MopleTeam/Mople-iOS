@@ -46,9 +46,14 @@ final class ProfileViewReactor: Reactor {
     
     init(fetchProfileIUseCase: FetchProfile,
          viewAction: ProfileViewAction) {
+        print(#function, #line, "LifeCycle Test ProfileView Reactor Created" )
         self.fetchProfileIUseCase = fetchProfileIUseCase
         self.viewAction = viewAction
         action.onNext(.fetchProfile)
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test ProfileView Reactor Deinit" )
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

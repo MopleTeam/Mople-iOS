@@ -98,8 +98,13 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     
     init(title: String?,
          reactor: GroupCreateViewReactor) {
+        print(#function, #line, "LifeCycle Test GroupCreate View Created" )
         super.init(title: title)
         self.reactor = reactor
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test GroupCreate View Deinit" )
     }
     
     @MainActor required init?(coder: NSCoder) {

@@ -14,7 +14,12 @@ final class NotifyViewController: DefaultViewController {
     
 
     init() {
+        print(#function, #line, "LifeCycle Test NotifyView Created" )
         super.init(title: "알림 관리 뷰")
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test NotifyView Deinit" )
     }
     
     required init?(coder: NSCoder) {

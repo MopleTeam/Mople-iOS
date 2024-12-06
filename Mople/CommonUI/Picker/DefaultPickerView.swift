@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class DefaultPickerView: UIView {
+class DefaultPickerView: UIView {
 
     // MARK: - Observer
     public var closeButtonTap: ControlEvent<Void> {
@@ -104,6 +104,13 @@ final class DefaultPickerView: UIView {
             make.height.equalTo(56)
         }
     }
+    
+    public func selectRow(row: Int, inComponent: Int, animated: Bool) {
+        guard pickerView.numberOfComponents - 1 >= inComponent,
+              pickerView.numberOfRows(inComponent: inComponent) - 1 >= row else { return }
+        
+        pickerView.selectRow(row, inComponent: inComponent, animated: animated)
+    }
  
 }
 
@@ -111,13 +118,6 @@ final class DefaultPickerView: UIView {
 extension DefaultPickerView {
     public func setDelegate(delegate: UIPickerViewDataSource & UIPickerViewDelegate ) {
         pickerView.delegate = delegate
-    }
-    
-    public func selectRow(row: Int, inComponent: Int, animated: Bool) {
-        guard pickerView.numberOfComponents - 1 >= inComponent,
-              pickerView.numberOfRows(inComponent: inComponent) - 1 >= row else { return }
-        
-        pickerView.selectRow(row, inComponent: inComponent, animated: animated)
     }
 }
 

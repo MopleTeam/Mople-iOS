@@ -19,6 +19,15 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
     private var singleObserver: ((SingleEvent<SocialAccountInfo>) -> Void)?
     
+    override init() {
+        super.init()
+        print(#function, #line, "LifeCycle Test DefaultAppleLoginService Created" )
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultAppleLoginService Deinit" )
+    }
+    
     func setPresentationContextProvider(_ view: UIViewController) {
         let loginView = view as? ASAuthorizationControllerPresentationContextProviding
         self.presentationContextProvider = loginView

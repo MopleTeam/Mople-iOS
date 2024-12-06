@@ -49,6 +49,8 @@ final class DateManager {
 }
 
 extension DateManager {
+    
+    /// 앱에서 표시할 최소 날짜 Date
     static func getMinimumDate() -> Date {
         var components = self.todayComponents
         components.month = 1
@@ -56,7 +58,8 @@ extension DateManager {
         let firstDate = self.toDate(components) ?? Date()
         return calendar.date(byAdding: .year, value: -10, to: firstDate) ?? Date()
     }
-    
+
+    /// 앱에서 표시할 최대 날짜
     static func getMaximumDate() -> Date {
         var components = self.todayComponents
         components.month = 12
@@ -65,6 +68,14 @@ extension DateManager {
         return calendar.date(byAdding: .year, value: 10, to: lastDate) ?? Date()
     }
     
+    /// 현재 달의 최대 일수
+    static func getDaysInCurrentMonth() -> [Int] {
+        guard let range = calendar.range(of: .day, in: .month, for: today) else {
+            return Array(1...28)
+        }
+        
+        return Array(range)
+    }
 }
 
 // MARK: - 비교

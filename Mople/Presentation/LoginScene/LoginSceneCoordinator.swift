@@ -19,8 +19,13 @@ final class LoginSceneCoordinator: BaseCoordinator {
     
     init(navigationController: UINavigationController,
          dependencies: LoginSceneDependencies) {
+        print(#function, #line, "LifeCycle Test LoginSceneCoordinator Created" )
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test LoginSceneCoordinator Deinit" )
     }
     
     override func start() {

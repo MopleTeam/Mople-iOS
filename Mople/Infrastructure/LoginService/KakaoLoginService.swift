@@ -15,6 +15,14 @@ protocol KakaoLoginService {
 
 final class DefaultKakaoLoginService: KakaoLoginService {
     
+    init() {
+        print(#function, #line, "LifeCycle Test DefaultKakaoLoginService Created" )
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultKakaoLoginService Deinit" )
+    }
+    
     func startKakaoLogin() -> Single<SocialAccountInfo> {
         return Single.zip(loginKakao(), parseEmail())
             .map { idToken, email in

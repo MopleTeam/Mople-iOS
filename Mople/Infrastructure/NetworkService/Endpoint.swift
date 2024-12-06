@@ -194,13 +194,22 @@ struct JSONBodyEncoder: BodyEncoder {
 struct MultipartBodyEncoder: BodyEncoder {
     var boundary: String
     
+    // 하나의 키에 여러 데이터를 어떻게 넣을까?
+    // 단순히 value에 배열을 받아서 하나의 키로 통일시키면 된다.
     func encode(_ parameters: [String : Any]) -> Data? {
         let parts = parameters.compactMap { (key, value) -> MultipartForm.Part? in
-            guard let data = value as? Data else { return nil }
-            return MultipartForm.Part(name: key,
-                                      data: data,
-                                      filename: "Profile",
-                                      contentType: "image/jpeg")
+            
+            switch value {
+            case let value as Data:
+                return MultipartForm.Part(name: key,
+                                          data: value,
+                                          filename: "Profile",
+                                          contentType: "image/jpeg")
+            case let value as [Data]:
+                return nil // nil 대신 하나의 키에 추가하는 로직 추가
+            default:
+                return nil
+            }
         }
         
         let form = MultipartForm(parts: parts, boundary: boundary)

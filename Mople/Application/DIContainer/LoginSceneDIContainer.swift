@@ -9,8 +9,8 @@ import UIKit
 
 final class LoginSceneDIContainer: LoginSceneDependencies {
     
-    let appleLoginService = DefaultAppleLoginService()
-    let kakaoLoginService = DefaultKakaoLoginService()
+    private lazy var appleLoginService = DefaultAppleLoginService()
+    private lazy var kakaoLoginService = DefaultKakaoLoginService()
     
     let appNetworkService: AppNetWorkService
     

@@ -13,7 +13,12 @@ final class DefaultSignUpRepo: SignUpRepo {
     private let networkService: AppNetWorkService
 
     init(networkService: AppNetWorkService) {
+        print(#function, #line, "LifeCycle Test DefaultSignUpRepo Created" )
         self.networkService = networkService
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultSignUpRepo Deinit" )
     }
     
     func getRandomNickname() -> Single<Data> {
@@ -31,9 +36,7 @@ final class DefaultSignUpRepo: SignUpRepo {
                                                   imagePath: imagePath)
         
         return networkService.basicRequest(endpoint: endpoint)
-            .map { token in
-                KeyChainService.shared.saveToken(token)
-            }
+            .map { KeyChainService.shared.saveToken($0) }
     }
 }
 

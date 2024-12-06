@@ -18,8 +18,13 @@ final class ProfileSceneCoordinator: BaseCoordinator {
     
     init(navigationController: UINavigationController,
          dependencies: ProfileSceneDependencies) {
+        print(#function, #line, "LifeCycle Test ProfileSceneCoordinator Created" )
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test ProfileSceneCoordinator Deinit" )
     }
     
     override func start() {

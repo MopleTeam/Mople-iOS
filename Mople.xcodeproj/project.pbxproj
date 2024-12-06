@@ -114,6 +114,8 @@
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
 		529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */; };
 		529D7B902CDE019A00BE77BE /* DetailGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */; };
+		52A787732D0277F500A633B3 /* DatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787722D0277F500A633B3 /* DatePickerView.swift */; };
+		52A787762D0348B400A633B3 /* PlanDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDatePickerView.swift */; };
 		52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* SignInRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
 		52B87E302C6B2A460026B601 /* Pretendard-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */; };
@@ -295,6 +297,8 @@
 		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
 		529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonGroup.swift; sourceTree = "<group>"; };
 		529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroup.swift; sourceTree = "<group>"; };
+		52A787722D0277F500A633B3 /* DatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerView.swift; sourceTree = "<group>"; };
+		52A787752D0348B400A633B3 /* PlanDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDatePickerView.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* SignInRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -419,32 +423,23 @@
 			path = AlertManager;
 			sourceTree = "<group>";
 		};
-		520C9E562CE54C4000778558 /* ProfileSetup */ = {
-			isa = PBXGroup;
-			children = (
-				520C9E622CE5DE7700778558 /* ProfileSetup */,
-				520C9E642CE5DF3A00778558 /* ProfileEdit */,
-			);
-			path = ProfileSetup;
-			sourceTree = "<group>";
-		};
-		520C9E572CE54C6500778558 /* Login */ = {
+		520C9E572CE54C6500778558 /* SignInView */ = {
 			isa = PBXGroup;
 			children = (
 				52E238362C76530D0066C9A3 /* SignInViewReactor.swift */,
 				520805162C69E0770015F6E0 /* SignInViewController.swift */,
 			);
-			path = Login;
+			path = SignInView;
 			sourceTree = "<group>";
 		};
-		520C9E582CE54E1600778558 /* Home */ = {
+		520C9E582CE54E1600778558 /* HomeView */ = {
 			isa = PBXGroup;
 			children = (
 				5211F9042C86E71500403980 /* HomeViewReactor.swift */,
 				527A3E8E2C836192007FE63B /* HomeViewController.swift */,
 				520C9E592CE54E3F00778558 /* ChildVC */,
 			);
-			path = Home;
+			path = HomeView;
 			sourceTree = "<group>";
 		};
 		520C9E592CE54E3F00778558 /* ChildVC */ = {
@@ -457,24 +452,24 @@
 			path = ChildVC;
 			sourceTree = "<group>";
 		};
-		520C9E5A2CE54EBB00778558 /* GroupList */ = {
+		520C9E5A2CE54EBB00778558 /* GroupListView */ = {
 			isa = PBXGroup;
 			children = (
 				523645422C901CF7009E0784 /* GroupListViewReactor.swift */,
 				527A3E962C83627C007FE63B /* GroupListViewController.swift */,
 				527A3E912C836227007FE63B /* ChildVC */,
 			);
-			path = GroupList;
+			path = GroupListView;
 			sourceTree = "<group>";
 		};
-		520C9E5B2CE54EEE00778558 /* CalendarSchedule */ = {
+		520C9E5B2CE54EEE00778558 /* CalendarScheduleView */ = {
 			isa = PBXGroup;
 			children = (
 				5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */,
 				527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */,
 				520C9E5C2CE54F3300778558 /* ChildVC */,
 			);
-			path = CalendarSchedule;
+			path = CalendarScheduleView;
 			sourceTree = "<group>";
 		};
 		520C9E5C2CE54F3300778558 /* ChildVC */ = {
@@ -499,9 +494,9 @@
 		520C9E602CE5A0FE00778558 /* Tabs */ = {
 			isa = PBXGroup;
 			children = (
-				520C9E582CE54E1600778558 /* Home */,
-				520C9E5A2CE54EBB00778558 /* GroupList */,
-				520C9E5B2CE54EEE00778558 /* CalendarSchedule */,
+				520C9E582CE54E1600778558 /* HomeView */,
+				520C9E5A2CE54EBB00778558 /* GroupListView */,
+				520C9E5B2CE54EEE00778558 /* CalendarScheduleView */,
 				527A3E822C834C00007FE63B /* ProfileScene */,
 			);
 			path = Tabs;
@@ -512,7 +507,7 @@
 			children = (
 				526B985C2CEDBBF6002488C5 /* PlanCreate */,
 				527DBE2D2CE89360008BB20E /* GroupCreate */,
-				520C9E562CE54C4000778558 /* ProfileSetup */,
+				520C9E622CE5DE7700778558 /* ProfileSetup */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -526,13 +521,13 @@
 			path = ProfileSetup;
 			sourceTree = "<group>";
 		};
-		520C9E632CE5DF3200778558 /* ProfileCreate */ = {
+		520C9E632CE5DF3200778558 /* SignUpView */ = {
 			isa = PBXGroup;
 			children = (
 				52EA6E052CF7F22900EFD753 /* SignUpViewReactor.swift */,
 				5208051C2C69FE700015F6E0 /* SignUpViewController.swift */,
 			);
-			path = ProfileCreate;
+			path = SignUpView;
 			sourceTree = "<group>";
 		};
 		520C9E642CE5DF3A00778558 /* ProfileEdit */ = {
@@ -620,6 +615,7 @@
 			isa = PBXGroup;
 			children = (
 				52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */,
+				52A787722D0277F500A633B3 /* DatePickerView.swift */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
@@ -627,6 +623,8 @@
 		52473D6D2CEF7959009D045A /* ChildVC */ = {
 			isa = PBXGroup;
 			children = (
+				52A787742D03489800A633B3 /* PlanDatePickerView */,
+				52A7876F2D02666C00A633B3 /* GroupSelectView */,
 			);
 			path = ChildVC;
 			sourceTree = "<group>";
@@ -826,6 +824,7 @@
 			children = (
 				527A3E7E2C834BEE007FE63B /* ProfileSceneCoordinator.swift */,
 				520C9E5D2CE54F6200778558 /* ProfileView */,
+				520C9E642CE5DF3A00778558 /* ProfileEdit */,
 				525DFCFB2CCA135500835312 /* NotifyView */,
 				525DFCFC2CCA136400835312 /* PolicyView */,
 			);
@@ -1061,6 +1060,21 @@
 				5285E6BC2CDA0BCA00B855CB /* Comment.swift */,
 			);
 			path = Comment;
+			sourceTree = "<group>";
+		};
+		52A7876F2D02666C00A633B3 /* GroupSelectView */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = GroupSelectView;
+			sourceTree = "<group>";
+		};
+		52A787742D03489800A633B3 /* PlanDatePickerView */ = {
+			isa = PBXGroup;
+			children = (
+				52A787752D0348B400A633B3 /* PlanDatePickerView.swift */,
+			);
+			path = PlanDatePickerView;
 			sourceTree = "<group>";
 		};
 		52B6F6392C77653F00DA2D75 /* Interfaces */ = {
@@ -1361,8 +1375,8 @@
 			isa = PBXGroup;
 			children = (
 				52E2383E2C76E8C00066C9A3 /* LoginSceneCoordinator.swift */,
-				520C9E572CE54C6500778558 /* Login */,
-				520C9E632CE5DF3200778558 /* ProfileCreate */,
+				520C9E572CE54C6500778558 /* SignInView */,
+				520C9E632CE5DF3200778558 /* SignUpView */,
 			);
 			path = LoginScene;
 			sourceTree = "<group>";
@@ -1583,6 +1597,7 @@
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */,
+				52A787732D0277F500A633B3 /* DatePickerView.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
@@ -1648,6 +1663,7 @@
 				52CE87C52CEC38E400EBD85D /* GroupTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
+				52A787762D0348B400A633B3 /* PlanDatePickerView.swift in Sources */,
 				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
@@ -1865,7 +1881,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -1908,7 +1924,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

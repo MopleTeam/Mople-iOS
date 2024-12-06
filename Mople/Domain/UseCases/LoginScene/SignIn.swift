@@ -56,16 +56,21 @@ enum LoginPlatform: String {
 
 final class SignInUseCase: SignIn {
     
-    let appleLoginService: AppleLoginService
-    let kakaoLoginService: KakaoLoginService
-    let signInRepo: SignInRepo
+    private let appleLoginService: AppleLoginService
+    private let kakaoLoginService: KakaoLoginService
+    private let signInRepo: SignInRepo
     
     init(appleLoginService: AppleLoginService,
          kakaoLoginService: KakaoLoginService,
          signInRepo: SignInRepo) {
+        print(#function, #line, "LifeCycle Test SignInUseCase Created" )
+        self.signInRepo = signInRepo
         self.appleLoginService = appleLoginService
         self.kakaoLoginService = kakaoLoginService
-        self.signInRepo = signInRepo
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test SignInUseCase Deinit" )
     }
     
     func login(_ platform: LoginPlatform) -> Single<Void> {
@@ -75,9 +80,14 @@ final class SignInUseCase: SignIn {
         
         return loginObserver
             .do(onSuccess: { socialLoginResult = $0 })
-            .flatMap({ self.signInRepo.signIn(socialAccountInfo: $0) })
-            .observe(on: MainScheduler.instance)
-            .catch({ .error(self.handleError($0, socialLoginResult)) })
+            .flatMap({ [weak self] accountInfo in
+                guard let self else { throw AppError.unknownError }
+                return self.signInRepo.signIn(socialAccountInfo: accountInfo)
+            })
+            .catch({ [weak self] err in
+                guard let self else { return .error(err) }
+                return .error(self.handleError(err, socialLoginResult))
+            })
     }
     
     private func handleLogin(_ platform: LoginPlatform) -> Single<SocialAccountInfo> {

@@ -35,8 +35,13 @@ final class GroupCreateViewReactor: Reactor {
     private let createGroupAction: CreateGroupAction
     
     init(createGroupImpl: CreateGroup, createGroupAction: CreateGroupAction) {
+        print(#function, #line, "LifeCycle Test GroupCreateView Reactor Created" )
         self.createGroupImpl = createGroupImpl
         self.createGroupAction = createGroupAction
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test GroupCreateView Reactor Deinit" )
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

@@ -18,7 +18,12 @@ final class DefaultImageUploadRepo: ImageUploadRepo {
     private let networkServbice: AppNetWorkService
     
     init(networkServbice: AppNetWorkService) {
+        print(#function, #line, "LifeCycle Test DefaultImageUploadRepo Created" )
         self.networkServbice = networkServbice
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultImageUploadRepo Deinit" )
     }
     
     func uploadImage(image: Data, path: ImageUploadPath) -> Single<Data> {
