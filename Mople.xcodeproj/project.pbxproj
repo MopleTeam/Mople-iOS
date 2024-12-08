@@ -114,7 +114,7 @@
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
 		529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */; };
 		529D7B902CDE019A00BE77BE /* DetailGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */; };
-		52A787732D0277F500A633B3 /* DatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787722D0277F500A633B3 /* DatePickerView.swift */; };
+		52A787732D0277F500A633B3 /* YearMonthPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787722D0277F500A633B3 /* YearMonthPickerView.swift */; };
 		52A787762D0348B400A633B3 /* PlanDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDatePickerView.swift */; };
 		52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* SignInRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
@@ -194,6 +194,8 @@
 		52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1A2CF8C4B900EFD753 /* FCMTokenManager.swift */; };
 		52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */; };
 		52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */; };
+		52F153592D0457B7001A7BF5 /* DynamicDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */; };
+		52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -297,7 +299,7 @@
 		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
 		529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonGroup.swift; sourceTree = "<group>"; };
 		529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroup.swift; sourceTree = "<group>"; };
-		52A787722D0277F500A633B3 /* DatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerView.swift; sourceTree = "<group>"; };
+		52A787722D0277F500A633B3 /* YearMonthPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthPickerView.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* PlanDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDatePickerView.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* SignInRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
@@ -371,6 +373,8 @@
 		52EA6E1A2CF8C4B900EFD753 /* FCMTokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenManager.swift; sourceTree = "<group>"; };
 		52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenUploadRepo.swift; sourceTree = "<group>"; };
 		52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFCMTokenUploadRepo.swift; sourceTree = "<group>"; };
+		52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicDatePickerView.swift; sourceTree = "<group>"; };
+		52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeElement.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -615,7 +619,8 @@
 			isa = PBXGroup;
 			children = (
 				52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */,
-				52A787722D0277F500A633B3 /* DatePickerView.swift */,
+				52A787722D0277F500A633B3 /* YearMonthPickerView.swift */,
+				52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
@@ -1034,6 +1039,7 @@
 				52BBF6AD2CE0590C00564F11 /* UIScreen+NotchSize.swift */,
 				52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */,
 				52CE87C22CEC38D100EBD85D /* String+Validator.swift */,
+				52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1576,6 +1582,7 @@
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */,
+				52F153592D0457B7001A7BF5 /* DynamicDatePickerView.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
 				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
@@ -1594,10 +1601,11 @@
 				526B98622CEDBDFD002488C5 /* LabeledTextField.swift in Sources */,
 				52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */,
 				5208C17A2CBE72A8006272E8 /* UIApplication+RootView.swift in Sources */,
+				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */,
-				52A787732D0277F500A633B3 /* DatePickerView.swift in Sources */,
+				52A787732D0277F500A633B3 /* YearMonthPickerView.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,

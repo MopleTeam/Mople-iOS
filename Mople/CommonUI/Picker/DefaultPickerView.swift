@@ -35,7 +35,7 @@ class DefaultPickerView: UIView {
         return btn
     }()
     
-    private let pickerView = UIPickerView()
+    public let pickerView = UIPickerView()
     
     private let completeButton: BaseButton = {
         let btn = BaseButton()
@@ -106,9 +106,12 @@ class DefaultPickerView: UIView {
     }
     
     public func selectRow(row: Int, inComponent: Int, animated: Bool) {
+        print(#function, #line, "Path : # # 1207 \(pickerView.numberOfRows(inComponent: inComponent)), row: \(row) ")
         guard pickerView.numberOfComponents - 1 >= inComponent,
               pickerView.numberOfRows(inComponent: inComponent) - 1 >= row else { return }
         
+        
+        print(#function, #line, "Path : # 1207 이동 성공")
         pickerView.selectRow(row, inComponent: inComponent, animated: animated)
     }
  

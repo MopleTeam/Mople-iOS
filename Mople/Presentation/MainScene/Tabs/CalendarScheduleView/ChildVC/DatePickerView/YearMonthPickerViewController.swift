@@ -21,8 +21,7 @@ final class YearMonthPickerViewController: UIViewController, View {
     private let selectedDateObserver: PublishRelay<DateComponents> = .init()
     
     // MARK: - UI Components
-    private let pickerView = DatePickerView(title: TextStyle.DatePicker.header,
-                                            type: .yearMonth)
+    private let pickerView = YearMonthPickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
     init(reactor: Reactor? = nil) {

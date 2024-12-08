@@ -16,8 +16,7 @@ final class FullDatePickerViewController: UIViewController {
     private var disposeBag = DisposeBag()
     
     // MARK: - UI Components
-    private let pickerView = DatePickerView(title: TextStyle.DatePicker.header,
-                                            type: .fullDate)
+    private let pickerView = DynamicDatePickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
     init() {
@@ -54,7 +53,7 @@ final class FullDatePickerViewController: UIViewController {
     
     // MARK: - Default Date
     private func setupDefaultDate() {
-        self.pickerView.defaultSelectedDate()
+        self.pickerView.setSelectedDate()
     }
     
     // MARK: - Action

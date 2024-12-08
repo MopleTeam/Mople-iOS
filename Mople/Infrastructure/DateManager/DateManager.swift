@@ -69,12 +69,15 @@ extension DateManager {
     }
     
     /// 현재 달의 최대 일수
-    static func getDaysInCurrentMonth() -> [Int] {
-        guard let range = calendar.range(of: .day, in: .month, for: today) else {
-            return Array(1...28)
-        }
+    static func getDaysCountInCurrentMonth(on dateComponents: DateComponents) -> Int {
+        var calculateDate = dateComponents
+        calculateDate.day = 1
         
-        return Array(range)
+        guard let date = toDate(calculateDate),
+              let range = calendar.range(of: .day, in: .month, for: date) else {
+            return 28
+        }
+        return range.count
     }
 }
 
@@ -105,10 +108,19 @@ extension DateManager {
     }
     
     static func numberOfDaysBetween(_ date: Date) -> Int {
-        let now = startOfDay(.now)
         let scheduleDate = startOfDay(date)
-        let result = calendar.dateComponents([.day], from: now, to: scheduleDate)
+        let result = calendar.dateComponents([.day], from: today, to: scheduleDate)
         return result.day ?? 0
+    }
+    
+    static func numberOfMonthBetween(_ date: Date) -> Int {
+        let todayYear = calendar.component(.year, from: today)
+        let todayMonth = calendar.component(.month, from: today)
+        
+        let targetYear = calendar.component(.year, from: date)
+        let targetMonth = calendar.component(.month, from: date)
+        
+        return (targetMonth - todayMonth) + (targetYear - todayYear) * 12
     }
 }
 
