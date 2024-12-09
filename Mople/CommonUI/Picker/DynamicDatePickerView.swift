@@ -137,7 +137,8 @@ extension DynamicDatePickerView {
     
     /// 년도 피커 조작 시 년도 아래로 업데이트
     private func updateMonth(isFuture: Bool) {
-        self.months = isFuture ? Array(1...12) : Array((todayComponents.month ?? 1)...12)
+        let isCurrentYear = todayComponents.year == selectedDate.year
+        self.months = !isCurrentYear && isFuture ? Array(1...12) : Array((todayComponents.month ?? 1)...12)
         updateDay(isFuture: isFuture)
     }
     
