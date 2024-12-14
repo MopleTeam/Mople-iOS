@@ -32,6 +32,7 @@ final class ThumbnailTitleView: UIView {
     
     enum ViewType {
         case simple
+        case basic
         case detail
     }
     
@@ -103,6 +104,12 @@ final class ThumbnailTitleView: UIView {
     private func infoConfigure() {
         switch viewType {
         case .simple:
+            setSpacing(8)
+            setThumbnail(size: 28, radius: 6)
+            setTitleLabel(font: FontStyle.Body1.medium,
+                          color: ColorStyle.Gray._02)
+            self.subButton.isHidden = true
+        case .basic:
             setSpacing(8)
             setThumbnail(size: 28, radius: 6)
             setTitleLabel(font: FontStyle.Body2.semiBold,

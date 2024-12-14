@@ -250,7 +250,6 @@ final class ProfileSetupViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         validNameObserver
-            .do(onNext: { print(#function, #line, "# 30 : \($0)" ) })
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isValid in

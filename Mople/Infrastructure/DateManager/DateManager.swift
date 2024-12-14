@@ -14,9 +14,12 @@ enum DateStringFormat {
 
 final class DateManager {
     
-    static let today = Date()
+    static var today: Date {
+        return Date()
+    }
+    
     static var todayComponents: DateComponents {
-       self.toDateComponents(today)
+        return today.toDateComponents()
     }
     
     static let calendar: Calendar = {
@@ -45,6 +48,12 @@ final class DateManager {
         return formatter
     }()
     
+    static let serverDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
     private init() { }
 }
 
@@ -55,7 +64,7 @@ extension DateManager {
         var components = self.todayComponents
         components.month = 1
         components.day = 1
-        let firstDate = self.toDate(components) ?? Date()
+        let firstDate = components.toDate() ?? Date()
         return calendar.date(byAdding: .year, value: -10, to: firstDate) ?? Date()
     }
 
@@ -64,7 +73,7 @@ extension DateManager {
         var components = self.todayComponents
         components.month = 12
         components.day = 31
-        let lastDate = self.toDate(components) ?? Date()
+        let lastDate = components.toDate() ?? Date()
         return calendar.date(byAdding: .year, value: 10, to: lastDate) ?? Date()
     }
     
@@ -73,7 +82,7 @@ extension DateManager {
         var calculateDate = dateComponents
         calculateDate.day = 1
         
-        guard let date = toDate(calculateDate),
+        guard let date = calculateDate.toDate(),
               let range = calendar.range(of: .day, in: .month, for: date) else {
             return 28
         }
@@ -126,16 +135,17 @@ extension DateManager {
 
 // MARK: - 전환
 extension DateManager {
-    static func toDateComponents(_ date: Date) -> DateComponents {
-        return DateManager.calendar.dateComponents([.year, .month, .day], from: date)
+    static func parseServerDate(string: String?) -> Date? {
+        guard let string else { return nil }
+        return DateManager.serverDateFormatter.date(from: string)
     }
     
-    static func toDate(_ dateComponents: DateComponents) -> Date? {
-        return DateManager.calendar.date(from: dateComponents)
+    static func toServerDateString(_ date: Date) -> String {
+        return DateManager.serverDateFormatter.string(from: date)
     }
     
     static func toString(date: Date,
-                         format: DateStringFormat) -> String? {
+                         format: DateStringFormat) -> String {
         switch format {
         case .full:
             return DateManager.detailDateFormatter.string(from: date)
@@ -147,8 +157,18 @@ extension DateManager {
 
 // MARK: - 추출
 extension Date {
+    func toDateComponents() -> DateComponents {
+        return DateManager.calendar.dateComponents([.year, .month, .day], from: self)
+    }
+    
     func getHours() -> Int {
         return DateManager.calendar.dateComponents([.hour], from: self).hour ?? 0
+    }
+}
+
+extension DateComponents {
+    func toDate() -> Date? {
+        return DateManager.calendar.date(from: self)
     }
 }
 

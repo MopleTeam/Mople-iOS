@@ -56,7 +56,7 @@ final class GroupListTableViewController: UIViewController, View {
     
     private func setupTableView() {
         self.tableView.delegate = self
-        self.tableView.register(GroupListCell.self, forCellReuseIdentifier: GroupListCell.reuseIdentifier)
+        self.tableView.register(GroupListTableCell.self, forCellReuseIdentifier: GroupListTableCell.reuseIdentifier)
     }
     
     private func setAction() {
@@ -71,7 +71,7 @@ final class GroupListTableViewController: UIViewController, View {
     func bind(reactor: GroupListViewReactor) {
         reactor.pulse(\.$groupList)
             .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: GroupListCell.reuseIdentifier, cellType: GroupListCell.self)) { index, item, cell in
+            .drive(self.tableView.rx.items(cellIdentifier: GroupListTableCell.reuseIdentifier, cellType: GroupListTableCell.self)) { index, item, cell in
                 cell.configure(with: ThumbnailViewModel(group: item.commonGroup,
                                                         memberCount: item.memberCount,
                                                         lastScheduleDate: item.lastScheduleDate))

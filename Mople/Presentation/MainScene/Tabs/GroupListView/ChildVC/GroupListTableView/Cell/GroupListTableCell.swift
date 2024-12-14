@@ -7,9 +7,8 @@
 
 import UIKit
 import SnapKit
-import Kingfisher
 
-final class GroupListCell: UITableViewCell {
+final class GroupListTableCell: UITableViewCell {
         
     private let thumbnailView = ThumbnailTitleView(type: .detail)
     
@@ -68,7 +67,7 @@ final class GroupListCell: UITableViewCell {
     }
 }
 
-extension GroupListCell {
+extension GroupListTableCell {
     private enum DateStatus {
         case past(_ days: Int)
         case present

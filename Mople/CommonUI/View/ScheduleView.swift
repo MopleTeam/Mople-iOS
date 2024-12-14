@@ -47,7 +47,7 @@ extension ScheduleViewModel {
 final class ScheduleView: UIView {
     
     private lazy var thumbnailView: ThumbnailTitleView = {
-        let view = ThumbnailTitleView(type: .simple)
+        let view = ThumbnailTitleView(type: .basic)
         return view
     }()
     

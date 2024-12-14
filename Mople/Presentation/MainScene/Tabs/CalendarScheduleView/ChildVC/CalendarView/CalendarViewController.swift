@@ -204,10 +204,7 @@ final class CalendarViewController: UIViewController, View {
 
         reactor.pulse(\.$switchPage)
             .asDriver(onErrorJustReturn: nil)
-            .compactMap({ date in
-                guard let date else { return nil}
-                return DateManager.toDate(date)
-            })
+            .compactMap({ $0?.toDate() })
             .drive(with: self, onNext: { vc, date in
                 vc.moveToPage(on: date)
             })
@@ -387,7 +384,7 @@ extension CalendarViewController {
 
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
     private func sendCurrentPageToHeader() {
-        pageObserver.accept(DateManager.toDateComponents(calendar.currentPage))
+        pageObserver.accept(calendar.currentPage.toDateComponents())
     }
 
     /// 월간에서 주간으로 변경될 때 표시할 값 계산

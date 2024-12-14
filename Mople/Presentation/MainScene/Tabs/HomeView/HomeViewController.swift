@@ -191,7 +191,8 @@ final class HomeViewController: UIViewController, View {
         self.makeScheduleButton.rx.controlEvent(.touchUpInside)
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                let createCalendarView = PlanCreateViewController(title: "약속 생성하기")
+                let createCalendarView = PlanCreateViewController(title: "약속 생성하기",
+                                                                  reactor: PlanCreateViewReactor(createPlanUseCase: CreatePlanMock()))
                 vc.navigationController?.pushViewController(createCalendarView, animated: true)
             })
             .disposed(by: disposeBag)

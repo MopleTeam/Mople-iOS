@@ -11,6 +11,11 @@ import RxCocoa
 
 final class LabeledTextField: UIView {
     
+    enum ViewMode {
+        case left
+        case right
+    }
+    
     // MARK: - Reactive
     public var rx_text: ControlProperty<String?> {
         return inputTextField.rx.text
@@ -24,9 +29,8 @@ final class LabeledTextField: UIView {
         return inputTextField.rx.isResign
     }
     
-    enum ViewMode {
-        case left
-        case right
+    public var text: String? {
+        return inputTextField.text
     }
     
     private var maxCount: Int?
@@ -137,10 +141,6 @@ extension LabeledTextField {
 // MARK: - 외부 설정
 extension LabeledTextField {
     
-    var text: String? {
-        return inputTextField.text
-    }
-    
     public func setInputTextField(view: UIView, mode: ViewMode) {
         switch mode {
         case .left:
@@ -152,3 +152,4 @@ extension LabeledTextField {
         }
     }
 }
+

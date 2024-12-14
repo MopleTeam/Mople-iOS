@@ -42,7 +42,7 @@
 		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
 		5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */; };
-		5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453E2C900E12009E0784 /* GroupListCell.swift */; };
+		5236453F2C900E12009E0784 /* GroupListTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453E2C900E12009E0784 /* GroupListTableCell.swift */; };
 		523645432C901CF7009E0784 /* GroupListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645422C901CF7009E0784 /* GroupListViewReactor.swift */; };
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
@@ -114,8 +114,7 @@
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
 		529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */; };
 		529D7B902CDE019A00BE77BE /* DetailGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */; };
-		52A787732D0277F500A633B3 /* YearMonthPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787722D0277F500A633B3 /* YearMonthPickerView.swift */; };
-		52A787762D0348B400A633B3 /* PlanDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDatePickerView.swift */; };
+		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
 		52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* SignInRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
 		52B87E302C6B2A460026B601 /* Pretendard-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */; };
@@ -136,6 +135,9 @@
 		52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */; };
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
+		52C5200C2D0D6A550085F5F7 /* GroupSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C5200B2D0D6A550085F5F7 /* GroupSelectViewController.swift */; };
+		52C5200F2D0D6DC90085F5F7 /* DefaultBottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C5200E2D0D6DC90085F5F7 /* DefaultBottomSheetView.swift */; };
+		52C520122D0D99CC0085F5F7 /* GroupSelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C520112D0D99CC0085F5F7 /* GroupSelectTableViewCell.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
 		52C72E932C4FBD6500CFF329 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E922C4FBD6500CFF329 /* Assets.xcassets */; };
 		52C72E962C4FBD6500CFF329 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E952C4FBD6500CFF329 /* Base */; };
@@ -144,6 +146,14 @@
 		52C72EA32C4FBE4100CFF329 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA22C4FBE4100CFF329 /* RxSwift */; };
 		52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA52C4FBE5900CFF329 /* SnapKit */; };
 		52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */; };
+		52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857AD2D07A71500765FB3 /* CreatePlan.swift */; };
+		52C857B22D081DE800765FB3 /* PlanRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857B12D081DE800765FB3 /* PlanRequest.swift */; };
+		52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857B52D082AFB00765FB3 /* PlanResponse.swift */; };
+		52C857BB2D0865A100765FB3 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857BA2D0865A100765FB3 /* Plan.swift */; };
+		52C857BD2D086C9200765FB3 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857BC2D086C9200765FB3 /* Location.swift */; };
+		52C857BF2D086C9B00765FB3 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857BE2D086C9B00765FB3 /* Weather.swift */; };
+		52C857C12D086CAB00765FB3 /* MeetingSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857C02D086CAB00765FB3 /* MeetingSummary.swift */; };
+		52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857C22D086D0000765FB3 /* CreatePlanMock.swift */; };
 		52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */; };
 		52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B442C730816002B6D20 /* NetworkConfig.swift */; };
 		52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CB0B462C7308A8002B6D20 /* Endpoint.swift */; };
@@ -194,8 +204,8 @@
 		52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1A2CF8C4B900EFD753 /* FCMTokenManager.swift */; };
 		52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */; };
 		52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */; };
-		52F153592D0457B7001A7BF5 /* DynamicDatePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */; };
 		52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */; };
+		52F1535D2D0724D0001A7BF5 /* PlanCreateViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -233,7 +243,7 @@
 		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
 		5236453B2C900DA3009E0784 /* GroupListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableViewController.swift; sourceTree = "<group>"; };
-		5236453E2C900E12009E0784 /* GroupListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListCell.swift; sourceTree = "<group>"; };
+		5236453E2C900E12009E0784 /* GroupListTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListTableCell.swift; sourceTree = "<group>"; };
 		523645422C901CF7009E0784 /* GroupListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListViewReactor.swift; sourceTree = "<group>"; };
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
@@ -299,8 +309,7 @@
 		529A26052C96A781009F4CFA /* ScheduleListReuseFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListReuseFooterView.swift; sourceTree = "<group>"; };
 		529D7B8D2CDDE78700BE77BE /* CommonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonGroup.swift; sourceTree = "<group>"; };
 		529D7B8F2CDE019A00BE77BE /* DetailGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroup.swift; sourceTree = "<group>"; };
-		52A787722D0277F500A633B3 /* YearMonthPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthPickerView.swift; sourceTree = "<group>"; };
-		52A787752D0348B400A633B3 /* PlanDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDatePickerView.swift; sourceTree = "<group>"; };
+		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* SignInRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		52B87E272C6B2A450026B601 /* Pretendard-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Pretendard-Light.ttf"; sourceTree = "<group>"; };
@@ -321,12 +330,23 @@
 		52BBF6BC2CE2536200564F11 /* UIStackView+Reverse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Reverse.swift"; sourceTree = "<group>"; };
 		52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCalendarCell.swift; sourceTree = "<group>"; };
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
+		52C5200B2D0D6A550085F5F7 /* GroupSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupSelectViewController.swift; sourceTree = "<group>"; };
+		52C5200E2D0D6DC90085F5F7 /* DefaultBottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBottomSheetView.swift; sourceTree = "<group>"; };
+		52C520112D0D99CC0085F5F7 /* GroupSelectTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupSelectTableViewCell.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Mople.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mople.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C72E892C4FBD6400CFF329 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52C72E922C4FBD6500CFF329 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52C72E952C4FBD6500CFF329 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		52C72E972C4FBD6500CFF329 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CALayer+Ext.swift"; sourceTree = "<group>"; };
+		52C857AD2D07A71500765FB3 /* CreatePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlan.swift; sourceTree = "<group>"; };
+		52C857B12D081DE800765FB3 /* PlanRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanRequest.swift; sourceTree = "<group>"; };
+		52C857B52D082AFB00765FB3 /* PlanResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanResponse.swift; sourceTree = "<group>"; };
+		52C857BA2D0865A100765FB3 /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
+		52C857BC2D086C9200765FB3 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		52C857BE2D086C9B00765FB3 /* Weather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
+		52C857C02D086CAB00765FB3 /* MeetingSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingSummary.swift; sourceTree = "<group>"; };
+		52C857C22D086D0000765FB3 /* CreatePlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanMock.swift; sourceTree = "<group>"; };
 		52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		52CB0B442C730816002B6D20 /* NetworkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConfig.swift; sourceTree = "<group>"; };
 		52CB0B462C7308A8002B6D20 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
@@ -373,8 +393,8 @@
 		52EA6E1A2CF8C4B900EFD753 /* FCMTokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenManager.swift; sourceTree = "<group>"; };
 		52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenUploadRepo.swift; sourceTree = "<group>"; };
 		52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFCMTokenUploadRepo.swift; sourceTree = "<group>"; };
-		52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicDatePickerView.swift; sourceTree = "<group>"; };
 		52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeElement.swift"; sourceTree = "<group>"; };
+		52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreateViewReactor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -588,7 +608,7 @@
 		5236453D2C900E0C009E0784 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				5236453E2C900E12009E0784 /* GroupListCell.swift */,
+				5236453E2C900E12009E0784 /* GroupListTableCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -619,8 +639,6 @@
 			isa = PBXGroup;
 			children = (
 				52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */,
-				52A787722D0277F500A633B3 /* YearMonthPickerView.swift */,
-				52F153582D0457B7001A7BF5 /* DynamicDatePickerView.swift */,
 			);
 			path = Picker;
 			sourceTree = "<group>";
@@ -628,8 +646,8 @@
 		52473D6D2CEF7959009D045A /* ChildVC */ = {
 			isa = PBXGroup;
 			children = (
-				52A787742D03489800A633B3 /* PlanDatePickerView */,
 				52A7876F2D02666C00A633B3 /* GroupSelectView */,
+				52A787742D03489800A633B3 /* PlanDatePickerView */,
 			);
 			path = ChildVC;
 			sourceTree = "<group>";
@@ -657,11 +675,8 @@
 		524E33D92C80C17A004B15FC /* DataMapping */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6AB2CD9D75B00B855CB /* Group */,
-				5285E6B22CD9F44200B855CB /* Schedule */,
-				5285E6B82CDA099E00B855CB /* Comment */,
-				5285E6AE2CD9F3DE00B855CB /* User */,
-				5285E6A92CD9D74000B855CB /* Error */,
+				52C857B82D0862DB00765FB3 /* Request */,
+				52C857B72D0862CB00765FB3 /* Response */,
 			);
 			path = DataMapping;
 			sourceTree = "<group>";
@@ -771,6 +786,7 @@
 		526B985C2CEDBBF6002488C5 /* PlanCreate */ = {
 			isa = PBXGroup;
 			children = (
+				52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */,
 				526B985D2CEDBC03002488C5 /* PlanCreateViewController.swift */,
 				52473D6D2CEF7959009D045A /* ChildVC */,
 			);
@@ -820,6 +836,7 @@
 				523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */,
 				52266BFB2CBD482F007D03EB /* FetchProfileMock.swift */,
 				52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */,
+				52C857C22D086D0000765FB3 /* CreatePlanMock.swift */,
 			);
 			path = UseCaseMock;
 			sourceTree = "<group>";
@@ -970,7 +987,6 @@
 				5285E6DB2CDC32FD00B855CB /* CommonSchedule.swift */,
 				5285E6DD2CDC340200B855CB /* SimpleSchedule.swift */,
 				5285E6DF2CDC340A00B855CB /* DetailSchedule.swift */,
-				5285E6E12CDC342D00B855CB /* Components */,
 			);
 			path = Schedule;
 			sourceTree = "<group>";
@@ -978,8 +994,9 @@
 		5285E6E12CDC342D00B855CB /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				5285E6D22CDB505500B855CB /* LocationInfo.swift */,
-				5285E6D42CDB505F00B855CB /* WeatherInfo.swift */,
+				52C857BC2D086C9200765FB3 /* Location.swift */,
+				52C857BE2D086C9B00765FB3 /* Weather.swift */,
+				52C857C02D086CAB00765FB3 /* MeetingSummary.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1071,6 +1088,8 @@
 		52A7876F2D02666C00A633B3 /* GroupSelectView */ = {
 			isa = PBXGroup;
 			children = (
+				52C5200B2D0D6A550085F5F7 /* GroupSelectViewController.swift */,
+				52C520102D0D99C00085F5F7 /* Cell */,
 			);
 			path = GroupSelectView;
 			sourceTree = "<group>";
@@ -1078,7 +1097,7 @@
 		52A787742D03489800A633B3 /* PlanDatePickerView */ = {
 			isa = PBXGroup;
 			children = (
-				52A787752D0348B400A633B3 /* PlanDatePickerView.swift */,
+				52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */,
 			);
 			path = PlanDatePickerView;
 			sourceTree = "<group>";
@@ -1176,6 +1195,22 @@
 			path = CalendarView;
 			sourceTree = "<group>";
 		};
+		52C5200D2D0D6DBC0085F5F7 /* SheetView */ = {
+			isa = PBXGroup;
+			children = (
+				52C5200E2D0D6DC90085F5F7 /* DefaultBottomSheetView.swift */,
+			);
+			path = SheetView;
+			sourceTree = "<group>";
+		};
+		52C520102D0D99C00085F5F7 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				52C520112D0D99CC0085F5F7 /* GroupSelectTableViewCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
 		52C72E7D2C4FBD6400CFF329 = {
 			isa = PBXGroup;
 			children = (
@@ -1209,6 +1244,75 @@
 				52CB0B3A2C72A961002B6D20 /* Test */,
 			);
 			path = Mople;
+			sourceTree = "<group>";
+		};
+		52C857AF2D081DD400765FB3 /* NeedEdit */ = {
+			isa = PBXGroup;
+			children = (
+				5285E6D22CDB505500B855CB /* LocationInfo.swift */,
+				5285E6D42CDB505F00B855CB /* WeatherInfo.swift */,
+				52EA6DF92CF78F8100EFD753 /* Login */,
+				5285E6C62CDB332A00B855CB /* Group */,
+				5285E6D12CDB504600B855CB /* Schedule */,
+				529D7B912CDE14BD00BE77BE /* Comment */,
+				5285E6C22CDB1E8500B855CB /* User */,
+				5285E6C12CDA0E0200B855CB /* Auth */,
+			);
+			path = NeedEdit;
+			sourceTree = "<group>";
+		};
+		52C857B02D081DDC00765FB3 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				52C857BA2D0865A100765FB3 /* Plan.swift */,
+				5285E6E12CDC342D00B855CB /* Components */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		52C857B32D082AE000765FB3 /* NeedEdit */ = {
+			isa = PBXGroup;
+			children = (
+				5285E6AB2CD9D75B00B855CB /* Group */,
+				5285E6B22CD9F44200B855CB /* Schedule */,
+				5285E6B82CDA099E00B855CB /* Comment */,
+				5285E6AE2CD9F3DE00B855CB /* User */,
+				5285E6A92CD9D74000B855CB /* Error */,
+			);
+			path = NeedEdit;
+			sourceTree = "<group>";
+		};
+		52C857B42D082AE900765FB3 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				52C857B12D081DE800765FB3 /* PlanRequest.swift */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		52C857B72D0862CB00765FB3 /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				52C857B92D0863EA00765FB3 /* Plan */,
+				52C857B32D082AE000765FB3 /* NeedEdit */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
+		52C857B82D0862DB00765FB3 /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				52C857B42D082AE900765FB3 /* Plan */,
+			);
+			path = Request;
+			sourceTree = "<group>";
+		};
+		52C857B92D0863EA00765FB3 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				52C857B52D082AFB00765FB3 /* PlanResponse.swift */,
+			);
+			path = Plan;
 			sourceTree = "<group>";
 		};
 		52CB0B382C72A564002B6D20 /* Application */ = {
@@ -1247,6 +1351,7 @@
 		52CB0B3C2C72AA1F002B6D20 /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
+				52C5200D2D0D6DBC0085F5F7 /* SheetView */,
 				52266BF52CBCF622007D03EB /* ViewController */,
 				52473D6A2CEF5D4A009D045A /* Picker */,
 				526B98602CEDBDE9002488C5 /* TextField */,
@@ -1305,12 +1410,13 @@
 			path = DateManager;
 			sourceTree = "<group>";
 		};
-		52CE87CA2CEC40B100EBD85D /* CreateGroup */ = {
+		52CE87CA2CEC40B100EBD85D /* Create */ = {
 			isa = PBXGroup;
 			children = (
 				52CE87CB2CEC40D000EBD85D /* CreateGroup.swift */,
+				52C857AD2D07A71500765FB3 /* CreatePlan.swift */,
 			);
-			path = CreateGroup;
+			path = Create;
 			sourceTree = "<group>";
 		};
 		52E238222C7453EC0066C9A3 /* Domain */ = {
@@ -1326,12 +1432,8 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				52EA6DF92CF78F8100EFD753 /* Login */,
-				5285E6C62CDB332A00B855CB /* Group */,
-				5285E6D12CDB504600B855CB /* Schedule */,
-				529D7B912CDE14BD00BE77BE /* Comment */,
-				5285E6C22CDB1E8500B855CB /* User */,
-				5285E6C12CDA0E0200B855CB /* Auth */,
+				52C857B02D081DDC00765FB3 /* Plan */,
+				52C857AF2D081DD400765FB3 /* NeedEdit */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1370,7 +1472,7 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
-				52CE87CA2CEC40B100EBD85D /* CreateGroup */,
+				52CE87CA2CEC40B100EBD85D /* Create */,
 				525DFCEE2CC8F01A00835312 /* LoginScene */,
 				525DFCF52CC8FB1100835312 /* MainScene */,
 			);
@@ -1581,11 +1683,12 @@
 				5259B0182CA028C2006B2711 /* ScheduleView.swift in Sources */,
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
+				52C5200F2D0D6DC90085F5F7 /* DefaultBottomSheetView.swift in Sources */,
 				5211F9032C86E41900403980 /* ScheduleListCollectionViewController.swift in Sources */,
-				52F153592D0457B7001A7BF5 /* DynamicDatePickerView.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
 				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
+				52C857BD2D086C9200765FB3 /* Location.swift in Sources */,
 				52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */,
 				5236452D2C8EDCEF009E0784 /* DefaultViewController.swift in Sources */,
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
@@ -1605,7 +1708,7 @@
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */,
-				52A787732D0277F500A633B3 /* YearMonthPickerView.swift in Sources */,
+				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchProfileMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
@@ -1613,6 +1716,7 @@
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
 				52EA6E022CF7B88D00EFD753 /* SignUpRepo.swift in Sources */,
+				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardEvent.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButton.swift in Sources */,
@@ -1641,7 +1745,9 @@
 				5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* DefaultNavigationBar.swift in Sources */,
+				52C857C12D086CAB00765FB3 /* MeetingSummary.swift in Sources */,
 				529D7B8E2CDDE78700BE77BE /* CommonGroup.swift in Sources */,
+				52C520122D0D99CC0085F5F7 /* GroupSelectTableViewCell.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* SignUpRepositoryMock.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				52CE87C92CEC3FED00EBD85D /* ImageUploadRepo.swift in Sources */,
@@ -1663,7 +1769,7 @@
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
-				5236453F2C900E12009E0784 /* GroupListCell.swift in Sources */,
+				5236453F2C900E12009E0784 /* GroupListTableCell.swift in Sources */,
 				52EA6E102CF84B3100EFD753 /* NicknameValidationRepo.swift in Sources */,
 				5285E6E02CDC340A00B855CB /* DetailSchedule.swift in Sources */,
 				52EA6E0A2CF83C6B00EFD753 /* ProfileEditRepo.swift in Sources */,
@@ -1671,13 +1777,14 @@
 				52CE87C52CEC38E400EBD85D /* GroupTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
-				52A787762D0348B400A633B3 /* PlanDatePickerView.swift in Sources */,
+				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
 				5285E6AD2CD9D78B00B855CB /* DetailGroupDTO.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleTableViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */,
 				52EA6E122CF8546700EFD753 /* ProfileEdit.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
+				52C857B22D081DE800765FB3 /* PlanRequest.swift in Sources */,
 				527A3E972C83627C007FE63B /* GroupListViewController.swift in Sources */,
 				52EA6E0E2CF84ABD00EFD753 /* ValidatorNickname.swift in Sources */,
 				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
@@ -1686,7 +1793,9 @@
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
+				52C857BF2D086C9B00765FB3 /* Weather.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
+				52F1535D2D0724D0001A7BF5 /* PlanCreateViewReactor.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52EA6E0C2CF83C9200EFD753 /* DefalutProfileEditRepo.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
@@ -1701,6 +1810,8 @@
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* CardButton.swift in Sources */,
+				52C5200C2D0D6A550085F5F7 /* GroupSelectViewController.swift in Sources */,
+				52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */,
 				527DBE2F2CE8965A008BB20E /* GroupCreateViewController.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */,
@@ -1713,6 +1824,7 @@
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */,
 				5236453C2C900DA3009E0784 /* GroupListTableViewController.swift in Sources */,
+				52C857BB2D0865A100765FB3 /* Plan.swift in Sources */,
 				5285E6DE2CDC340200B855CB /* SimpleSchedule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

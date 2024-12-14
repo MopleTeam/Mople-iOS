@@ -11,7 +11,16 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class PlanCreateViewController: DefaultViewController {
+// 모임 생성 뷰 : (리액터 포함) 홈화면에서는 모임 리스트가 있지만, 모임 상세에서는 없음 최신화를 위해서 API 요청 -> 모임 ID
+// 날짜 선택 뷰 : (리액터 포함) 일정 날짜
+// 시간 선택 뷰 : (리액터 포함) 일정 시간 (오늘이면 5분 뒤 부터 설정가능, 미래면 모든 시간)
+// 맵 뷰 : (리액터 포함) 일정 장소
+// 현재 뷰 : 일정 이름
+// 요청 시 : 액션 처리 (탭: 그룹 리스트, 화면 모임상세 -> 일정 상세)
+
+final class PlanCreateViewController: DefaultViewController, View {
+    
+    typealias Reactor = PlanCreateViewReactor
     
     var disposeBag: DisposeBag = DisposeBag()
     
@@ -21,6 +30,7 @@ final class PlanCreateViewController: DefaultViewController {
         return view
     }()
     
+    
     private let contentView = UIView()
     
     private let groupSelectView: LabeledButton = {
@@ -29,7 +39,7 @@ final class PlanCreateViewController: DefaultViewController {
         return btn
     }()
     
-    private let planInputView: LabeledTextField = {
+    private let planTitleInputView: LabeledTextField = {
         let view = LabeledTextField(title: TextStyle.CreatePlan.plan,
                                   placeholder: TextStyle.CreatePlan.planInfo,
                                   maxCount: 30)
@@ -77,7 +87,7 @@ final class PlanCreateViewController: DefaultViewController {
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
-            groupSelectView, planInputView, dateSelectView,
+            groupSelectView, planTitleInputView, dateSelectView,
             timeSelectView, placeSelectView, emptyView
         ])
         stackView.axis = .vertical
@@ -89,9 +99,10 @@ final class PlanCreateViewController: DefaultViewController {
     private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - LifeCycle
-    override init(title: String?) {
+    init(title: String?, reactor: PlanCreateViewReactor) {
         print(#function, #line, "LifeCycle Test PlanCreateView Created" )
         super.init(title: title)
+        self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -144,6 +155,16 @@ final class PlanCreateViewController: DefaultViewController {
         self.setBarItem(type: .left, image: .arrowBack)
     }
     
+    // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함
+    // 추가로 받을 것 모든 데이터 입력됐을 시 completed버튼 활성화
+    func bind(reactor: PlanCreateViewReactor) {
+        planTitleInputView.rx_editing
+            .compactMap { [weak self] _ in self?.planTitleInputView.text }
+            .map({ Reactor.Action.setPlanName(name: $0) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
     private func setButtonAction() {
         leftItemEvent
             .asDriver(onErrorJustReturn: ())
@@ -154,7 +175,7 @@ final class PlanCreateViewController: DefaultViewController {
         
         self.dateSelectView.rx_tap
             .subscribe(with: self, onNext: { vc, isHide in
-                let datePickerView = FullDatePickerViewController()
+                let datePickerView = PlanDateSelectViewController()
                 
                 datePickerView.modalPresentationStyle = .pageSheet
                 
@@ -162,6 +183,12 @@ final class PlanCreateViewController: DefaultViewController {
                     sheet.detents = [ .medium() ]
                 }
                 self.present(datePickerView, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        self.groupSelectView.rx_tap
+            .subscribe(with: self, onNext: { vc, isHide in
+                self.presentSubView(destination: .group)
             })
             .disposed(by: disposeBag)
         
@@ -181,6 +208,23 @@ final class PlanCreateViewController: DefaultViewController {
                 vc.view.endEditing(true)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension PlanCreateViewController {
+    enum Route {
+        case group
+    }
+    
+    private func presentSubView(destination: Route) {
+        let destinationVC: UIViewController
+        
+        switch destination {
+        case .group:
+            destinationVC = GroupSelectViewController(reactor: reactor!)
+        }
+        
+        self.present(destinationVC, animated: true)
     }
 }
 

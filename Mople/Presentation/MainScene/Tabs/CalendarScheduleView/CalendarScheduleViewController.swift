@@ -14,14 +14,6 @@ final class CalendarScheduleViewController: DefaultViewController, View {
     
     typealias Reactor = CalendarViewReactor
     
-    private enum DistanceThreshold {
-        static let weekToMonthDistance: CGFloat = 50.0
-    }
-    
-    private enum VelocityThreshold {
-        static let thresholdVelocity: CGFloat = 300.0
-    }
-    
     // MARK: - Variables
     var disposeBag = DisposeBag()
     
