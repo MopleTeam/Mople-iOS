@@ -7,8 +7,8 @@
 import Foundation
 import RxSwift
 
-protocol FetchRecentSchedule {
-    func fetchRecentSchedule() -> Single<[SimpleSchedule]>
+protocol FetchRecentPlan {
+    func fetchRecentPlan() -> Single<HomeModel>
 }
 
     

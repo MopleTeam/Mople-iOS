@@ -16,25 +16,17 @@ final class GroupSelectViewController: UIViewController, View {
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Observer
-    public var closeButtonTap: ControlEvent<Void> {
-        return sheetView.closeButtonTap
-    }
-    
-    public var completedButtonTap: ControlEvent<Void> {
-        return sheetView.completedButtonTap
-    }
-    
     // MARK: - UI Components
     private let tableView: UITableView = {
         let table = UITableView()
-        table.backgroundColor = .systemGray
+        table.backgroundColor = .clear
         table.showsVerticalScrollIndicator = false
+        table.separatorStyle = .none
         return table
     }()
     
-    private lazy var sheetView: DefaultBottomSheetView = {
-        let view = DefaultBottomSheetView(contentView: tableView)
+    private lazy var sheetView: CompactSheet = {
+        let view = CompactSheet(contentView: tableView)
         view.setTitle("테스트")
         return view
     }()
@@ -57,8 +49,8 @@ final class GroupSelectViewController: UIViewController, View {
         super.viewDidLoad()
         setupUI()
         setupTableView()
-        setAction()
         setPresentationStyle()
+        setAction()
     }
     
     // MARK: - ModalStyle
@@ -76,30 +68,36 @@ final class GroupSelectViewController: UIViewController, View {
     }
     
     private func setupTableView() {
-        self.tableView.delegate = self
+        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(GroupSelectTableCell.self, forCellReuseIdentifier: GroupSelectTableCell.reuseIdentifier)
     }
     
+    // MARK: - Binding
     func bind(reactor: PlanCreateViewReactor) {
-        print(#function, #line, "Path : # 1214 ")
-        
-        Observable.combineLatest(self.rx.viewWillAppear, reactor.pulse(\.$testCount))
-            .do(onNext: { test in
-                print(#function, #line, "test : \(test)" )
-                
+        tableView.rx.itemSelected
+            .asDriver()
+            .map { Reactor.Action.setSelectedMeet(index: $0.row) }
+            .drive(with: self, onNext: { vc, action  in
+                reactor.action.onNext(action)
+                vc.dismiss(animated: true)
             })
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(self.rx.viewWillAppear, reactor.pulse(\.$meets))
             .map({ $0.1 })
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: GroupSelectTableCell.reuseIdentifier, cellType: GroupSelectTableCell.self)) { index, item, cell in
       
+                cell.configure(with: .init(meet: item))
             }
             .disposed(by: disposeBag)
     }
     
     private func setAction() {
-        tableView.rx.itemSelected
-            .subscribe(with: self, onNext: { vc, _ in
-
+        sheetView.closeButtonTap
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -107,6 +105,8 @@ final class GroupSelectViewController: UIViewController, View {
 
 extension GroupSelectViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        print(#function, #line, "indexPath : \(indexPath)" )
         return 60
     }
 }
+

@@ -10,12 +10,28 @@ import RxSwift
 
 
 
-final class FetchRecentScheduleMock: FetchRecentSchedule {
+final class FetchRecentScheduleMock: FetchRecentPlan {
     
-    func fetchRecentSchedule() -> Single<[SimpleSchedule]> {
-        return Single.just(SimpleSchedule.getMockEvents())
+    func fetchRecentPlan() -> Single<HomeModel> {
+        return Single.just(HomeModel.mock())
     }
 }
+
+extension HomeModel {
+    static func mock() -> Self {
+        let plans = Array(1...5).map {
+            let date = Date().addingTimeInterval(3600 * (24 * Double($0)))
+            return Plan.mock(date: date)
+        }
+        
+        let meetSummarys = Array(1...10).map { index in
+            return MeetSummary.mock(id: index)
+        }
+
+        return .init(plans: plans, meetSummary: meetSummarys)
+    }
+}
+
 
 extension SimpleSchedule {
     static func getMockEvents() -> [Self] {

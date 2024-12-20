@@ -189,15 +189,11 @@ final class HomeViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         self.makeScheduleButton.rx.controlEvent(.touchUpInside)
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                let createCalendarView = PlanCreateViewController(title: "약속 생성하기",
-                                                                  reactor: PlanCreateViewReactor(createPlanUseCase: CreatePlanMock()))
-                vc.navigationController?.pushViewController(createCalendarView, animated: true)
-            })
+            .map { _ in Reactor.Action.createPlan }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$schedules)
+        reactor.pulse(\.$plans)
                 .asDriver(onErrorJustReturn: [])
                 .drive(with: self, onNext: { vc, schedules in
                     vc.emptyDataView.isHidden = !schedules.isEmpty

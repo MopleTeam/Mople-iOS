@@ -125,11 +125,34 @@ extension MainSceneDIContainer {
     func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController {
         let title = TextStyle.CreateGroup.title
         return .init(title: title,
-                     reactor: makeGroupCreateViewReactor(action))
+                     reactor: makeCreateGroupViewReactor(action))
     }
     
-    private func makeGroupCreateViewReactor(_ action: CreateGroupAction) -> GroupCreateViewReactor {
+    private func makeCreateGroupViewReactor(_ action: CreateGroupAction) -> GroupCreateViewReactor {
         return .init(createGroupImpl: CreateGroupMock(), createGroupAction: action)
+    }
+    
+    // MARK: - 그룹 생성 화면
+    func makeCreatePlanViewController(
+        action: CreatePlanAction,
+        meets: [MeetSummary]
+    ) -> PlanCreateViewController {
+        
+        let title = TextStyle.CreateGroup.title
+        
+        return .init(title: title,
+                     reactor: makeCreatePlanViewReactor(action: action,
+                                                        meets: meets))
+    }
+    
+    private func makeCreatePlanViewReactor(
+        action: CreatePlanAction,
+        meets: [MeetSummary]
+    ) -> PlanCreateViewReactor {
+        
+        return .init(createPlanUseCase: CreatePlanMock(),
+                     createPlanAction: action,
+                     meets: meets)
     }
 }
 

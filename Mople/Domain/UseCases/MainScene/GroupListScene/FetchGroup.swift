@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol FetchGroup {
-    func fetchGroupList() -> Single<[SimpleGroup]>
+    func fetchGroupList() -> Single<[Meet]>
 }
 
 

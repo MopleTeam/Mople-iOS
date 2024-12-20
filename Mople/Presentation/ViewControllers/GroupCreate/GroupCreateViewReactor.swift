@@ -34,7 +34,8 @@ final class GroupCreateViewReactor: Reactor {
     private let createGroupImpl: CreateGroup
     private let createGroupAction: CreateGroupAction
     
-    init(createGroupImpl: CreateGroup, createGroupAction: CreateGroupAction) {
+    init(createGroupImpl: CreateGroup,
+         createGroupAction: CreateGroupAction) {
         print(#function, #line, "LifeCycle Test GroupCreateView Reactor Created" )
         self.createGroupImpl = createGroupImpl
         self.createGroupAction = createGroupAction

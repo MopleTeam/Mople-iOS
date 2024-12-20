@@ -51,7 +51,7 @@ final class ScheduleTableViewCell: UITableViewCell {
         self.scheduleView.layer.cornerRadius = 12
     }
 
-    public func configure(viewModel: ScheduleViewModel) {
+    public func configure(viewModel: PlanViewModel) {
         self.scheduleView.configure(viewModel)
     }
 }

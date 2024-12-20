@@ -9,36 +9,39 @@ import UIKit
 import ReactorKit
 
 struct HomeViewAction {
-    var presentCreateGroupView: (((() -> Void)?) -> Void)
+    var presentCreateGroupView: (() -> Void)
+    var presentCreatePlanView: (([MeetSummary]) -> Void)
     var presentCalendarView: (Date) -> Void
 }
 
 final class HomeViewReactor: Reactor {
     enum Action {
         case checkNotificationPermission
-        case fetchRecentSchedule
         case createGroup
+        case createPlan
         case presentCalendaer
+        case requestRecentPlan
     }
     
     enum Mutation {
-        case fetchRecentScehdule(schedules: [SimpleSchedule])
         case presentCalendar(date: Date)
-        case presentCreateGroupView(completedAction: (() -> Void)?)
+        case presentCreateGroupView
+        case presentCreatePlanView
+        case responseRecentPlan(schedules: HomeModel)
     }
     
     struct State {
-        @Pulse var schedules: [SimpleSchedule] = []
-        @Pulse var presentCompleted: Void?
+        @Pulse var plans: [Plan] = []
     }
     
-    private let fetchRecentScheduleUseCase: FetchRecentSchedule
+    private let fetchRecentScheduleUseCase: FetchRecentPlan
     private let requestRefreshFCMTokenUseCase: ReqseutRefreshFCMToken
     private let homeViewAction: HomeViewAction
     
     var initialState: State = State()
+    var meets: [MeetSummary] = []
     
-    init(fetchRecentScheduleUseCase: FetchRecentSchedule,
+    init(fetchRecentScheduleUseCase: FetchRecentPlan,
          refreshFCMTokenUseCase: ReqseutRefreshFCMToken,
          viewAction: HomeViewAction) {
         print(#function, #line, "LifeCycle Test HomeViewReactor Created" )
@@ -46,7 +49,7 @@ final class HomeViewReactor: Reactor {
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
         self.requestRefreshFCMTokenUseCase = refreshFCMTokenUseCase
         self.homeViewAction = viewAction
-        action.onNext(.fetchRecentSchedule)
+        action.onNext(.requestRecentPlan)
     }
     
     deinit {
@@ -55,14 +58,16 @@ final class HomeViewReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .fetchRecentSchedule:
-            fetchRecentSchedules()
+        case .requestRecentPlan:
+            return fetchRecentSchedules()
         case .createGroup:
-            presentCreateGroupView()
+            return .just(.presentCreateGroupView)
         case .presentCalendaer:
-            presentNextEvent()
+            return presentNextEvent()
         case .checkNotificationPermission:
-            checkNotificationPermission()
+            return checkNotificationPermission()
+        case .createPlan:
+            return .just(.presentCreatePlanView)
         }
     }
     
@@ -71,12 +76,16 @@ final class HomeViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .fetchRecentScehdule(let schedules):
-            newState.schedules = schedules.sorted(by: <)
+        case .responseRecentPlan(let homeModel):
+            let recentSchedules = homeModel.plans.sorted(by: <)
+            newState.plans = recentSchedules
+            self.meets = homeModel.meetSummary
         case .presentCalendar(let date):
             homeViewAction.presentCalendarView(date)
-        case .presentCreateGroupView(let completedAction):
-            homeViewAction.presentCreateGroupView(completedAction)
+        case .presentCreateGroupView:
+            homeViewAction.presentCreateGroupView()
+        case .presentCreatePlanView:
+            homeViewAction.presentCreatePlanView(meets)
         }
         return newState
     }
@@ -127,21 +136,17 @@ extension HomeViewReactor {
     
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
-        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentSchedule()
+        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentPlan()
             .asObservable()
-            .map { Mutation.fetchRecentScehdule(schedules: $0) }
+            .map { Mutation.responseRecentPlan(schedules: $0) }
         
         return fetchSchedules
     }
     
     private func presentNextEvent() -> Observable<Mutation> {
-        guard !currentState.schedules.isEmpty,
-              let lastDate = currentState.schedules.last?.date else { return Observable.empty() }
+        guard !currentState.plans.isEmpty,
+              let lastDate = currentState.plans.last?.date else { return Observable.empty() }
         let startOfDay = DateManager.startOfDay(lastDate)
         return .just(.presentCalendar(date: startOfDay))
-    }
-    
-    private func presentCreateGroupView() -> Observable<Mutation> {
-        return .just(.presentCreateGroupView(completedAction: nil))
     }
 }

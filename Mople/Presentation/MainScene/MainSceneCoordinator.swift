@@ -16,6 +16,7 @@ protocol MainSceneDependencies {
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileEditAction) -> ProfileEditViewController
     func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController
+    func makeCreatePlanViewController(action: CreatePlanAction, meets: [MeetSummary]) -> PlanCreateViewController
 }
 
 protocol AccountAction {
@@ -75,11 +76,12 @@ extension MainSceneCoordinator {
     
     private func getHomeViewController() -> HomeViewController {
         let action = HomeViewAction(presentCreateGroupView: pushCreateGroupView,
+                                    presentCreatePlanView: pushCreatePlanView,
                                     presentCalendarView: pushCalendarView(lastRecentDate:))
         return dependencies.makeHomeViewController(action: action)
     }
     
-    /// 캘린더 뷰로 이동하기
+    // MARK: - 캘린더 뷰 이동
     /// - Parameter lastRecentDate: 이동시 표시할 데이트
     private func pushCalendarView(lastRecentDate: Date) {
         guard let index = getIndexFromTabBar(destination: .calendar),
@@ -89,11 +91,10 @@ extension MainSceneCoordinator {
         tabBarController?.selectedIndex = index
     }
     
-    /// 그룹 생성 화면으로 이동
+    // MARK: - 그룹 생성 화면 이동
     /// - Parameter completedAction: 완료 후 액션 (예시: 그룹 생성 후 그룹 리스트 reload)
-    private func pushCreateGroupView(completedAction: (() -> Void)? = nil) {
+    private func pushCreateGroupView() {
         let action: CreateGroupAction = .init {
-            completedAction?()
             self.switchToGroupListTap()
             self.navigationController.popViewController(animated: true)
         }
@@ -102,7 +103,19 @@ extension MainSceneCoordinator {
         self.navigationController.pushViewController(createGroupView, animated: true)
     }
     
-    /// 새로운 그룹 생성 후 그룹 리스트 탭으로 이동
+    // MARK: - 일정 생성 화면 이동
+    private func pushCreatePlanView(meets: [MeetSummary]) {
+        let action: CreatePlanAction = .init {
+            self.switchToGroupListTap()
+            self.navigationController.popViewController(animated: true)
+        }
+        
+        let createPlanView = dependencies.makeCreatePlanViewController(action: action, meets: meets )
+        self.navigationController.pushViewController(createPlanView, animated: true)
+    }
+    
+    // MARK: - Helper
+    /// 새로운 일정 및 그룹 생성 후 그룹 리스트 탭으로 이동
     private func switchToGroupListTap() {
         guard let groupListInex = getIndexFromTabBar(destination: .group),
               self.tabBarController?.selectedIndex != groupListInex else { return }

@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol CreatePlanUsecase {
-    func createPlan(with plan: PlanRequest) -> Single<Plan>
+    func createPlan(with plan: PlanUploadRequest) -> Single<Plan>
 }

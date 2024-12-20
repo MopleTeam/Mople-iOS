@@ -27,7 +27,7 @@ final class CalendarViewReactor: Reactor {
     }
     
     enum Mutation {
-        case loadScheduleList(scheduleList: [ScheduleTableSectionModel])
+        case loadScheduleList(scheduleList: [PlanTableSectionModel])
         case loadEventDateList(eventDateList: [Date])
         case setCalendarHeight(_ height: CGFloat)
         case switchPage(_ dateComponents: DateComponents)
@@ -42,7 +42,7 @@ final class CalendarViewReactor: Reactor {
     }
     
     struct State {
-        @Pulse var schedules: [ScheduleTableSectionModel] = []
+        @Pulse var schedules: [PlanTableSectionModel] = []
         @Pulse var events: [Date] = []
         @Pulse var calendarHeight: CGFloat?
         @Pulse var switchPage: DateComponents?
@@ -137,7 +137,7 @@ extension CalendarViewReactor {
 
         let fetchAndProcess = fetchUseCase.fetchScheduleList()
             .asObservable()
-            .map { schedules -> (scheduleList: [ScheduleTableSectionModel], eventDateList: [Date]) in
+            .map { schedules -> (scheduleList: [PlanTableSectionModel], eventDateList: [Date]) in
                 let scheduleList = self.makeTableSectionModels(schedules)
                 let eventDateList = self.makeEventList(schedules)
                 return (scheduleList, eventDateList)
@@ -176,17 +176,17 @@ extension CalendarViewReactor {
     /// 서버로부터 전달된 일정 데이터를 테이블뷰 모델로 전환
     /// - Parameter schedules: 서버에서 받아온 일정 데이터
     /// - Returns: 일정 데이터를 일정별로 나누어서 리턴
-    private func makeTableSectionModels(_ schedules: [SimpleSchedule]) -> [ScheduleTableSectionModel] {
+    private func makeTableSectionModels(_ schedules: [Plan]) -> [PlanTableSectionModel] {
         let grouped = Dictionary(grouping: schedules) { schedule -> Date? in
             return schedule.startOfDate
         }
-        return grouped.map { ScheduleTableSectionModel(date: $0.key, items: $0.value) }
+        return grouped.map { PlanTableSectionModel(date: $0.key, items: $0.value) }
     }
     
     #warning("날짜 중복검사 시에는 날짜의 시작시간으로 초기화하는 것이 옳다. (startOfDay)")
     /// 서버로부터 전달된 일정 데이터에서 이벤트만 추출
     /// - Returns: 중복값을 제거 후 전달
-    private func makeEventList(_ schedules: [SimpleSchedule]) -> [Date] {
+    private func makeEventList(_ schedules: [Plan]) -> [Date] {
         let eventArray = schedules.compactMap { $0.startOfDate }
         let withOutDuplicate = Set(eventArray)
         return Array(withOutDuplicate)

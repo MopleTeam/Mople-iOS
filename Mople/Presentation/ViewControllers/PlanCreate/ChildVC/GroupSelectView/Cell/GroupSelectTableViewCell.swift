@@ -22,7 +22,7 @@ final class GroupSelectTableCell: UITableViewCell {
     }
     
     private func setupUI() {
-        self.backgroundColor = .systemBlue
+        self.backgroundColor = ColorStyle.Default.white
         self.contentView.addSubview(thumbnailView)
         
         thumbnailView.snp.makeConstraints { make in

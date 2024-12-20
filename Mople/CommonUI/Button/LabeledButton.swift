@@ -11,6 +11,8 @@ import RxCocoa
 
 final class LabeledButton: UIView {
     
+    fileprivate let defaultText: String?
+    
     // MARK: - Reactive
     public var rx_tap: ControlEvent<Void> {
         return button.rx.controlEvent(.touchUpInside)
@@ -50,9 +52,10 @@ final class LabeledButton: UIView {
     init(title: String,
          inputText: String? = nil,
          icon: UIImage? = nil) {
+        defaultText = inputText
         super.init(frame: .zero)
         setTitle(title)
-        setDefaultText(inputText)
+        setText(inputText)
         setIconImage(icon)
         setupUI()
     }
@@ -87,7 +90,7 @@ extension LabeledButton {
     }
     
     /// 텍스트 필드 플레이스 홀더 설정
-    private func setDefaultText(_ text: String?) {
+    fileprivate func setText(_ text: String?) {
         button.setTitle(text: text,
                      font: FontStyle.Body1.regular,
                      color: ColorStyle.Gray._05)
@@ -104,6 +107,14 @@ extension LabeledButton {
 
     public func setLayoutMargins(inset: NSDirectionalEdgeInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)) {
         button.setLayoutMargins(inset: inset)
+    }
+}
+
+extension Reactive where Base: LabeledButton {
+    var text: Binder<String?> {
+        return Binder(self.base) { button, text in
+            button.setText(text ?? button.defaultText)
+        }
     }
 }
 

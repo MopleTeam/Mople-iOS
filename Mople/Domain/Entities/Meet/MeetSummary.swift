@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct MeetingSummary {
-    let meetId: Int?
-    let meetName: String?
-    let meetThumnail: String?
+struct MeetSummary: Hashable {
+    let id: Int?
+    let name: String?
+    let imagePath: String?
 }

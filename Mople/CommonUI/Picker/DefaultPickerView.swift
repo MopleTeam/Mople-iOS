@@ -23,7 +23,7 @@ final class DefaultPickerView: UIView {
     // MARK: - UI Components
     private let pickerView = UIPickerView()
 
-    private lazy var sheetView = DefaultBottomSheetView(contentView: pickerView)
+    private lazy var sheetView = CompletableSheet(contentView: pickerView)
     
     // MARK: - LifeCycle
     init(title: String?) {

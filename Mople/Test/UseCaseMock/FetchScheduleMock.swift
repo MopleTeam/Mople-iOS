@@ -8,22 +8,21 @@
 import Foundation
 import RxSwift
 
-#warning("향후 메모리 성능을 향상시키기 위해서 페이징 처리를 생각해보면 좋을 것 같음")
 final class FetchScheduleMock: FetchSchedule {
     
-    private func getEvents() -> [SimpleSchedule] {
+    private func getEvents() -> [Plan] {
         print(#function, #line)
-        var scheduleArray = SimpleSchedule.getMockEvents()
+        var scheduleArray = Plan.recentMock()
         
         for _ in 1...100 {
-            let randomSchedule = SimpleSchedule.getRandomSchedule()
+            let randomSchedule = Plan.randomeMock()
             scheduleArray.append(randomSchedule)
         }
         
         return scheduleArray
     }
    
-    func fetchScheduleList() -> Single<[SimpleSchedule]> {
+    func fetchScheduleList() -> Single<[Plan]> {
         print(#function, #line)
         
         return Observable.just(getEvents())

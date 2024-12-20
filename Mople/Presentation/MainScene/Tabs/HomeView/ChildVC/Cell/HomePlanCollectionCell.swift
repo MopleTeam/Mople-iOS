@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ScheduleCollectionCell: UICollectionViewCell {
+final class HomePlanCollectionCell: UICollectionViewCell {
 
     private let scheduleView = ScheduleView()
     
@@ -40,7 +40,7 @@ final class ScheduleCollectionCell: UICollectionViewCell {
         self.contentView.layer.cornerRadius = 12
     }
 
-    public func configure(with viewModel: ScheduleViewModel) {
+    public func configure(with viewModel: PlanViewModel) {
         self.scheduleView.configure(viewModel)
     }
 }

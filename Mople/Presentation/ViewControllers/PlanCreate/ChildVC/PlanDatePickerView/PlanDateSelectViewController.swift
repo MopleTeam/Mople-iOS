@@ -11,15 +11,16 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class PlanDateSelectViewController: UIViewController {
+final class PlanDateSelectViewController: UIViewController, View {
+    
+    typealias Reactor = PlanCreateViewReactor
     
     // MARK: - Variables
-    
-    private var disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     private let today = DateManager.today
     private let todayComponents = DateManager.todayComponents
-    public lazy var selectedDate = todayComponents
+    private lazy var selectedDate = todayComponents
     
     private lazy var years: [Int] = []
     
@@ -32,9 +33,10 @@ final class PlanDateSelectViewController: UIViewController {
     private let pickerView = DefaultPickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
-    init() {
+    init(reactor: PlanCreateViewReactor) {
         print(#function, #line, "LifeCycle Test CalendarDate PickerView Created" )
         super.init(nibName: nil, bundle: nil)
+        self.reactor = reactor
     }
     
     deinit {
@@ -52,8 +54,9 @@ final class PlanDateSelectViewController: UIViewController {
     
     private func initialSetup() {
         setupUI()
-        setupDefaultDate()
+        setupPickerview()
         setPresentationStyle()
+        setupAction()
     }
     
     // MARK: - ModalStyle
@@ -72,9 +75,23 @@ final class PlanDateSelectViewController: UIViewController {
     }
     
     // MARK: - Default Date
-    private func setupDefaultDate() {
+    private func setupPickerview() {
         self.pickerView.setDelegate(delegate: self)
         self.defaultDateSeting(on: today)
+    }
+    
+    // MARK: - Binding
+    func bind(reactor: PlanCreateViewReactor) {
+        self.pickerView.completedButtonTap
+            .asDriver()
+            .compactMap({ [weak self] _ in
+                self?.selectedDate
+            })
+            .drive(with: self, onNext: { vc, date in
+                reactor.action.onNext(.setPlanDate(date: date, type: .day))
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
@@ -82,15 +99,6 @@ final class PlanDateSelectViewController: UIViewController {
         self.pickerView.closeButtonTap
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                vc.dismiss(animated: true)
-            })
-            .disposed(by: disposeBag)
-        
-        self.pickerView.completedButtonTap
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-//                let selectedDate = vc.pickerView.selectedDate
-//                vc.selectedDateObserver.accept(selectedDate)
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)

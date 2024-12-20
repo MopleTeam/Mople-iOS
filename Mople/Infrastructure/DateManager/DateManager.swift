@@ -10,6 +10,7 @@ import Foundation
 enum DateStringFormat {
     case full
     case simple
+    case time
 }
 
 final class DateManager {
@@ -45,6 +46,14 @@ final class DateManager {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy년 MM월 dd일"
+        return formatter
+    }()
+
+    
+    static let timeDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "HH시 mm분"
         return formatter
     }()
     
@@ -92,6 +101,10 @@ extension DateManager {
 
 // MARK: - 비교
 extension DateManager {
+    static func isToday(on date: Date) -> Bool {
+        return calendar.isDateInToday(date)
+    }
+    
     static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .day)
     }
@@ -103,19 +116,10 @@ extension DateManager {
     static func isSameMonth(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .month)
     }
-    
-    static func startOfDay(_ date: Date) -> Date {
-        return calendar.startOfDay(for: date)
-    }
+}
 
-    static func isNextMonth(_ date: Date) -> Date {
-        return calendar.date(byAdding: .month, value: 1, to: date) ?? Date()
-    }
-    
-    static func isPreviousMonth(_ date: Date) -> Date {
-        return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
-    }
-    
+// MARK: - 추출
+extension DateManager {
     static func numberOfDaysBetween(_ date: Date) -> Int {
         let scheduleDate = startOfDay(date)
         let result = calendar.dateComponents([.day], from: today, to: scheduleDate)
@@ -135,34 +139,80 @@ extension DateManager {
 
 // MARK: - 전환
 extension DateManager {
+    static func startOfDay(_ date: Date) -> Date {
+        return calendar.startOfDay(for: date)
+    }
+
+    static func isNextMonth(_ date: Date) -> Date {
+        return calendar.date(byAdding: .month, value: 1, to: date) ?? Date()
+    }
+    
+    static func isPreviousMonth(_ date: Date) -> Date {
+        return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
+    }
+    
     static func parseServerDate(string: String?) -> Date? {
         guard let string else { return nil }
         return DateManager.serverDateFormatter.date(from: string)
     }
     
+    static func convertTo24Hour(_ date: DateComponents) -> DateComponents {
+        var convertDate = date
+        guard let hour = convertDate.hour,
+              hour < 12 else { return date }
+        convertDate.hour = hour + 12
+        return convertDate
+    }
+    
+    static func convertTo12Hour(_ date: DateComponents) -> DateComponents {
+        var convertDate = date
+        guard let hour = convertDate.hour,
+              hour > 12 else { return date }
+        convertDate.hour = hour % 12
+        return convertDate
+    }
+}
+
+// MARK: - 문자열 전환
+extension DateManager {
     static func toServerDateString(_ date: Date) -> String {
         return DateManager.serverDateFormatter.string(from: date)
     }
     
-    static func toString(date: Date,
-                         format: DateStringFormat) -> String {
+    static func toString(date: Date?,
+                         format: DateStringFormat) -> String? {
+        guard let date else { return nil }
         switch format {
         case .full:
             return DateManager.detailDateFormatter.string(from: date)
         case .simple:
             return DateManager.simpleDateFormatter.string(from: date)
+        case .time:
+            return addPeriodPrefix(on: date)
+        }
+    }
+    
+    static func addPeriodPrefix(on date: Date) -> String? {
+        guard let hour = date.getTime().hour else { return nil }
+        
+        if hour >= 12 {
+            let convertDate = DateManager.convertTo12Hour(date.getTime())
+            guard let date = convertDate.toDate() else { return nil }
+            return ["오후", Self.timeDateFormatter.string(from: date)].joined(separator: " ")
+        } else {
+            return ["오전", Self.timeDateFormatter.string(from: date)].joined(separator: " ")
         }
     }
 }
 
-// MARK: - 추출
+// MARK: - 변환
 extension Date {
     func toDateComponents() -> DateComponents {
         return DateManager.calendar.dateComponents([.year, .month, .day], from: self)
     }
     
-    func getHours() -> Int {
-        return DateManager.calendar.dateComponents([.hour], from: self).hour ?? 0
+    func getTime() -> DateComponents {
+        return DateManager.calendar.dateComponents([.hour, .minute], from: self)
     }
 }
 

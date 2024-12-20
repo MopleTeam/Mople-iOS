@@ -33,20 +33,20 @@ final class PlanCreateViewController: DefaultViewController, View {
     
     private let contentView = UIView()
     
-    private let groupSelectView: LabeledButton = {
+    private let groupSelectButton: LabeledButton = {
         let btn = LabeledButton(title: TextStyle.CreatePlan.group,
                               inputText: TextStyle.CreatePlan.groupInfo)
         return btn
     }()
     
-    private let planTitleInputView: LabeledTextField = {
+    private let planTitleTextField: LabeledTextField = {
         let view = LabeledTextField(title: TextStyle.CreatePlan.plan,
                                   placeholder: TextStyle.CreatePlan.planInfo,
                                   maxCount: 30)
         return view
     }()
         
-    private let dateSelectView: LabeledButton = {
+    private let dateSelectButton: LabeledButton = {
         let btn = LabeledButton(title: TextStyle.CreatePlan.date,
                               inputText: TextStyle.CreatePlan.dateInfo,
                               icon: .createCalendar)
@@ -54,14 +54,14 @@ final class PlanCreateViewController: DefaultViewController, View {
         return btn
     }()
         
-    private let timeSelectView: LabeledButton = {
+    private let timeSelectButton: LabeledButton = {
         let btn = LabeledButton(title: TextStyle.CreatePlan.time,
                               inputText: TextStyle.CreatePlan.timeInfo,
                               icon: .createCalendar)
         return btn
     }()
     
-    private let placeSelectView: LabeledButton = {
+    private let placeSelectButton: LabeledButton = {
         let btn = LabeledButton(title: TextStyle.CreatePlan.plan,
                               inputText: TextStyle.CreatePlan.planInfo,
                               icon: .createPlace)
@@ -87,8 +87,8 @@ final class PlanCreateViewController: DefaultViewController, View {
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
-            groupSelectView, planTitleInputView, dateSelectView,
-            timeSelectView, placeSelectView, emptyView
+            groupSelectButton, planTitleTextField, dateSelectButton,
+            timeSelectButton, placeSelectButton, emptyView
         ])
         stackView.axis = .vertical
         stackView.spacing = 24
@@ -158,10 +158,32 @@ final class PlanCreateViewController: DefaultViewController, View {
     // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함
     // 추가로 받을 것 모든 데이터 입력됐을 시 completed버튼 활성화
     func bind(reactor: PlanCreateViewReactor) {
-        planTitleInputView.rx_editing
-            .compactMap { [weak self] _ in self?.planTitleInputView.text }
+        planTitleTextField.rx_editing
+            .compactMap { [weak self] _ in self?.planTitleTextField.text }
             .map({ Reactor.Action.setPlanName(name: $0) })
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$seletedMeet)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0?.name }
+            .drive(groupSelectButton.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$selectedDay)
+            .asDriver(onErrorJustReturn: nil)
+            .map({
+                DateManager.toString(date: $0?.toDate(), format: .simple)
+            })
+            .drive(dateSelectButton.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$selectedTime)
+            .asDriver(onErrorJustReturn: nil)
+            .map({
+                DateManager.toString(date: $0?.toDate(), format: .time)
+            })
+            .drive(timeSelectButton.rx.text)
             .disposed(by: disposeBag)
     }
     
@@ -173,28 +195,24 @@ final class PlanCreateViewController: DefaultViewController, View {
             })
             .disposed(by: disposeBag)
         
-        self.dateSelectView.rx_tap
-            .subscribe(with: self, onNext: { vc, isHide in
-                let datePickerView = PlanDateSelectViewController()
-                
-                datePickerView.modalPresentationStyle = .pageSheet
-                
-                if let sheet = datePickerView.sheetPresentationController {
-                    sheet.detents = [ .medium() ]
-                }
-                self.present(datePickerView, animated: true)
+        self.dateSelectButton.rx_tap
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                self.presentSubView(destination: .date)
             })
             .disposed(by: disposeBag)
         
-        self.groupSelectView.rx_tap
-            .subscribe(with: self, onNext: { vc, isHide in
+        self.groupSelectButton.rx_tap
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
                 self.presentSubView(destination: .group)
             })
             .disposed(by: disposeBag)
         
-        self.timeSelectView.rx_tap
-            .subscribe(with: self, onNext: { vc, isHide in
-                
+        self.timeSelectButton.rx_tap
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                self.presentSubView(destination: .time)
             })
             .disposed(by: disposeBag)
     }
@@ -214,6 +232,8 @@ final class PlanCreateViewController: DefaultViewController, View {
 extension PlanCreateViewController {
     enum Route {
         case group
+        case date
+        case time
     }
     
     private func presentSubView(destination: Route) {
@@ -222,6 +242,10 @@ extension PlanCreateViewController {
         switch destination {
         case .group:
             destinationVC = GroupSelectViewController(reactor: reactor!)
+        case .date:
+            destinationVC = PlanDateSelectViewController(reactor: reactor!)
+        case .time:
+            destinationVC = PlanTimePickerViewController(reactor: reactor!)
         }
         
         self.present(destinationVC, animated: true)

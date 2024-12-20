@@ -18,33 +18,19 @@ final class FetchGroupListMock: FetchGroup {
         return "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"
     }
     
-    private func getMockData() -> [SimpleGroup] {
+    private func getMockData() -> [Meet] {
         
-        var groupArray: [SimpleGroup] = []
-
-        let randomGroup = (1...6).map { index in
-            if index <= 5 {
-                return SimpleGroup(
-                    commonGroup: .getGroup(name: "\(index)"),
-                    memberCount: Int.random(in: 5...50),
-                    lastScheduleDate: randomDate
-                )
-            } else {
-                return SimpleGroup(
-                    commonGroup: .getGroup(name: "6"),
-                    memberCount: 20,
-                    lastScheduleDate: nil
-                )
-            }
+        return (1...5).map { index in
+            
+            return Meet(meetSummary: .mock(id: index),
+                        sinceDays: Int.random(in: 1...100),
+                        creatorId: 0,
+                        memberCount: Int.random(in: 1...100),
+                        firstPlanDate: randomDate)
         }
-
-        groupArray.append(contentsOf: randomGroup)
-        return groupArray
     }
     
-    func fetchGroupList() -> RxSwift.Single<[SimpleGroup]> {
+    func fetchGroupList() -> RxSwift.Single<[Meet]> {
         return Single.just(getMockData())
     }
-    
-    
 }

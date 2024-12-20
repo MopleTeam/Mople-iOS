@@ -63,7 +63,7 @@ final class GroupListTableCell: UITableViewCell {
     public func configure(with viewModel: ThumbnailViewModel?) {
         guard let viewModel = viewModel else { return }
         thumbnailView.configure(with: viewModel)
-        scheduleLabel.text = checkScheduleStatus(date: viewModel.lastScheduleDate).message
+        scheduleLabel.text = checkScheduleStatus(date: viewModel.lastPlanDate).message
     }
 }
 

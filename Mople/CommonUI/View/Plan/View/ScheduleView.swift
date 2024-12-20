@@ -1,30 +1,15 @@
 //
-//  SimpleScheduleView.swift
+//  EventView.swift
 //  Group
 //
-//  Created by CatSlave on 9/23/24.
+//  Created by CatSlave on 9/22/24.
 //
 
 import UIKit
 import SnapKit
 
-// MARK: - ViewModel
-struct SimpleScheduleViewModel {
-    let group: CommonGroup?
-    let title: String?
-    let place: String?
-    let participantCount: Int?
-    let weather: WeatherInfo?
+final class ScheduleView: UIView { // PlanView
     
-    var participantCountString: String? {
-        guard let participantCount = participantCount else { return nil }
-        
-        return "\(participantCount)명 참여"
-    }
-}
-
-final class SimpleScheduleView : UIView {
-
     private lazy var thumbnailView: ThumbnailTitleView = {
         let view = ThumbnailTitleView(type: .basic)
         return view
@@ -32,24 +17,36 @@ final class SimpleScheduleView : UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Title2.bold
+        label.font = FontStyle.Title.bold
         label.textColor = ColorStyle.Gray._01
         return label
     }()
     
     private let countInfoLabel: IconLabel = {
-        let label = IconLabel(icon: .member,
-                              iconSize: 18)
-        label.setTitle(font: FontStyle.Body2.medium,
-                       color: ColorStyle.Gray._04)
+        let label = IconLabel(icon: .member, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
         label.setSpacing(4)
         return label
     }()
-                      
+    
+    private lazy var dateInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .date, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setSpacing(4)
+        return label
+    }()
+    
+    private lazy var placeInfoLabel: IconLabel = {
+        let label = IconLabel(icon: .place, iconSize: 18)
+        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setSpacing(4)
+        return label
+    }()
+
     private let weatherView = WeatherView()
     
     private lazy var subStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleLabel, countInfoLabel])
+        let sv = UIStackView(arrangedSubviews: [countInfoLabel, dateInfoLabel, placeInfoLabel])
         sv.axis = .vertical
         sv.spacing = 4
         sv.alignment = .fill
@@ -58,7 +55,7 @@ final class SimpleScheduleView : UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [thumbnailView, subStackView, weatherView])
+        let sv = UIStackView(arrangedSubviews: [thumbnailView, titleLabel, subStackView, weatherView])
         sv.axis = .vertical
         sv.spacing = 16
         sv.alignment = .fill
@@ -88,11 +85,19 @@ final class SimpleScheduleView : UIView {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.height.equalTo(25)
+            make.height.equalTo(28)
         }
         
         countInfoLabel.snp.makeConstraints { make in
             make.height.equalTo(18)
+        }
+        
+        dateInfoLabel.snp.makeConstraints { make in
+            make.height.equalTo(18)
+        }
+        
+        placeInfoLabel.snp.makeConstraints { make in
+            make.height.equalTo(34)
         }
         
         weatherView.snp.makeConstraints { make in
@@ -100,11 +105,15 @@ final class SimpleScheduleView : UIView {
         }
     }
     
-    public func configure(_ viewModel: ScheduleViewModel) {
+    public func configure(_ viewModel: PlanViewModel) {
         
         self.titleLabel.text = viewModel.title
+        
         self.countInfoLabel.text = viewModel.participantCountString
-        self.thumbnailView.configure(with: ThumbnailViewModel(group: viewModel.group))
+        self.dateInfoLabel.text = viewModel.dateString
+        self.placeInfoLabel.text = viewModel.address
+        self.thumbnailView.configure(with: ThumbnailViewModel(meet: viewModel.meet))
         self.weatherView.configure(with: .init(weather: viewModel.weather))
     }
 }
+

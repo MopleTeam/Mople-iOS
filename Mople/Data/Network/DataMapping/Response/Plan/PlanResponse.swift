@@ -10,49 +10,40 @@ import Foundation
 struct PlanResponse: Decodable {
     let meetId: Int?
     let meetName: String?
-    let meetThumnail: String?
+    let meetImage: String?
     let planId: Int?
-    let title: String?
-    let date: String?
-    let participantCount: Int?
-    let isParticipating: Bool?
+    let planName: String?
+    let planTime: String?
+    let planMemberCount: Int?
+    let participant: Bool?
+    let addressTitle: String? // 서버 이름과 맞춰야 함
     let address: String?
     let lat: Double?
     let lot: Double?
     let weatherAddress: String?
-    let weatherImagePath: String?
+    let weatherIcon: String?
     let temperature: Double?
     let pop: Double?
-    
-
-    enum CodingKeys: String, CodingKey {
-        case meetId, meetName, planId, address, lat, lot, weatherAddress, pop, temperature
-        case meetThumnail = "meetImage"
-        case title = "planName"
-        case date = "planTime"
-        case participantCount = "planMemberCount"
-        case isParticipating = "participant"
-        case weatherImagePath = "weatherIcon"
-    }
 }
 
 extension PlanResponse {
     func toDomain() -> Plan {
-        let date = DateManager.parseServerDate(string: self.date)
+        let date = DateManager.parseServerDate(string: self.planTime)
         
-        return .init(planId: planId,
-                     title: title,
+        return .init(id: planId,
+                     title: planName,
                      date: date,
-                     participantCount: participantCount,
-                     isParticipating: isParticipating,
+                     participantCount: planMemberCount,
+                     isParticipating: participant,
+                     addressTitle: addressTitle,
                      address: address,
-                     meetngSummart: .init(meetId: meetId,
-                                          meetName: meetName,
-                                          meetThumnail: meetThumnail),
+                     meetngSummary: .init(id: meetId,
+                                          name: meetName,
+                                          imagePath: meetImage),
                      location: .init(longitude: lot,
                                      latitude: lat),
-                     weather: .init(weatherAddress: weatherAddress,
-                                    weatherImagePath: weatherImagePath,
+                     weather: .init(address: weatherAddress,
+                                    imagePath: weatherIcon,
                                     temperature: temperature,
                                     pop: pop))
     }

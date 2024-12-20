@@ -8,7 +8,7 @@
 import Foundation
 import Differentiator
 
-struct ScheduleTableSectionModel: SectionModelType {
+struct PlanTableSectionModel: SectionModelType {
     
     var date: Date?
     var items: [Item] = []
@@ -18,7 +18,7 @@ struct ScheduleTableSectionModel: SectionModelType {
         return DateManager.simpleDateFormatter.string(from: dateComponents)
     }
     
-    static func < (lhs: ScheduleTableSectionModel, rhs: ScheduleTableSectionModel) -> Bool {
+    static func < (lhs: PlanTableSectionModel, rhs: PlanTableSectionModel) -> Bool {
         guard let lhsDate = lhs.date,
               let rhsDate = rhs.date else { return false }
         
@@ -26,11 +26,11 @@ struct ScheduleTableSectionModel: SectionModelType {
     }
 }
 
-extension ScheduleTableSectionModel {
+extension PlanTableSectionModel {
     
-    typealias Item = SimpleSchedule
+    typealias Item = Plan
     
-    init(original: ScheduleTableSectionModel, items: [SimpleSchedule]) {
+    init(original: PlanTableSectionModel, items: [Plan]) {
         self = original
         self.items = items
     }

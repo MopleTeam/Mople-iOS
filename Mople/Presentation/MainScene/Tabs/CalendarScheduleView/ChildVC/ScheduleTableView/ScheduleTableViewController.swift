@@ -21,8 +21,8 @@ final class ScheduleTableViewController: UIViewController, View {
     // MARK: - Variables
     // isSystemDragging 주간 달력을 넘기거나, 선택 시 스크롤 애니메이션(true)로 진행되는데 이 때, 스크롤 되면서 선택되는 것을 방지하기 위함
     private var isSystemDragging = false
-    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>?
-    private var sectionModels: [ScheduleTableSectionModel] = []
+    private var dataSource: RxTableViewSectionedReloadDataSource<PlanTableSectionModel>?
+    private var sectionModels: [PlanTableSectionModel] = []
     private var visibleHeaders: [UIView] = []
 
     // MARK: - Observable
@@ -99,11 +99,11 @@ final class ScheduleTableViewController: UIViewController, View {
     }
     
     private func setupDataSource() {
-        dataSource = RxTableViewSectionedReloadDataSource<ScheduleTableSectionModel>(
+        dataSource = RxTableViewSectionedReloadDataSource<PlanTableSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleTableViewCell.reuseIdentifier) as! ScheduleTableViewCell
-                cell.configure(viewModel: .init(schedule: item))
+                cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
                 return cell
             }

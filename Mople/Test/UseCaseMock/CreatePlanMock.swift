@@ -9,29 +9,50 @@ import Foundation
 import RxSwift
 
 final class CreatePlanMock: CreatePlanUsecase {
-    func createPlan(with plan: PlanRequest) -> Single<Plan> {
+    func createPlan(with plan: PlanUploadRequest) -> Single<Plan> {
         return Observable.just(())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
-            .map { _ -> Plan in
-                    .init(planId: 1,
-                          title: "개발회의",
-                          date: Date(),
-                          participantCount: 10,
-                          isParticipating: true,
-                          address: "서울 강남구 선릉로100길 1",
-                          meetngSummart: MeetingSummary.mock(),
-                          location: Location.mock(),
-                          weather: Weather.mock())
+            .map { _ in
+                Plan.mock(date: Date())
             }
             .asSingle()
     }
 }
 
-extension MeetingSummary {
-    static func mock() -> MeetingSummary {
-        return .init(meetId: 5,
-                     meetName: "사이드프로젝트모임",
-                     meetThumnail: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300")
+extension Plan {
+    static func mock(date: Date) -> Plan {
+        .init(id: 1,
+              title: "개발회의",
+              date: date,
+              participantCount: Int.random(in: 1...10),
+              isParticipating: true,
+              addressTitle: "CGV",
+              address: "서울 강남구 선릉로100길 1",
+              meetngSummary: MeetSummary.mock(id: 0),
+              location: Location.mock(),
+              weather: Weather.mock())
+    }
+    
+    static func recentMock() -> [Plan] {
+        let plans = Array(1...5).map {
+            let date = Date().addingTimeInterval(3600 * (24 * Double($0)))
+            return Plan.mock(date: date)
+        }
+        
+        return plans
+    }
+    
+    static func randomeMock() -> Plan {
+        let date = Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 6...100))))
+        return Plan.mock(date: date)
+    }
+}
+
+extension MeetSummary {
+    static func mock(id: Int) -> MeetSummary {
+        return .init(id: id,
+                     name: "테스트 모임",
+                     imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300")
     }
 }
 
@@ -45,9 +66,15 @@ extension Location {
 
 extension Weather {
     static func mock() -> Weather {
-        return .init(weatherAddress: "서울시 강남구",
-                     weatherImagePath: "https://openweathermap.org/img/wn/0\(Int.random(in: 1...4))d@2x.png",
+        return .init(address: "서울시 강남구",
+                     imagePath: "https://openweathermap.org/img/wn/0\(Int.random(in: 1...4))d@2x.png",
                      temperature: Double.random(in: 0...10),
                      pop: Bool.random() ? nil : Double.random(in: 0.01 ... 1))
+    }
+}
+
+extension Date {
+    static func random() -> Self {
+        return Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 1...10))))
     }
 }

@@ -8,26 +8,6 @@
 import UIKit
 import SnapKit
 
-// MARK: - ViewModel
-struct ThumbnailViewModel {
-    let name: String?
-    let thumbnailPath: String?
-    let memberCount: Int?
-    let lastScheduleDate: Date?
-}
-
-extension ThumbnailViewModel {
-    init(group: CommonGroup?,
-         memberCount: Int? = nil,
-         lastScheduleDate: Date? = nil) {
-        self.name = group?.name
-        self.thumbnailPath = group?.thumbnailPath
-        self.memberCount = memberCount
-        self.lastScheduleDate = lastScheduleDate
-    }
-}
-
-// MARK: - View
 final class ThumbnailTitleView: UIView {
     
     enum ViewType {

@@ -9,5 +9,5 @@ import Foundation
 import RxSwift
 
 protocol FetchSchedule {
-    func fetchScheduleList() -> Single<[SimpleSchedule]>
+    func fetchScheduleList() -> Single<[Plan]>
 }

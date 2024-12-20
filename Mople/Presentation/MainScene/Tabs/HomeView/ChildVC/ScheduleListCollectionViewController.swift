@@ -14,7 +14,7 @@ import RxDataSources
 final class ScheduleListCollectionViewController: UIViewController, View {
     
     typealias Reactor = HomeViewReactor
-    typealias Section = SectionModel<Void, SimpleSchedule>
+    typealias Section = SectionModel<Void, Plan>
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -69,7 +69,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
     
     private func setCollectionView() {
         self.collectionView.delegate = self
-        collectionView.register(ScheduleCollectionCell.self, forCellWithReuseIdentifier: ScheduleCollectionCell.reuseIdentifier)
+        collectionView.register(HomePlanCollectionCell.self, forCellWithReuseIdentifier: HomePlanCollectionCell.reuseIdentifier)
         collectionView.register(ScheduleListReuseFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: ScheduleListReuseFooterView.reuseIdentifier)
@@ -80,8 +80,8 @@ final class ScheduleListCollectionViewController: UIViewController, View {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
              configureCell: { _, collectionView, indexPath, item in
-                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ScheduleCollectionCell.reuseIdentifier, for: indexPath) as! ScheduleCollectionCell
-                 cell.configure(with: ScheduleViewModel(schedule: item))
+                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomePlanCollectionCell.reuseIdentifier, for: indexPath) as! HomePlanCollectionCell
+                 cell.configure(with: PlanViewModel(plan: item))
                  return cell
              },
              configureSupplementaryView: { [weak self] dataSource, collectionView, kind, indexPath in
@@ -107,7 +107,7 @@ final class ScheduleListCollectionViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$schedules)
+        reactor.pulse(\.$plans)
             .map { [Section(model: (), items: $0)] }
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: dataSource))

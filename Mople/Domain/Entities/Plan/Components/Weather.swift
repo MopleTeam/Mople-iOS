@@ -7,9 +7,15 @@
 
 import Foundation
 
-struct Weather {
-    let weatherAddress: String?
-    let weatherImagePath: String?
+struct Weather: Hashable {
+    let address: String?
+    let imagePath: String?
     let temperature: Double?
     let pop: Double?
+    
+    var faceTemperature: Int {
+        guard let temperature else { return 0 }
+        let rounded = temperature.rounded()
+        return Int(rounded)
+    }
 }

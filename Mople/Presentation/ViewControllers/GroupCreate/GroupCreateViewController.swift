@@ -84,7 +84,6 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
                      color: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
-        btn.rx.isEnabled.onNext(false)
         return btn
     }()
     
@@ -251,7 +250,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
 // MARK: - 그룹 생성 및 적용
 extension GroupCreateViewController {
     private func makeGroup() -> (String?, UIImage?) {
-        let nickName = inputTextField.text
+        let nickName = inputTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         let image = try? imageObserver.value()
         return (nickName, image)
     }

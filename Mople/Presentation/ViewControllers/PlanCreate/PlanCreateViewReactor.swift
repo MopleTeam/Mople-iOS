@@ -8,62 +8,74 @@
 import Foundation
 import ReactorKit
 
+struct CreatePlanAction {
+    var completed:(() -> Void)?
+}
+
 final class PlanCreateViewReactor: Reactor {
     
+    enum UpdatePlanType {
+        case day
+        case time
+    }
+    
     enum Action {
-        case setGroupId(id: Int)
+        case setSelectedMeet(index: Int)
         case setPlanName(name: String)
         case setPlanDate(date: DateComponents, type: UpdatePlanType)
-        case setPlanAddress(address: String)
-        case setPlanTime(date: DateComponents)
-        case setLocation(location: (lot: Double, lat: Double))
-        case setWeatherAddress(address: String)
+        case setLocation(location: UploadLocation)
+        case setMeetList(_ meets: [MeetSummary])
         case requestPlanCreation
     }
     
     enum Mutation {
-        case updateGroupId(_ id: Int)
+        case updateSelectedMeet(_ meet: MeetSummary)
         case updatePlanName(_ name: String)
         case updateDate(_ date: DateComponents)
-        case updatePlanAddress(_ address: String)
-        case updateWeatherAddress(_ address: String)
+        case updateTime(_ date: DateComponents)
+        case updateLocation(_ location: UploadLocation)
+        case updateMeetList(_ meets: [MeetSummary])
         case responsePlanCreation(_ plan: Plan)
         case notifyLoadingState(_ isLoading: Bool)
     }
     
     struct State {
-        @Pulse var planCreationForm: PlanRequest?
-        @Pulse var selectedDate: DateComponents?
+        @Pulse var seletedMeet: MeetSummary?
+        @Pulse var planTitle: String?
+        @Pulse var selectedDay : DateComponents?
+        @Pulse var selectedTime : DateComponents?
+        @Pulse var location: UploadLocation?
+        @Pulse var meets: [MeetSummary] = []
         @Pulse var isLoading: Bool = false
-        @Pulse var testCount: [Int] = Array(1...20)
     }
     
     private let createPlanUseCase: CreatePlanUsecase
+    private let createPlanAction: CreatePlanAction
     
     var initialState: State = State()
     
-    init(createPlanUseCase: CreatePlanUsecase) {
+    init(createPlanUseCase: CreatePlanUsecase,
+         createPlanAction: CreatePlanAction,
+         meets: [MeetSummary]) {
         self.createPlanUseCase = createPlanUseCase
+        self.createPlanAction = createPlanAction
+        self.action.onNext(.setMeetList(meets))
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .setGroupId(let id):
-            return .just(.updateGroupId(id))
+        case .setSelectedMeet(let index):
+            return self.parseMeetId(selectedIndex: index)
         case .setPlanName(let name):
             return .just(.updatePlanName(name))
         case let .setPlanDate(date, type):
-            return self.updatePlanDate(on: date, type: type)
-        case .setPlanAddress(let address):
-            return .just(.updatePlanAddress(address))
-        case .setPlanTime(let time):
-            return self.updatePlanDate(on: time, type: .time)
+            return self.updateDate(date: date, type: type)
         case .setLocation(let location):
-            return self.updatePlanLocation(location: location)
-        case .setWeatherAddress(let address):
-            return .just(.updateWeatherAddress(address))
+            return .just(.updateLocation(location))
         case .requestPlanCreation:
             return .empty()
+        case .setMeetList(let meets):
+            return .just(.updateMeetList(meets))
         }
     }
     
@@ -72,16 +84,18 @@ final class PlanCreateViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .updateGroupId(let id):
-            newState.planCreationForm?.meetId = id
+        case .updateSelectedMeet(let meet):
+            newState.seletedMeet = meet
         case .updatePlanName(let name):
-            newState.planCreationForm?.name = name
+            newState.planTitle = name
         case .updateDate(let date):
-            newState.selectedDate = date
-        case .updatePlanAddress(let address):
-            newState.planCreationForm?.address = address
-        case .updateWeatherAddress(let address):
-            newState.planCreationForm?.weatherAddress = address
+            newState.selectedDay = date
+        case .updateTime(let time):
+            newState.selectedTime = time
+        case .updateLocation(let location):
+            newState.location = location
+        case .updateMeetList(let meets):
+            newState.meets = meets
         case .responsePlanCreation(let plan):
             break 
         case .notifyLoadingState(let isLoad):
@@ -94,37 +108,9 @@ final class PlanCreateViewReactor: Reactor {
 }
 
 extension PlanCreateViewReactor {
-    enum UpdatePlanType {
-        case date
-        case time
-    }
-    
-    private func updatePlanDate(on date: DateComponents, type: UpdatePlanType) -> Observable<Mutation> {
-        guard var currentDate = currentState.selectedDate else { return .empty() }
-        
-        switch type {
-        case .date:
-            currentDate.year = date.year
-            currentDate.month = date.month
-            currentDate.day = date.day
-        case .time:
-            currentDate.hour = date.hour
-            currentDate.minute = date.minute
-        }
-        
-        return .just(Mutation.updateDate(currentDate))
-    }
-    
-    private func updatePlanLocation(location: (lot: Double, lat: Double)) -> Observable<Mutation> {
-        guard var planCreationForm = currentState.planCreationForm else { return .empty() }
-        planCreationForm.updateLocation(location)
-        return .empty()
-    }
     
     private func requestPlanCreation() -> Observable<Mutation> {
-        guard var planCreationForm = currentState.planCreationForm,
-              let date = currentState.selectedDate?.toDate() else { return .empty() }
-        planCreationForm.updateDate(on: date)
+        guard let planCreationForm = buliderPlanCreation() else { return .empty() }
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
@@ -138,5 +124,42 @@ extension PlanCreateViewReactor {
         return Observable.concat([loadingStart,
                                   updatePlan,
                                   loadingStop])
+    }
+    
+    private func updateDate(date: DateComponents, type: UpdatePlanType) -> Observable<Mutation> {
+        switch type {
+        case .day:
+            return .just(.updateDate(date))
+        case .time:
+            return .just(.updateTime(date))
+        }
+    }
+    
+    private func buliderPlanCreation() -> PlanUploadRequest? {
+        guard let date = self.createDate(),
+              let meetId = currentState.seletedMeet?.id,
+              let name = currentState.planTitle,
+              let location = currentState.location else { return nil }
+        
+        return .init(meetId: meetId,
+                     name: name,
+                     date: DateManager.toServerDateString(date),
+                     location: location)
+    }
+    
+    private func createDate() -> Date? {
+        guard let date = currentState.selectedDay,
+              let time = currentState.selectedTime else { return nil }
+        
+        return DateComponents(year: date.year,
+                              month: date.month,
+                              day: date.day,
+                              hour: time.hour,
+                              minute: time.minute).toDate()
+    }
+    
+    private func parseMeetId(selectedIndex: Int) -> Observable<Mutation> {
+        guard let meet = currentState.meets[safe: selectedIndex] else { return .empty() }
+        return .just(.updateSelectedMeet(meet))
     }
 }

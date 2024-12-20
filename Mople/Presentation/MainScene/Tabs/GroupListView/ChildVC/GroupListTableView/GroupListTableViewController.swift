@@ -72,9 +72,11 @@ final class GroupListTableViewController: UIViewController, View {
         reactor.pulse(\.$groupList)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: GroupListTableCell.reuseIdentifier, cellType: GroupListTableCell.self)) { index, item, cell in
-                cell.configure(with: ThumbnailViewModel(group: item.commonGroup,
+
+                cell.configure(with: ThumbnailViewModel(meet: item.meetSummary,
                                                         memberCount: item.memberCount,
-                                                        lastScheduleDate: item.lastScheduleDate))
+                                                        lastPlanDate: item.firstPlanDate))
+                
                 cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)

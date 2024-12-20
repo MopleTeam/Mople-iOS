@@ -10,7 +10,7 @@ import Foundation
 struct GroupTitleValidator {
     
     enum result {
-        case success, empty, countUnder, countOver, strange
+        case success, empty, countUnder, countOver
         
         var info: String {
             switch self {
@@ -22,8 +22,6 @@ struct GroupTitleValidator {
                 "모임 이름은 2글자 이상으로 입력해 주세요."
             case .countOver:
                 "모임 이름은 30글자 이하로 입력해 주세요."
-            case .strange:
-                "특수문자는 사용할 수 없습니다.\n한글, 영문, 숫자만 입력해 주세요."
             }
         }
     }
@@ -33,8 +31,6 @@ struct GroupTitleValidator {
             return .empty
         }
         switch text {
-        case _ where text.contains(where: { $0.isWhitespace }) || !text.checkValidator():
-            return .strange
         case _ where text.count < 2:
             return .countUnder
         case _ where text.count > 30:

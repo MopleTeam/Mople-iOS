@@ -1,8 +1,8 @@
 //
-//  BottomSheetView.swift
+//  SheetTableView.swift
 //  Mople
 //
-//  Created by CatSlave on 12/14/24.
+//  Created by CatSlave on 12/17/24.
 //
 
 import UIKit
@@ -10,14 +10,10 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
-final class DefaultBottomSheetView: UIView {
+final class CompactSheet: UIView {
     // MARK: - Observer
     public var closeButtonTap: ControlEvent<Void> {
         return closeButton.rx.controlEvent(.touchUpInside)
-    }
-    
-    public var completedButtonTap: ControlEvent<Void> {
-        return completeButton.rx.controlEvent(.touchUpInside)
     }
     
     // MARK: - UI Components
@@ -37,28 +33,19 @@ final class DefaultBottomSheetView: UIView {
         return btn
     }()
     
-    private let completeButton: BaseButton = {
-        let btn = BaseButton()
-        btn.setTitle(text: TextStyle.DatePicker.completedTitle,
-                     font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
-        btn.setRadius(8)
-        return btn
-    }()
-    
     private lazy var headerStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [titleLabel, closeButton])
         sv.axis = .horizontal
         sv.distribution = .fill
         sv.alignment = .center
+        sv.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        sv.isLayoutMarginsRelativeArrangement = true
         return sv
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [headerStackView, contentView, completeButton])
+        let sv = UIStackView(arrangedSubviews: [headerStackView, contentView])
         sv.axis = .vertical
-        sv.spacing = 20
         sv.alignment = .fill
         sv.distribution = .fill
         sv.layer.cornerRadius = 13
@@ -82,16 +69,12 @@ final class DefaultBottomSheetView: UIView {
         
         mainStackView.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.bottom.equalTo(self.safeAreaLayoutGuide).inset(20)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
         
         headerStackView.snp.makeConstraints { make in
             make.height.equalTo(60)
-        }
-        
-        completeButton.snp.makeConstraints { make in
-            make.height.equalTo(56)
         }
     }
     
@@ -99,3 +82,4 @@ final class DefaultBottomSheetView: UIView {
         titleLabel.text = title
     }
 }
+
