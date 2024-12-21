@@ -24,10 +24,20 @@ final class PlanTimePickerViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Default Value
-    private let todayTime = DateManager.today.getTime()
+    private var todayTime = DateManager.today.getTime()
     private let hours: [Int] = Array(0...11).map { $0 % 12 == 0 ? 12 : $0 }
     private let minutes: [Int] = Array(stride(from: 0, through: 55, by: 5))
     private let period: [DayPeriod] = [.am, .pm]
+    
+    private let virtualRows: Int = 10_000
+    
+    private var hoursMiddleRow: Int {
+        return (virtualRows / hours.count / 2) * hours.count
+    }
+    
+    private var minutesMiddleRow: Int {
+        return (virtualRows / minutes.count / 2) * minutes.count
+    }
     
     // MARK: - Selected Value
     private var selectedTime: DateComponents?
@@ -92,7 +102,6 @@ final class PlanTimePickerViewController: UIViewController, View {
                 return self?.convert24hourSelctedTime(on: date)
             })
             .drive(with: self, onNext: { vc, date in
-                print(#function, #line, "#9 : \(date)" )
                 reactor.action.onNext(.setPlanDate(date: date, type: .time))
                 vc.dismiss(animated: true)
             })
@@ -130,8 +139,8 @@ extension PlanTimePickerViewController: UIPickerViewDataSource, UIPickerViewDele
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         switch component {
-        case 0: hours.count
-        case 1: minutes.count
+        case 0: virtualRows
+        case 1: virtualRows
         case 2: period.count
         default: 0
         }
@@ -143,9 +152,12 @@ extension PlanTimePickerViewController: UIPickerViewDataSource, UIPickerViewDele
         let label = self.pickerView.dequeuePickerLabel(reusing: view)
         
         switch component {
-        case 0: label.text = "\(hours[row]) 시"
-        case 1: label.text = "\(minutes[row]) 분"
-        case 2: label.text = "\(period[row].rawValue)"
+        case 0: label.text =
+            "\(hours[row % hours.count]) 시"
+        case 1: label.text =
+            "\(minutes[row % minutes.count])분"
+        case 2: label.text = 
+            "\(period[row].rawValue)"
         default: break
         }
         
@@ -154,9 +166,18 @@ extension PlanTimePickerViewController: UIPickerViewDataSource, UIPickerViewDele
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch component {
-        case 0: selectedTime?.hour = hours[row]
-        case 1: selectedTime?.minute = minutes[row]
-        case 2: selectedPeriod = period[row]
+        case 0:
+            pickerView.selectRow(hoursMiddleRow + (row % hours.count),
+                                 inComponent: 0,
+                                 animated: false)
+            selectedTime?.hour = hours[row % hours.count]
+        case 1:
+            pickerView.selectRow(minutesMiddleRow + (row % minutes.count),
+                                 inComponent: 1,
+                                 animated: false)
+            selectedTime?.minute = minutes[row % minutes.count]
+        case 2:
+            selectedPeriod = period[row]
         default: break
         }
     }
@@ -166,30 +187,44 @@ extension PlanTimePickerViewController: UIPickerViewDataSource, UIPickerViewDele
     }
 }
 
+// MARK: - Row 설정
+extension PlanTimePickerViewController {
+    private func setCurrentTime(on date: DateComponents?) {
+        setHourRow(on: date)
+        setMinuteRow(on: date)
+        setPeriodRow()
+    }
+    
+    private func setHourRow(on date: DateComponents?) {
+        guard let hour = date?.hour,
+              let hourIndex = self.hours.firstIndex(of: hour == 0 ? 12 : hour) else { return }
+        let hourRow = hoursMiddleRow + hourIndex
+        self.pickerView.selectRow(row: hourRow, inComponent: 0, animated: false)
+    }
+    
+    private func setMinuteRow(on date: DateComponents?) {
+        guard let minute = date?.minute,
+              let minuteIndex = self.minutes.firstIndex(of: minute / 5 * 5) else { return }
+        let minuteRow = minutesMiddleRow + minuteIndex
+        self.pickerView.selectRow(row: minuteRow, inComponent: 1, animated: false)
+    }
+    
+    private func setPeriodRow() {
+        guard let period = self.selectedPeriod,
+              let periodIndex = self.period.firstIndex(of: period) else { return }
+        self.pickerView.selectRow(row: periodIndex, inComponent: 2, animated: false)
+    }
+}
+
 // MARK: - Hleper
 extension PlanTimePickerViewController {
     
     /// 선택값 기본설정
     private func setDefaultTime(on date: DateComponents?) {
-        guard let hour = date?.hour,
-              let minute = date?.minute else { return }
-        self.selectedTime = .init(hour: hour, minute: minute)
+        self.selectedTime = .init(hour: date?.hour,
+                                  minute: date?.minute)
     }
-    
-    /// Row 설정
-    private func setCurrentTime(on date: DateComponents?) {
-        guard let hour = date?.hour,
-              let minute = date?.minute,
-              let period = self.selectedPeriod,
-              let hourIndex = self.hours.firstIndex(of: hour == 0 ? 12 : hour),
-              let minuteIndex = self.minutes.firstIndex(of: (minute / 5) * 5),
-              let periodIndex = self.period.firstIndex(of: period) else { return }
-        
-        [hourIndex, minuteIndex, periodIndex].enumerated().forEach { (components, index) in
-            self.pickerView.selectRow(row: index, inComponent: components, animated: false)
-        }
-    }
-    
+
     /// 24시간 기준으로 변경하기
     private func convert24hourSelctedTime(on date: DateComponents) -> DateComponents {
         guard let selectedPeriod else { return date }
@@ -205,9 +240,15 @@ extension PlanTimePickerViewController {
     
     /// 오전, 오후 시간 판단 및 12시간 기준으로 변경
     private func configurePeriodSettings(on date: DateComponents?) -> DateComponents? {
-        let date = date ?? todayTime
+        let date = date ?? addOneHourToday()
         guard let hour = date.hour else { return nil }
         self.selectedPeriod = hour >= 12 ? .pm : .am
         return DateManager.convertTo12Hour(date)
+    }
+    
+    /// 현재 시간에서 한시간 더해진 시간
+    private func addOneHourToday() -> DateComponents {
+        guard let currentHour = todayTime.hour else { return todayTime }
+        return .init(hour: currentHour + 1, minute: 0)
     }
 }
