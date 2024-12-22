@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-final class NotifyViewController: DefaultViewController {
+final class NotifyViewController: TitleNaviViewController {
     
     var disposeBag = DisposeBag()
     

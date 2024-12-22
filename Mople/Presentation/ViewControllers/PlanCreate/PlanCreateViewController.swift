@@ -18,7 +18,7 @@ import ReactorKit
 // 현재 뷰 : 일정 이름
 // 요청 시 : 액션 처리 (탭: 그룹 리스트, 화면 모임상세 -> 일정 상세)
 
-final class PlanCreateViewController: DefaultViewController, View {
+final class PlanCreateViewController: TitleNaviViewController, View {
     
     typealias Reactor = PlanCreateViewReactor
     
@@ -42,7 +42,7 @@ final class PlanCreateViewController: DefaultViewController, View {
     private let planTitleTextField: LabeledTextField = {
         let view = LabeledTextField(title: TextStyle.CreatePlan.plan,
                                   placeholder: TextStyle.CreatePlan.planInfo,
-                                  maxCount: 30)
+                                  maxTextCount: 30)
         return view
     }()
         
@@ -189,30 +189,37 @@ final class PlanCreateViewController: DefaultViewController, View {
     
     private func setButtonAction() {
         leftItemEvent
-            .asDriver(onErrorJustReturn: ())
+            .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)
             })
             .disposed(by: disposeBag)
         
         self.dateSelectButton.rx_tap
-            .asDriver(onErrorJustReturn: ())
+            .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 self.presentSubView(destination: .date)
             })
             .disposed(by: disposeBag)
         
         self.groupSelectButton.rx_tap
-            .asDriver(onErrorJustReturn: ())
+            .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 self.presentSubView(destination: .group)
             })
             .disposed(by: disposeBag)
         
         self.timeSelectButton.rx_tap
-            .asDriver(onErrorJustReturn: ())
+            .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 self.presentSubView(destination: .time)
+            })
+            .disposed(by: disposeBag)
+        
+        self.placeSelectButton.rx_tap
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                self.presentSubView(destination: .place)
             })
             .disposed(by: disposeBag)
     }
@@ -234,6 +241,7 @@ extension PlanCreateViewController {
         case group
         case date
         case time
+        case place
     }
     
     private func presentSubView(destination: Route) {
@@ -246,9 +254,12 @@ extension PlanCreateViewController {
             destinationVC = PlanDateSelectViewController(reactor: reactor!)
         case .time:
             destinationVC = PlanTimePickerViewController(reactor: reactor!)
+        case .place:
+            destinationVC = LocationSearchViewController(reactor: reactor!)
         }
         
-        self.present(destinationVC, animated: true)
+        self.present(destinationVC,
+                     animated: !(destinationVC is LocationSearchViewController))
     }
 }
 

@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-final class PolicyViewController: DefaultViewController {
+final class PolicyViewController: TitleNaviViewController {
     
     var disposeBag = DisposeBag()
     

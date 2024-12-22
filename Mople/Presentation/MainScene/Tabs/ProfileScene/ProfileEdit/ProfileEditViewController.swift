@@ -12,7 +12,7 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileEditViewController: DefaultViewController, View {
+class ProfileEditViewController: TitleNaviViewController, View {
     typealias Reactor = ProfileEditViewReactor
     
     var disposeBag = DisposeBag()

@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-class GroupListViewController: DefaultViewController, View {
+class GroupListViewController: TitleNaviViewController, View {
     
     typealias Reactor = GroupListViewReactor
     

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 import ReactorKit
 
 struct HomeViewAction {
@@ -105,14 +106,15 @@ extension HomeViewReactor {
     private func checkNotificationPermission() -> Observable<Mutation> {
         
         let notificationCenter = UNUserNotificationCenter.current()
-        notificationCenter.getNotificationSettings { setting in
+        notificationCenter.getNotificationSettings { [weak self] setting in
             switch setting.authorizationStatus {
             case .authorized:
-                print(#function, #line, "# 30 몇번 호출" )
-                self.requestRefreshFCMTokenUseCase.refreshFCMToken()
+                self?.requestRefreshFCMTokenUseCase.refreshFCMToken()
+                self?.test()
             case .notDetermined:
-                self.requestNotificationPermission(notificationCenter)
-            default: break
+                self?.requestNotificationPermission(notificationCenter)
+            default:
+                self?.test()
             }
         }
         
@@ -122,8 +124,10 @@ extension HomeViewReactor {
     
     /// 유저에게 알림 허용여부 묻기
     private func requestNotificationPermission(_ center: UNUserNotificationCenter) {
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
-            self.registerForRemoteNotifications()
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] (granted, error) in
+            self?.registerForRemoteNotifications()
+            self?.test()
+            print(#function, #line, "#10 : \(granted)" )
         }
     }
     
@@ -131,6 +135,16 @@ extension HomeViewReactor {
     private func registerForRemoteNotifications() {
         DispatchQueue.main.async {
             UIApplication.shared.registerForRemoteNotifications()
+        }
+    }
+    
+    private func test() {
+        let locationManager = CLLocationManager()
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        default:
+            break
         }
     }
     

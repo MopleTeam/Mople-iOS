@@ -10,8 +10,8 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
-class DefaultViewController: UIViewController {
-    
+class TitleNaviViewController: UIViewController {
+
     // MARK: - Variables
     public var titleViewBottom: ConstraintItem {
         return navigationView.snp.bottom
@@ -27,7 +27,7 @@ class DefaultViewController: UIViewController {
     }
         
     // MARK: - UI Components
-    private let navigationView = DefaultNavigationBar()
+    private var navigationView = TitleNaviBar()
     
     // MARK: - Indicator
     fileprivate let indicator: UIActivityIndicatorView = {
@@ -80,22 +80,22 @@ class DefaultViewController: UIViewController {
     }
     
     private func setTitle(_ title: String?) {
-        self.navigationView.title = title
+        self.navigationView.setTitle(title)
     }
 }
 
 // MARK: - 네비게이션 아이템 설정
-extension DefaultViewController {
-    public func setBarItem(type: DefaultNavigationBar.ButtonType, image: UIImage) {
+extension TitleNaviViewController {
+    public func setBarItem(type: TitleNaviBar.ButtonType, image: UIImage) {
         navigationView.setBarItem(type: type, image: image)
     }
     
-    public func hideBaritem(type: DefaultNavigationBar.ButtonType, isHidden: Bool) {
+    public func hideBaritem(type: TitleNaviBar.ButtonType, isHidden: Bool) {
         navigationView.hideBarItem(type: type, isHidden: isHidden)
     }
 }
 
-extension Reactive where Base: DefaultViewController {
+extension Reactive where Base: TitleNaviViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
             vc.indicator.rx.isAnimating.onNext(isLoading)

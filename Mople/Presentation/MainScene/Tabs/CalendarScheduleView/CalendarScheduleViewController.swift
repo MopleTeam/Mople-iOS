@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CalendarScheduleViewController: DefaultViewController, View {
+final class CalendarScheduleViewController: TitleNaviViewController, View {
     
     typealias Reactor = CalendarViewReactor
     

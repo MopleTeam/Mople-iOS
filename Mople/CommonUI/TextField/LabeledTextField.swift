@@ -18,23 +18,21 @@ final class LabeledTextField: UIView {
     
     // MARK: - Reactive
     public var rx_text: ControlProperty<String?> {
-        return inputTextField.rx.text
+        return textField.rx_text
     }
     
     public var rx_editing: ControlEvent<Void> {
-        return inputTextField.rx.controlEvent(.editingChanged)
+        return textField.rx_editing
     }
     
     public var rx_Resign: Binder<Bool> {
-        return inputTextField.rx.isResign
+        return textField.rx_Resign
     }
     
     public var text: String? {
-        return inputTextField.text
+        return textField.text
     }
-    
-    private var maxCount: Int?
-    
+        
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
@@ -43,24 +41,10 @@ final class LabeledTextField: UIView {
         return label
     }()
     
-    private let textFieldContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = ColorStyle.BG.input
-        view.layer.cornerRadius = 8
-        return view
-    }()
+    private let textField = DefaultTextField()
 
-    // 플레이스 홀더 셋팅
-    private let inputTextField: UITextField = {
-        let textField = UITextField()
-        textField.font = FontStyle.Body1.regular
-        textField.textColor = ColorStyle.Gray._01
-        textField.tintColor = ColorStyle.Gray._01
-        return textField
-    }()
-    
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleLabel, textFieldContainer])
+        let sv = UIStackView(arrangedSubviews: [titleLabel, textField])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -70,9 +54,9 @@ final class LabeledTextField: UIView {
     
     init(title: String,
          placeholder: String?,
-         maxCount: Int) {
+         maxTextCount: Int) {
         super.init(frame: .zero)
-        self.maxCount = maxCount
+        setMaxCount(maxTextCount)
         initialsetup(title, placeholder)
     }
     
@@ -82,14 +66,12 @@ final class LabeledTextField: UIView {
 
     private func initialsetup(_ title: String,_ placeholder: String?) {
         setTitle(title)
-        setPlaceholder(placeholder)
-        setTextfield()
+        setPlaceHolder(text: placeholder)
         setupUI()
     }
     
     private func setupUI() {
         self.addSubview(mainStackView)
-        self.textFieldContainer.addSubview(inputTextField)
         
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -99,26 +81,9 @@ final class LabeledTextField: UIView {
             make.height.equalTo(22)
         }
         
-        textFieldContainer.snp.makeConstraints { make in
+        textField.snp.makeConstraints { make in
             make.height.equalTo(56)
         }
-        
-        inputTextField.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(16)
-            make.verticalEdges.equalToSuperview()
-        }
-    }
-    
-    private func setTextfield() {
-        inputTextField.delegate = self
-    }
-}
-
-extension LabeledTextField : UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let currentText = textField.text, let maxCount else { return true }
-        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        return newText.count <= maxCount
     }
 }
 
@@ -128,28 +93,20 @@ extension LabeledTextField {
         titleLabel.text = title
     }
     
-    /// 텍스트 필드 플레이스 홀더 설정
-    private func setPlaceholder(_ text: String?,
-                               _ textColor: UIColor = ColorStyle.Gray._05) {
-        guard let text else { return }
-        
-        inputTextField.attributedPlaceholder = NSAttributedString(string:text,
-                                                                  attributes: [NSAttributedString.Key.foregroundColor: textColor])
+    private func setPlaceHolder(text: String?) {
+        self.textField.setPlaceholder(text)
+    }
+    
+    private func setMaxCount(_ maxCount: Int) {
+        self.textField.setMaxTextCount(maxCount)
     }
 }
 
 // MARK: - 외부 설정
 extension LabeledTextField {
     
-    public func setInputTextField(view: UIView, mode: ViewMode) {
-        switch mode {
-        case .left:
-            self.inputTextField.leftView = view
-            self.inputTextField.leftViewMode = .always
-        case .right:
-            self.inputTextField.rightView = view
-            self.inputTextField.rightViewMode = .always
-        }
+    public func setInputTextField(view: UIView, mode: DefaultTextField.ViewMode) {
+        self.textField.setInputTextField(view: view, mode: mode)
     }
 }
 

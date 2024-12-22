@@ -65,7 +65,7 @@ final class ProfileSetupViewController: UIViewController, View {
     private let nameTextField: LabeledTextField = {
         let textField = LabeledTextField(title: TextStyle.ProfileSetup.nameTitle,
                                               placeholder: TextStyle.ProfileSetup.typingName,
-                                              maxCount: 15)
+                                              maxTextCount: 15)
         return textField
     }()
     

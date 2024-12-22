@@ -11,7 +11,7 @@ import ReactorKit
 
 
 
-final class ProfileViewController: DefaultViewController, View {
+final class ProfileViewController: TitleNaviViewController, View {
     typealias Reactor = ProfileViewReactor
     
     var disposeBag = DisposeBag()

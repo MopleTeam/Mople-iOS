@@ -10,18 +10,11 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
-final class DefaultNavigationBar: UIView {
+final class TitleNaviBar: UIView {
  
     enum ButtonType {
         case left
         case right
-    }
-    
-    // MARK: - Variables
-    var title: String? {
-        didSet {
-            titleLable.text = title
-        }
     }
     
     // MARK: - Observable
@@ -42,13 +35,13 @@ final class DefaultNavigationBar: UIView {
         return label
     }()
     
-    private let rightButton: UIButton = {
+    private lazy var rightButton: UIButton = {
         let btn = UIButton()
         btn.isHidden = true
         return btn
     }()
 
-    private let leftButton: UIButton = {
+    private lazy var leftButton: UIButton = {
         let btn = UIButton()
         btn.isHidden = true
         return btn
@@ -105,8 +98,12 @@ final class DefaultNavigationBar: UIView {
     }
 }
 
-// MARK: - Set Item
-extension DefaultNavigationBar {
+// MARK: - Configure
+extension TitleNaviBar {
+    
+    public func setTitle(_ title: String?) {
+        titleLable.text = title
+    }
     
     public func setBarItem(type: ButtonType, image: UIImage) {
         switch type {

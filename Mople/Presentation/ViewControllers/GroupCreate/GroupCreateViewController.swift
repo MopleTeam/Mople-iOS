@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class GroupCreateViewController: DefaultViewController, View, KeyboardEvent {
+final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEvent {
     
     typealias Reactor = GroupCreateViewReactor
     
@@ -73,7 +73,7 @@ final class GroupCreateViewController: DefaultViewController, View, KeyboardEven
     private let inputTextField: LabeledTextField = {
         let textField = LabeledTextField(title: TextStyle.CreateGroup.groupTitle,
                                               placeholder: TextStyle.CreateGroup.placeholder,
-                                              maxCount: 30)
+                                              maxTextCount: 30)
         return textField
     }()
     

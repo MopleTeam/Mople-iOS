@@ -18,7 +18,7 @@ class DefaultEmptyView: UIView {
     
     private let label: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Title3.medium
+        label.font = FontStyle.Body1.medium
         label.textColor = ColorStyle.Gray._06
         return label
     }()
