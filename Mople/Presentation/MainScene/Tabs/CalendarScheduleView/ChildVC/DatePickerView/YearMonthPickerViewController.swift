@@ -91,14 +91,14 @@ final class YearMonthPickerViewController: UIViewController, View {
     
     // MARK: - Action
     private func setupAction() {
-        self.pickerView.closeButtonTap
+        self.pickerView.sheetView.rx.closeEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
         
-        self.pickerView.completedButtonTap
+        self.pickerView.sheetView.rx.completedEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
                 let selectedDate = vc.selectedDate

@@ -8,20 +8,24 @@
 import UIKit
 
 protocol MainSceneDependencies {
-    func makeTabBarController() -> UITabBarController
     func makeHomeViewController(action: HomeViewAction) -> HomeViewController
     func makeGroupListViewController() -> GroupListViewController
     func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
     func makeProfileSceneCoordinator() -> BaseCoordinator
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileEditAction) -> ProfileEditViewController
-    func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController
-    func makeCreatePlanViewController(action: CreatePlanAction, meets: [MeetSummary]) -> PlanCreateViewController
+    func makeCreateGroupViewController(flowAction: CreatedGroupFlowAction) -> GroupCreateViewController
+    
+    func makePlanCreateDIContainer() -> PlanCreateSceneContainer
 }
 
 protocol AccountAction {
     func signOut()
     func moveToProfileEditView(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?)
+}
+
+protocol CreatedGroupFlowAction: AnyObject {
+    func endProcess()
 }
 
 private enum Route {
@@ -44,7 +48,7 @@ private enum Route {
 final class MainSceneCoordinator: BaseCoordinator {
     
     private let dependencies: MainSceneDependencies
-    private var tabBarController: UITabBarController?
+    private var tabBarController: UITabBarController = DefaultTabBarController()
  
     init(navigationController: UINavigationController,
          dependencies: MainSceneDependencies) {
@@ -58,9 +62,8 @@ final class MainSceneCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        tabBarController = dependencies.makeTabBarController()
-        tabBarController!.setViewControllers(getTabs(), animated: false)
-        navigationController.pushViewController(tabBarController!, animated: true)
+        tabBarController.setViewControllers(getTabs(), animated: false)
+        navigationController.pushViewController(tabBarController, animated: true)
     }
     
     private func getTabs() -> [UIViewController] {
@@ -88,39 +91,32 @@ extension MainSceneCoordinator {
               let destinationNavi = getDestinationVC(index: index),
               let calendarVC = destinationNavi as? CalendarScheduleViewController else { return }
         calendarVC.presentEvent(on: lastRecentDate)
-        tabBarController?.selectedIndex = index
+        tabBarController.selectedIndex = index
     }
     
     // MARK: - 그룹 생성 화면 이동
     /// - Parameter completedAction: 완료 후 액션 (예시: 그룹 생성 후 그룹 리스트 reload)
     private func pushCreateGroupView() {
-        let action: CreateGroupAction = .init {
-            self.switchToGroupListTap()
-            self.navigationController.popViewController(animated: true)
-        }
-        
-        let createGroupView = dependencies.makeCreateGroupViewController(action: action)
-        self.navigationController.pushViewController(createGroupView, animated: true)
+        let createGroupView = dependencies.makeCreateGroupViewController(flowAction: self)
+        self.navigationController.present(createGroupView, animated: false)
     }
     
     // MARK: - 일정 생성 화면 이동
-    private func pushCreatePlanView(meets: [MeetSummary]) {
-        let action: CreatePlanAction = .init {
-            self.switchToGroupListTap()
-            self.navigationController.popViewController(animated: true)
-        }
-        
-        let createPlanView = dependencies.makeCreatePlanViewController(action: action, meets: meets )
-        self.navigationController.pushViewController(createPlanView, animated: true)
+    private func pushCreatePlanView() {
+        let planCreateDI = dependencies.makePlanCreateDIContainer()
+        let navigationController = UINavigationController.createFullScreenNavigation()
+        let flow = planCreateDI.makePlanCreateFlowCoordinator(navigationController: navigationController)
+        self.start(coordinator: flow)
+        self.navigationController.present(navigationController, animated: false)
     }
     
     // MARK: - Helper
     /// 새로운 일정 및 그룹 생성 후 그룹 리스트 탭으로 이동
     private func switchToGroupListTap() {
         guard let groupListInex = getIndexFromTabBar(destination: .group),
-              self.tabBarController?.selectedIndex != groupListInex else { return }
+              self.tabBarController.selectedIndex != groupListInex else { return }
         
-        tabBarController?.selectedIndex = groupListInex
+        tabBarController.selectedIndex = groupListInex
     }
 }
 
@@ -171,20 +167,22 @@ extension MainSceneCoordinator: AccountAction {
     }
 }
 
+extension MainSceneCoordinator: CreatedGroupFlowAction {
+    func endProcess() {
+        self.switchToGroupListTap()
+        self.navigationController.dismiss(animated: false, completion: { [weak self] in
+            self?.switchToGroupListTap()
+        })
+    }
+}
+
 // MARK: - Helper
 extension MainSceneCoordinator {
     
     /// 로그아웃, 회원탈퇴 시 자식 뷰 지우기
     private func clearScene() {
-        self.childCoordinators.forEach {
-            $0.navigationController.viewControllers = []
-            self.didFinish(coordinator: $0)
-        }
-        
-        self.childCoordinators.removeAll()
-        self.tabBarController!.viewControllers?.removeAll()
-        
-        self.navigationController.viewControllers = []
+        self.clearUp()
+        self.tabBarController.viewControllers?.removeAll()
         self.parentCoordinator?.didFinish(coordinator: self)
         (self.parentCoordinator as? SignOutListener)?.signOut()
     }
@@ -192,15 +190,13 @@ extension MainSceneCoordinator {
     #warning("메타타입 비교하기, Claude 타입과 메타타입 참고")
     /// 이동하려고 하는 뷰의 Navi Index 찾기
     private func getIndexFromTabBar(destination: Route) -> Int? {
-        return tabBarController?.viewControllers?.firstIndex(where: { vc in
+        return tabBarController.viewControllers?.firstIndex(where: { vc in
             return vc.isKind(of: destination.type)
         })
     }
     
     /// 이동하려고 하는 뷰 찾기
     private func getDestinationVC(index: Int) -> UIViewController? {
-        return tabBarController?.viewControllers?[index]
+        return tabBarController.viewControllers?[index]
     }
 }
-
-

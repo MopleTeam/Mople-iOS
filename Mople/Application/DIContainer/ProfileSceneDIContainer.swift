@@ -9,9 +9,9 @@ import UIKit
 
 final class ProfileSceneDIContainer: ProfileSceneDependencies {
  
-    let appNetworkService: AppNetWorkService
+    let appNetworkService: AppNetworkService
 
-    init(appNetworkService: AppNetWorkService) {
+    init(appNetworkService: AppNetworkService) {
         self.appNetworkService = appNetworkService
     }
     

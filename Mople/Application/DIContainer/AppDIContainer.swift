@@ -12,7 +12,7 @@ final class AppDIContainer {
     // MARK: - 앱 서비스
     lazy var appConfiguration = AppConfiguration()
     
-    lazy var appNetworkService: AppNetWorkService = {
+    lazy var appNetworkService: AppNetworkService = {
         
         let config = ApiDataNetworkConfig(baseURL: URL(string: appConfiguration.apiBaseURL))
         

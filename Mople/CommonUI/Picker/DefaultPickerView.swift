@@ -11,19 +11,14 @@ import RxCocoa
 
 final class DefaultPickerView: UIView {
 
-    // MARK: - Observer
-    public var closeButtonTap: ControlEvent<Void> {
-        return sheetView.closeButtonTap
-    }
-    
-    public var completedButtonTap: ControlEvent<Void> {
-        return sheetView.completedButtonTap
-    }
-    
     // MARK: - UI Components
     private let pickerView = UIPickerView()
 
-    private lazy var sheetView = CompletableSheet(contentView: pickerView)
+    private(set) lazy var sheetView: DefaultSheetView = {
+        let view = DefaultSheetView(contentView: pickerView)
+        view.setCompletedBUtton()
+        return view
+    }()
     
     // MARK: - LifeCycle
     init(title: String?) {

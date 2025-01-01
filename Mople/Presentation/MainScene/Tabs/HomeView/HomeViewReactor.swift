@@ -11,7 +11,7 @@ import ReactorKit
 
 struct HomeViewAction {
     var presentCreateGroupView: (() -> Void)
-    var presentCreatePlanView: (([MeetSummary]) -> Void)
+    var presentCreatePlanView: (() -> Void)
     var presentCalendarView: (Date) -> Void
 }
 
@@ -40,7 +40,6 @@ final class HomeViewReactor: Reactor {
     private let homeViewAction: HomeViewAction
     
     var initialState: State = State()
-    var meets: [MeetSummary] = []
     
     init(fetchRecentScheduleUseCase: FetchRecentPlan,
          refreshFCMTokenUseCase: ReqseutRefreshFCMToken,
@@ -80,13 +79,12 @@ final class HomeViewReactor: Reactor {
         case .responseRecentPlan(let homeModel):
             let recentSchedules = homeModel.plans.sorted(by: <)
             newState.plans = recentSchedules
-            self.meets = homeModel.meetSummary
         case .presentCalendar(let date):
             homeViewAction.presentCalendarView(date)
         case .presentCreateGroupView:
             homeViewAction.presentCreateGroupView()
         case .presentCreatePlanView:
-            homeViewAction.presentCreatePlanView(meets)
+            homeViewAction.presentCreatePlanView()
         }
         return newState
     }

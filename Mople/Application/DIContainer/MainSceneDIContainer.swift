@@ -8,14 +8,14 @@
 import UIKit
 
 final class MainSceneDIContainer: MainSceneDependencies {
-    
+
     private lazy var FCMTokenManager: FCMTokenManager = {
         return .init(repo: DefaultFCMTokenRepo(networkService: appNetworkService))
     }()
 
-    private let appNetworkService: AppNetWorkService
+    private let appNetworkService: AppNetworkService
     
-    init(appNetworkService: AppNetWorkService) {
+    init(appNetworkService: AppNetworkService) {
         self.appNetworkService = appNetworkService
     }
     
@@ -23,12 +23,6 @@ final class MainSceneDIContainer: MainSceneDependencies {
         let flow = MainSceneCoordinator(navigationController: navigationController,
                                      dependencies: self)
         return flow
-    }
-}
-
-extension MainSceneDIContainer {
-    func makeTabBarController() -> UITabBarController {
-        return DefaultTabBarController()
     }
 }
 
@@ -122,37 +116,20 @@ extension MainSceneDIContainer {
     
     
     // MARK: - 그룹 생성 화면
-    func makeCreateGroupViewController(action: CreateGroupAction) -> GroupCreateViewController {
+    func makeCreateGroupViewController(flowAction: CreatedGroupFlowAction) -> GroupCreateViewController {
         let title = TextStyle.CreateGroup.title
         return .init(title: title,
-                     reactor: makeCreateGroupViewReactor(action))
+                     reactor: makeCreateGroupViewReactor(flowAction))
     }
     
-    private func makeCreateGroupViewReactor(_ action: CreateGroupAction) -> GroupCreateViewReactor {
-        return .init(createGroupImpl: CreateGroupMock(), createGroupAction: action)
+    private func makeCreateGroupViewReactor(_ flowAction: CreatedGroupFlowAction) -> GroupCreateViewReactor {
+        return .init(createGroupImpl: CreateGroupMock(),
+                     flowAction: flowAction)
     }
     
-    // MARK: - 그룹 생성 화면
-    func makeCreatePlanViewController(
-        action: CreatePlanAction,
-        meets: [MeetSummary]
-    ) -> PlanCreateViewController {
-        
-        let title = TextStyle.CreateGroup.title
-        
-        return .init(title: title,
-                     reactor: makeCreatePlanViewReactor(action: action,
-                                                        meets: meets))
-    }
-    
-    private func makeCreatePlanViewReactor(
-        action: CreatePlanAction,
-        meets: [MeetSummary]
-    ) -> PlanCreateViewReactor {
-        
-        return .init(createPlanUseCase: CreatePlanMock(),
-                     createPlanAction: action,
-                     meets: meets)
+    // MARK: - 일정 생성 화면
+    func makePlanCreateDIContainer() -> PlanCreateSceneContainer {
+        return PlanCreateSceneDIContainer(appNetworkService: appNetworkService)
     }
 }
 

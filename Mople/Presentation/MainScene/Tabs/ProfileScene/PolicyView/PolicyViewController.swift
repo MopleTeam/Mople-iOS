@@ -37,7 +37,7 @@ final class PolicyViewController: TitleNaviViewController {
 
     // MARK: - Binding
     func bind() {
-        leftItemEvent
+        naviBar.leftItemEvent
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.navigationController?.popViewController(animated: true)

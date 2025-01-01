@@ -10,11 +10,12 @@ import Foundation
 struct HomeResponse: Decodable {
     let plans: [PlanResponse]
     let meetSummarys: [MeetSummaryResponse]
+
 }
 
 extension HomeResponse {
     func toDomain() -> HomeModel {
         return .init(plans: plans.map({ $0.toDomain() }),
-                     meetSummary: meetSummarys.map({ $0.toDomain() }))
+                     hasMeet: !meetSummarys.isEmpty)
     }
 }

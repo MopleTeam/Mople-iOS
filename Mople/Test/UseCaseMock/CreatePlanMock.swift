@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class CreatePlanMock: CreatePlanUsecase {
+final class CreatePlanMock: CreatePlan {
     func createPlan(with plan: PlanUploadRequest) -> Single<Plan> {
         return Observable.just(())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
@@ -51,7 +51,7 @@ extension Plan {
 extension MeetSummary {
     static func mock(id: Int) -> MeetSummary {
         return .init(id: id,
-                     name: "테스트 모임",
+                     name: "테스트 모임 \(id)",
                      imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300")
     }
 }

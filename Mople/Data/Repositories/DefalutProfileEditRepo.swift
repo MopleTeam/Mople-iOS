@@ -9,10 +9,10 @@ import RxSwift
 
 final class DefaultProfileEditRepo: ProfileEditRepo {
 
-    private let networkService: AppNetWorkService
+    private let networkService: AppNetworkService
 
     
-    init(networkService: AppNetWorkService) {
+    init(networkService: AppNetworkService) {
         self.networkService = networkService
     }
 

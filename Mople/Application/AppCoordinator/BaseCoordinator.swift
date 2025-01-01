@@ -42,6 +42,16 @@ class BaseCoordinator: Coordinator {
             self.childCoordinators.remove(at: index)
         }
     }
+    
+    func clearUp() {
+        self.childCoordinators.forEach {
+            $0.navigationController.viewControllers.removeAll()
+            self.didFinish(coordinator: $0)
+        }
+        
+        self.childCoordinators.removeAll()
+        self.navigationController.viewControllers.removeAll()
+    }
 }
 
 extension BaseCoordinator {

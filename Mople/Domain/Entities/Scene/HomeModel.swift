@@ -9,5 +9,5 @@ import Foundation
 
 struct HomeModel {
     let plans: [Plan]
-    let meetSummary: [MeetSummary]
+    let hasMeet: Bool
 }

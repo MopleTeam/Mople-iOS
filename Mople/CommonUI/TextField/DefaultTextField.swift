@@ -16,21 +16,12 @@ final class DefaultTextField: UIView {
         case right
     }
     
-    // MARK: - Reactive
-    public var rx_text: ControlProperty<String?> {
-        return inputTextField.rx.text
-    }
-    
-    public var rx_editing: ControlEvent<Void> {
-        return inputTextField.rx.controlEvent(.editingChanged)
-    }
-    
-    public var rx_Resign: Binder<Bool> {
-        return inputTextField.rx.isResign
-    }
-    
     public var text: String? {
-        return inputTextField.text
+        get {
+            return inputTextField.text
+        } set {
+            inputTextField.text = newValue
+        }
     }
     
     private var maxCount: Int?
@@ -42,8 +33,7 @@ final class DefaultTextField: UIView {
         return view
     }()
     
-    // 플레이스 홀더 셋팅
-    private let inputTextField: UITextField = {
+    public let inputTextField: UITextField = {
         let textField = UITextField()
         textField.font = FontStyle.Body1.regular
         textField.textColor = ColorStyle.Gray._01
@@ -113,3 +103,24 @@ extension DefaultTextField {
         }
     }
 }
+
+extension Reactive where Base: DefaultTextField {
+    var isResponse: Binder<Void> {
+        Binder(base.self) { _, _ in
+            base.inputTextField.becomeFirstResponder()
+        }
+    }
+    
+    var isResign: Binder<Bool> {
+        base.inputTextField.rx.isResign
+    }
+    
+    var editEvent: ControlEvent<Void> {
+        base.inputTextField.rx.controlEvent(.editingChanged)
+    }
+    
+    var returnEvent: ControlEvent<Void> {
+        base.inputTextField.rx.controlEvent(.editingDidEndOnExit)
+    }
+}
+

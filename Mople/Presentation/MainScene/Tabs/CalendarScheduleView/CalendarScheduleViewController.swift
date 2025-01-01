@@ -16,15 +16,15 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
-    
+        
     // MARK: - Observer
-    private let scopeObserver: PublishSubject<Void> = .init()
+    #warning("캘린더 페이징 처리와 함께 고쳐야 함")
     private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
     
     #warning("reactor외의 용도로 만드는 이유")
     // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
     private let verticalGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
-        
+    
     // MARK: - UI Components
     private let headerButton: UIButton = {
         let view = UIButton()
@@ -88,18 +88,18 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     deinit {
         print(#function, #line, "LifeCycle Test CalendarScheduleView Deinit" )
     }
-     
-     required init?(coder: NSCoder) {
-         fatalError("init(coder:) has not been implemented")
-     }
-     
-     override func viewDidLoad() {
-         print(#function, #line)
-         super.viewDidLoad()
-         setupUI()
-         setAction()
-         setGesture()
-     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        print(#function, #line)
+        super.viewDidLoad()
+        setupUI()
+        setAction()
+        setGesture()
+    }
     
     override func viewWillDisappear(_ animated: Bool) {
         print(#function, #line)
@@ -111,7 +111,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     private func setupUI() {
         setupNavi()
         setLayout()
-        setContainer()
+        addChildVC()
         setHeaderLabel(DateManager.todayComponents)
     }
     
@@ -127,7 +127,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
         self.view.addSubview(borderView)
-                        
+        
         headerButton.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom).offset(16)
             make.horizontalEdges.equalToSuperview().inset(24)
@@ -156,27 +156,9 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         }
     }
     
-    private func setContainer() {
-        addCalendarView()
-        addScheduleListView()
-    }
-    
-    private func addCalendarView() {
-        addChild(calendarView)
-        calendarContainer.addSubview(calendarView.view)
-        calendarView.didMove(toParent: self)
-        calendarView.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-    }
-    
-    private func addScheduleListView() {
-        addChild(scheduleListTableView)
-        scheduleListContainer.addSubview(scheduleListTableView.view)
-        scheduleListTableView.didMove(toParent: self)
-        scheduleListTableView.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+    private func addChildVC() {
+        add(child: calendarView, container: calendarContainer)
+        add(child: scheduleListTableView, container: scheduleListContainer)
     }
     
     // MARK: - Binding
@@ -220,13 +202,13 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     private func outputBind(_ reactor: Reactor) {
-        self.rightItemEvent
+        naviBar.rightItemEvent
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.leftItemEvent
+        naviBar.leftItemEvent
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
             .bind(to: reactor.action)
@@ -259,7 +241,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         self.view.addGestureRecognizer(scopeGesture)
         self.scheduleListTableView.panGestureRequire(scopeGesture)
     }
-    
 }
 
 extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
@@ -386,7 +367,9 @@ extension CalendarScheduleViewController {
 }
 
 
-
+// 홈에서 데이터가 넘어오면 리액터로 전달
+// 홈에서 아직 데이터를 받고 있다면 데이터가 다 받아진 다음 전달
+//
 
 
 

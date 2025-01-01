@@ -41,7 +41,6 @@ final class ProfileSetupViewController: UIViewController, View {
 
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()
-    private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
     private let imageContainerView = UIView()
@@ -62,8 +61,8 @@ final class ProfileSetupViewController: UIViewController, View {
         return imageView
     }()
     
-    private let nameTextField: LabeledTextField = {
-        let textField = LabeledTextField(title: TextStyle.ProfileSetup.nameTitle,
+    private let nameView: LabeledTextFieldView = {
+        let textField = LabeledTextFieldView(title: TextStyle.ProfileSetup.nameTitle,
                                               placeholder: TextStyle.ProfileSetup.typingName,
                                               maxTextCount: 15)
         return textField
@@ -76,7 +75,7 @@ final class ProfileSetupViewController: UIViewController, View {
                      color: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.secondary, disabledColor: ColorStyle.Primary.disable2)
         btn.setRadius(6)
-        btn.rx.isEnabled.onNext(false)
+        btn.isEnabled = false
         return btn
     }()
     
@@ -95,12 +94,12 @@ final class ProfileSetupViewController: UIViewController, View {
                      color: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
-        btn.rx.isEnabled.onNext(false)
+        btn.isEnabled = false
         return btn
     }()
     
     private lazy var nameStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [nameTextField, nameCheckContanierView])
+        let sv = UIStackView(arrangedSubviews: [nameView, nameCheckContanierView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -138,15 +137,16 @@ final class ProfileSetupViewController: UIViewController, View {
     }
     
     override func viewDidLoad() {
-        setupUI()
+        initalSetup()
         setBind()
     }
 
     // MARK: - UI Setup
-    private func setupUI() {
+    private func initalSetup() {
         setupLayout()
         setupTextField()
         configureView()
+        setupKeyboardDismissGestrue()
     }
     
     private func setupLayout() {
@@ -184,7 +184,7 @@ final class ProfileSetupViewController: UIViewController, View {
     }
 
     private func setupTextField() {
-        nameTextField.setInputTextField(view: duplicateButton, mode: .right)
+        nameView.setInputTextField(view: duplicateButton, mode: .right)
      }
     
     // MARK: - 외부 바인딩
@@ -195,7 +195,7 @@ final class ProfileSetupViewController: UIViewController, View {
     
     private func setInput(reactor: Reactor) {
         self.duplicateButton.rx.controlEvent(.touchUpInside)
-            .compactMap({ _ in self.nameTextField.text })
+            .compactMap({ _ in self.nameView.text })
             .map { Reactor.Action.checkNickname(name: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -255,7 +255,7 @@ final class ProfileSetupViewController: UIViewController, View {
             .drive(with: self, onNext: { vc, isValid in
                 vc.duplicateButton.rx.isEnabled.onNext(false)
                 vc.nameCheckLabel.rx.isOverlap.onNext(!isValid)
-                vc.nameTextField.rx_Resign.onNext(isValid)
+                vc.nameView.textField.rx.isResign.onNext(isValid)
             })
             .disposed(by: disposeBag)
     }
@@ -270,7 +270,7 @@ final class ProfileSetupViewController: UIViewController, View {
     }
     
     private func setEditNameBind() {
-        nameTextField.rx_editing
+        nameView.textField.rx.editEvent
             .asDriver(onErrorJustReturn: ())
             .do(onNext: { _ in
                 self.nameCheckLabel.rx.isHidden.onNext(true)
@@ -285,15 +285,7 @@ final class ProfileSetupViewController: UIViewController, View {
 
     // 제스처
     private func setGeestureBind() {
-        self.view.addGestureRecognizer(backTapGesture)
         self.profileImageView.addGestureRecognizer(imageTapGesture)
-        
-        backTapGesture.rx.event
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.view.endEditing(true)
-            })
-            .disposed(by: disposeBag)
         
         imageTapGesture.rx.event
             .asDriver()
@@ -317,15 +309,15 @@ extension ProfileSetupViewController : UITextFieldDelegate {
 // MARK: - 랜덤 닉네임
 extension ProfileSetupViewController {
     public func setRandomNickname(_ name: String) {
-        duplicateButton.rx.isEnabled.onNext(true)
-        nameTextField.rx_text.onNext(name)
+        duplicateButton.isEnabled = true
+        nameView.text = name
     }
 }
 
 // MARK: - 프로필 생성 및 적용
 extension ProfileSetupViewController {
     private func makeProfile() -> (String, UIImage?)? {
-        guard let nickName = nameTextField.text else {
+        guard let nickName = nameView.text else {
             alertManager.showAlert(message: "입력 정보를 확인해주세요.")
             return nil
         }
@@ -335,7 +327,7 @@ extension ProfileSetupViewController {
     
     private func setProfile(_ profile: ProfileInfo) {
         _ = self.profileImageView.kfSetimage(profile.imagePath)
-        self.nameTextField.rx_text.onNext(profile.name)
+        nameView.text = profile.name
     }
 }
 
@@ -381,12 +373,12 @@ extension ProfileSetupViewController {
         case .create:
             return true
         case .edit(let previousProfile):
-            return self.nameTextField.text != previousProfile.name
+            return self.nameView.text != previousProfile.name
         }
     }
 }
 
-// MARK: - 프로필 생성, 편집에
+// MARK: - 프로필 생성, 편집
 extension ProfileSetupViewController {
     private func configureView() {
         switch viewType {
@@ -399,3 +391,10 @@ extension ProfileSetupViewController {
         }
     }
 }
+
+extension ProfileSetupViewController: KeyboardDismissable {
+    private func setupKeyboardDismissGestrue() {
+        setupTapKeyboardDismiss()
+    }
+}
+

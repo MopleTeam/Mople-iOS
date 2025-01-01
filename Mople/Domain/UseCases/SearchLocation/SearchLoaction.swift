@@ -7,6 +7,6 @@
 
 import RxSwift
 
-protocol SearchLoactionUseCase {
-    func requestSearchLocation(query: String) -> Single<Void>
+protocol SearchLoaction {
+    func requestSearchLocation(query: String) -> Single<SearchPlaceResult>
 }

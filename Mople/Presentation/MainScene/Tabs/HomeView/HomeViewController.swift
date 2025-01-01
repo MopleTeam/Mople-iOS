@@ -49,9 +49,9 @@ final class HomeViewController: UIViewController, View {
         return sv
     }()
     
-    private let collectionContainerView = UIView()
+    private let recentPlanContainerView = UIView()
     
-    private lazy var scheduleListCollectionView = ScheduleListCollectionViewController(reactor: reactor!)
+    private lazy var resentPlanCollectionView = RecentPlanCollectionViewController(reactor: reactor!)
     
     #warning("configure")
     private let emptyDataView: UILabel = {
@@ -96,7 +96,7 @@ final class HomeViewController: UIViewController, View {
     
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [topStackView,
-                                                collectionContainerView,
+                                                recentPlanContainerView,
                                                 buttonStackView,
                                                 spacerView])
         sv.axis = .vertical
@@ -138,7 +138,7 @@ final class HomeViewController: UIViewController, View {
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
-        self.collectionContainerView.addSubview(emptyDataView)
+        self.recentPlanContainerView.addSubview(emptyDataView)
         
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -154,7 +154,7 @@ final class HomeViewController: UIViewController, View {
             make.bottom.equalToSuperview()
         }
         
-        collectionContainerView.snp.makeConstraints { make in
+        recentPlanContainerView.snp.makeConstraints { make in
             make.height.equalTo(270)
         }
         
@@ -169,12 +169,7 @@ final class HomeViewController: UIViewController, View {
     }
     
     private func addScheduleListCollectionView() {
-        addChild(scheduleListCollectionView)
-        collectionContainerView.addSubview(scheduleListCollectionView.view)
-        scheduleListCollectionView.didMove(toParent: self)
-        scheduleListCollectionView.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        add(child: resentPlanCollectionView, container: recentPlanContainerView)
     }
     
     func bind(reactor: HomeViewReactor) {
@@ -197,7 +192,7 @@ final class HomeViewController: UIViewController, View {
                 .asDriver(onErrorJustReturn: [])
                 .drive(with: self, onNext: { vc, schedules in
                     vc.emptyDataView.isHidden = !schedules.isEmpty
-                    vc.collectionContainerView.isHidden = schedules.isEmpty
+                    vc.recentPlanContainerView.isHidden = schedules.isEmpty
                 })
                 .disposed(by: disposeBag)
     }

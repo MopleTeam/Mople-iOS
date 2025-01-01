@@ -17,30 +17,22 @@ final class SearchNaviBar: UIView {
         case right
     }
     
-    // MARK: - Observable
-    public var searchButtonEvent: ControlEvent<Void> {
-        return searchButton.rx.controlEvent(.touchUpInside)
-    }
-    
-    public var backButtonEvent: ControlEvent<Void> {
-        return backButton.rx.controlEvent(.touchUpInside)
-    }
-    
     // MARK: - UI Components
-    private lazy var searchTextField: DefaultTextField = {
+    private(set) lazy var searchTextField: DefaultTextField = {
         let textField = DefaultTextField()
         textField.setPlaceholder("장소를 검색해주세요")
         textField.setInputTextField(view: searchButton, mode: .right)
+        textField.inputTextField.returnKeyType = .search
         return textField
     }()
     
-    private let backButton: UIButton = {
+    fileprivate let backButton: UIButton = {
         let btn = UIButton()
         btn.setImage(.arrowBack, for: .normal)
         return btn
     }()
     
-    private let searchButton: BaseButton = {
+    fileprivate let searchButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(text: "검색",
                      font: FontStyle.Body2.semiBold,
@@ -87,6 +79,21 @@ final class SearchNaviBar: UIView {
     }
 }
 
-
-
-
+extension Reactive where Base: SearchNaviBar {
+    
+    var editEvent: ControlEvent<Void> {
+        base.searchTextField.rx.editEvent
+    }
+    
+    var searchButtonEvent: ControlEvent<Void> {
+        base.searchButton.rx.controlEvent(.touchUpInside)
+    }
+    
+    var searchEvent: ControlEvent<Void> {
+        base.searchTextField.rx.returnEvent
+    }
+    
+    var backEvent: ControlEvent<Void> {
+        base.backButton.rx.controlEvent(.touchUpInside)
+    }
+}

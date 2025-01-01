@@ -24,14 +24,14 @@ class GroupListViewController: TitleNaviViewController, View {
         return view
     }()
 
-    private let containerView: UIView = {
+    private let groupTableContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = ColorStyle.BG.primary
         view.clipsToBounds = true
         return view
     }()
     
-    private lazy var groupListTableView = GroupListTableViewController(reactor: reactor!)
+    private lazy var groupTableView = GroupListTableViewController(reactor: reactor!)
     
     private let borderView: UIView = {
         let view = UIView()
@@ -67,12 +67,12 @@ class GroupListViewController: TitleNaviViewController, View {
     }
 
     func setupUI() {
-        self.view.addSubview(containerView)
+        self.view.addSubview(groupTableContainerView)
         self.view.addSubview(borderView)
         
-        self.containerView.addSubview(emptyView)
+        self.groupTableContainerView.addSubview(emptyView)
 
-        containerView.snp.makeConstraints { make in
+        groupTableContainerView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.bottom.horizontalEdges.equalToSuperview()
         }
@@ -89,12 +89,7 @@ class GroupListViewController: TitleNaviViewController, View {
     }
     
     private func addScheduleListCollectionView() {
-        addChild(groupListTableView)
-        containerView.addSubview(groupListTableView.view)
-        groupListTableView.didMove(toParent: self)
-        groupListTableView.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        add(child: groupTableView, container: groupTableContainerView)
     }
     
     func bind(reactor: GroupListViewReactor) {
@@ -102,7 +97,7 @@ class GroupListViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, groupList in
                 vc.emptyView.isHidden = !groupList.isEmpty
-                vc.groupListTableView.view.isHidden = groupList.isEmpty
+                vc.groupTableView.view.isHidden = groupList.isEmpty
             })
             .disposed(by: disposeBag)
     }

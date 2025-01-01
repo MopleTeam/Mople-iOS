@@ -30,7 +30,9 @@ final class FetchGroupListMock: FetchGroup {
         }
     }
     
-    func fetchGroupList() -> RxSwift.Single<[Meet]> {
-        return Single.just(getMockData())
+    func fetchGroupList() -> Single<[Meet]> {
+        return Observable.just(getMockData())
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
+            .asSingle()
     }
 }

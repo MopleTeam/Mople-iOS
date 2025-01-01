@@ -12,9 +12,9 @@ final class LoginSceneDIContainer: LoginSceneDependencies {
     private lazy var appleLoginService = DefaultAppleLoginService()
     private lazy var kakaoLoginService = DefaultKakaoLoginService()
     
-    let appNetworkService: AppNetWorkService
+    let appNetworkService: AppNetworkService
     
-    init(appNetworkService: AppNetWorkService) {
+    init(appNetworkService: AppNetworkService) {
         self.appNetworkService = appNetworkService
     }
     

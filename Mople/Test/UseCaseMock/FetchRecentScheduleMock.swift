@@ -23,12 +23,8 @@ extension HomeModel {
             let date = Date().addingTimeInterval(3600 * (24 * Double($0)))
             return Plan.mock(date: date)
         }
-        
-        let meetSummarys = Array(1...10).map { index in
-            return MeetSummary.mock(id: index)
-        }
 
-        return .init(plans: plans, meetSummary: meetSummarys)
+        return .init(plans: plans, hasMeet: Bool.random())
     }
 }
 

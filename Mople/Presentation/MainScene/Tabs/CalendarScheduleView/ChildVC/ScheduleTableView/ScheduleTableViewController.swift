@@ -95,7 +95,7 @@ final class ScheduleTableViewController: UIViewController, View {
     private func setupTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: ScheduleTableViewCell.reuseIdentifier)
-        self.tableView.register(SchedulTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SchedulTableHeaderView.reuseIdentifier)
+        self.tableView.register(PlanTableHeaderView.self, forHeaderFooterViewReuseIdentifier: PlanTableHeaderView.reuseIdentifier)
     }
     
     private func setupDataSource() {
@@ -182,7 +182,7 @@ extension ScheduleTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SchedulTableHeaderView.reuseIdentifier) as! SchedulTableHeaderView
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: PlanTableHeaderView.reuseIdentifier) as! PlanTableHeaderView
         let title = dataSource?[section].title
         header.setTitle(title: title, tag: section)
         return header

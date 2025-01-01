@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEvent {
+final class GroupCreateViewController: TitleNaviViewController, View, KeyboardResponsive {
     
     typealias Reactor = GroupCreateViewReactor
     
@@ -39,7 +39,6 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
         
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()
-    private let backTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
     private let mainView: UIScrollView = {
@@ -70,8 +69,8 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
         return imageView
     }()
     
-    private let inputTextField: LabeledTextField = {
-        let textField = LabeledTextField(title: TextStyle.CreateGroup.groupTitle,
+    private let inputTextField: LabeledTextFieldView = {
+        let textField = LabeledTextFieldView(title: TextStyle.CreateGroup.groupTitle,
                                               placeholder: TextStyle.CreateGroup.placeholder,
                                               maxTextCount: 30)
         return textField
@@ -112,8 +111,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupAction()
+        initalSetup()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -126,9 +124,17 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
         removeKeyboardObserver()
     }
     
+    private func initalSetup() {
+        setupUI()
+        setGesture()
+        setObserver()
+    }
+    
+    // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
         setNaviItem()
+        setPresentationStyle()
     }
     
     private func setupLayout() {
@@ -178,56 +184,55 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
         }
     }
     
+    private func setNaviItem() {
+        self.setBarItem(type: .left, image: .arrowBack)
+    }
+    
+    // MARK: - Modal
+    private func setPresentationStyle() {
+        modalPresentationStyle = .fullScreen
+    }
+    
     // MARK: - Binding
     func bind(reactor: GroupCreateViewReactor) {
         self.completionButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.setGroup(group: self.makeGroup()) }
+            .compactMap({ [weak self] in
+                self?.makeGroup()
+            })
+            .map { Reactor.Action.setGroup(group: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        naviBar.leftItemEvent
+            .map { Reactor.Action.endFlow }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
-            .drive(self.rx.isLoading)
+            .drive(with: self, onNext: { vc, isLoading in
+                vc.rx.isLoading.onNext(isLoading)
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$message)
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
+//                vc.inputTextField.rx.i
                 vc.alertManager.showAlert(message: message)
             })
             .disposed(by: disposeBag)
     }
     
-    private func setNaviItem() {
-        self.setBarItem(type: .left, image: .arrowBack)
-    }
-    
-    private func setupAction() {
-        setupButton()
-        setGesture()
-        setEditImage()
-    }
-    
-    private func setupButton() {
-        leftItemEvent
-            .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.navigationController?.popViewController(animated: true)
-            })
-            .disposed(by: disposeBag)
-    }
-    
+    // MARK: - Gesture Setup
     private func setGesture() {
-        self.view.addGestureRecognizer(backTapGesture)
+        setImageGestrue()
+        setupTapKeyboardDismiss()
+    }
+    
+    private func setImageGestrue() {
         self.groupImageView.addGestureRecognizer(imageTapGesture)
-        
-        backTapGesture.rx.event
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.view.endEditing(true)
-            })
-            .disposed(by: disposeBag)
         
         imageTapGesture.rx.event
             .asDriver()
@@ -237,8 +242,8 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardEv
             .disposed(by: disposeBag)
     }
     
-    // 이미지 변경
-    private func setEditImage() {
+    // MARK: - Observer Setup
+    private func setObserver() {
         imageObserver
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: .defaultIProfile)
@@ -268,5 +273,15 @@ extension GroupCreateViewController : UITextFieldDelegate {
         guard let currentText = textField.text else { return true }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
         return newText.count <= 30
+    }
+}
+
+extension GroupCreateViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    private func setupKeyboardDismissGestrue() {
+        setupTapKeyboardDismiss()
     }
 }

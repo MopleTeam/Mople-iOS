@@ -10,9 +10,9 @@ import RxSwift
 
 final class DefaultSignUpRepo: SignUpRepo {
 
-    private let networkService: AppNetWorkService
+    private let networkService: AppNetworkService
 
-    init(networkService: AppNetWorkService) {
+    init(networkService: AppNetworkService) {
         print(#function, #line, "LifeCycle Test DefaultSignUpRepo Created" )
         self.networkService = networkService
     }

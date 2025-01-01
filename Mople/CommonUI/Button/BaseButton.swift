@@ -7,12 +7,18 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 
 class BaseButton: UIButton {
 
     var title: String? {
         get { configuration?.title }
         set { configuration?.title = newValue }
+    }
+    
+    override var isEnabled: Bool {
+        get { self.isEnabled }
+        set { self.setEnabled(newValue) }
     }
     
     private(set) var enabledBackColor: UIColor?
@@ -80,18 +86,9 @@ extension BaseButton {
         configuration?.titleTextAttributesTransformer = transformer
     }
     
-    fileprivate func updateEnabledColor(_ isEnabled: Bool) {
+    private func setEnabled(_ isEnabled: Bool) {
         guard let enabledBackColor, let disabledBackColor else { return }
         configuration?.background.backgroundColor = isEnabled ? enabledBackColor : disabledBackColor
-    }
-}
-
-extension Reactive where Base: BaseButton {
-    var isEnabled: Binder<Bool> {
-        return Binder(self.base) { button, isEnabled in
-            button.isEnabled = isEnabled
-            button.updateEnabledColor(isEnabled)
-        }
     }
 }
 

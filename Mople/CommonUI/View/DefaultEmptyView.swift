@@ -44,7 +44,7 @@ class DefaultEmptyView: UIView {
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.edges.equalToSuperview()
         }
         
         imageView.snp.makeConstraints { make in

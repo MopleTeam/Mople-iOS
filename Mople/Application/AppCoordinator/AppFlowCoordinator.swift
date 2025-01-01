@@ -17,7 +17,6 @@ protocol SignOutListener {
 
 final class AppFlowCoordinator: BaseCoordinator {
     
-    
     private let appDIContainer: AppDIContainer
  
     init(navigationController: UINavigationController,

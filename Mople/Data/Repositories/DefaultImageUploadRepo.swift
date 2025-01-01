@@ -15,9 +15,9 @@ enum ImageUploadPath: String {
 }
 
 final class DefaultImageUploadRepo: ImageUploadRepo {
-    private let networkServbice: AppNetWorkService
+    private let networkServbice: AppNetworkService
     
-    init(networkServbice: AppNetWorkService) {
+    init(networkServbice: AppNetworkService) {
         print(#function, #line, "LifeCycle Test DefaultImageUploadRepo Created" )
         self.networkServbice = networkServbice
     }

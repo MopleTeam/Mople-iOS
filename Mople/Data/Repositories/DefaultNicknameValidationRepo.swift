@@ -9,9 +9,9 @@ import RxSwift
 
 final class DefaultNicknameValidationRepo: NicknameValidationRepo {
     
-    private let networkService: AppNetWorkService
+    private let networkService: AppNetworkService
     
-    init(networkService: AppNetWorkService) {
+    init(networkService: AppNetworkService) {
         self.networkService = networkService
     }
     

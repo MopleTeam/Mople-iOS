@@ -8,14 +8,11 @@
 import UIKit
 import ReactorKit
 
-struct CreateGroupAction {
-    var completed: (() -> Void)?
-}
-
 final class GroupCreateViewReactor: Reactor {
     
     enum Action {
         case setGroup(group: (title: String?, image: UIImage?))
+        case endFlow
     }
     
     enum Mutation {
@@ -32,13 +29,13 @@ final class GroupCreateViewReactor: Reactor {
     var initialState: State = State()
     
     private let createGroupImpl: CreateGroup
-    private let createGroupAction: CreateGroupAction
+    private weak var flowAction: CreatedGroupFlowAction?
     
     init(createGroupImpl: CreateGroup,
-         createGroupAction: CreateGroupAction) {
+         flowAction: CreatedGroupFlowAction) {
         print(#function, #line, "LifeCycle Test GroupCreateView Reactor Created" )
         self.createGroupImpl = createGroupImpl
-        self.createGroupAction = createGroupAction
+        self.flowAction = flowAction
     }
     
     deinit {
@@ -48,7 +45,10 @@ final class GroupCreateViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .setGroup(let group):
-            self.createGroup(title: group.title, image: group.image)
+            return self.createGroup(title: group.title, image: group.image)
+        case .endFlow:
+            self.flowAction?.endProcess()
+            return .empty()
         }
     }
     
@@ -58,7 +58,7 @@ final class GroupCreateViewReactor: Reactor {
         
         switch mutation {
         case .madeGroup:
-            createGroupAction.completed?()
+            flowAction?.endProcess()
         case .notifyMessage(let message):
             newState.message = message
         case .setLoading(let isLoad):

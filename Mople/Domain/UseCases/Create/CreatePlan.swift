@@ -7,6 +7,6 @@
 
 import RxSwift
 
-protocol CreatePlanUsecase {
+protocol CreatePlan {
     func createPlan(with plan: PlanUploadRequest) -> Single<Plan>
 }
