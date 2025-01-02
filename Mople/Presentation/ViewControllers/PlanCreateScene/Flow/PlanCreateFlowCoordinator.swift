@@ -16,7 +16,7 @@ protocol PlanCreateFlow: AnyObject {
 }
 
 protocol PlaceSelectionDelegate {
-    func didSelectPlace(_ place: PlaceInfo?)
+    func didSelectPlace(_ place: PlaceInfo)
 }
 
 final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateFlow {
@@ -70,8 +70,7 @@ extension PlanCreateFlowCoordinator {
 }
 
 extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
-    func didSelectPlace(_ place: PlaceInfo?) {
-        guard let place else { return }
+    func didSelectPlace(_ place: PlaceInfo) {
         planCreateVC?.setupPlace(place)
     }
 }

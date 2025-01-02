@@ -17,8 +17,9 @@ class BaseButton: UIButton {
     }
     
     override var isEnabled: Bool {
-        get { self.isEnabled }
-        set { self.setEnabled(newValue) }
+        didSet {
+            self.setEnabled(isEnabled)
+        }
     }
     
     private(set) var enabledBackColor: UIColor?

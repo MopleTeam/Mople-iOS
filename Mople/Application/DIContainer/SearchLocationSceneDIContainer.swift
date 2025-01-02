@@ -14,7 +14,7 @@ protocol SearchLocationSceneContainer {
 protocol SearchPlaceSceneDependencies {
     func makeSearchLocationViewController(flow: SearchPlaceFlowAction) -> SearchPlaceViewController
     func makeSearchResultViewController() -> SearchResultViewController
-    func makeDetailLocationViewController() -> UIViewController
+    func makeDetailLocationViewController(place: PlaceInfo) -> DetailPlaceViewController
 }
 
 final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies & SearchLocationSceneContainer {
@@ -48,7 +48,7 @@ extension SearchLocationSceneDIContainer {
         return .init(reactor: commonReactor)
     }
     
-    func makeDetailLocationViewController() -> UIViewController {
-        return UIViewController()
+    func makeDetailLocationViewController(place: PlaceInfo) -> DetailPlaceViewController {
+        return DetailPlaceViewController(reactor: commonReactor, place: place)
     }
 }

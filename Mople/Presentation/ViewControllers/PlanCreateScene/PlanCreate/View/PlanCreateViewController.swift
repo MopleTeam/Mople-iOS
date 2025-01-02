@@ -56,8 +56,8 @@ final class PlanCreateViewController: TitleNaviViewController, View {
     
     private let placeSelectView: LabeledButtonView = {
         let btn = LabeledButtonView(title: TextStyle.CreatePlan.plan,
-                              inputText: TextStyle.CreatePlan.planInfo,
-                              icon: .createPlace)
+                                    inputText: TextStyle.CreatePlan.planInfo,
+                                    icon: .location)
         return btn
     }()
     
@@ -161,23 +161,31 @@ final class PlanCreateViewController: TitleNaviViewController, View {
         reactor.pulse(\.$seletedMeet)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0?.name }
-            .drive(groupSelectView.rx.text)
+            .drive(groupSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDay)
             .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0?.toDate() })
             .map({
-                DateManager.toString(date: $0?.toDate(), format: .simple)
+                DateManager.toString(date: $0, format: .simple)
             })
-            .drive(dateSelectView.rx.text)
+            .drive(dateSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedTime)
             .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0?.toDate() })
             .map({
-                DateManager.toString(date: $0?.toDate(), format: .time)
+                DateManager.toString(date: $0, format: .time)
             })
-            .drive(timeSelectView.rx.text)
+            .drive(timeSelectView.rx.selectedText)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$selectedPlace)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0?.title })
+            .drive(placeSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)

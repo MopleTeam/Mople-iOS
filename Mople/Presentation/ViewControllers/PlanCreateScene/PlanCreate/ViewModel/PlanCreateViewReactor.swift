@@ -20,7 +20,7 @@ final class PlanCreateViewReactor: Reactor {
             case meet(_ index: Int)
             case name(_ name: String)
             case date(_ date: DateComponents, type: UpdatePlanType)
-            case place(_ location: PlaceInfo)
+            case place(_ placeInfo: PlaceInfo)
         }
 
         enum FlowAction {
@@ -57,7 +57,7 @@ final class PlanCreateViewReactor: Reactor {
         @Pulse var planTitle: String?
         @Pulse var selectedDay : DateComponents?
         @Pulse var selectedTime : DateComponents?
-        @Pulse var place: UploadPlace?
+        @Pulse var selectedPlace: UploadPlace?
         @Pulse var meets: [MeetSummary] = []
         @Pulse var isLoading: Bool = false
     }
@@ -156,7 +156,7 @@ extension PlanCreateViewReactor {
         guard let date = self.createDate(),
               let meetId = currentState.seletedMeet?.id,
               let name = currentState.planTitle,
-              let location = currentState.place else { return nil }
+              let location = currentState.selectedPlace else { return nil }
         
         return .init(meetId: meetId,
                      name: name,
@@ -191,11 +191,7 @@ extension PlanCreateViewReactor {
         case .time(let time):
             state.selectedTime = time
         case .place(let place):
-            state.place = .init(title: place.title ?? "이름 없음",
-                                planAddress: "",
-                                lat: 0,
-                                lot: 0,
-                                weatherAddress: "")
+            state.selectedPlace = .init(place: place)
         }
     }
     
@@ -207,8 +203,8 @@ extension PlanCreateViewReactor {
             return .just(.updateValue(.name(name)))
         case let .date(date, type):
             return self.updateDate(date: date, type: type)
-        case let .place(location):
-            return .just(.updateValue(.place(location)))
+        case let .place(placeInfo):
+            return .just(.updateValue(.place(placeInfo)))
         }
     }
     

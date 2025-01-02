@@ -61,13 +61,14 @@ final class SearchPlaceReactor: Reactor {
         case let .searchPlace(query):
             return self.searchLocation(query: query)
         case let .showDetailPlace(index):
-            return self.selectedPlace(index: index)
+            return self.showDetailPlcae(index: index)
         case let .deletePlace(index):
             return self.deleteHistory(index: index)
         case .endProcess:
-            self.flow?.endFlow(place: nil)
+            self.flow?.endProcess()
             return .empty()
-        case .selectedPlace(_):
+        case let .selectedPlace(place):
+            self.flow?.completedProcess(selectedPlace: place)
             return .empty()
         }
     }
@@ -120,7 +121,7 @@ extension SearchPlaceReactor {
                                   loadingStop])
     }
         
-    private func selectedPlace(index: Int) -> Observable<Mutation> {
+    private func showDetailPlcae(index: Int) -> Observable<Mutation> {
         guard let result = currentState.searchResult,
               !result.isCached,
               result.places.count > index,
@@ -128,6 +129,7 @@ extension SearchPlaceReactor {
               
         print(#function, #line, "#1 selectedPlace : \(index)" )
         queryStorage.addPlace(selectedPlace)
+        flow?.showDetailPlaceView(place: selectedPlace)
         return .empty()
     }
     

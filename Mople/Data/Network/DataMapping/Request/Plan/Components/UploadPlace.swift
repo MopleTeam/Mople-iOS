@@ -14,3 +14,13 @@ struct UploadPlace: Encodable {
     let lot: Double
     let weatherAddress: String
 }
+
+extension UploadPlace {
+    init(place: PlaceInfo) {
+        self.title = place.title ?? ""
+        self.planAddress = place.address ?? ""
+        self.lat = place.latitude ?? 0
+        self.lot = place.longitude ?? 0
+        self.weatherAddress = place.roadAddress ?? ""
+    }
+}

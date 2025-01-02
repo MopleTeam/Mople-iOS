@@ -48,6 +48,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NaverClientId</key>
+	<string>$(NAVER_CLIENT_ID)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Black.ttf</string>

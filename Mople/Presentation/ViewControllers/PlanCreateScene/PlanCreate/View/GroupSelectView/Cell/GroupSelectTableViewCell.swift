@@ -32,7 +32,7 @@ final class GroupSelectTableCell: UITableViewCell {
         
         thumbnailView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(16)
-            make.horizontalEdges.equalToSuperview().inset(20)
+            make.horizontalEdges.equalToSuperview()
         }
     }
 

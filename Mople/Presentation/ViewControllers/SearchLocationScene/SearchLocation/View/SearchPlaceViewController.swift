@@ -34,7 +34,13 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         return view
     }()
     
-    private(set) var resultVCContainer: UIView = {
+    private(set) var placeListContainer: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        return view
+    }()
+    
+    private(set) var detailPlaceContainer: UIView = {
         let view = UIView()
         view.isHidden = true
         return view
@@ -75,22 +81,22 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     private func setupUI() {
         self.view.addSubview(startView)
         self.view.addSubview(emptyView)
-        self.view.addSubview(resultVCContainer)
+        self.view.addSubview(placeListContainer)
+        self.view.addSubview(detailPlaceContainer)
         
-        startView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.height.width.lessThanOrEqualTo(self.view)
-        }
+        [startView, emptyView].forEach {
+            $0.snp.makeConstraints { make in
+                make.center.equalToSuperview()
+                make.height.width.lessThanOrEqualTo(self.view)
+            }
+        } 
         
-        emptyView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.height.width.lessThanOrEqualTo(self.view)
-        }
-        
-        resultVCContainer.snp.makeConstraints { make in
-            make.top.equalTo(self.searchViewBottom)
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
+        [placeListContainer, detailPlaceContainer].forEach {
+            $0.snp.makeConstraints { make in
+                make.top.equalTo(self.searchViewBottom)
+                make.horizontalEdges.equalToSuperview()
+                make.bottom.equalToSuperview()
+            }
         }
     }
     

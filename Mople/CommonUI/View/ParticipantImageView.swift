@@ -48,8 +48,6 @@ final class ParticipantImageView: UIImageView {
     
     private func setLayer() {
         self.clipsToBounds = true
-        
-        self.layer.borderWidth = 2
-        self.layer.borderColor = ColorStyle.App.stroke.cgColor
+        self.layer.makeLine(width: 2)
     }
 }

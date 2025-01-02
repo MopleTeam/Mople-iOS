@@ -85,10 +85,10 @@ final class ScheduleTableViewController: UIViewController, View {
         self.view.backgroundColor = .clear
         view.addSubview(tableView)
         view.addSubview(emptyScheduleView)
-        
+
         emptyScheduleView.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalToSuperview()
-            make.top.equalTo(self.view.snp.bottom)
+            make.center.equalToSuperview()
+            make.height.width.lessThanOrEqualTo(self.view)
         }
     }
     

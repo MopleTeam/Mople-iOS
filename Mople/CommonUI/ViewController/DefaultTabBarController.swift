@@ -22,8 +22,9 @@ final class DefaultTabBarController: UITabBarController {
     private func setupUI() {
         tabBar.backgroundColor = ColorStyle.Default.white
         tabBar.layer.makeLine(width: 1)
-        tabBar.layer.makeCornes(radius: 18, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
-        tabBar.layer.makeShadow(CGSize(width: 0, height: -4))
+        tabBar.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        tabBar.layer.makeShadow(opactity: 0.02,
+                                radius: 12)
     }
     
     private func updateTabBarFrame() {

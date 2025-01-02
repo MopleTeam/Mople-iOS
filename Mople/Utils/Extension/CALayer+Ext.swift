@@ -10,7 +10,7 @@ import UIKit
 extension CALayer {
     func makeLine(width: CGFloat) {
         self.borderWidth = width
-        self.borderColor = ColorStyle.App.stroke.cgColor
+        self.borderColor = ColorStyle.App.storke.cgColor
     }
     
     func makeCornes(radius: CGFloat, corners: CACornerMask) {
@@ -18,10 +18,13 @@ extension CALayer {
         self.maskedCorners = corners
     }
     
-    func makeShadow(_ cgSize: CGSize) {
-        self.shadowOpacity = 0.05
-        self.shadowRadius = 24
-        self.shadowColor = ColorStyle.Gray._01.cgColor
-        self.shadowOffset = cgSize
+    func makeShadow(opactity: Float,
+                    radius: CGFloat,
+                    offset: CGSize = .init(width: 0, height: -4),
+                    color: UIColor = UIColor.black) {
+        self.shadowOpacity = opactity
+        self.shadowRadius = radius
+        self.shadowOffset = offset
+        self.shadowColor = color.cgColor
     }
 }

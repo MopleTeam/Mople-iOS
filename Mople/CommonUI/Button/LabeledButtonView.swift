@@ -85,10 +85,16 @@ extension LabeledButtonView {
     }
     
     /// 텍스트 필드 플레이스 홀더 설정
-    fileprivate func setText(_ text: String?) {
+    private func setText(_ text: String?) {
         button.setTitle(text: text,
                      font: FontStyle.Body1.regular,
                      color: ColorStyle.Gray._05)
+    }
+    
+    fileprivate func setSelectedTextText(_ text: String?) {
+        button.setTitle(text: text,
+                     font: FontStyle.Body1.regular,
+                     color: ColorStyle.Gray._02)
     }
     
     private func setIconImage(_ image: UIImage?) {
@@ -106,9 +112,9 @@ extension LabeledButtonView {
 }
 
 extension Reactive where Base: LabeledButtonView {
-    var text: Binder<String?> {
+    var selectedText: Binder<String?> {
         return Binder(self.base) { button, text in
-            button.setText(text ?? button.defaultText)
+            button.setSelectedTextText(text ?? button.defaultText)
         }
     }
 }

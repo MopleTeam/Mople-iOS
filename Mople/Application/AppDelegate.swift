@@ -9,6 +9,7 @@ import UIKit
 import KakaoSDKCommon
 import FirebaseCore
 import KakaoSDKAuth
+import NMapsMap
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,8 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        registerKakaoKey()
-        regiseterFirebase()
+        registerServices()
         
         reqeustRemoteNotifications()
         AppAppearance.setupAppearance()
@@ -68,15 +68,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate {
-    private func registerKakaoKey() {
-        if let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoKey") as? String {
-            print(#function, #line, "kakaoKey : \(appKey)" )
-            KakaoSDK.initSDK(appKey: appKey)
-        }
+    private func registerServices() {
+        registerFirebase()
+        registerKakaoKey()
+        registerNaverMap()
     }
     
-    private func regiseterFirebase() {
+    private func registerKakaoKey() {
+        guard let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoKey") as? String else { return }
+        KakaoSDK.initSDK(appKey: appKey)
+    }
+    
+    private func registerFirebase() {
         FirebaseApp.configure()
+    }
+    
+    private func registerNaverMap() {
+        guard let appKey = Bundle.main.object(forInfoDictionaryKey: "NaverClientId") as? String else { return }
+        NMFAuthManager.shared().clientId = appKey
     }
 }
 

@@ -25,7 +25,7 @@ extension SearchPlaceResult {
             PlaceInfo.mock(id: index)
         })
         
-        return .init(result: Bool.random() ? [] : mockResult,
+        return .init(result: mockResult,
                      page: 0,
                      isEnd: true)
     }
@@ -38,7 +38,7 @@ extension PlaceInfo {
                      distance: 3000,
                      address: "테스트 Address",
                      roadAddress: "서울 강남구 도산대로 323 8층",
-                     longitude: 126.963950815777,
-                     latitude: 37.5297517407141)
+                     longitude: 128.3727604,
+                     latitude: 36.1200412)
     }
 }

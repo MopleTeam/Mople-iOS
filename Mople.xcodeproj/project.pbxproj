@@ -201,6 +201,8 @@
 		52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87CD2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift */; };
 		52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */; };
 		52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */; };
+		52D8642C2D26416D000F8378 /* DetailPlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8642B2D26416D000F8378 /* DetailPlaceViewController.swift */; };
+		52D8642F2D264271000F8378 /* NMapsMap in Frameworks */ = {isa = PBXBuildFile; productRef = 52D8642E2D264271000F8378 /* NMapsMap */; };
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
@@ -443,6 +445,7 @@
 		52CE87CD2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadRepositoryMock.swift; sourceTree = "<group>"; };
 		52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupRepositoryMock.swift; sourceTree = "<group>"; };
 		52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupMock.swift; sourceTree = "<group>"; };
+		52D8642B2D26416D000F8378 /* DetailPlaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPlaceViewController.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
@@ -499,6 +502,7 @@
 				525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */,
 				52E2383A2C765A2D0066C9A3 /* ReactorKit in Frameworks */,
 				529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */,
+				52D8642F2D264271000F8378 /* NMapsMap in Frameworks */,
 				52C72E9F2C4FBE4100CFF329 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1174,6 +1178,7 @@
 			children = (
 				52818C5D2D1808140001E30B /* SearchPlaceViewController.swift */,
 				52818C8B2D1C45890001E30B /* SearchResultViewController */,
+				52D8642A2D264157000F8378 /* DetailPlaceViewController */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1776,6 +1781,14 @@
 			path = Create;
 			sourceTree = "<group>";
 		};
+		52D8642A2D264157000F8378 /* DetailPlaceViewController */ = {
+			isa = PBXGroup;
+			children = (
+				52D8642B2D26416D000F8378 /* DetailPlaceViewController.swift */,
+			);
+			path = DetailPlaceViewController;
+			sourceTree = "<group>";
+		};
 		52D9651C2D23B726000610B2 /* Keyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -1949,6 +1962,7 @@
 				52EA6DF72CF75A6600EFD753 /* FirebaseMessaging */,
 				52EA6DFD2CF79D0600EFD753 /* MultipartForm */,
 				52D965192D201756000610B2 /* RealmSwift */,
+				52D8642E2D264271000F8378 /* NMapsMap */,
 			);
 			productName = Group;
 			productReference = 52C72E862C4FBD6400CFF329 /* Mople.app */;
@@ -1992,6 +2006,7 @@
 				52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				52EA6DFC2CF79D0600EFD753 /* XCRemoteSwiftPackageReference "MultipartForm" */,
 				52D965182D201756000610B2 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				52D8642D2D264271000F8378 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */,
 			);
 			productRefGroup = 52C72E872C4FBD6400CFF329 /* Products */;
 			projectDirPath = "";
@@ -2060,6 +2075,7 @@
 				52CC75CE2D1D4B4D000CC8B9 /* DefaultViewController.swift in Sources */,
 				52EA6E062CF7F22900EFD753 /* SignUpViewReactor.swift in Sources */,
 				52E238252C7454230066C9A3 /* ProfileInfo.swift in Sources */,
+				52D8642C2D26416D000F8378 /* DetailPlaceViewController.swift in Sources */,
 				52266BF22CBCF605007D03EB /* ProfileSetupViewController.swift in Sources */,
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
 				5259B0182CA028C2006B2711 /* ScheduleView.swift in Sources */,
@@ -2400,6 +2416,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NAVER_CLIENT_ID = f4x3z49vll;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2444,6 +2461,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NAVER_CLIENT_ID = f4x3z49vll;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2528,6 +2546,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.7.1;
+			};
+		};
+		52D8642D2D264271000F8378 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/navermaps/SPM-NMapsMap";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.20.0;
 			};
 		};
 		52D965182D201756000610B2 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
@@ -2619,6 +2645,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 52C72EA42C4FBE5900CFF329 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		52D8642E2D264271000F8378 /* NMapsMap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 52D8642D2D264271000F8378 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
+			productName = NMapsMap;
 		};
 		52D965192D201756000610B2 /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -49,9 +49,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(reactor: reactor!,
                                                   verticalGestureObserver: verticalGestureObserver)
-        
-        calendarView.view.layer.cornerRadius = 16
-        calendarView.view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        calendarView.view.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
         return calendarView
     }()
     
