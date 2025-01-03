@@ -10,6 +10,14 @@ import ReactorKit
 
 final class PlanCreateViewReactor: Reactor {
     
+    enum DateError: Error {
+        case invalid
+        
+        var info: String {
+            "선택된 시간이 너무 이릅니다."
+        }
+    }
+    
     enum UpdatePlanType {
         case day
         case time
@@ -50,6 +58,7 @@ final class PlanCreateViewReactor: Reactor {
         case updateMeetList(_ meets: [MeetSummary])
         case responsePlanCreation(_ plan: Plan)
         case notifyLoadingState(_ isLoading: Bool)
+        case notifyMessage(_ message: String)
     }
     
     struct State {
@@ -60,6 +69,16 @@ final class PlanCreateViewReactor: Reactor {
         @Pulse var selectedPlace: UploadPlace?
         @Pulse var meets: [MeetSummary] = []
         @Pulse var isLoading: Bool = false
+        @Pulse var message: String?
+        
+        var isAllFieldsFilled: Bool {
+            return seletedMeet != nil &&
+            planTitle != nil &&
+            planTitle?.isEmpty == false &&
+            selectedDay != nil &&
+            selectedTime != nil &&
+            selectedPlace != nil
+        }
     }
     
     private let fetchMeetListUseCase: FetchGroup
@@ -106,9 +125,11 @@ final class PlanCreateViewReactor: Reactor {
         case .updateMeetList(let meets):
             newState.meets = meets
         case .responsePlanCreation(let plan):
-            self.flow?.endFlow(plan: plan)
+            self.flow?.completedProcess(plan: plan)
         case .notifyLoadingState(let isLoad):
             newState.isLoading = isLoad
+        case let .notifyMessage(message):
+            newState.message = message
         }
         
         return newState
@@ -135,13 +156,27 @@ extension PlanCreateViewReactor {
                                   loadingStop])
     }
     
+#warning("에러 처리")
     private func requestPlanCreation() -> Observable<Mutation> {
-        guard let planCreationForm = buliderPlanCreation() else { return .empty() }
-        
+        do {
+            guard let planCreationForm = try buliderPlanCreation() else { throw DateError.invalid }
+            return self.createPlan(planCreationForm)
+        } catch {
+            if let err = error as? DateError {
+                return .just(.notifyMessage(err.info))
+            } else {
+                return .just(.notifyMessage("Unknown Error"))
+            }
+        }
+    }
+}
+
+// MARK: - 일정 생성 및 일정 유효성 체크
+extension PlanCreateViewReactor {
+    private func createPlan(_ plan: PlanUploadRequest) -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        #warning("에러 처리")
-        let updatePlan = createPlanUseCase.createPlan(with: planCreationForm)
+        let updatePlan = createPlanUseCase.createPlan(with: plan)
             .asObservable()
             .map { Mutation.responsePlanCreation($0) }
         
@@ -152,8 +187,8 @@ extension PlanCreateViewReactor {
                                   loadingStop])
     }
     
-    private func buliderPlanCreation() -> PlanUploadRequest? {
-        guard let date = self.createDate(),
+    private func buliderPlanCreation() throws -> PlanUploadRequest? {
+        guard let date = try self.createDate(),
               let meetId = currentState.seletedMeet?.id,
               let name = currentState.planTitle,
               let location = currentState.selectedPlace else { return nil }
@@ -164,18 +199,21 @@ extension PlanCreateViewReactor {
                      location: location)
     }
     
-    private func createDate() -> Date? {
+    private func createDate() throws -> Date? {
         guard let date = currentState.selectedDay,
-              let time = currentState.selectedTime else { return nil }
-        
-        return DateComponents(year: date.year,
-                              month: date.month,
-                              day: date.day,
-                              hour: time.hour,
-                              minute: time.minute).toDate()
+              let time = currentState.selectedTime,
+              let combineDate = DateComponents(year: date.year,
+                                               month: date.month,
+                                               day: date.day,
+                                               hour: time.hour,
+                                               minute: time.minute).toDate() else { return nil }
+        return try checkValidDate(combineDate)
     }
     
-
+    private func checkValidDate(_ date: Date) throws -> Date {
+        guard date > DateManager.addFiveMinutes(Date()) else { throw DateError.invalid }
+        return date
+    }
 }
 
 // MARK: - Set Value
@@ -236,7 +274,7 @@ extension PlanCreateViewReactor {
         case .placeSelectView:
             flow?.presentSearchLocationView()
         case .endProcess:
-            flow?.endFlow(plan: nil)
+            flow?.endProcess()
         }
         return .empty()
     }

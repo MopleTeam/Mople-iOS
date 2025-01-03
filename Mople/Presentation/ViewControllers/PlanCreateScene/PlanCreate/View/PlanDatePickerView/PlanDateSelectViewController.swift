@@ -18,7 +18,7 @@ final class PlanDateSelectViewController: UIViewController, View {
     // MARK: - Variables
     var disposeBag = DisposeBag()
     
-    private let today = DateManager.today
+    private let today = Date()
     private let todayComponents = DateManager.todayComponents
     private lazy var selectedDate = todayComponents
     

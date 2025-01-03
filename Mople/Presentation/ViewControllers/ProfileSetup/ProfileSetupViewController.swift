@@ -28,7 +28,7 @@ final class ProfileSetupViewController: UIViewController, View {
         return photoManager
     }()
     
-    private lazy var alertManager = AlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - Variables
     private let viewType: ViewType

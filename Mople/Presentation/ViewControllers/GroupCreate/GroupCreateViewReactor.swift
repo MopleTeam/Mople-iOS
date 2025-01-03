@@ -29,10 +29,10 @@ final class GroupCreateViewReactor: Reactor {
     var initialState: State = State()
     
     private let createGroupImpl: CreateGroup
-    private weak var flowAction: CreatedGroupFlowAction?
+    private weak var flowAction: CreatedFlowAction?
     
     init(createGroupImpl: CreateGroup,
-         flowAction: CreatedGroupFlowAction) {
+         flowAction: CreatedFlowAction) {
         print(#function, #line, "LifeCycle Test GroupCreateView Reactor Created" )
         self.createGroupImpl = createGroupImpl
         self.flowAction = flowAction
@@ -47,7 +47,7 @@ final class GroupCreateViewReactor: Reactor {
         case .setGroup(let group):
             return self.createGroup(title: group.title, image: group.image)
         case .endFlow:
-            self.flowAction?.endProcess()
+            self.flowAction?.completedAndSwitchGroupTap()
             return .empty()
         }
     }
@@ -58,7 +58,7 @@ final class GroupCreateViewReactor: Reactor {
         
         switch mutation {
         case .madeGroup:
-            flowAction?.endProcess()
+            flowAction?.completedAndSwitchGroupTap()
         case .notifyMessage(let message):
             newState.message = message
         case .setLoading(let isLoad):

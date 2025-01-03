@@ -17,7 +17,7 @@ final class SignInViewController: UIViewController, View {
     typealias Reactor = SignInViewReactor
     
     // MARK: - Manager
-    private lazy var alertManager = AlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - Variables
     var disposeBag = DisposeBag()

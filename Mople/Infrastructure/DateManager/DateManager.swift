@@ -15,12 +15,8 @@ enum DateStringFormat {
 
 final class DateManager {
     
-    static var today: Date {
-        return Date()
-    }
-    
     static var todayComponents: DateComponents {
-        return today.toDateComponents()
+        return Date().toDateComponents()
     }
     
     static let calendar: Calendar = {
@@ -122,13 +118,13 @@ extension DateManager {
 extension DateManager {
     static func numberOfDaysBetween(_ date: Date) -> Int {
         let scheduleDate = startOfDay(date)
-        let result = calendar.dateComponents([.day], from: today, to: scheduleDate)
+        let result = calendar.dateComponents([.day], from: Date(), to: scheduleDate)
         return result.day ?? 0
     }
     
     static func numberOfMonthBetween(_ date: Date) -> Int {
-        let todayYear = calendar.component(.year, from: today)
-        let todayMonth = calendar.component(.month, from: today)
+        let todayYear = calendar.component(.year, from: Date())
+        let todayMonth = calendar.component(.month, from: Date())
         
         let targetYear = calendar.component(.year, from: date)
         let targetMonth = calendar.component(.month, from: date)
@@ -149,6 +145,10 @@ extension DateManager {
     
     static func isPreviousMonth(_ date: Date) -> Date {
         return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
+    }
+    
+    static func addFiveMinutes(_ date: Date) -> Date {
+        return calendar.date(byAdding: .minute, value: +5, to: date) ?? Date()
     }
     
     static func parseServerDate(string: String?) -> Date? {

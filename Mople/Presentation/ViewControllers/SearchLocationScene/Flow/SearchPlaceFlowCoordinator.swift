@@ -109,8 +109,7 @@ extension SearchPlaceFlowCoordinator {
     }
     
     func completedProcess(selectedPlace: PlaceInfo) {
-        guard let parent = self.parentCoordinator as? PlaceSelectionDelegate else { return }
-        parent.didSelectPlace(selectedPlace)
+        (self.parentCoordinator as? PlaceSelectionDelegate)?.didSelectPlace(selectedPlace)
         self.endFlow()
     }
     

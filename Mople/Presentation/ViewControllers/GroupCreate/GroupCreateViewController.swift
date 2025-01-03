@@ -32,7 +32,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
         return photoManager
     }()
     
-    private lazy var alertManager = AlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - Observer
     private let imageObserver: BehaviorSubject<UIImage?> = .init(value: nil)
@@ -185,7 +185,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .arrowBack)
+        self.setBarItem(type: .left, image: .backArrow)
     }
     
     // MARK: - Modal

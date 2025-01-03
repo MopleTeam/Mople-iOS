@@ -25,7 +25,7 @@ final class DefaultSheetView: UIView {
     
     fileprivate let closeButton: UIButton = {
         let btn = UIButton()
-        btn.setImage(.close, for: .normal)
+        btn.setImage(.blackClose, for: .normal)
         return btn
     }()
     

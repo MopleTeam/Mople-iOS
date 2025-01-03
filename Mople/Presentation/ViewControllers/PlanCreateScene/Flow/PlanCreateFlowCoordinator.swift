@@ -12,7 +12,8 @@ protocol PlanCreateFlow: AnyObject {
     func presentDateSelectView()
     func presentTimeSelectView()
     func presentSearchLocationView()
-    func endFlow(plan: Plan?)
+    func endProcess()
+    func completedProcess(plan: Plan)
 }
 
 protocol PlaceSelectionDelegate {
@@ -77,7 +78,17 @@ extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
 
 // MARK: - End Flow
 extension PlanCreateFlowCoordinator {
-    func endFlow(plan: Plan?) {
+    
+    func endProcess() {
+        endFlow()
+    }
+    
+    func completedProcess(plan: Plan) {
+        (self.parentCoordinator as? CreatedFlowAction)?.completedAndSwitchGroupTap()
+        endFlow()
+    }
+    
+    private func endFlow() {
         self.navigationController.dismiss(animated: false) { [weak self] in
             guard let self else { return }
             self.clearUp()

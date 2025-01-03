@@ -21,16 +21,14 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         let view = DefaultEmptyView()
         view.setImage(image: .searchEmpty)
         view.setTitle(text: "약속 장소를 검색해주세요")
-        view.backgroundColor = ColorStyle.Default.blue
         return view
     }()
     
     private(set) var emptyView: DefaultEmptyView = {
         let view = DefaultEmptyView()
-        view.setImage(image: .apple)
+        view.setImage(image: .searchEmpty)
         view.setTitle(text: "검색결과 없음")
         view.isHidden = true
-        view.backgroundColor = ColorStyle.Default.red
         return view
     }()
     

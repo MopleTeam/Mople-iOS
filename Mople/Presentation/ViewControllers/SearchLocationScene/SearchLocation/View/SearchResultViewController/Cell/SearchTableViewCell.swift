@@ -42,7 +42,7 @@ final class SearchTableViewCell: UITableViewCell {
     
     private let deleteButton: UIButton = {
         let button = UIButton()
-        button.setImage(.close, for: .normal)
+        button.setImage(.whiteClose, for: .normal)
         button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return button

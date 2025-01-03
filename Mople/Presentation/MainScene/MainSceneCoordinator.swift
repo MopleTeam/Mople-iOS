@@ -14,7 +14,7 @@ protocol MainSceneDependencies {
     func makeProfileSceneCoordinator() -> BaseCoordinator
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileEditAction) -> ProfileEditViewController
-    func makeCreateGroupViewController(flowAction: CreatedGroupFlowAction) -> GroupCreateViewController
+    func makeCreateGroupViewController(flowAction: CreatedFlowAction) -> GroupCreateViewController
     
     func makePlanCreateDIContainer() -> PlanCreateSceneContainer
 }
@@ -24,8 +24,8 @@ protocol AccountAction {
     func moveToProfileEditView(_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?)
 }
 
-protocol CreatedGroupFlowAction: AnyObject {
-    func endProcess()
+protocol CreatedFlowAction: AnyObject {
+    func completedAndSwitchGroupTap()
 }
 
 private enum Route {
@@ -167,12 +167,10 @@ extension MainSceneCoordinator: AccountAction {
     }
 }
 
-extension MainSceneCoordinator: CreatedGroupFlowAction {
-    func endProcess() {
+extension MainSceneCoordinator: CreatedFlowAction {
+    func completedAndSwitchGroupTap() {
         self.switchToGroupListTap()
-        self.navigationController.dismiss(animated: false, completion: { [weak self] in
-            self?.switchToGroupListTap()
-        })
+        self.navigationController.dismiss(animated: false)
     }
 }
 

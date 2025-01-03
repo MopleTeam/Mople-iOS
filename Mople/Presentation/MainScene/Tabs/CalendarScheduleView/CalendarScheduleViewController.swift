@@ -35,7 +35,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }()
     
     private let header: IconLabel = {
-        let header = IconLabel(icon: .arrow, iconSize: 24)
+        let header = IconLabel(icon: .downArrow, iconSize: 24)
         header.setTitle(font: FontStyle.Title3.semiBold,
                         color: ColorStyle.Gray._01)
         header.setIconAligment(.right)
@@ -114,7 +114,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     private func setupNavi() {
-        self.setBarItem(type: .left, image: .arrowBack)
+        self.setBarItem(type: .left, image: .backArrow)
         self.setBarItem(type: .right, image: .calendar)
         self.hideBaritem(type: .left, isHidden: true)
     }

@@ -76,6 +76,10 @@ extension DefaultTextField : UITextFieldDelegate {
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
         return newText.count <= maxCount
     }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 // MARK: - 외부 설정
@@ -105,6 +109,12 @@ extension DefaultTextField {
 }
 
 extension Reactive where Base: DefaultTextField {
+    var text: Observable<String?> {
+        return base.inputTextField.rx.text
+            .asObservable()
+            .map { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+    
     var isResponse: Binder<Void> {
         Binder(base.self) { _, _ in
             base.inputTextField.becomeFirstResponder()

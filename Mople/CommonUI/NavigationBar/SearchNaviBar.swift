@@ -28,7 +28,7 @@ final class SearchNaviBar: UIView {
     
     fileprivate let backButton: UIButton = {
         let btn = UIButton()
-        btn.setImage(.arrowBack, for: .normal)
+        btn.setImage(.backArrow, for: .normal)
         return btn
     }()
     

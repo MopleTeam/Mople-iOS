@@ -99,7 +99,6 @@ extension SearchPlaceReactor {
     
     private func searchLocation(query: String?) -> Observable<Mutation> {
         
-        #warning("정규식 검사")
         guard let query else { return .empty() }
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
@@ -123,14 +122,17 @@ extension SearchPlaceReactor {
         
     private func showDetailPlcae(index: Int) -> Observable<Mutation> {
         guard let result = currentState.searchResult,
-              !result.isCached,
               result.places.count > index,
               let selectedPlace = result.places[safe: index] else { return .empty() }
-              
-        print(#function, #line, "#1 selectedPlace : \(index)" )
-        queryStorage.addPlace(selectedPlace)
         flow?.showDetailPlaceView(place: selectedPlace)
-        return .empty()
+        queryStorage.addPlace(selectedPlace)
+        return Observable.just(())
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                guard let self,
+                      result.isCached == true else { return .empty() }
+                return self.fetchCahcedPlace()
+            }
     }
     
     private func deleteHistory(index: Int) -> Observable<Mutation>  {

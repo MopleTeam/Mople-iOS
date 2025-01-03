@@ -17,6 +17,9 @@ final class PlanCreateViewController: TitleNaviViewController, View {
     
     var disposeBag: DisposeBag = DisposeBag()
     
+    // MARK: - Alert
+    private let alertManager = AlertManager.shared
+    
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
@@ -28,35 +31,34 @@ final class PlanCreateViewController: TitleNaviViewController, View {
     
     private let groupSelectView: LabeledButtonView = {
         let btn = LabeledButtonView(title: TextStyle.CreatePlan.group,
-                              inputText: TextStyle.CreatePlan.groupInfo)
+                                    inputText: TextStyle.CreatePlan.groupInfo)
         return btn
     }()
     
     private let planTitleView: LabeledTextFieldView = {
         let view = LabeledTextFieldView(title: TextStyle.CreatePlan.plan,
-                                  placeholder: TextStyle.CreatePlan.planInfo,
-                                  maxTextCount: 30)
+                                        placeholder: TextStyle.CreatePlan.planInfo,
+                                        maxTextCount: 30)
         return view
     }()
-        
+    
     private let dateSelectView: LabeledButtonView = {
         let btn = LabeledButtonView(title: TextStyle.CreatePlan.date,
-                              inputText: TextStyle.CreatePlan.dateInfo,
-                              icon: .createCalendar)
-        btn.layer.zPosition = 1
+                                    inputText: TextStyle.CreatePlan.dateInfo,
+                                    icon: .smallCalendar)
         return btn
     }()
-        
+    
     private let timeSelectView: LabeledButtonView = {
         let btn = LabeledButtonView(title: TextStyle.CreatePlan.time,
-                              inputText: TextStyle.CreatePlan.timeInfo,
-                              icon: .createCalendar)
+                                    inputText: TextStyle.CreatePlan.timeInfo,
+                                    icon: .clock)
         return btn
     }()
     
     private let placeSelectView: LabeledButtonView = {
-        let btn = LabeledButtonView(title: TextStyle.CreatePlan.plan,
-                                    inputText: TextStyle.CreatePlan.planInfo,
+        let btn = LabeledButtonView(title: TextStyle.CreatePlan.place,
+                                    inputText: TextStyle.CreatePlan.placeInfo,
                                     icon: .location)
         return btn
     }()
@@ -87,7 +89,7 @@ final class PlanCreateViewController: TitleNaviViewController, View {
         stackView.spacing = 24
         return stackView
     }()
-
+    
     // MARK: - LifeCycle
     init(title: String?,
          reactor: PlanCreateViewReactor?) {
@@ -114,7 +116,7 @@ final class PlanCreateViewController: TitleNaviViewController, View {
         setNaviItem()
         setupKeyboardDismissGestrue()
     }
-        
+    
     private func setupLayout() {
         self.view.backgroundColor = ColorStyle.Default.white
         self.view.addSubview(scrollView)
@@ -146,7 +148,7 @@ final class PlanCreateViewController: TitleNaviViewController, View {
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .arrowBack)
+        self.setBarItem(type: .left, image: .backArrow)
     }
     
     // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함
@@ -168,7 +170,8 @@ final class PlanCreateViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0?.toDate() })
             .map({
-                DateManager.toString(date: $0, format: .simple)
+                print(#function, #line, "#3 : \($0)" )
+                return DateManager.toString(date: $0, format: .simple)
             })
             .drive(dateSelectView.rx.selectedText)
             .disposed(by: disposeBag)
@@ -188,16 +191,34 @@ final class PlanCreateViewController: TitleNaviViewController, View {
             .drive(placeSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$message)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: "요청에 실패했습니다.")
+            .drive(with: self, onNext: { vc, message in
+                vc.alertManager.showAlert(message: message)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.state
+            .map { $0.isAllFieldsFilled }
+            .bind(to: completeButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
-    
+
     private func outputBind(_ reactor: PlanCreateViewReactor) {
-        planTitleView.textField.rx.editEvent
-            .compactMap { [weak self] _ in self?.planTitleView.text }
+        planTitleView.textField.rx.text
+            .compactMap { $0 }
             .map({ Reactor.Action.setValue(.name($0)) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        completeButton.rx.controlEvent(.touchUpInside)
+            .map({ Reactor.Action.requestPlanCreation })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

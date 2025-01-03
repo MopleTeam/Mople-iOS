@@ -32,7 +32,7 @@ final class PolicyViewController: TitleNaviViewController {
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .arrowBack)
+        self.setBarItem(type: .left, image: .backArrow)
     }
 
     // MARK: - Binding

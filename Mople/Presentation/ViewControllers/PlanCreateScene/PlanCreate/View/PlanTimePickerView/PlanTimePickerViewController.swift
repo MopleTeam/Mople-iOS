@@ -24,7 +24,7 @@ final class PlanTimePickerViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Default Value
-    private var todayTime = DateManager.today.getTime()
+    private var todayTime = Date().getTime()
     private let hours: [Int] = Array(0...11).map { $0 % 12 == 0 ? 12 : $0 }
     private let minutes: [Int] = Array(stride(from: 0, through: 55, by: 5))
     private let period: [DayPeriod] = [.am, .pm]
