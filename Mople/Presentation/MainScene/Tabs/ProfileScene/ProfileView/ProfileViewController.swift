@@ -149,7 +149,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         sv.spacing  = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = ColorStyle.Border.primary
+        sv.backgroundColor = ColorStyle.BG.secondary
         return sv
     }()
     

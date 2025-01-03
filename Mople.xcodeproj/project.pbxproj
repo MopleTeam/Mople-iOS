@@ -203,6 +203,8 @@
 		52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */; };
 		52D8642C2D26416D000F8378 /* DetailPlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8642B2D26416D000F8378 /* DetailPlaceViewController.swift */; };
 		52D8642F2D264271000F8378 /* NMapsMap in Frameworks */ = {isa = PBXBuildFile; productRef = 52D8642E2D264271000F8378 /* NMapsMap */; };
+		52D864322D27E5F3000F8378 /* DefaultMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864312D27E5F3000F8378 /* DefaultMapView.swift */; };
+		52D864362D289613000F8378 /* CommonDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864352D289613000F8378 /* CommonDIContainer.swift */; };
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
@@ -446,6 +448,8 @@
 		52CE87CF2CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupRepositoryMock.swift; sourceTree = "<group>"; };
 		52CE87D12CEC5BC800EBD85D /* CreateGroupMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupMock.swift; sourceTree = "<group>"; };
 		52D8642B2D26416D000F8378 /* DetailPlaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPlaceViewController.swift; sourceTree = "<group>"; };
+		52D864312D27E5F3000F8378 /* DefaultMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMapView.swift; sourceTree = "<group>"; };
+		52D864352D289613000F8378 /* CommonDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonDIContainer.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
 		52E238242C7454230066C9A3 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
@@ -603,15 +607,13 @@
 			path = Tabs;
 			sourceTree = "<group>";
 		};
-		520C9E612CE5A5E300778558 /* ViewControllers */ = {
+		520C9E612CE5A5E300778558 /* CommonView */ = {
 			isa = PBXGroup;
 			children = (
-				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
-				52818C5C2D1804240001E30B /* SearchLocationScene */,
 				527DBE2D2CE89360008BB20E /* GroupCreate */,
 				520C9E622CE5DE7700778558 /* ProfileSetup */,
 			);
-			path = ViewControllers;
+			path = CommonView;
 			sourceTree = "<group>";
 		};
 		520C9E622CE5DE7700778558 /* ProfileSetup */ = {
@@ -737,6 +739,8 @@
 			children = (
 				527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */,
 				520C9E602CE5A0FE00778558 /* Tabs */,
+				52D864332D27F1D6000F8378 /* SubScene */,
+				520C9E612CE5A5E300778558 /* CommonView */,
 			);
 			path = MainScene;
 			sourceTree = "<group>";
@@ -1679,6 +1683,7 @@
 		52CB0B3C2C72AA1F002B6D20 /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
+				52D864302D27E5E3000F8378 /* MapView */,
 				52C5200D2D0D6DBC0085F5F7 /* SheetView */,
 				52266BF52CBCF622007D03EB /* ViewController */,
 				52473D6A2CEF5D4A009D045A /* Picker */,
@@ -1789,6 +1794,23 @@
 			path = DetailPlaceViewController;
 			sourceTree = "<group>";
 		};
+		52D864302D27E5E3000F8378 /* MapView */ = {
+			isa = PBXGroup;
+			children = (
+				52D864312D27E5F3000F8378 /* DefaultMapView.swift */,
+			);
+			path = MapView;
+			sourceTree = "<group>";
+		};
+		52D864332D27F1D6000F8378 /* SubScene */ = {
+			isa = PBXGroup;
+			children = (
+				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
+				52818C5C2D1804240001E30B /* SearchLocationScene */,
+			);
+			path = SubScene;
+			sourceTree = "<group>";
+		};
 		52D9651C2D23B726000610B2 /* Keyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -1835,7 +1857,6 @@
 			children = (
 				52E238332C75E0570066C9A3 /* LoginScene */,
 				5211F8F92C84B78100403980 /* MainScene */,
-				520C9E612CE5A5E300778558 /* ViewControllers */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -1849,6 +1870,7 @@
 				527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */,
 				52818C742D198A760001E30B /* PlanCreateSceneDIContainer.swift */,
 				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
+				52D864352D289613000F8378 /* CommonDIContainer.swift */,
 			);
 			path = DIContainer;
 			sourceTree = "<group>";
@@ -2083,6 +2105,7 @@
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				5211F9032C86E41900403980 /* RecentPlanCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
+				52D864322D27E5F3000F8378 /* DefaultMapView.swift in Sources */,
 				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
 				52818C732D1983370001E30B /* SearchLoactionUseCaseMock.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
@@ -2182,6 +2205,7 @@
 				52CC75D42D1E7DA1000CC8B9 /* SearchedPlaceStorage.swift in Sources */,
 				5285E6D82CDC2F2C00B855CB /* CommonScheduleDTO.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
+				52D864362D289613000F8378 /* CommonDIContainer.swift in Sources */,
 				52266BFA2CBD474D007D03EB /* FetchProfile.swift in Sources */,
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* GroupListTableCell.swift in Sources */,

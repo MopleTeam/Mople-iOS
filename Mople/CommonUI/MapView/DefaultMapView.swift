@@ -1,20 +1,14 @@
 //
-//  DetailPlaceViewController.swift
+//  DefaultMapView.swift
 //  Mople
 //
-//  Created by CatSlave on 1/2/25.
+//  Created by CatSlave on 1/3/25.
 //
 
 import UIKit
 import NMapsMap
-import ReactorKit
-import RxSwift
 
-final class DetailPlaceViewController: UIViewController, View {
-    
-    typealias Reactor = SearchPlaceReactor
-    
-    var disposeBag = DisposeBag()
+final class DefaultMapView: UIView {
     
     private let place: PlaceInfo
     
@@ -45,7 +39,7 @@ final class DetailPlaceViewController: UIViewController, View {
         return label
     }()
     
-    private let selectedButton: BaseButton = {
+    private(set) lazy var selectedButton: BaseButton = {
         let button = BaseButton()
         button.setTitle(text: "장소 선택",
                         font: FontStyle.Title3.semiBold,
@@ -88,22 +82,11 @@ final class DetailPlaceViewController: UIViewController, View {
         return sv
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initalSetup()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        initializeMap(place: place)
-    }
-    
-    init(reactor: SearchPlaceReactor?,
-         place: PlaceInfo) {
+    init(place: PlaceInfo) {
         print(#function, #line, "LifeCycle Test DetailPlaceViewController Created" )
         self.place = place
-        super.init(nibName: nil, bundle: nil)
-        self.reactor = reactor
+        super.init(frame: .zero)
+        self.initalSetup()
     }
     
     deinit {
@@ -114,14 +97,19 @@ final class DetailPlaceViewController: UIViewController, View {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.initializeMap()
+    }
+    
     private func initalSetup() {
         setLayout()
         setLabel()
     }
     
     private func setLayout() {
-        self.view.addSubview(mapView)
-        self.view.addSubview(mainStackView)
+        self.addSubview(mapView)
+        self.addSubview(mainStackView)
         
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -146,21 +134,11 @@ final class DetailPlaceViewController: UIViewController, View {
         guard let distance else { return }
         distanceLabel.text = "\(distance)m"
     }
-    
-    func bind(reactor: SearchPlaceReactor) {
-        selectedButton.rx.controlEvent(.touchUpInside)
-            .compactMap { [weak self] in
-                guard let self else { return nil }
-                return Reactor.Action.selectedPlace(self.place)
-            }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-    }
 }
 
 // MARK: - Setup Map
-extension DetailPlaceViewController {
-    private func initializeMap(place: PlaceInfo) {
+extension DefaultMapView {
+    private func initializeMap() {
         guard let lat = place.latitude,
               let lng = place.longitude else { return }
         let position = NMGLatLng(lat: lat, lng: lng)

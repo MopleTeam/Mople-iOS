@@ -14,9 +14,12 @@ final class MainSceneDIContainer: MainSceneDependencies {
     }()
 
     private let appNetworkService: AppNetworkService
-    
-    init(appNetworkService: AppNetworkService) {
+    let commonDependencies: CommonDependencies
+
+    init(appNetworkService: AppNetworkService,
+         commonDependencies: CommonDependencies) {
         self.appNetworkService = appNetworkService
+        self.commonDependencies = commonDependencies
     }
     
     func makeMainFlowCoordinator(navigationController: UINavigationController) -> MainSceneCoordinator {
@@ -92,7 +95,7 @@ extension MainSceneDIContainer {
     func makeProfileEditViewController(previousProfile: ProfileInfo,
                                        action: ProfileEditAction) -> ProfileEditViewController {
         return .init(profile: previousProfile,
-                     profileSetupReactor: makeProfileSetupReactor(),
+                     profileSetupReactor: commonDependencies.makeProfileSetupReactor(),
                      editProfileReactor: makeProfileEditViewReactor(action))
     }
     
@@ -133,17 +136,3 @@ extension MainSceneDIContainer {
     }
 }
 
-// MARK: - 프로필 셋업 Reactor
-extension MainSceneDIContainer {
-    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
-        return .init(useCase: makeValidatorNicknameUsecase())
-    }
-    
-    private func makeValidatorNicknameUsecase() -> ValidatorNickname {
-        return ValidatorNicknameUseCase(repo: makeNicknameValidatorRepo())
-    }
-    
-    private func makeNicknameValidatorRepo() -> NicknameValidationRepo {
-        return DefaultNicknameValidationRepo(networkService: appNetworkService)
-    }
-}

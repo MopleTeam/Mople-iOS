@@ -29,6 +29,7 @@ struct ColorStyle {
 
     enum BG {
         static let primary: UIColor = .init(hexCode: "F5F5F5")
+        static let secondary: UIColor = .init(hexCode: "F7F7F8")
         static let input: UIColor = .init(hexCode: "F6F8FA")
     }
     
@@ -50,11 +51,6 @@ struct ColorStyle {
         static let _05: UIColor = .init(hexCode: "999999")
         static let _06: UIColor = .init(hexCode: "CCCCCC")
         static let _07: UIColor = .init(hexCode: "DCDCDC")
-    }
-    
-    enum Border {
-        static let primary: UIColor = .init(hexCode: "F7F7F8")
-        static let _01: UIColor = .init(hexCode: "F1F2F3") // Tertiary
     }
 }
 

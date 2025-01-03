@@ -16,7 +16,6 @@ protocol PlanCreateSceneDependencies {
     func makeGroupSelectViewController() -> GroupSelectViewController
     func makeDateSelectViewController() -> PlanDateSelectViewController
     func makeTimeSelectViewController() -> PlanTimePickerViewController
-    
     func makeSearchLocationDIContainer() -> SearchLocationSceneContainer
 }
 

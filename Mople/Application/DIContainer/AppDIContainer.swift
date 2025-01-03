@@ -22,6 +22,8 @@ final class AppDIContainer {
         
         return DefaultAppNetWorkService(dataTransferService: transferService)
     }()
+    
+    lazy var commonDIContainer = CommonDIContainer(appNetworkService: appNetworkService)
 }
 
 // MARK: - Make DIContainer
@@ -29,12 +31,14 @@ extension AppDIContainer {
     
     // MARK: - 로그인 플로우
     func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
-        return LoginSceneDIContainer(appNetworkService: appNetworkService)
+        return LoginSceneDIContainer(appNetworkService: appNetworkService,
+                                     commonDependencies: commonDIContainer)
     }
     
     // MARK: - 메인 플로우
     func makeMainSceneDIContainer() -> MainSceneDIContainer {
-        return MainSceneDIContainer(appNetworkService: appNetworkService)
+        return MainSceneDIContainer(appNetworkService: appNetworkService,
+                                    commonDependencies: commonDIContainer)
     }
 }
 

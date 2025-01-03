@@ -109,15 +109,6 @@ extension MainSceneCoordinator {
         self.start(coordinator: flow)
         self.navigationController.present(navigationController, animated: false)
     }
-    
-    // MARK: - Helper
-    /// 새로운 일정 및 그룹 생성 후 그룹 리스트 탭으로 이동
-    private func switchToGroupListTap() {
-        guard let groupListInex = getIndexFromTabBar(destination: .group),
-              self.tabBarController.selectedIndex != groupListInex else { return }
-        
-        tabBarController.selectedIndex = groupListInex
-    }
 }
 
 // MARK: - Group List
@@ -157,32 +148,14 @@ extension MainSceneCoordinator {
     }
 }
 
-// MARK: - 로그아웃 -> 로그인 뷰로 돌아가기
-extension MainSceneCoordinator: AccountAction {
-    /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
-    func signOut() {
-        fadeOut { [weak self] in
-            self?.clearScene()
-        }
-    }
-}
-
-extension MainSceneCoordinator: CreatedFlowAction {
-    func completedAndSwitchGroupTap() {
-        self.switchToGroupListTap()
-        self.navigationController.dismiss(animated: false)
-    }
-}
-
-// MARK: - Helper
+// MARK: - 탭바 컨트롤
 extension MainSceneCoordinator {
-    
-    /// 로그아웃, 회원탈퇴 시 자식 뷰 지우기
-    private func clearScene() {
-        self.clearUp()
-        self.tabBarController.viewControllers?.removeAll()
-        self.parentCoordinator?.didFinish(coordinator: self)
-        (self.parentCoordinator as? SignOutListener)?.signOut()
+    /// 새로운 일정 및 그룹 생성 후 그룹 리스트 탭으로 이동
+    private func switchToGroupListTap() {
+        guard let groupListInex = getIndexFromTabBar(destination: .group),
+              self.tabBarController.selectedIndex != groupListInex else { return }
+        
+        tabBarController.selectedIndex = groupListInex
     }
     
     #warning("메타타입 비교하기, Claude 타입과 메타타입 참고")
@@ -198,3 +171,32 @@ extension MainSceneCoordinator {
         return tabBarController.viewControllers?[index]
     }
 }
+
+// MARK: - 로그아웃 액션
+extension MainSceneCoordinator: AccountAction {
+    /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
+    func signOut() {
+        fadeOut { [weak self] in
+            self?.clearScene()
+        }
+    }
+    
+    /// 로그아웃, 회원탈퇴 시 자식 뷰 지우기
+    private func clearScene() {
+        self.clearUp()
+        self.tabBarController.viewControllers?.removeAll()
+        self.parentCoordinator?.didFinish(coordinator: self)
+        (self.parentCoordinator as? SignOutListener)?.signOut()
+    }
+}
+
+// MARK: - 모임, 일정 생성 액션
+extension MainSceneCoordinator: CreatedFlowAction {
+    
+    /// 모임 및 일정 생성 후 모임리스트 탭으로 변경
+    func completedAndSwitchGroupTap() {
+        self.switchToGroupListTap()
+        self.navigationController.dismiss(animated: false)
+    }
+}
+

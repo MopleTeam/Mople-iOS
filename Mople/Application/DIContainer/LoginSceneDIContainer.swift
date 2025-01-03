@@ -13,9 +13,12 @@ final class LoginSceneDIContainer: LoginSceneDependencies {
     private lazy var kakaoLoginService = DefaultKakaoLoginService()
     
     let appNetworkService: AppNetworkService
+    let commonDependencies: CommonDependencies
     
-    init(appNetworkService: AppNetworkService) {
+    init(appNetworkService: AppNetworkService,
+         commonDependencies: CommonDependencies) {
         self.appNetworkService = appNetworkService
+        self.commonDependencies = commonDependencies
     }
     
     func makeLoginFlowCoordinator(navigationController: UINavigationController) -> LoginSceneCoordinator {
@@ -60,7 +63,7 @@ extension LoginSceneDIContainer {
 extension LoginSceneDIContainer {
     func makeSignUpViewController(socialAccountInfo: SocialAccountInfo,
                                          action: SignUpAction) -> SignUpViewController {
-        return SignUpViewController(profileSetupReactor: makeProfileSetupReactor(),
+        return SignUpViewController(profileSetupReactor: self.commonDependencies.makeProfileSetupReactor(),
                                     signUpReactor: makeSignUpReactor(socialAccountInfo: socialAccountInfo,
                                                                      action: action))
     }
@@ -83,20 +86,5 @@ extension LoginSceneDIContainer {
     
     private func makeSignUpRepo() -> SignUpRepo {
         return DefaultSignUpRepo(networkService: appNetworkService)
-    }
-}
-
-// MARK: - 프로필 셋업 Reactor
-extension LoginSceneDIContainer {
-    private func makeProfileSetupReactor() -> ProfileSetupViewReactor {
-        return .init(useCase: makeValidatorNicknameUsecase())
-    }
-    
-    private func makeValidatorNicknameUsecase() -> ValidatorNickname {
-        return ValidatorNicknameUseCase(repo: makeNicknameValidatorRepo())
-    }
-    
-    private func makeNicknameValidatorRepo() -> NicknameValidationRepo {
-        return DefaultNicknameValidationRepo(networkService: appNetworkService)
     }
 }
