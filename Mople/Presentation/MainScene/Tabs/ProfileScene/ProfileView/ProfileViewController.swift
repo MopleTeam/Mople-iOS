@@ -16,9 +16,6 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Observer
-    private let fetchObserver: PublishSubject<Void> = .init()
-    
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
@@ -224,11 +221,6 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     // MARK: - Binding
     func bind(reactor: Reactor) {
-        fetchObserver
-            .map { _ in Reactor.Action.fetchProfile }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         notifyButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.presentNotifyView }
             .bind(to: reactor.action)
@@ -261,9 +253,15 @@ final class ProfileViewController: TitleNaviViewController, View {
 
 // MARK: - 프로필 적용
 extension ProfileViewController {
-    private func setProfile(_ profile: ProfileInfo) {
+    private func setProfile(_ profile: UserInfo) {
         profileNameButton.title = profile.name
-        _ = profileImageView.kfSetimage(profile.imagePath)
+        _ = profileImageView.kfSetimage(profile.thumbnailPath)
+    }
+}
+
+extension ProfileViewController {
+    public func fetchProfile() {
+        reactor?.action.onNext(.fetchProfile)
     }
 }
 

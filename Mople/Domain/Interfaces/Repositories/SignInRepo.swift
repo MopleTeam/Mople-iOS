@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol SignInRepo {
-    func signIn(socialAccountInfo: SocialAccountInfo) -> Single<Void>
+    func signIn(social: SocialInfo) -> Single<Void>
 }
 
 

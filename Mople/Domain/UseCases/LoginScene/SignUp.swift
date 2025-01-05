@@ -10,7 +10,7 @@ import RxSwift
 
 protocol SignUp {
     func getRandomNickname() -> Single<String?>
-    func signUp(nickname: String, image: UIImage?, socialAccountInfo: SocialAccountInfo) -> Single<Void>
+    func signUp(nickname: String, image: UIImage?, social: SocialInfo) -> Single<Void>
 }
 
 final class SignUpUseCase: SignUp {
@@ -43,27 +43,26 @@ extension SignUpUseCase {
 extension SignUpUseCase {
     func signUp(nickname: String,
                 image: UIImage?,
-                socialAccountInfo: SocialAccountInfo) -> Single<Void> {
+                social: SocialInfo) -> Single<Void> {
         print(#function, #line)
         let imageData = self.convertImageToData(image)
         return self.uploadImage(imageData)
-            .map { $0.isEmpty ? nil : $0 }
             .flatMap { [weak self] imagePath in
                 guard let self else { throw AppError.unknownError }
-                return self.signUpRepo.signUp(nickname: nickname,
-                                              imagePath: imagePath,
-                                              socialAccountInfo: socialAccountInfo)
+                
+                return self.signUpRepo.signUp(requestModel: .init(social: social,
+                                                                  nickname: nickname,
+                                                                  imagePath: imagePath))
             }
     }
     
-    private func uploadImage(_ data: Data?) -> Single<String> {
+    private func uploadImage(_ data: Data?) -> Single<String?> {
         return Single.deferred { [weak self] in
             guard let self else { return .error(AppError.unknownError) }
-            guard let data else { return .just("")}
+            guard let data else { return .just(nil)}
             
             return self.imageUploadRepo.uploadImage(image: data, path: .profile)
-                .map { String(data: $0, encoding: .utf8) ?? "" }
-                .do { print(#function, #line, "# 30 : \($0)" ) }
+                .map { String(data: $0, encoding: .utf8) }
         }
     }
     

@@ -11,8 +11,6 @@ import RxSwift
 protocol SignUpRepo {
     func getRandomNickname() -> Single<Data>
     
-    func signUp(nickname: String,
-                imagePath: String?,
-                socialAccountInfo: SocialAccountInfo) -> Single<Void>
+    func signUp(requestModel: SignUpRequest) -> Single<Void>
 }
 

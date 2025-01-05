@@ -10,7 +10,7 @@ import RxSwift
 import KakaoSDKUser
 
 protocol KakaoLoginService {
-    func startKakaoLogin() -> Single<SocialAccountInfo>
+    func startKakaoLogin() -> Single<SocialInfo>
 }
 
 final class DefaultKakaoLoginService: KakaoLoginService {
@@ -23,11 +23,11 @@ final class DefaultKakaoLoginService: KakaoLoginService {
         print(#function, #line, "LifeCycle Test DefaultKakaoLoginService Deinit" )
     }
     
-    func startKakaoLogin() -> Single<SocialAccountInfo> {
+    func startKakaoLogin() -> Single<SocialInfo> {
         return Single.zip(loginKakao(), parseEmail())
             .map { idToken, email in
-                return .init(platform: LoginPlatform.kakao.rawValue,
-                             identityCode: idToken,
+                return .init(provider: LoginPlatform.kakao.rawValue,
+                             token: idToken,
                              email: email)
             }
             .debug("kakao login debug test")

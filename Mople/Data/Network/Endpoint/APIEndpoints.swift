@@ -73,20 +73,11 @@ extension APIEndpoints {
 
 // MARK: - Login
 extension APIEndpoints {
-    static func executeSignUp(platform: String,
-                              identityToken: String,
-                              email: String,
-                              nickname: String,
-                              imagePath: String?) -> Endpoint<Data> {
+    static func executeSignUp(requestModel: SignUpRequest) -> Endpoint<Data> {
         return try! Endpoint(path: "auth/sign-up",
                              method: .post,
                              headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                             bodyParameters: ["socialProvider": platform,
-                                              "providerToken": identityToken,
-                                              "email": email,
-                                              "nickname": nickname,
-                                              "deviceType": "IOS",
-                                              "image": imagePath ?? NSNull()],
+                             bodyParametersEncodable: requestModel,
                              responseDecoder: RawDataResponseDecoder())
     }
     
@@ -136,7 +127,6 @@ extension APIEndpoints {
     static func uploadImage(_ imageData: Data, folderPath: ImageUploadPath) -> Endpoint<Data> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
-        print(#function, #line, "# 30 초기 바운더리 : \(boundary)")
         return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
                              method: .post,
                              headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),

@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class FetchGroupListMock: FetchGroup {
+final class FetchGroupListMock: FetchMeetListUseCase {
     
     private var randomDate: Date {
         Date().addingTimeInterval((3600 * Double(Int.random(in: -50...50))))

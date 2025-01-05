@@ -8,6 +8,9 @@
 import Foundation
 import RxSwift
 
+
+
+
 final class SearchLoactionUseCaseMock: SearchLoaction {
     func requestSearchLocation(query: String) -> Single<SearchPlaceResult> {
         return Observable.just(())

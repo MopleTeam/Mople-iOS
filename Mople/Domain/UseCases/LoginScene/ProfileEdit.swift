@@ -12,6 +12,7 @@ protocol ProfileEdit {
     func editProfile(nickname: String, image: UIImage?) -> Single<Void>
 }
 
+
 final class ProfileEditUseCase: ProfileEdit {
     
     let imageUploadRepo: ImageUploadRepo

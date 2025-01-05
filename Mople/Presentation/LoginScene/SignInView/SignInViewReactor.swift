@@ -10,7 +10,7 @@ import RxSwift
 import RxRelay
 
 struct SignInAction {
-    var toProfileSetup: (SocialAccountInfo) -> Void
+    var toProfileSetup: (SocialInfo) -> Void
     var toMain: () -> Void
 }
 
@@ -22,7 +22,7 @@ final class SignInViewReactor: Reactor {
     }
     
     enum Mutation {
-        case moveToProfileSetup(_ socialInfo: SocialAccountInfo)
+        case moveToProfileSetup(_ socialInfo: SocialInfo)
         case moveToMain
         case notifyMessage(message: String?)
         case setLoading(isLoad: Bool)
@@ -57,8 +57,8 @@ final class SignInViewReactor: Reactor {
             newState.message = message
         case .setLoading(let isLoad):
             newState.isLoading = isLoad
-        case .moveToProfileSetup(let SocialAccountInfo):
-            loginAction.toProfileSetup(SocialAccountInfo)
+        case .moveToProfileSetup(let socialInfo):
+            loginAction.toProfileSetup(socialInfo)
         case .moveToMain:
             print(#function, #line, "# 30" )
             loginAction.toMain()
@@ -107,10 +107,10 @@ extension SignInViewReactor {
 extension SignInViewReactor {
     private func handleError(err: Error) -> Observable<Mutation> {
         switch err {
-        case LoginError.notFoundInfo(let socialAccountInfo):
+        case LoginError.notFoundInfo(let socialInfo):
             return Observable.just(())
                 .subscribe(on: MainScheduler.instance)
-                .map { _ in .moveToProfileSetup(socialAccountInfo) }
+                .map { _ in .moveToProfileSetup(socialInfo) }
         case let err as LoginError:
             return .just(.notifyMessage(message: err.info))
         case let err as AppError:

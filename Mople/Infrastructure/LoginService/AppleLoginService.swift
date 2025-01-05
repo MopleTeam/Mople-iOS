@@ -11,13 +11,13 @@ import AuthenticationServices
 
 protocol AppleLoginService {
     func setPresentationContextProvider(_ view: UIViewController)
-    func startAppleLogin() -> Single<SocialAccountInfo>
+    func startAppleLogin() -> Single<SocialInfo>
 }
 
 final class DefaultAppleLoginService: NSObject, AppleLoginService {
     
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
-    private var singleObserver: ((SingleEvent<SocialAccountInfo>) -> Void)?
+    private var singlnObserver: ((SingleEvent<SocialInfo>) -> Void)?
     
     override init() {
         super.init()
@@ -33,7 +33,7 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
         self.presentationContextProvider = loginView
     }
     
-    func startAppleLogin() -> Single<SocialAccountInfo> {
+    func startAppleLogin() -> Single<SocialInfo> {
         return Single.create { [weak self] single in
             guard let self = self else { return Disposables.create() }
             let appleIDProvider = ASAuthorizationAppleIDProvider()
@@ -45,7 +45,7 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
             authorizationController.presentationContextProvider = self.presentationContextProvider
             authorizationController.performRequests()
             
-            self.singleObserver = single
+            self.singlnObserver = single
             
             return Disposables.create()
         }
@@ -62,20 +62,20 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
             print(#function, #line, "# 29 : \(appleIDCredential.email)" )
             
             guard let email = fetchAppleEmail(appleIDCredential.email) else {
-                singleObserver?(.failure(LoginError.appleAccountError))
+                singlnObserver?(.failure(LoginError.appleAccountError))
                 return
             }
 
-            singleObserver?(.success(.init(platform: LoginPlatform.apple.rawValue,
-                                           identityCode: identityCode,
+            singlnObserver?(.success(.init(provider: LoginPlatform.apple.rawValue,
+                                           token: identityCode,
                                            email: email)))
         } else {
-            singleObserver?(.failure(LoginError.appleAccountError))
+            singlnObserver?(.failure(LoginError.appleAccountError))
         }
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        singleObserver?(.failure(LoginError.completeError))
+        singlnObserver?(.failure(LoginError.completeError))
     }
     
     private func fetchAppleEmail(_ email: String?) -> String? {

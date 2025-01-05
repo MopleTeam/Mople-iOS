@@ -58,6 +58,7 @@ class DefaultViewController: UIViewController {
 extension Reactive where Base: DefaultViewController {
     var isLoading: Binder<Bool> {
         return Binder(self.base) { vc, isLoading in
+            print(#function, #line, "#3 : \(isLoading)" )
             vc.indicator.rx.isAnimating.onNext(isLoading)
             vc.view.isUserInteractionEnabled = !isLoading
         }

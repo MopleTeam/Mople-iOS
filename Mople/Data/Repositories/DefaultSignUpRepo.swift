@@ -26,14 +26,8 @@ final class DefaultSignUpRepo: SignUpRepo {
         return networkService.basicRequest(endpoint: endpoint)
     }
     
-    func signUp(nickname: String,
-                imagePath: String?,
-                socialAccountInfo: SocialAccountInfo) -> Single<Void> {
-        let endpoint = APIEndpoints.executeSignUp(platform: socialAccountInfo.platform,
-                                                  identityToken: socialAccountInfo.identityCode,
-                                                  email: socialAccountInfo.email,
-                                                  nickname: nickname,
-                                                  imagePath: imagePath)
+    func signUp(requestModel: SignUpRequest) -> Single<Void> {
+        let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
         
         return networkService.basicRequest(endpoint: endpoint)
             .map { KeyChainService.shared.saveToken($0) }

@@ -15,7 +15,7 @@ final class SignUpRepositoryMock: SignUpRepo {
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }
     
-    func signUp(nickname: String, imagePath: String?, socialAccountInfo: SocialAccountInfo) -> Single<Void> {
+    func signUp(requestModel: SignUpRequest) -> Single<Void> {
         return Single.just(())
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }

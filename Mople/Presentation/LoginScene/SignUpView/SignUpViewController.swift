@@ -138,7 +138,6 @@ class SignUpViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
-            .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)

@@ -20,10 +20,10 @@ final class DefaultSignInRepo: SignInRepo {
         print(#function, #line, "LifeCycle Test DefaultSignInRepo Deinit" )
     }
     
-    func signIn(socialAccountInfo: SocialAccountInfo) -> Single<Void> {
-        let endpoint = APIEndpoints.executeSignIn(platform: socialAccountInfo.platform,
-                                                   identityToken: socialAccountInfo.identityCode,
-                                                   email: socialAccountInfo.email)
+    func signIn(social: SocialInfo) -> Single<Void> {
+        let endpoint = APIEndpoints.executeSignIn(platform: social.provider,
+                                                  identityToken: social.token,
+                                                  email: social.email)
         
         return self.networkService.basicRequest(endpoint: endpoint)
             .map { KeyChainService.shared.saveToken($0) }

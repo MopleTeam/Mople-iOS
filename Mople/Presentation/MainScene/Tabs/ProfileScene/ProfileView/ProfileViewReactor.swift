@@ -8,15 +8,8 @@
 import UIKit
 import ReactorKit
 
-struct ProfileViewAction {
-    var presentEditView: (_ previousProfile: ProfileInfo,_ completedAction: (() -> Void)?) -> Void
-    var presentNotifyView: () -> Void
-    var presentPolicyView: () -> Void
-    var logout: () -> Void
-}
-
 struct ProfileUpdateModel {
-    var currentProfile: ProfileInfo
+    var currentProfile: UserInfo
     var completedAction: () -> Void
 }
 
@@ -32,23 +25,23 @@ final class ProfileViewReactor: Reactor {
     }
     
     enum Mutation {
-        case loadedProfile(profile: ProfileInfo)
+        case loadedProfile(profile: UserInfo)
     }
     
     struct State {
-        @Pulse var userProfile: ProfileInfo?
+        @Pulse var userProfile: UserInfo?
     }
     
     var initialState = State()
     
-    var fetchProfileIUseCase: FetchProfile
-    var viewAction: ProfileViewAction
+    private let fetchProfileIUseCase: FetchProfile
+    private weak var coordinator: ProfileCoordination?
     
     init(fetchProfileIUseCase: FetchProfile,
-         viewAction: ProfileViewAction) {
+         coordinator: ProfileCoordination) {
         print(#function, #line, "LifeCycle Test ProfileView Reactor Created" )
         self.fetchProfileIUseCase = fetchProfileIUseCase
-        self.viewAction = viewAction
+        self.coordinator = coordinator
         action.onNext(.fetchProfile)
     }
     
@@ -95,32 +88,26 @@ extension ProfileViewReactor {
     
     private func presentEditView() -> Observable<Mutation> {
         guard let previousProfile = currentState.userProfile else { return .empty() }
-        viewAction.presentEditView(previousProfile, fetchProfile)
-        
+        coordinator?.presentEditView(previousProfile: previousProfile)
         return Observable.empty()
-    }
-    
-    /// Profile 최신화 요청
-    private func fetchProfile() {
-        action.onNext(.fetchProfile)
     }
     
     /// 코디네이터에게 알림관리 뷰로 이동요청
     private func presentNotifyView() -> Observable<Mutation> {
-        viewAction.presentNotifyView()
+        coordinator?.presentNotifyView()
         return Observable.empty()
     }
     
     /// 코디네이터에게 개인정보 처리방침 뷰로 이동요청
     private func presentPolicyView() -> Observable<Mutation> {
-        viewAction.presentPolicyView()
+        coordinator?.presentPolicyView()
         return Observable.empty()
     }
     
     /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
     private func logout() -> Observable<Mutation> {
         KeyChainService.shared.deleteToken()
-        viewAction.logout()
+        coordinator?.logout()
         return Observable.empty()
     }
 }

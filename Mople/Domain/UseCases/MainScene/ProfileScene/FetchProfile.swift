@@ -9,6 +9,6 @@ import Foundation
 import RxSwift
 
 protocol FetchProfile {
-    func fetchProfile() -> Single<ProfileInfo>
+    func fetchProfile() -> Single<UserInfo>
 }
 

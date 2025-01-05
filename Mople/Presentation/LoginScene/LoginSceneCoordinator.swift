@@ -9,8 +9,8 @@ import UIKit
 
 protocol LoginSceneDependencies {
     func makeLoginViewController(action: SignInAction) -> SignInViewController
-    func makeSignUpViewController(socialAccountInfo: SocialAccountInfo,
-                                         action: SignUpAction) -> SignUpViewController
+    func makeSignUpViewController(socialInfo: SocialInfo,
+                                  action: SignUpAction) -> SignUpViewController
 }
 
 final class LoginSceneCoordinator: BaseCoordinator {
@@ -39,10 +39,10 @@ final class LoginSceneCoordinator: BaseCoordinator {
 
 // MARK: - 프로필 뷰 전환
 extension LoginSceneCoordinator {
-    private func showProfileSetupView(_ socialAccountInfo: SocialAccountInfo) {
+    private func showProfileSetupView(_ socialInfo: SocialInfo) {
         let action = SignUpAction(completed: completedSignIn)
-        let vc = self.dependencies.makeSignUpViewController(socialAccountInfo: socialAccountInfo,
-                                                                   action: action)
+        let vc = self.dependencies.makeSignUpViewController(socialInfo: socialInfo,
+                                                            action: action)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }

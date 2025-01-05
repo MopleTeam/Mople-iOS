@@ -27,7 +27,7 @@ enum AppError: Error {
 }
 
 enum LoginError: Error {
-    case notFoundInfo(result: SocialAccountInfo)
+    case notFoundInfo(result: SocialInfo)
     case appleAccountError
     case kakaoAccountError
     case completeError
@@ -76,13 +76,13 @@ final class SignInUseCase: SignIn {
     func login(_ platform: LoginPlatform) -> Single<Void> {
         
         let loginObserver = self.handleLogin(platform)
-        var socialLoginResult: SocialAccountInfo?
+        var socialLoginResult: SocialInfo?
         
         return loginObserver
             .do(onSuccess: { socialLoginResult = $0 })
             .flatMap({ [weak self] accountInfo in
                 guard let self else { throw AppError.unknownError }
-                return self.signInRepo.signIn(socialAccountInfo: accountInfo)
+                return self.signInRepo.signIn(social: accountInfo)
             })
             .catch({ [weak self] err in
                 guard let self else { return .error(err) }
@@ -90,7 +90,7 @@ final class SignInUseCase: SignIn {
             })
     }
     
-    private func handleLogin(_ platform: LoginPlatform) -> Single<SocialAccountInfo> {
+    private func handleLogin(_ platform: LoginPlatform) -> Single<SocialInfo> {
         switch platform {
         case .apple:
             appleLoginService.startAppleLogin()
@@ -99,7 +99,7 @@ final class SignInUseCase: SignIn {
         }
     }
     
-    private func handleError(_ error: Error, _ socialLoginResult: SocialAccountInfo?) -> LoginError {
+    private func handleError(_ error: Error, _ socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
         case let err as LoginError:
             return err
@@ -110,7 +110,7 @@ final class SignInUseCase: SignIn {
         }
     }
     
-    private func handleTransferError(_ error: DataTransferError, socialLoginResult: SocialAccountInfo?) -> LoginError {
+    private func handleTransferError(_ error: DataTransferError, socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
         case .httpRespon(let statusCode, _):
             switch statusCode {
