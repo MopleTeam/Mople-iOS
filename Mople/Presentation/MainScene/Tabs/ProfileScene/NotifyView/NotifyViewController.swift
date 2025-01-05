@@ -33,7 +33,7 @@ final class NotifyViewController: TitleNaviViewController {
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .backArrow)
+        self.setBarItem(type: .left)
     }
 
     // MARK: - Binding

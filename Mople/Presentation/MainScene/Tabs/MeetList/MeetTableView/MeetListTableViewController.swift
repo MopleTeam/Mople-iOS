@@ -68,9 +68,7 @@ final class MeetListTableViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: MeetListTableCell.reuseIdentifier, cellType: MeetListTableCell.self)) { index, item, cell in
 
-                cell.configure(with: ThumbnailViewModel(meet: item.meetSummary,
-                                                        memberCount: item.memberCount,
-                                                        lastPlanDate: item.firstPlanDate))
+                cell.configure(with: .init(meet: item))
                 
                 cell.selectionStyle = .none
             }

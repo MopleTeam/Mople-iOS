@@ -8,15 +8,15 @@
 import UIKit
 import ReactorKit
 
-final class GroupCreateViewReactor: Reactor {
+final class CreateMeetViewReactor: Reactor {
     
     enum Action {
-        case setGroup(group: (title: String?, image: UIImage?))
+        case requestMeetCreate(group: (title: String?, image: UIImage?))
         case endFlow
     }
     
     enum Mutation {
-        case madeGroup
+        case responseMeet
         case notifyMessage(message: String?)
         case setLoading(isLoad: Bool)
     }
@@ -28,13 +28,13 @@ final class GroupCreateViewReactor: Reactor {
     
     var initialState: State = State()
     
-    private let createGroupImpl: CreateGroup
-    private weak var coordinator: GroupCreateCoordination?
+    private let createMeetUseCase: CreateMeet
+    private weak var coordinator: CreateMeetCoordination?
     
-    init(createGroupImpl: CreateGroup,
-         coordinator: GroupCreateCoordination) {
+    init(createMeetUseCase: CreateMeet,
+         coordinator: CreateMeetCoordination) {
         print(#function, #line, "LifeCycle Test GroupCreateView Reactor Created" )
-        self.createGroupImpl = createGroupImpl
+        self.createMeetUseCase = createMeetUseCase
         self.coordinator = coordinator
     }
     
@@ -44,8 +44,8 @@ final class GroupCreateViewReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .setGroup(let group):
-            return self.createGroup(title: group.title, image: group.image)
+        case .requestMeetCreate(let group):
+            return self.createMeet(title: group.title, image: group.image)
         case .endFlow:
             self.coordinator?.closeSubView(completion: nil)
             return .empty()
@@ -57,8 +57,8 @@ final class GroupCreateViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .madeGroup:
-            coordinator?.completedAndSwitchGroupTap(completion: nil)
+        case .responseMeet:
+            coordinator?.completedAndSwitchMeetListTap(completion: nil)
         case .notifyMessage(let message):
             newState.message = message
         case .setLoading(let isLoad):
@@ -69,8 +69,8 @@ final class GroupCreateViewReactor: Reactor {
     }
 }
 
-extension GroupCreateViewReactor {
-    private func createGroup(title: String?, image: UIImage?) -> Observable<Mutation> {
+extension CreateMeetViewReactor {
+    private func createMeet(title: String?, image: UIImage?) -> Observable<Mutation> {
         let validCheck = titleValidCheck(title: title)
         
         guard validCheck.valid else {
@@ -80,20 +80,20 @@ extension GroupCreateViewReactor {
         let loadStart = Observable.just(Mutation.setLoading(isLoad: true))
         
         #warning("오류 발생 시 문제 해결")
-        let makeGroup = createGroupImpl.createGroup(title: title!, image: image)
+        let createMeet = createMeetUseCase.createMeet(title: title!, image: image)
             .asObservable()
-            .map { _ in Mutation.madeGroup }
+            .map { _ in Mutation.responseMeet }
             .catch { err in .just(.notifyMessage(message: "오류 발생")) }
         
         let loadEnd = Observable.just(Mutation.setLoading(isLoad: false))
             
         return Observable.concat([loadStart,
-                                  makeGroup,
+                                  createMeet,
                                   loadEnd])
     }
     
     private func titleValidCheck(title: String?) -> (valid: Bool, message: String) {
-        let valid = GroupTitleValidator.validator(title)
+        let valid = MeetTitleValidator.validator(title)
         
         switch valid {
         case .success:

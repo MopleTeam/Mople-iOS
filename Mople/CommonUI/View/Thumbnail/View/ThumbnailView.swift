@@ -11,12 +11,18 @@ import SnapKit
 final class ThumbnailTitleView: UIView {
     
     enum ViewType {
+        enum contentSize {
+            case small
+            case large
+        }
+        
         case simple
         case basic
-        case detail
+        case detail(size: contentSize)
     }
     
     private var viewType: ViewType
+    private var viewModel: ThumbnailViewModel?
     
     private let thumbnailView: UIImageView = {
         let view = UIImageView()
@@ -36,10 +42,11 @@ final class ThumbnailTitleView: UIView {
         return label
     }()
     
-    private let subButton: UIButton = {
-        let btn = UIButton()
-        btn.setImage(.listArrow, for: .normal)
-        return btn
+    private lazy var arrowImage: UIImageView = {
+        let view = UIImageView()
+        view.image = .listArrow
+        view.contentMode = .scaleAspectFit
+        return view
     }()
     
     private lazy var groupInfoStackView: UIStackView = {
@@ -53,7 +60,7 @@ final class ThumbnailTitleView: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [thumbnailView, groupInfoStackView, subButton])
+        let sv = UIStackView(arrangedSubviews: [thumbnailView, groupInfoStackView])
         sv.axis = .horizontal
         sv.distribution = .fill
         sv.alignment = .center
@@ -78,29 +85,7 @@ final class ThumbnailTitleView: UIView {
             make.edges.equalToSuperview()
         }
         
-        infoConfigure()
-    }
-    
-    private func infoConfigure() {
-        switch viewType {
-        case .simple:
-            setSpacing(8)
-            setThumbnail(size: 28, radius: 6)
-            setTitleLabel(font: FontStyle.Body1.medium,
-                          color: ColorStyle.Gray._02)
-            self.subButton.isHidden = true
-        case .basic:
-            setSpacing(8)
-            setThumbnail(size: 28, radius: 6)
-            setTitleLabel(font: FontStyle.Body2.semiBold,
-                          color: ColorStyle.Gray._04)
-        case .detail:
-            setSpacing(12)
-            setThumbnail(size: 56, radius: 12)
-            setTitleLabel(font: FontStyle.Title3.semiBold,
-                          color: ColorStyle.Gray._01)
-            makeDetail()
-        }
+        handleUseType()
     }
     
     private func setTitleLabel(font: UIFont, color: UIColor) {
@@ -118,13 +103,9 @@ final class ThumbnailTitleView: UIView {
     
     public func configure(with viewModel: ThumbnailViewModel?) {
         guard let viewModel = viewModel else { return }
-        
+        self.viewModel = viewModel
         loadImage(viewModel.thumbnailPath)
         groupTitleLabel.text = viewModel.name
-        
-        if viewType == .detail {
-            setCountView(count: viewModel.memberCount ?? 0)
-        }
     }
 
     private func loadImage(_ path: String?) {
@@ -133,16 +114,59 @@ final class ThumbnailTitleView: UIView {
 }
 
 extension ThumbnailTitleView {
-    private func makeDetail() {
-        groupInfoStackView.addArrangedSubview(memberCountLabel)
-        
-        memberCountLabel.snp.makeConstraints { make in
-            make.height.equalTo(20)
+    private func handleUseType() {
+        handleSize()
+        handleUI()
+    }
+    
+    private func handleSize() {
+        switch viewType {
+        case .simple, .basic:
+            setSpacing(8)
+            setThumbnail(size: 28, radius: 6)
+        case .detail:
+            setSpacing(12)
+            setThumbnail(size: 56, radius: 12)
         }
     }
     
-    private func setCountView(count: Int) {
-        memberCountLabel.text = "\(count) 명"
+    private func handleUI() {
+        switch viewType {
+        case .simple:
+            setTitleLabel(font: FontStyle.Body1.medium,
+                          color: ColorStyle.Gray._02)
+        case .basic:
+            addArrowImageView()
+            setTitleLabel(font: FontStyle.Body2.semiBold,
+                          color: ColorStyle.Gray._04)
+        case let .detail(size):
+            self.handleDetailTypeUI(size: size)
+        }
+    }
+    
+    private func handleDetailTypeUI(size: ViewType.contentSize) {
+        switch size {
+        case .small:
+            addArrowImageView()
+            addMemberCountLabel()
+            setTitleLabel(font: FontStyle.Title3.semiBold,
+                          color: ColorStyle.Gray._01)
+        case .large:
+            addMemberCountLabel()
+            setTitleLabel(font: FontStyle.Title2.semiBold,
+                          color: ColorStyle.Gray._01)
+        }
+    }
+}
+
+extension ThumbnailTitleView {
+    private func addMemberCountLabel() {
+        groupInfoStackView.addArrangedSubview(memberCountLabel)
+        memberCountLabel.text = "\(self.viewModel?.memberCount ?? 0) 명"
+    }
+    
+    private func addArrowImageView() {
+        mainStackView.addArrangedSubview(arrowImage)
     }
     
     private func setSpacing(_ space: CGFloat) {

@@ -33,7 +33,7 @@ final class DefaultSheetView: UIView {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.DatePicker.completedTitle,
                      font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Default.white)
+                     normalColor: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         return btn

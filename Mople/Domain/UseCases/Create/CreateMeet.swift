@@ -8,27 +8,27 @@
 import UIKit
 import RxSwift
 
-protocol CreateGroup {
-    func createGroup(title: String, image: UIImage?) -> Single<Void>
+protocol CreateMeet {
+    func createMeet(title: String, image: UIImage?) -> Single<Void>
 }
 
-final class CreateGroupImpl: CreateGroup {
+final class CreateGroupImpl: CreateMeet {
     
     let imageUploadRepo: ImageUploadRepo
-    let createGroupRepo: CreateGroupRepo
+    let createMeetRepo: CreateMeetRepo
     
     init(imageUploadRepo: ImageUploadRepo,
-         createGroupRepo: CreateGroupRepo) {
+         createMeetRepo: CreateMeetRepo) {
         self.imageUploadRepo = imageUploadRepo
-        self.createGroupRepo = createGroupRepo
+        self.createMeetRepo = createMeetRepo
     }
     
-    func createGroup(title: String, image: UIImage?) -> Single<Void> {
+    func createMeet(title: String, image: UIImage?) -> Single<Void> {
         
         let imageData = self.convertImageToData(image)
         return self.uploadImage(imageData)
             .map { $0.isEmpty ? nil : $0 }
-            .flatMap { self.createGroupRepo.makeGroup(title: title, imagePath: $0) }
+            .flatMap { self.createMeetRepo.createMeet(title: title, imagePath: $0) }
     }
     
     private func uploadImage(_ data: Data?) -> Single<String> {

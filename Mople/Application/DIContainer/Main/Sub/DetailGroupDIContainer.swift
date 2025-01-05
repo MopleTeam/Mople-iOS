@@ -8,34 +8,45 @@
 import UIKit
 
 protocol DetailMeetSceneDependencies {
-    func makeDetailGroupViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController
+    func makeDetailMeetViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController
+    func makeFutruePlanListViewController() -> FuturePlanListViewController
+    func makePastPlanListViewController() -> PastPlanListViewController
 }
 
 final class DetailGroupSceneDIContainer: DetailMeetSceneDependencies {
-    
+
     private let appNetworkService: AppNetworkService
-    private let groupID: Int
+    private let meetId: Int
     
     init(appNetworkService: AppNetworkService,
-         groupID: Int) {
+         meetId: Int) {
         self.appNetworkService = appNetworkService
-        self.groupID = groupID
+        self.meetId = meetId
     }
     
-    func makeDetailGroupCoordinator(navigationController: UINavigationController) -> DetailMeetSceneCoordinator {
+    func makeDetailMeetCoordinator(navigationController: UINavigationController) -> DetailMeetSceneCoordinator {
         return .init(dependencies: self,
                      navigationController: navigationController)
     }
 }
 
 extension DetailGroupSceneDIContainer {
-    func makeDetailGroupViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController {
+    func makeDetailMeetViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController {
         return .init(title: nil,
-                     reactor: makeDetailGroupViewReactor(coordinator: coordinator))
+                     reactor: makeDetailMeetViewReactor(coordinator: coordinator))
     }
     
-    private func makeDetailGroupViewReactor(coordinator: DetailMeetCoordination) -> DetailMeetViewReactor {
-        return .init(coordinator: coordinator,
-                     groupID: groupID)
+    private func makeDetailMeetViewReactor(coordinator: DetailMeetCoordination) -> DetailMeetViewReactor {
+        return .init(fetchMeetUseCase: fetchMeetUseCaseMock(),
+                     coordinator: coordinator,
+                     meetID: meetId)
+    }
+    
+    func makeFutruePlanListViewController() -> FuturePlanListViewController {
+        return FuturePlanListViewController()
+    }
+    
+    func makePastPlanListViewController() -> PastPlanListViewController {
+        return PastPlanListViewController()
     }
 }

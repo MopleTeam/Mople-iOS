@@ -11,9 +11,9 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class GroupCreateViewController: TitleNaviViewController, View, KeyboardResponsive {
+final class CreateMeetViewController: TitleNaviViewController, View, KeyboardResponsive {
     
-    typealias Reactor = GroupCreateViewReactor
+    typealias Reactor = CreateMeetViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -51,7 +51,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
     
     private let imageContainerView = UIView()
     
-    private let groupImageView: UIImageView = {
+    private let thumnailView: UIImageView = {
         let imageView = UIImageView()
 //        imageView.image = .defaultIProfile
         imageView.backgroundColor = .systemMint
@@ -80,7 +80,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.CreateGroup.completedTitle,
                      font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Default.white)
+                     normalColor: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         return btn
@@ -95,7 +95,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
     }()
     
     init(title: String?,
-         reactor: GroupCreateViewReactor) {
+         reactor: CreateMeetViewReactor) {
         print(#function, #line, "LifeCycle Test GroupCreate View Created" )
         super.init(title: title)
         self.reactor = reactor
@@ -142,7 +142,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
         self.view.addSubview(completionButton)
         self.mainView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
-        self.imageContainerView.addSubview(groupImageView)
+        self.imageContainerView.addSubview(thumnailView)
         self.imageContainerView.addSubview(imageEditIcon)
         
         mainView.snp.makeConstraints { make in
@@ -172,28 +172,28 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
             make.height.equalTo(160)
         }
         
-        groupImageView.snp.makeConstraints { make in
+        thumnailView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.size.equalTo(80)
         }
         
         imageEditIcon.snp.makeConstraints { make in
-            make.bottom.trailing.equalTo(groupImageView).offset(6)
+            make.bottom.trailing.equalTo(thumnailView).offset(6)
             make.size.equalTo(24)
         }
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .backArrow)
+        self.setBarItem(type: .left)
     }
     
     // MARK: - Binding
-    func bind(reactor: GroupCreateViewReactor) {
+    func bind(reactor: CreateMeetViewReactor) {
         self.completionButton.rx.controlEvent(.touchUpInside)
             .compactMap({ [weak self] in
-                self?.makeGroup()
+                self?.makeMeet()
             })
-            .map { Reactor.Action.setGroup(group: $0) }
+            .map { Reactor.Action.requestMeetCreate(group: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -213,7 +213,6 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
-//                vc.inputTextField.rx.i
                 vc.alertManager.showAlert(message: message)
             })
             .disposed(by: disposeBag)
@@ -226,7 +225,7 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
     }
     
     private func setImageGestrue() {
-        self.groupImageView.addGestureRecognizer(imageTapGesture)
+        self.thumnailView.addGestureRecognizer(imageTapGesture)
         
         imageTapGesture.rx.event
             .asDriver()
@@ -241,14 +240,14 @@ final class GroupCreateViewController: TitleNaviViewController, View, KeyboardRe
         imageObserver
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: .defaultIProfile)
-            .drive(groupImageView.rx.image)
+            .drive(thumnailView.rx.image)
             .disposed(by: disposeBag)
     }
 }
 
 // MARK: - 그룹 생성 및 적용
-extension GroupCreateViewController {
-    private func makeGroup() -> (String?, UIImage?) {
+extension CreateMeetViewController {
+    private func makeMeet() -> (String?, UIImage?) {
         let nickName = inputTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         let image = try? imageObserver.value()
         return (nickName, image)
@@ -256,13 +255,13 @@ extension GroupCreateViewController {
 }
 
 // MARK: - 이미지 선택
-extension GroupCreateViewController {
+extension CreateMeetViewController {
     private func showPhotos() {
         photoManager.requestPhotoLibraryPermission()
     }
 }
 
-extension GroupCreateViewController : UITextFieldDelegate {
+extension CreateMeetViewController : UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return true }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
@@ -270,7 +269,7 @@ extension GroupCreateViewController : UITextFieldDelegate {
     }
 }
 
-extension GroupCreateViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
+extension CreateMeetViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }

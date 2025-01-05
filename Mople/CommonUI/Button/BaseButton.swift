@@ -22,8 +22,11 @@ class BaseButton: UIButton {
         }
     }
     
-    private(set) var enabledBackColor: UIColor?
-    private(set) var disabledBackColor: UIColor?
+    private var defaultFont: UIFont?
+    private var enabledBackColor: UIColor?
+    private var disabledBackColor: UIColor?
+    private var normalTextColor: UIColor?
+    private var selectedTextColor: UIColor?
     
     init() {
         super.init(frame: .zero)
@@ -58,7 +61,8 @@ extension BaseButton {
         
     }
     
-    public func setBgColor(_ color: UIColor?, disabledColor: UIColor? = nil) {
+    public func setBgColor(_ color: UIColor?,
+                           disabledColor: UIColor? = nil) {
         configuration?.background.backgroundColor = color
         enabledBackColor = color
         disabledBackColor = disabledColor
@@ -66,10 +70,13 @@ extension BaseButton {
     
     public func setTitle(text: String? = nil,
                          font: UIFont? = nil,
-                         color: UIColor? = nil) {
-        
+                         normalColor: UIColor? = nil,
+                         selectedColor: UIColor? = nil) {
         configuration?.title = text
-        setFont(font, color)
+        setFont(font, normalColor)
+        self.defaultFont = font
+        self.normalTextColor = normalColor
+        self.selectedTextColor = selectedColor
     }
     
     public func setRadius(_ radius: CGFloat) {
@@ -83,13 +90,19 @@ extension BaseButton {
             outgoing.font = font
             return outgoing
         }
-        
         configuration?.titleTextAttributesTransformer = transformer
     }
     
     private func setEnabled(_ isEnabled: Bool) {
         guard let enabledBackColor, let disabledBackColor else { return }
         configuration?.background.backgroundColor = isEnabled ? enabledBackColor : disabledBackColor
+    }
+}
+
+extension BaseButton {
+    public func updateTextColor(isSelected: Bool) {
+        let changeColor = isSelected ? selectedTextColor : normalTextColor
+        setFont(defaultFont, changeColor)
     }
 }
 

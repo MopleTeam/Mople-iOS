@@ -88,13 +88,13 @@ extension LabeledButtonView {
     private func setText(_ text: String?) {
         button.setTitle(text: text,
                      font: FontStyle.Body1.regular,
-                     color: ColorStyle.Gray._05)
+                     normalColor: ColorStyle.Gray._05)
     }
     
     fileprivate func setSelectedTextText(_ text: String?) {
         button.setTitle(text: text,
                      font: FontStyle.Body1.regular,
-                     color: ColorStyle.Gray._02)
+                     normalColor: ColorStyle.Gray._02)
     }
     
     private func setIconImage(_ image: UIImage?) {

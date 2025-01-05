@@ -38,7 +38,7 @@ final class ProfileViewController: TitleNaviViewController, View {
     private let profileNameButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Gray._01)
+                     normalColor: ColorStyle.Gray._01)
         btn.setImage(image: .editPan)
         btn.setLayoutMargins(inset: .zero)
         return btn
@@ -48,7 +48,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Profile.notifyTitle,
                      font: FontStyle.Title3.medium,
-                     color: ColorStyle.Gray._01)
+                     normalColor: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
         btn.setLayoutMargins(inset: .zero)
@@ -59,7 +59,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Profile.policyTitle,
                      font: FontStyle.Title3.medium,
-                     color: ColorStyle.Gray._01)
+                     normalColor: ColorStyle.Gray._01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
         btn.setLayoutMargins(inset: .zero)
@@ -88,7 +88,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Profile.logoutTitle,
                      font: FontStyle.Title3.medium,
-                     color: ColorStyle.Gray._01)
+                     normalColor: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
         return btn
@@ -98,7 +98,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Profile.resignTitle,
                      font: FontStyle.Title3.medium,
-                     color: ColorStyle.Gray._01)
+                     normalColor: ColorStyle.Gray._01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
         return btn

@@ -73,7 +73,7 @@ final class PlanCreateViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.CreatePlan.completedTitle,
                      font: FontStyle.Title3.semiBold,
-                     color: ColorStyle.Default.white)
+                     normalColor: ColorStyle.Default.white)
         btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         btn.rx.isEnabled.onNext(false)
@@ -148,7 +148,7 @@ final class PlanCreateViewController: TitleNaviViewController, View {
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .backArrow)
+        self.setBarItem(type: .left)
     }
     
     // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함

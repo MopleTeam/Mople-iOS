@@ -64,7 +64,7 @@ class TitleNaviViewController: DefaultViewController {
 
 // MARK: - 네비게이션 아이템 설정
 extension TitleNaviViewController {
-    public func setBarItem(type: TitleNaviBar.ButtonType, image: UIImage) {
+    public func setBarItem(type: TitleNaviBar.ButtonType, image: UIImage = .backArrow) {
         naviBar.setBarItem(type: type, image: image)
     }
     

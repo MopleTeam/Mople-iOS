@@ -55,7 +55,7 @@ final class SignInViewController: UIViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Login.kakao,
                         font: FontStyle.Title3.semiBold,
-                        color: ColorStyle.Gray._01)
+                        normalColor: ColorStyle.Gray._01)
         
         btn.setImage(image: .kakao,
                         imagePlacement: .leading,
@@ -69,7 +69,7 @@ final class SignInViewController: UIViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Login.apple,
                         font: FontStyle.Title3.semiBold,
-                        color: ColorStyle.Default.white)
+                        normalColor: ColorStyle.Default.white)
         
         btn.setImage(image: .apple,
                         imagePlacement: .leading,

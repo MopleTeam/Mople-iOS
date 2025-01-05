@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GroupTitleValidator {
+struct MeetTitleValidator {
     
     enum result {
         case success, empty, countUnder, countOver

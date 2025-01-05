@@ -90,7 +90,7 @@ class ProfileEditViewController: TitleNaviViewController, View {
     }
     
     private func setNaviItem() {
-        self.setBarItem(type: .left, image: .backArrow)
+        self.setBarItem(type: .left)
     }
 
     // MARK: - Binding

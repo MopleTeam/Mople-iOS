@@ -43,7 +43,7 @@ final class DefaultMapView: UIView {
         let button = BaseButton()
         button.setTitle(text: "장소 선택",
                         font: FontStyle.Title3.semiBold,
-                        color: ColorStyle.Default.white)
+                        normalColor: ColorStyle.Default.white)
         button.setBgColor(ColorStyle.App.primary)
         button.setRadius(8)
         return button

@@ -7,6 +7,6 @@
 
 import RxSwift
 
-protocol FetchGroupUseCase {
-    func fetchGroup(groupId: Int) -> Single<Meet>
+protocol FetchMeetUseCase {
+    func fetchMeet(meetId: Int) -> Single<Meet>
 }

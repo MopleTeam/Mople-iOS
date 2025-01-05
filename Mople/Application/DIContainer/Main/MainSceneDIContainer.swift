@@ -17,8 +17,8 @@ protocol MainTapDependencies {
 }
 
 protocol MainNavigationDependencies {
-    func makeCreateGroupViewController(coordinator: GroupCreateCoordination) -> GroupCreateViewController
-    func makeDetailGroupCoordinator(groupID: Int) -> BaseCoordinator
+    func makeCreateGroupViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController
+    func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator
     func makePlanCreateCoordinator() -> BaseCoordinator
 }
 
@@ -67,13 +67,13 @@ extension MainSceneDIContainer {
     func makeMeetListViewController(coordinator: MainCoordination) -> MeetListViewController {
         let titel = TextStyle.Tabbar.group
         
-        let groupListVC = MeetListViewController(title: titel,
-                                                  reactor: makeGroupListViewReactor(coordinator: coordinator))
-        groupListVC.tabBarItem = .init(title: titel, image: .people, selectedImage: nil)
-        return groupListVC
+        let meetListVC = MeetListViewController(title: titel,
+                                                  reactor: makeMeetListViewReactor(coordinator: coordinator))
+        meetListVC.tabBarItem = .init(title: titel, image: .people, selectedImage: nil)
+        return meetListVC
     }
     
-    private func makeGroupListViewReactor(coordinator: MainCoordination) -> MeetListViewReactor {
+    private func makeMeetListViewReactor(coordinator: MainCoordination) -> MeetListViewReactor {
         return MeetListViewReactor(fetchUseCase: FetchGroupListMock(),
                                     coordinator: coordinator)
     }
@@ -110,15 +110,15 @@ extension MainSceneDIContainer {
 // MARK: - Main Navigation
 extension MainSceneDIContainer {
     // MARK: - 그룹 생성 화면
-    func makeCreateGroupViewController(coordinator: GroupCreateCoordination) -> GroupCreateViewController {
-        let createGroupVC = GroupCreateViewController(title: TextStyle.CreateGroup.title,
+    func makeCreateGroupViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController {
+        let createGroupVC = CreateMeetViewController(title: TextStyle.CreateGroup.title,
                                                       reactor: makeCreateGroupViewReactor(coordinator: coordinator))
         createGroupVC.configureModalPresentation()
         return createGroupVC
     }
     
-    private func makeCreateGroupViewReactor(coordinator: GroupCreateCoordination) -> GroupCreateViewReactor {
-        return .init(createGroupImpl: CreateGroupMock(),
+    private func makeCreateGroupViewReactor(coordinator: CreateMeetCoordination) -> CreateMeetViewReactor {
+        return .init(createMeetUseCase: CreateGroupMock(),
                      coordinator: coordinator)
     }
     
@@ -129,9 +129,9 @@ extension MainSceneDIContainer {
         return planCreateDI.makePlanCreateFlowCoordinator(navigationController: navigationController)
     }
     
-    func makeDetailGroupCoordinator(groupID: Int) -> BaseCoordinator {
-        let detailGroupDI = DetailGroupSceneDIContainer(appNetworkService: appNetworkService, groupID: groupID)
+    func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator {
+        let detailMeetDI = DetailGroupSceneDIContainer(appNetworkService: appNetworkService, meetId: meetId)
         let navigationController = UINavigationController.createFullScreenNavigation()
-        return detailGroupDI.makeDetailGroupCoordinator(navigationController: navigationController)
+        return detailMeetDI.makeDetailMeetCoordinator(navigationController: navigationController)
     }
 }

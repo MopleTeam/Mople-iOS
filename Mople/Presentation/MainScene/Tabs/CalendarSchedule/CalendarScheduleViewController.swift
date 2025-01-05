@@ -114,7 +114,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     private func setupNavi() {
-        self.setBarItem(type: .left, image: .backArrow)
+        self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .calendar)
         self.hideBaritem(type: .left, isHidden: true)
     }

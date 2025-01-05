@@ -44,7 +44,7 @@ final class MeetListViewReactor: Reactor {
         case let .selectMeet(index):
             guard let selectedGroup = currentState.meetList[safe: index],
                   let id = selectedGroup.meetSummary?.id else { return .empty() }
-            coordinator.presentDetailMeetScene(groupID: id)
+            coordinator.presentDetailMeetScene(meetId: id)
             return .empty()
         }
     }

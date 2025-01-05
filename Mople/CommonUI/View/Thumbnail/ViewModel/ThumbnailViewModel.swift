@@ -8,19 +8,21 @@
 import Foundation
 
 struct ThumbnailViewModel {
-    let name: String?
-    let thumbnailPath: String?
-    let memberCount: Int?
-    let lastPlanDate: Date?
+    var name: String?
+    var thumbnailPath: String?
+    var memberCount: Int?
+    var lastPlanDate: Date?
 }
 
 extension ThumbnailViewModel {
-    init(meet: MeetSummary?,
-         memberCount: Int? = nil,
-         lastPlanDate: Date? = nil) {
-        self.name = "\(meet?.id)"
-        self.thumbnailPath = meet?.imagePath
-        self.memberCount = memberCount
-        self.lastPlanDate = lastPlanDate
+    init(meetSummary: MeetSummary?) {
+        self.name = meetSummary?.name
+        self.thumbnailPath = meetSummary?.imagePath
+    }
+    
+    init(meet: Meet) {
+        self.init(meetSummary: meet.meetSummary)
+        self.memberCount = meet.memberCount
+        self.lastPlanDate = meet.firstPlanDate
     }
 }

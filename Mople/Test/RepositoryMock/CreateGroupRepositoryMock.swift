@@ -8,8 +8,8 @@
 import Foundation
 import RxSwift
 
-final class CreateGroupRepositoryMock: CreateGroupRepo {
-    func makeGroup(title: String, imagePath: String?) -> Single<Void> {
+final class CreateGroupRepositoryMock: CreateMeetRepo {
+    func createMeet(title: String, imagePath: String?) -> Single<Void> {
         return Single.just(())
     }
 }

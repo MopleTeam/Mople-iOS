@@ -11,7 +11,7 @@ protocol MainCoordination: AnyObject {
     func closeSubView(completion: (() -> Void)?)
     func presentCreateGroupView()
     func presentCreatePlanScene()
-    func presentDetailMeetScene(groupID: Int)
+    func presentDetailMeetScene(meetId: Int)
     func signOut()
 }
 
@@ -65,8 +65,8 @@ extension MainSceneCoordinator: MainCoordination {
         self.navigationController.present(planCreateCoordinator.navigationController, animated: false)
     }
     
-    func presentDetailMeetScene(groupID: Int) {
-        let detailGroupCoordinator = self.dependencies.makeDetailGroupCoordinator(groupID: groupID)
+    func presentDetailMeetScene(meetId: Int) {
+        let detailGroupCoordinator = self.dependencies.makeDetailMeetCoordinator(meetId: meetId)
         self.start(coordinator: detailGroupCoordinator)
         self.navigationController.present(detailGroupCoordinator.navigationController, animated: false)
     }

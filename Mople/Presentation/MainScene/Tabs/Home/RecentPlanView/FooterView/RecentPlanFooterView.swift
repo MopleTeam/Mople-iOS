@@ -18,7 +18,7 @@ final class RecentPlanFooterView: UICollectionReusableView {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Home.moreBtnTitle,
                        font: FontStyle.Title3.semiBold,
-                       color: ColorStyle.Gray._01)
+                       normalColor: ColorStyle.Gray._01)
         btn.setBgColor(ColorStyle.Default.white)
         btn.setImage(image: .plus,
                        imagePlacement: .top)

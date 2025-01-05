@@ -89,7 +89,7 @@ final class SimpleScheduleView: UIView { // BasicPlanView
         
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
-        self.thumbnailView.configure(with: ThumbnailViewModel(meet: viewModel.meet))
+        self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))
         self.weatherView.configure(with: .init(weather: viewModel.weather))
     }
 }

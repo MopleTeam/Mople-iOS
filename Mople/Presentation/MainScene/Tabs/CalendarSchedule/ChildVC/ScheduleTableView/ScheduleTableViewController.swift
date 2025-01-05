@@ -41,10 +41,10 @@ final class ScheduleTableViewController: UIViewController, View {
         return table
     }()
 
-    private let emptyScheduleView: DefaultEmptyView = {
+    private let emptyPlanView: DefaultEmptyView = {
         let view = DefaultEmptyView()
         view.setTitle(text: TextStyle.Calendar.emptyTitle)
-        view.setImage(image: .emptySchedule)
+        view.setImage(image: .emptyPlan)
         view.clipsToBounds = true
         return view
     }()
@@ -84,9 +84,9 @@ final class ScheduleTableViewController: UIViewController, View {
     private func setLayout() {
         self.view.backgroundColor = .clear
         view.addSubview(tableView)
-        view.addSubview(emptyScheduleView)
+        view.addSubview(emptyPlanView)
 
-        emptyScheduleView.snp.makeConstraints { make in
+        emptyPlanView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.height.width.lessThanOrEqualTo(self.view)
         }
@@ -160,7 +160,7 @@ final class ScheduleTableViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isEmpty in
                 vc.tableView.isHidden = isEmpty
-                vc.emptyScheduleView.isHidden = !isEmpty
+                vc.emptyPlanView.isHidden = !isEmpty
             })
             .disposed(by: disposeBag)
         
@@ -234,8 +234,8 @@ extension ScheduleTableViewController {
     }
     
     private func remakeEmptyView(_ isHide: Bool) {
-        guard !emptyScheduleView.isHidden else { return }
-        emptyScheduleView.snp.remakeConstraints(isHide ? hideView(_:) : showEmptyView(_:))
+        guard !emptyPlanView.isHidden else { return }
+        emptyPlanView.snp.remakeConstraints(isHide ? hideView(_:) : showEmptyView(_:))
     }
     
     private func hideView(_ make: ConstraintMaker) {

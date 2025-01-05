@@ -10,6 +10,7 @@ import RxSwift
 
 final class ProfileEditMock: ProfileEdit {
     func editProfile(nickname: String, image: UIImage?) -> Single<Void> {
+        
         return Observable.just(())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()

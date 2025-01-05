@@ -81,13 +81,13 @@ extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
 extension PlanCreateFlowCoordinator {
     
     func endProcess() {
-        (self.parentCoordinator as? GroupCreateCoordination)?.closeSubView(completion: { [weak self] in
+        (self.parentCoordinator as? CreateMeetCoordination)?.closeSubView(completion: { [weak self] in
             self?.clear()
         })
     }
     
     func completedProcess(plan: Plan) {
-        (self.parentCoordinator as? GroupCreateCoordination)?.completedAndSwitchGroupTap(completion: { [weak self] in
+        (self.parentCoordinator as? CreateMeetCoordination)?.completedAndSwitchMeetListTap(completion: { [weak self] in
             self?.clear()
         })
     }

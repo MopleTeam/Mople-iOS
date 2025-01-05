@@ -10,7 +10,7 @@ import SnapKit
 
 final class MeetListTableCell: UITableViewCell {
         
-    private let thumbnailView = ThumbnailTitleView(type: .detail)
+    private let thumbnailView = ThumbnailTitleView(type: .detail(size: .small))
     
     private let scheduleLabel: UILabel = {
         let label = UILabel()

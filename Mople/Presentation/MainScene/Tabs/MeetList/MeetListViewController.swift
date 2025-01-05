@@ -31,7 +31,7 @@ class MeetListViewController: TitleNaviViewController, View {
         return view
     }()
     
-    private lazy var groupTableView = MeetListTableViewController(reactor: reactor!)
+    private lazy var meetTableView = MeetListTableViewController(reactor: reactor!)
     
     private let borderView: UIView = {
         let view = UIView()
@@ -89,7 +89,7 @@ class MeetListViewController: TitleNaviViewController, View {
     }
     
     private func addScheduleListCollectionView() {
-        add(child: groupTableView, container: groupTableContainerView)
+        add(child: meetTableView, container: groupTableContainerView)
     }
     
     func bind(reactor: MeetListViewReactor) {
@@ -97,7 +97,7 @@ class MeetListViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, groupList in
                 vc.emptyView.isHidden = !groupList.isEmpty
-                vc.groupTableView.view.isHidden = groupList.isEmpty
+                vc.meetTableView.view.isHidden = groupList.isEmpty
             })
             .disposed(by: disposeBag)
     }

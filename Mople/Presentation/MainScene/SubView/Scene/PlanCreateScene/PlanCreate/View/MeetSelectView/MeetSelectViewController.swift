@@ -90,7 +90,7 @@ final class MeetSelectViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: MeetSelectTableCell.reuseIdentifier, cellType: MeetSelectTableCell.self)) { index, item, cell in
       
-                cell.configure(with: .init(meet: item))
+                cell.configure(with: .init(meetSummary: item))
                 cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
