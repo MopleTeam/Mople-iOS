@@ -26,6 +26,8 @@ final class DefaultSignInRepo: SignInRepo {
                                                   email: social.email)
         
         return self.networkService.basicRequest(endpoint: endpoint)
-            .map { KeyChainService.shared.saveToken($0) }
+            .map {
+                KeyChainService.shared.saveToken($0)
+            }
     }
 }

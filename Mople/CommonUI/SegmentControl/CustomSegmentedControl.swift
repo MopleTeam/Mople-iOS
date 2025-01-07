@@ -16,7 +16,7 @@ final class CustomSegmentedControl: UIView {
                        font: FontStyle.Body1.semiBold,
                        normalColor: ColorStyle.Gray._04,
                        selectedColor: ColorStyle.Default.white)
-        button.updateTextColor(isSelected: true)
+        button.updateSelectedTextColor(isSelected: true)
         return button
     }()
     
@@ -96,8 +96,8 @@ extension CustomSegmentedControl {
     }
     
     private func updateTextColor(isNext: Bool) {
-        self.nextButton.updateTextColor(isSelected: isNext)
-        self.previousButton.updateTextColor(isSelected: !isNext)
+        self.nextButton.updateSelectedTextColor(isSelected: isNext)
+        self.previousButton.updateSelectedTextColor(isSelected: !isNext)
     }
 }
 

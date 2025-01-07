@@ -25,7 +25,6 @@ final class DefaultMapView: UIView {
         let label = UILabel()
         label.font = FontStyle.Body1.semiBold
         label.textColor = ColorStyle.Gray._02
-        label.textAlignment = .left
         return label
     }()
     
@@ -33,7 +32,6 @@ final class DefaultMapView: UIView {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
         label.textColor = ColorStyle.Gray._05
-        label.textAlignment = .left
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
         return label
@@ -44,7 +42,7 @@ final class DefaultMapView: UIView {
         button.setTitle(text: "장소 선택",
                         font: FontStyle.Title3.semiBold,
                         normalColor: ColorStyle.Default.white)
-        button.setBgColor(ColorStyle.App.primary)
+        button.setBgColor(normalColor: ColorStyle.App.primary)
         button.setRadius(8)
         return button
     }()

@@ -51,7 +51,7 @@ final class HomeViewController: UIViewController, View {
     
     private let recentPlanContainerView = UIView()
     
-    private lazy var resentPlanCollectionView = RecentPlanCollectionViewController(reactor: reactor!)
+    private lazy var resentPlanCollectionView = HomePlanCollectionViewController(reactor: reactor!)
     
     #warning("configure")
     private let emptyDataView: UILabel = {

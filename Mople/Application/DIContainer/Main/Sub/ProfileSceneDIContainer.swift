@@ -42,8 +42,7 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeProfileViewReactor(coordinator: ProfileCoordination) -> ProfileViewReactor {
-        return ProfileViewReactor(fetchProfileIUseCase: FetchProfileMock(),
-                                  coordinator: coordinator)
+        return ProfileViewReactor(coordinator: coordinator)
     }
 }
 

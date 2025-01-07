@@ -81,7 +81,8 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
         btn.setTitle(text: TextStyle.CreateGroup.completedTitle,
                      font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
+        btn.setBgColor(normalColor: ColorStyle.App.primary,
+                       disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         return btn
     }()

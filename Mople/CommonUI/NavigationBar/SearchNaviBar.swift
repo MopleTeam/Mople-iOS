@@ -37,7 +37,7 @@ final class SearchNaviBar: UIView {
         btn.setTitle(text: "검색",
                      font: FontStyle.Body2.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary)
+        btn.setBgColor(normalColor: ColorStyle.App.primary)
         btn.setRadius(4)
         return btn
     }()

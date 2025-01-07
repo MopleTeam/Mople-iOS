@@ -16,7 +16,7 @@ struct ProfileUpdateModel {
 final class ProfileViewReactor: Reactor {
     
     enum Action {
-        case fetchProfile
+        case readUserInfo
         case editProfile
         case presentNotifyView
         case presentPolicyView
@@ -25,7 +25,7 @@ final class ProfileViewReactor: Reactor {
     }
     
     enum Mutation {
-        case loadedProfile(profile: UserInfo)
+        case fetchUserInfo(_ userInfo: UserInfo)
     }
     
     struct State {
@@ -34,15 +34,12 @@ final class ProfileViewReactor: Reactor {
     
     var initialState = State()
     
-    private let fetchProfileIUseCase: FetchProfile
     private weak var coordinator: ProfileCoordination?
     
-    init(fetchProfileIUseCase: FetchProfile,
-         coordinator: ProfileCoordination) {
+    init(coordinator: ProfileCoordination) {
         print(#function, #line, "LifeCycle Test ProfileView Reactor Created" )
-        self.fetchProfileIUseCase = fetchProfileIUseCase
         self.coordinator = coordinator
-        action.onNext(.fetchProfile)
+        action.onNext(.readUserInfo)
     }
     
     deinit {
@@ -51,7 +48,7 @@ final class ProfileViewReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .fetchProfile:
+        case .readUserInfo:
             return self.getProfile()
         case .editProfile:
             return presentEditView()
@@ -70,7 +67,7 @@ final class ProfileViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .loadedProfile(let profile):
+        case .fetchUserInfo(let profile):
             newState.userProfile = profile
         }
         
@@ -80,10 +77,11 @@ final class ProfileViewReactor: Reactor {
 }
 
 extension ProfileViewReactor {
+    
+    #warning("프로필 없는 경우(?) 처리")
     private func getProfile() -> Observable<Mutation> {
-        return fetchProfileIUseCase.fetchProfile()
-            .asObservable()
-            .map { Mutation.loadedProfile(profile: $0) }
+        guard let userInfo = UserInfoStorage.shared.userInfo else { return .empty() }
+        return .just(.fetchUserInfo(userInfo))
     }
     
     private func presentEditView() -> Observable<Mutation> {
@@ -107,7 +105,8 @@ extension ProfileViewReactor {
     /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
     private func logout() -> Observable<Mutation> {
         KeyChainService.shared.deleteToken()
-        coordinator?.logout()
-        return Observable.empty()
+        UserInfoStorage.shared.deleteEnitity()
+        self.coordinator?.logout()
+        return .empty()
     }
 }

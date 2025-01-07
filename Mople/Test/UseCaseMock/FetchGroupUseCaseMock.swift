@@ -17,10 +17,3 @@ final class fetchMeetUseCaseMock: FetchMeetUseCase {
 
 
 
-extension MeetSummary {
-    static func mock(id: Int) -> MeetSummary {
-        return .init(id: id,
-                     name: "테스트 모임 \(id)",
-                     imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300")
-    }
-}

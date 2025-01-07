@@ -9,7 +9,7 @@ import UIKit
 
 protocol DetailMeetSceneDependencies {
     func makeDetailMeetViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController
-    func makeFutruePlanListViewController() -> FuturePlanListViewController
+    func makeFuturePlanListViewController() -> FuturePlanListViewController
     func makePastPlanListViewController() -> PastPlanListViewController
 }
 
@@ -17,6 +17,7 @@ final class DetailGroupSceneDIContainer: DetailMeetSceneDependencies {
 
     private let appNetworkService: AppNetworkService
     private let meetId: Int
+    private var mainReactor: DetailMeetViewReactor?
     
     init(appNetworkService: AppNetworkService,
          meetId: Int) {
@@ -32,21 +33,35 @@ final class DetailGroupSceneDIContainer: DetailMeetSceneDependencies {
 
 extension DetailGroupSceneDIContainer {
     func makeDetailMeetViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController {
-        return .init(title: nil,
-                     reactor: makeDetailMeetViewReactor(coordinator: coordinator))
+        makeDetailMeetViewReactor(coordinator: coordinator)
+        return .init(title: nil, reactor: mainReactor!)
     }
     
-    private func makeDetailMeetViewReactor(coordinator: DetailMeetCoordination) -> DetailMeetViewReactor {
-        return .init(fetchMeetUseCase: fetchMeetUseCaseMock(),
+    private func makeDetailMeetViewReactor(coordinator: DetailMeetCoordination) {
+        self.mainReactor = .init(fetchMeetUseCase: fetchMeetUseCaseMock(),
                      coordinator: coordinator,
                      meetID: meetId)
     }
     
-    func makeFutruePlanListViewController() -> FuturePlanListViewController {
-        return FuturePlanListViewController()
+    func makeFuturePlanListViewController() -> FuturePlanListViewController {
+        return FuturePlanListViewController(reactor: makeFuturePlanListViewReactor(),
+                                            parentReactor: mainReactor!)
+    }
+    
+    private func makeFuturePlanListViewReactor() -> FutruePlanListViewReactor {
+        return .init(fetchPlanUseCase: FetchMeetFuturePlanMock(),
+                     requestJoinPlanUseCase: RequestJoinPlanMock(),
+                     requsetLeavePlanUseCase: RequestLeavePlanMock(),
+                     meetID: meetId)
     }
     
     func makePastPlanListViewController() -> PastPlanListViewController {
-        return PastPlanListViewController()
+        return PastPlanListViewController(reactor: makePastPlanListViewReactor(),
+                                          parentReactor: mainReactor!)
+    }
+    
+    private func makePastPlanListViewReactor() -> PastPlanListViewReactor {
+        return .init(fetchReviewUseCase: FetchReviewMock(),
+                     meetID: meetId)
     }
 }

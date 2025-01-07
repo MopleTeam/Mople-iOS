@@ -34,13 +34,17 @@ final class SignInViewReactor: Reactor {
     }
     
     private let userLoginUseCase: SignIn
+    private let fetchUserInfoUseCase: FetchUserInfo
     private let loginAction: SignInAction
     
     var initialState: State = State()
     
-    init(loginUseCase: SignIn, loginAction: SignInAction) {
+    init(loginUseCase: SignIn,
+         fetchUserInfoUseCase: FetchUserInfo,
+         loginAction: SignInAction) {
         print(#function, #line, "LifeCycle Test SignIn View Reactor Created" )
         self.userLoginUseCase = loginUseCase
+        self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.loginAction = loginAction
     }
     
@@ -87,8 +91,12 @@ extension SignInViewReactor {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
                 
         let loginTask = userLoginUseCase.login(platform)
+            .flatMap({ [weak self] in
+                guard let self else { throw AppError.unknownError }
+                return self.fetchUserInfoUseCase.fetchUserInfo()
+            })
             .asObservable()
-            .map { _ in Mutation.moveToMain }
+            .map { Mutation.moveToMain }
             .catch { [weak self] err in
                 guard let self else { throw AppError.unknownError }
                 return self.handleError(err: err)

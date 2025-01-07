@@ -12,12 +12,13 @@ struct Plan: Hashable, Equatable {
     let title: String?
     let date: Date?
     let participantCount: Int?
-    let isParticipating: Bool?
+    var isParticipating: Bool = false
     let addressTitle: String?
     let address: String?
-    let meetngSummary: MeetSummary?
+    let meet: MeetSummary?
     let location: Location?
     let weather: Weather?
+    let postUserId: Int?
     
     static func < (lhs: Plan, rhs: Plan) -> Bool {
         guard let lhsDate = lhs.date,

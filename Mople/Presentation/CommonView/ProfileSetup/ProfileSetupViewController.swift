@@ -73,7 +73,8 @@ final class ProfileSetupViewController: UIViewController, View {
         btn.setTitle(text: TextStyle.ProfileSetup.checkBtnTitle,
                      font: FontStyle.Body1.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.secondary, disabledColor: ColorStyle.Primary.disable2)
+        btn.setBgColor(normalColor: ColorStyle.App.secondary,
+                       disabledColor: ColorStyle.Primary.disable2)
         btn.setRadius(6)
         btn.isEnabled = false
         return btn
@@ -92,7 +93,8 @@ final class ProfileSetupViewController: UIViewController, View {
         btn.setTitle(text: TextStyle.DatePicker.completedTitle,
                      font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
+        btn.setBgColor(normalColor: ColorStyle.App.primary,
+                       disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         btn.isEnabled = false
         return btn
@@ -326,7 +328,7 @@ extension ProfileSetupViewController {
     }
     
     private func setProfile(_ profile: UserInfo) {
-        _ = self.profileImageView.kfSetimage(profile.thumbnailPath)
+        _ = self.profileImageView.kfSetimage(profile.imagePath)
         nameView.text = profile.name
     }
 }

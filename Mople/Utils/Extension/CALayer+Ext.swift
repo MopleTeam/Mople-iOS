@@ -8,9 +8,9 @@
 import UIKit
 
 extension CALayer {
-    func makeLine(width: CGFloat) {
+    func makeLine(width: CGFloat, color: UIColor = ColorStyle.App.stroke) {
         self.borderWidth = width
-        self.borderColor = ColorStyle.App.storke.cgColor
+        self.borderColor = color.cgColor
     }
     
     func makeCornes(radius: CGFloat, corners: CACornerMask) {

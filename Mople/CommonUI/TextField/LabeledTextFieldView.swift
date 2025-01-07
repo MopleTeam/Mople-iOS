@@ -28,7 +28,6 @@ final class LabeledTextFieldView: UIView {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
         label.textColor = ColorStyle.Gray._01
-        label.textAlignment = .left
         return label
     }()
     

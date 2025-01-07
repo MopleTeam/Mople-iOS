@@ -30,7 +30,18 @@ final class DefaultSignUpRepo: SignUpRepo {
         let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
         
         return networkService.basicRequest(endpoint: endpoint)
-            .map { KeyChainService.shared.saveToken($0) }
+            .map {
+                KeyChainService.shared.saveToken($0)
+            }
+    }
+    
+    func testSignUp(requestModel: SignUpRequest) -> Single<Void> {
+        let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
+        
+        return networkService.basicRequest(endpoint: endpoint)
+            .map {
+                KeyChainService.shared.saveToken($0)
+            }
     }
 }
 

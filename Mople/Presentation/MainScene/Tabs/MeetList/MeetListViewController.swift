@@ -36,7 +36,6 @@ class MeetListViewController: TitleNaviViewController, View {
     private let borderView: UIView = {
         let view = UIView()
         view.layer.makeLine(width: 1)
-        
         return view
     }()
     

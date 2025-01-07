@@ -35,13 +35,13 @@ final class TitleNaviBar: UIView {
         return label
     }()
     
-    private lazy var rightButton: UIButton = {
+    fileprivate lazy var rightButton: UIButton = {
         let btn = UIButton()
         btn.isHidden = true
         return btn
     }()
 
-    private lazy var leftButton: UIButton = {
+    fileprivate lazy var leftButton: UIButton = {
         let btn = UIButton()
         btn.isHidden = true
         return btn
@@ -123,5 +123,15 @@ extension TitleNaviBar {
         case .right:
             rightButton.isHidden = isHidden
         }
+    }
+}
+
+extension Reactive where Base: TitleNaviBar {
+    var leftItemTap: ControlEvent<Void> {
+        return base.leftButton.rx.controlEvent(.touchUpInside)
+    }
+    
+    var rightItemTap: ControlEvent<Void> {
+        return base.rightButton.rx.controlEvent(.touchUpInside)
     }
 }

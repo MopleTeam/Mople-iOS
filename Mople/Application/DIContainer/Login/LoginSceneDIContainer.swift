@@ -41,7 +41,8 @@ extension LoginSceneDIContainer {
     #warning("Mock")
     private func makeLoginViewReacotr(_ action: SignInAction) -> SignInViewReactor {
         return SignInViewReactor(loginUseCase: makeUserLoginUseCase(),
-                                loginAction: action)
+                                 fetchUserInfoUseCase: makeFetchUserInfoUserCase(),
+                                 loginAction: action)
     }
     
     private func makeUserLoginUseCase() -> SignIn {
@@ -72,6 +73,7 @@ extension LoginSceneDIContainer {
                                    action: SignUpAction) -> SignUpViewReactor {
         return .init(socialInfo: socialInfo,
                      signUpUseCase: makeSignUpUseCase(),
+                     fetchUserInfoUseCase: makeFetchUserInfoUserCase(),
                      completedAction: action)
     }
     
@@ -86,5 +88,15 @@ extension LoginSceneDIContainer {
     
     private func makeSignUpRepo() -> SignUpRepo {
         return DefaultSignUpRepo(networkService: appNetworkService)
+    }
+}
+
+extension LoginSceneDIContainer {
+    private func makeFetchUserInfoUserCase() -> FetchUserInfo {
+        return FetchUserInfoUseCase(userInfoRepo: makeUserInfoRepo())
+    }
+    
+    private func makeUserInfoRepo() -> UserInfoRepo  {
+        return DefaultUserInfoRepo(networkService: appNetworkService)
     }
 }

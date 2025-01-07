@@ -44,7 +44,11 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }()
     
     // 캘린더
-    private let calendarContainer = UIView()
+    private let calendarContainer: UIView = {
+        let view = UIView()
+        view.layer.zPosition = 2
+        return view
+    }()
     
     private lazy var calendarView: CalendarViewController = {
         let calendarView = CalendarViewController(reactor: reactor!,
@@ -56,14 +60,20 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     // 스케쥴 리스트 테이블 뷰
     private let scheduleListContainer = UIView()
     
-    private lazy var scheduleListTableView: ScheduleTableViewController = {
+    private lazy var scheduleListTableView: CalendarPlanTableViewController = {
         
-        let scheduleListTableView = ScheduleTableViewController(reactor: reactor!)
+        let scheduleListTableView = CalendarPlanTableViewController(reactor: reactor!)
         return scheduleListTableView
     }()
     
     // 구분선
-    private let borderView = UIView()
+    private let borderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = ColorStyle.Default.white
+        view.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
+        view.layer.zPosition = 1
+        return view
+    }()
     
     // MARK: - Gesture
     private lazy var scopeGesture: UIPanGestureRecognizer = {
@@ -122,9 +132,9 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     private func setLayout() {
         self.view.addSubview(headerButton)
         self.headerButton.addSubview(header)
+        self.view.addSubview(borderView)
         self.view.addSubview(calendarContainer)
         self.view.addSubview(scheduleListContainer)
-        self.view.addSubview(borderView)
         
         headerButton.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom).offset(16)
@@ -142,15 +152,15 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             make.height.equalTo(360)
         }
         
-        borderView.snp.makeConstraints { make in
+        scheduleListContainer.snp.makeConstraints { make in
             make.top.equalTo(calendarContainer.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(1)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
-        scheduleListContainer.snp.makeConstraints { make in
-            make.top.equalTo(borderView.snp.bottom)
-            make.horizontalEdges.bottom.equalToSuperview()
+        borderView.snp.makeConstraints { make in
+            make.top.equalTo(calendarContainer)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(calendarContainer).offset(1)
         }
     }
     
@@ -289,18 +299,16 @@ extension CalendarScheduleViewController {
             self.calendarContainer.snp.updateConstraints { make in
                 make.height.equalTo(height)
             }
-            
             self.view.layoutIfNeeded()
         }
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        UIView.animate(withDuration: 0.33) {
+        UIView.animate(withDuration: 0.2) {
+            self.hideScheduleListTableView(scope: scope)
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)
-            self.hideScheduleListTableView(scope: scope)
-            
             self.view.layoutIfNeeded()
         }
     }
@@ -317,15 +325,10 @@ extension CalendarScheduleViewController {
         scheduleListTableView.remakeConstraints(isHide: scope == .month)
     }
     
-    #warning("참고")
-    // 애니메이션 중에는 유저 액션이 차단되는데 이를 허용할 수 있는 옵션이 존재
     private func updateBackgroundColor(scope: ScopeType) {
-        let views: [UIView] = [self.calendarContainer, self.scheduleListContainer, self.borderView]
-        
-        views.forEach {
-            let color = scope == .month ? ColorStyle.Default.white : ColorStyle.BG.primary
-            $0.backgroundColor = color
-        }
+        self.calendarContainer.backgroundColor = scope == .month ? ColorStyle.Default.white : ColorStyle.BG.primary
+        self.scheduleListContainer.backgroundColor = scope == .month ? ColorStyle.Default.white : ColorStyle.BG.primary
+        self.borderView.backgroundColor = scope == .month ? ColorStyle.Default.white : ColorStyle.App.stroke
     }
     
     private func naviItemChange(scope: ScopeType) {

@@ -34,7 +34,8 @@ final class DefaultSheetView: UIView {
         btn.setTitle(text: TextStyle.DatePicker.completedTitle,
                      font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(ColorStyle.App.primary, disabledColor: ColorStyle.Primary.disable)
+        btn.setBgColor(normalColor: ColorStyle.App.primary,
+                       disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(8)
         return btn
     }()

@@ -8,7 +8,9 @@
 import Foundation
 
 struct MeetResponse: Decodable {
-    var meetSummary: MeetSummaryResponse
+    var meetId: Int?
+    var meetName: String?
+    var meetImage: String?
     var sinceDays: Int?
     var creatorId: Int?
     var memberCount: Int?
@@ -19,7 +21,9 @@ extension MeetResponse {
     func toDomain() -> Meet {
         let date = DateManager.parseServerDate(string: lastPlanDay)
         
-        return .init(meetSummary: meetSummary.toDomain(),
+        return .init(meetSummary: .init(id: meetId,
+                                        name: meetName,
+                                        imagePath: meetImage),
                      sinceDays: sinceDays,
                      creatorId: creatorId,
                      memberCount: memberCount,

@@ -14,8 +14,8 @@ final class FetchScheduleMock: FetchSchedule {
         print(#function, #line)
         var scheduleArray = Plan.recentMock()
         
-        for _ in 1...100 {
-            let randomSchedule = Plan.randomeMock()
+        for index in 1...100 {
+            let randomSchedule = Plan.randomeMock(id: index)
             scheduleArray.append(randomSchedule)
         }
         

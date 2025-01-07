@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class MeetListTableViewController: UIViewController, View {
+final class MeetListTableViewController: UIViewController, View, UIScrollViewDelegate {
     
     typealias Reactor = MeetListViewReactor
     var disposeBag = DisposeBag()
@@ -54,7 +54,7 @@ final class MeetListTableViewController: UIViewController, View {
     }
     
     private func setupTableView() {
-        self.tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
+        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(MeetListTableCell.self, forCellReuseIdentifier: MeetListTableCell.reuseIdentifier)
     }
     
@@ -73,11 +73,5 @@ final class MeetListTableViewController: UIViewController, View {
                 cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
-    }
-}
-
-extension MeetListTableViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 152
     }
 }

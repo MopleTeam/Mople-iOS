@@ -9,6 +9,7 @@ import Foundation
 
 enum DateStringFormat {
     case full
+    case dot
     case simple
     case time
 }
@@ -42,6 +43,13 @@ final class DateManager {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy년 MM월 dd일"
+        return formatter
+    }()
+    
+    static let dotDateFormat: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy. MM. dd E"
         return formatter
     }()
 
@@ -151,6 +159,10 @@ extension DateManager {
         return calendar.date(byAdding: .minute, value: +5, to: date) ?? Date()
     }
     
+    static func subtractFiveMinutes(_ date: Date) -> Date {
+        return calendar.date(byAdding: .minute, value: -5, to: date) ?? Date()
+    }
+    
     static func parseServerDate(string: String?) -> Date? {
         guard let string else { return nil }
         return DateManager.serverDateFormatter.date(from: string)
@@ -189,6 +201,8 @@ extension DateManager {
             return DateManager.simpleDateFormatter.string(from: date)
         case .time:
             return addPeriodPrefix(on: date)
+        case .dot:
+            return DateManager.dotDateFormat.string(from: date)
         }
     }
     

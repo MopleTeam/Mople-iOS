@@ -13,9 +13,9 @@ enum TokenError: Error {
 }
 
 enum HTTPHeader {
-    static let acceptAll = ["Accept": "*/*"]
-    static let acceptJson = ["Accept": "application/json"]
-    static let contentJson = ["Content-Type": "application/json"]
+    private static let acceptAll = ["Accept": "*/*"]
+    private static let acceptJson = ["Accept": "application/json"]
+    private static let contentJson = ["Content-Type": "application/json"]
     
     static func getReceiveJsonHeader() -> [String:String] {
         Self.acceptJson
@@ -91,6 +91,13 @@ extension APIEndpoints {
                                               "providerToken": identityToken,
                                               "email": email],
                              responseDecoder: RawDataResponseDecoder())
+    }
+    
+    static func getUserInfo() throws -> Endpoint<UserInfoDTO> {
+        return try Endpoint(path: "user/info",
+                             authenticationType: .accessToken,
+                             method: .get,
+                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 }
 

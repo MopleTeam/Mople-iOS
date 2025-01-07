@@ -56,9 +56,9 @@ final class WeatherView: UIView {
         label.text = "서울 강남구"
         label.font = FontStyle.Body2.medium
         label.textColor = ColorStyle.Gray._04
-        label.textAlignment = .right
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
+        label.textAlignment = .right
         return label
     }()
     

@@ -22,11 +22,17 @@ class BaseButton: UIButton {
         }
     }
     
+    // MARK: - Font Save
     private var defaultFont: UIFont?
-    private var enabledBackColor: UIColor?
-    private var disabledBackColor: UIColor?
+    
+    // MARK: - TextColor Save
     private var normalTextColor: UIColor?
     private var selectedTextColor: UIColor?
+    
+    // MARK: - BackColor Save
+    private var normalBackColor: UIColor?
+    private var selectedBackColor: UIColor?
+    private var disabledBackColor: UIColor?
     
     init() {
         super.init(frame: .zero)
@@ -39,7 +45,7 @@ class BaseButton: UIButton {
     
     private func initialSetup() {
         configuration = .filled()
-        setBgColor(.clear)
+        setBgColor(normalColor: .clear)
     }
 }
 
@@ -61,10 +67,12 @@ extension BaseButton {
         
     }
     
-    public func setBgColor(_ color: UIColor?,
+    public func setBgColor(normalColor: UIColor?,
+                           selectedColor: UIColor? = nil,
                            disabledColor: UIColor? = nil) {
-        configuration?.background.backgroundColor = color
-        enabledBackColor = color
+        configuration?.background.backgroundColor = normalColor
+        normalBackColor = normalColor
+        selectedBackColor = selectedColor
         disabledBackColor = disabledColor
     }
     
@@ -94,15 +102,20 @@ extension BaseButton {
     }
     
     private func setEnabled(_ isEnabled: Bool) {
-        guard let enabledBackColor, let disabledBackColor else { return }
-        configuration?.background.backgroundColor = isEnabled ? enabledBackColor : disabledBackColor
+        guard let normalBackColor, let disabledBackColor else { return }
+        configuration?.background.backgroundColor = isEnabled ? normalBackColor : disabledBackColor
     }
 }
 
 extension BaseButton {
-    public func updateTextColor(isSelected: Bool) {
+    public func updateSelectedTextColor(isSelected: Bool) {
         let changeColor = isSelected ? selectedTextColor : normalTextColor
         setFont(defaultFont, changeColor)
+    }
+    
+    public func updateSelectedBackColor(isSelected: Bool) {
+        let changeColor = isSelected ? selectedBackColor : normalBackColor
+        configuration?.background.backgroundColor = changeColor
     }
 }
 

@@ -22,14 +22,13 @@ final class LabeledButtonView: UIView {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
         label.textColor = ColorStyle.Gray._01
-        label.textAlignment = .left
         return label
     }()
     
     private(set) lazy var button: BaseButton = {
         let btn = BaseButton()
         btn.setButtonAlignment(.left)
-        btn.setBgColor(ColorStyle.BG.input)
+        btn.setBgColor(normalColor: ColorStyle.BG.input)
         btn.setRadius(8)
         btn.setLayoutMargins()
         return btn

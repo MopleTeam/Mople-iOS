@@ -60,8 +60,8 @@ final class SearchResultViewController: UIViewController, View {
     
     private func setupTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
-        self.tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.reuseIdentifier)
-        self.tableView.register(SearchTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SearchTableHeaderView.reuseIdentifier)
+        self.tableView.register(SearchPlaceTableCell.self, forCellReuseIdentifier: SearchPlaceTableCell.reuseIdentifier)
+        self.tableView.register(SearchPlaceTableHeaderView.self, forHeaderFooterViewReuseIdentifier: SearchPlaceTableHeaderView.reuseIdentifier)
     }
     
     func bind(reactor: SearchPlaceReactor) {
@@ -75,13 +75,12 @@ final class SearchResultViewController: UIViewController, View {
             .compactMap({ $0 })
             .filter({ !$0.places.isEmpty })
             .do(onNext: { [weak self] result in
-                print(#function, #line, "#1 캐시데이터 : \(result.isCached)" )
                 self?.isSearchHistory = result.isCached
                 self?.historyCount = result.places.count
             })
             .map({ $0.places })
             .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: SearchTableViewCell.reuseIdentifier, cellType: SearchTableViewCell.self)) { [weak self] index, item, cell in
+            .drive(self.tableView.rx.items(cellIdentifier: SearchPlaceTableCell.reuseIdentifier, cellType: SearchPlaceTableCell.self)) { [weak self] index, item, cell in
                 cell.configure(with: .init(placeInfo: item))
                 cell.selectionStyle = .none
                 cell.shouldShowButton(isEnabled: self?.isSearchHistory ?? false)
@@ -100,7 +99,7 @@ extension SearchResultViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard self.isSearchHistory else { return nil }
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SearchTableHeaderView.reuseIdentifier) as! SearchTableHeaderView
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: SearchPlaceTableHeaderView.reuseIdentifier) as! SearchPlaceTableHeaderView
         header.setCount(historyCount ?? 0)
         return header
     }

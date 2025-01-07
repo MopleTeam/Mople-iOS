@@ -7,6 +7,7 @@
 
 import Foundation
 
+#warning("서버랑 맞추기")
 struct PlanResponse: Decodable {
     let meetId: Int?
     let meetName: String?
@@ -24,6 +25,9 @@ struct PlanResponse: Decodable {
     let weatherIcon: String?
     let temperature: Double?
     let pop: Double?
+    
+    
+    let postUserId: Int?
 }
 
 extension PlanResponse {
@@ -34,10 +38,10 @@ extension PlanResponse {
                      title: planName,
                      date: date,
                      participantCount: planMemberCount,
-                     isParticipating: participant,
+                     isParticipating: participant ?? false,
                      addressTitle: addressTitle,
                      address: address,
-                     meetngSummary: .init(id: meetId,
+                     meet: .init(id: meetId,
                                           name: meetName,
                                           imagePath: meetImage),
                      location: .init(longitude: lot,
@@ -45,6 +49,7 @@ extension PlanResponse {
                      weather: .init(address: weatherAddress,
                                     imagePath: weatherIcon,
                                     temperature: temperature,
-                                    pop: pop))
+                                    pop: pop),
+                     postUserId: postUserId)
     }
 }

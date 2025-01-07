@@ -6,12 +6,28 @@
 //
 
 import UIKit
+import SnapKit
 
 final class DefaultTabBarController: UITabBarController {
+    
+    private let borderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = ColorStyle.App.stroke
+        view.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        return view
+    }()
+    
+    private let mainBackView: UIView = {
+        let view = UIView()
+        view.backgroundColor = ColorStyle.Default.white
+        view.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        return view
+    }()
         
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setTabBar()
     }
     
     override func viewDidLayoutSubviews() {
@@ -20,8 +36,21 @@ final class DefaultTabBarController: UITabBarController {
     }
 
     private func setupUI() {
-        tabBar.backgroundColor = ColorStyle.Default.white
-        tabBar.layer.makeLine(width: 1)
+        self.tabBar.addSubview(borderView)
+        self.tabBar.addSubview(mainBackView)
+        mainBackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        borderView.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(tabBar)
+            make.bottom.equalTo(tabBar)
+            make.top.equalTo(tabBar).offset(-1)
+        }
+    }
+    
+    private func setTabBar() {
+        tabBar.clipsToBounds = false
         tabBar.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         tabBar.layer.makeShadow(opactity: 0.02,
                                 radius: 12)

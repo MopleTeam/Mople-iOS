@@ -72,7 +72,6 @@ final class ProfileViewController: TitleNaviViewController, View {
         label.text = TextStyle.Profile.versionTitle
         label.font = FontStyle.Title3.medium
         label.textColor = ColorStyle.Gray._01
-        label.textAlignment = .left
         return label
     }()
     
@@ -255,13 +254,13 @@ final class ProfileViewController: TitleNaviViewController, View {
 extension ProfileViewController {
     private func setProfile(_ profile: UserInfo) {
         profileNameButton.title = profile.name
-        _ = profileImageView.kfSetimage(profile.thumbnailPath)
+        _ = profileImageView.kfSetimage(profile.imagePath)
     }
 }
 
 extension ProfileViewController {
     public func fetchProfile() {
-        reactor?.action.onNext(.fetchProfile)
+        reactor?.action.onNext(.readUserInfo)
     }
 }
 

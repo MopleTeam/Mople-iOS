@@ -17,7 +17,7 @@ final class DefaultProfileEditRepo: ProfileEditRepo {
     }
 
     func editProfile(nickname: String, imagePath: String?) -> Single<Void> {
-        return networkService.authenticatedRequest { () throws -> Endpoint<Void> in
+        return networkService.authenticatedRequest { 
             try APIEndpoints.setupProfile(nickname: nickname,
                                           imagePath: imagePath)
         }

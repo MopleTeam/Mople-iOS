@@ -13,7 +13,7 @@ import SnapKit
 class DefaultViewController: UIViewController {
 
     // MARK: - Indicator
-    fileprivate let indicator: UIActivityIndicatorView = {
+    private(set) var indicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
         indicator.layer.zPosition = 1

@@ -41,6 +41,7 @@ class SignUpViewReactor: Reactor {
     
     init(socialInfo: SocialInfo,
          signUpUseCase: SignUp,
+         fetchUserInfoUseCase: FetchUserInfo,
          completedAction: SignUpAction) {
         print(#function, #line, "LifeCycle Test SignUp Reactor Created" )
         self.socialInfo = socialInfo

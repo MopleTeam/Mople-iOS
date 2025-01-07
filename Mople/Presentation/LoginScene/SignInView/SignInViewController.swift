@@ -60,7 +60,7 @@ final class SignInViewController: UIViewController, View {
         btn.setImage(image: .kakao,
                         imagePlacement: .leading,
                         contentPadding: 8)
-        btn.setBgColor(ColorStyle.Default.yellow)
+        btn.setBgColor(normalColor: ColorStyle.Default.yellow)
         btn.setRadius(8)
         return btn
     }()
@@ -74,7 +74,7 @@ final class SignInViewController: UIViewController, View {
         btn.setImage(image: .apple,
                         imagePlacement: .leading,
                         contentPadding: 8)
-        btn.setBgColor(ColorStyle.Default.black)
+        btn.setBgColor(normalColor: ColorStyle.Default.black)
         btn.setRadius(8)
         return btn
     }()

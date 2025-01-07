@@ -8,21 +8,15 @@
 import Foundation
 
 struct UserInfoDTO: Decodable {
-    let id: Int?
-    let name: String?
-    let thumbnailPath: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name = "userNickname"
-        case thumbnailPath = "userProfileImgUrl"
-    }
+    let userId: Int?
+    let nickname: String?
+    let image: String?
 }
 
 extension UserInfoDTO {
     func toDomain() -> UserInfo {
-        return .init(id: id,
-                     name: name,
-                     imagePath: thumbnailPath)
+        return .init(id: userId,
+                     name: nickname,
+                     imagePath: image)
     }
 }
