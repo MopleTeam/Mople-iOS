@@ -18,7 +18,7 @@ final class SearchPlaceTableCell: UITableViewCell {
     private let placeIcon: UIImageView = {
         let view = UIImageView()
         view.image = .location
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
         view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         view.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return view

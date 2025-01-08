@@ -11,6 +11,8 @@ protocol DetailMeetSceneDependencies {
     func makeDetailMeetViewController(coordinator: DetailMeetCoordination) -> DetailMeetViewController
     func makeFuturePlanListViewController() -> FuturePlanListViewController
     func makePastPlanListViewController() -> PastPlanListViewController
+    func makeMeetSetupViewController(meet: Meet,
+                                     coordinator: DetailMeetCoordination) -> MeetSetupViewController
 }
 
 final class DetailGroupSceneDIContainer: DetailMeetSceneDependencies {
@@ -63,5 +65,15 @@ extension DetailGroupSceneDIContainer {
     private func makePastPlanListViewReactor() -> PastPlanListViewReactor {
         return .init(fetchReviewUseCase: FetchReviewMock(),
                      meetID: meetId)
+    }
+    
+    func makeMeetSetupViewController(meet: Meet, coordinator: DetailMeetCoordination) -> MeetSetupViewController {
+        return .init(title: "모임 설정",
+                     reactor: makeMeetSetupViewReactor(meet: meet, coordinator: coordinator))
+    }
+    
+    private func makeMeetSetupViewReactor(meet: Meet, coordinator: DetailMeetCoordination) -> MeetSetupViewReactor {
+        return .init(meet: meet,
+                     coordinator: coordinator)
     }
 }

@@ -37,7 +37,6 @@ class DefaultViewController: UIViewController {
     // MARK: - UI Setup
     private func initialsetup() {
         setupUI()
-        setNavigation()
     }
     
     private func setupUI() {
@@ -47,11 +46,6 @@ class DefaultViewController: UIViewController {
         indicator.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-    }
-    
-    private func setNavigation() {
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        navigationController?.interactivePopGestureRecognizer?.delegate = nil
     }
 }
 

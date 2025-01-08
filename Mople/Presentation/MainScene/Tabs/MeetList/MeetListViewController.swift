@@ -11,31 +11,33 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-class MeetListViewController: TitleNaviViewController, View {
+class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
     
     typealias Reactor = MeetListViewReactor
     
     var disposeBag = DisposeBag()
-
-    private let emptyView: DefaultEmptyView = {
-        let view = DefaultEmptyView()
-        view.setTitle(text: TextStyle.GroupList.emptyTitle)
-        view.setImage(image: .emptyGroup)
-        return view
-    }()
-
-    private let groupTableContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = ColorStyle.BG.primary
-        view.clipsToBounds = true
-        return view
-    }()
-    
-    private lazy var meetTableView = MeetListTableViewController(reactor: reactor!)
     
     private let borderView: UIView = {
         let view = UIView()
         view.layer.makeLine(width: 1)
+        return view
+    }()
+    
+    private let tableView: UITableView = {
+        let table = UITableView()
+        table.separatorStyle = .none
+        table.backgroundColor = ColorStyle.BG.primary
+        table.showsVerticalScrollIndicator = false
+        table.contentInset = .init(top: 28, left: 0, bottom: 10, right: 0)
+        table.clipsToBounds = true
+        return table
+    }()
+    
+    private let emptyView: DefaultEmptyView = {
+        let view = DefaultEmptyView()
+        view.backgroundColor = ColorStyle.BG.primary
+        view.setTitle(text: TextStyle.GroupList.emptyTitle)
+        view.setImage(image: .emptyGroup)
         return view
     }()
     
@@ -56,48 +58,67 @@ class MeetListViewController: TitleNaviViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        addScheduleListCollectionView()
+        initalSetup()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         print(#function, #line)
     }
+    
+    private func initalSetup() {
+        setLayout()
+        setupTableView()
+    }
 
-    func setupUI() {
-        self.view.addSubview(groupTableContainerView)
+    private func setLayout() {
+        self.view.addSubview(tableView)
         self.view.addSubview(borderView)
-        
-        self.groupTableContainerView.addSubview(emptyView)
-
-        groupTableContainerView.snp.makeConstraints { make in
-            make.top.equalTo(titleViewBottom)
-            make.bottom.horizontalEdges.equalToSuperview()
-        }
-        
-        emptyView.snp.makeConstraints { make in
-            make.center.equalTo(self.view)
-        }
+        self.view.addSubview(emptyView)
         
         borderView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(1)
         }
+
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(borderView.snp.bottom)
+            make.bottom.horizontalEdges.equalToSuperview()
+        }
+        
+        emptyView.snp.makeConstraints { make in
+            make.top.equalTo(borderView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+        }
     }
     
-    private func addScheduleListCollectionView() {
-        add(child: meetTableView, container: groupTableContainerView)
+    private func setupTableView() {
+        tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
+        self.tableView.register(MeetListTableCell.self, forCellReuseIdentifier: MeetListTableCell.reuseIdentifier)
     }
     
     func bind(reactor: MeetListViewReactor) {
+        tableView.rx.itemSelected
+            .map({ Reactor.Action.selectMeet(index: $0.row) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$meetList)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, groupList in
                 vc.emptyView.isHidden = !groupList.isEmpty
-                vc.meetTableView.view.isHidden = groupList.isEmpty
+                vc.tableView.isHidden = groupList.isEmpty
             })
+            .disposed(by: disposeBag)
+
+        reactor.pulse(\.$meetList)
+            .asDriver(onErrorJustReturn: [])
+            .drive(self.tableView.rx.items(cellIdentifier: MeetListTableCell.reuseIdentifier, cellType: MeetListTableCell.self)) { index, item, cell in
+                cell.configure(with: .init(meet: item))
+                cell.selectionStyle = .none
+            }
             .disposed(by: disposeBag)
     }
 }

@@ -134,6 +134,11 @@ final class DetailMeetViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        self.naviBar.rightItemEvent
+            .map { Reactor.Action.pushMeetSetupView }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         [self.segment.rx.nextTap, self.segment.rx.previousTap].forEach({
             $0.map({ Reactor.Action.switchPage(isFuture: $0)
             })

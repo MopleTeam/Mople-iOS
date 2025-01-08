@@ -9,12 +9,16 @@ import UIKit
 import ReactorKit
 import Kingfisher
 
-final class HomeViewController: UIViewController, View {
+final class HomeViewController: DefaultViewController, View {
  
     typealias Reactor = HomeViewReactor
     
     var disposeBag = DisposeBag()
     
+    // MARK: - Manager
+    private let alertManager = AlertManager.shared
+    
+    // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
@@ -52,16 +56,6 @@ final class HomeViewController: UIViewController, View {
     private let recentPlanContainerView = UIView()
     
     private lazy var resentPlanCollectionView = HomePlanCollectionViewController(reactor: reactor!)
-    
-    #warning("configure")
-    private let emptyDataView: UILabel = {
-        let label = UILabel()
-        label.text = "빈 화면"
-        label.textAlignment = .center
-        label.layer.cornerRadius = 12
-        label.clipsToBounds = true
-        return label
-    }()
     
     private let makeMeetButton: CardButton = {
         let btn = CardButton()
@@ -108,8 +102,7 @@ final class HomeViewController: UIViewController, View {
     
     init(reactor: HomeViewReactor) {
         print(#function, #line, "LifeCycle Test HomeView Created" )
-
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
     }
     
@@ -138,7 +131,6 @@ final class HomeViewController: UIViewController, View {
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
-        self.recentPlanContainerView.addSubview(emptyDataView)
         
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -160,11 +152,6 @@ final class HomeViewController: UIViewController, View {
         
         notifyButton.snp.makeConstraints { make in
             make.width.height.greaterThanOrEqualTo(40)
-        }
-        
-        emptyDataView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.leading.trailing.equalToSuperview().inset(20)
         }
     }
     
@@ -188,13 +175,10 @@ final class HomeViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$plans)
-                .asDriver(onErrorJustReturn: [])
-                .drive(with: self, onNext: { vc, schedules in
-                    vc.emptyDataView.isHidden = !schedules.isEmpty
-                    vc.recentPlanContainerView.isHidden = schedules.isEmpty
-                })
-                .disposed(by: disposeBag)
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
     }
 }
 

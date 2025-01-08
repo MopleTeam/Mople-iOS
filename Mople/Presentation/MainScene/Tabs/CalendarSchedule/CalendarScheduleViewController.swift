@@ -304,7 +304,7 @@ extension CalendarScheduleViewController {
     }
     
     private func updateMainView(_ scope: ScopeType) {
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.33) {
             self.hideScheduleListTableView(scope: scope)
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
@@ -322,7 +322,7 @@ extension CalendarScheduleViewController {
     }
     
     private func hideScheduleListTableView(scope: ScopeType) {
-        scheduleListTableView.remakeConstraints(isHide: scope == .month)
+        scheduleListTableView.updateConstraints(isHide: scope == .month)
     }
     
     private func updateBackgroundColor(scope: ScopeType) {
@@ -353,6 +353,8 @@ extension CalendarScheduleViewController {
         self.presentEventObserver.accept(lastRecentDate)
     }
     
+    #warning("홈화면에서 캘린더로 넘어올 때 테이블뷰가 윈도우에 추가되지 않은 경우 아래에 표시된 에러 발생")
+    #warning("현재는 기본 로딩이 끝난 뒤 체크하는 중 차후에 로딩이 발생하면 다시 실행됨")
     /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
     private func checkIsPresent(_ isLoading: Bool) {
         guard !isLoading,
@@ -368,9 +370,7 @@ extension CalendarScheduleViewController {
 }
 
 
-// 홈에서 데이터가 넘어오면 리액터로 전달
-// 홈에서 아직 데이터를 받고 있다면 데이터가 다 받아진 다음 전달
-//
+// Warning once only: UITableView was told to layout its visible cells and other contents without being in the view hierarchy (the table view or one of its superviews has not been added to a window). This may cause bugs by forcing views inside the table view to load and perform layout without accurate information (e.g. table view bounds, trait collection, layout margins, safe area insets, etc), and will also cause unnecessary performance overhead due to extra layout passes. Make a symbolic breakpoint at UITableViewAlertForLayoutOutsideViewHierarchy to catch this in the debugger and see what caused this to occur, so you can avoid this action altogether if possible, or defer it until the table view has been added to a window. Table view: <UITableView: 0x10e022a00; frame = (0 0; 375 314); clipsToBounds = YES; gestureRecognizers = <NSArray: 0x30304b930>; animations = { bounds.size=<CABasicAnimation: 0x303abeda0>; position=<CABasicAnimation: 0x303abee20>; }; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <CALayer: 0x303e6b420>; contentOffset: {0, 0}; contentSize: {375, 6868.3333352406862}; adjustedContentInset: {0, 0, 83, 0}; dataSource: <RxCocoa.RxTableViewDataSourceProxy: 0x301aac660>>
 
 
 

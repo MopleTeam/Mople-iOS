@@ -8,6 +8,20 @@
 import Foundation
 import ReactorKit
 
+enum SearchError: Error {
+    case emptyQuery
+    case unkonwnError
+    
+    var info: String {
+        switch self {
+        case .emptyQuery:
+            return "검색어를 입력해주세요."
+        case .unkonwnError:
+            return "잠시 후 다시 시도해주세요."
+        }
+    }
+}
+
 final class SearchPlaceReactor: Reactor {
     
     struct PlaceSearchResult {
@@ -27,10 +41,12 @@ final class SearchPlaceReactor: Reactor {
     enum Mutation {
         case updatePlace(_ result: PlaceSearchResult)
         case notifyLoadingState(_ isLoading: Bool)
+        case handleSearchError(error: SearchError?)
     }
     
     struct State {
         @Pulse var searchResult: PlaceSearchResult?
+        @Pulse var error: SearchError?
         @Pulse var isLoading: Bool = false
     }
     
@@ -80,6 +96,8 @@ final class SearchPlaceReactor: Reactor {
         switch mutation {
         case let .updatePlace(result):
             newState.searchResult = result
+        case let .handleSearchError(err):
+            newState.error = err
         case let .notifyLoadingState(isLoading):
             newState.isLoading = isLoading
        
@@ -99,7 +117,9 @@ extension SearchPlaceReactor {
     
     private func searchLocation(query: String?) -> Observable<Mutation> {
         
-        guard let query else { return .empty() }
+        guard let query, !query.isEmpty else {
+            return .just(.handleSearchError(error: SearchError.emptyQuery))
+        }
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         

@@ -10,6 +10,12 @@ import CoreLocation
 import ReactorKit
 
 final class HomeViewReactor: Reactor {
+    
+    enum HomeError: Error {
+        
+    }
+    
+    
     enum Action {
         case checkNotificationPermission
         case createGroup
@@ -23,10 +29,14 @@ final class HomeViewReactor: Reactor {
         case presentCreateGroupView
         case presentCreatePlanView
         case responseRecentPlan(schedules: HomeModel)
+        case notifyLoadingState(_ isLoading: Bool)
+        case handleHomeError(error: HomeError?)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
+        @Pulse var error: HomeError?
+        @Pulse var isLoading: Bool = false
     }
     
     private let fetchRecentScheduleUseCase: FetchRecentPlan
@@ -79,6 +89,10 @@ final class HomeViewReactor: Reactor {
             coordinator.presentCreateGroupView()
         case .presentCreatePlanView:
             coordinator.presentCreatePlanScene()
+        case let .handleHomeError(err):
+            newState.error = err
+        case let .notifyLoadingState(isLoading):
+            newState.isLoading = isLoading
         }
         return newState
     }
@@ -94,7 +108,31 @@ final class HomeViewReactor: Reactor {
     
 
 extension HomeViewReactor {
+
+    private func fetchRecentSchedules() -> Observable<Mutation> {
+        
+        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
+        
+        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentPlan()
+            .asObservable()
+            .map { Mutation.responseRecentPlan(schedules: $0) }
+        
+        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
+        
+        return Observable.concat([loadingStart,
+                                  fetchSchedules,
+                                  loadingStop])
+    }
     
+    private func presentNextEvent() -> Observable<Mutation> {
+        guard !currentState.plans.isEmpty,
+              let lastDate = currentState.plans.last?.date else { return Observable.empty() }
+        let startOfDay = DateManager.startOfDay(lastDate)
+        return .just(.presentCalendar(date: startOfDay))
+    }
+}
+
+extension HomeViewReactor {
     private func checkNotificationPermission() -> Observable<Mutation> {
         
         let notificationCenter = UNUserNotificationCenter.current()
@@ -102,11 +140,11 @@ extension HomeViewReactor {
             switch setting.authorizationStatus {
             case .authorized:
                 self?.requestRefreshFCMTokenUseCase.refreshFCMToken()
-                self?.test()
+                self?.requestLocationPermission()
             case .notDetermined:
                 self?.requestNotificationPermission(notificationCenter)
             default:
-                self?.test()
+                self?.requestLocationPermission()
             }
         }
         
@@ -118,7 +156,7 @@ extension HomeViewReactor {
     private func requestNotificationPermission(_ center: UNUserNotificationCenter) {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] (granted, error) in
             self?.registerForRemoteNotifications()
-            self?.test()
+            self?.requestLocationPermission()
             print(#function, #line, "#10 : \(granted)" )
         }
     }
@@ -130,7 +168,7 @@ extension HomeViewReactor {
         }
     }
     
-    private func test() {
+    private func requestLocationPermission() {
         let locationManager = CLLocationManager()
         switch locationManager.authorizationStatus {
         case .notDetermined:
@@ -138,21 +176,5 @@ extension HomeViewReactor {
         default:
             break
         }
-    }
-    
-    private func fetchRecentSchedules() -> Observable<Mutation> {
-        
-        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentPlan()
-            .asObservable()
-            .map { Mutation.responseRecentPlan(schedules: $0) }
-        
-        return fetchSchedules
-    }
-    
-    private func presentNextEvent() -> Observable<Mutation> {
-        guard !currentState.plans.isEmpty,
-              let lastDate = currentState.plans.last?.date else { return Observable.empty() }
-        let startOfDay = DateManager.startOfDay(lastDate)
-        return .just(.presentCalendar(date: startOfDay))
     }
 }

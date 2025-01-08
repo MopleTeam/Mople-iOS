@@ -54,8 +54,8 @@ final class HomePlanCollectionCell: UICollectionViewCell {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.layer.cornerRadius = 12
         sv.backgroundColor = ColorStyle.Default.white
+        sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
         return sv
@@ -77,7 +77,6 @@ final class HomePlanCollectionCell: UICollectionViewCell {
     }
     
     private func setLayout() {
-        self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
 
         mainStackView.snp.makeConstraints { make in

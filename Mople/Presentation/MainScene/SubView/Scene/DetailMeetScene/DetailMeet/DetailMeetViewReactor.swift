@@ -13,6 +13,7 @@ final class DetailMeetViewReactor: Reactor {
     enum Action {
         case requestMeetInfo(id: Int)
         case switchPage(isFuture: Bool)
+        case pushMeetSetupView
         case futurePlanLoading(_ isLoading: Bool)
         case pastPlanLoading(_ isLoading: Bool)
         case endFlow
@@ -63,6 +64,8 @@ final class DetailMeetViewReactor: Reactor {
             return .just(.notifyFuturePlanLoading(isLoading))
         case let .pastPlanLoading(isLoading):
             return .just(.notifyPastPlanLoading(isLoading))
+        case .pushMeetSetupView:
+            return pushMeetSetupView()
         case .endFlow:
             coordinator?.endFlow()
             return .empty()
@@ -106,3 +109,10 @@ extension DetailMeetViewReactor {
     }
 }
 
+extension DetailMeetViewReactor {
+    private func pushMeetSetupView() -> Observable<Mutation> {
+        guard let meet = currentState.meet else { return .empty() }
+        coordinator?.pushMeetSetupView(meet: meet)
+        return .empty()
+    }
+}

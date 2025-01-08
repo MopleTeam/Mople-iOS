@@ -20,6 +20,8 @@ class DefaultEmptyView: UIView {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
         label.textColor = ColorStyle.Gray._06
+        label.textAlignment = .center
+        label.numberOfLines = 2
         return label
     }()
     
@@ -31,24 +33,26 @@ class DefaultEmptyView: UIView {
         return sv
     }()
     
-    init() {
+    init(imageSize: CGSize = .init(width: 80, height: 80)) {
         super.init(frame: .zero)
-        setupUI()
+        setupUI(imageSize: imageSize)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupUI() {
+    private func setupUI(imageSize: CGSize) {
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.center.equalToSuperview()
+            make.size.lessThanOrEqualToSuperview()
         }
         
         imageView.snp.makeConstraints { make in
-            make.size.equalTo(80)
+            make.width.lessThanOrEqualTo(imageSize.width)
+            make.height.lessThanOrEqualTo(imageSize.height)
         }
     }
 }
@@ -60,5 +64,9 @@ extension DefaultEmptyView {
     
     public func setImage(image: UIImage?) {
         imageView.image = image
+    }
+    
+    public func hideContent(_ isHidden: Bool) {
+        mainStackView.isHidden = isHidden
     }
 }

@@ -44,7 +44,7 @@ final class CalendarPlanTableViewController: UIViewController, View {
         let view = DefaultEmptyView()
         view.setTitle(text: TextStyle.Calendar.emptyTitle)
         view.setImage(image: .emptyPlan)
-        view.clipsToBounds = true
+        view.hideContent(true)
         return view
     }()
     
@@ -82,10 +82,12 @@ final class CalendarPlanTableViewController: UIViewController, View {
         self.view.backgroundColor = .clear
         view.addSubview(tableView)
         view.addSubview(emptyPlanView)
-
+        
+        tableView.snp.makeConstraints(hideTableView(_:))
+        
         emptyPlanView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.height.width.lessThanOrEqualTo(self.view)
+            make.verticalEdges.equalTo(self.view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalToSuperview()
         }
     }
     
@@ -217,25 +219,19 @@ extension CalendarPlanTableViewController {
 
 // MARK: - 테이블 뷰 화면 표시
 extension CalendarPlanTableViewController {
-    public func remakeConstraints(isHide: Bool) {
-        if !tableView.isHidden {
+    public func updateConstraints(isHide: Bool) {
+        if tableView.isHidden == false {
             remakeTableView(isHide)
         } else {
-            remakeEmptyView(isHide)
+            emptyPlanView.hideContent(isHide)
         }
     }
     
     private func remakeTableView(_ isHide: Bool) {
-        guard !tableView.isHidden else { return }
-        tableView.snp.remakeConstraints(isHide ? hideView(_:) : showTableView(_:))
+        tableView.snp.remakeConstraints(isHide ? hideTableView(_:) : showTableView(_:))
     }
     
-    private func remakeEmptyView(_ isHide: Bool) {
-        guard !emptyPlanView.isHidden else { return }
-        emptyPlanView.snp.remakeConstraints(isHide ? hideView(_:) : showEmptyView(_:))
-    }
-    
-    private func hideView(_ make: ConstraintMaker) {
+    private func hideTableView(_ make: ConstraintMaker) {
         make.horizontalEdges.equalToSuperview()
         make.bottom.equalToSuperview()
         make.top.equalTo(self.view.snp.bottom)
@@ -243,12 +239,6 @@ extension CalendarPlanTableViewController {
     
     private func showTableView(_ make: ConstraintMaker) {
         make.edges.equalToSuperview()
-    }
-    
-    private func showEmptyView(_ make: ConstraintMaker) {
-        make.horizontalEdges.equalToSuperview()
-        make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-        make.top.equalTo(self.view.snp.top)
     }
 }
 

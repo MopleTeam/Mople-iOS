@@ -45,7 +45,7 @@ final class ThumbnailTitleView: UIView {
     private lazy var arrowImage: UIImageView = {
         let view = UIImageView()
         view.image = .listArrow
-        view.contentMode = .scaleAspectFit
+        view.contentMode = .scaleAspectFill
         return view
     }()
     

@@ -25,6 +25,13 @@ final class MeetListTableViewController: UIViewController, View, UIScrollViewDel
         return table
     }()
     
+    private let emptyView: DefaultEmptyView = {
+        let view = DefaultEmptyView()
+        view.setTitle(text: TextStyle.GroupList.emptyTitle)
+        view.setImage(image: .emptyGroup)
+        return view
+    }()
+    
     init(reactor: MeetListViewReactor) {
         print(#function, #line, "LifeCycle Test GroupList TableView Created" )
         super.init(nibName: nil, bundle: nil)
@@ -59,19 +66,6 @@ final class MeetListTableViewController: UIViewController, View, UIScrollViewDel
     }
     
     func bind(reactor: MeetListViewReactor) {
-        tableView.rx.itemSelected
-            .map({ Reactor.Action.selectMeet(index: $0.row) })
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$meetList)
-            .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: MeetListTableCell.reuseIdentifier, cellType: MeetListTableCell.self)) { index, item, cell in
-
-                cell.configure(with: .init(meet: item))
-                
-                cell.selectionStyle = .none
-            }
-            .disposed(by: disposeBag)
+      
     }
 }

@@ -9,6 +9,8 @@ import UIKit
 
 protocol DetailMeetCoordination: AnyObject {
     func swicthPlanListPage(isFuture: Bool)
+    func pushMeetSetupView(meet: Meet)
+    func popView()
     func endFlow()
 }
 
@@ -44,6 +46,7 @@ final class DetailMeetSceneCoordinator: BaseCoordinator, DetailMeetCoordination 
     }
 }
 
+// MARK: - PageControl Setup
 extension DetailMeetSceneCoordinator {
     func swicthPlanListPage(isFuture: Bool) {
         guard let vc = isFuture ? futurePlanListVC : pastPlanListVC,
@@ -53,6 +56,22 @@ extension DetailMeetSceneCoordinator {
         let direction: UIPageViewController.NavigationDirection = isFuture ? .reverse : .forward
         
         self.detailMeetVC?.pageController.setViewControllers([vc], direction: direction, animated: true)
+    }
+}
+
+// MARK: - Push View
+extension DetailMeetSceneCoordinator {
+    func pushMeetSetupView(meet: Meet) {
+        let vc = dependencies.makeMeetSetupViewController(meet: meet,
+                                                          coordinator: self)
+        self.navigationController.pushViewController(vc, animated: true)
+    }
+}
+
+// MARK: - Pop View
+extension DetailMeetSceneCoordinator {
+    func popView() {
+        self.navigationController.popViewController(animated: true)
     }
 }
 

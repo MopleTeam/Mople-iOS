@@ -45,6 +45,7 @@ struct FontStyle {
     }
     
     enum Body1 {
+        static let bold: UIFont = .pretendard(type: .bold, size: Size.body1)
         static let semiBold: UIFont = .pretendard(type: .semiBold, size: Size.body1)
         static let medium: UIFont = .pretendard(type: .medium, size: Size.body1)
         static let regular: UIFont = .pretendard(type: .regular, size: Size.body1)

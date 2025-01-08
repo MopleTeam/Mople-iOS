@@ -9,8 +9,6 @@ import UIKit
 import RxSwift
 import ReactorKit
 
-
-
 final class ProfileViewController: TitleNaviViewController, View {
     typealias Reactor = ProfileViewReactor
     
@@ -40,7 +38,6 @@ final class ProfileViewController: TitleNaviViewController, View {
         btn.setTitle(font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Gray._01)
         btn.setImage(image: .editPan)
-        btn.setLayoutMargins(inset: .zero)
         return btn
     }()
 

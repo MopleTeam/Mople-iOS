@@ -27,9 +27,18 @@ final class HomePlanCollectionViewController: UIViewController, View {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = .clear
         return collectionView
+    }()
+    
+    private let emptyPlanView: DefaultEmptyView = {
+        let emptyView = DefaultEmptyView(imageSize: .init(width: 100, height: 100))
+        emptyView.setTitle(text: "새로운 일정을 추가하고\n관리해보세요")
+        emptyView.setImage(image: .emptyHomePlan)
+        emptyView.backgroundColor = ColorStyle.Default.white
+        emptyView.layer.cornerRadius = 12
+        return emptyView
     }()
     
     // MARK: - LifeCycle
@@ -61,9 +70,15 @@ final class HomePlanCollectionViewController: UIViewController, View {
     // MARK: - UI Setup
     private func setupUI() {
         view.addSubview(collectionView)
+        view.addSubview(emptyPlanView)
         
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        emptyPlanView.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
         }
     }
     
@@ -112,6 +127,14 @@ final class HomePlanCollectionViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$plans)
+                .asDriver(onErrorJustReturn: [])
+                .drive(with: self, onNext: { vc, schedules in
+                    vc.emptyPlanView.isHidden = !schedules.isEmpty
+                    vc.collectionView.isHidden = schedules.isEmpty
+                })
+                .disposed(by: disposeBag)
     }
 }
 
