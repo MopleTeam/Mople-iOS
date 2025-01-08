@@ -35,7 +35,7 @@
 		5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */; };
 		5214F8802D2BA97F00E8CE9C /* FuturePlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87F2D2BA97F00E8CE9C /* FuturePlanTableCell.swift */; };
 		5214F8822D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift */; };
-		5214F8862D2BAE5500E8CE9C /* FuturePlanTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8852D2BAE5500E8CE9C /* FuturePlanTableHeaderView.swift */; };
+		5214F8862D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8852D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift */; };
 		5214F8892D2BB08500E8CE9C /* FuturePlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8882D2BB08500E8CE9C /* FuturePlanListViewReactor.swift */; };
 		5214F88C2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */; };
 		5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */; };
@@ -314,7 +314,7 @@
 		5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanCollectionCellViewModel.swift; sourceTree = "<group>"; };
 		5214F87F2D2BA97F00E8CE9C /* FuturePlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanTableCell.swift; sourceTree = "<group>"; };
 		5214F8812D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanTableCellModel.swift; sourceTree = "<group>"; };
-		5214F8852D2BAE5500E8CE9C /* FuturePlanTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanTableHeaderView.swift; sourceTree = "<group>"; };
+		5214F8852D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableHeaderView.swift; sourceTree = "<group>"; };
 		5214F8882D2BB08500E8CE9C /* FuturePlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanListViewReactor.swift; sourceTree = "<group>"; };
 		5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetFuturePlan.swift; sourceTree = "<group>"; };
 		5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetFuturePlanMock.swift; sourceTree = "<group>"; };
@@ -788,7 +788,7 @@
 		5214F8842D2BAE3E00E8CE9C /* HeaderView */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8852D2BAE5500E8CE9C /* FuturePlanTableHeaderView.swift */,
+				5214F8852D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift */,
 			);
 			path = HeaderView;
 			sourceTree = "<group>";
@@ -2467,7 +2467,7 @@
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* CardButton.swift in Sources */,
 				52C5200C2D0D6A550085F5F7 /* MeetSelectViewController.swift in Sources */,
-				5214F8862D2BAE5500E8CE9C /* FuturePlanTableHeaderView.swift in Sources */,
+				5214F8862D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift in Sources */,
 				52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */,
 				527DBE2F2CE8965A008BB20E /* CreateMeetViewController.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,

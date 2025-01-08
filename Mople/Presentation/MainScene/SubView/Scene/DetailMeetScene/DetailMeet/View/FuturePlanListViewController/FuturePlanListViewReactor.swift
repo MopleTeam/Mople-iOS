@@ -106,10 +106,8 @@ extension FutruePlanListViewReactor {
                 guard let self = self else { throw AppError.unknownError }
                 
                 if isJoining {
-                    print(#function, #line, "불참 요청 : \(planId)" )
                     return self.requestJoinPlanUseCase.requestJoinPlan(planId: planId)
                 } else {
-                    print(#function, #line, "참석 요청 : \(planId)" )
                     return self.requestLeavePlanUseCase.requstLeavePlan(planId: planId)
                 }
             }

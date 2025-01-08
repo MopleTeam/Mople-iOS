@@ -15,7 +15,7 @@ final class FetchReviewMock: FetchMeetReview {
     
     func fetchReview(meetId: Int) -> Single<[Review]> {
         return Observable.just(getReviews())
-            .delay(.seconds(5), scheduler: MainScheduler.instance)
+            .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()
     }
     

@@ -130,4 +130,9 @@ extension PastPlanListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        guard scrollView.contentOffset.y < -60 else { return }
+        reactor?.action.onNext(.requestReviewList)
+    }
 }

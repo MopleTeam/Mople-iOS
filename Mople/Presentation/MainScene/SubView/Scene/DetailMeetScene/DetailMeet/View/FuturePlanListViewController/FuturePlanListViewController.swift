@@ -30,7 +30,7 @@ final class FuturePlanListViewController: UIViewController, View {
         table.tableHeaderView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
         return table
     }()
-    
+        
     private let emptyPlanView: DefaultEmptyView = {
         let view = DefaultEmptyView()
         view.setTitle(text: TextStyle.Calendar.emptyTitle)
@@ -142,6 +142,11 @@ extension FuturePlanListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
+    }
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        guard scrollView.contentOffset.y < -60 else { return }
+        reactor?.action.onNext(.requestPlanList)
     }
 }
 
