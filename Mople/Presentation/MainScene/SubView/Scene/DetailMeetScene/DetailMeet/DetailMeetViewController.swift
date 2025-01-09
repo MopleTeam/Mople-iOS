@@ -34,8 +34,8 @@ final class DetailMeetViewController: TitleNaviViewController, View {
         return view
     }()
     
-    private let segment:CustomSegmentedControl = {
-        let segControl = CustomSegmentedControl()
+    private let segment:DefaultSegmentedControl = {
+        let segControl = DefaultSegmentedControl()
         return segControl
     }()
     

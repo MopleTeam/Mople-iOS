@@ -9,6 +9,6 @@ import Foundation
 
 extension HomeModel {
     static func mock() -> Self {
-        return .init(plans: Plan.recentMock(), hasMeet: Bool.random())
+        return .init(plans: Plan.recentMock(), hasMeet: false)
     }
 }

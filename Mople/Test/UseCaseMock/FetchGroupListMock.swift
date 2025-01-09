@@ -19,9 +19,9 @@ final class FetchGroupListMock: FetchMeetListUseCase {
     private func getMockData() -> [Meet] {
         
         var list = (1...5).map { index in
-            Meet.mock(id: index)
+            Meet.mock(id: index, creatorId: index)
         }
-        list.append(.mock(id: 103))
+        list.append(.mock(id: 103, creatorId: 103))
         return list
     }
     

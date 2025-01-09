@@ -261,16 +261,7 @@ final class ProfileSetupViewController: UIViewController, View {
             })
             .disposed(by: disposeBag)
     }
-    
-    // 이미지 변경
-    private func setEditImageBind() {
-        imageObserver
-            .map({ $0 ?? .defaultIProfile })
-            .asDriver(onErrorJustReturn: .defaultIProfile)
-            .drive(profileImageView.rx.image)
-            .disposed(by: disposeBag)
-    }
-    
+        
     private func setEditNameBind() {
         nameView.textField.rx.editEvent
             .asDriver(onErrorJustReturn: ())
@@ -282,6 +273,15 @@ final class ProfileSetupViewController: UIViewController, View {
             .drive(with: self, onNext: { vc, isChanged in
                 vc.duplicateButton.rx.isEnabled.onNext(isChanged)
             })
+            .disposed(by: disposeBag)
+    }
+    
+    // 이미지 변경
+    private func setEditImageBind() {
+        imageObserver
+            .map({ $0 ?? .meet })
+            .asDriver(onErrorJustReturn: .meet)
+            .drive(profileImageView.rx.image)
             .disposed(by: disposeBag)
     }
 

@@ -9,13 +9,12 @@ import UIKit
 import CoreLocation
 import ReactorKit
 
+enum HomeError: Error {
+    case emptyMeet
+}
+
 final class HomeViewReactor: Reactor {
-    
-    enum HomeError: Error {
-        
-    }
-    
-    
+
     enum Action {
         case checkNotificationPermission
         case createGroup
@@ -35,6 +34,7 @@ final class HomeViewReactor: Reactor {
     
     struct State {
         @Pulse var plans: [Plan] = []
+        @Pulse var hasMeet: Bool = false
         @Pulse var error: HomeError?
         @Pulse var isLoading: Bool = false
     }
@@ -63,15 +63,15 @@ final class HomeViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .requestRecentPlan:
-            return fetchRecentSchedules()
+            fetchRecentSchedules()
         case .createGroup:
-            return .just(.presentCreateGroupView)
-        case .presentCalendaer:
-            return presentNextEvent()
-        case .checkNotificationPermission:
-            return checkNotificationPermission()
+            presentMeetCreateView()
         case .createPlan:
-            return .just(.presentCreatePlanView)
+            presentPlanCreateView()
+        case .presentCalendaer:
+            presentNextEvent()
+        case .checkNotificationPermission:
+            checkNotificationPermission()
         }
     }
     
@@ -82,6 +82,7 @@ final class HomeViewReactor: Reactor {
         switch mutation {
         case .responseRecentPlan(let homeModel):
             let recentSchedules = homeModel.plans.sorted(by: <)
+            newState.hasMeet = homeModel.hasMeet
             newState.plans = recentSchedules
         case .presentCalendar(let date):
             coordinator.pushCalendarView(lastRecentDate: date)
@@ -108,7 +109,6 @@ final class HomeViewReactor: Reactor {
     
 
 extension HomeViewReactor {
-
     private func fetchRecentSchedules() -> Observable<Mutation> {
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
@@ -124,14 +124,31 @@ extension HomeViewReactor {
                                   loadingStop])
     }
     
+    
+}
+
+// MARK: - Flow
+extension HomeViewReactor {
     private func presentNextEvent() -> Observable<Mutation> {
         guard !currentState.plans.isEmpty,
-              let lastDate = currentState.plans.last?.date else { return Observable.empty() }
+              let lastDate = currentState.plans.last?.date else { return .empty() }
         let startOfDay = DateManager.startOfDay(lastDate)
         return .just(.presentCalendar(date: startOfDay))
     }
+    
+    private func presentMeetCreateView() -> Observable<Mutation> {
+        coordinator.presentCreateGroupView()
+        return .empty()
+    }
+    
+    private func presentPlanCreateView() -> Observable<Mutation> {
+        guard currentState.hasMeet else { return .just(.handleHomeError(error: .emptyMeet)) }
+        coordinator.presentCreatePlanScene()
+        return .empty()
+    }
 }
 
+// MARK: - Premission
 extension HomeViewReactor {
     private func checkNotificationPermission() -> Observable<Mutation> {
         

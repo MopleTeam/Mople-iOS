@@ -16,7 +16,7 @@ final class HomeViewController: DefaultViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Manager
-    private let alertManager = AlertManager.shared
+    private let alertManager = TestAlertManager.shared
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -179,6 +179,38 @@ final class HomeViewController: DefaultViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleError(_ err: HomeError) {
+        switch err {
+        case .emptyMeet:
+            self.showEmptyMeetAlert()
+        }
+    }
+}
+
+extension HomeViewController {
+    private func showEmptyMeetAlert() {
+        let action: DefaultAction = .init(text: "모임 생성하기",
+                                          completion: makeMeet,
+                                          tintColor: ColorStyle.Default.white,
+                                          bgColor: ColorStyle.App.primary)
+        
+        alertManager.showAlert(title: "아직 소속된 모임이 없어요",
+                                   subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
+                                   addAction: [action])
+    }
+    
+    private func makeMeet() {
+        reactor?.action.onNext(.createGroup)
     }
 }
 

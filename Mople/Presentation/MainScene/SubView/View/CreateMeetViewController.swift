@@ -53,8 +53,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     
     private let thumnailView: UIImageView = {
         let imageView = UIImageView()
-//        imageView.image = .defaultIProfile
-        imageView.backgroundColor = .systemMint
+        imageView.image = .meet
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
         imageView.clipsToBounds = true
@@ -239,9 +238,9 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     // MARK: - Observer Setup
     private func setObserver() {
         imageObserver
-            .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: .defaultIProfile)
-            .drive(thumnailView.rx.image)
+            .map({ $0 ?? .meet })
+            .asDriver(onErrorJustReturn: .meet)
+            .drive(self.thumnailView.rx.image)
             .disposed(by: disposeBag)
     }
 }
@@ -258,7 +257,18 @@ extension CreateMeetViewController {
 // MARK: - 이미지 선택
 extension CreateMeetViewController {
     private func showPhotos() {
+        let selectPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
+        let defaultPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
+        
+        alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
+    }
+    
+    private func presentPhotos() {
         photoManager.requestPhotoLibraryPermission()
+    }
+    
+    private func setDefaultImage() {
+        imageObserver.onNext(nil)
     }
 }
 

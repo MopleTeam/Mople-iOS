@@ -12,10 +12,10 @@ extension Meet {
         Date().addingTimeInterval((3600 * Double(Int.random(in: -50...50))))
     }
     
-    static func mock(id: Int) -> Self {
+    static func mock(id: Int, creatorId: Int) -> Self {
         return Meet(meetSummary: .mock(id: id),
                     sinceDays: Int.random(in: 1...100),
-                    creatorId: 0,
+                    creatorId: creatorId,
                     memberCount: Int.random(in: 1...100),
                     firstPlanDate: randomDate)
     }

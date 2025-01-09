@@ -68,6 +68,7 @@
 		52266BFA2CBD474D007D03EB /* FetchUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* FetchUserInfo.swift */; };
 		52266BFC2CBD482F007D03EB /* FetchUserInfoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* FetchUserInfoMock.swift */; };
 		5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */; };
+		5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */; };
 		5235B7152D2E6744006BEAF3 /* MeetSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */; };
 		5235B7172D2E7303006BEAF3 /* MeetSetupViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5235B7162D2E7303006BEAF3 /* MeetSetupViewReactor.swift */; };
 		523645292C8E522A009E0784 /* IconLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645282C8E522A009E0784 /* IconLabel.swift */; };
@@ -230,7 +231,7 @@
 		52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864642D2A2994000F8378 /* SignUpRequest.swift */; };
 		52D8646C2D2A35CF000F8378 /* FetchMeet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646B2D2A35CF000F8378 /* FetchMeet.swift */; };
 		52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */; };
-		52D864852D2A8E79000F8378 /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864842D2A8E79000F8378 /* CustomSegmentedControl.swift */; };
+		52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */; };
 		52D864892D2A93DF000F8378 /* FuturePlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */; };
 		52D8648B2D2A9400000F8378 /* PastPlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */; };
 		52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864912D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift */; };
@@ -349,6 +350,7 @@
 		52266BF92CBD474D007D03EB /* FetchUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUserInfo.swift; sourceTree = "<group>"; };
 		52266BFB2CBD482F007D03EB /* FetchUserInfoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUserInfoMock.swift; sourceTree = "<group>"; };
 		5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateLabel.swift; sourceTree = "<group>"; };
+		5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAlertControl.swift; sourceTree = "<group>"; };
 		5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewController.swift; sourceTree = "<group>"; };
 		5235B7162D2E7303006BEAF3 /* MeetSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewReactor.swift; sourceTree = "<group>"; };
 		523645282C8E522A009E0784 /* IconLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabel.swift; sourceTree = "<group>"; };
@@ -502,7 +504,7 @@
 		52D864642D2A2994000F8378 /* SignUpRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpRequest.swift; sourceTree = "<group>"; };
 		52D8646B2D2A35CF000F8378 /* FetchMeet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeet.swift; sourceTree = "<group>"; };
 		52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupUseCaseMock.swift; sourceTree = "<group>"; };
-		52D864842D2A8E79000F8378 /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
+		52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSegmentedControl.swift; sourceTree = "<group>"; };
 		52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanListViewController.swift; sourceTree = "<group>"; };
 		52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanListViewController.swift; sourceTree = "<group>"; };
 		52D864912D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPlanTableCellModel.swift; sourceTree = "<group>"; };
@@ -906,6 +908,14 @@
 				52818C612D18217B0001E30B /* SearchNaviViewController.swift */,
 			);
 			path = ViewController;
+			sourceTree = "<group>";
+		};
+		5231DF322D2F29FF00D52529 /* Alert */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */,
+			);
+			path = Alert;
 			sourceTree = "<group>";
 		};
 		5235B7122D2E6722006BEAF3 /* PlanList */ = {
@@ -1736,6 +1746,7 @@
 		52CB0B3C2C72AA1F002B6D20 /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
+				5231DF322D2F29FF00D52529 /* Alert */,
 				52D864832D2A8E66000F8378 /* SegmentControl */,
 				52D864302D27E5E3000F8378 /* MapView */,
 				52C5200D2D0D6DBC0085F5F7 /* SheetView */,
@@ -2001,7 +2012,7 @@
 		52D864832D2A8E66000F8378 /* SegmentControl */ = {
 			isa = PBXGroup;
 			children = (
-				52D864842D2A8E79000F8378 /* CustomSegmentedControl.swift */,
+				52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */,
 			);
 			path = SegmentControl;
 			sourceTree = "<group>";
@@ -2294,7 +2305,7 @@
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */,
 				52818C7B2D1994800001E30B /* PlanCreateFlowCoordinator.swift in Sources */,
-				52D864852D2A8E79000F8378 /* CustomSegmentedControl.swift in Sources */,
+				52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */,
 				52D8644F2D29F898000F8378 /* ProfileEditCoordination.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */,
@@ -2397,6 +2408,7 @@
 				52818C622D18217B0001E30B /* SearchNaviViewController.swift in Sources */,
 				5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
+				5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,

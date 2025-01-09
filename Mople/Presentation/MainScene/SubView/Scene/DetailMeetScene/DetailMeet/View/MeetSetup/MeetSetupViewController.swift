@@ -187,27 +187,26 @@ final class MeetSetupViewController: TitleNaviViewController, View {
                 vc.setMeetInfo(meet)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isHost)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isHost in
+                vc.setLeaveButtonText(isHost: isHost)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setMeetInfo(_ meet: Meet) {
         _ = thumbnailImage.kfSetimage(meet.meetSummary?.imagePath)
         meetNameButton.title = meet.meetSummary?.name
-        setLeaveButtonText(creatorId: meet.creatorId)
         setMemberCountLabel(meet.memberCount)
         setSinceLabel(meet.sinceDays)
     }
     
-    private func setLeaveButtonText(creatorId: Int?) {
-        guard let userID = UserInfoStorage.shared.userInfo?.id else { return }
-        if userID == creatorId {
-            leaveButton.setTitle(text: "모임 삭제",
-                                 font: FontStyle.Title3.medium,
-                                 normalColor: ColorStyle.Default.red)
-        } else {
-            leaveButton.setTitle(text: "모임 나가기",
-                                 font: FontStyle.Title3.medium,
-                                 normalColor: ColorStyle.Gray._01)
-        }
+    private func setLeaveButtonText(isHost: Bool) {
+        leaveButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
+                             font: FontStyle.Title3.medium,
+                             normalColor: isHost ? ColorStyle.Default.red : ColorStyle.Gray._01)
     }
     
     private func setMemberCountLabel(_ memberCount: Int?) {

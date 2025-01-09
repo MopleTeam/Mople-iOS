@@ -52,3 +52,52 @@ extension AlertManager {
         }
     }
 }
+
+struct DefaultAction {
+    
+    enum DefaultStyle {
+        case cancle, check
+        
+        var text: String {
+            switch self {
+            case .cancle: "취소"
+            case .check: "확인"
+            }
+        }
+    }
+    
+    var text: String
+    var completion: (() -> Void)?
+    var tintColor: UIColor = ColorStyle.Gray._01
+    var bgColor: UIColor = ColorStyle.App.tertiary
+    
+    static func defaultButton(style: DefaultStyle,
+                              completion: (() -> Void)? = nil) -> Self {
+        return .init(text: style.text,
+                     completion: completion,
+                     tintColor: ColorStyle.Gray._01,
+                     bgColor: ColorStyle.App.tertiary)
+    }
+}
+
+final class TestAlertManager {
+    
+    static let shared = TestAlertManager()
+    
+    private init() { }
+    
+    private var currentVC: UIViewController? {
+        UIApplication.shared.topViewController
+    }
+    
+    func showAlert(title: String,
+                   subTitle: String?,
+                   defaultAction: DefaultAction = .defaultButton(style: .cancle),
+                   addAction: [DefaultAction]) {
+        let alert = DefaultAlertControl(title: title,
+                                        subTitle: subTitle,
+                                        defaultAction: defaultAction,
+                                        addAction: addAction)
+        currentVC?.present(alert, animated: true)
+    }
+}
