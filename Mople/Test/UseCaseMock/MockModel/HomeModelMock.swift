@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension HomeModel {
+extension RecentPlan {
     static func mock() -> Self {
         return .init(plans: Plan.recentMock(), hasMeet: false)
     }

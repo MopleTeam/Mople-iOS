@@ -25,7 +25,7 @@ final class CalenadrPalnTableCell: UITableViewCell {
     
     private let countInfoLabel: IconLabel = {
         let label = IconLabel(icon: .member,
-                              iconSize: 18)
+                              iconSize: .init(width: 18, height: 18))
         label.setTitle(font: FontStyle.Body2.medium,
                        color: ColorStyle.Gray._04)
         label.setSpacing(4)

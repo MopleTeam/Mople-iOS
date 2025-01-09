@@ -21,6 +21,10 @@ enum HTTPHeader {
         Self.acceptJson
     }
     
+    static func getReceiveAllHeader() -> [String:String] {
+        Self.acceptAll
+    }
+    
     static func getSendAndReceiveAllHeader() -> [String:String] {
         return Self.acceptAll.merging(Self.contentJson) { current, _ in current }
     }
@@ -95,9 +99,9 @@ extension APIEndpoints {
     
     static func getUserInfo() throws -> Endpoint<UserInfoDTO> {
         return try Endpoint(path: "user/info",
-                             authenticationType: .accessToken,
-                             method: .get,
-                             headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 }
 
@@ -131,7 +135,8 @@ extension APIEndpoints {
 }
 // MARK: - 이미지 업로드
 extension APIEndpoints {
-    static func uploadImage(_ imageData: Data, folderPath: ImageUploadPath) -> Endpoint<Data> {
+    static func uploadImage(_ imageData: Data,
+                            folderPath: ImageUploadPath) -> Endpoint<Data> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
         return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
@@ -148,9 +153,97 @@ extension APIEndpoints {
 extension APIEndpoints {
     static func uploadToken(fcmToken: String) throws -> Endpoint<Void> {
         return try Endpoint(path: "token/save",
-                             authenticationType: .accessToken,
-                             method: .post,
-                             headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
-                             bodyParameters: ["token": fcmToken])
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            bodyParameters: ["token": fcmToken])
+    }
+}
+
+// MARK: - Meet
+extension APIEndpoints {
+    static func createMeet(_ meet: CreateMeetRequest) throws -> Endpoint<MeetResponse> {
+        return try Endpoint(path: "meet/create",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParametersEncodable: meet)
+    }
+    
+    static func fetchMeetList() throws -> Endpoint<[MeetResponse]> {
+        return try Endpoint(path: "meet/list",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+        
+    }
+    
+    static func fetchMeetDetail(_ meetId: Int) throws -> Endpoint<MeetResponse> {
+        return try Endpoint(path: "meet/\(meetId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+}
+
+// MARK: - Plan
+extension APIEndpoints {
+    static func createPlan(_ plan: CreatePlanRequest) throws -> Endpoint<PlanResponse> {
+        return try Endpoint(path: "plan/create",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParametersEncodable: plan)
+    }
+    
+    static func fetchRecentPlan() throws -> Endpoint<RecentPlanResponse> {
+        return try Endpoint(path: "plan/view",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+        
+    }
+    
+    static func fetchMeetPlan(meetId: Int) throws -> Endpoint<[PlanResponse]> {
+        return try Endpoint(path: "plan/list/\(meetId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+        
+    }
+    
+    static func joinPlan(planId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "plan/join/\(planId)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveAllHeader())
+    }
+    
+    static func leavePlan(planId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "plan/leave/\(planId)",
+                            authenticationType: .accessToken,
+                            method: .delete,
+                            headerParameters: HTTPHeader.getReceiveAllHeader())
+    }
+}
+
+// MARK: - Review
+extension APIEndpoints {
+    static func fetchMeetReview(meetId: Int) throws -> Endpoint<ReviewResponse> {
+        return try Endpoint(path: "review/list/\(meetId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+}
+
+// MARK: - Search Location
+extension APIEndpoints {
+    static func searchLoaction(_ locationRequest: SearchLocationReqeust) throws -> Endpoint<SearchPlaceResultResponse> {
+        return try Endpoint(path: "location/kakao",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParametersEncodable: locationRequest)
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import ReactorKit
 
-final class FutruePlanListViewReactor: Reactor {
+final class FuturePlanListViewReactor: Reactor {
     
     enum Action {
         case requestPlanList
@@ -30,19 +30,16 @@ final class FutruePlanListViewReactor: Reactor {
     var initialState: State = State()
     
     let fetchPlanUseCase: FetchMeetFuturePlan
-    let requestJoinPlanUseCase: RequestJoinPlan
-    let requestLeavePlanUseCase: RequestLeavePlan
+    let participationPlanUseCase: RequsetParticipationPlan
     let meedId: Int
     
     init(fetchPlanUseCase: FetchMeetFuturePlan,
-         requestJoinPlanUseCase: RequestJoinPlan,
-         requsetLeavePlanUseCase: RequestLeavePlan,
+         participationPlanUseCase: RequsetParticipationPlan,
          meetID: Int) {
         print(#function, #line, "LifeCycle Test FutruePlanListViewReactor Created" )
 
         self.fetchPlanUseCase = fetchPlanUseCase
-        self.requestJoinPlanUseCase = requestJoinPlanUseCase
-        self.requestLeavePlanUseCase = requsetLeavePlanUseCase
+        self.participationPlanUseCase = participationPlanUseCase
         self.meedId = meetID
         action.onNext(.requestPlanList)
     }
@@ -83,11 +80,11 @@ final class FutruePlanListViewReactor: Reactor {
     }
 }
 
-extension FutruePlanListViewReactor {
+extension FuturePlanListViewReactor {
     private func fetchPlanList() -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let fetchPlanList = fetchPlanUseCase.fetchPlan(meetId: meedId)
+        let fetchPlanList = fetchPlanUseCase.fetchPlanList(meetId: meedId)
             .map({ Mutation.fetchPlanList(plans: $0) })
             .asObservable()
         
@@ -98,18 +95,16 @@ extension FutruePlanListViewReactor {
                                   loadingStop])
     }
     
-    private func requestParticipationPlan(planId: Int, isJoining: Bool) -> Observable<Mutation> {
+    private func requestParticipationPlan(planId: Int,
+                                          isJoining: Bool) -> Observable<Mutation> {
+        
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let requestParticipation = Observable.just(isJoining)
             .flatMap { [weak self] isJoining in
                 guard let self = self else { throw AppError.unknownError }
-                
-                if isJoining {
-                    return self.requestJoinPlanUseCase.requestJoinPlan(planId: planId)
-                } else {
-                    return self.requestLeavePlanUseCase.requstLeavePlan(planId: planId)
-                }
+                return self.participationPlanUseCase.requestParticipationPlan(planId: planId,
+                                                                              isJoining: isJoining)
             }
             .map { Mutation.updatePlanParticipant(planId: planId) }
         

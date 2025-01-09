@@ -41,8 +41,8 @@ final class AppFlowCoordinator: BaseCoordinator {
         }
     }
     
-    private func mainFlowStart() {
-        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer()
+    private func mainFlowStart(isFirstStart: Bool = false) {
+        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isFirstStart: isFirstStart)
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
     }
@@ -56,13 +56,12 @@ final class AppFlowCoordinator: BaseCoordinator {
 
 extension AppFlowCoordinator: SignInListener {
     func signIn() {
-        mainFlowStart()
+        mainFlowStart(isFirstStart: true)
     }
 }
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
-        KeyChainService.shared.deleteToken()
         loginFlowStart()
     }
 }

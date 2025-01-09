@@ -81,14 +81,14 @@ final class PlanCreateViewReactor: Reactor {
         }
     }
     
-    private let fetchMeetListUseCase: FetchMeetListUseCase
+    private let fetchMeetListUseCase: FetchMeetList
     private let createPlanUseCase: CreatePlan
     private weak var coordinator: PlanCreateCoordination?
     
     var initialState: State = State()
     
     init(createPlanUseCase: CreatePlan,
-         fetchMeetListUSeCase: FetchMeetListUseCase,
+         fetchMeetListUSeCase: FetchMeetList,
          coordinator: PlanCreateCoordination) {
         print(#function, #line, "LifeCycle Test PlanCreateViewReactor Created" )
 
@@ -142,7 +142,7 @@ extension PlanCreateViewReactor {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         #warning("에러 처리")
-        let updateMeet = fetchMeetListUseCase.fetchGroupList()
+        let updateMeet = fetchMeetListUseCase.fetchMeetList()
             .asObservable()
             .map({ $0.compactMap { meet in
                 meet.meetSummary }
@@ -173,7 +173,7 @@ extension PlanCreateViewReactor {
 
 // MARK: - 일정 생성 및 일정 유효성 체크
 extension PlanCreateViewReactor {
-    private func createPlan(_ plan: PlanUploadRequest) -> Observable<Mutation> {
+    private func createPlan(_ plan: CreatePlanRequest) -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let updatePlan = createPlanUseCase.createPlan(with: plan)
@@ -187,7 +187,7 @@ extension PlanCreateViewReactor {
                                   loadingStop])
     }
     
-    private func buliderPlanCreation() throws -> PlanUploadRequest? {
+    private func buliderPlanCreation() throws -> CreatePlanRequest? {
         guard let date = try self.createDate(),
               let meetId = currentState.seletedMeet?.id,
               let name = currentState.planTitle,

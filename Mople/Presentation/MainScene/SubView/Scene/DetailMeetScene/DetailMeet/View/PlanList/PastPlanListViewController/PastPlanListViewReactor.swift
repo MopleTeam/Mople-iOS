@@ -68,7 +68,7 @@ extension PastPlanListViewReactor {
     private func fetchReviewList() -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let fetchPlanList = fetchReviewUseCase.fetchReview(meetId: meedId)
+        let fetchPlanList = fetchReviewUseCase.fetchReviewList(meetId: meedId)
             .map({ Mutation.fetchReviewList(reviews: $0) })
             .asObservable()
         

@@ -203,10 +203,10 @@ extension HomeViewController {
                                           completion: makeMeet,
                                           tintColor: ColorStyle.Default.white,
                                           bgColor: ColorStyle.App.primary)
-        
+    
         alertManager.showAlert(title: "아직 소속된 모임이 없어요",
-                                   subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
-                                   addAction: [action])
+                               subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
+                               addAction: [action])
     }
     
     private func makeMeet() {

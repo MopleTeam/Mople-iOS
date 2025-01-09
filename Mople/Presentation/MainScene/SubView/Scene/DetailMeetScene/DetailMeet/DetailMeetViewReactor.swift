@@ -36,10 +36,10 @@ final class DetailMeetViewReactor: Reactor {
     
     var initialState: State = State()
     
-    private let fetchMeetUseCase: FetchMeetUseCase
+    private let fetchMeetUseCase: FetchMeetDetail
     private weak var coordinator: DetailMeetCoordination?
     
-    init(fetchMeetUseCase: FetchMeetUseCase,
+    init(fetchMeetUseCase: FetchMeetDetail,
          coordinator: DetailMeetCoordination,
          meetID: Int) {
         print(#function, #line, "LifeCycle Test DetailMeetViewReactor Created" )
@@ -97,7 +97,7 @@ extension DetailMeetViewReactor {
         let loadingStart = Observable.just(Mutation.notifyMeetInfoLoading(true))
         
         #warning("에러 처리")
-        let updateMeet = fetchMeetUseCase.fetchMeet(meetId: id)
+        let updateMeet = fetchMeetUseCase.fetchMeetDetail(meetId: id)
             .asObservable()
             .map { Mutation.fetchMeetInfo(meet: $0) }
         

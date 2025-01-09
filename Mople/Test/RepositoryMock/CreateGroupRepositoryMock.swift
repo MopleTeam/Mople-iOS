@@ -9,7 +9,13 @@ import Foundation
 import RxSwift
 
 final class CreateGroupRepositoryMock: CreateMeetRepo {
-    func createMeet(title: String, imagePath: String?) -> Single<Void> {
-        return Single.just(())
+    func createMeet(_ meet: CreateMeetRequest) -> Single<MeetResponse> {
+        return .just(.init(meetId: 999,
+                           meetName: "테스트",
+                           meetImage: nil,
+                           sinceDays: 0,
+                           creatorId: 999,
+                           memberCount: 1,
+                           lastPlanDay: nil))
     }
 }

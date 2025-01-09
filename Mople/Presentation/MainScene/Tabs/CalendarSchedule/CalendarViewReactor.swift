@@ -56,11 +56,11 @@ final class CalendarViewReactor: Reactor {
         @Pulse var isTableViewInteracting: Bool = false
     }
         
-    private let fetchUseCase: FetchSchedule
+    private let fetchUseCase: FetchPlanList
 
     var initialState: State = State()
     
-    init(fetchUseCase: FetchSchedule) {
+    init(fetchUseCase: FetchPlanList) {
         print(#function, #line, "LifeCycle Test CalendarView Reactor Created" )
         self.fetchUseCase = fetchUseCase
         action.onNext(.fetchData)
@@ -135,7 +135,7 @@ extension CalendarViewReactor {
     private func fetchData() -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
 
-        let fetchAndProcess = fetchUseCase.fetchScheduleList()
+        let fetchAndProcess = fetchUseCase.fetchPlanList()
             .asObservable()
             .map { schedules -> (scheduleList: [PlanTableSectionModel], eventDateList: [Date]) in
                 let scheduleList = self.makeTableSectionModels(schedules)

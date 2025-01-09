@@ -13,7 +13,7 @@ final class FetchReviewMock: FetchMeetReview {
         return Array(0...10).map { .mock(posterId: $0) }
     }
     
-    func fetchReview(meetId: Int) -> Single<[Review]> {
+    func fetchReviewList(meetId: Int) -> Single<[Review]> {
         return Observable.just(getReviews())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()

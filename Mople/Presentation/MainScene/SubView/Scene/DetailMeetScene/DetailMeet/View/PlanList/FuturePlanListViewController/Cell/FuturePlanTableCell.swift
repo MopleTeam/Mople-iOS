@@ -31,15 +31,17 @@ final class FuturePlanTableCell: UITableViewCell {
         return imageView
     }()
 
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = FontStyle.Title.bold
-        label.textColor = ColorStyle.Gray._01
+    private let titleLabel: IconLabel = {
+        let label = IconLabel(icon: .circlePan,
+                              iconSize: .init(width: 20, height: 22))
+        label.setTitle(font: FontStyle.Title.bold,
+                       color: ColorStyle.Gray._01)
         return label
     }()
 
     private let countInfoLabel: IconLabel = {
-        let label = IconLabel(icon: .member, iconSize: 20)
+        let label = IconLabel(icon: .member,
+                              iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
         label.setSpacing(4)
         return label
@@ -140,40 +142,47 @@ final class FuturePlanTableCell: UITableViewCell {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.weatherView.configure(with: .init(weather: viewModel.weather))
-        self.handleCompletdButton(userID: userID,
-                                  postUserID: viewModel.postUserID,
-                                  isParticipant: viewModel.isParticipant,
-                                  planDate: viewModel.date)
+        self.resolveUserView(userID: userID,
+                             postUserID: viewModel.postUserID,
+                             isParticipant: viewModel.isParticipant,
+                             planDate: viewModel.date)
     }
     
-    private func handleCompletdButton(userID: Int?,
-                                      postUserID: Int?,
+    private func resolveUserView(userID: Int?,
+                                 postUserID: Int?,
+                                 isParticipant: Bool?,
+                                 planDate: Date?) {
+        let isPostUser = userID == postUserID
+        handleTitlePostIcon(isPostUser: isPostUser)
+        handleCompletdButton(isPostUser: isPostUser,
+                             isParticipant: isParticipant,
+                             planDate: planDate)
+    }
+    
+    private func handleTitlePostIcon(isPostUser: Bool) {
+        self.titleLabel.hideIcon(isHide: !isPostUser)
+    }
+    
+    private func handleCompletdButton(isPostUser: Bool,
                                       isParticipant: Bool?,
                                       planDate: Date?) {
-        guard let userID,
-              let postUserID,
+        guard isPostUser == false,
               let isParticipant,
-              let planDate else { return }
+              let planDate else { return  removeCompletionButton() }
                 
         guard isButtonEnabledForDate(planDate) else { return }
-        guard shouldShowAuthorButtons(userID: userID, postUserID: postUserID) else { return }
         isAlreadyParticipated(isParticipant)
     }
 }
 
 extension FuturePlanTableCell {
+
     private func isButtonEnabledForDate(_ date: Date) -> Bool {
         guard date < Date() else { return true }
         completdButton.isEnabled = false
         completdButton.setTitle(text: "해당 약속은 마감되었어요",
                                 font: FontStyle.Body1.medium,
                                 normalColor: ColorStyle.Gray._05)
-        return false
-    }
-    
-    private func shouldShowAuthorButtons(userID: Int, postUserID: Int) -> Bool {
-        guard userID == postUserID else { return true }
-        removeCompletionButton()
         return false
     }
     
@@ -186,18 +195,18 @@ extension FuturePlanTableCell {
         completdButton.updateSelectedTextColor(isSelected: isParticipant)
     }
     
-    private func addCompletionButton() {
-        if !mainStackView.arrangedSubviews.contains(completdButton) {
-            mainStackView.addArrangedSubview(completdButton)
-        }
-        completdButton.isEnabled = true
-    }
-    
     private func removeCompletionButton() {
         if mainStackView.arrangedSubviews.contains(completdButton) {
             mainStackView.removeArrangedSubview(completdButton)
             completdButton.removeFromSuperview()
         }
+    }
+    
+    private func addCompletionButton() {
+        if !mainStackView.arrangedSubviews.contains(completdButton) {
+            mainStackView.addArrangedSubview(completdButton)
+        }
+        completdButton.isEnabled = true
     }
 }
 

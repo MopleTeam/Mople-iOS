@@ -13,7 +13,7 @@ import ReactorKit
 
 final class FuturePlanListViewController: UIViewController, View {
     
-    typealias Reactor = FutruePlanListViewReactor
+    typealias Reactor = FuturePlanListViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -88,7 +88,7 @@ final class FuturePlanListViewController: UIViewController, View {
         self.tableView.register(MeetPlanTableHeaderView.self, forHeaderFooterViewReuseIdentifier: MeetPlanTableHeaderView.reuseIdentifier)
     }
     
-    func bind(reactor: FutruePlanListViewReactor) {
+    func bind(reactor: FuturePlanListViewReactor) {
         reactor.pulse(\.$plans)
             .asDriver(onErrorJustReturn: [])
             .map({ $0.isEmpty })
@@ -111,10 +111,8 @@ final class FuturePlanListViewController: UIViewController, View {
                 cell.selectionStyle = .none
                 
                 cell.rx.completed
-                    .do(onNext: {
-                        print(#function, #line, "버튼 눌림 : \($0)" )
-                    })
-                    .map { Reactor.Action.updateParticipants(id: $0, isJoining: item.isParticipating) }
+                    .map { Reactor.Action.updateParticipants(id: $0,
+                                                             isJoining: item.isParticipating) }
                     .bind(to: reactor.action)
                     .disposed(by: cell.disposeBag)
             }

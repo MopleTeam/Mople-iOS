@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class FetchGroupListMock: FetchMeetListUseCase {
+final class FetchGroupListMock: FetchMeetList {
     
 
     
@@ -25,7 +25,7 @@ final class FetchGroupListMock: FetchMeetListUseCase {
         return list
     }
     
-    func fetchGroupList() -> Single<[Meet]> {
+    func fetchMeetList() -> Single<[Meet]> {
         return Observable.just(getMockData())
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .asSingle()

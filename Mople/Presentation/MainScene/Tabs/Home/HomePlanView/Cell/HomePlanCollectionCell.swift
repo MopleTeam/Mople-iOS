@@ -23,17 +23,20 @@ final class HomePlanCollectionCell: UICollectionViewCell {
     }()
     
     private let countInfoLabel: IconLabel = {
-        let label = IconLabel(icon: .member, iconSize: 18)
+        let label = IconLabel(icon: .member,
+                              iconSize: .init(width: 18, height: 18))
         return label
     }()
     
     private let dateInfoLabel: IconLabel = {
-        let label = IconLabel(icon: .date, iconSize: 18)
+        let label = IconLabel(icon: .date,
+                              iconSize: .init(width: 18, height: 18))
         return label
     }()
     
     private let placeInfoLabel: IconLabel = {
-        let label = IconLabel(icon: .place, iconSize: 18)
+        let label = IconLabel(icon: .place,
+                              iconSize: .init(width: 18, height: 18))
         return label
     }()
 

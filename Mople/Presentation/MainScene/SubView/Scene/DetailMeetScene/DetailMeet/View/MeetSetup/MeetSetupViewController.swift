@@ -66,7 +66,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     private let memberCountLabel: IconLabel = {
         let label = IconLabel(icon: .listArrow,
-                              iconSize: 24)
+                              iconSize: .init(width: 24, height: 24))
         label.setTitle(font: FontStyle.Title3.medium,
                        color: ColorStyle.Gray._06)
         label.setSpacing(4)

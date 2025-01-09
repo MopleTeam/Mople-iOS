@@ -23,23 +23,35 @@ protocol MainNavigationDependencies {
 }
 
 final class MainSceneDIContainer: MainSceneDependencies {
-    private lazy var FCMTokenManager: FCMTokenManager = {
-        return .init(repo: DefaultFCMTokenRepo(networkService: appNetworkService))
-    }()
+    private var FCMTokenManager: FCMTokenManager?
 
     private let appNetworkService: AppNetworkService
     let commonDependencies: CommonDependencies
 
     init(appNetworkService: AppNetworkService,
-         commonDependencies: CommonDependencies) {
+         commonDependencies: CommonDependencies,
+         isFirstStart: Bool) {
         self.appNetworkService = appNetworkService
         self.commonDependencies = commonDependencies
+        makeFCMTokenManager(isFirstStart: isFirstStart)
     }
     
     func makeMainFlowCoordinator(navigationController: UINavigationController) -> MainSceneCoordinator {
         let flow = MainSceneCoordinator(navigationController: navigationController,
                                      dependencies: self)
         return flow
+    }
+}
+
+// MARK: - FCMToken Manager
+extension MainSceneDIContainer {
+    private func makeFCMTokenManager(isFirstStart: Bool)  {
+        FCMTokenManager = .init(repo: makeFCMTokenRepo(),
+                                isRefresh: isFirstStart)
+    }
+    
+    private func makeFCMTokenRepo() -> FCMTokenUploadRepo {
+        return DefaultFCMTokenRepo(networkService: appNetworkService)
     }
 }
 
@@ -55,12 +67,7 @@ extension MainSceneDIContainer {
     
     private func makeHomeViewReactor(coordinator: HomeCoordination) -> HomeViewReactor {
         return HomeViewReactor(fetchRecentScheduleUseCase: FetchRecentScheduleMock(),
-                               refreshFCMTokenUseCase: makeRefreshFCMTokenUseCase(),
                                coordinator: coordinator)
-    }
-    
-    private func makeRefreshFCMTokenUseCase() -> ReqseutRefreshFCMToken {
-        return RefreshFCMTokenUseCase(tokenRefreshManager: FCMTokenManager)
     }
     
     // MARK: - 모임 리스트

@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class FetchScheduleMock: FetchSchedule {
+final class FetchScheduleMock: FetchPlanList {
     
     private func getEvents() -> [Plan] {
         print(#function, #line)
@@ -22,7 +22,7 @@ final class FetchScheduleMock: FetchSchedule {
         return scheduleArray
     }
    
-    func fetchScheduleList() -> Single<[Plan]> {
+    func fetchPlanList() -> Single<[Plan]> {
         print(#function, #line)
         
         return Observable.just(getEvents())

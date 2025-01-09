@@ -27,7 +27,7 @@ final class HomeViewReactor: Reactor {
         case presentCalendar(date: Date)
         case presentCreateGroupView
         case presentCreatePlanView
-        case responseRecentPlan(schedules: HomeModel)
+        case responseRecentPlan(schedules: RecentPlan)
         case notifyLoadingState(_ isLoading: Bool)
         case handleHomeError(error: HomeError?)
     }
@@ -40,18 +40,15 @@ final class HomeViewReactor: Reactor {
     }
     
     private let fetchRecentScheduleUseCase: FetchRecentPlan
-    private let requestRefreshFCMTokenUseCase: ReqseutRefreshFCMToken
     private let coordinator: HomeCoordination
     
     var initialState: State = State()
     
     init(fetchRecentScheduleUseCase: FetchRecentPlan,
-         refreshFCMTokenUseCase: ReqseutRefreshFCMToken,
          coordinator: HomeCoordination) {
         print(#function, #line, "LifeCycle Test HomeViewReactor Created" )
 
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
-        self.requestRefreshFCMTokenUseCase = refreshFCMTokenUseCase
         self.coordinator = coordinator
         action.onNext(.requestRecentPlan)
     }
@@ -153,10 +150,10 @@ extension HomeViewReactor {
     private func checkNotificationPermission() -> Observable<Mutation> {
         
         let notificationCenter = UNUserNotificationCenter.current()
+        
         notificationCenter.getNotificationSettings { [weak self] setting in
             switch setting.authorizationStatus {
             case .authorized:
-                self?.requestRefreshFCMTokenUseCase.refreshFCMToken()
                 self?.requestLocationPermission()
             case .notDetermined:
                 self?.requestNotificationPermission(notificationCenter)

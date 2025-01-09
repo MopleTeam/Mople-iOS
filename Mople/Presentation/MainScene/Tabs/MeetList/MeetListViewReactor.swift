@@ -21,11 +21,11 @@ final class MeetListViewReactor: Reactor {
         @Pulse var meetList: [Meet] = []
     }
     
-    private let fetchUseCase: FetchMeetListUseCase
+    private let fetchUseCase: FetchMeetList
     private let coordinator: MainCoordination
     var initialState: State = State()
     
-    init(fetchUseCase: FetchMeetListUseCase,
+    init(fetchUseCase: FetchMeetList,
          coordinator: MainCoordination) {
         print(#function, #line, "LifeCycle Test GroupListViewReactor Created" )
         self.fetchUseCase = fetchUseCase
@@ -65,7 +65,7 @@ final class MeetListViewReactor: Reactor {
 extension MeetListViewReactor {
     private func fetchMeetList() -> Observable<Mutation> {
         
-        let fetchData = fetchUseCase.fetchGroupList()
+        let fetchData = fetchUseCase.fetchMeetList()
             .asObservable()
             .map { Mutation.fetchMeetList(groupList: $0) }
         

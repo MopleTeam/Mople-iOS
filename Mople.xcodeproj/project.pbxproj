@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */; };
 		5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200C36D2CFF66D000C0CEFC /* Single+retry.swift */; };
 		5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */; };
-		5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */; };
+		5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */; };
 		520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520805162C69E0770015F6E0 /* SignInViewController.swift */; };
 		5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */; };
 		5208051D2C69FE700015F6E0 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208051C2C69FE700015F6E0 /* SignUpViewController.swift */; };
@@ -18,8 +17,8 @@
 		5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */; };
 		5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */; };
 		5208C17A2CBE72A8006272E8 /* UIApplication+RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */; };
-		521091E02D0FAC3800DD0407 /* HomeResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091DF2D0FAC3800DD0407 /* HomeResponse.swift */; };
-		521091E32D0FACB500DD0407 /* HomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091E22D0FACB500DD0407 /* HomeModel.swift */; };
+		521091E02D0FAC3800DD0407 /* RecentPlanResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */; };
+		521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091E22D0FACB500DD0407 /* RecentPlan.swift */; };
 		521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091EE2D1021B700DD0407 /* WeatherViewModel.swift */; };
 		521091F12D10559600DD0407 /* Meet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091F02D10559600DD0407 /* Meet.swift */; };
 		5211F8F62C84234800403980 /* DefaultTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* DefaultTabBarController.swift */; };
@@ -58,10 +57,8 @@
 		5214F8C12D2CA38C00E8CE9C /* PastPlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C02D2CA38C00E8CE9C /* PastPlanTableCell.swift */; };
 		5214F8C32D2CAB5000E8CE9C /* PastPlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C22D2CAB5000E8CE9C /* PastPlanListViewReactor.swift */; };
 		5214F8C52D2CADD100E8CE9C /* PastPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C42D2CADD100E8CE9C /* PastPlanTableCellModel.swift */; };
-		5214F8C92D2CEAE600E8CE9C /* RequestJoinPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C82D2CEAE600E8CE9C /* RequestJoinPlan.swift */; };
 		5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */; };
 		5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */; };
-		5214F8D02D2D64A500E8CE9C /* RequestLeavePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CF2D2D64A500E8CE9C /* RequestLeavePlan.swift */; };
 		521917582CEB088B00696292 /* CreateMeetViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521917572CEB088B00696292 /* CreateMeetViewReactor.swift */; };
 		52266BF22CBCF605007D03EB /* ProfileSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF12CBCF604007D03EB /* ProfileSetupViewController.swift */; };
 		52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */; };
@@ -69,12 +66,32 @@
 		52266BFC2CBD482F007D03EB /* FetchUserInfoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* FetchUserInfoMock.swift */; };
 		5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */; };
 		5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */; };
+		5231DF3C2D2F968000D52529 /* DefaultRecentPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF3B2D2F968000D52529 /* DefaultRecentPlanListRepo.swift */; };
+		5231DF442D2F972B00D52529 /* RecentPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF432D2F972B00D52529 /* RecentPlanListRepo.swift */; };
+		5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF462D2F9F9000D52529 /* CreateMeetRequest.swift */; };
+		5231DF4A2D2FA1C500D52529 /* DefaultCreateMeetRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF492D2FA1C500D52529 /* DefaultCreateMeetRepo.swift */; };
+		5231DF4C2D2FA23000D52529 /* BaseRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */; };
+		5231DF4E2D2FA8EF00D52529 /* DefaultMeetListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4D2D2FA8EF00D52529 /* DefaultMeetListRepo.swift */; };
+		5231DF502D2FA91F00D52529 /* MeetListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4F2D2FA91F00D52529 /* MeetListRepo.swift */; };
+		5231DF522D2FA96100D52529 /* CreatePlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF512D2FA96100D52529 /* CreatePlanRepo.swift */; };
+		5231DF542D2FA99C00D52529 /* MeetPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF532D2FA99C00D52529 /* MeetPlanListRepo.swift */; };
+		5231DF572D2FAA2300D52529 /* FetchMeetReviewListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */; };
+		5231DF592D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF582D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift */; };
+		5231DF5B2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF5A2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift */; };
+		5231DF672D2FC0FF00D52529 /* MeetDetailRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF662D2FC0FF00D52529 /* MeetDetailRepo.swift */; };
+		5231DF692D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF682D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift */; };
+		5231DF732D2FCAEE00D52529 /* ParticipationPlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF722D2FCAEE00D52529 /* ParticipationPlanRepo.swift */; };
+		5231DF752D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF742D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift */; };
+		5231DF772D2FCC4A00D52529 /* RequsetParticipationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */; };
+		5231DF7A2D2FE63600D52529 /* SearchLocationReqeust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */; };
+		5231DF7D2D2FE77800D52529 /* SearchLocationRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF7C2D2FE77800D52529 /* SearchLocationRepo.swift */; };
+		5231DF7F2D2FE78700D52529 /* DefaultSearchLocationRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF7E2D2FE78700D52529 /* DefaultSearchLocationRepo.swift */; };
 		5235B7152D2E6744006BEAF3 /* MeetSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */; };
 		5235B7172D2E7303006BEAF3 /* MeetSetupViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5235B7162D2E7303006BEAF3 /* MeetSetupViewReactor.swift */; };
 		523645292C8E522A009E0784 /* IconLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645282C8E522A009E0784 /* IconLabel.swift */; };
 		5236452D2C8EDCEF009E0784 /* TitleNaviViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452C2C8EDCEF009E0784 /* TitleNaviViewController.swift */; };
 		523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236452F2C8EE518009E0784 /* DefaultEmptyView.swift */; };
-		523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchGroupList.swift */; };
+		523645332C8FFDEB009E0784 /* FetchMeetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchMeetList.swift */; };
 		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
 		5236453C2C900DA3009E0784 /* MeetListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* MeetListTableViewController.swift */; };
@@ -189,7 +206,7 @@
 		52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 52C72EA52C4FBE5900CFF329 /* SnapKit */; };
 		52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */; };
 		52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857AD2D07A71500765FB3 /* CreatePlan.swift */; };
-		52C857B22D081DE800765FB3 /* PlanUploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857B12D081DE800765FB3 /* PlanUploadRequest.swift */; };
+		52C857B22D081DE800765FB3 /* CreatePlanRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857B12D081DE800765FB3 /* CreatePlanRequest.swift */; };
 		52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857B52D082AFB00765FB3 /* PlanResponse.swift */; };
 		52C857BB2D0865A100765FB3 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857BA2D0865A100765FB3 /* Plan.swift */; };
 		52C857BD2D086C9200765FB3 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C857BC2D086C9200765FB3 /* Location.swift */; };
@@ -229,7 +246,7 @@
 		52D864592D29FDBC000F8378 /* DetailMeetViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864582D29FDBC000F8378 /* DetailMeetViewReactor.swift */; };
 		52D8645B2D2A027C000F8378 /* DetailGroupDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8645A2D2A027C000F8378 /* DetailGroupDIContainer.swift */; };
 		52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864642D2A2994000F8378 /* SignUpRequest.swift */; };
-		52D8646C2D2A35CF000F8378 /* FetchMeet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646B2D2A35CF000F8378 /* FetchMeet.swift */; };
+		52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */; };
 		52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */; };
 		52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */; };
 		52D864892D2A93DF000F8378 /* FuturePlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */; };
@@ -290,10 +307,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshFCMToken.swift; sourceTree = "<group>"; };
 		5200C36D2CFF66D000C0CEFC /* Single+retry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Single+retry.swift"; sourceTree = "<group>"; };
 		5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchScheduleMock.swift; sourceTree = "<group>"; };
-		5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchSchedule.swift; sourceTree = "<group>"; };
+		5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanList.swift; sourceTree = "<group>"; };
 		520805162C69E0770015F6E0 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		5208051A2C69E2480015F6E0 /* UIColor+hexCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+hexCode.swift"; sourceTree = "<group>"; };
 		5208051C2C69FE700015F6E0 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
@@ -301,8 +317,8 @@
 		5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewController.swift; sourceTree = "<group>"; };
 		5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+RootView.swift"; sourceTree = "<group>"; };
-		521091DF2D0FAC3800DD0407 /* HomeResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeResponse.swift; sourceTree = "<group>"; };
-		521091E22D0FACB500DD0407 /* HomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeModel.swift; sourceTree = "<group>"; };
+		521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanResponse.swift; sourceTree = "<group>"; };
+		521091E22D0FACB500DD0407 /* RecentPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlan.swift; sourceTree = "<group>"; };
 		521091EE2D1021B700DD0407 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		521091F02D10559600DD0407 /* Meet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meet.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* DefaultTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTabBarController.swift; sourceTree = "<group>"; };
@@ -340,10 +356,8 @@
 		5214F8C02D2CA38C00E8CE9C /* PastPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanTableCell.swift; sourceTree = "<group>"; };
 		5214F8C22D2CAB5000E8CE9C /* PastPlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanListViewReactor.swift; sourceTree = "<group>"; };
 		5214F8C42D2CADD100E8CE9C /* PastPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanTableCellModel.swift; sourceTree = "<group>"; };
-		5214F8C82D2CEAE600E8CE9C /* RequestJoinPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestJoinPlan.swift; sourceTree = "<group>"; };
 		5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParticipationPlanMock.swift; sourceTree = "<group>"; };
 		5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceTableCellModel.swift; sourceTree = "<group>"; };
-		5214F8CF2D2D64A500E8CE9C /* RequestLeavePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestLeavePlan.swift; sourceTree = "<group>"; };
 		521917572CEB088B00696292 /* CreateMeetViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetViewReactor.swift; sourceTree = "<group>"; };
 		52266BF12CBCF604007D03EB /* ProfileSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewController.swift; sourceTree = "<group>"; };
 		52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewReactor.swift; sourceTree = "<group>"; };
@@ -351,12 +365,32 @@
 		52266BFB2CBD482F007D03EB /* FetchUserInfoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUserInfoMock.swift; sourceTree = "<group>"; };
 		5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateLabel.swift; sourceTree = "<group>"; };
 		5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAlertControl.swift; sourceTree = "<group>"; };
+		5231DF3B2D2F968000D52529 /* DefaultRecentPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRecentPlanListRepo.swift; sourceTree = "<group>"; };
+		5231DF432D2F972B00D52529 /* RecentPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanListRepo.swift; sourceTree = "<group>"; };
+		5231DF462D2F9F9000D52529 /* CreateMeetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetRequest.swift; sourceTree = "<group>"; };
+		5231DF492D2FA1C500D52529 /* DefaultCreateMeetRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCreateMeetRepo.swift; sourceTree = "<group>"; };
+		5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRepositories.swift; sourceTree = "<group>"; };
+		5231DF4D2D2FA8EF00D52529 /* DefaultMeetListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMeetListRepo.swift; sourceTree = "<group>"; };
+		5231DF4F2D2FA91F00D52529 /* MeetListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListRepo.swift; sourceTree = "<group>"; };
+		5231DF512D2FA96100D52529 /* CreatePlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanRepo.swift; sourceTree = "<group>"; };
+		5231DF532D2FA99C00D52529 /* MeetPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListRepo.swift; sourceTree = "<group>"; };
+		5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetReviewListRepo.swift; sourceTree = "<group>"; };
+		5231DF582D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCreatePlanRepo.swift; sourceTree = "<group>"; };
+		5231DF5A2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMeetPlanListRepo.swift; sourceTree = "<group>"; };
+		5231DF662D2FC0FF00D52529 /* MeetDetailRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailRepo.swift; sourceTree = "<group>"; };
+		5231DF682D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFetchMeetDetailRepo.swift; sourceTree = "<group>"; };
+		5231DF722D2FCAEE00D52529 /* ParticipationPlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipationPlanRepo.swift; sourceTree = "<group>"; };
+		5231DF742D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultParticipationPlanRepo.swift; sourceTree = "<group>"; };
+		5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequsetParticipationPlan.swift; sourceTree = "<group>"; };
+		5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationReqeust.swift; sourceTree = "<group>"; };
+		5231DF7C2D2FE77800D52529 /* SearchLocationRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationRepo.swift; sourceTree = "<group>"; };
+		5231DF7E2D2FE78700D52529 /* DefaultSearchLocationRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSearchLocationRepo.swift; sourceTree = "<group>"; };
 		5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewController.swift; sourceTree = "<group>"; };
 		5235B7162D2E7303006BEAF3 /* MeetSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewReactor.swift; sourceTree = "<group>"; };
 		523645282C8E522A009E0784 /* IconLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconLabel.swift; sourceTree = "<group>"; };
 		5236452C2C8EDCEF009E0784 /* TitleNaviViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleNaviViewController.swift; sourceTree = "<group>"; };
 		5236452F2C8EE518009E0784 /* DefaultEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultEmptyView.swift; sourceTree = "<group>"; };
-		523645322C8FFDEB009E0784 /* FetchGroupList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupList.swift; sourceTree = "<group>"; };
+		523645322C8FFDEB009E0784 /* FetchMeetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetList.swift; sourceTree = "<group>"; };
 		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
 		5236453B2C900DA3009E0784 /* MeetListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListTableViewController.swift; sourceTree = "<group>"; };
@@ -463,7 +497,7 @@
 		52C72E972C4FBD6500CFF329 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CALayer+Ext.swift"; sourceTree = "<group>"; };
 		52C857AD2D07A71500765FB3 /* CreatePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlan.swift; sourceTree = "<group>"; };
-		52C857B12D081DE800765FB3 /* PlanUploadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanUploadRequest.swift; sourceTree = "<group>"; };
+		52C857B12D081DE800765FB3 /* CreatePlanRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanRequest.swift; sourceTree = "<group>"; };
 		52C857B52D082AFB00765FB3 /* PlanResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanResponse.swift; sourceTree = "<group>"; };
 		52C857BA2D0865A100765FB3 /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
 		52C857BC2D086C9200765FB3 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
@@ -502,7 +536,7 @@
 		52D864582D29FDBC000F8378 /* DetailMeetViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMeetViewReactor.swift; sourceTree = "<group>"; };
 		52D8645A2D2A027C000F8378 /* DetailGroupDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroupDIContainer.swift; sourceTree = "<group>"; };
 		52D864642D2A2994000F8378 /* SignUpRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpRequest.swift; sourceTree = "<group>"; };
-		52D8646B2D2A35CF000F8378 /* FetchMeet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeet.swift; sourceTree = "<group>"; };
+		52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetDetail.swift; sourceTree = "<group>"; };
 		52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupUseCaseMock.swift; sourceTree = "<group>"; };
 		52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSegmentedControl.swift; sourceTree = "<group>"; };
 		52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanListViewController.swift; sourceTree = "<group>"; };
@@ -711,24 +745,9 @@
 			isa = PBXGroup;
 			children = (
 				5214F8B42D2C9CD500E8CE9C /* MeetResponse.swift */,
+				5214F8B22D2C9CC200E8CE9C /* MeetSummaryResponse.swift */,
 			);
 			path = Meet;
-			sourceTree = "<group>";
-		};
-		521091DE2D0FABFD00DD0407 /* Scene */ = {
-			isa = PBXGroup;
-			children = (
-				5214F8B62D2C9D2100E8CE9C /* Home */,
-			);
-			path = Scene;
-			sourceTree = "<group>";
-		};
-		521091E12D0FAC8500DD0407 /* Scene */ = {
-			isa = PBXGroup;
-			children = (
-				521091E22D0FACB500DD0407 /* HomeModel.swift */,
-			);
-			path = Scene;
 			sourceTree = "<group>";
 		};
 		521091EB2D1021A500DD0407 /* Weather */ = {
@@ -839,30 +858,12 @@
 			path = MockModel;
 			sourceTree = "<group>";
 		};
-		5214F8A92D2C9AA500E8CE9C /* FetchPlan */ = {
-			isa = PBXGroup;
-			children = (
-				5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */,
-				5214F8AB2D2C9ACC00E8CE9C /* FetchMeetReview.swift */,
-			);
-			path = FetchPlan;
-			sourceTree = "<group>";
-		};
 		5214F8AD2D2C9B1300E8CE9C /* Review */ = {
 			isa = PBXGroup;
 			children = (
 				5214F8AE2D2C9B2900E8CE9C /* ReviewResponse.swift */,
 			);
 			path = Review;
-			sourceTree = "<group>";
-		};
-		5214F8B62D2C9D2100E8CE9C /* Home */ = {
-			isa = PBXGroup;
-			children = (
-				521091DF2D0FAC3800DD0407 /* HomeResponse.swift */,
-				5214F8B22D2C9CC200E8CE9C /* MeetSummaryResponse.swift */,
-			);
-			path = Home;
 			sourceTree = "<group>";
 		};
 		5214F8B72D2C9FC500E8CE9C /* Review */ = {
@@ -882,23 +883,6 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		5214F8C62D2CEABB00E8CE9C /* Fetch */ = {
-			isa = PBXGroup;
-			children = (
-				5214F8A92D2C9AA500E8CE9C /* FetchPlan */,
-			);
-			path = Fetch;
-			sourceTree = "<group>";
-		};
-		5214F8C72D2CEABF00E8CE9C /* Request */ = {
-			isa = PBXGroup;
-			children = (
-				5214F8C82D2CEAE600E8CE9C /* RequestJoinPlan.swift */,
-				5214F8CF2D2D64A500E8CE9C /* RequestLeavePlan.swift */,
-			);
-			path = Request;
-			sourceTree = "<group>";
-		};
 		52266BF52CBCF622007D03EB /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -916,6 +900,232 @@
 				5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */,
 			);
 			path = Alert;
+			sourceTree = "<group>";
+		};
+		5231DF362D2F95FB00D52529 /* AccountRepo */ = {
+			isa = PBXGroup;
+			children = (
+				525DFCEA2CC8D47B00835312 /* DefaultSignInRepo.swift */,
+				525DFCEC2CC8E95500835312 /* DefaultSignUpRepo.swift */,
+			);
+			path = AccountRepo;
+			sourceTree = "<group>";
+		};
+		5231DF372D2F960F00D52529 /* ImageRepo */ = {
+			isa = PBXGroup;
+			children = (
+				52EA6E072CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift */,
+			);
+			path = ImageRepo;
+			sourceTree = "<group>";
+		};
+		5231DF382D2F961700D52529 /* ProfileRepo */ = {
+			isa = PBXGroup;
+			children = (
+				5214F89B2D2C0A4D00E8CE9C /* DetailUserInfoRepo.swift */,
+				52EA6E172CF85F9200EFD753 /* DefaultNicknameValidationRepo.swift */,
+				52EA6E0B2CF83C9200EFD753 /* DefalutProfileEditRepo.swift */,
+			);
+			path = ProfileRepo;
+			sourceTree = "<group>";
+		};
+		5231DF392D2F964200D52529 /* Token */ = {
+			isa = PBXGroup;
+			children = (
+				52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */,
+			);
+			path = Token;
+			sourceTree = "<group>";
+		};
+		5231DF3A2D2F967300D52529 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF582D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift */,
+				5231DF3B2D2F968000D52529 /* DefaultRecentPlanListRepo.swift */,
+				5231DF5A2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift */,
+				5231DF742D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift */,
+				5231DF7E2D2FE78700D52529 /* DefaultSearchLocationRepo.swift */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		5231DF3D2D2F969B00D52529 /* AccountRepo */ = {
+			isa = PBXGroup;
+			children = (
+				52B6F63A2C77655200DA2D75 /* SignInRepo.swift */,
+				52EA6E012CF7B88D00EFD753 /* SignUpRepo.swift */,
+			);
+			path = AccountRepo;
+			sourceTree = "<group>";
+		};
+		5231DF3E2D2F96A600D52529 /* ImageRepo */ = {
+			isa = PBXGroup;
+			children = (
+				52CE87C82CEC3FED00EBD85D /* ImageUploadRepo.swift */,
+			);
+			path = ImageRepo;
+			sourceTree = "<group>";
+		};
+		5231DF3F2D2F96B000D52529 /* ProfileRepo */ = {
+			isa = PBXGroup;
+			children = (
+				5214F8992D2C060400E8CE9C /* UserInfoRepo.swift */,
+				52EA6E092CF83C6B00EFD753 /* ProfileEditRepo.swift */,
+				52EA6E0F2CF84B3100EFD753 /* NicknameValidationRepo.swift */,
+			);
+			path = ProfileRepo;
+			sourceTree = "<group>";
+		};
+		5231DF402D2F96CB00D52529 /* Token */ = {
+			isa = PBXGroup;
+			children = (
+				52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */,
+			);
+			path = Token;
+			sourceTree = "<group>";
+		};
+		5231DF412D2F96CF00D52529 /* Meet */ = {
+			isa = PBXGroup;
+			children = (
+				52CE87C62CEC3F9200EBD85D /* CreateMeetRepo.swift */,
+				5231DF4F2D2FA91F00D52529 /* MeetListRepo.swift */,
+				5231DF662D2FC0FF00D52529 /* MeetDetailRepo.swift */,
+			);
+			path = Meet;
+			sourceTree = "<group>";
+		};
+		5231DF422D2F971500D52529 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF512D2FA96100D52529 /* CreatePlanRepo.swift */,
+				5231DF432D2F972B00D52529 /* RecentPlanListRepo.swift */,
+				5231DF532D2FA99C00D52529 /* MeetPlanListRepo.swift */,
+				5231DF722D2FCAEE00D52529 /* ParticipationPlanRepo.swift */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		5231DF452D2F9F5900D52529 /* Meet */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF462D2F9F9000D52529 /* CreateMeetRequest.swift */,
+			);
+			path = Meet;
+			sourceTree = "<group>";
+		};
+		5231DF482D2FA1B300D52529 /* Meet */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF492D2FA1C500D52529 /* DefaultCreateMeetRepo.swift */,
+				5231DF4D2D2FA8EF00D52529 /* DefaultMeetListRepo.swift */,
+				5231DF682D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift */,
+			);
+			path = Meet;
+			sourceTree = "<group>";
+		};
+		5231DF552D2FAA1200D52529 /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */,
+			);
+			path = Review;
+			sourceTree = "<group>";
+		};
+		5231DF5C2D2FBB1C00D52529 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */,
+				5231DF642D2FBE6A00D52529 /* Create */,
+				5231DF5F2D2FBC6200D52529 /* Recent */,
+				5231DF5E2D2FBC5700D52529 /* MeetPlan */,
+				5231DF5D2D2FBB3000D52529 /* Participation */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		5231DF5D2D2FBB3000D52529 /* Participation */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */,
+			);
+			path = Participation;
+			sourceTree = "<group>";
+		};
+		5231DF5E2D2FBC5700D52529 /* MeetPlan */ = {
+			isa = PBXGroup;
+			children = (
+				5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */,
+			);
+			path = MeetPlan;
+			sourceTree = "<group>";
+		};
+		5231DF5F2D2FBC6200D52529 /* Recent */ = {
+			isa = PBXGroup;
+			children = (
+				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
+			);
+			path = Recent;
+			sourceTree = "<group>";
+		};
+		5231DF602D2FBDC200D52529 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				52E238312C74BFB00066C9A3 /* SignIn.swift */,
+				52EA6DFF2CF7AD9600EFD753 /* SignUp.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		5231DF612D2FBDCE00D52529 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				52EA6E0D2CF84ABD00EFD753 /* ValidatorNickname.swift */,
+				52EA6E112CF8546700EFD753 /* ProfileEdit.swift */,
+				52266BF92CBD474D007D03EB /* FetchUserInfo.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		5231DF632D2FBE2900D52529 /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				5214F8AB2D2C9ACC00E8CE9C /* FetchMeetReview.swift */,
+			);
+			path = Review;
+			sourceTree = "<group>";
+		};
+		5231DF642D2FBE6A00D52529 /* Create */ = {
+			isa = PBXGroup;
+			children = (
+				52C857AD2D07A71500765FB3 /* CreatePlan.swift */,
+			);
+			path = Create;
+			sourceTree = "<group>";
+		};
+		5231DF652D2FBE7200D52529 /* Meet */ = {
+			isa = PBXGroup;
+			children = (
+				52CE87CB2CEC40D000EBD85D /* CreateMeet.swift */,
+				523645322C8FFDEB009E0784 /* FetchMeetList.swift */,
+				52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */,
+			);
+			path = Meet;
+			sourceTree = "<group>";
+		};
+		5231DF782D2FE62400D52529 /* SearchLocation */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */,
+			);
+			path = SearchLocation;
+			sourceTree = "<group>";
+		};
+		5231DF7B2D2FE77100D52529 /* Place */ = {
+			isa = PBXGroup;
+			children = (
+				5231DF7C2D2FE77800D52529 /* SearchLocationRepo.swift */,
+			);
+			path = Place;
 			sourceTree = "<group>";
 		};
 		5235B7122D2E6722006BEAF3 /* PlanList */ = {
@@ -1031,17 +1241,6 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
-		525DFCEE2CC8F01A00835312 /* LoginScene */ = {
-			isa = PBXGroup;
-			children = (
-				52E238312C74BFB00066C9A3 /* SignIn.swift */,
-				52EA6DFF2CF7AD9600EFD753 /* SignUp.swift */,
-				52EA6E112CF8546700EFD753 /* ProfileEdit.swift */,
-				52EA6E0D2CF84ABD00EFD753 /* ValidatorNickname.swift */,
-			);
-			path = LoginScene;
-			sourceTree = "<group>";
-		};
 		525DFCF22CC8F53400835312 /* RepositoryMock */ = {
 			isa = PBXGroup;
 			children = (
@@ -1052,50 +1251,6 @@
 				52EA6E152CF85A0B00EFD753 /* ProfileEditRepositoryMock.swift */,
 			);
 			path = RepositoryMock;
-			sourceTree = "<group>";
-		};
-		525DFCF52CC8FB1100835312 /* MainScene */ = {
-			isa = PBXGroup;
-			children = (
-				525DFCF62CC8FB2300835312 /* HomeScene */,
-				525DFCF72CC8FB2500835312 /* MeetList */,
-				525DFCF82CC8FB2700835312 /* CalendarScene */,
-				525DFCF92CC8FB2800835312 /* ProfileScene */,
-			);
-			path = MainScene;
-			sourceTree = "<group>";
-		};
-		525DFCF62CC8FB2300835312 /* HomeScene */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
-				5200C36B2CFF473F00C0CEFC /* RefreshFCMToken.swift */,
-			);
-			path = HomeScene;
-			sourceTree = "<group>";
-		};
-		525DFCF72CC8FB2500835312 /* MeetList */ = {
-			isa = PBXGroup;
-			children = (
-				523645322C8FFDEB009E0784 /* FetchGroupList.swift */,
-			);
-			path = MeetList;
-			sourceTree = "<group>";
-		};
-		525DFCF82CC8FB2700835312 /* CalendarScene */ = {
-			isa = PBXGroup;
-			children = (
-				5207C9142CB3C21800BB27A6 /* FetchSchedule.swift */,
-			);
-			path = CalendarScene;
-			sourceTree = "<group>";
-		};
-		525DFCF92CC8FB2800835312 /* ProfileScene */ = {
-			isa = PBXGroup;
-			children = (
-				52266BF92CBD474D007D03EB /* FetchUserInfo.swift */,
-			);
-			path = ProfileScene;
 			sourceTree = "<group>";
 		};
 		525DFCFB2CCA135500835312 /* NotifyView */ = {
@@ -1524,14 +1679,14 @@
 		52B6F63C2C77655C00DA2D75 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				52B6F63A2C77655200DA2D75 /* SignInRepo.swift */,
-				52EA6E012CF7B88D00EFD753 /* SignUpRepo.swift */,
-				52EA6E092CF83C6B00EFD753 /* ProfileEditRepo.swift */,
-				52EA6E0F2CF84B3100EFD753 /* NicknameValidationRepo.swift */,
-				52CE87C62CEC3F9200EBD85D /* CreateMeetRepo.swift */,
-				52CE87C82CEC3FED00EBD85D /* ImageUploadRepo.swift */,
-				52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */,
-				5214F8992D2C060400E8CE9C /* UserInfoRepo.swift */,
+				5231DF3D2D2F969B00D52529 /* AccountRepo */,
+				5231DF402D2F96CB00D52529 /* Token */,
+				5231DF3F2D2F96B000D52529 /* ProfileRepo */,
+				5231DF3E2D2F96A600D52529 /* ImageRepo */,
+				5231DF412D2F96CF00D52529 /* Meet */,
+				5231DF422D2F971500D52529 /* Plan */,
+				5231DF7B2D2FE77100D52529 /* Place */,
+				5231DF552D2FAA1200D52529 /* Review */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -1661,6 +1816,7 @@
 		52C857B02D081DDC00765FB3 /* Plan */ = {
 			isa = PBXGroup;
 			children = (
+				521091E22D0FACB500DD0407 /* RecentPlan.swift */,
 				52C857BA2D0865A100765FB3 /* Plan.swift */,
 				5285E6E12CDC342D00B855CB /* Components */,
 				529D7B912CDE14BD00BE77BE /* Comment */,
@@ -1671,7 +1827,7 @@
 		52C857B42D082AE900765FB3 /* Plan */ = {
 			isa = PBXGroup;
 			children = (
-				52C857B12D081DE800765FB3 /* PlanUploadRequest.swift */,
+				52C857B12D081DE800765FB3 /* CreatePlanRequest.swift */,
 				52741ECA2D11A54400C249A6 /* Components */,
 			);
 			path = Plan;
@@ -1680,7 +1836,6 @@
 		52C857B72D0862CB00765FB3 /* Response */ = {
 			isa = PBXGroup;
 			children = (
-				521091DE2D0FABFD00DD0407 /* Scene */,
 				5214F8AD2D2C9B1300E8CE9C /* Review */,
 				5285E6A92CD9D74000B855CB /* Error */,
 				5285E6AE2CD9F3DE00B855CB /* User */,
@@ -1694,9 +1849,11 @@
 		52C857B82D0862DB00765FB3 /* Request */ = {
 			isa = PBXGroup;
 			children = (
+				5231DF782D2FE62400D52529 /* SearchLocation */,
 				52D864672D2A2A15000F8378 /* SignIn */,
 				52D864632D2A26FE000F8378 /* SignUp */,
 				52C857B42D082AE900765FB3 /* Plan */,
+				5231DF452D2F9F5900D52529 /* Meet */,
 			);
 			path = Request;
 			sourceTree = "<group>";
@@ -1704,6 +1861,7 @@
 		52C857B92D0863EA00765FB3 /* Plan */ = {
 			isa = PBXGroup;
 			children = (
+				521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */,
 				52C857B52D082AFB00765FB3 /* PlanResponse.swift */,
 				5285E6B82CDA099E00B855CB /* Comment */,
 			);
@@ -1823,15 +1981,6 @@
 				52CC75DE2D1EB2DA000CC8B9 /* SearchPlaceTableHeaderView.swift */,
 			);
 			path = Header;
-			sourceTree = "<group>";
-		};
-		52CE87CA2CEC40B100EBD85D /* Create */ = {
-			isa = PBXGroup;
-			children = (
-				52CE87CB2CEC40D000EBD85D /* CreateMeet.swift */,
-				52C857AD2D07A71500765FB3 /* CreatePlan.swift */,
-			);
-			path = Create;
 			sourceTree = "<group>";
 		};
 		52D8642A2D264157000F8378 /* DetailPlaceViewController */ = {
@@ -2001,14 +2150,6 @@
 			path = SignIn;
 			sourceTree = "<group>";
 		};
-		52D8646A2D2A3595000F8378 /* FetchDetailMeet */ = {
-			isa = PBXGroup;
-			children = (
-				52D8646B2D2A35CF000F8378 /* FetchMeet.swift */,
-			);
-			path = FetchDetailMeet;
-			sourceTree = "<group>";
-		};
 		52D864832D2A8E66000F8378 /* SegmentControl */ = {
 			isa = PBXGroup;
 			children = (
@@ -2060,7 +2201,6 @@
 			isa = PBXGroup;
 			children = (
 				5214F8B72D2C9FC500E8CE9C /* Review */,
-				521091E12D0FAC8500DD0407 /* Scene */,
 				5285E6C22CDB1E8500B855CB /* User */,
 				521091D82D0FA5F000DD0407 /* Meet */,
 				52C857B02D081DDC00765FB3 /* Plan */,
@@ -2102,13 +2242,12 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8C72D2CEABF00E8CE9C /* Request */,
-				5214F8C62D2CEABB00E8CE9C /* Fetch */,
-				52D8646A2D2A3595000F8378 /* FetchDetailMeet */,
+				5231DF602D2FBDC200D52529 /* Account */,
+				5231DF612D2FBDCE00D52529 /* Profile */,
+				5231DF652D2FBE7200D52529 /* Meet */,
+				5231DF632D2FBE2900D52529 /* Review */,
+				5231DF5C2D2FBB1C00D52529 /* Plan */,
 				52818C632D182AE00001E30B /* SearchLocation */,
-				52CE87CA2CEC40B100EBD85D /* Create */,
-				525DFCEE2CC8F01A00835312 /* LoginScene */,
-				525DFCF52CC8FB1100835312 /* MainScene */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -2135,13 +2274,13 @@
 		52E238462C772EFA0066C9A3 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				525DFCEA2CC8D47B00835312 /* DefaultSignInRepo.swift */,
-				525DFCEC2CC8E95500835312 /* DefaultSignUpRepo.swift */,
-				52EA6E072CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift */,
-				52EA6E0B2CF83C9200EFD753 /* DefalutProfileEditRepo.swift */,
-				52EA6E172CF85F9200EFD753 /* DefaultNicknameValidationRepo.swift */,
-				52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */,
-				5214F89B2D2C0A4D00E8CE9C /* DetailUserInfoRepo.swift */,
+				5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */,
+				5231DF362D2F95FB00D52529 /* AccountRepo */,
+				5231DF392D2F964200D52529 /* Token */,
+				5231DF382D2F961700D52529 /* ProfileRepo */,
+				5231DF372D2F960F00D52529 /* ImageRepo */,
+				5231DF482D2FA1B300D52529 /* Meet */,
+				5231DF3A2D2F967300D52529 /* Plan */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -2286,6 +2425,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5231DF672D2FC0FF00D52529 /* MeetDetailRepo.swift in Sources */,
+				5231DF4A2D2FA1C500D52529 /* DefaultCreateMeetRepo.swift in Sources */,
 				5259B01D2CA038AA006B2711 /* CalenadrPalnTableCell.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* CalendarPlanTableHeaderView.swift in Sources */,
@@ -2296,6 +2437,7 @@
 				52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
 				52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */,
+				5231DF572D2FAA2300D52529 /* FetchMeetReviewListRepo.swift in Sources */,
 				524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
 				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
@@ -2317,6 +2459,7 @@
 				527A3E992C836287007FE63B /* CalendarScheduleViewController.swift in Sources */,
 				52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */,
 				52CC75CE2D1D4B4D000CC8B9 /* DefaultViewController.swift in Sources */,
+				5231DF7F2D2FE78700D52529 /* DefaultSearchLocationRepo.swift in Sources */,
 				52EA6E062CF7F22900EFD753 /* SignUpViewReactor.swift in Sources */,
 				52D8642C2D26416D000F8378 /* DetailPlaceViewController.swift in Sources */,
 				5214F8C12D2CA38C00E8CE9C /* PastPlanTableCell.swift in Sources */,
@@ -2330,7 +2473,6 @@
 				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
 				52818C732D1983370001E30B /* SearchLoactionUseCaseMock.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */,
-				5214F8D02D2D64A500E8CE9C /* RequestLeavePlan.swift in Sources */,
 				52C857BD2D086C9200765FB3 /* Location.swift in Sources */,
 				52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */,
 				5214F89F2D2C403900E8CE9C /* PlanMock.swift in Sources */,
@@ -2349,6 +2491,7 @@
 				521091F12D10559600DD0407 /* Meet.swift in Sources */,
 				52818C8D2D1C45EA0001E30B /* SearchResultViewController.swift in Sources */,
 				52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */,
+				5231DF442D2F972B00D52529 /* RecentPlanListRepo.swift in Sources */,
 				526B98622CEDBDFD002488C5 /* LabeledTextFieldView.swift in Sources */,
 				5214F8BC2D2CA09200E8CE9C /* ReviewMock.swift in Sources */,
 				52818C752D198A760001E30B /* PlanCreateSceneDIContainer.swift in Sources */,
@@ -2360,25 +2503,30 @@
 				52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */,
 				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */,
+				5231DF522D2FA96100D52529 /* CreatePlanRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
 				52266BFC2CBD482F007D03EB /* FetchUserInfoMock.swift in Sources */,
 				528D27CD2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift in Sources */,
 				52CB41DE2CA2EC2B0071679D /* PlanTableSectionModel.swift in Sources */,
 				52818C902D1C469F0001E30B /* SearchPlaceTableCell.swift in Sources */,
-				521091E02D0FAC3800DD0407 /* HomeResponse.swift in Sources */,
+				521091E02D0FAC3800DD0407 /* RecentPlanResponse.swift in Sources */,
 				5214F88C2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
+				5231DF592D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift in Sources */,
 				52EA6E022CF7B88D00EFD753 /* SignUpRepo.swift in Sources */,
 				5214F8C52D2CADD100E8CE9C /* PastPlanTableCellModel.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
 				52D8645B2D2A027C000F8378 /* DetailGroupDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
+				5231DF772D2FCC4A00D52529 /* RequsetParticipationPlan.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
-				521091E32D0FACB500DD0407 /* HomeModel.swift in Sources */,
+				521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */,
+				5231DF732D2FCAEE00D52529 /* ParticipationPlanRepo.swift in Sources */,
 				5214F8822D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
+				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
@@ -2406,8 +2554,8 @@
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
 				52818C622D18217B0001E30B /* SearchNaviViewController.swift in Sources */,
-				5200C36C2CFF473F00C0CEFC /* RefreshFCMToken.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
+				5231DF4E2D2FA8EF00D52529 /* DefaultMeetListRepo.swift in Sources */,
 				5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
@@ -2422,10 +2570,12 @@
 				5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */,
 				52EA6DFB2CF78F9D00EFD753 /* SocialInfo.swift in Sources */,
+				5231DF692D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */,
+				5231DF4C2D2FA23000D52529 /* BaseRepositories.swift in Sources */,
 				523645492C90B711009E0784 /* UIView+PreView.swift in Sources */,
-				523645332C8FFDEB009E0784 /* FetchGroupList.swift in Sources */,
+				523645332C8FFDEB009E0784 /* FetchMeetList.swift in Sources */,
 				52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
 				52D864892D2A93DF000F8378 /* FuturePlanListViewController.swift in Sources */,
@@ -2434,6 +2584,7 @@
 				5214F8A62D2C40C700E8CE9C /* MeetMock.swift in Sources */,
 				52818C712D1981ED0001E30B /* SearchPlaceResult.swift in Sources */,
 				52EA6E162CF85A0B00EFD753 /* ProfileEditRepositoryMock.swift in Sources */,
+				5231DF752D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* SignUpViewController.swift in Sources */,
 				5235B7172D2E7303006BEAF3 /* MeetSetupViewReactor.swift in Sources */,
 				52818C862D1ACE4D0001E30B /* UINavigation+Common.swift in Sources */,
@@ -2455,6 +2606,7 @@
 				5214F8A22D2C407A00E8CE9C /* HomeModelMock.swift in Sources */,
 				5214F8AF2D2C9B2900E8CE9C /* ReviewResponse.swift in Sources */,
 				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
+				5231DF7D2D2FE77800D52529 /* SearchLocationRepo.swift in Sources */,
 				52818C6D2D194C940001E30B /* PlaceInfo.swift in Sources */,
 				52818C672D1836E90001E30B /* DefaultTextField.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* CalendarPlanTableViewController.swift in Sources */,
@@ -2465,15 +2617,18 @@
 				52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */,
 				52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */,
 				52EA6E122CF8546700EFD753 /* ProfileEdit.swift in Sources */,
+				5231DF502D2FA91F00D52529 /* MeetListRepo.swift in Sources */,
 				52D864382D28AFE9000F8378 /* EditProfileMock.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
-				52C857B22D081DE800765FB3 /* PlanUploadRequest.swift in Sources */,
+				52C857B22D081DE800765FB3 /* CreatePlanRequest.swift in Sources */,
 				527A3E972C83627C007FE63B /* MeetListViewController.swift in Sources */,
 				5214F8952D2BF91B00E8CE9C /* UserInfoStorage.swift in Sources */,
 				52EA6E0E2CF84ABD00EFD753 /* ValidatorNickname.swift in Sources */,
+				5231DF3C2D2F968000D52529 /* DefaultRecentPlanListRepo.swift in Sources */,
 				5214F8932D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift in Sources */,
 				5214F8892D2BB08500E8CE9C /* FuturePlanListViewReactor.swift in Sources */,
 				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
+				5231DF7A2D2FE63600D52529 /* SearchLocationReqeust.swift in Sources */,
 				5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */,
 				52818C692D19462B0001E30B /* PlaceInfoResponse.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
@@ -2489,7 +2644,7 @@
 				52D864522D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52EA6E0C2CF83C9200EFD753 /* DefalutProfileEditRepo.swift in Sources */,
-				5207C9152CB3C21800BB27A6 /* FetchSchedule.swift in Sources */,
+				5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */,
 				52CE87C32CEC38D100EBD85D /* String+Validator.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
@@ -2505,9 +2660,10 @@
 				52C5200C2D0D6A550085F5F7 /* MeetSelectViewController.swift in Sources */,
 				5214F8862D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift in Sources */,
 				52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */,
+				5231DF5B2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift in Sources */,
 				527DBE2F2CE8965A008BB20E /* CreateMeetViewController.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
-				52D8646C2D2A35CF000F8378 /* FetchMeet.swift in Sources */,
+				52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */,
 				52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */,
 				52D864472D292D34000F8378 /* HomeCoordination.swift in Sources */,
 				52818C842D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift in Sources */,
@@ -2518,10 +2674,10 @@
 				520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* LoginSceneCoordinator.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
-				5214F8C92D2CEAE600E8CE9C /* RequestJoinPlan.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */,
 				5236453C2C900DA3009E0784 /* MeetListTableViewController.swift in Sources */,
 				52C857BB2D0865A100765FB3 /* Plan.swift in Sources */,
+				5231DF542D2FA99C00D52529 /* MeetPlanListRepo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

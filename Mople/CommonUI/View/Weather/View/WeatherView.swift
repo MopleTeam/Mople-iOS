@@ -41,7 +41,7 @@ final class WeatherView: UIView {
     
     private let popLabel: IconLabel = {
         let label = IconLabel(icon: .pop,
-                              iconSize: 18)
+                              iconSize: .init(width: 18, height: 18))
         label.layer.cornerRadius = 6
         label.backgroundColor = ColorStyle.Default.blueGray
         label.setTitle(font: FontStyle.Body2.bold,

@@ -139,6 +139,7 @@ extension DefaultAlertControl {
         btn.addAction(makeAction(action.completion,
                                  dismissAnimated: dismissAnimated),
                       for: .touchUpInside)
+        btn.titleLabel?.textAlignment = .center
         return btn
     }
     

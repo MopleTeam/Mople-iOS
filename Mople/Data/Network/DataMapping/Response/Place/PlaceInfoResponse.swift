@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct PlaceInfoResponse: Decodable {
     let title: String?
     let distance: String?

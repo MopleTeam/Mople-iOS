@@ -50,10 +50,9 @@ extension DetailGroupSceneDIContainer {
                                             parentReactor: mainReactor!)
     }
     
-    private func makeFuturePlanListViewReactor() -> FutruePlanListViewReactor {
+    private func makeFuturePlanListViewReactor() -> FuturePlanListViewReactor {
         return .init(fetchPlanUseCase: FetchMeetFuturePlanMock(),
-                     requestJoinPlanUseCase: RequestJoinPlanMock(),
-                     requsetLeavePlanUseCase: RequestLeavePlanMock(),
+                     participationPlanUseCase: RequsetParticipationPlanUseCaseMock(),
                      meetID: meetId)
     }
     

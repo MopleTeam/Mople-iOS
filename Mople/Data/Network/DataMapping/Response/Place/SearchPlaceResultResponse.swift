@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SearchPlaceResultResponse {
+struct SearchPlaceResultResponse: Decodable {
     let searchResult: [PlaceInfoResponse]
     let page: Int
     let isEnd: Bool

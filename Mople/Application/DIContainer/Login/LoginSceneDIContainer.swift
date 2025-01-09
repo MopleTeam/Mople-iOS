@@ -83,7 +83,7 @@ extension LoginSceneDIContainer {
     }
 
     private func makeImageUploadRepo() -> ImageUploadRepo {
-        return DefaultImageUploadRepo(networkServbice: appNetworkService)
+        return DefaultImageUploadRepo(networkService: appNetworkService)
     }
     
     private func makeSignUpRepo() -> SignUpRepo {

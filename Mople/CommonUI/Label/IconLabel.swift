@@ -20,9 +20,7 @@ final class IconLabel: UIView {
             infoLabel.text = text
         }
     }
-    
-    private var iconSize: CGFloat?
-    
+        
     private let imageContainerView: UIView = {
         let view = UIView()
         return view
@@ -54,10 +52,9 @@ final class IconLabel: UIView {
     }()
     
     init(icon: UIImage?,
-         iconSize: CGFloat) {
+         iconSize: CGSize) {
         super.init(frame: .zero)
-        self.iconSize = iconSize
-        setupUI()
+        setupUI(iconSize: iconSize)
         setupIcon(icon)
     }
     
@@ -69,7 +66,7 @@ final class IconLabel: UIView {
         self.imageView.image = icon
     }
     
-    private func setupUI() {
+    private func setupUI(iconSize: CGSize) {
         self.addSubview(mainStackView)
         self.imageContainerView.addSubview(imageView)
         self.labelContainerView.addSubview(infoLabel)
@@ -80,12 +77,12 @@ final class IconLabel: UIView {
         }
         
         imageContainerView.snp.makeConstraints { make in
-            make.width.equalTo(iconSize ?? 0)
+            make.width.equalTo(iconSize.width)
         }
 
         imageView.snp.makeConstraints { make in
             make.centerX.top.equalToSuperview()
-            make.size.equalTo(iconSize ?? 0)
+            make.size.equalTo(iconSize)
         }
         
         infoLabel.snp.makeConstraints { make in
@@ -124,6 +121,10 @@ extension IconLabel {
     public func setMargin(_ margin: UIEdgeInsets) {
         mainStackView.isLayoutMarginsRelativeArrangement = true
         mainStackView.layoutMargins = margin
+    }
+    
+    public func hideIcon(isHide: Bool) {
+        imageContainerView.isHidden = isHide
     }
 }
 

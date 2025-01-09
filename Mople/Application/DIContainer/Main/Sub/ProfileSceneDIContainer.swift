@@ -66,7 +66,7 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeImageUploadRepo() -> ImageUploadRepo {
-        return DefaultImageUploadRepo(networkServbice: appNetworkService)
+        return DefaultImageUploadRepo(networkService: appNetworkService)
     }
     
     private func makeProfileEditRepo() -> ProfileEditRepo {

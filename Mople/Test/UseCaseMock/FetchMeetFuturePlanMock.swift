@@ -25,7 +25,7 @@ final class FetchMeetFuturePlanMock: FetchMeetFuturePlan {
         return planArray
     }
     
-    func fetchPlan(meetId: Int) -> Single<[Plan]> {
+    func fetchPlanList(meetId: Int) -> Single<[Plan]> {
         return Observable.just(getEvents())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()
