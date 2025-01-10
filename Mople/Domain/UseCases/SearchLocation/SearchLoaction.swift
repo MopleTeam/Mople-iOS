@@ -6,29 +6,27 @@
 //
 
 import RxSwift
-import CoreLocation
-
 
 protocol SearchLoaction {
-    func requestSearchLocation(query: String) -> Single<SearchPlaceResult>
+    func requestSearchLocation(query: String,
+                               x: Double?,
+                               y: Double?) -> Single<SearchPlaceResult>
 }
 
 final class SearchLoactionUseCase: SearchLoaction {
-    
-    let locationManaber = CLLocationManager()
-    
+        
     let searchLocationRepo: SearchLocationRepo
     
     init(searchLocationRepo: SearchLocationRepo) {
         self.searchLocationRepo = searchLocationRepo
     }
     
-    func requestSearchLocation(query: String) -> Single<SearchPlaceResult> {
-        
-        
+    func requestSearchLocation(query: String,
+                               x: Double?,
+                               y: Double?) -> Single<SearchPlaceResult> {
         
         return searchLocationRepo
-            .searchLocation(.init(query: query, x: nil, y: nil))
+            .searchLocation(.init(query: query, x: x, y: y))
             .map { $0.toDomain() }
     }
 }

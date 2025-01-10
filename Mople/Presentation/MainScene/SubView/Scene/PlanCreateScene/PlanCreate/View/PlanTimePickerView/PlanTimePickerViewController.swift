@@ -18,7 +18,7 @@ final class PlanTimePickerViewController: UIViewController, View {
         case pm = "오후"
     }
     
-    typealias Reactor = PlanCreateViewReactor
+    typealias Reactor = CreatePlanViewReactor
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -47,7 +47,7 @@ final class PlanTimePickerViewController: UIViewController, View {
     private let pickerView = DefaultPickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
-    init(reactor: PlanCreateViewReactor?) {
+    init(reactor: CreatePlanViewReactor?) {
         print(#function, #line, "LifeCycle Test CalendarDate PickerView Created" )
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -94,7 +94,7 @@ final class PlanTimePickerViewController: UIViewController, View {
     }
     
     // MARK: - Binding
-    func bind(reactor: PlanCreateViewReactor) {
+    func bind(reactor: CreatePlanViewReactor) {
         self.pickerView.sheetView.rx.completedEvent
             .asDriver()
             .compactMap({ [weak self] _ -> DateComponents? in

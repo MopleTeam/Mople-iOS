@@ -117,7 +117,7 @@ extension SignInViewReactor {
         switch err {
         case LoginError.notFoundInfo(let socialInfo):
             return Observable.just(())
-                .subscribe(on: MainScheduler.instance)
+                .observe(on: MainScheduler.instance)
                 .map { _ in .moveToProfileSetup(socialInfo) }
         case let err as LoginError:
             return .just(.notifyMessage(message: err.info))

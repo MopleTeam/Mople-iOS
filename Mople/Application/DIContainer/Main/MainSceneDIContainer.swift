@@ -17,7 +17,7 @@ protocol MainTapDependencies {
 }
 
 protocol MainNavigationDependencies {
-    func makeCreateGroupViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController
+    func makeCreateMeetViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController
     func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator
     func makePlanCreateCoordinator() -> BaseCoordinator
 }
@@ -66,8 +66,21 @@ extension MainSceneDIContainer {
     }
     
     private func makeHomeViewReactor(coordinator: HomeCoordination) -> HomeViewReactor {
-        return HomeViewReactor(fetchRecentScheduleUseCase: FetchRecentScheduleMock(),
+        return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
+                               notificationService: makeNotificationService(),
                                coordinator: coordinator)
+    }
+    
+    private func makeRecentPlanUseCase() -> FetchRecentPlan {
+        return FetchRecentPlanUseCase(recentPlanRepo: makeRecentPlanRepo())
+    }
+    
+    private func makeRecentPlanRepo() -> RecentPlanListRepo {
+        return DefaultRecentPlanListRepo(networkServbice: appNetworkService)
+    }
+    
+    private func makeNotificationService() -> NotificationService {
+        return DefaultNotificationService()
     }
     
     // MARK: - 모임 리스트
@@ -81,8 +94,16 @@ extension MainSceneDIContainer {
     }
     
     private func makeMeetListViewReactor(coordinator: MainCoordination) -> MeetListViewReactor {
-        return MeetListViewReactor(fetchUseCase: FetchGroupListMock(),
+        return MeetListViewReactor(fetchUseCase: makeMeetListUseCase(), // FetchGroupListMock()
                                     coordinator: coordinator)
+    }
+    
+    private func makeMeetListUseCase() -> FetchMeetList {
+        return FetchMeetListUseCase(meetListRepo: makeMeetListRepo())
+    }
+    
+    private func makeMeetListRepo() -> MeetListRepo {
+        return DefaultMeetListRepo(networkService: appNetworkService)
     }
     
     // MARK: - 캘린더
@@ -117,28 +138,45 @@ extension MainSceneDIContainer {
 // MARK: - Main Navigation
 extension MainSceneDIContainer {
     // MARK: - 그룹 생성 화면
-    func makeCreateGroupViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController {
+    func makeCreateMeetViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController {
         let createGroupVC = CreateMeetViewController(title: TextStyle.CreateGroup.title,
-                                                      reactor: makeCreateGroupViewReactor(coordinator: coordinator))
+                                                      reactor: makeCreateMeetViewReactor(coordinator: coordinator))
         createGroupVC.configureModalPresentation()
         return createGroupVC
     }
     
-    private func makeCreateGroupViewReactor(coordinator: CreateMeetCoordination) -> CreateMeetViewReactor {
-        return .init(createMeetUseCase: CreateGroupMock(),
+    private func makeCreateMeetViewReactor(coordinator: CreateMeetCoordination) -> CreateMeetViewReactor {
+        return .init(createMeetUseCase: makeCreateMeetUseCase(), // CreateGroupMock()
                      coordinator: coordinator)
+    }
+    
+    private func makeCreateMeetUseCase() -> CreateMeet {
+        return CreateGroupUseCase(imageUploadRepo: makeImageUploadRepo(),
+                                  createMeetRepo: makeCreateMeetRepo())
+    }
+    
+    private func makeImageUploadRepo() -> ImageUploadRepo {
+        return DefaultImageUploadRepo(networkService: appNetworkService)
+    }
+    
+    private func makeCreateMeetRepo() -> CreateMeetRepo {
+        return DefaultCreateMeetRepo(networkService: appNetworkService)
     }
     
     // MARK: - 일정 생성 화면
     func makePlanCreateCoordinator() -> BaseCoordinator {
-        let planCreateDI = PlanCreateSceneDIContainer(appNetworkService: appNetworkService)
+        let planCreateDI = PlanCreateSceneDIContainer(
+            appNetworkService: appNetworkService,
+            fetchMeetListUseCase: FetchMeetListUseCase(meetListRepo: makeMeetListRepo()) )
+        
         let navigationController = UINavigationController.createFullScreenNavigation()
         return planCreateDI.makePlanCreateFlowCoordinator(navigationController: navigationController)
     }
     
+    // MARK: - 미팅 상세 뷰
     func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator {
-        let detailMeetDI = DetailGroupSceneDIContainer(appNetworkService: appNetworkService, meetId: meetId)
+        let detailMeetDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService, meetId: meetId)
         let navigationController = UINavigationController.createFullScreenNavigation()
-        return detailMeetDI.makeDetailMeetCoordinator(navigationController: navigationController)
+        return detailMeetDI.makeMeetDetailCoordinator(navigationController: navigationController)
     }
 }

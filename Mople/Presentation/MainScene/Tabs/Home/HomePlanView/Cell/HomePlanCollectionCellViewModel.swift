@@ -12,6 +12,7 @@ struct HomePlanCollectionCellViewModel {
     let meet: MeetSummary?
     let date: Date?
     let address: String?
+    let addressTitle: String?
     let participantCount: Int?
     let weather: Weather?
     
@@ -24,14 +25,20 @@ struct HomePlanCollectionCellViewModel {
     var dateString: String? {
         return DateManager.toString(date: date, format: .full)
     }
+    
+    var fullAddress: String? {
+        [address, addressTitle].compactMap { $0 }.joined(separator: " ")
+    }
 }
 
 extension HomePlanCollectionCellViewModel {
     init(plan: Plan) {
+        print(#function, #line, "#5 : \(plan)" )
         self.title = plan.title
         self.meet = plan.meet
         self.date = plan.date
         self.address = plan.address
+        self.addressTitle = plan.addressTitle
         self.participantCount = plan.participantCount
         self.weather = plan.weather
     }

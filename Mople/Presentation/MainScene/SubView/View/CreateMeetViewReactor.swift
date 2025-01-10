@@ -82,6 +82,7 @@ extension CreateMeetViewReactor {
         #warning("오류 발생 시 문제 해결")
         let createMeet = createMeetUseCase.createMeet(title: title!, image: image)
             .asObservable()
+            .observe(on: MainScheduler.instance)
             .map { _ in Mutation.responseMeet }
             .catch { err in .just(.notifyMessage(message: "오류 발생")) }
         

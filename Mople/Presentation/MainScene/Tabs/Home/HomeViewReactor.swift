@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreLocation
 import ReactorKit
 
 enum HomeError: Error {
@@ -40,15 +39,17 @@ final class HomeViewReactor: Reactor {
     }
     
     private let fetchRecentScheduleUseCase: FetchRecentPlan
+    private let notificationService: NotificationService
     private let coordinator: HomeCoordination
     
     var initialState: State = State()
     
     init(fetchRecentScheduleUseCase: FetchRecentPlan,
+         notificationService: NotificationService,
          coordinator: HomeCoordination) {
         print(#function, #line, "LifeCycle Test HomeViewReactor Created" )
-
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
+        self.notificationService = notificationService
         self.coordinator = coordinator
         action.onNext(.requestRecentPlan)
     }
@@ -68,7 +69,7 @@ final class HomeViewReactor: Reactor {
         case .presentCalendaer:
             presentNextEvent()
         case .checkNotificationPermission:
-            checkNotificationPermission()
+            requestNotificationPermission()
         }
     }
     
@@ -147,48 +148,19 @@ extension HomeViewReactor {
 
 // MARK: - Premission
 extension HomeViewReactor {
-    private func checkNotificationPermission() -> Observable<Mutation> {
-        
-        let notificationCenter = UNUserNotificationCenter.current()
-        
-        notificationCenter.getNotificationSettings { [weak self] setting in
-            switch setting.authorizationStatus {
-            case .authorized:
-                self?.requestLocationPermission()
-            case .notDetermined:
-                self?.requestNotificationPermission(notificationCenter)
-            default:
-                self?.requestLocationPermission()
+    private func requestNotificationPermission() -> Observable<Mutation> {
+        return Observable<Mutation>.create { observer in
+            self.notificationService.requestPremission {
+                observer.onCompleted()
             }
-        }
-        
-        return Observable.empty()
-    }
-    
-    
-    /// 유저에게 알림 허용여부 묻기
-    private func requestNotificationPermission(_ center: UNUserNotificationCenter) {
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] (granted, error) in
-            self?.registerForRemoteNotifications()
-            self?.requestLocationPermission()
-            print(#function, #line, "#10 : \(granted)" )
-        }
-    }
-    
-    /// 앱 진입 시 디바이스 토큰 재업로드 하기
-    private func registerForRemoteNotifications() {
-        DispatchQueue.main.async {
-            UIApplication.shared.registerForRemoteNotifications()
-        }
-    }
-    
-    private func requestLocationPermission() {
-        let locationManager = CLLocationManager()
-        switch locationManager.authorizationStatus {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
-        default:
-            break
+            
+            return Disposables.create()
         }
     }
 }
+
+
+
+
+
+

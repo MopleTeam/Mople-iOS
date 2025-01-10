@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 import ReactorKit
 
 enum SearchError: Error {
@@ -30,6 +31,7 @@ final class SearchPlaceReactor: Reactor {
     }
     
     enum Action {
+        case updateUserLocation
         case fetchCahcedPlace
         case searchPlace(query: String?)
         case showDetailPlace(index: Int)
@@ -39,13 +41,15 @@ final class SearchPlaceReactor: Reactor {
     }
     
     enum Mutation {
-        case updatePlace(_ result: PlaceSearchResult)
+        case setUserLocation(_ location: CLLocationCoordinate2D?)
+        case setPlace(_ result: PlaceSearchResult)
         case notifyLoadingState(_ isLoading: Bool)
         case handleSearchError(error: SearchError?)
     }
     
     struct State {
         @Pulse var searchResult: PlaceSearchResult?
+        @Pulse var userLocation: CLLocationCoordinate2D?
         @Pulse var error: SearchError?
         @Pulse var isLoading: Bool = false
     }
@@ -53,17 +57,21 @@ final class SearchPlaceReactor: Reactor {
     var initialState: State = State()
     
     private let searchUseCase: SearchLoaction
+    private let locationService: LocationService
     private let queryStorage: SearchedPlaceStorage
     private weak var coordinator: SearchPlaceCoordination?
     
     init(searchLocationUseCase: SearchLoaction,
+         locationService: LocationService,
          queryStorage: SearchedPlaceStorage,
          coordinator: SearchPlaceCoordination) {
         print(#function, #line, "LifeCycle Test SearchLocationReactor Created" )
         self.searchUseCase = searchLocationUseCase
+        self.locationService = locationService
         self.queryStorage = queryStorage
         self.coordinator = coordinator
         action.onNext(.fetchCahcedPlace)
+        action.onNext(.updateUserLocation)
     }
     
     deinit {
@@ -72,6 +80,8 @@ final class SearchPlaceReactor: Reactor {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
+        case .updateUserLocation:
+            return updateUserLocation()
         case .fetchCahcedPlace:
             return self.fetchCahcedPlace()
         case let .searchPlace(query):
@@ -94,13 +104,14 @@ final class SearchPlaceReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case let .updatePlace(result):
+        case let .setPlace(result):
             newState.searchResult = result
         case let .handleSearchError(err):
             newState.error = err
         case let .notifyLoadingState(isLoading):
             newState.isLoading = isLoading
-       
+        case let .setUserLocation(location):
+            newState.userLocation = location
         }
         
         return newState
@@ -112,7 +123,18 @@ extension SearchPlaceReactor {
     private func fetchCahcedPlace() -> Observable<Mutation> {
         let places = queryStorage.readPlaces()
         self.updateHistoryVisibility(result: places)
-        return .just(Mutation.updatePlace(.init(places: places, isCached: true)))
+        return .just(Mutation.setPlace(.init(places: places, isCached: true)))
+    }
+    
+    private func updateUserLocation() -> Observable<Mutation> {
+        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
+        
+        let fetchUserLocation = locationService.updateLocation()
+            .map { Mutation.setUserLocation($0) }
+        
+        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
+
+        return .concat([loadingStart, fetchUserLocation, loadingStop])
     }
     
     private func searchLocation(query: String?) -> Observable<Mutation> {
@@ -123,15 +145,19 @@ extension SearchPlaceReactor {
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
+        let userLocation = currentState.userLocation
         #warning("에러 처리")
-        let requestSearch = searchUseCase.requestSearchLocation(query: query)
+        let requestSearch = searchUseCase.requestSearchLocation(query: query,
+                                                                x: userLocation?.longitude,
+                                                                y: userLocation?.latitude)
             .asObservable()
+            .observe(on: MainScheduler.instance)
             .filter({ [weak self] response in
                 let isEmpty = response.result.isEmpty
                 self?.updateSearchResultVisibility(result: response.result)
                 return !isEmpty
             })
-            .map { Mutation.updatePlace(.init(places: $0.result, isCached: false)) }
+            .map { Mutation.setPlace(.init(places: $0.result, isCached: false)) }
         
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
         
@@ -146,7 +172,7 @@ extension SearchPlaceReactor {
               let selectedPlace = result.places[safe: index] else { return .empty() }
         coordinator?.showDetailPlaceView(place: selectedPlace)
         queryStorage.addPlace(selectedPlace)
-        return Observable.just(())
+        return Observable.just(()) // 화면 전환이 되기 전 검색어 업데이트 방지
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self,

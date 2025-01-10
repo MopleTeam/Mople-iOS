@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseMessaging
 
+
 final class FCMTokenManager: NSObject, MessagingDelegate {
     private let repo: FCMTokenUploadRepo
     private var lastUploadedToken: String?

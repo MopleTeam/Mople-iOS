@@ -229,7 +229,7 @@ extension APIEndpoints {
 
 // MARK: - Review
 extension APIEndpoints {
-    static func fetchMeetReview(meetId: Int) throws -> Endpoint<ReviewResponse> {
+    static func fetchMeetReview(meetId: Int) throws -> Endpoint<[ReviewResponse]> {
         return try Endpoint(path: "review/list/\(meetId)",
                             authenticationType: .accessToken,
                             method: .get,

@@ -22,7 +22,7 @@ protocol PlaceSelectionDelegate {
 
 final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
     private let dependencies: PlanCreateSceneDependencies
-    private var planCreateVC: PlanCreateViewController?
+    private var planCreateVC: CreatePlanViewController?
     
     init(navigationController: UINavigationController,
          dependencies: PlanCreateSceneDependencies) {
@@ -73,6 +73,7 @@ extension PlanCreateFlowCoordinator {
 // MARK: - SearchLoactionFlow로부터 주입받기
 extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
     func didSelectPlace(_ place: PlaceInfo) {
+        print(#function, #line, "#5 : \(place)" )
         planCreateVC?.setupPlace(place)
     }
 }

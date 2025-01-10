@@ -54,7 +54,7 @@ extension MainSceneCoordinator: MainCoordination {
     // MARK: - 그룹 생성 화면 이동
     /// - Parameter completedAction: 완료 후 액션 (예시: 그룹 생성 후 그룹 리스트 reload)
     func presentCreateGroupView() {
-        let createGroupView = dependencies.makeCreateGroupViewController(coordinator: self)
+        let createGroupView = dependencies.makeCreateMeetViewController(coordinator: self)
         self.navigationController.present(createGroupView, animated: false)
     }
     

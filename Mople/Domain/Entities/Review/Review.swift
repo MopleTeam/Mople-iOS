@@ -8,7 +8,7 @@
 import Foundation
 
 struct Review {
-    var postUserId: Int?
+    var creatorId: Int?
     var id: Int?
     var name: String?
     var date: Date?

@@ -8,6 +8,6 @@
 import Foundation
 
 struct CreateMeetRequest: Encodable {
-    let title: String
+    let name: String
     let image: String?
 }

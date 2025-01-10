@@ -47,7 +47,7 @@
 		5214F8A42D2C408900E8CE9C /* UserInfoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8A32D2C408900E8CE9C /* UserInfoMock.swift */; };
 		5214F8A62D2C40C700E8CE9C /* MeetMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8A52D2C40C700E8CE9C /* MeetMock.swift */; };
 		5214F8A82D2C418500E8CE9C /* PlaceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8A72D2C418500E8CE9C /* PlaceMock.swift */; };
-		5214F8AC2D2C9ACC00E8CE9C /* FetchMeetReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8AB2D2C9ACC00E8CE9C /* FetchMeetReview.swift */; };
+		5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */; };
 		5214F8AF2D2C9B2900E8CE9C /* ReviewResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8AE2D2C9B2900E8CE9C /* ReviewResponse.swift */; };
 		5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8B22D2C9CC200E8CE9C /* MeetSummaryResponse.swift */; };
 		5214F8B52D2C9CD500E8CE9C /* MeetResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8B42D2C9CD500E8CE9C /* MeetResponse.swift */; };
@@ -75,14 +75,14 @@
 		5231DF502D2FA91F00D52529 /* MeetListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4F2D2FA91F00D52529 /* MeetListRepo.swift */; };
 		5231DF522D2FA96100D52529 /* CreatePlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF512D2FA96100D52529 /* CreatePlanRepo.swift */; };
 		5231DF542D2FA99C00D52529 /* MeetPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF532D2FA99C00D52529 /* MeetPlanListRepo.swift */; };
-		5231DF572D2FAA2300D52529 /* FetchMeetReviewListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */; };
+		5231DF572D2FAA2300D52529 /* FetchReviewListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */; };
 		5231DF592D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF582D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift */; };
 		5231DF5B2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF5A2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift */; };
 		5231DF672D2FC0FF00D52529 /* MeetDetailRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF662D2FC0FF00D52529 /* MeetDetailRepo.swift */; };
 		5231DF692D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF682D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift */; };
 		5231DF732D2FCAEE00D52529 /* ParticipationPlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF722D2FCAEE00D52529 /* ParticipationPlanRepo.swift */; };
 		5231DF752D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF742D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift */; };
-		5231DF772D2FCC4A00D52529 /* RequsetParticipationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */; };
+		5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */; };
 		5231DF7A2D2FE63600D52529 /* SearchLocationReqeust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */; };
 		5231DF7D2D2FE77800D52529 /* SearchLocationRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF7C2D2FE77800D52529 /* SearchLocationRepo.swift */; };
 		5231DF7F2D2FE78700D52529 /* DefaultSearchLocationRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF7E2D2FE78700D52529 /* DefaultSearchLocationRepo.swift */; };
@@ -120,7 +120,7 @@
 		525DFD032CCB640000835312 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD022CCB640000835312 /* KakaoSDKAuth */; };
 		525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD042CCB640000835312 /* KakaoSDKCommon */; };
 		525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD062CCB640000835312 /* KakaoSDKUser */; };
-		526B985E2CEDBC03002488C5 /* PlanCreateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B985D2CEDBC03002488C5 /* PlanCreateViewController.swift */; };
+		526B985E2CEDBC03002488C5 /* CreatePlanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */; };
 		526B98622CEDBDFD002488C5 /* LabeledTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B98612CEDBDFD002488C5 /* LabeledTextFieldView.swift */; };
 		526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
@@ -241,10 +241,10 @@
 		52D8643F2D292A5D000F8378 /* CreateMeetCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8643E2D292A5D000F8378 /* CreateMeetCoordination.swift */; };
 		52D864472D292D34000F8378 /* HomeCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864462D292D34000F8378 /* HomeCoordination.swift */; };
 		52D8644F2D29F898000F8378 /* ProfileEditCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8644E2D29F898000F8378 /* ProfileEditCoordination.swift */; };
-		52D864522D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864512D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift */; };
-		52D864572D29FD89000F8378 /* DetailMeetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864562D29FD89000F8378 /* DetailMeetViewController.swift */; };
-		52D864592D29FDBC000F8378 /* DetailMeetViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864582D29FDBC000F8378 /* DetailMeetViewReactor.swift */; };
-		52D8645B2D2A027C000F8378 /* DetailGroupDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8645A2D2A027C000F8378 /* DetailGroupDIContainer.swift */; };
+		52D864522D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */; };
+		52D864572D29FD89000F8378 /* MeetDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864562D29FD89000F8378 /* MeetDetailViewController.swift */; };
+		52D864592D29FDBC000F8378 /* MeetDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */; };
+		52D8645B2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */; };
 		52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864642D2A2994000F8378 /* SignUpRequest.swift */; };
 		52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */; };
 		52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */; };
@@ -255,6 +255,9 @@
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
+		52E0E8062D30B957002213FF /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E8052D30B957002213FF /* LocationService.swift */; };
+		52E0E8082D30B95D002213FF /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E8072D30B95D002213FF /* NotificationService.swift */; };
+		52E0E80B2D30ED73002213FF /* DefaultFetchReviewListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E80A2D30ED73002213FF /* DefaultFetchReviewListRepo.swift */; };
 		52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */; };
 		52E2382D2C745E960066C9A3 /* LoginSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */; };
 		52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2382E2C74601D0066C9A3 /* AppleLoginService.swift */; };
@@ -289,7 +292,7 @@
 		52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */; };
 		52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */; };
 		52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */; };
-		52F1535D2D0724D0001A7BF5 /* PlanCreateViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */; };
+		52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -346,7 +349,7 @@
 		5214F8A32D2C408900E8CE9C /* UserInfoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoMock.swift; sourceTree = "<group>"; };
 		5214F8A52D2C40C700E8CE9C /* MeetMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetMock.swift; sourceTree = "<group>"; };
 		5214F8A72D2C418500E8CE9C /* PlaceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceMock.swift; sourceTree = "<group>"; };
-		5214F8AB2D2C9ACC00E8CE9C /* FetchMeetReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetReview.swift; sourceTree = "<group>"; };
+		5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewList.swift; sourceTree = "<group>"; };
 		5214F8AE2D2C9B2900E8CE9C /* ReviewResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewResponse.swift; sourceTree = "<group>"; };
 		5214F8B22D2C9CC200E8CE9C /* MeetSummaryResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSummaryResponse.swift; sourceTree = "<group>"; };
 		5214F8B42D2C9CD500E8CE9C /* MeetResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetResponse.swift; sourceTree = "<group>"; };
@@ -374,14 +377,14 @@
 		5231DF4F2D2FA91F00D52529 /* MeetListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListRepo.swift; sourceTree = "<group>"; };
 		5231DF512D2FA96100D52529 /* CreatePlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanRepo.swift; sourceTree = "<group>"; };
 		5231DF532D2FA99C00D52529 /* MeetPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListRepo.swift; sourceTree = "<group>"; };
-		5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetReviewListRepo.swift; sourceTree = "<group>"; };
+		5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewListRepo.swift; sourceTree = "<group>"; };
 		5231DF582D2FB8AB00D52529 /* DefaultCreatePlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCreatePlanRepo.swift; sourceTree = "<group>"; };
 		5231DF5A2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMeetPlanListRepo.swift; sourceTree = "<group>"; };
 		5231DF662D2FC0FF00D52529 /* MeetDetailRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailRepo.swift; sourceTree = "<group>"; };
 		5231DF682D2FC14600D52529 /* DefaultFetchMeetDetailRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFetchMeetDetailRepo.swift; sourceTree = "<group>"; };
 		5231DF722D2FCAEE00D52529 /* ParticipationPlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipationPlanRepo.swift; sourceTree = "<group>"; };
 		5231DF742D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultParticipationPlanRepo.swift; sourceTree = "<group>"; };
-		5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequsetParticipationPlan.swift; sourceTree = "<group>"; };
+		5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParticipationPlan.swift; sourceTree = "<group>"; };
 		5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationReqeust.swift; sourceTree = "<group>"; };
 		5231DF7C2D2FE77800D52529 /* SearchLocationRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationRepo.swift; sourceTree = "<group>"; };
 		5231DF7E2D2FE78700D52529 /* DefaultSearchLocationRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSearchLocationRepo.swift; sourceTree = "<group>"; };
@@ -415,7 +418,7 @@
 		525DFCF32CC8F54E00835312 /* SignUpRepositoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpRepositoryMock.swift; sourceTree = "<group>"; };
 		525DFCFD2CCA13A900835312 /* PolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyViewController.swift; sourceTree = "<group>"; };
 		525DFCFF2CCA13B000835312 /* NotifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyViewController.swift; sourceTree = "<group>"; };
-		526B985D2CEDBC03002488C5 /* PlanCreateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreateViewController.swift; sourceTree = "<group>"; };
+		526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanViewController.swift; sourceTree = "<group>"; };
 		526B98612CEDBDFD002488C5 /* LabeledTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledTextFieldView.swift; sourceTree = "<group>"; };
 		526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledButtonView.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
@@ -531,10 +534,10 @@
 		52D8643E2D292A5D000F8378 /* CreateMeetCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetCoordination.swift; sourceTree = "<group>"; };
 		52D864462D292D34000F8378 /* HomeCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordination.swift; sourceTree = "<group>"; };
 		52D8644E2D29F898000F8378 /* ProfileEditCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditCoordination.swift; sourceTree = "<group>"; };
-		52D864512D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMeetSceneCoordinator.swift; sourceTree = "<group>"; };
-		52D864562D29FD89000F8378 /* DetailMeetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMeetViewController.swift; sourceTree = "<group>"; };
-		52D864582D29FDBC000F8378 /* DetailMeetViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMeetViewReactor.swift; sourceTree = "<group>"; };
-		52D8645A2D2A027C000F8378 /* DetailGroupDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailGroupDIContainer.swift; sourceTree = "<group>"; };
+		52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailSceneCoordinator.swift; sourceTree = "<group>"; };
+		52D864562D29FD89000F8378 /* MeetDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailViewController.swift; sourceTree = "<group>"; };
+		52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailViewReactor.swift; sourceTree = "<group>"; };
+		52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailSceneDIContainer.swift; sourceTree = "<group>"; };
 		52D864642D2A2994000F8378 /* SignUpRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpRequest.swift; sourceTree = "<group>"; };
 		52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetDetail.swift; sourceTree = "<group>"; };
 		52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupUseCaseMock.swift; sourceTree = "<group>"; };
@@ -543,6 +546,9 @@
 		52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanListViewController.swift; sourceTree = "<group>"; };
 		52D864912D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPlanTableCellModel.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
+		52E0E8052D30B957002213FF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		52E0E8072D30B95D002213FF /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		52E0E80A2D30ED73002213FF /* DefaultFetchReviewListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFetchReviewListRepo.swift; sourceTree = "<group>"; };
 		52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
 		52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSceneDIContainer.swift; sourceTree = "<group>"; };
 		52E2382E2C74601D0066C9A3 /* AppleLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleLoginService.swift; sourceTree = "<group>"; };
@@ -573,7 +579,7 @@
 		52EA6E1C2CF8C62700EFD753 /* FCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenUploadRepo.swift; sourceTree = "<group>"; };
 		52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFCMTokenUploadRepo.swift; sourceTree = "<group>"; };
 		52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeElement.swift"; sourceTree = "<group>"; };
-		52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreateViewReactor.swift; sourceTree = "<group>"; };
+		52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanViewReactor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -753,26 +759,10 @@
 		521091EB2D1021A500DD0407 /* Weather */ = {
 			isa = PBXGroup;
 			children = (
-				521091ED2D1021B000DD0407 /* ViewModel */,
-				521091EC2D1021AB00DD0407 /* View */,
-			);
-			path = Weather;
-			sourceTree = "<group>";
-		};
-		521091EC2D1021AB00DD0407 /* View */ = {
-			isa = PBXGroup;
-			children = (
+				521091EE2D1021B700DD0407 /* WeatherViewModel.swift */,
 				5259B0152CA013A8006B2711 /* WeatherView.swift */,
 			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		521091ED2D1021B000DD0407 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				521091EE2D1021B700DD0407 /* WeatherViewModel.swift */,
-			);
-			path = ViewModel;
+			path = Weather;
 			sourceTree = "<group>";
 		};
 		5211F8F42C84233A00403980 /* Zone */ = {
@@ -1026,7 +1016,7 @@
 		5231DF552D2FAA1200D52529 /* Review */ = {
 			isa = PBXGroup;
 			children = (
-				5231DF562D2FAA2300D52529 /* FetchMeetReviewListRepo.swift */,
+				5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */,
 			);
 			path = Review;
 			sourceTree = "<group>";
@@ -1046,7 +1036,7 @@
 		5231DF5D2D2FBB3000D52529 /* Participation */ = {
 			isa = PBXGroup;
 			children = (
-				5231DF762D2FCC4A00D52529 /* RequsetParticipationPlan.swift */,
+				5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */,
 			);
 			path = Participation;
 			sourceTree = "<group>";
@@ -1089,7 +1079,7 @@
 		5231DF632D2FBE2900D52529 /* Review */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8AB2D2C9ACC00E8CE9C /* FetchMeetReview.swift */,
+				5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */,
 			);
 			path = Review;
 			sourceTree = "<group>";
@@ -1434,8 +1424,8 @@
 		52818C772D1992CE0001E30B /* PlanCreate */ = {
 			isa = PBXGroup;
 			children = (
-				52F1535C2D0724D0001A7BF5 /* PlanCreateViewReactor.swift */,
-				526B985D2CEDBC03002488C5 /* PlanCreateViewController.swift */,
+				52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */,
+				526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */,
 				52818C792D1992D80001E30B /* View */,
 			);
 			path = PlanCreate;
@@ -1949,6 +1939,7 @@
 		52CB0B432C7307D0002B6D20 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				52E0E8042D30B94A002213FF /* PremissionService */,
 				52EA6E192CF8C4AE00EFD753 /* FCMTokenManager */,
 				5208C1882CC0D618006272E8 /* AlertManager */,
 				52CB41E02CA2F2800071679D /* DateManager */,
@@ -2036,7 +2027,7 @@
 		52D864482D29F335000F8378 /* Scene */ = {
 			isa = PBXGroup;
 			children = (
-				52D864502D29FC47000F8378 /* DetailMeetScene */,
+				52D864502D29FC47000F8378 /* MeetDetailScene */,
 				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
 				52818C5C2D1804240001E30B /* SearchLocationScene */,
 			);
@@ -2069,23 +2060,23 @@
 			path = FlowAction;
 			sourceTree = "<group>";
 		};
-		52D864502D29FC47000F8378 /* DetailMeetScene */ = {
+		52D864502D29FC47000F8378 /* MeetDetailScene */ = {
 			isa = PBXGroup;
 			children = (
 				52D8645F2D2A0452000F8378 /* Flow */,
-				52D864532D29FD40000F8378 /* DetailMeet */,
+				52D864532D29FD40000F8378 /* MeetDetail */,
 			);
-			path = DetailMeetScene;
+			path = MeetDetailScene;
 			sourceTree = "<group>";
 		};
-		52D864532D29FD40000F8378 /* DetailMeet */ = {
+		52D864532D29FD40000F8378 /* MeetDetail */ = {
 			isa = PBXGroup;
 			children = (
-				52D864582D29FDBC000F8378 /* DetailMeetViewReactor.swift */,
-				52D864562D29FD89000F8378 /* DetailMeetViewController.swift */,
+				52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */,
+				52D864562D29FD89000F8378 /* MeetDetailViewController.swift */,
 				52D864552D29FD7D000F8378 /* View */,
 			);
-			path = DetailMeet;
+			path = MeetDetail;
 			sourceTree = "<group>";
 		};
 		52D864552D29FD7D000F8378 /* View */ = {
@@ -2121,7 +2112,7 @@
 				52818C742D198A760001E30B /* PlanCreateSceneDIContainer.swift */,
 				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
 				52D864352D289613000F8378 /* CommonDIContainer.swift */,
-				52D8645A2D2A027C000F8378 /* DetailGroupDIContainer.swift */,
+				52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */,
 			);
 			path = Sub;
 			sourceTree = "<group>";
@@ -2129,7 +2120,7 @@
 		52D8645F2D2A0452000F8378 /* Flow */ = {
 			isa = PBXGroup;
 			children = (
-				52D864512D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift */,
+				52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */,
 			);
 			path = Flow;
 			sourceTree = "<group>";
@@ -2185,6 +2176,23 @@
 				52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */,
 			);
 			path = Keyboard;
+			sourceTree = "<group>";
+		};
+		52E0E8042D30B94A002213FF /* PremissionService */ = {
+			isa = PBXGroup;
+			children = (
+				52E0E8052D30B957002213FF /* LocationService.swift */,
+				52E0E8072D30B95D002213FF /* NotificationService.swift */,
+			);
+			path = PremissionService;
+			sourceTree = "<group>";
+		};
+		52E0E8092D30ED5F002213FF /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				52E0E80A2D30ED73002213FF /* DefaultFetchReviewListRepo.swift */,
+			);
+			path = Review;
 			sourceTree = "<group>";
 		};
 		52E238222C7453EC0066C9A3 /* Domain */ = {
@@ -2281,6 +2289,7 @@
 				5231DF372D2F960F00D52529 /* ImageRepo */,
 				5231DF482D2FA1B300D52529 /* Meet */,
 				5231DF3A2D2F967300D52529 /* Plan */,
+				52E0E8092D30ED5F002213FF /* Review */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -2430,20 +2439,20 @@
 				5259B01D2CA038AA006B2711 /* CalenadrPalnTableCell.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* CalendarPlanTableHeaderView.swift in Sources */,
-				5214F8AC2D2C9ACC00E8CE9C /* FetchMeetReview.swift in Sources */,
+				5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
 				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
 				5211F9082C86F2DB00403980 /* HomePlanCollectionCell.swift in Sources */,
 				52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
 				52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */,
-				5231DF572D2FAA2300D52529 /* FetchMeetReviewListRepo.swift in Sources */,
+				5231DF572D2FAA2300D52529 /* FetchReviewListRepo.swift in Sources */,
 				524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
 				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */,
-				52D864572D29FD89000F8378 /* DetailMeetViewController.swift in Sources */,
+				52D864572D29FD89000F8378 /* MeetDetailViewController.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */,
 				52818C7B2D1994800001E30B /* PlanCreateFlowCoordinator.swift in Sources */,
@@ -2469,6 +2478,7 @@
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				5211F9032C86E41900403980 /* HomePlanCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
+				52E0E8082D30B95D002213FF /* NotificationService.swift in Sources */,
 				52D864322D27E5F3000F8378 /* DefaultMapView.swift in Sources */,
 				52BBF6B02CE164D500564F11 /* ColorStyle.swift in Sources */,
 				52818C732D1983370001E30B /* SearchLoactionUseCaseMock.swift in Sources */,
@@ -2497,7 +2507,7 @@
 				52818C752D198A760001E30B /* PlanCreateSceneDIContainer.swift in Sources */,
 				52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */,
 				5208C17A2CBE72A8006272E8 /* UIApplication+RootView.swift in Sources */,
-				52D864592D29FDBC000F8378 /* DetailMeetViewReactor.swift in Sources */,
+				52D864592D29FDBC000F8378 /* MeetDetailViewReactor.swift in Sources */,
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */,
@@ -2518,9 +2528,9 @@
 				52EA6E022CF7B88D00EFD753 /* SignUpRepo.swift in Sources */,
 				5214F8C52D2CADD100E8CE9C /* PastPlanTableCellModel.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
-				52D8645B2D2A027C000F8378 /* DetailGroupDIContainer.swift in Sources */,
+				52D8645B2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
-				5231DF772D2FCC4A00D52529 /* RequsetParticipationPlan.swift in Sources */,
+				5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
 				521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */,
 				5231DF732D2FCAEE00D52529 /* ParticipationPlanRepo.swift in Sources */,
@@ -2539,6 +2549,7 @@
 				5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */,
 				52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */,
 				52CE87CC2CEC40D000EBD85D /* CreateMeet.swift in Sources */,
+				52E0E80B2D30ED73002213FF /* DefaultFetchReviewListRepo.swift in Sources */,
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
@@ -2546,7 +2557,7 @@
 				5235B7152D2E6744006BEAF3 /* MeetSetupViewController.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* SignIn.swift in Sources */,
 				52EA6E082CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift in Sources */,
-				526B985E2CEDBC03002488C5 /* PlanCreateViewController.swift in Sources */,
+				526B985E2CEDBC03002488C5 /* CreatePlanViewController.swift in Sources */,
 				5214F8A42D2C408900E8CE9C /* UserInfoMock.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultSignInRepo.swift in Sources */,
@@ -2627,6 +2638,7 @@
 				5231DF3C2D2F968000D52529 /* DefaultRecentPlanListRepo.swift in Sources */,
 				5214F8932D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift in Sources */,
 				5214F8892D2BB08500E8CE9C /* FuturePlanListViewReactor.swift in Sources */,
+				52E0E8062D30B957002213FF /* LocationService.swift in Sources */,
 				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
 				5231DF7A2D2FE63600D52529 /* SearchLocationReqeust.swift in Sources */,
 				5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */,
@@ -2640,8 +2652,8 @@
 				5214F8A82D2C418500E8CE9C /* PlaceMock.swift in Sources */,
 				52C857BF2D086C9B00765FB3 /* Weather.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
-				52F1535D2D0724D0001A7BF5 /* PlanCreateViewReactor.swift in Sources */,
-				52D864522D29FC7D000F8378 /* DetailMeetSceneCoordinator.swift in Sources */,
+				52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */,
+				52D864522D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52EA6E0C2CF83C9200EFD753 /* DefalutProfileEditRepo.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */,

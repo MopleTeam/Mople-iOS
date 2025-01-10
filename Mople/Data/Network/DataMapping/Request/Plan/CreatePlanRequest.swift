@@ -18,7 +18,7 @@ struct CreatePlanRequest: Encodable {
     let weatherAddress: String
     
     enum CodingKeys: String, CodingKey {
-        case meetId, name
+        case meetId, name, title, planAddress, lat, lot, weatherAddress
         case date = "planTime"
     }
 }
@@ -27,15 +27,15 @@ extension CreatePlanRequest {
     init(meetId: Int,
          name: String,
          date: String,
-         place: PlaceInfo) {
+         place: UploadPlace) {
         
         self.meetId = meetId
         self.name = name
         self.date = date
-        self.title = place.title ?? ""
-        self.planAddress = place.address ?? ""
-        self.lat = place.latitude ?? 0
-        self.lot = place.longitude ?? 0
-        self.weatherAddress = place.roadAddress ?? ""
+        self.title = place.title
+        self.planAddress = place.planAddress
+        self.lat = place.lat
+        self.lot = place.lot
+        self.weatherAddress = place.weatherAddress
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 struct Plan: Hashable, Equatable {
     let id: Int?
+    let creatorId: Int?
     let title: String?
     let date: Date?
     let participantCount: Int?
@@ -18,7 +19,6 @@ struct Plan: Hashable, Equatable {
     let meet: MeetSummary?
     let location: Location?
     let weather: Weather?
-    let postUserId: Int?
     
     static func < (lhs: Plan, rhs: Plan) -> Bool {
         guard let lhsDate = lhs.date,

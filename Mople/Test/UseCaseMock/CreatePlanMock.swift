@@ -13,7 +13,7 @@ final class CreatePlanMock: CreatePlan {
         return Observable.just(())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .map { _ in
-                Plan.mock(id: 155, date: Date(), posterId: 103)
+                Plan.mock(id: 155, date: Date(), creatorId: 103)
             }
             .asSingle()
     }

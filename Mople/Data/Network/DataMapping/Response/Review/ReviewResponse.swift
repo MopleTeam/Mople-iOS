@@ -9,6 +9,7 @@ import Foundation
 
 struct ReviewResponse: Decodable {
     var meetId: Int?
+    var creatorId: Int?
     var meetName: String?
     var meetImage: String?
     var reviewId: Int?
@@ -18,7 +19,6 @@ struct ReviewResponse: Decodable {
     var address: String?
     var lat: Double?
     var lot: Double?
-    var postUserId: Int?
     var images: [String]?
 }
 
@@ -26,7 +26,7 @@ extension ReviewResponse {
     func toDomain() -> Review {
         let date = DateManager.parseServerDate(string: self.reviewDateTime)
         
-        return .init(postUserId: postUserId,
+        return .init(creatorId: creatorId,
                      id: reviewId,
                      name: reviewName,
                      date: date,

@@ -111,7 +111,7 @@ final class ThumbnailTitleView: UIView {
     }
 
     private func loadImage(_ path: String?) {
-        _ = thumbnailView.kfSetimage(path)
+        _ = thumbnailView.kfSetimage(path, defaultImageType: .meet)
     }
 }
 

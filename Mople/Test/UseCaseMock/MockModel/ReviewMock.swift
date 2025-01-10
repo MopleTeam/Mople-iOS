@@ -15,7 +15,7 @@ extension Review {
     }
     
     static func mock(posterId: Int) -> Self {
-        .init(postUserId: posterId,
+        .init(creatorId: posterId,
               id: 1,
               name: "리뷰 테스트",
               date: Date().addingTimeInterval(-3600 * (24 * Double(Int.random(in: 6...100)))),

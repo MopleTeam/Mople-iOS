@@ -28,7 +28,7 @@ final class CreateGroupUseCase: CreateMeet {
         
         let imageData = self.convertImageToData(image)
         return self.uploadImage(imageData)
-            .flatMap { self.createMeetRepo.createMeet(.init(title: title,
+            .flatMap { self.createMeetRepo.createMeet(.init(name: title,
                                                             image: $0)) }
             .map { $0.toDomain() }
     }

@@ -9,13 +9,13 @@ import Foundation
 
 struct RecentPlanResponse: Decodable {
     let plans: [PlanResponse]
-    let meetSummarys: [MeetSummaryResponse]
+    let meets: [MeetSummaryResponse]
 
 }
 
 extension RecentPlanResponse {
     func toDomain() -> RecentPlan {
         return .init(plans: plans.map({ $0.toDomain() }),
-                     hasMeet: !meetSummarys.isEmpty)
+                     hasMeet: !meets.isEmpty)
     }
 }

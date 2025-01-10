@@ -14,7 +14,7 @@ import ReactorKit
 #warning("모임이 없는 경우 처리하기")
 final class MeetSelectViewController: UIViewController, View {
     
-    typealias Reactor = PlanCreateViewReactor
+    typealias Reactor = CreatePlanViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -33,7 +33,7 @@ final class MeetSelectViewController: UIViewController, View {
         return view
     }()
     
-    init(reactor: PlanCreateViewReactor?) {
+    init(reactor: CreatePlanViewReactor?) {
         print(#function, #line, "LifeCycle Test GroupList TableView Created" )
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
@@ -75,7 +75,7 @@ final class MeetSelectViewController: UIViewController, View {
     }
     
     // MARK: - Binding
-    func bind(reactor: PlanCreateViewReactor) {
+    func bind(reactor: CreatePlanViewReactor) {
         tableView.rx.itemSelected
             .asDriver()
             .map { Reactor.Action.setValue(.meet($0.row)) }

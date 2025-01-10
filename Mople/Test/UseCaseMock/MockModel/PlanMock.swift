@@ -8,8 +8,9 @@
 import Foundation
 
 extension Plan {
-    static func mock(id: Int, date: Date, posterId: Int) -> Plan {
+    static func mock(id: Int, date: Date, creatorId: Int) -> Plan {
         .init(id: id,
+              creatorId: creatorId,
               title: "개발회의 일정 ID: \(id)",
               date: date,
               participantCount: Int.random(in: 1...10),
@@ -18,14 +19,13 @@ extension Plan {
               address: "서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1",
               meet: MeetSummary.mock(id: 0),
               location: Location.mock(),
-              weather: Weather.mock(),
-              postUserId: posterId)
+              weather: Weather.mock())
     }
     
     static func recentMock() -> [Plan] {
         let plans = Array(1...5).map {
             let date = Date().addingTimeInterval(3600 * (24 * Double($0)))
-            return Plan.mock(id: $0, date: date, posterId: 1)
+            return Plan.mock(id: $0, date: date, creatorId: 1)
         }
         
         return plans
@@ -33,7 +33,7 @@ extension Plan {
     
     static func randomeMock(id: Int) -> Plan {
         let date = Date().addingTimeInterval(3600 * (24 * Double(Int.random(in: 6...100))))
-        return Plan.mock(id: id, date: date, posterId: 1)
+        return Plan.mock(id: id, date: date, creatorId: 1)
     }
 }
 

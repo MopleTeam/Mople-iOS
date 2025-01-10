@@ -328,7 +328,8 @@ extension ProfileSetupViewController {
     }
     
     private func setProfile(_ profile: UserInfo) {
-        _ = self.profileImageView.kfSetimage(profile.imagePath)
+        _ = self.profileImageView.kfSetimage(profile.imagePath,
+                                             defaultImageType: .user)
         nameView.text = profile.name
     }
 }

@@ -32,13 +32,8 @@ final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies & Searc
     }
 }
 
+// MARK: - View
 extension SearchLocationSceneDIContainer {
-    private func makeCommonReactor(coordinator: SearchPlaceCoordination) {
-        commonReactor = .init(searchLocationUseCase: SearchLoactionUseCaseMock(),
-                              queryStorage: DefaultSearchedPlaceStorage(),
-                              coordinator: coordinator)
-    }
-    
     func makeSearchLocationViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController {
         makeCommonReactor(coordinator: coordinator)
         return SearchPlaceViewController(reactor: commonReactor)
@@ -50,5 +45,27 @@ extension SearchLocationSceneDIContainer {
     
     func makeDetailLocationViewController(place: PlaceInfo) -> DetailPlaceViewController {
         return DetailPlaceViewController(reactor: commonReactor, place: place)
+    }
+}
+
+// MARK: - Common Reactor
+extension SearchLocationSceneDIContainer {
+    private func makeCommonReactor(coordinator: SearchPlaceCoordination) {
+        commonReactor = .init(searchLocationUseCase: makeSearchLocationUseCase(),
+                              locationService: makeLocationService(),
+                              queryStorage: DefaultSearchedPlaceStorage(),
+                              coordinator: coordinator)
+    }
+    
+    private func makeSearchLocationUseCase() -> SearchLoaction {
+        return SearchLoactionUseCase(searchLocationRepo: makeSearchLocationRepo())
+    }
+    
+    private func makeSearchLocationRepo() -> SearchLocationRepo {
+        return DefaultSearchLocationRepo(networkService: appNetworkService)
+    }
+    
+    private func makeLocationService() -> LocationService {
+        return DefaultLocationService()
     }
 }

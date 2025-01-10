@@ -7,7 +7,7 @@
 
 import RxSwift
 
-final class FetchReviewMock: FetchMeetReview {
+final class FetchReviewMock: FetchReviewList {
     
     private func getReviews() -> [Review] {
         return Array(0...10).map { .mock(posterId: $0) }

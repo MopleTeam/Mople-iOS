@@ -124,7 +124,7 @@ final class DefaultMapView: UIView {
     
     private func setLabel() {
         titleLable.text = place.title ?? "이름없음"
-        addressLabel.text = place.address
+        addressLabel.text = place.roadAddress
         setDistanceLabel(place.distance)
     }
     

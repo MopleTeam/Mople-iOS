@@ -19,9 +19,9 @@ final class FetchMeetFuturePlanMock: FetchMeetFuturePlan {
             planArray.append(randomPlan)
         }
         
-        planArray.append(Plan.mock(id: 11, date: DateManager.subtractFiveMinutes(Date()), posterId: 1))
-        planArray.append(Plan.mock(id: 12, date: DateManager.addFiveMinutes(Date()), posterId: 1))
-        planArray.append(Plan.mock(id: 13, date: DateManager.isNextMonth(Date()), posterId: 103))
+        planArray.append(Plan.mock(id: 11, date: DateManager.subtractFiveMinutes(Date()), creatorId: 1))
+        planArray.append(Plan.mock(id: 12, date: DateManager.addFiveMinutes(Date()), creatorId: 1))
+        planArray.append(Plan.mock(id: 13, date: DateManager.isNextMonth(Date()), creatorId: 103))
         return planArray
     }
     

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol PlanCreateSceneDependencies {
-    func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> PlanCreateViewController
+    func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController
     func makeGroupSelectViewController() -> MeetSelectViewController
     func makeDateSelectViewController() -> PlanDateSelectViewController
     func makeTimeSelectViewController() -> PlanTimePickerViewController
@@ -18,10 +18,13 @@ protocol PlanCreateSceneDependencies {
 final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
 
     private let appNetworkService: AppNetworkService
-    private var commonReactor: PlanCreateViewReactor?
+    private let fetchMeetListUseCase: FetchMeetList
+    private var commonReactor: CreatePlanViewReactor?
     
-    init(appNetworkService: AppNetworkService) {
+    init(appNetworkService: AppNetworkService,
+         fetchMeetListUseCase: FetchMeetList) {
         self.appNetworkService = appNetworkService
+        self.fetchMeetListUseCase = fetchMeetListUseCase
     }
     
     func makePlanCreateFlowCoordinator(navigationController: UINavigationController) -> BaseCoordinator {
@@ -37,15 +40,9 @@ extension PlanCreateSceneDIContainer {
 }
 
 extension PlanCreateSceneDIContainer {
-    private func makeCommonReactor(coordinator: PlanCreateCoordination) {
-        commonReactor = .init(createPlanUseCase: CreatePlanMock(),
-                              fetchMeetListUSeCase: FetchGroupListMock(),
-                              coordinator: coordinator)
-    }
-
-    func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> PlanCreateViewController {
+    func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController {
         makeCommonReactor(coordinator: coordinator)
-        return PlanCreateViewController(title: "일정 생성",
+        return CreatePlanViewController(title: "일정 생성",
                                         reactor: commonReactor)
     }
     
@@ -59,5 +56,22 @@ extension PlanCreateSceneDIContainer {
     
     func makeTimeSelectViewController() -> PlanTimePickerViewController {
         return PlanTimePickerViewController(reactor: commonReactor)
+    }
+}
+
+// MARK: - 공통 ViewModel
+extension PlanCreateSceneDIContainer {
+    private func makeCommonReactor(coordinator: PlanCreateCoordination) {
+        commonReactor = .init(createPlanUseCase: makeCreatePlanUseCase(),
+                              fetchMeetListUSeCase: fetchMeetListUseCase,
+                              coordinator: coordinator)
+    }
+    
+    private func makeCreatePlanUseCase() -> CreatePlan {
+        return CreatePlanUseCase(createPlanRepo: makeCreatePlanRepo())
+    }
+    
+    private func makeCreatePlanRepo() -> CreatePlanRepo {
+        return DefaultCreatePlanRepo(networkService: appNetworkService)
     }
 }

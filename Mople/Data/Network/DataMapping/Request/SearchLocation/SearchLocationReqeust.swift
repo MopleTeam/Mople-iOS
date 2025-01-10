@@ -9,6 +9,22 @@ import Foundation
 
 struct SearchLocationReqeust: Encodable {
     let query: String
-    let x: String?
-    let y: String?
+    var x: String? = nil
+    var y: String? = nil
+}
+
+extension SearchLocationReqeust {
+    init(query: String,
+         x: Double?,
+         y: Double?) {
+        
+        self.query = query
+        setLocation(x: x, y: y)
+    }
+    
+    private mutating func setLocation(x: Double?, y: Double?) {
+        guard let x, let y else { return }
+        self.x = String(x)
+        self.y = String(y)
+    }
 }

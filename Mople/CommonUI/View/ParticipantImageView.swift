@@ -29,7 +29,7 @@ final class ParticipantImageView: UIImageView {
     }
     
     private func setImage(_ path: String?) {
-        task = self.kfSetimage(path)
+        task = self.kfSetimage(path, defaultImageType: .user)
     }
     
     deinit {
