@@ -45,15 +45,19 @@ extension SignUpUseCase {
                 image: UIImage?,
                 social: SocialInfo) -> Single<Void> {
         print(#function, #line)
-        let imageData = self.convertImageToData(image)
-        return self.uploadImage(imageData)
-            .flatMap { [weak self] imagePath in
-                guard let self else { throw AppError.unknownError }
-                
-                return self.signUpRepo.signUp(requestModel: .init(social: social,
-                                                                  nickname: nickname,
-                                                                  imagePath: imagePath))
+        return Single.deferred { [weak self] in
+            guard let self else { return .error(AppError.unknownError) }
+            
+            do {
+                let imageData = try Data.imageDataCompressed(uiImage: image)
+                return self.uploadImage(imageData)
+                    .flatMap { self.signUpRepo.signUp(requestModel: .init(social: social,
+                                                                          nickname: nickname,
+                                                                          imagePath: $0)) }
+            } catch {
+                return .error(error)
             }
+        }
     }
     
     private func uploadImage(_ data: Data?) -> Single<String?> {
@@ -62,13 +66,7 @@ extension SignUpUseCase {
             guard let data else { return .just(nil)}
             
             return self.imageUploadRepo.uploadImage(image: data, path: .profile)
-                .map { String(data: $0, encoding: .utf8) }
         }
-    }
-    
-    #warning("허용범위 내로 수정하기")
-    private func convertImageToData(_ image: UIImage?, quality: CGFloat = 0.1) -> Data? {
-        return image?.jpegData(compressionQuality: quality)
     }
 }
 

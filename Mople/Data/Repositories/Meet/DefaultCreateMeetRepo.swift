@@ -10,6 +10,7 @@ import RxSwift
 
 final class DefaultCreateMeetRepo: BaseRepositories, CreateMeetRepo {
     func createMeet(_ meet: CreateMeetRequest) -> Single<MeetResponse> {
+        print(#function, #line, "#5 image save url: \(meet.image)" )
         return self.networkService.authenticatedRequest {
             try APIEndpoints.createMeet(meet)
         }

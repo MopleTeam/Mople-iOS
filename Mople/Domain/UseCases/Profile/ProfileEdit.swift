@@ -29,25 +29,25 @@ final class ProfileEditUseCase: ProfileEdit {
 extension ProfileEditUseCase {
     func editProfile(nickname: String,
                      image: UIImage?) -> Single<Void> {
-        
-        let imageData = self.convertImageToData(image)
-        return self.uploadImage(imageData)
-            .map { $0.isEmpty ? nil : $0 }
-            .flatMap { self.profileEditRepo.editProfile(nickname: nickname,
-                                                        imagePath: $0) }
-    }
-    
-    private func uploadImage(_ data: Data?) -> Single<String> {
-        return Single.deferred {
-            guard let data else {
-                return .just("")
+        return Single.deferred { [weak self] in
+            guard let self else { return .error(AppError.unknownError) }
+            
+            do {
+                let imageData = try Data.imageDataCompressed(uiImage: image)
+                return self.uploadImage(imageData)
+                    .flatMap { self.profileEditRepo.editProfile(nickname: nickname,
+                                                                imagePath: $0) }
+            } catch {
+                return .error(error)
             }
-            return self.imageUploadRepo.uploadImage(image: data, path: .profile)
-                .map { String(data: $0, encoding: .utf8) ?? "" }
         }
     }
     
-    private func convertImageToData(_ image: UIImage?, quality: CGFloat = 0.3) -> Data? {
-        return image?.jpegData(compressionQuality: quality)
+    private func uploadImage(_ data: Data?) -> Single<String?> {
+        return Single.deferred { [weak self] in
+            guard let self else { return .error(AppError.unknownError) }
+            guard let data else { return .just(nil) }
+            return self.imageUploadRepo.uploadImage(image: data, path: .profile)
+        }
     }
 }

@@ -35,6 +35,7 @@ class SignUpViewReactor: Reactor {
     
     private let signUpUseCase: SignUp
     private var completedAction: SignUpAction
+    private let fetchUserInfoUseCase: FetchUserInfo
     private var socialInfo: SocialInfo
     
     var initialState: State = State()
@@ -46,6 +47,7 @@ class SignUpViewReactor: Reactor {
         print(#function, #line, "LifeCycle Test SignUp Reactor Created" )
         self.socialInfo = socialInfo
         self.signUpUseCase = signUpUseCase
+        self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.completedAction = completedAction
     }
     
@@ -118,6 +120,10 @@ extension SignUpViewReactor {
         let makeProfile = signUpUseCase.signUp(nickname: name,
                                                image: image,
                                                social: socialInfo)
+            .flatMap({ [weak self] in
+                guard let self else { throw AppError.unknownError }
+                return self.fetchUserInfoUseCase.fetchUserInfo()
+            })
             .asObservable()
             .map({ _ in Mutation.singUpCompleted })
             .catch { Observable.just(Mutation.notifyMessage(message: self.handleError(err: $0))) }

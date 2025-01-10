@@ -136,15 +136,14 @@ extension APIEndpoints {
 // MARK: - 이미지 업로드
 extension APIEndpoints {
     static func uploadImage(_ imageData: Data,
-                            folderPath: ImageUploadPath) -> Endpoint<Data> {
+                            folderPath: ImageUploadPath) -> Endpoint<String?> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
         return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
                              method: .post,
                              headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
                              bodyParameters: ["image": imageData],
-                             bodyEncoder: multipartFormEncoder,
-                             responseDecoder: RawDataResponseDecoder())
+                             bodyEncoder: multipartFormEncoder)
     }
     
 }

@@ -12,7 +12,7 @@ protocol CreateMeet {
     func createMeet(title: String, image: UIImage?) -> Single<Meet>
 }
 
-final class CreateGroupUseCase: CreateMeet {
+final class CreateMeetUseCase: CreateMeet {
     
     let imageUploadRepo: ImageUploadRepo
     let createMeetRepo: CreateMeetRepo
@@ -25,24 +25,28 @@ final class CreateGroupUseCase: CreateMeet {
     
     func createMeet(title: String,
                     image: UIImage?) -> Single<Meet> {
-        
-        let imageData = self.convertImageToData(image)
-        return self.uploadImage(imageData)
-            .flatMap { self.createMeetRepo.createMeet(.init(name: title,
-                                                            image: $0)) }
-            .map { $0.toDomain() }
-    }
-    
-    private func uploadImage(_ data: Data?) -> Single<String?> {
-        return Single.deferred {
-            guard let data else { return .just(nil) }
+        return Single.deferred { [weak self] in
+            guard let self else { return .error(AppError.unknownError) }
             
-            return self.imageUploadRepo.uploadImage(image: data, path: .meet)
-                .map { String(data: $0, encoding: .utf8) }
+            do {
+                let imageData = try Data.imageDataCompressed(uiImage: image)
+                return self.uploadImage(imageData)
+                    .flatMap { self.createMeetRepo.createMeet(.init(name: title,
+                                                                    image: $0)) }
+                    .map { $0.toDomain() }
+            } catch {
+                return .error(error)
+            }
         }
     }
     
-    private func convertImageToData(_ image: UIImage?, quality: CGFloat = 0.3) -> Data? {
-        return image?.jpegData(compressionQuality: quality)
+    private func uploadImage(_ data: Data?) -> Single<String?> {
+        return Single.deferred { [weak self] in
+            guard let self else { return .error(AppError.unknownError) }
+            guard let data else { return .just(nil) }
+            return self.imageUploadRepo.uploadImage(image: data, path: .meet)
+        }
     }
 }
+
+

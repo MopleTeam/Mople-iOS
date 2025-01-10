@@ -151,7 +151,7 @@ extension MainSceneDIContainer {
     }
     
     private func makeCreateMeetUseCase() -> CreateMeet {
-        return CreateGroupUseCase(imageUploadRepo: makeImageUploadRepo(),
+        return CreateMeetUseCase(imageUploadRepo: makeImageUploadRepo(),
                                   createMeetRepo: makeCreateMeetRepo())
     }
     

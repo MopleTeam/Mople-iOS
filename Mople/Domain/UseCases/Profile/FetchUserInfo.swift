@@ -32,6 +32,9 @@ extension FetchUserInfoUseCase {
     func fetchUserInfo() -> Single<Void> {
         return self.userInfoRepo.getUserInfo()
             .observe(on: MainScheduler.instance)
-            .map { UserInfoStorage.shared.addEntity($0.toDomain()) }
+            .map {
+                print(#function, #line, "# userProfile : \($0)" )
+                UserInfoStorage.shared.addEntity($0.toDomain())
+            }
     }
 }
