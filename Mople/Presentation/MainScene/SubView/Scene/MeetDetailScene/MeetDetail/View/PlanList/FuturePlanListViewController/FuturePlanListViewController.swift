@@ -27,7 +27,10 @@ final class FuturePlanListViewController: BaseViewController, View {
         table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
         table.sectionFooterHeight = 8
-        table.tableHeaderView = UIView(frame: .init(x: 0, y: 0, width: table.bounds.width, height: 28))
+        table.tableHeaderView = UIView(frame: .init(x: 0,
+                                                    y: 0,
+                                                    width: table.bounds.width,
+                                                    height: 28))
         return table
     }()
         
@@ -83,6 +86,11 @@ final class FuturePlanListViewController: BaseViewController, View {
     }
     
     func bind(reactor: FuturePlanListViewReactor) {
+        tableView.rx.itemSelected
+            .map({ Reactor.Action.selectedPlan(index: $0.row) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$plans)
             .asDriver(onErrorJustReturn: [])
             .map({ $0.isEmpty })

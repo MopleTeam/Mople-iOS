@@ -11,6 +11,7 @@ import ReactorKit
 final class FuturePlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        case selectedPlan(index: Int)
         case requestPlanList
         case updateParticipants(id: Int, isJoining: Bool)
     }
@@ -29,15 +30,18 @@ final class FuturePlanListViewReactor: Reactor, LifeCycleLoggable {
     
     var initialState: State = State()
     
-    let fetchPlanUseCase: FetchMeetFuturePlan
-    let participationPlanUseCase: RequestParticipationPlan
-    let meedId: Int
+    private let fetchPlanUseCase: FetchMeetFuturePlan
+    private let participationPlanUseCase: RequestParticipationPlan
+    private weak var coordinator: MeetDetailCoordination?
+    private let meedId: Int
     
     init(fetchPlanUseCase: FetchMeetFuturePlan,
          participationPlanUseCase: RequestParticipationPlan,
+         coordinator: MeetDetailCoordination,
          meetID: Int) {
         self.fetchPlanUseCase = fetchPlanUseCase
         self.participationPlanUseCase = participationPlanUseCase
+        self.coordinator = coordinator
         self.meedId = meetID
         action.onNext(.requestPlanList)
         logLifeCycle()
@@ -50,9 +54,11 @@ final class FuturePlanListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .requestPlanList:
-            return fetchPlanList()
+            fetchPlanList()
         case let .updateParticipants(id, isJoining):
-            return requestParticipationPlan(planId: id, isJoining: isJoining)
+            requestParticipationPlan(planId: id, isJoining: isJoining)
+        case let .selectedPlan(index):
+            presentPlanDetailView(index: index)
         }
     }
     
@@ -112,6 +118,12 @@ extension FuturePlanListViewReactor {
         return Observable.concat([loadingStart,
                                   requestParticipation,
                                   loadingStop])
-    }                                       
+    }
+    
+    private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
+        guard let selectedPlan = currentState.plans[safe: index] else { return .empty() }
+        self.coordinator?.pushPlanDetailView(plan: selectedPlan)
+        return .empty()
+    }
 }
 

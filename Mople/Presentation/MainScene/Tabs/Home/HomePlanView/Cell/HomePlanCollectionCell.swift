@@ -10,8 +10,13 @@ import SnapKit
 
 final class HomePlanCollectionCell: UICollectionViewCell {
 
-    private let thumbnailView: ThumbnailTitleView = {
-        let view = ThumbnailTitleView(type: .basic)
+    private let thumbnailView: ThumbnailView = {
+        let view = ThumbnailView(thumbnailSize: 28,
+                                      thumbnailRadius: 6)
+        view.setTitleLabel(font: FontStyle.Body2.semiBold,
+                           color: ColorStyle.Gray._02)
+        view.setSpacing(8)
+        view.addArrowImageView()
         return view
     }()
     
@@ -94,16 +99,10 @@ final class HomePlanCollectionCell: UICollectionViewCell {
             make.height.equalTo(28)
         }
         
-        countInfoLabel.snp.makeConstraints { make in
-            make.height.equalTo(18)
-        }
-        
-        dateInfoLabel.snp.makeConstraints { make in
-            make.height.equalTo(18)
-        }
-        
-        placeInfoLabel.snp.makeConstraints { make in
-            make.height.equalTo(34)
+        [countInfoLabel, dateInfoLabel].forEach {
+            $0.snp.makeConstraints { make in
+                make.height.equalTo(18)
+            }
         }
         
         weatherView.snp.makeConstraints { make in

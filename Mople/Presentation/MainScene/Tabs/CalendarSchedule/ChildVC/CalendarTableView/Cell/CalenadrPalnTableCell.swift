@@ -11,8 +11,13 @@ import SnapKit
 final class CalenadrPalnTableCell: UITableViewCell {
  
     // MARK: - UI Components
-    private let thumbnailView: ThumbnailTitleView = {
-        let view = ThumbnailTitleView(type: .basic)
+    private let thumbnailView: ThumbnailView = {
+        let view = ThumbnailView(thumbnailSize: 28,
+                                      thumbnailRadius: 6)
+        view.setTitleLabel(font: FontStyle.Body2.semiBold,
+                           color: ColorStyle.Gray._02)
+        view.setSpacing(8)
+        view.addArrowImageView()
         return view
     }()
     

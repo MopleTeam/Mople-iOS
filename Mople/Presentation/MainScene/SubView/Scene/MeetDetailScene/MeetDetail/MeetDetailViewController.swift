@@ -29,8 +29,13 @@ final class DetailMeetViewController: TitleNaviViewController, View {
         return view
     }()
     
-    private let thumnailView: ThumbnailTitleView = {
-        let view = ThumbnailTitleView(type: .detail(size: .large))
+    private let thumbnailView: ThumbnailView = {
+        let view = ThumbnailView(thumbnailSize: 56,
+                                      thumbnailRadius: 12)
+        view.addMemberCountLabel()
+        view.setTitleLabel(font: FontStyle.Title2.semiBold,
+                           color: ColorStyle.Gray._01)
+        view.setSpacing(12)
         return view
     }()
     
@@ -40,7 +45,7 @@ final class DetailMeetViewController: TitleNaviViewController, View {
     }()
     
     private lazy var headerStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [thumnailView, segment])
+        let stackView = UIStackView(arrangedSubviews: [thumbnailView, segment])
         stackView.axis = .vertical
         stackView.distribution = .fill
         stackView.alignment = .fill
@@ -144,7 +149,7 @@ final class DetailMeetViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, meet in
-                vc.thumnailView.configure(with: .init(meet: meet))
+                vc.thumbnailView.configure(with: .init(meet: meet))
             })
             .disposed(by: disposeBag)
         

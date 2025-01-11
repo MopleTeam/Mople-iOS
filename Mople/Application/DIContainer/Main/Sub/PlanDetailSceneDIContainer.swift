@@ -8,43 +8,34 @@
 import UIKit
 
 protocol PlanDetailSceneDependencies {
-    
+    func makePlanDetailViewController() -> PlanDetailViewController
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     
-    let appNetworkService: AppNetworkService
+    private let appNetworkService: AppNetworkService
+    private let plan: Plan
     
-    init(appNetworkService: AppNetworkService) {
-        print(#function, #line, "LifeCycle Test PlanDetailSceneDIContainer Created" )
+    init(appNetworkService: AppNetworkService,
+         plan: Plan) {
         self.appNetworkService = appNetworkService
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test PlanDetailSceneDIContainer Deinit" )
+        self.plan = plan
     }
     
     func makePlanDetailCoordinator(navigationController: UINavigationController) -> PlanDetailFlowCoordinator {
         return .init(dependencies: self,
                      navigationController: navigationController)
     }
-    
-    
 }
 
-final class PlanDetailFlowCoordinator: BaseCoordinator {
-    
-    private let dependencies: PlanDetailSceneDependencies
-    
-    init(dependencies: PlanDetailSceneDependencies,
-         navigationController: UINavigationController) {
-        print(#function, #line, "LifeCycle Test PlanDetailFlowCoordinator Created" )
-
-        self.dependencies = dependencies
-        super.init(navigationController: navigationController)
+extension PlanDetailSceneDIContainer {
+    func makePlanDetailViewController() -> PlanDetailViewController {
+        return .init(reactor: makePlanDetailViewReactor(),
+                     title: "약속 상세")
     }
     
-    deinit {
-        print(#function, #line, "LifeCycle Test PlanDetailFlowCoordinator Deinit" )
+    func makePlanDetailViewReactor() -> PlanDetailViewReactor {
+        return .init(plan: plan)
     }
 }
+

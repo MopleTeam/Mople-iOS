@@ -36,6 +36,7 @@ final class FuturePlanTableCell: UITableViewCell {
                               iconSize: .init(width: 20, height: 22))
         label.setTitle(font: FontStyle.Title.bold,
                        color: ColorStyle.Gray._01)
+        label.setSpacing(4)
         return label
     }()
 
@@ -44,6 +45,7 @@ final class FuturePlanTableCell: UITableViewCell {
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
         label.setSpacing(4)
+        label.setTitleTopPadding(3)
         return label
     }()
 

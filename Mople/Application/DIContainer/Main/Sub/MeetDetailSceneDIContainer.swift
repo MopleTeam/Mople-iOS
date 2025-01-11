@@ -9,7 +9,7 @@ import UIKit
 
 protocol MeetDetailSceneDependencies {
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> DetailMeetViewController
-    func makeFuturePlanListViewController() -> FuturePlanListViewController
+    func makeFuturePlanListViewController(coordinator: MeetDetailCoordination) -> FuturePlanListViewController
     func makePastPlanListViewController() -> PastPlanListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetDetailCoordination) -> MeetSetupViewController
@@ -43,8 +43,8 @@ extension MeetDetailSceneDIContainer {
     
     private func makeDetailMeetViewReactor(coordinator: MeetDetailCoordination) {
         self.mainReactor = .init(fetchMeetUseCase: makeFetchMeetDetailUseCase(),
-                     coordinator: coordinator,
-                     meetID: meetId)
+                                 coordinator: coordinator,
+                                 meetID: meetId)
     }
     
     private func makeFetchMeetDetailUseCase() -> FetchMeetDetail {
@@ -57,14 +57,16 @@ extension MeetDetailSceneDIContainer {
     
     
     // MARK: - FuturePlanList
-    func makeFuturePlanListViewController() -> FuturePlanListViewController {
-        return FuturePlanListViewController(reactor: makeFuturePlanListViewReactor(),
-                                            parentReactor: mainReactor!)
+    func makeFuturePlanListViewController(coordinator: MeetDetailCoordination) -> FuturePlanListViewController {
+        return FuturePlanListViewController(
+            reactor: makeFuturePlanListViewReactor(coordinator: coordinator),
+            parentReactor: mainReactor!)
     }
     
-    private func makeFuturePlanListViewReactor() -> FuturePlanListViewReactor {
+    private func makeFuturePlanListViewReactor(coordinator: MeetDetailCoordination) -> FuturePlanListViewReactor {
         return .init(fetchPlanUseCase: makeFetchFuturePlanUsecase(),
                      participationPlanUseCase: makeParticipationPlanUseCase(),
+                     coordinator: coordinator,
                      meetID: meetId)
     }
     

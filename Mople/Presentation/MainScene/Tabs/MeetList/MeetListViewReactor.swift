@@ -40,12 +40,9 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchMeetList:
-            return fetchMeetList()
+            fetchMeetList()
         case let .selectMeet(index):
-            guard let selectedGroup = currentState.meetList[safe: index],
-                  let id = selectedGroup.meetSummary?.id else { return .empty() }
-            coordinator.presentDetailMeetScene(meetId: id)
-            return .empty()
+            presentMeetDetailView(index: index)
         }
     }
     
@@ -70,5 +67,12 @@ extension MeetListViewReactor {
             .map { Mutation.fetchMeetList(groupList: $0) }
         
         return fetchData
+    }
+    
+    private func presentMeetDetailView(index: Int) -> Observable<Mutation> {
+        guard let selectedGroup = currentState.meetList[safe: index],
+              let id = selectedGroup.meetSummary?.id else { return .empty() }
+        coordinator.presentMeetDetailScene(meetId: id)
+        return .empty()
     }
 }

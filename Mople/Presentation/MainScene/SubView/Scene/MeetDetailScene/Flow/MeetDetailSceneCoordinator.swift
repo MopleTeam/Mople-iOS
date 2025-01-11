@@ -10,12 +10,12 @@ import UIKit
 protocol MeetDetailCoordination: AnyObject {
     func swicthPlanListPage(isFuture: Bool)
     func pushMeetSetupView(meet: Meet)
+    func pushPlanDetailView(plan: Plan)
     func popView()
     func endFlow()
 }
 
 final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination {
-    
     private let dependencies: MeetDetailSceneDependencies
     private var detailMeetVC: DetailMeetViewController?
     private var futurePlanListVC: FuturePlanListViewController?
@@ -34,7 +34,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     }
     
     private func setPageViews() {
-        futurePlanListVC = dependencies.makeFuturePlanListViewController()
+        futurePlanListVC = dependencies.makeFuturePlanListViewController(coordinator: self)
         pastPlanListVC = dependencies.makePastPlanListViewController()
         self.detailMeetVC?.pageController.setViewControllers([futurePlanListVC!], direction: .forward, animated: false)
     }
@@ -62,6 +62,14 @@ extension MeetDetailSceneCoordinator {
     }
 }
 
+// MARK: - Push Flow
+extension MeetDetailSceneCoordinator {
+    func pushPlanDetailView(plan: Plan) {
+        guard let parent = self.parentCoordinator as? MainCoordination else { return }
+        parent.presentPlanDetailScene(plan: plan)
+    }
+}
+
 // MARK: - Pop View
 extension MeetDetailSceneCoordinator {
     func popView() {
@@ -73,9 +81,10 @@ extension MeetDetailSceneCoordinator {
 extension MeetDetailSceneCoordinator {
     
     func endFlow() {
-        (self.parentCoordinator as? CreateMeetCoordination)?.closeSubView(completion: { [weak self] in
+        guard let parent = self.parentCoordinator as? MainCoordination else { return }
+        parent.closeSubView { [weak self] in
             self?.clear()
-        })
+        }
     }
     
     private func clear() {

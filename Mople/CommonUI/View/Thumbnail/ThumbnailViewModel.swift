@@ -12,6 +12,11 @@ struct ThumbnailViewModel {
     var thumbnailPath: String?
     var memberCount: Int?
     var lastPlanDate: Date?
+    
+    var countText: String? {
+        guard let memberCount else { return nil }
+        return "\(memberCount) 명"
+    }
 }
 
 extension ThumbnailViewModel {

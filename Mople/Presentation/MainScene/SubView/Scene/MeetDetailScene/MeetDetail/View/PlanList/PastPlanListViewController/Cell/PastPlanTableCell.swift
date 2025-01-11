@@ -15,7 +15,6 @@ final class PastPlanTableCell: UITableViewCell {
         label.font = FontStyle.Body2.medium
         label.textColor = ColorStyle.Gray._04
         label.setContentHuggingPriority(.init(1), for: .horizontal)
-        label.text = "Data Test"
         return label
     }()
 
@@ -29,7 +28,6 @@ final class PastPlanTableCell: UITableViewCell {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
         label.textColor = ColorStyle.Gray._01
-        label.text = "Title Test"
         return label
     }()
 
@@ -37,7 +35,7 @@ final class PastPlanTableCell: UITableViewCell {
         let label = IconLabel(icon: .member, iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
         label.setSpacing(4)
-        label.text = "Count Test"
+        label.setTitleTopPadding(3)
         return label
     }()
     
@@ -53,14 +51,12 @@ final class PastPlanTableCell: UITableViewCell {
         return imageView
     }()
     
-    #warning("폰트 바꿔야 함")
     private let photoCountLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.semiBold
         label.textColor = ColorStyle.App.primary
         label.backgroundColor = ColorStyle.Default.blueGray
         label.layer.makeLine(width: 1, color: ColorStyle.Default.white)
-        label.text = "3"
         label.textAlignment = .center
         label.clipsToBounds = true
         return label

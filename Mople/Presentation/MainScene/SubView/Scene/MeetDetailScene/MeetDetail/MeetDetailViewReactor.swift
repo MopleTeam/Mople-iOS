@@ -11,7 +11,7 @@ import ReactorKit
 final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case requestMeetInfo(id: Int)
+        case updateMeetInfo(id: Int)
         case switchPage(isFuture: Bool)
         case pushMeetSetupView
         case futurePlanLoading(_ isLoading: Bool)
@@ -20,7 +20,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        case fetchMeetInfo(meet: Meet)
+        case setMeetInfo(meet: Meet)
         case notifyMeetInfoLoading(_ isLoading: Bool)
         case notifyFuturePlanLoading(_ isLoading: Bool)
         case notifyPastPlanLoading(_ isLoading: Bool)
@@ -44,7 +44,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
          meetID: Int) {
         self.fetchMeetUseCase = fetchMeetUseCase
         self.coordinator = coordinator
-        action.onNext(.requestMeetInfo(id: meetID))
+        action.onNext(.updateMeetInfo(id: meetID))
         logLifeCycle()
     }
     
@@ -54,7 +54,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .requestMeetInfo(id):
+        case let .updateMeetInfo(id):
             return self.fetchMeetInfo(id: id)
         case let .switchPage(isFuture):
             coordinator?.swicthPlanListPage(isFuture: isFuture)
@@ -76,7 +76,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .fetchMeetInfo(meet):
+        case let .setMeetInfo(meet):
             newState.meet = meet
         case let .notifyMeetInfoLoading(isLoading):
             newState.meetInfoLoaded = isLoading
@@ -98,7 +98,7 @@ extension MeetDetailViewReactor {
         #warning("에러 처리")
         let updateMeet = fetchMeetUseCase.fetchMeetDetail(meetId: id)
             .asObservable()
-            .map { Mutation.fetchMeetInfo(meet: $0) }
+            .map { Mutation.setMeetInfo(meet: $0) }
         
         let loadingStop = Observable.just(Mutation.notifyMeetInfoLoading(false))
         

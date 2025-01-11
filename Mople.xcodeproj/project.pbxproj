@@ -94,7 +94,6 @@
 		523645332C8FFDEB009E0784 /* FetchMeetList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645322C8FFDEB009E0784 /* FetchMeetList.swift */; };
 		523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */; };
 		523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */; };
-		5236453C2C900DA3009E0784 /* MeetListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453B2C900DA3009E0784 /* MeetListTableViewController.swift */; };
 		5236453F2C900E12009E0784 /* MeetListTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236453E2C900E12009E0784 /* MeetListTableCell.swift */; };
 		523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645422C901CF7009E0784 /* MeetListViewReactor.swift */; };
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
@@ -180,6 +179,11 @@
 		529CCD4A2D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */; };
 		529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */; };
 		529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */; };
+		529CCD562D323FDF0041CBB7 /* PlanDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */; };
+		529CCD582D3240930041CBB7 /* PlanDetailFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */; };
+		529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */; };
+		529CCD5D2D326A070041CBB7 /* PlanDetailInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD5C2D326A070041CBB7 /* PlanDetailInfoView.swift */; };
+		529CCD5F2D3278E00041CBB7 /* PlanDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD5E2D3278E00041CBB7 /* PlanDetailViewModel.swift */; };
 		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
 		52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* SignInRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
@@ -402,7 +406,6 @@
 		523645322C8FFDEB009E0784 /* FetchMeetList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetList.swift; sourceTree = "<group>"; };
 		523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentScheduleMock.swift; sourceTree = "<group>"; };
 		523645382C8FFF9F009E0784 /* FetchGroupListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupListMock.swift; sourceTree = "<group>"; };
-		5236453B2C900DA3009E0784 /* MeetListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListTableViewController.swift; sourceTree = "<group>"; };
 		5236453E2C900E12009E0784 /* MeetListTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListTableCell.swift; sourceTree = "<group>"; };
 		523645422C901CF7009E0784 /* MeetListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListViewReactor.swift; sourceTree = "<group>"; };
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
@@ -482,6 +485,11 @@
 		529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailSceneDIContainer.swift; sourceTree = "<group>"; };
 		529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewContoller.swift; sourceTree = "<group>"; };
 		529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleLoggable.swift; sourceTree = "<group>"; };
+		529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailViewController.swift; sourceTree = "<group>"; };
+		529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailFlowCoordinator.swift; sourceTree = "<group>"; };
+		529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailViewReactor.swift; sourceTree = "<group>"; };
+		529CCD5C2D326A070041CBB7 /* PlanDetailInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailInfoView.swift; sourceTree = "<group>"; };
+		529CCD5E2D3278E00041CBB7 /* PlanDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailViewModel.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* SignInRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
@@ -670,7 +678,7 @@
 			children = (
 				523645422C901CF7009E0784 /* MeetListViewReactor.swift */,
 				527A3E962C83627C007FE63B /* MeetListViewController.swift */,
-				5236453A2C900D57009E0784 /* MeetTableView */,
+				5236453D2C900E0C009E0784 /* Cell */,
 			);
 			path = MeetList;
 			sourceTree = "<group>";
@@ -1108,15 +1116,6 @@
 				5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */,
 			);
 			path = MeetSetup;
-			sourceTree = "<group>";
-		};
-		5236453A2C900D57009E0784 /* MeetTableView */ = {
-			isa = PBXGroup;
-			children = (
-				5236453B2C900DA3009E0784 /* MeetListTableViewController.swift */,
-				5236453D2C900E0C009E0784 /* Cell */,
-			);
-			path = MeetTableView;
 			sourceTree = "<group>";
 		};
 		5236453D2C900E0C009E0784 /* Cell */ = {
@@ -1618,6 +1617,42 @@
 			path = Base;
 			sourceTree = "<group>";
 		};
+		529CCD522D323FAF0041CBB7 /* PlanDetailScene */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD532D323FCE0041CBB7 /* Flow */,
+				529CCD542D323FD10041CBB7 /* PlanDetail */,
+			);
+			path = PlanDetailScene;
+			sourceTree = "<group>";
+		};
+		529CCD532D323FCE0041CBB7 /* Flow */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */,
+			);
+			path = Flow;
+			sourceTree = "<group>";
+		};
+		529CCD542D323FD10041CBB7 /* PlanDetail */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD5B2D3269F70041CBB7 /* HeaderView */,
+				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
+				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
+			);
+			path = PlanDetail;
+			sourceTree = "<group>";
+		};
+		529CCD5B2D3269F70041CBB7 /* HeaderView */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD5E2D3278E00041CBB7 /* PlanDetailViewModel.swift */,
+				529CCD5C2D326A070041CBB7 /* PlanDetailInfoView.swift */,
+			);
+			path = HeaderView;
+			sourceTree = "<group>";
+		};
 		529D7B912CDE14BD00BE77BE /* Comment */ = {
 			isa = PBXGroup;
 			children = (
@@ -2012,6 +2047,7 @@
 		52D864482D29F335000F8378 /* Scene */ = {
 			isa = PBXGroup;
 			children = (
+				529CCD522D323FAF0041CBB7 /* PlanDetailScene */,
 				52D864502D29FC47000F8378 /* MeetDetailScene */,
 				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
 				52818C5C2D1804240001E30B /* SearchLocationScene */,
@@ -2488,6 +2524,7 @@
 				5211F8F62C84234800403980 /* DefaultTabBarController.swift in Sources */,
 				521091F12D10559600DD0407 /* Meet.swift in Sources */,
 				52818C8D2D1C45EA0001E30B /* SearchResultViewController.swift in Sources */,
+				529CCD582D3240930041CBB7 /* PlanDetailFlowCoordinator.swift in Sources */,
 				52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */,
 				5231DF442D2F972B00D52529 /* RecentPlanListRepo.swift in Sources */,
 				526B98622CEDBDFD002488C5 /* LabeledTextFieldView.swift in Sources */,
@@ -2562,6 +2599,7 @@
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,
+				529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */,
 				52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */,
 				52D8648B2D2A9400000F8378 /* PastPlanListViewController.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* SignUpRepositoryMock.swift in Sources */,
@@ -2599,8 +2637,10 @@
 				52266BFA2CBD474D007D03EB /* FetchUserInfo.swift in Sources */,
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* MeetListTableCell.swift in Sources */,
+				529CCD5D2D326A070041CBB7 /* PlanDetailInfoView.swift in Sources */,
 				52EA6E102CF84B3100EFD753 /* NicknameValidationRepo.swift in Sources */,
 				52EA6E0A2CF83C6B00EFD753 /* ProfileEditRepo.swift in Sources */,
+				529CCD5F2D3278E00041CBB7 /* PlanDetailViewModel.swift in Sources */,
 				52CE87C52CEC38E400EBD85D /* MeetTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
@@ -2663,6 +2703,7 @@
 				5211F9002C86B37B00403980 /* CardButton.swift in Sources */,
 				52C5200C2D0D6A550085F5F7 /* MeetSelectViewController.swift in Sources */,
 				5214F8862D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift in Sources */,
+				529CCD562D323FDF0041CBB7 /* PlanDetailViewController.swift in Sources */,
 				52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */,
 				5231DF5B2D2FBA7900D52529 /* DefaultMeetPlanListRepo.swift in Sources */,
 				527DBE2F2CE8965A008BB20E /* CreateMeetViewController.swift in Sources */,
@@ -2679,7 +2720,6 @@
 				52E2383F2C76E8C00066C9A3 /* LoginSceneCoordinator.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */,
-				5236453C2C900DA3009E0784 /* MeetListTableViewController.swift in Sources */,
 				52C857BB2D0865A100765FB3 /* Plan.swift in Sources */,
 				5231DF542D2FA99C00D52529 /* MeetPlanListRepo.swift in Sources */,
 			);

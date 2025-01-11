@@ -8,21 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ThumbnailTitleView: UIView {
-    
-    enum ViewType {
-        enum contentSize {
-            case small
-            case large
-        }
-        
-        case simple
-        case basic
-        case detail(size: contentSize)
-    }
-    
-    private var viewType: ViewType
-    private var viewModel: ThumbnailViewModel?
+final class ThumbnailView: UIView {
     
     private let thumbnailView: UIImageView = {
         let view = UIImageView()
@@ -33,7 +19,7 @@ final class ThumbnailTitleView: UIView {
     
     private let groupTitleLabel = UILabel()
     
-    private let memberCountLabel: IconLabel = {
+    private lazy var memberCountLabel: IconLabel = {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,
@@ -69,10 +55,12 @@ final class ThumbnailTitleView: UIView {
     }()
     
     
-    init(type: ViewType) {
-        self.viewType = type
-        defer { setupUI() }
+    init(thumbnailSize: CGFloat,
+         thumbnailRadius: CGFloat) {
         super.init(frame: .zero)
+        setupUI()
+        setThumbnail(size: thumbnailSize,
+                     radius: thumbnailRadius)
     }
 
     required init?(coder: NSCoder) {
@@ -85,29 +73,22 @@ final class ThumbnailTitleView: UIView {
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        handleUseType()
     }
-    
-    private func setTitleLabel(font: UIFont, color: UIColor) {
-        groupTitleLabel.font = font
-        groupTitleLabel.textColor = color
-    }
-    
-    private func setThumbnail(size: CGFloat, radius: CGFloat) {
-        thumbnailView.snp.makeConstraints { make in
-            make.size.equalTo(size)
-        }
-        thumbnailView.layer.cornerRadius = radius
-    }
-    
-    
+
     public func configure(with viewModel: ThumbnailViewModel?) {
         guard let viewModel = viewModel else { return }
-        self.viewModel = viewModel
         loadImage(viewModel.thumbnailPath)
         groupTitleLabel.text = viewModel.name
-        memberCountLabel.text = "\(self.viewModel?.memberCount ?? 0) 명"
+        memberCountLabel.text = "\(viewModel.memberCount ?? 0) 명"
+        setMemberCount(viewModel.countText)
+    }
+    
+    private func setMemberCount(_ countText: String?) {
+        guard groupInfoStackView.subviews.contains(where: {
+            $0 is IconLabel
+        }) else { return }
+        
+        memberCountLabel.text = countText
     }
 
     private func loadImage(_ path: String?) {
@@ -115,62 +96,28 @@ final class ThumbnailTitleView: UIView {
     }
 }
 
-extension ThumbnailTitleView {
-    private func handleUseType() {
-        handleSize()
-        handleUI()
+extension ThumbnailView {
+    public func setTitleLabel(font: UIFont, color: UIColor) {
+        groupTitleLabel.font = font
+        groupTitleLabel.textColor = color
     }
     
-    private func handleSize() {
-        switch viewType {
-        case .simple, .basic:
-            setSpacing(8)
-            setThumbnail(size: 28, radius: 6)
-        case .detail:
-            setSpacing(12)
-            setThumbnail(size: 56, radius: 12)
+    public func setThumbnail(size: CGFloat, radius: CGFloat) {
+        thumbnailView.snp.makeConstraints { make in
+            make.size.equalTo(size)
         }
+        thumbnailView.layer.cornerRadius = radius
     }
     
-    private func handleUI() {
-        switch viewType {
-        case .simple:
-            setTitleLabel(font: FontStyle.Body1.medium,
-                          color: ColorStyle.Gray._02)
-        case .basic:
-            addArrowImageView()
-            setTitleLabel(font: FontStyle.Body2.semiBold,
-                          color: ColorStyle.Gray._04)
-        case let .detail(size):
-            self.handleDetailTypeUI(size: size)
-        }
-    }
-    
-    private func handleDetailTypeUI(size: ViewType.contentSize) {
-        switch size {
-        case .small:
-            addArrowImageView()
-            addMemberCountLabel()
-            setTitleLabel(font: FontStyle.Title3.semiBold,
-                          color: ColorStyle.Gray._01)
-        case .large:
-            addMemberCountLabel()
-            setTitleLabel(font: FontStyle.Title2.semiBold,
-                          color: ColorStyle.Gray._01)
-        }
-    }
-}
-
-extension ThumbnailTitleView {
-    private func addMemberCountLabel() {
+    public func addMemberCountLabel() {
         groupInfoStackView.addArrangedSubview(memberCountLabel)
     }
     
-    private func addArrowImageView() {
+    public func addArrowImageView() {
         mainStackView.addArrangedSubview(arrowImage)
     }
     
-    private func setSpacing(_ space: CGFloat) {
+    public func setSpacing(_ space: CGFloat) {
         mainStackView.spacing = space
     }
 }

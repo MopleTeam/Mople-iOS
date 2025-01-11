@@ -18,8 +18,9 @@ protocol MainTapDependencies {
 
 protocol MainNavigationDependencies {
     func makeCreateMeetViewController(coordinator: CreateMeetCoordination) -> CreateMeetViewController
-    func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator
+    func makeMeetDetailCoordinator(meetId: Int) -> BaseCoordinator
     func makePlanCreateCoordinator() -> BaseCoordinator
+    func makePlanDetailCoordinator(plan: Plan) -> BaseCoordinator
 }
 
 final class MainSceneDIContainer: MainSceneDependencies {
@@ -174,9 +175,18 @@ extension MainSceneDIContainer {
     }
     
     // MARK: - 미팅 상세 뷰
-    func makeDetailMeetCoordinator(meetId: Int) -> BaseCoordinator {
-        let detailMeetDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService, meetId: meetId)
+    func makeMeetDetailCoordinator(meetId: Int) -> BaseCoordinator {
+        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      meetId: meetId)
         let navigationController = UINavigationController.createFullScreenNavigation()
-        return detailMeetDI.makeMeetDetailCoordinator(navigationController: navigationController)
+        return meetDetailDI.makeMeetDetailCoordinator(navigationController: navigationController)
+    }
+    
+    // MARK: - 일정 상세 뷰
+    func makePlanDetailCoordinator(plan: Plan) -> BaseCoordinator {
+        let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      plan: plan)
+        let navigationController = UINavigationController.createFullScreenNavigation()
+        return planDetailDI.makePlanDetailCoordinator(navigationController: navigationController)
     }
 }

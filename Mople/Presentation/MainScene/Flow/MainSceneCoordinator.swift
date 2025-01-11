@@ -11,7 +11,8 @@ protocol MainCoordination: AnyObject {
     func closeSubView(completion: (() -> Void)?)
     func presentCreateGroupView()
     func presentCreatePlanScene()
-    func presentDetailMeetScene(meetId: Int)
+    func presentMeetDetailScene(meetId: Int)
+    func presentPlanDetailScene(plan: Plan)
     func signOut()
 }
 
@@ -60,10 +61,20 @@ extension MainSceneCoordinator: MainCoordination {
         self.navigationController.present(planCreateCoordinator.navigationController, animated: false)
     }
     
-    func presentDetailMeetScene(meetId: Int) {
-        let detailGroupCoordinator = self.dependencies.makeDetailMeetCoordinator(meetId: meetId)
+    // MARK: - 미팅 상세 씬
+    func presentMeetDetailScene(meetId: Int) {
+        let detailGroupCoordinator = self.dependencies.makeMeetDetailCoordinator(meetId: meetId)
         self.start(coordinator: detailGroupCoordinator)
         self.navigationController.present(detailGroupCoordinator.navigationController, animated: false)
+    }
+    
+    // MARK: - 일정 상세 씬
+    func presentPlanDetailScene(plan: Plan) {
+        guard let currentVC = UIApplication.shared.topViewController else { return }
+        print(#function, #line, "plan : \(plan)" )
+        let detailPlanCoordinator = self.dependencies.makePlanDetailCoordinator(plan: plan)
+        self.start(coordinator: detailPlanCoordinator)
+        currentVC.present(detailPlanCoordinator.navigationController, animated: false)
     }
     
     // MARK: - 로그아웃

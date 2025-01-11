@@ -10,7 +10,14 @@ import SnapKit
 
 final class MeetSelectTableCell: UITableViewCell {
         
-    private let thumbnailView = ThumbnailTitleView(type: .simple)
+    private let thumbnailView: ThumbnailView = {
+        let view = ThumbnailView(thumbnailSize: 28,
+                                      thumbnailRadius: 6)
+        view.setTitleLabel(font: FontStyle.Body1.medium,
+                           color: ColorStyle.Gray._02)
+        view.setSpacing(8)
+        return view
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

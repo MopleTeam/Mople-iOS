@@ -64,7 +64,8 @@ final class MeetPlanTableHeaderView: UITableViewHeaderFooterView {
         countLabel.text = "\(count)개"
     }
     
-    /// 특히 페이지 전환 시 TableView HeaderView가 생성되는 시점에 ContentView의 크기가 0으로 초기화되는 문제방지
+    /// 뷰컨트롤러에 의해서 테이블뷰가 생성될 땐 문제가 발생하지 않으나 페이지 컨트롤러에 의해서 생성 시 헤더뷰의 높이가 0이라는 경고가 표시됨
+    /// 해당 경고를 막기위해 초기부터 높이를 지정해줌
     private func prepareContentViewLayout() {
         self.contentView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 36)
     }
