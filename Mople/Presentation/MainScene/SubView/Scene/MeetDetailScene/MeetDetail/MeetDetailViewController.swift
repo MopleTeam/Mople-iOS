@@ -66,17 +66,12 @@ final class DetailMeetViewController: TitleNaviViewController, View {
     
     init(title: String?,
          reactor: MeetDetailViewReactor) {
-        print(#function, #line, "LifeCycle Test DetailGroupViewController Created" )
         super.init(title: title)
         self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test DetailGroupViewController Deinit" )
     }
     
     private func initalizeSetup() {

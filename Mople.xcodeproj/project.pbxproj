@@ -175,6 +175,11 @@
 		529A26062C96A781009F4CFA /* RecentPlanFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
+		529CCD462D3232020041CBB7 /* FetchPlanDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */; };
+		529CCD482D3232370041CBB7 /* FetchPlanDetailMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD472D3232370041CBB7 /* FetchPlanDetailMock.swift */; };
+		529CCD4A2D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */; };
+		529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */; };
+		529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */; };
 		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
 		52B6F63B2C77655200DA2D75 /* SignInRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* SignInRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
@@ -472,6 +477,11 @@
 		528D27CC2C7B2D6F00178F14 /* ProfileSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewReactor.swift; sourceTree = "<group>"; };
 		529528762D317A360095ACCD /* Data+Compressed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Compressed.swift"; sourceTree = "<group>"; };
 		529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanFooterView.swift; sourceTree = "<group>"; };
+		529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanDetail.swift; sourceTree = "<group>"; };
+		529CCD472D3232370041CBB7 /* FetchPlanDetailMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanDetailMock.swift; sourceTree = "<group>"; };
+		529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailSceneDIContainer.swift; sourceTree = "<group>"; };
+		529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewContoller.swift; sourceTree = "<group>"; };
+		529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleLoggable.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* SignInRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
@@ -858,14 +868,6 @@
 			path = Review;
 			sourceTree = "<group>";
 		};
-		5214F8B72D2C9FC500E8CE9C /* Review */ = {
-			isa = PBXGroup;
-			children = (
-				5214F8B82D2C9FCB00E8CE9C /* Review.swift */,
-			);
-			path = Review;
-			sourceTree = "<group>";
-		};
 		5214F8BF2D2CA38300E8CE9C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
@@ -1027,36 +1029,13 @@
 			isa = PBXGroup;
 			children = (
 				5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */,
-				5231DF642D2FBE6A00D52529 /* Create */,
-				5231DF5F2D2FBC6200D52529 /* Recent */,
-				5231DF5E2D2FBC5700D52529 /* MeetPlan */,
-				5231DF5D2D2FBB3000D52529 /* Participation */,
+				52C857AD2D07A71500765FB3 /* CreatePlan.swift */,
+				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
+				5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */,
+				5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */,
+				529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */,
 			);
 			path = Plan;
-			sourceTree = "<group>";
-		};
-		5231DF5D2D2FBB3000D52529 /* Participation */ = {
-			isa = PBXGroup;
-			children = (
-				5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */,
-			);
-			path = Participation;
-			sourceTree = "<group>";
-		};
-		5231DF5E2D2FBC5700D52529 /* MeetPlan */ = {
-			isa = PBXGroup;
-			children = (
-				5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */,
-			);
-			path = MeetPlan;
-			sourceTree = "<group>";
-		};
-		5231DF5F2D2FBC6200D52529 /* Recent */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
-			);
-			path = Recent;
 			sourceTree = "<group>";
 		};
 		5231DF602D2FBDC200D52529 /* Account */ = {
@@ -1084,14 +1063,6 @@
 				5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */,
 			);
 			path = Review;
-			sourceTree = "<group>";
-		};
-		5231DF642D2FBE6A00D52529 /* Create */ = {
-			isa = PBXGroup;
-			children = (
-				52C857AD2D07A71500765FB3 /* CreatePlan.swift */,
-			);
-			path = Create;
 			sourceTree = "<group>";
 		};
 		5231DF652D2FBE7200D52529 /* Meet */ = {
@@ -1348,6 +1319,7 @@
 				5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */,
 				5214F8BD2D2CA24B00E8CE9C /* FetchReviewMock.swift */,
 				5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */,
+				529CCD472D3232370041CBB7 /* FetchPlanDetailMock.swift */,
 			);
 			path = UseCaseMock;
 			sourceTree = "<group>";
@@ -1531,23 +1503,6 @@
 			path = Comment;
 			sourceTree = "<group>";
 		};
-		5285E6C12CDA0E0200B855CB /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				5285E6A52CD9A63C00B855CB /* Token.swift */,
-			);
-			name = Auth;
-			sourceTree = "<group>";
-		};
-		5285E6C22CDB1E8500B855CB /* User */ = {
-			isa = PBXGroup;
-			children = (
-				5285E6C12CDA0E0200B855CB /* Auth */,
-				5285E6C32CDB1EBB00B855CB /* UserInfo.swift */,
-			);
-			name = User;
-			sourceTree = "<group>";
-		};
 		5285E6E12CDC342D00B855CB /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -1634,6 +1589,33 @@
 				529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */,
 			);
 			path = FooterView;
+			sourceTree = "<group>";
+		};
+		529CCD432D32312A0041CBB7 /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				5285E6A52CD9A63C00B855CB /* Token.swift */,
+				5285E6C32CDB1EBB00B855CB /* UserInfo.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		529CCD442D3231430041CBB7 /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				5214F8B82D2C9FCB00E8CE9C /* Review.swift */,
+			);
+			path = Review;
+			sourceTree = "<group>";
+		};
+		529CCD4B2D3236FA0041CBB7 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */,
+				52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */,
+				529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */,
+			);
+			path = Base;
 			sourceTree = "<group>";
 		};
 		529D7B912CDE14BD00BE77BE /* Comment */ = {
@@ -1812,7 +1794,6 @@
 				521091E22D0FACB500DD0407 /* RecentPlan.swift */,
 				52C857BA2D0865A100765FB3 /* Plan.swift */,
 				5285E6E12CDC342D00B855CB /* Components */,
-				529D7B912CDE14BD00BE77BE /* Comment */,
 			);
 			path = Plan;
 			sourceTree = "<group>";
@@ -1869,6 +1850,7 @@
 				52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */,
 				52E238282C7457CC0066C9A3 /* DIContainer */,
 				52E238412C76E99D0066C9A3 /* AppCoordinator */,
+				529CCD4B2D3236FA0041CBB7 /* Base */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -1897,11 +1879,11 @@
 		52CB0B3C2C72AA1F002B6D20 /* CommonUI */ = {
 			isa = PBXGroup;
 			children = (
+				52266BF52CBCF622007D03EB /* ViewController */,
 				5231DF322D2F29FF00D52529 /* Alert */,
 				52D864832D2A8E66000F8378 /* SegmentControl */,
 				52D864302D27E5E3000F8378 /* MapView */,
 				52C5200D2D0D6DBC0085F5F7 /* SheetView */,
-				52266BF52CBCF622007D03EB /* ViewController */,
 				52473D6A2CEF5D4A009D045A /* Picker */,
 				526B98602CEDBDE9002488C5 /* TextField */,
 				526B985F2CEDBDD6002488C5 /* NavigationBar */,
@@ -2116,6 +2098,7 @@
 				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
 				52D864352D289613000F8378 /* CommonDIContainer.swift */,
 				52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */,
+				529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */,
 			);
 			path = Sub;
 			sourceTree = "<group>";
@@ -2211,11 +2194,12 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8B72D2C9FC500E8CE9C /* Review */,
-				5285E6C22CDB1E8500B855CB /* User */,
+				529CCD442D3231430041CBB7 /* Review */,
+				529CCD432D32312A0041CBB7 /* Account */,
 				521091D82D0FA5F000DD0407 /* Meet */,
 				52C857B02D081DDC00765FB3 /* Plan */,
 				52818C6B2D194C8B0001E30B /* Place */,
+				529D7B912CDE14BD00BE77BE /* Comment */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -2276,7 +2260,6 @@
 		52E238412C76E99D0066C9A3 /* AppCoordinator */ = {
 			isa = PBXGroup;
 			children = (
-				52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */,
 				52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */,
 			);
 			path = AppCoordinator;
@@ -2455,6 +2438,7 @@
 				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */,
+				529CCD482D3232370041CBB7 /* FetchPlanDetailMock.swift in Sources */,
 				52D864572D29FD89000F8378 /* MeetDetailViewController.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
 				521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */,
@@ -2479,6 +2463,7 @@
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
+				529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */,
 				5211F9032C86E41900403980 /* HomePlanCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
 				52E0E8082D30B95D002213FF /* NotificationService.swift in Sources */,
@@ -2541,6 +2526,7 @@
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
+				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
 				529528772D317A360095ACCD /* Data+Compressed.swift in Sources */,
@@ -2565,6 +2551,7 @@
 				5214F8A42D2C408900E8CE9C /* UserInfoMock.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultSignInRepo.swift in Sources */,
+				529CCD462D3232020041CBB7 /* FetchPlanDetail.swift in Sources */,
 				52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */,
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
@@ -2665,6 +2652,7 @@
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
+				529CCD4A2D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift in Sources */,
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
 				5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,

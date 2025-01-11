@@ -12,7 +12,7 @@ import ReactorKit
 
 
 #warning("모임이 없는 경우 처리하기")
-final class MeetSelectViewController: UIViewController, View {
+final class MeetSelectViewController: BaseViewController, View {
     
     typealias Reactor = CreatePlanViewReactor
     
@@ -34,13 +34,8 @@ final class MeetSelectViewController: UIViewController, View {
     }()
     
     init(reactor: CreatePlanViewReactor?) {
-        print(#function, #line, "LifeCycle Test GroupList TableView Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test GroupList TableView Deinit" )
     }
     
     required init?(coder: NSCoder) {

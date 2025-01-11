@@ -13,7 +13,7 @@ struct ProfileUpdateModel {
     var completedAction: () -> Void
 }
 
-final class ProfileViewReactor: Reactor {
+final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case readUserInfo
@@ -37,13 +37,13 @@ final class ProfileViewReactor: Reactor {
     private weak var coordinator: ProfileCoordination?
     
     init(coordinator: ProfileCoordination) {
-        print(#function, #line, "LifeCycle Test ProfileView Reactor Created" )
         self.coordinator = coordinator
         action.onNext(.readUserInfo)
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test ProfileView Reactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

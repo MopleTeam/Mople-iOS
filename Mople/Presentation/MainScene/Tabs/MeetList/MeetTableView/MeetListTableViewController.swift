@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class MeetListTableViewController: UIViewController, View, UIScrollViewDelegate {
+final class MeetListTableViewController: BaseViewController, View, UIScrollViewDelegate {
     
     typealias Reactor = MeetListViewReactor
     var disposeBag = DisposeBag()
@@ -33,13 +33,8 @@ final class MeetListTableViewController: UIViewController, View, UIScrollViewDel
     }()
     
     init(reactor: MeetListViewReactor) {
-        print(#function, #line, "LifeCycle Test GroupList TableView Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test GroupList TableView Deinit" )
     }
     
     required init?(coder: NSCoder) {

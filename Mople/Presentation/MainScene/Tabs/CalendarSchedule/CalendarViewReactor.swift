@@ -8,7 +8,7 @@
 import ReactorKit
 import UIKit
 
-final class CalendarViewReactor: Reactor {
+final class CalendarViewReactor: Reactor, LifeCycleLoggable {
     
     typealias SelectDate = CalendarViewController.SelectDate
     typealias ScopeChangeType = CalendarViewController.ScopeChangeType
@@ -61,13 +61,13 @@ final class CalendarViewReactor: Reactor {
     var initialState: State = State()
     
     init(fetchUseCase: FetchPlanList) {
-        print(#function, #line, "LifeCycle Test CalendarView Reactor Created" )
         self.fetchUseCase = fetchUseCase
+        logLifeCycle()
         action.onNext(.fetchData)
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test CalendarView Reactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

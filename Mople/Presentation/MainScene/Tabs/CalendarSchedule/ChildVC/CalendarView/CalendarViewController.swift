@@ -17,7 +17,7 @@ enum ScopeType {
     case month
 }
 
-final class CalendarViewController: UIViewController, View {
+final class CalendarViewController: BaseViewController, View {
 
     typealias Reactor = CalendarViewReactor
     typealias SelectDate = (selectedDate: Date?, isScroll: Bool)
@@ -68,15 +68,9 @@ final class CalendarViewController: UIViewController, View {
     // MARK: - LifeCycle
     init(reactor: CalendarViewReactor,
          verticalGestureObserver: Observable<UIPanGestureRecognizer>) {
-        print(#function, #line, "LifeCycle Test CalendarView Created" )
-
         self.gestureObserver = verticalGestureObserver
-        defer { self.reactor = reactor }
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test CalendarView Deinit" )
+        super.init()
+        self.reactor = reactor
     }
 
     required init?(coder: NSCoder) {

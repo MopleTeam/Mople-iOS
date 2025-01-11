@@ -96,13 +96,8 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     
     init(title: String?,
          reactor: CreateMeetViewReactor) {
-        print(#function, #line, "LifeCycle Test GroupCreate View Created" )
         super.init(title: title)
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test GroupCreate View Deinit" )
     }
     
     @MainActor required init?(coder: NSCoder) {

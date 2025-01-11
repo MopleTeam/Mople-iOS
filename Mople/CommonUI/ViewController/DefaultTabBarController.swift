@@ -23,7 +23,20 @@ final class DefaultTabBarController: UITabBarController {
         view.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         return view
     }()
-        
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        print(#function, #line, "LifeCycle Test DefaultTabBarController Created" )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print(#function, #line, "LifeCycle Test DefaultTabBarController Deinit" )
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()

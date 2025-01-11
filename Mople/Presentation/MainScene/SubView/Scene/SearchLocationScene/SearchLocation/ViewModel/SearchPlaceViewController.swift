@@ -52,17 +52,12 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     }()
         
     init(reactor: SearchPlaceReactor?) {
-        print(#function, #line, "LifeCycle Test SearchLocationViewController Created" )
         super.init()
         self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test SearchLocationViewController Deinit" )
     }
     
     override func viewDidLoad() {

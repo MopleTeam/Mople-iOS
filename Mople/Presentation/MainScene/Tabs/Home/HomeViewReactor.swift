@@ -12,7 +12,7 @@ enum HomeError: Error {
     case emptyMeet
 }
 
-final class HomeViewReactor: Reactor {
+final class HomeViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
         case checkNotificationPermission
@@ -47,15 +47,15 @@ final class HomeViewReactor: Reactor {
     init(fetchRecentScheduleUseCase: FetchRecentPlan,
          notificationService: NotificationService,
          coordinator: HomeCoordination) {
-        print(#function, #line, "LifeCycle Test HomeViewReactor Created" )
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
         self.notificationService = notificationService
         self.coordinator = coordinator
+        logLifeCycle()
         action.onNext(.requestRecentPlan)
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test HomeViewReactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

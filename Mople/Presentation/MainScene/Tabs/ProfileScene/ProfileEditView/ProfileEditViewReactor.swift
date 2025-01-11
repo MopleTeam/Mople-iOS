@@ -8,7 +8,7 @@
 import UIKit
 import ReactorKit
 
-class ProfileEditViewReactor: Reactor {
+class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
         case setLoading(isLoad: Bool)
@@ -33,13 +33,13 @@ class ProfileEditViewReactor: Reactor {
     
     init(profileEditUseCase: ProfileEdit,
          coordinator: ProfileEditCoordination) {
-        print(#function, #line, "LifeCycle Test ProfileEditView Reactor Created" )
         self.profileEditUseCase = profileEditUseCase
         self.coordinator = coordinator
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test ProfileEditView Reactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class PastPlanListViewController: UIViewController, View {
+final class PastPlanListViewController: BaseViewController, View {
 
     typealias Reactor = PastPlanListViewReactor
     
@@ -40,18 +40,13 @@ final class PastPlanListViewController: UIViewController, View {
     
     init(reactor: PastPlanListViewReactor,
          parentReactor: MeetDetailViewReactor) {
-        print(#function, #line, "LifeCycle Test PastPlanListViewController Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
         self.parentReactor = parentReactor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test PastPlanListViewController Deinit" )
     }
     
     override func viewDidLoad() {

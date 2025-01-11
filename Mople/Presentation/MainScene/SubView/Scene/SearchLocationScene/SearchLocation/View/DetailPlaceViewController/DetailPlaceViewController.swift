@@ -10,7 +10,7 @@ import NMapsMap
 import ReactorKit
 import RxSwift
 
-final class DetailPlaceViewController: UIViewController, View {
+final class DetailPlaceViewController: BaseViewController, View {
     
     typealias Reactor = SearchPlaceReactor
     
@@ -27,16 +27,11 @@ final class DetailPlaceViewController: UIViewController, View {
     
     init(reactor: SearchPlaceReactor?,
          place: PlaceInfo) {
-        print(#function, #line, "LifeCycle Test DetailPlaceViewController Created" )
         self.place = place
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
     }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test DetailPlaceViewController Deinit" )
-    }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

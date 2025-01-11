@@ -7,7 +7,7 @@
 
 import ReactorKit
 
-final class MeetListViewReactor: Reactor {
+final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         case fetchMeetList
         case selectMeet(index: Int)
@@ -27,14 +27,14 @@ final class MeetListViewReactor: Reactor {
     
     init(fetchUseCase: FetchMeetList,
          coordinator: MainCoordination) {
-        print(#function, #line, "LifeCycle Test GroupListViewReactor Created" )
         self.fetchUseCase = fetchUseCase
         self.coordinator = coordinator
         action.onNext(.fetchMeetList)
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test GroupListViewReactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

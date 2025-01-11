@@ -13,12 +13,7 @@ final class PolicyViewController: TitleNaviViewController {
     var disposeBag = DisposeBag()
     
     init() {
-        print(#function, #line, "LifeCycle Test PolicyView Created" )
         super.init(title: "개인정보 처리방침")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test PolicyView Deinit" )
     }
     
     required init?(coder: NSCoder) {

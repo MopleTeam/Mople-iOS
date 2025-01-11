@@ -149,13 +149,8 @@ final class ProfileViewController: TitleNaviViewController, View {
     // MARK: - LifeCycle
     init(title: String,
          reactor: ProfileViewReactor) {
-        print(#function, #line, "LifeCycle Test ProfileView Created" )
-        defer { self.reactor = reactor }
         super.init(title: title)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test ProfileView Deinit" )
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {

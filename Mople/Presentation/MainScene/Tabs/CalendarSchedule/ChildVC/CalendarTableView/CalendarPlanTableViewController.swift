@@ -12,7 +12,7 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-final class CalendarPlanTableViewController: UIViewController, View {
+final class CalendarPlanTableViewController: BaseViewController, View {
     
     typealias Reactor = CalendarViewReactor
     
@@ -50,14 +50,10 @@ final class CalendarPlanTableViewController: UIViewController, View {
     
     // MARK: - LifeCycle
     init(reactor: Reactor) {
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
     }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test ScheduleTableView Deinit" )
-    }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

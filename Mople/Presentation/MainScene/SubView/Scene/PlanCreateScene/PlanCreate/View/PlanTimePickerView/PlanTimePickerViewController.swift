@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class PlanTimePickerViewController: UIViewController, View {
+final class PlanTimePickerViewController: BaseViewController, View {
     
     enum DayPeriod: String {
         case am = "오전"
@@ -48,13 +48,8 @@ final class PlanTimePickerViewController: UIViewController, View {
     
     // MARK: - LifeCycle
     init(reactor: CreatePlanViewReactor?) {
-        print(#function, #line, "LifeCycle Test CalendarDate PickerView Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test CalendarDate PickerView Deinit" )
     }
     
     required init?(coder: NSCoder) {

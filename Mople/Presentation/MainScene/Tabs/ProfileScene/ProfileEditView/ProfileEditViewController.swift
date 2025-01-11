@@ -42,15 +42,10 @@ class ProfileEditViewController: TitleNaviViewController, View {
     init(profile: UserInfo,
          profileSetupReactor: ProfileSetupViewReactor,
          editProfileReactor: ProfileEditViewReactor) {
-        print(#function, #line, "LifeCycle Test ProfileEdit View Created" )
         self.previousProfile = profile
         self.profileSetupReactor = profileSetupReactor
-        defer { self.reactor = editProfileReactor }
         super.init(title: TextStyle.ProfileEdit.title)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test ProfileEdit View Deinit" )
+        self.reactor = editProfileReactor
     }
     
     required init?(coder: NSCoder) {

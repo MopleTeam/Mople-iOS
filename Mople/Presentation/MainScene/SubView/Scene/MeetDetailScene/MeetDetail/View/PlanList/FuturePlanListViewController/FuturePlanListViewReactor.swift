@@ -8,7 +8,7 @@
 import Foundation
 import ReactorKit
 
-final class FuturePlanListViewReactor: Reactor {
+final class FuturePlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case requestPlanList
@@ -36,16 +36,15 @@ final class FuturePlanListViewReactor: Reactor {
     init(fetchPlanUseCase: FetchMeetFuturePlan,
          participationPlanUseCase: RequestParticipationPlan,
          meetID: Int) {
-        print(#function, #line, "LifeCycle Test FutruePlanListViewReactor Created" )
-
         self.fetchPlanUseCase = fetchPlanUseCase
         self.participationPlanUseCase = participationPlanUseCase
         self.meedId = meetID
         action.onNext(.requestPlanList)
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test FutruePlanListViewReactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

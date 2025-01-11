@@ -89,13 +89,8 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     // MARK: - LifeCycle
     init(title: String,
          reactor: CalendarViewReactor) {
-        print(#function, #line, "LifeCycle Test CalendarScheduleView Created" )
         super.init(title: title)
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test CalendarScheduleView Deinit" )
     }
     
     required init?(coder: NSCoder) {

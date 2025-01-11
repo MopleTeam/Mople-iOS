@@ -94,17 +94,12 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     // MARK: - LifeCycle
     init(title: String?,
          reactor: CreatePlanViewReactor?) {
-        print(#function, #line, "LifeCycle Test PlanCreateView Created" )
         super.init(title: title)
         self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test PlanCreateView Deinit" )
     }
     
     override func viewDidLoad() {

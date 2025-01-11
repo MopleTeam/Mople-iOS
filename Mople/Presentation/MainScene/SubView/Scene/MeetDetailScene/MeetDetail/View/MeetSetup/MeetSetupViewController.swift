@@ -116,17 +116,12 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     init(title: String?,
          reactor: MeetSetupViewReactor) {
-        print(#function, #line, "LifeCycle Test MeetSetupViewController Created" )
         super.init(title: title)
         self.reactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test MeetSetupViewController Deinit" )
     }
     
     override func viewDidLoad() {

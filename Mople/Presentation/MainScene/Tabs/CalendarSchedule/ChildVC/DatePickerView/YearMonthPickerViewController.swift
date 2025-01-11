@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class YearMonthPickerViewController: UIViewController, View {
+final class YearMonthPickerViewController: BaseViewController, View {
     
     typealias Reactor = CalendarViewReactor
     
@@ -38,14 +38,8 @@ final class YearMonthPickerViewController: UIViewController, View {
     
     // MARK: - LifeCycle
     init(reactor: Reactor? = nil) {
-        print(#function, #line, "LifeCycle Test CalendarDate PickerView Created" )
-
-        defer { self.reactor = reactor }
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test CalendarDate PickerView Deinit" )
+        super.init()
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {

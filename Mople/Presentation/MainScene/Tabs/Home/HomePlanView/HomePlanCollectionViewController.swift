@@ -11,7 +11,7 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-final class HomePlanCollectionViewController: UIViewController, View {
+final class HomePlanCollectionViewController: BaseViewController, View {
     
     typealias Reactor = HomeViewReactor
     typealias Section = SectionModel<Void, Plan>
@@ -43,13 +43,8 @@ final class HomePlanCollectionViewController: UIViewController, View {
     
     // MARK: - LifeCycle
     init(reactor: HomeViewReactor) {
-        print(#function, #line, "LifeCycle Test ScheduleListCollectionView Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test ScheduleListCollectionView Deinit" )
     }
     
     required init?(coder: NSCoder) {

@@ -23,14 +23,8 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     
     init(dependencies: MeetDetailSceneDependencies,
          navigationController: UINavigationController) {
-        print(#function, #line, "LifeCycle Test DetailMeetSceneCoordinator Created" )
-
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test DetailMeetSceneCoordinator Deinit" )
     }
     
     override func start() {

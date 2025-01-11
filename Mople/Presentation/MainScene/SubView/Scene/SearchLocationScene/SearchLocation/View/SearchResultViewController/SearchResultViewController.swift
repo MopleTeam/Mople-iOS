@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class SearchResultViewController: UIViewController, View {
+final class SearchResultViewController: BaseViewController, View {
     typealias Reactor = SearchPlaceReactor
     
     var disposeBag = DisposeBag()
@@ -30,17 +30,12 @@ final class SearchResultViewController: UIViewController, View {
     }()
     
     init(reactor: SearchPlaceReactor?) {
-        print(#function, #line, "LifeCycle Test SearchTableViewController Created" )
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test SearchTableViewController Deinit" )
     }
     
     override func viewDidLoad() {

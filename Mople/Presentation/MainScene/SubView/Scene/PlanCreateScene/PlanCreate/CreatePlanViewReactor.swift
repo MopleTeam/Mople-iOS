@@ -8,7 +8,7 @@
 import Foundation
 import ReactorKit
 
-final class CreatePlanViewReactor: Reactor {
+final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     
     enum DateError: Error {
         case invalid
@@ -90,16 +90,15 @@ final class CreatePlanViewReactor: Reactor {
     init(createPlanUseCase: CreatePlan,
          fetchMeetListUSeCase: FetchMeetList,
          coordinator: PlanCreateCoordination) {
-        print(#function, #line, "LifeCycle Test PlanCreateViewReactor Created" )
-
         self.createPlanUseCase = createPlanUseCase
         self.fetchMeetListUseCase = fetchMeetListUSeCase
         self.coordinator = coordinator
+        logLifeCycle()
         self.action.onNext(.fetchMeetList)
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test PlanCreateViewReactor Deinit" )
+        logLifeCycle()
     }
         
     func mutate(action: Action) -> Observable<Mutation> {

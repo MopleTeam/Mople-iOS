@@ -43,15 +43,10 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
     
     init(title: String?,
          reactor: MeetListViewReactor) {
-        print(#function, #line, "LifeCycle Test GroupList View Created" )
         super.init(title: title)
         self.reactor = reactor
     }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test GroupList View Deinit" )
-    }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

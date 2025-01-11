@@ -26,13 +26,8 @@ final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
     
     init(navigationController: UINavigationController,
          dependencies: PlanCreateSceneDependencies) {
-        print(#function, #line, "LifeCycle Test PlanCreateFlowCoordinator Created" )
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test PlanCreateFlowCoordinator Deinit" )
     }
     
     override func start() {
@@ -73,7 +68,6 @@ extension PlanCreateFlowCoordinator {
 // MARK: - SearchLoactionFlow로부터 주입받기
 extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
     func didSelectPlace(_ place: PlaceInfo) {
-        print(#function, #line, "#5 : \(place)" )
         planCreateVC?.setupPlace(place)
     }
 }

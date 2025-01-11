@@ -99,15 +99,9 @@ final class HomeViewController: DefaultViewController, View {
         return sv
     }()
     
-    
     init(reactor: HomeViewReactor) {
-        print(#function, #line, "LifeCycle Test HomeView Created" )
         super.init()
         self.reactor = reactor
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test HomeView Deinit" )
     }
     
     required init?(coder: NSCoder) {

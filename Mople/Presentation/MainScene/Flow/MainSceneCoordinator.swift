@@ -22,13 +22,8 @@ final class MainSceneCoordinator: BaseCoordinator {
  
     init(navigationController: UINavigationController,
          dependencies: MainSceneDependencies) {
-        print(#function, #line, "LifeCycle Test MainSceneCoordinator Created" )
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test MainSceneCoordinator Deinit" )
     }
     
     override func start() {

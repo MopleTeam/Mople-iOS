@@ -12,7 +12,7 @@ struct SignUpAction {
     var completed: (() -> Void)?
 }
 
-class SignUpViewReactor: Reactor {
+class SignUpViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
         case setLoading(isLoad: Bool)
@@ -44,15 +44,15 @@ class SignUpViewReactor: Reactor {
          signUpUseCase: SignUp,
          fetchUserInfoUseCase: FetchUserInfo,
          completedAction: SignUpAction) {
-        print(#function, #line, "LifeCycle Test SignUp Reactor Created" )
         self.socialInfo = socialInfo
         self.signUpUseCase = signUpUseCase
         self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.completedAction = completedAction
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test SignUp Reactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

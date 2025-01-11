@@ -14,7 +14,7 @@ struct SignInAction {
     var toMain: () -> Void
 }
 
-final class SignInViewReactor: Reactor {
+final class SignInViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case appleLogin
@@ -42,14 +42,14 @@ final class SignInViewReactor: Reactor {
     init(loginUseCase: SignIn,
          fetchUserInfoUseCase: FetchUserInfo,
          loginAction: SignInAction) {
-        print(#function, #line, "LifeCycle Test SignIn View Reactor Created" )
         self.userLoginUseCase = loginUseCase
         self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.loginAction = loginAction
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test SignIn View Reactor Deinit" )
+        logLifeCycle()
     }
     
     func reduce(state: State, mutation: Mutation) -> State {

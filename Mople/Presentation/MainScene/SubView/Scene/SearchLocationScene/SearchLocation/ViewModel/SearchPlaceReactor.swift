@@ -23,7 +23,7 @@ enum SearchError: Error {
     }
 }
 
-final class SearchPlaceReactor: Reactor {
+final class SearchPlaceReactor: Reactor, LifeCycleLoggable {
     
     struct PlaceSearchResult {
         let places: [PlaceInfo]
@@ -65,17 +65,17 @@ final class SearchPlaceReactor: Reactor {
          locationService: LocationService,
          queryStorage: SearchedPlaceStorage,
          coordinator: SearchPlaceCoordination) {
-        print(#function, #line, "LifeCycle Test SearchLocationReactor Created" )
         self.searchUseCase = searchLocationUseCase
         self.locationService = locationService
         self.queryStorage = queryStorage
         self.coordinator = coordinator
+        logLifeCycle()
         action.onNext(.fetchCahcedPlace)
         action.onNext(.updateUserLocation)
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test SearchLocationReactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

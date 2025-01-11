@@ -24,13 +24,8 @@ final class SearchPlaceFlowCoordinator: BaseCoordinator, SearchPlaceCoordination
     
     init(navigationController: UINavigationController,
          dependencies: SearchPlaceSceneDependencies) {
-        print(#function, #line, "LifeCycle Test SearchPlaceFlowCoordinator Created" )
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test SearchPlaceFlowCoordinator Deinit" )
     }
     
     override func start() {

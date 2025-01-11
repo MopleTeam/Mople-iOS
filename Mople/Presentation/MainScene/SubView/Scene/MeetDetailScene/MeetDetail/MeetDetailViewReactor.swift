@@ -8,7 +8,7 @@
 import Foundation
 import ReactorKit
 
-final class MeetDetailViewReactor: Reactor {
+final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case requestMeetInfo(id: Int)
@@ -42,15 +42,14 @@ final class MeetDetailViewReactor: Reactor {
     init(fetchMeetUseCase: FetchMeetDetail,
          coordinator: MeetDetailCoordination,
          meetID: Int) {
-        print(#function, #line, "LifeCycle Test DetailMeetViewReactor Created" )
-
         self.fetchMeetUseCase = fetchMeetUseCase
         self.coordinator = coordinator
         action.onNext(.requestMeetInfo(id: meetID))
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test DetailMeetViewReactor Deinit" )
+        logLifeCycle()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {

@@ -12,7 +12,7 @@ import SnapKit
 import ReactorKit
 import AuthenticationServices
 
-final class SignInViewController: UIViewController, View {
+final class SignInViewController: DefaultViewController, View {
     
     typealias Reactor = SignInViewReactor
     
@@ -97,19 +97,10 @@ final class SignInViewController: UIViewController, View {
         return sv
     }()
     
-    // MARK: - Indicator
-    fileprivate let indicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.hidesWhenStopped = true
-        indicator.layer.zPosition = 1
-        return indicator
-    }()
-    
     // MARK: - LifeCycle
     init(reactor: SignInViewReactor) {
-        print(#function, #line, "LifeCycle Test SignIn View Created" )
-        defer { self.reactor = reactor }
-        super.init(nibName: nil, bundle: nil)
+        super.init()
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -121,11 +112,6 @@ final class SignInViewController: UIViewController, View {
         setupUI()
     }
     
-    deinit {
-        print(#function, #line, "LifeCycle Test SignIn View Deinit" )
-    }
-    
-
     // MARK: - UI Setup
     private func setupUI() {
         setupLayout()
@@ -134,7 +120,6 @@ final class SignInViewController: UIViewController, View {
     private func setupLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainStackView)
-        self.view.addSubview(indicator)
         self.titleContainerView.addSubview(titleStackView)
         
         mainStackView.snp.makeConstraints { make in
@@ -157,10 +142,6 @@ final class SignInViewController: UIViewController, View {
         
         kakaoLoginButton.snp.makeConstraints { make in
             make.height.equalTo(56)
-        }
-        
-        indicator.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
     
@@ -194,15 +175,5 @@ final class SignInViewController: UIViewController, View {
 extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return self.view.window!
-    }
-}
-
-#warning("일반 ViewController를 사용시 중복 구현, 보완필요")
-extension Reactive where Base: SignInViewController {
-    var isLoading: Binder<Bool> {
-        return Binder(self.base) { vc, isLoading in
-            vc.indicator.rx.isAnimating.onNext(isLoading)
-            vc.view.isUserInteractionEnabled = !isLoading
-        }
     }
 }

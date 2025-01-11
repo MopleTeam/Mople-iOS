@@ -12,7 +12,7 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class SignUpViewController: UIViewController, View {
+class SignUpViewController: DefaultViewController, View {
     typealias Reactor = SignUpViewReactor
     
     var disposeBag = DisposeBag()
@@ -44,29 +44,16 @@ class SignUpViewController: UIViewController, View {
         return viewController
     }()
     
-    // MARK: - Indicator
-    fileprivate let indicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.hidesWhenStopped = true
-        indicator.layer.zPosition = 1
-        return indicator
-    }()
-    
     // MARK: - LifeCycle
     init(profileSetupReactor: ProfileSetupViewReactor,
          signUpReactor: SignUpViewReactor) {
-        print(#function, #line, "LifeCycle Test signUp Created" )
         self.profileSetupReactor = profileSetupReactor
-        defer { self.reactor = signUpReactor }
-        super.init(nibName: nil, bundle: nil)
+        super.init()
+        self.reactor = signUpReactor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test signUp Deinit" )
     }
     
     override func viewDidLoad() {
@@ -84,7 +71,6 @@ class SignUpViewController: UIViewController, View {
         self.view.backgroundColor = .white
         self.view.addSubview(mainTitle)
         self.view.addSubview(profileContainerView)
-        self.view.addSubview(indicator)
 
         mainTitle.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).inset(28)
@@ -95,10 +81,6 @@ class SignUpViewController: UIViewController, View {
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
             make.bottom.equalToSuperview().inset(UIScreen.getAdditionalBottomInset())
-        }
-
-        indicator.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
         }
     }
     
@@ -141,14 +123,6 @@ class SignUpViewController: UIViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
-    }
-}
-
-extension Reactive where Base: SignUpViewController {
-    var isLoading: Binder<Bool> {
-        return Binder(self.base) { vc, isLoading in
-            vc.indicator.rx.isAnimating.onNext(isLoading)
-        }
     }
 }
 
