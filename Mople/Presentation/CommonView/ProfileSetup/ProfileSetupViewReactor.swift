@@ -26,13 +26,13 @@ class ProfileSetupViewReactor: Reactor {
         @Pulse var isLoading: Bool = false
     }
     
-    private let useCase: ValidatorNickname
+    private let validatorNicknameUseCase: ValidatorNickname
     
     var initialState: State = State()
     
     init(useCase: ValidatorNickname) {
         print(#function, #line, "LifeCycle Test ProfileSetup Reactor Created" )
-        self.useCase = useCase
+        self.validatorNicknameUseCase = useCase
     }
     
     deinit {
@@ -80,7 +80,7 @@ extension ProfileSetupViewReactor {
     private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let nicknameValidator = useCase.validatorNickname(name)
+        let nicknameValidator = validatorNicknameUseCase.validatorNickname(name)
             .asObservable()
             .map { Mutation.nameCheck(isOverlap: $0)}
             .catch { [weak self] err in
@@ -93,3 +93,4 @@ extension ProfileSetupViewReactor {
                                   loadingOff])
     }
 }
+

@@ -9,6 +9,6 @@ import Foundation
 
 extension RecentPlan {
     static func mock() -> Self {
-        return .init(plans: Plan.recentMock(), hasMeet: true)
+        return .init(plans: Plan.recentMock(), meets: [MeetSummary.mock(id: 1)])
     }
 }

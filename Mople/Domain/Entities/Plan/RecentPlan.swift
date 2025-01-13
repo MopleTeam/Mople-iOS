@@ -9,5 +9,5 @@ import Foundation
 
 struct RecentPlan {
     let plans: [Plan]
-    let hasMeet: Bool
+    let meets: [MeetSummary]
 }

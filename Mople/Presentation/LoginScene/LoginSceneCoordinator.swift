@@ -17,7 +17,7 @@ final class LoginSceneCoordinator: BaseCoordinator {
     
     private let dependencies: LoginSceneDependencies
     
-    init(navigationController: UINavigationController,
+    init(navigationController: AppNaviViewController,
          dependencies: LoginSceneDependencies) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)

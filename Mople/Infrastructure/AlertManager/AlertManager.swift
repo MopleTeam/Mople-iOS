@@ -14,7 +14,7 @@ final class AlertManager {
     private init() { }
     
     private var currentVC: UIViewController? {
-        UIApplication.shared.topViewController
+        UIApplication.shared.topVC
     }
     
     func showAlert(
@@ -87,7 +87,7 @@ final class TestAlertManager {
     private init() { }
     
     private var currentVC: UIViewController? {
-        UIApplication.shared.topViewController
+        UIApplication.shared.topVC
     }
     
     func showAlert(title: String,

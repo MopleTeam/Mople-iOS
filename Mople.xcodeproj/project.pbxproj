@@ -99,6 +99,8 @@
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
 		52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */; };
+		524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */; };
+		524B2F6E2D34048100D80B12 /* NavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6D2D34048100D80B12 /* NavigationTransition.swift */; };
 		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
 		524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* NickNameValidator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
@@ -124,7 +126,6 @@
 		526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */; };
-		526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */; };
 		52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC22D11565B00C249A6 /* DefaultSheetView.swift */; };
 		52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */; };
 		52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECB2D11A57E00C249A6 /* UploadPlace.swift */; };
@@ -132,7 +133,7 @@
 		527A3E6C2C82CA8F007FE63B /* UserLoginUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */; };
 		527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */; };
 		527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */; };
-		527A3E7F2C834BEE007FE63B /* ProfileSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7E2C834BEE007FE63B /* ProfileSceneCoordinator.swift */; };
+		527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7E2C834BEE007FE63B /* ProfileFlowCoordinator.swift */; };
 		527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E8E2C836192007FE63B /* HomeViewController.swift */; };
 		527A3E972C83627C007FE63B /* MeetListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E962C83627C007FE63B /* MeetListViewController.swift */; };
 		527A3E992C836287007FE63B /* CalendarScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */; };
@@ -155,7 +156,6 @@
 		52818C7B2D1994800001E30B /* PlanCreateFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C7A2D1994800001E30B /* PlanCreateFlowCoordinator.swift */; };
 		52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C812D1A98040001E30B /* SearchPlaceFlowCoordinator.swift */; };
 		52818C842D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */; };
-		52818C862D1ACE4D0001E30B /* UINavigation+Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C852D1ACE4D0001E30B /* UINavigation+Common.swift */; };
 		52818C8A2D1C40D60001E30B /* SearchPlaceReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C892D1C40D60001E30B /* SearchPlaceReactor.swift */; };
 		52818C8D2D1C45EA0001E30B /* SearchResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C8C2D1C45EA0001E30B /* SearchResultViewController.swift */; };
 		52818C902D1C469F0001E30B /* SearchPlaceTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52818C8F2D1C469F0001E30B /* SearchPlaceTableCell.swift */; };
@@ -247,10 +247,6 @@
 		52D864322D27E5F3000F8378 /* DefaultMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864312D27E5F3000F8378 /* DefaultMapView.swift */; };
 		52D864362D289613000F8378 /* CommonDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864352D289613000F8378 /* CommonDIContainer.swift */; };
 		52D864382D28AFE9000F8378 /* EditProfileMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864372D28AFE9000F8378 /* EditProfileMock.swift */; };
-		52D8643C2D292248000F8378 /* UIViewController+Modal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8643B2D292248000F8378 /* UIViewController+Modal.swift */; };
-		52D8643F2D292A5D000F8378 /* CreateMeetCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8643E2D292A5D000F8378 /* CreateMeetCoordination.swift */; };
-		52D864472D292D34000F8378 /* HomeCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864462D292D34000F8378 /* HomeCoordination.swift */; };
-		52D8644F2D29F898000F8378 /* ProfileEditCoordination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8644E2D29F898000F8378 /* ProfileEditCoordination.swift */; };
 		52D864522D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */; };
 		52D864572D29FD89000F8378 /* MeetDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864562D29FD89000F8378 /* MeetDetailViewController.swift */; };
 		52D864592D29FDBC000F8378 /* MeetDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */; };
@@ -303,6 +299,13 @@
 		52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */; };
 		52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */; };
 		52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */; };
+		52F83A4A2D34D820003DD790 /* HomeSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A492D34D820003DD790 /* HomeSceneDIContainer.swift */; };
+		52F83A4C2D34D831003DD790 /* MeetListSceneDIConatiner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A4B2D34D831003DD790 /* MeetListSceneDIConatiner.swift */; };
+		52F83A4E2D34D83A003DD790 /* CalendarSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A4D2D34D83A003DD790 /* CalendarSceneDIContainer.swift */; };
+		52F83A532D34F1CD003DD790 /* HomeFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A522D34F1CD003DD790 /* HomeFlowCoordinator.swift */; };
+		52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A562D34F6EA003DD790 /* MeetListFlowCoordinator.swift */; };
+		52F83A5C2D34FD5F003DD790 /* CalendarFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A5B2D34FD5F003DD790 /* CalendarFlowCoordinator.swift */; };
+		52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A602D354528003DD790 /* NavigationCloseable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -411,6 +414,8 @@
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
 		52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultPickerView.swift; sourceTree = "<group>"; };
+		524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
+		524B2F6D2D34048100D80B12 /* NavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTransition.swift; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+ViewLifeCycle.swift"; sourceTree = "<group>"; };
 		524E33D02C804C7A004B15FC /* NickNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NickNameValidator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
@@ -432,7 +437,6 @@
 		526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledButtonView.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponsive.swift; sourceTree = "<group>"; };
-		526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Response+Ext.swift"; sourceTree = "<group>"; };
 		52741EC22D11565B00C249A6 /* DefaultSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSheetView.swift; sourceTree = "<group>"; };
 		52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewModel.swift; sourceTree = "<group>"; };
 		52741ECB2D11A57E00C249A6 /* UploadPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPlace.swift; sourceTree = "<group>"; };
@@ -440,7 +444,7 @@
 		527A3E6B2C82CA8F007FE63B /* UserLoginUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLoginUseCaseMock.swift; sourceTree = "<group>"; };
 		527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentPlan.swift; sourceTree = "<group>"; };
 		527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneCoordinator.swift; sourceTree = "<group>"; };
-		527A3E7E2C834BEE007FE63B /* ProfileSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSceneCoordinator.swift; sourceTree = "<group>"; };
+		527A3E7E2C834BEE007FE63B /* ProfileFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlowCoordinator.swift; sourceTree = "<group>"; };
 		527A3E8E2C836192007FE63B /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		527A3E962C83627C007FE63B /* MeetListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListViewController.swift; sourceTree = "<group>"; };
 		527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarScheduleViewController.swift; sourceTree = "<group>"; };
@@ -463,7 +467,6 @@
 		52818C7A2D1994800001E30B /* PlanCreateFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCreateFlowCoordinator.swift; sourceTree = "<group>"; };
 		52818C812D1A98040001E30B /* SearchPlaceFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceFlowCoordinator.swift; sourceTree = "<group>"; };
 		52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationSceneDIContainer.swift; sourceTree = "<group>"; };
-		52818C852D1ACE4D0001E30B /* UINavigation+Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigation+Common.swift"; sourceTree = "<group>"; };
 		52818C892D1C40D60001E30B /* SearchPlaceReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceReactor.swift; sourceTree = "<group>"; };
 		52818C8C2D1C45EA0001E30B /* SearchResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultViewController.swift; sourceTree = "<group>"; };
 		52818C8F2D1C469F0001E30B /* SearchPlaceTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceTableCell.swift; sourceTree = "<group>"; };
@@ -550,10 +553,6 @@
 		52D864312D27E5F3000F8378 /* DefaultMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMapView.swift; sourceTree = "<group>"; };
 		52D864352D289613000F8378 /* CommonDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonDIContainer.swift; sourceTree = "<group>"; };
 		52D864372D28AFE9000F8378 /* EditProfileMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileMock.swift; sourceTree = "<group>"; };
-		52D8643B2D292248000F8378 /* UIViewController+Modal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Modal.swift"; sourceTree = "<group>"; };
-		52D8643E2D292A5D000F8378 /* CreateMeetCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetCoordination.swift; sourceTree = "<group>"; };
-		52D864462D292D34000F8378 /* HomeCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCoordination.swift; sourceTree = "<group>"; };
-		52D8644E2D29F898000F8378 /* ProfileEditCoordination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditCoordination.swift; sourceTree = "<group>"; };
 		52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailSceneCoordinator.swift; sourceTree = "<group>"; };
 		52D864562D29FD89000F8378 /* MeetDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailViewController.swift; sourceTree = "<group>"; };
 		52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetDetailViewReactor.swift; sourceTree = "<group>"; };
@@ -600,6 +599,13 @@
 		52EA6E1E2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultFCMTokenUploadRepo.swift; sourceTree = "<group>"; };
 		52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeElement.swift"; sourceTree = "<group>"; };
 		52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanViewReactor.swift; sourceTree = "<group>"; };
+		52F83A492D34D820003DD790 /* HomeSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSceneDIContainer.swift; sourceTree = "<group>"; };
+		52F83A4B2D34D831003DD790 /* MeetListSceneDIConatiner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListSceneDIConatiner.swift; sourceTree = "<group>"; };
+		52F83A4D2D34D83A003DD790 /* CalendarSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSceneDIContainer.swift; sourceTree = "<group>"; };
+		52F83A522D34F1CD003DD790 /* HomeFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFlowCoordinator.swift; sourceTree = "<group>"; };
+		52F83A562D34F6EA003DD790 /* MeetListFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListFlowCoordinator.swift; sourceTree = "<group>"; };
+		52F83A5B2D34FD5F003DD790 /* CalendarFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFlowCoordinator.swift; sourceTree = "<group>"; };
+		52F83A602D354528003DD790 /* NavigationCloseable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCloseable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -666,9 +672,8 @@
 		520C9E582CE54E1600778558 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				5211F9042C86E71500403980 /* HomeViewReactor.swift */,
-				527A3E8E2C836192007FE63B /* HomeViewController.swift */,
-				52818C7C2D1A930C0001E30B /* HomePlanView */,
+				52F83A522D34F1CD003DD790 /* HomeFlowCoordinator.swift */,
+				52F83A542D34F6C3003DD790 /* View */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -676,21 +681,19 @@
 		520C9E5A2CE54EBB00778558 /* MeetList */ = {
 			isa = PBXGroup;
 			children = (
-				523645422C901CF7009E0784 /* MeetListViewReactor.swift */,
-				527A3E962C83627C007FE63B /* MeetListViewController.swift */,
-				5236453D2C900E0C009E0784 /* Cell */,
+				52F83A562D34F6EA003DD790 /* MeetListFlowCoordinator.swift */,
+				52F83A582D34FA8F003DD790 /* View */,
 			);
 			path = MeetList;
 			sourceTree = "<group>";
 		};
-		520C9E5B2CE54EEE00778558 /* CalendarSchedule */ = {
+		520C9E5B2CE54EEE00778558 /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
-				5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */,
-				527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */,
-				520C9E5C2CE54F3300778558 /* ChildVC */,
+				52F83A5B2D34FD5F003DD790 /* CalendarFlowCoordinator.swift */,
+				52F83A5A2D34FBC4003DD790 /* View */,
 			);
-			path = CalendarSchedule;
+			path = Calendar;
 			sourceTree = "<group>";
 		};
 		520C9E5C2CE54F3300778558 /* ChildVC */ = {
@@ -710,17 +713,6 @@
 				527A3E9A2C836290007FE63B /* ProfileViewController.swift */,
 			);
 			path = ProfileView;
-			sourceTree = "<group>";
-		};
-		520C9E602CE5A0FE00778558 /* Tabs */ = {
-			isa = PBXGroup;
-			children = (
-				520C9E582CE54E1600778558 /* Home */,
-				520C9E5A2CE54EBB00778558 /* MeetList */,
-				520C9E5B2CE54EEE00778558 /* CalendarSchedule */,
-				527A3E822C834C00007FE63B /* ProfileScene */,
-			);
-			path = Tabs;
 			sourceTree = "<group>";
 		};
 		520C9E612CE5A5E300778558 /* CommonView */ = {
@@ -795,9 +787,9 @@
 		5211F8F92C84B78100403980 /* MainScene */ = {
 			isa = PBXGroup;
 			children = (
-				52D864432D292B33000F8378 /* Flow */,
-				520C9E602CE5A0FE00778558 /* Tabs */,
-				52D864492D29F3A8000F8378 /* SubView */,
+				527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */,
+				52F83A682D354CC0003DD790 /* SubScene */,
+				527DBE2D2CE89360008BB20E /* SubView */,
 			);
 			path = MainScene;
 			sourceTree = "<group>";
@@ -888,10 +880,8 @@
 		52266BF52CBCF622007D03EB /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				5211F8F52C84234800403980 /* DefaultTabBarController.swift */,
-				52CC75CD2D1D4B4D000CC8B9 /* DefaultViewController.swift */,
-				5236452C2C8EDCEF009E0784 /* TitleNaviViewController.swift */,
-				52818C612D18217B0001E30B /* SearchNaviViewController.swift */,
+				52F83A622D35455F003DD790 /* Tabbar */,
+				52F83A632D354565003DD790 /* ViewController */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -1154,6 +1144,16 @@
 			path = Picker;
 			sourceTree = "<group>";
 		};
+		524B2F6A2D34045400D80B12 /* AppNavigation */ = {
+			isa = PBXGroup;
+			children = (
+				524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */,
+				524B2F6D2D34048100D80B12 /* NavigationTransition.swift */,
+				52F83A602D354528003DD790 /* NavigationCloseable.swift */,
+			);
+			path = AppNavigation;
+			sourceTree = "<group>";
+		};
 		524E33CD2C8028A4004B15FC /* RxSwift */ = {
 			isa = PBXGroup;
 			children = (
@@ -1234,8 +1234,8 @@
 		526B985C2CEDBBF6002488C5 /* PlanCreateScene */ = {
 			isa = PBXGroup;
 			children = (
-				52818C762D1992C90001E30B /* Flow */,
-				52818C772D1992CE0001E30B /* PlanCreate */,
+				52818C7A2D1994800001E30B /* PlanCreateFlowCoordinator.swift */,
+				52818C792D1992D80001E30B /* View */,
 			);
 			path = PlanCreateScene;
 			sourceTree = "<group>";
@@ -1323,16 +1323,13 @@
 			path = UseCaseMock;
 			sourceTree = "<group>";
 		};
-		527A3E822C834C00007FE63B /* ProfileScene */ = {
+		527A3E822C834C00007FE63B /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				52D8644C2D29F869000F8378 /* Flow */,
-				520C9E5D2CE54F6200778558 /* ProfileView */,
-				520C9E642CE5DF3A00778558 /* ProfileEditView */,
-				525DFCFB2CCA135500835312 /* NotifyView */,
-				525DFCFC2CCA136400835312 /* PolicyView */,
+				527A3E7E2C834BEE007FE63B /* ProfileFlowCoordinator.swift */,
+				52F83A5F2D354379003DD790 /* View */,
 			);
-			path = ProfileScene;
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		527A3E862C834DEF007FE63B /* Data */ = {
@@ -1342,20 +1339,20 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
-		527DBE2D2CE89360008BB20E /* View */ = {
+		527DBE2D2CE89360008BB20E /* SubView */ = {
 			isa = PBXGroup;
 			children = (
 				521917572CEB088B00696292 /* CreateMeetViewReactor.swift */,
 				527DBE2E2CE8965A008BB20E /* CreateMeetViewController.swift */,
 			);
-			path = View;
+			path = SubView;
 			sourceTree = "<group>";
 		};
 		52818C5C2D1804240001E30B /* SearchLocationScene */ = {
 			isa = PBXGroup;
 			children = (
-				52818C7D2D1A97DE0001E30B /* Flow */,
-				52818C7E2D1A97E20001E30B /* SearchLocation */,
+				52818C812D1A98040001E30B /* SearchPlaceFlowCoordinator.swift */,
+				52818C802D1A97ED0001E30B /* View */,
 			);
 			path = SearchLocationScene;
 			sourceTree = "<group>";
@@ -1386,20 +1383,11 @@
 			path = Place;
 			sourceTree = "<group>";
 		};
-		52818C762D1992C90001E30B /* Flow */ = {
-			isa = PBXGroup;
-			children = (
-				52818C7A2D1994800001E30B /* PlanCreateFlowCoordinator.swift */,
-			);
-			path = Flow;
-			sourceTree = "<group>";
-		};
 		52818C772D1992CE0001E30B /* PlanCreate */ = {
 			isa = PBXGroup;
 			children = (
 				52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */,
 				526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */,
-				52818C792D1992D80001E30B /* View */,
 			);
 			path = PlanCreate;
 			sourceTree = "<group>";
@@ -1407,6 +1395,7 @@
 		52818C792D1992D80001E30B /* View */ = {
 			isa = PBXGroup;
 			children = (
+				52818C772D1992CE0001E30B /* PlanCreate */,
 				52A7876F2D02666C00A633B3 /* MeetSelectView */,
 				52A787742D03489800A633B3 /* PlanDatePickerView */,
 				52741ECD2D14DFD600C249A6 /* PlanTimePickerView */,
@@ -1424,35 +1413,10 @@
 			path = HomePlanView;
 			sourceTree = "<group>";
 		};
-		52818C7D2D1A97DE0001E30B /* Flow */ = {
-			isa = PBXGroup;
-			children = (
-				52818C812D1A98040001E30B /* SearchPlaceFlowCoordinator.swift */,
-			);
-			path = Flow;
-			sourceTree = "<group>";
-		};
-		52818C7E2D1A97E20001E30B /* SearchLocation */ = {
-			isa = PBXGroup;
-			children = (
-				52818C7F2D1A97EA0001E30B /* ViewModel */,
-				52818C802D1A97ED0001E30B /* View */,
-			);
-			path = SearchLocation;
-			sourceTree = "<group>";
-		};
-		52818C7F2D1A97EA0001E30B /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				52818C892D1C40D60001E30B /* SearchPlaceReactor.swift */,
-				52818C5D2D1808140001E30B /* SearchPlaceViewController.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
 		52818C802D1A97ED0001E30B /* View */ = {
 			isa = PBXGroup;
 			children = (
+				52F83A672D354C71003DD790 /* SearchPlace */,
 				52818C8B2D1C45890001E30B /* SearchResultViewController */,
 				52D8642A2D264157000F8378 /* DetailPlaceViewController */,
 			);
@@ -1551,14 +1515,11 @@
 		528D27C82C7A3ABE00178F14 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
-				52D8643A2D292238000F8378 /* UIViewController */,
-				52D864392D29222A000F8378 /* UINavigation */,
 				5208C1722CBE2B03006272E8 /* Kingfisher */,
 				526F45032C96004600C347C7 /* Design */,
 				526F45022C96001A00C347C7 /* UIView */,
 				523645472C90B703009E0784 /* PreView */,
 				524E33CD2C8028A4004B15FC /* RxSwift */,
-				526FA3C82C65DE8500D2F2B5 /* Response+Ext.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				52C7A4A72CAED102009DB5B9 /* CALayer+Ext.swift */,
@@ -1577,6 +1538,7 @@
 		528D27C92C7A3ACC00178F14 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				52F83A642D354588003DD790 /* LifeCycleLog */,
 				52D9651C2D23B726000610B2 /* Keyboard */,
 			);
 			path = Protocol;
@@ -1607,41 +1569,23 @@
 			path = Review;
 			sourceTree = "<group>";
 		};
-		529CCD4B2D3236FA0041CBB7 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */,
-				52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */,
-				529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
-		529CCD522D323FAF0041CBB7 /* PlanDetailScene */ = {
-			isa = PBXGroup;
-			children = (
-				529CCD532D323FCE0041CBB7 /* Flow */,
-				529CCD542D323FD10041CBB7 /* PlanDetail */,
-			);
-			path = PlanDetailScene;
-			sourceTree = "<group>";
-		};
-		529CCD532D323FCE0041CBB7 /* Flow */ = {
+		529CCD522D323FAF0041CBB7 /* PlanDetail */ = {
 			isa = PBXGroup;
 			children = (
 				529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */,
-			);
-			path = Flow;
-			sourceTree = "<group>";
-		};
-		529CCD542D323FD10041CBB7 /* PlanDetail */ = {
-			isa = PBXGroup;
-			children = (
-				529CCD5B2D3269F70041CBB7 /* HeaderView */,
-				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
-				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
+				529CCD542D323FD10041CBB7 /* View */,
 			);
 			path = PlanDetail;
+			sourceTree = "<group>";
+		};
+		529CCD542D323FD10041CBB7 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
+				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
+				529CCD5B2D3269F70041CBB7 /* HeaderView */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		529CCD5B2D3269F70041CBB7 /* HeaderView */ = {
@@ -1885,7 +1829,7 @@
 				52CB0B412C72AD23002B6D20 /* AppConfiguration.swift */,
 				52E238282C7457CC0066C9A3 /* DIContainer */,
 				52E238412C76E99D0066C9A3 /* AppCoordinator */,
-				529CCD4B2D3236FA0041CBB7 /* Base */,
+				524B2F6A2D34045400D80B12 /* AppNavigation */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -2010,91 +1954,10 @@
 			path = MapView;
 			sourceTree = "<group>";
 		};
-		52D864392D29222A000F8378 /* UINavigation */ = {
+		52D864502D29FC47000F8378 /* MeetDetail */ = {
 			isa = PBXGroup;
 			children = (
-				52818C852D1ACE4D0001E30B /* UINavigation+Common.swift */,
-			);
-			path = UINavigation;
-			sourceTree = "<group>";
-		};
-		52D8643A2D292238000F8378 /* UIViewController */ = {
-			isa = PBXGroup;
-			children = (
-				52D8643B2D292248000F8378 /* UIViewController+Modal.swift */,
-			);
-			path = UIViewController;
-			sourceTree = "<group>";
-		};
-		52D8643D2D292A41000F8378 /* FlowAction */ = {
-			isa = PBXGroup;
-			children = (
-				52D864462D292D34000F8378 /* HomeCoordination.swift */,
-				52D8643E2D292A5D000F8378 /* CreateMeetCoordination.swift */,
-			);
-			path = FlowAction;
-			sourceTree = "<group>";
-		};
-		52D864432D292B33000F8378 /* Flow */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */,
-				52D8643D2D292A41000F8378 /* FlowAction */,
-			);
-			path = Flow;
-			sourceTree = "<group>";
-		};
-		52D864482D29F335000F8378 /* Scene */ = {
-			isa = PBXGroup;
-			children = (
-				529CCD522D323FAF0041CBB7 /* PlanDetailScene */,
-				52D864502D29FC47000F8378 /* MeetDetailScene */,
-				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
-				52818C5C2D1804240001E30B /* SearchLocationScene */,
-			);
-			path = Scene;
-			sourceTree = "<group>";
-		};
-		52D864492D29F3A8000F8378 /* SubView */ = {
-			isa = PBXGroup;
-			children = (
-				52D864482D29F335000F8378 /* Scene */,
-				527DBE2D2CE89360008BB20E /* View */,
-			);
-			path = SubView;
-			sourceTree = "<group>";
-		};
-		52D8644C2D29F869000F8378 /* Flow */ = {
-			isa = PBXGroup;
-			children = (
-				527A3E7E2C834BEE007FE63B /* ProfileSceneCoordinator.swift */,
-				52D8644D2D29F870000F8378 /* FlowAction */,
-			);
-			path = Flow;
-			sourceTree = "<group>";
-		};
-		52D8644D2D29F870000F8378 /* FlowAction */ = {
-			isa = PBXGroup;
-			children = (
-				52D8644E2D29F898000F8378 /* ProfileEditCoordination.swift */,
-			);
-			path = FlowAction;
-			sourceTree = "<group>";
-		};
-		52D864502D29FC47000F8378 /* MeetDetailScene */ = {
-			isa = PBXGroup;
-			children = (
-				52D8645F2D2A0452000F8378 /* Flow */,
-				52D864532D29FD40000F8378 /* MeetDetail */,
-			);
-			path = MeetDetailScene;
-			sourceTree = "<group>";
-		};
-		52D864532D29FD40000F8378 /* MeetDetail */ = {
-			isa = PBXGroup;
-			children = (
-				52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */,
-				52D864562D29FD89000F8378 /* MeetDetailViewController.swift */,
+				52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */,
 				52D864552D29FD7D000F8378 /* View */,
 			);
 			path = MeetDetail;
@@ -2103,48 +1966,39 @@
 		52D864552D29FD7D000F8378 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				52F83A652D354C06003DD790 /* MeetDetail */,
 				5235B7132D2E672D006BEAF3 /* MeetSetup */,
 				5235B7122D2E6722006BEAF3 /* PlanList */,
 			);
 			path = View;
 			sourceTree = "<group>";
 		};
-		52D8645C2D2A0284000F8378 /* Login */ = {
+		52D8645C2D2A0284000F8378 /* LoginSceneDI */ = {
 			isa = PBXGroup;
 			children = (
 				52E2382C2C745E960066C9A3 /* LoginSceneDIContainer.swift */,
 			);
-			path = Login;
+			path = LoginSceneDI;
 			sourceTree = "<group>";
 		};
-		52D8645D2D2A028B000F8378 /* Main */ = {
+		52D8645D2D2A028B000F8378 /* MainSceneDI */ = {
 			isa = PBXGroup;
 			children = (
 				527A3EA42C837034007FE63B /* MainSceneDIContainer.swift */,
-				52D8645E2D2A0293000F8378 /* Sub */,
+				52F83A4F2D34D84D003DD790 /* SubScene */,
 			);
-			path = Main;
+			path = MainSceneDI;
 			sourceTree = "<group>";
 		};
 		52D8645E2D2A0293000F8378 /* Sub */ = {
 			isa = PBXGroup;
 			children = (
-				527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */,
 				52818C742D198A760001E30B /* PlanCreateSceneDIContainer.swift */,
-				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
-				52D864352D289613000F8378 /* CommonDIContainer.swift */,
 				52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */,
+				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
 				529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */,
 			);
 			path = Sub;
-			sourceTree = "<group>";
-		};
-		52D8645F2D2A0452000F8378 /* Flow */ = {
-			isa = PBXGroup;
-			children = (
-				52D864512D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift */,
-			);
-			path = Flow;
 			sourceTree = "<group>";
 		};
 		52D864632D2A26FE000F8378 /* SignUp */ = {
@@ -2264,8 +2118,9 @@
 			isa = PBXGroup;
 			children = (
 				52E2382A2C7457DB0066C9A3 /* AppDIContainer.swift */,
-				52D8645C2D2A0284000F8378 /* Login */,
-				52D8645D2D2A028B000F8378 /* Main */,
+				52F83A502D34D872003DD790 /* CommonDI */,
+				52D8645C2D2A0284000F8378 /* LoginSceneDI */,
+				52D8645D2D2A028B000F8378 /* MainSceneDI */,
 			);
 			path = DIContainer;
 			sourceTree = "<group>";
@@ -2296,6 +2151,7 @@
 		52E238412C76E99D0066C9A3 /* AppCoordinator */ = {
 			isa = PBXGroup;
 			children = (
+				52E2383B2C76E7DE0066C9A3 /* BaseCoordinator.swift */,
 				52E238422C76E9B00066C9A3 /* AppFlowCoordinator.swift */,
 			);
 			path = AppCoordinator;
@@ -2338,6 +2194,143 @@
 				52EA6E1A2CF8C4B900EFD753 /* FCMTokenManager.swift */,
 			);
 			path = FCMTokenManager;
+			sourceTree = "<group>";
+		};
+		52F83A4F2D34D84D003DD790 /* SubScene */ = {
+			isa = PBXGroup;
+			children = (
+				52F83A6A2D354DFF003DD790 /* Main */,
+				52D8645E2D2A0293000F8378 /* Sub */,
+			);
+			path = SubScene;
+			sourceTree = "<group>";
+		};
+		52F83A502D34D872003DD790 /* CommonDI */ = {
+			isa = PBXGroup;
+			children = (
+				52D864352D289613000F8378 /* CommonDIContainer.swift */,
+			);
+			path = CommonDI;
+			sourceTree = "<group>";
+		};
+		52F83A542D34F6C3003DD790 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5211F9042C86E71500403980 /* HomeViewReactor.swift */,
+				527A3E8E2C836192007FE63B /* HomeViewController.swift */,
+				52818C7C2D1A930C0001E30B /* HomePlanView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		52F83A582D34FA8F003DD790 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				523645422C901CF7009E0784 /* MeetListViewReactor.swift */,
+				527A3E962C83627C007FE63B /* MeetListViewController.swift */,
+				5236453D2C900E0C009E0784 /* Cell */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		52F83A5A2D34FBC4003DD790 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5259B01E2CA03F96006B2711 /* CalendarViewReactor.swift */,
+				527A3E982C836287007FE63B /* CalendarScheduleViewController.swift */,
+				520C9E5C2CE54F3300778558 /* ChildVC */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		52F83A5F2D354379003DD790 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				520C9E5D2CE54F6200778558 /* ProfileView */,
+				520C9E642CE5DF3A00778558 /* ProfileEditView */,
+				525DFCFB2CCA135500835312 /* NotifyView */,
+				525DFCFC2CCA136400835312 /* PolicyView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		52F83A622D35455F003DD790 /* Tabbar */ = {
+			isa = PBXGroup;
+			children = (
+				5211F8F52C84234800403980 /* DefaultTabBarController.swift */,
+			);
+			path = Tabbar;
+			sourceTree = "<group>";
+		};
+		52F83A632D354565003DD790 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */,
+				52CC75CD2D1D4B4D000CC8B9 /* DefaultViewController.swift */,
+				5236452C2C8EDCEF009E0784 /* TitleNaviViewController.swift */,
+				52818C612D18217B0001E30B /* SearchNaviViewController.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		52F83A642D354588003DD790 /* LifeCycleLog */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD502D3239680041CBB7 /* LifeCycleLoggable.swift */,
+			);
+			path = LifeCycleLog;
+			sourceTree = "<group>";
+		};
+		52F83A652D354C06003DD790 /* MeetDetail */ = {
+			isa = PBXGroup;
+			children = (
+				52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */,
+				52D864562D29FD89000F8378 /* MeetDetailViewController.swift */,
+			);
+			path = MeetDetail;
+			sourceTree = "<group>";
+		};
+		52F83A672D354C71003DD790 /* SearchPlace */ = {
+			isa = PBXGroup;
+			children = (
+				52818C892D1C40D60001E30B /* SearchPlaceReactor.swift */,
+				52818C5D2D1808140001E30B /* SearchPlaceViewController.swift */,
+			);
+			path = SearchPlace;
+			sourceTree = "<group>";
+		};
+		52F83A682D354CC0003DD790 /* SubScene */ = {
+			isa = PBXGroup;
+			children = (
+				52F83A692D354DD5003DD790 /* Main */,
+				529CCD522D323FAF0041CBB7 /* PlanDetail */,
+				52D864502D29FC47000F8378 /* MeetDetail */,
+				526B985C2CEDBBF6002488C5 /* PlanCreateScene */,
+				52818C5C2D1804240001E30B /* SearchLocationScene */,
+			);
+			path = SubScene;
+			sourceTree = "<group>";
+		};
+		52F83A692D354DD5003DD790 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				520C9E582CE54E1600778558 /* Home */,
+				520C9E5A2CE54EBB00778558 /* MeetList */,
+				520C9E5B2CE54EEE00778558 /* Calendar */,
+				527A3E822C834C00007FE63B /* Profile */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		52F83A6A2D354DFF003DD790 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				52F83A492D34D820003DD790 /* HomeSceneDIContainer.swift */,
+				52F83A4B2D34D831003DD790 /* MeetListSceneDIConatiner.swift */,
+				52F83A4D2D34D83A003DD790 /* CalendarSceneDIContainer.swift */,
+				527A3EA02C836435007FE63B /* ProfileSceneDIContainer.swift */,
+			);
+			path = Main;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2460,6 +2453,7 @@
 				5231DF4A2D2FA1C500D52529 /* DefaultCreateMeetRepo.swift in Sources */,
 				5259B01D2CA038AA006B2711 /* CalenadrPalnTableCell.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
+				524B2F6E2D34048100D80B12 /* NavigationTransition.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* CalendarPlanTableHeaderView.swift in Sources */,
 				5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
@@ -2467,11 +2461,11 @@
 				5211F9082C86F2DB00403980 /* HomePlanCollectionCell.swift in Sources */,
 				52CE87D02CEC5ACE00EBD85D /* CreateGroupRepositoryMock.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
+				52F83A4A2D34D820003DD790 /* HomeSceneDIContainer.swift in Sources */,
 				52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */,
 				5231DF572D2FAA2300D52529 /* FetchReviewListRepo.swift in Sources */,
 				524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
-				526FA3C92C65DE8500D2F2B5 /* Response+Ext.swift in Sources */,
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */,
 				529CCD482D3232370041CBB7 /* FetchPlanDetailMock.swift in Sources */,
@@ -2480,7 +2474,6 @@
 				521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */,
 				52818C7B2D1994800001E30B /* PlanCreateFlowCoordinator.swift in Sources */,
 				52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */,
-				52D8644F2D29F898000F8378 /* ProfileEditCoordination.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
@@ -2517,9 +2510,9 @@
 				5214F8BE2D2CA24B00E8CE9C /* FetchReviewMock.swift in Sources */,
 				523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */,
 				52E238372C76530D0066C9A3 /* SignInViewReactor.swift in Sources */,
-				527A3E7F2C834BEE007FE63B /* ProfileSceneCoordinator.swift in Sources */,
-				52D8643F2D292A5D000F8378 /* CreateMeetCoordination.swift in Sources */,
+				527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */,
 				52818C8A2D1C40D60001E30B /* SearchPlaceReactor.swift in Sources */,
+				52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */,
 				52E238482C7733320066C9A3 /* AppNetworkService.swift in Sources */,
 				5211F8F62C84234800403980 /* DefaultTabBarController.swift in Sources */,
 				521091F12D10559600DD0407 /* Meet.swift in Sources */,
@@ -2564,6 +2557,7 @@
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
+				524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
 				529528772D317A360095ACCD /* Data+Compressed.swift in Sources */,
@@ -2580,6 +2574,7 @@
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
 				5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */,
+				52F83A4C2D34D831003DD790 /* MeetListSceneDIConatiner.swift in Sources */,
 				5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */,
 				5235B7152D2E6744006BEAF3 /* MeetSetupViewController.swift in Sources */,
 				52E238322C74BFB00066C9A3 /* SignIn.swift in Sources */,
@@ -2627,7 +2622,6 @@
 				5231DF752D2FCB6C00D52529 /* DefaultParticipationPlanRepo.swift in Sources */,
 				5208051D2C69FE700015F6E0 /* SignUpViewController.swift in Sources */,
 				5235B7172D2E7303006BEAF3 /* MeetSetupViewReactor.swift in Sources */,
-				52818C862D1ACE4D0001E30B /* UINavigation+Common.swift in Sources */,
 				52EA6E002CF7AD9600EFD753 /* SignUp.swift in Sources */,
 				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
 				52CC75D42D1E7DA1000CC8B9 /* SearchedPlaceStorage.swift in Sources */,
@@ -2678,16 +2672,18 @@
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
 				5214F8C32D2CAB5000E8CE9C /* PastPlanListViewReactor.swift in Sources */,
-				52D8643C2D292248000F8378 /* UIViewController+Modal.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				5214F8A82D2C418500E8CE9C /* PlaceMock.swift in Sources */,
 				52C857BF2D086C9B00765FB3 /* Weather.swift in Sources */,
+				52F83A5C2D34FD5F003DD790 /* CalendarFlowCoordinator.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
 				52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */,
 				52D864522D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
 				52EA6E0C2CF83C9200EFD753 /* DefalutProfileEditRepo.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */,
+				52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */,
+				52F83A532D34F1CD003DD790 /* HomeFlowCoordinator.swift in Sources */,
 				52CE87C32CEC38D100EBD85D /* String+Validator.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
@@ -2702,6 +2698,7 @@
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* CardButton.swift in Sources */,
 				52C5200C2D0D6A550085F5F7 /* MeetSelectViewController.swift in Sources */,
+				52F83A4E2D34D83A003DD790 /* CalendarSceneDIContainer.swift in Sources */,
 				5214F8862D2BAE5500E8CE9C /* MeetPlanTableHeaderView.swift in Sources */,
 				529CCD562D323FDF0041CBB7 /* PlanDetailViewController.swift in Sources */,
 				52C857C32D086D0000765FB3 /* CreatePlanMock.swift in Sources */,
@@ -2710,7 +2707,6 @@
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */,
 				52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */,
-				52D864472D292D34000F8378 /* HomeCoordination.swift in Sources */,
 				52818C842D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift in Sources */,
 				52EA6E042CF7F14B00EFD753 /* ProfileEditViewReactor.swift in Sources */,
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,

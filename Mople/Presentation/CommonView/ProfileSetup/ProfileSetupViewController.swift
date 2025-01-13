@@ -14,7 +14,7 @@ final class ProfileSetupViewController: UIViewController, View {
     
     enum ViewType {
         case create
-        case edit(_ previousProfile: UserInfo)
+        case edit(previousProfile: UserInfo)
     }
     
     typealias Reactor = ProfileSetupViewReactor

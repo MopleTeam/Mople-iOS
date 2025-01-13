@@ -16,6 +16,6 @@ struct RecentPlanResponse: Decodable {
 extension RecentPlanResponse {
     func toDomain() -> RecentPlan {
         return .init(plans: plans.map({ $0.toDomain() }),
-                     hasMeet: !meets.isEmpty)
+                     meets: meets.map({ $0.toDomain() }))
     }
 }

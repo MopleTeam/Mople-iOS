@@ -32,13 +32,13 @@ extension AppDIContainer {
     // MARK: - 로그인 플로우
     func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
         return LoginSceneDIContainer(appNetworkService: appNetworkService,
-                                     commonDependencies: commonDIContainer)
+                                     commonFactory: commonDIContainer)
     }
     
     // MARK: - 메인 플로우
     func makeMainSceneDIContainer(isFirstStart: Bool) -> MainSceneDIContainer {
         return MainSceneDIContainer(appNetworkService: appNetworkService,
-                                    commonDependencies: commonDIContainer,
+                                    commonFactory: commonDIContainer,
                                     isFirstStart: isFirstStart)
     }
 }

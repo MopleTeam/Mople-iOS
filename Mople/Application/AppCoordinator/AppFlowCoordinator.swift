@@ -19,7 +19,7 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     private let appDIContainer: AppDIContainer
  
-    init(navigationController: UINavigationController,
+    init(navigationController: AppNaviViewController,
          appDIContainer: AppDIContainer) {
         self.appDIContainer = appDIContainer
         super.init(navigationController: navigationController)
@@ -27,7 +27,6 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     
     override func start() {
-        self.navigationController.navigationBar.isHidden = true
         fadeOut { [weak self] in
             self?.checkEntry()
         }

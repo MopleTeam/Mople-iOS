@@ -17,8 +17,12 @@ extension UIApplication {
 }
 
 extension UIApplication {
-    var topViewController: UIViewController? {
+    var topVC: UIViewController? {
         return topViewController()
+    }
+    
+    var topNavi: UINavigationController? {
+        return topVC?.navigationController
     }
     
     private func topViewController(controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
