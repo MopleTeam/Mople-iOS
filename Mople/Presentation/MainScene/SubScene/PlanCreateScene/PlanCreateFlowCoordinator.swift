@@ -58,7 +58,7 @@ extension PlanCreateFlowCoordinator {
     func presentSearchLocationView() {
         let flow = dependencies.makeSearchLocationCoordinator()
         self.start(coordinator: flow)
-        self.navigationController.present(flow.navigationController, animated: false)
+        self.navigationController.presentWithTransition(flow.navigationController)
     }
 }
 

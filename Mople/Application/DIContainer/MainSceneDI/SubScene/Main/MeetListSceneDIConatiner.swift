@@ -28,7 +28,7 @@ final class MeetListSceneDIConatiner {
     }
     
     func makeMeetListFlowCoordinator() -> MeetListFlowCoordinator {
-        let navi = AppNaviViewController()
+        let navi = AppNaviViewController(type: .main)
         navi.tabBarItem = .init(title: TextStyle.Tabbar.group,
                                 image: .people,
                                 selectedImage: nil)

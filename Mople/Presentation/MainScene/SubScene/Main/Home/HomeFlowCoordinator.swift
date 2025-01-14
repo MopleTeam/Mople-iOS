@@ -36,19 +36,19 @@ final class HomeFlowCoordinator: BaseCoordinator {
 extension HomeFlowCoordinator: HomeFlowCoordination {
     func presentMeetCreateView() {
         let meetCreateVC = dependencies.makeMeetCreateViewController(navigator: self)
-        self.navigationController.present(meetCreateVC, animated: true)
+        self.navigationController.presentWithTransition(meetCreateVC)
     }
     
     func presentPlanCreateView(meetList: [MeetSummary]) {
         let planCreateFlowCoordiator = dependencies.makePlanCreateFlowCoordinator(meetList: meetList)
         self.start(coordinator: planCreateFlowCoordiator)
-        self.navigationController.present(planCreateFlowCoordiator.navigationController, animated: true)
+        self.navigationController.presentWithTransition(planCreateFlowCoordiator.navigationController)
     }
     
     func presentPlanDetailView(plan: Plan) {
         let planDetailCoordinates = dependencies.makePlanDetailFlowCoordinator(plan: plan)
         self.start(coordinator: planDetailCoordinates)
-        self.navigationController.present(planDetailCoordinates.navigationController, animated: true)
+        self.navigationController.presentWithTransition(planDetailCoordinates.navigationController)
     }
     
     func pushCalendarView(lastRecentDate: Date) {

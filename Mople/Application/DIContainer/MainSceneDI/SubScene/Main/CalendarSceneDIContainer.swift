@@ -26,7 +26,7 @@ final class CalendarSceneDIContainer {
     }
     
     func makeCalendarFlowCoordinator() -> CalendarFlowCoordinator {
-        let navi = AppNaviViewController()
+        let navi = AppNaviViewController(type: .main)
         navi.tabBarItem = .init(title: TextStyle.Tabbar.group,
                                 image: .people,
                                 selectedImage: nil)

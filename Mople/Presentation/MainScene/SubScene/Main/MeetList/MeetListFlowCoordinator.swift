@@ -36,13 +36,12 @@ final class MeetListFlowCoordinator: BaseCoordinator, MeetListFlowCoordination {
 extension MeetListFlowCoordinator{
     func presentMeetCreateView() {
         let meetCreateVC = dependency.makeCreateMeetViewController(navigator: self)
-        self.navigationController.present(meetCreateVC, animated: true)
+        self.navigationController.presentWithTransition(meetCreateVC)
     }
     
     func presentMeetDetailView(meetId: Int) {
         let meetDetailFlowCoordinator = dependency.makeMeetDetailFlowCoordiantor(meetId: meetId)
         self.start(coordinator: meetDetailFlowCoordinator)
-        self.navigationController.present(meetDetailFlowCoordinator.navigationController,
-                                          animated: true)
+        self.navigationController.presentWithTransition(meetDetailFlowCoordinator.navigationController)
     }
 }

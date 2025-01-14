@@ -17,6 +17,10 @@ class ProfileEditViewController: TitleNaviViewController, View {
     
     var disposeBag = DisposeBag()
     
+    var presentTransition: AppTransition = .init(type: .present)
+    
+    var dismissTransition: AppTransition = .init(type: .dismiss)
+    
     // MARK: - Sub Reactor
     let profileSetupReactor: ProfileSetupViewReactor
     
@@ -46,6 +50,7 @@ class ProfileEditViewController: TitleNaviViewController, View {
         self.profileSetupReactor = profileSetupReactor
         super.init(title: TextStyle.ProfileEdit.title)
         self.reactor = editProfileReactor
+        setupTransition()
     }
     
     required init?(coder: NSCoder) {
@@ -113,5 +118,15 @@ class ProfileEditViewController: TitleNaviViewController, View {
                 vc.reactor?.action.onNext(.endView)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension ProfileEditViewController: TransitionControllable {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return presentTransition
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return dismissTransition
     }
 }

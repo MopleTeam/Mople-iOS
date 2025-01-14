@@ -29,7 +29,7 @@ final class HomeSceneDIContainer {
     }
     
     func makeHomeFlowCoordinator() -> HomeFlowCoordinator {
-        let navi = AppNaviViewController()
+        let navi = AppNaviViewController(type: .main)
         navi.tabBarItem = .init(title: TextStyle.Tabbar.home,
                                 image: .home,
                                 selectedImage: nil)

@@ -7,12 +7,22 @@
 
 import UIKit
 
-final class AppNaviViewController: UINavigationController {
+final class AppNaviViewController: UINavigationController, TransitionControllable {
     
-    private let presentTransition = NavigationTransition(type: .present)
-    private let dismissTransition = NavigationTransition(type: .dismiss)
+    enum NaviType {
+        case main
+        case sub
+    }
     
-    init() {
+    private let type: NaviType
+    
+    // MARK: - Transition
+    var presentTransition: AppTransition = .init(type: .present)
+    var dismissTransition: AppTransition = .init(type: .dismiss)
+    
+
+    init(type: NaviType = .sub) {
+        self.type = type
         super.init(nibName: nil, bundle: nil)
         initalSetup()
     }
@@ -21,31 +31,24 @@ final class AppNaviViewController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initalSetup() {
-        self.navigationBar.isHidden = true
-        self.modalPresentationStyle = .fullScreen
-        self.dismissTransition.setupDismissGesture(for: self)
+    deinit {
+        print(#function, #line, "Path : # 네비 삭제 ")
     }
     
-    override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
-        viewControllerToPresent.transitioningDelegate = self
-        super.present(viewControllerToPresent,
-                      animated: flag,
-                      completion: completion)
+    private func initalSetup() {
+        self.navigationBar.isHidden = true
+        guard type == .sub else { return }
+        setupTransition()
     }
 }
 
-extension AppNaviViewController: UIViewControllerTransitioningDelegate {
+extension AppNaviViewController {
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return presentTransition
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return dismissTransition
-    }
-    
-    func interactionControllerForDismissal(using animator: any UIViewControllerAnimatedTransitioning) -> (any UIViewControllerInteractiveTransitioning)? {
-        return dismissTransition.interactionController
     }
 }
 

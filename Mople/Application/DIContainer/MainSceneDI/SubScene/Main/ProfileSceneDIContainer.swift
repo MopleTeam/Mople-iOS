@@ -28,7 +28,7 @@ final class ProfileSceneDIContainer: ProfileSceneDependencies {
     }
     
     func makeSetupFlowCoordinator() -> ProfileFlowCoordinator {
-        let navigationController = AppNaviViewController()
+        let navigationController = AppNaviViewController(type: .main)
         navigationController.tabBarItem = .init(title: TextStyle.Tabbar.profile,
                                                 image: .person,
                                                 selectedImage: nil)
@@ -54,11 +54,9 @@ extension ProfileSceneDIContainer {
 extension ProfileSceneDIContainer {
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        navigator: NavigationCloseable) -> ProfileEditViewController {
-        let profileEditVC = ProfileEditViewController(profile: previousProfile,
-                                                      profileSetupReactor: commonFacoty.makeProfileSetupReactor(),
-                                                      editProfileReactor: makeProfileEditViewReactor(navigator: navigator))
-        profileEditVC.modalPresentationStyle = .fullScreen
-        return profileEditVC
+        return ProfileEditViewController(profile: previousProfile,
+                                         profileSetupReactor: commonFacoty.makeProfileSetupReactor(),
+                                         editProfileReactor: makeProfileEditViewReactor(navigator: navigator))
     }
     
     private func makeProfileEditViewReactor(navigator: NavigationCloseable) -> ProfileEditViewReactor {

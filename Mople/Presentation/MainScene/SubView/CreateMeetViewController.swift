@@ -17,6 +17,9 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     
     var disposeBag = DisposeBag()
     
+    var presentTransition: AppTransition = .init(type: .present)
+    var dismissTransition: AppTransition = .init(type: .dismiss)
+    
     // MARK: - Handle KeyboardEvent
     var superView: UIView { self.view }
     var floatingView: UIView { self.completionButton }
@@ -98,6 +101,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
          reactor: CreateMeetViewReactor) {
         super.init(title: title)
         self.reactor = reactor
+        setupTransition()
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -282,5 +286,16 @@ extension CreateMeetViewController: KeyboardDismissable, UIGestureRecognizerDele
     
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
+    }
+}
+
+extension CreateMeetViewController: TransitionControllable {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return presentTransition
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return dismissTransition
     }
 }

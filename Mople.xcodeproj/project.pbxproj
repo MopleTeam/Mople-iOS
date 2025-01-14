@@ -100,7 +100,7 @@
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
 		52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */; };
 		524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */; };
-		524B2F6E2D34048100D80B12 /* NavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6D2D34048100D80B12 /* NavigationTransition.swift */; };
+		524B2F6E2D34048100D80B12 /* AppTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6D2D34048100D80B12 /* AppTransition.swift */; };
 		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
 		524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* NickNameValidator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
@@ -306,6 +306,7 @@
 		52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A562D34F6EA003DD790 /* MeetListFlowCoordinator.swift */; };
 		52F83A5C2D34FD5F003DD790 /* CalendarFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A5B2D34FD5F003DD790 /* CalendarFlowCoordinator.swift */; };
 		52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A602D354528003DD790 /* NavigationCloseable.swift */; };
+		52F83A812D363E57003DD790 /* TransitionControllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A802D363E57003DD790 /* TransitionControllable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -415,7 +416,7 @@
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
 		52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultPickerView.swift; sourceTree = "<group>"; };
 		524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
-		524B2F6D2D34048100D80B12 /* NavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTransition.swift; sourceTree = "<group>"; };
+		524B2F6D2D34048100D80B12 /* AppTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTransition.swift; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+ViewLifeCycle.swift"; sourceTree = "<group>"; };
 		524E33D02C804C7A004B15FC /* NickNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NickNameValidator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
@@ -606,6 +607,7 @@
 		52F83A562D34F6EA003DD790 /* MeetListFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListFlowCoordinator.swift; sourceTree = "<group>"; };
 		52F83A5B2D34FD5F003DD790 /* CalendarFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFlowCoordinator.swift; sourceTree = "<group>"; };
 		52F83A602D354528003DD790 /* NavigationCloseable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCloseable.swift; sourceTree = "<group>"; };
+		52F83A802D363E57003DD790 /* TransitionControllable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionControllable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1148,8 +1150,6 @@
 			isa = PBXGroup;
 			children = (
 				524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */,
-				524B2F6D2D34048100D80B12 /* NavigationTransition.swift */,
-				52F83A602D354528003DD790 /* NavigationCloseable.swift */,
 			);
 			path = AppNavigation;
 			sourceTree = "<group>";
@@ -1538,6 +1538,8 @@
 		528D27C92C7A3ACC00178F14 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				52F83A7F2D363E3A003DD790 /* Transition */,
+				52F83A822D363E8A003DD790 /* Navigation */,
 				52F83A642D354588003DD790 /* LifeCycleLog */,
 				52D9651C2D23B726000610B2 /* Keyboard */,
 			);
@@ -2333,6 +2335,23 @@
 			path = Main;
 			sourceTree = "<group>";
 		};
+		52F83A7F2D363E3A003DD790 /* Transition */ = {
+			isa = PBXGroup;
+			children = (
+				524B2F6D2D34048100D80B12 /* AppTransition.swift */,
+				52F83A802D363E57003DD790 /* TransitionControllable.swift */,
+			);
+			path = Transition;
+			sourceTree = "<group>";
+		};
+		52F83A822D363E8A003DD790 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				52F83A602D354528003DD790 /* NavigationCloseable.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2453,7 +2472,7 @@
 				5231DF4A2D2FA1C500D52529 /* DefaultCreateMeetRepo.swift in Sources */,
 				5259B01D2CA038AA006B2711 /* CalenadrPalnTableCell.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
-				524B2F6E2D34048100D80B12 /* NavigationTransition.swift in Sources */,
+				524B2F6E2D34048100D80B12 /* AppTransition.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* CalendarPlanTableHeaderView.swift in Sources */,
 				5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
@@ -2492,6 +2511,7 @@
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
+				52F83A812D363E57003DD790 /* TransitionControllable.swift in Sources */,
 				529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */,
 				5211F9032C86E41900403980 /* HomePlanCollectionViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,

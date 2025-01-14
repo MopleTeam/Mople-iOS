@@ -40,7 +40,7 @@ extension ProfileFlowCoordinator {
     
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,                                        navigator: self)
-        self.navigationController.present(profileEditView, animated: true)
+        self.navigationController.presentWithTransition(profileEditView)
     }
     
     func presentNotifyView() {

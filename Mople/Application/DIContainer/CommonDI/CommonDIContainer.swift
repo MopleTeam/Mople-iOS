@@ -39,10 +39,8 @@ extension CommonDIContainer {
     
     // MARK: - 그룹 생성 화면
     func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController {
-        let createGroupVC = CreateMeetViewController(title: TextStyle.CreateGroup.title,
-                                                      reactor: makeCreateMeetViewReactor(navigator: navigator))
-        createGroupVC.modalPresentationStyle = .fullScreen
-        return createGroupVC
+        return CreateMeetViewController(title: TextStyle.CreateGroup.title,
+                                        reactor: makeCreateMeetViewReactor(navigator: navigator))
     }
     
     private func makeCreateMeetViewReactor(navigator: NavigationCloseable) -> CreateMeetViewReactor {

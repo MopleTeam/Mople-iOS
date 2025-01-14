@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
 
-        let navigationController = AppNaviViewController()
+        let navigationController = AppNaviViewController(type: .main)
 
         appFlowCoordinator = AppFlowCoordinator(navigationController: navigationController,
                                                 appDIContainer: appDIContainer)

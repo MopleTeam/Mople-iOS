@@ -79,7 +79,7 @@ final class PlanDetailViewController: TitleNaviViewController, View {
         self.naviBar.leftItemEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                vc.dismiss(animated: false)
+                vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }

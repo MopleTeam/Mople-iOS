@@ -79,7 +79,7 @@ extension MeetDetailSceneCoordinator {
     func pushPlanDetailView(plan: Plan) {
         let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(plan: plan)
         self.start(coordinator: planDetailFlowCoordinator)
-        self.navigationController.present(planDetailFlowCoordinator.navigationController, animated: true)
+        self.navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
     }
 }
 
