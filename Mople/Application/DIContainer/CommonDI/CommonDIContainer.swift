@@ -11,7 +11,7 @@ protocol CommonSceneFactory {
     func makeProfileSetupReactor() -> ProfileSetupViewReactor
     func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
     func makePlanCreateCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
-    func makePlanDetailCoordinator(plan: Plan) -> BaseCoordinator
+    func makePlanDetailCoordinator(planId: Int) -> BaseCoordinator
 }
 
 final class CommonDIContainer: CommonSceneFactory {
@@ -70,9 +70,8 @@ extension CommonDIContainer {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailCoordinator(plan: Plan) -> BaseCoordinator {
-        let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      plan: plan)
+    func makePlanDetailCoordinator(planId: Int) -> BaseCoordinator {
+        let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService, planId: planId)
         return planDetailDI.makePlanDetailCoordinator()
     }
 }

@@ -11,8 +11,3 @@ protocol NavigationCloseable: AnyObject {
     func dismiss()
     func pop()
 }
-
-extension NavigationCloseable {
-    func dismiss() {}
-    func pop() {}
-}

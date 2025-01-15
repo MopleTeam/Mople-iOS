@@ -11,3 +11,15 @@ protocol FetchPlanDetail {
     func fetchPlanDetail(planId: Int) -> Single<Plan>
 }
 
+final class FetchPlanDetailUseCase: FetchPlanDetail {
+    let planRepo: PlanDetailRepo
+    
+    init(planRepo: PlanDetailRepo) {
+        self.planRepo = planRepo
+    }
+    
+    func fetchPlanDetail(planId: Int) -> Single<Plan> {
+        return planRepo.fetchPlanDetail(planId: planId)
+            .map { $0.toDomain() }
+    }
+}

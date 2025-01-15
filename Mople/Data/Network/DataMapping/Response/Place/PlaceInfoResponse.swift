@@ -22,9 +22,17 @@ extension PlaceInfoResponse {
                      distance: getDistance(),
                      address: address,
                      roadAddress: roadAddress,
-                     longitude: getLongitude(),
-                     latitude: getLatitude())
-
+                     location: getLocation())
+    }
+    
+    private func getLocation() -> Location? {
+        guard let x,
+              let y,
+              let longitude = Double(x),
+              let latitude = Double(y) else { return .defaultLocation }
+        
+        return .init(longitude: longitude,
+                     latitude: latitude)
     }
     
     private func getDistance() -> Int {

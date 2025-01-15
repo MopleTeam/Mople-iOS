@@ -187,6 +187,13 @@ extension APIEndpoints {
 
 // MARK: - Plan
 extension APIEndpoints {
+    static func fetchPlan(planId: Int) throws -> Endpoint<PlanResponse> {
+        return try Endpoint(path: "plan/detail/\(planId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
     static func createPlan(_ plan: CreatePlanRequest) throws -> Endpoint<PlanResponse> {
         return try Endpoint(path: "plan/create",
                             authenticationType: .accessToken,

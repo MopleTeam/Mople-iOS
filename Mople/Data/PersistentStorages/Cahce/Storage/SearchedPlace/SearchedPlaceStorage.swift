@@ -85,8 +85,8 @@ extension DefaultSearchedPlaceStorage {
     private func findPlaceByInfo(_ placeInfo: PlaceInfo) -> PlaceInfoEntity? {
         return queriesData.filter {
             $0.title == placeInfo.title &&
-            $0.longitude == placeInfo.longitude &&
-            $0.latitude == placeInfo.latitude
+            $0.longitude == placeInfo.location?.longitude &&
+            $0.latitude == placeInfo.location?.latitude
         }.first
     }
     

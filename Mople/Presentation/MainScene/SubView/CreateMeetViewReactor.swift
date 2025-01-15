@@ -83,6 +83,7 @@ extension CreateMeetViewReactor {
         let createMeet = createMeetUseCase.createMeet(title: title!, image: image)
             .asObservable()
             .observe(on: MainScheduler.instance)
+            .do(onNext: { [weak self] in self?.notificationNewMeet($0) })
             .map { _ in Mutation.responseMeet }
             .catch { err in .just(.notifyMessage(message: "오류 발생")) }
         
@@ -103,5 +104,9 @@ extension CreateMeetViewReactor {
             return (false, valid.info)
         }
     }
+    
+    private func notificationNewMeet(_ meet: Meet) {
+        EventService.shared.postItem(.created(meet),
+                                     from: self)
+    }
 }
-

@@ -55,6 +55,14 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
         self.childCoordinators.removeAll()
         self.navigationController.viewControllers.removeAll()
     }
+    
+    func dismiss() {
+        
+    }
+    
+    func pop() {
+        
+    }
 }
 
 // MARK: - Fade 효과로 전환하기

@@ -48,6 +48,7 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         self.signUpUseCase = signUpUseCase
         self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.completedAction = completedAction
+        self.action.onNext(.getRandomNickname)
         logLifeCycle()
     }
     

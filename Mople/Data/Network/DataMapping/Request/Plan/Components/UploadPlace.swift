@@ -19,8 +19,8 @@ extension UploadPlace {
     init(place: PlaceInfo) {
         self.title = place.title ?? ""
         self.planAddress = place.roadAddress ?? ""
-        self.lat = place.latitude ?? 37.575968
-        self.lot = place.longitude ?? 126.976894
+        self.lat = place.location?.latitude ?? 37.575968
+        self.lot = place.location?.longitude ?? 126.976894
         self.weatherAddress = place.address ?? ""
     }
 }

@@ -94,12 +94,8 @@ class SignUpViewController: DefaultViewController, View {
     }
     
     // MARK: - Binding
+    #warning("랜덤 닉네임 받는 로직이 viewwillappear로 되어 있었으나 reactor init에서 처리하게 바꿨음 추후 이상있으면 확인 없으면 warning 제거")
     func bind(reactor: SignUpViewReactor) {
-        rx.viewWillAppear
-            .map { _ in Reactor.Action.getRandomNickname }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         loadingObservable
             .map({ Reactor.Action.setLoading(isLoad: $0) })
             .bind(to: reactor.action)

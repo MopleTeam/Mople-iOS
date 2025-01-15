@@ -13,8 +13,7 @@ extension PlaceInfo {
                      distance: 3000,
                      address: "테스트 Address",
                      roadAddress: "서울 강남구 도산대로 323 8층",
-                     longitude: 128.3727604,
-                     latitude: 36.1200412)
+                     location: .defaultLocation)
     }
 }
 

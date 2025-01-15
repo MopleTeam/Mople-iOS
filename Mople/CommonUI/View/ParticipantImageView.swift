@@ -12,11 +12,9 @@ final class ParticipantImageView: UIImageView {
     
     private var task: DownloadTask?
     
-    init(imagePath: String?) {
+    init() {
         super.init(frame: .zero)
-        
         self.setupUI()
-        self.setImage(imagePath)
     }
     
     required init?(coder: NSCoder) {
@@ -26,10 +24,6 @@ final class ParticipantImageView: UIImageView {
     override func layoutSubviews() {
         super.layoutSubviews()
         self.layer.cornerRadius = self.frame.height / 2
-    }
-    
-    private func setImage(_ path: String?) {
-        task = self.kfSetimage(path, defaultImageType: .user)
     }
     
     deinit {
@@ -48,6 +42,12 @@ final class ParticipantImageView: UIImageView {
     
     private func setLayer() {
         self.clipsToBounds = true
-        self.layer.makeLine(width: 2)
+        self.layer.makeLine(width: 1)
+    }
+}
+
+extension ParticipantImageView {
+    public func setImage(_ path: String?) {
+        task = self.kfSetimage(path, defaultImageType: .user)
     }
 }

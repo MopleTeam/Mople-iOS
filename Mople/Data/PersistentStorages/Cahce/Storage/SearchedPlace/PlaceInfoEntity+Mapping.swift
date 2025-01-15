@@ -30,8 +30,8 @@ extension PlaceInfoEntity {
         self.distance = placeInfo.distance
         self.address = placeInfo.address
         self.roadAddress = placeInfo.roadAddress
-        self.longitude = placeInfo.longitude
-        self.latitude = placeInfo.latitude
+        self.longitude = placeInfo.location?.longitude
+        self.latitude = placeInfo.location?.latitude
     }
 }
 
@@ -43,8 +43,8 @@ extension PlaceInfoEntity {
             distance: distance,
             address: address,
             roadAddress: roadAddress,
-            longitude: longitude,
-            latitude: latitude
+            location: .init(longitude: longitude,
+                            latitude: latitude)
         )
     }
 }

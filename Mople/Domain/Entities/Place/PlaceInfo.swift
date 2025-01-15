@@ -13,6 +13,5 @@ struct PlaceInfo {
     let distance: Int?
     let address: String?
     let roadAddress: String?
-    let longitude: Double?
-    let latitude: Double?
+    let location: Location?
 }

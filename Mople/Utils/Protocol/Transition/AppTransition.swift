@@ -133,7 +133,7 @@ extension AppTransition: UIGestureRecognizerDelegate {
     }
     
     private func animateTransitionToComplete(currentView: UIView) {
-        animateTransition(duration: 0.3,
+        animateTransition(duration: 0.2,
                           animations: { [weak self] in
             guard let self else { return }
             currentView.frame.origin.x = currentView.frame.width
