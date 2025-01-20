@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 import RxCocoa
 
 final class DefaultTextField: UIView {
@@ -25,6 +26,8 @@ final class DefaultTextField: UIView {
     }
     
     private var maxCount: Int?
+    
+    fileprivate let editingObservable: BehaviorRelay<Bool> = .init(value: false)
     
     private let textFieldContainer: UIView = {
         let view = UIView()
@@ -77,8 +80,14 @@ extension DefaultTextField : UITextFieldDelegate {
         return newText.count <= maxCount
     }
     
+    #warning("앞 뒤 공백자르기 전체 적용할건지 생각해보기")
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        editingObservable.accept(false)
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        editingObservable.accept(true)
     }
 }
 
@@ -113,6 +122,10 @@ extension Reactive where Base: DefaultTextField {
         return base.inputTextField.rx.text
             .asObservable()
             .map { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+    
+    var isEditMode: Observable<Bool> {
+        return base.editingObservable.asObservable()
     }
     
     var isResponse: Binder<Void> {

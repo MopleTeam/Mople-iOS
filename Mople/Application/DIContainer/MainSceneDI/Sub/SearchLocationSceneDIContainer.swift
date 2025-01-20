@@ -16,7 +16,7 @@ protocol SearchPlaceSceneDependencies {
 final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
 
     private let appNetworkService: AppNetworkService
-    private var commonReactor: SearchPlaceReactor?
+    private var commonReactor: SearchPlaceViewReactor?
     
     init(appNetworkService: AppNetworkService) {
         self.appNetworkService = appNetworkService
@@ -53,12 +53,12 @@ extension SearchLocationSceneDIContainer {
                               coordinator: coordinator)
     }
     
-    private func makeSearchLocationUseCase() -> SearchLoaction {
-        return SearchLoactionUseCase(searchLocationRepo: makeSearchLocationRepo())
+    private func makeSearchLocationUseCase() -> SearchPlace {
+        return SearchPlaceUseCase(searchPlaceRepo: makeSearchLocationRepo())
     }
     
-    private func makeSearchLocationRepo() -> SearchLocationRepo {
-        return DefaultSearchLocationRepo(networkService: appNetworkService)
+    private func makeSearchLocationRepo() -> SearchPlaceRepo {
+        return DefaultSearchPlaceRepo(networkService: appNetworkService)
     }
     
     private func makeLocationService() -> LocationService {

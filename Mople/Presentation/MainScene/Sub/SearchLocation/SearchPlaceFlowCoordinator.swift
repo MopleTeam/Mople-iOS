@@ -109,7 +109,7 @@ extension SearchPlaceFlowCoordinator {
     }
     
     private func endFlow() {
-        self.navigationController.dismiss(animated: false) { [weak self] in
+        self.navigationController.dismiss(animated: true) { [weak self] in
             guard let self else { return }
             self.clearUp()
             self.parentCoordinator?.didFinish(coordinator: self)

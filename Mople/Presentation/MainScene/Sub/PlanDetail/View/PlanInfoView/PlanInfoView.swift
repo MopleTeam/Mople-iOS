@@ -68,7 +68,7 @@ final class PlanInfoView: UIView {
     }()
 
     private let mapView: MapView = {
-        let view = MapView()
+        let view = MapView(isScroll: false)
         view.layer.cornerRadius = 8
         view.layer.makeLine(width: 1)
         view.backgroundColor = ColorStyle.BG.input

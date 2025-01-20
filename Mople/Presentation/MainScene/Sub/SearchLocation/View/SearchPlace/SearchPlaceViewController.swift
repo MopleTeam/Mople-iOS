@@ -13,7 +13,7 @@ import ReactorKit
 
 // PlanCreate Reactor를 받아와서 데이터 공유하기
 class SearchPlaceViewController: SearchNaviViewController, View {
-    typealias Reactor = SearchPlaceReactor
+    typealias Reactor = SearchPlaceViewReactor
     
     var disposeBag = DisposeBag()
     
@@ -51,7 +51,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         return view
     }()
         
-    init(reactor: SearchPlaceReactor?) {
+    init(reactor: SearchPlaceViewReactor?) {
         super.init()
         self.reactor = reactor
     }
@@ -93,7 +93,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         }
     }
     
-    func bind(reactor: SearchPlaceReactor) {
+    func bind(reactor: SearchPlaceViewReactor) {
         [searchBar.rx.searchEvent, searchBar.rx.searchButtonEvent].forEach { $0.map { [weak self] _ in
             return Reactor.Action.searchPlace(query: self?.searchQuery)
         }

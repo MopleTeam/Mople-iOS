@@ -19,7 +19,7 @@ final class ThumbnailView: UIView {
     
     private let groupTitleLabel = UILabel()
     
-    private lazy var memberCountLabel: IconLabel = {
+    private let memberCountLabel: IconLabel = {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,

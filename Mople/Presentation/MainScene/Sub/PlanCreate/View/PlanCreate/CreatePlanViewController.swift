@@ -261,7 +261,6 @@ extension CreatePlanViewController: KeyboardDismissable, UIGestureRecognizerDele
     }
     
     private func setupKeyboardDismissGestrue() {
-        setupPanKeyboardDismiss()
         setupTapKeyboardDismiss()
     }
 }

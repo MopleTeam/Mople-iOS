@@ -20,9 +20,13 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case createPlan
         case presentCalendaer
         case requestRecentPlan
+        case updatePlan(_ planPayload: PlanPayload)
+        case updateMeet(_ meetPayload: MeetPayload)
     }
     
     enum Mutation {
+        case updatePlanList(_ updatedPlanList: [Plan])
+        case updateMeetList(_ updatedMeetList: [MeetSummary])
         case responseRecentPlan(schedules: RecentPlan)
         case notifyLoadingState(_ isLoading: Bool)
         case handleHomeError(error: HomeError?)
@@ -67,6 +71,10 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             presentNextEvent()
         case .checkNotificationPermission:
             requestNotificationPermission()
+        case let .updatePlan(payload):
+            handlePlanPayload(payload)
+        case let .updateMeet(payload):
+            handleMeetPayload(payload)
         }
     }
     
@@ -83,6 +91,10 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             newState.error = err
         case let .notifyLoadingState(isLoading):
             newState.isLoading = isLoading
+        case let .updatePlanList(planList):
+            newState.plans = planList
+        case let .updateMeetList(meetList):
+            newState.meetList = meetList
         }
         return newState
     }
@@ -153,8 +165,67 @@ extension HomeViewReactor {
     }
 }
 
+// MARK: - 일정 생성 알림 수신
+extension HomeViewReactor {
+    private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
+        print(#function, #line, "payload : \(payload)" )
+        var planList = currentState.plans
+        
+        switch payload {
+        case let .created(plan):
+            self.addMeet(&planList, plan: plan)
+        case let .updated(plan):
+            self.updatedMeet(&planList, plan: plan)
+        case let .deleted(plan):
+            self.deleteMeet(&planList, plan: plan)
+        }
+        return .just(.updatePlanList(planList))
+    }
+    
+    private func addMeet(_ planList: inout [Plan], plan: Plan) {
+        planList.append(plan)
+        planList.sort(by: <)
+        
+        if planList.count > 5 {
+            planList.removeLast()
+        }
+    }
+    
+    private func updatedMeet(_ planList: inout [Plan], plan: Plan) {
+        guard let updatedIndex = planList.firstIndex(where: {
+            $0.id == plan.id
+        }) else { return }
+        
+        planList[updatedIndex] = plan
+    }
+    
+    private func deleteMeet(_ planList: inout [Plan], plan: Plan) {
+        planList.removeAll { $0.id == plan.id }
+    }
+}
 
-
-
-
-
+// MARK: - 모임 생성 알림 수신
+extension HomeViewReactor {
+    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
+        var meetList = currentState.meetList
+        
+        switch payload {
+        case let .created(meet):
+            self.addMeet(&meetList, meet: meet)
+        case let .deleted(meet):
+            self.deleteMeet(&meetList, meet: meet)
+        default:
+            break
+        }
+        return .just(.updateMeetList(meetList))
+    }
+    
+    private func addMeet(_ meetList: inout [MeetSummary], meet: Meet) {
+        guard let meetSummary = meet.meetSummary else { return }
+        meetList.insert(meetSummary, at: 0)
+    }
+    
+    private func deleteMeet(_ meetList: inout [MeetSummary], meet: Meet) {
+        meetList.removeAll { $0.id == meet.meetSummary?.id }
+    }
+}

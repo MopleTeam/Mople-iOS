@@ -29,8 +29,7 @@ final class HomeFlowCoordinator: BaseCoordinator {
     }
     
     override func dismiss() {
-        print(#function, #line, "#5 createMeeting : \(self.navigationController.presentedViewController)" )
-        self.navigationController.presentedViewController?.dismiss(animated: true)
+        self.navigationController.dismiss(animated: true)
     }
 }
 

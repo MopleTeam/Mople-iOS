@@ -12,7 +12,7 @@ struct Comment: Hashable, Equatable {
     var writerId: Int?
     var writerName: String?
     var writerThumbnailPath: String?
-    var commnet: String?
+    var comment: String?
     var createdDate: String?
     
     init(id: Int? = nil,
@@ -25,7 +25,7 @@ struct Comment: Hashable, Equatable {
         self.writerId = writerId
         self.writerName = writerName
         self.writerThumbnailPath = writerThumbnailPath
-        self.commnet = commnet
+        self.comment = commnet
         self.createdDate = createdDate
     }
 }

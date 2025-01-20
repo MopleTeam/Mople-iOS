@@ -27,14 +27,17 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isLoading: Bool = false
     }
     
-    private let profileEditUseCase: ProfileEdit
+    private let userInfoManagementUseCase: UserInfoManagement
+    private let imageUploadUseCase: ImageUpload
     private weak var navigator: NavigationCloseable?
     
     var initialState: State = State()
     
-    init(profileEditUseCase: ProfileEdit,
+    init(userInfoManagementUseCase: UserInfoManagement,
+         imageUploadUseCase: ImageUpload,
          navigator: NavigationCloseable) {
-        self.profileEditUseCase = profileEditUseCase
+        self.userInfoManagementUseCase = userInfoManagementUseCase
+        self.imageUploadUseCase = imageUploadUseCase
         self.navigator = navigator
         logLifeCycle()
     }
@@ -86,8 +89,13 @@ extension ProfileEditViewReactor {
     private func editProfile(name: String, image: UIImage?) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        #warning("이미지 업로드 먼저")
-        let editProfile = profileEditUseCase.editProfile(nickname: name, image: image)
+        
+        let editProfile = imageUploadUseCase.uploadImage(image)
+            .flatMap { [weak self] imagePath -> Single<Void> in
+                guard let self else { return .error(AppError.unknownError)}
+                return self.userInfoManagementUseCase
+                    .editProfile(nickname: name, imagePath: imagePath)
+            }
             .asObservable()
             .map({ _ in Mutation.editCompleted })
             .catch {

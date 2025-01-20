@@ -11,28 +11,59 @@ import ReactorKit
 class ProfileSetupViewReactor: Reactor {
 
     enum Action {
-        case checkNickname(name: String)
+        case setName(_ name: String?)
+        case setImage(_ image: UIImage?)
+        case setPreviousProfile(_ profile: UserInfo)
+        case generatorName
+        case duplicateCheck(name: String)
     }
     
     enum Mutation {
-        case nameCheck(isOverlap: Bool?)
+        case updateName(_ name: String?)
+        case updateImage(_ image: UIImage?)
+        case updateDuplication(_ isDuplication: Bool?)
+        case randomName(_ name: String)
+        case updatePreviousProfile(_ profile: UserInfo?)
+        
+        case isDuplicationEnabled(_ enabled: Bool)
+        case isCompletionEnalbed(_ enabled: Bool)
+        
         case notifyMessage(message: String?)
         case setLoading(isLoad: Bool)
     }
     
     struct State {
-        @Pulse var nameOverlap: Bool?
+        @Pulse var name: String?
+        @Pulse var image: UIImage?
+        @Pulse var generatorName: String?
+        @Pulse var isDuplicationName: Bool?
         @Pulse var message: String?
         @Pulse var isLoading: Bool = false
+        @Pulse var previousProfile: UserInfo?
+        @Pulse var canCheckDuplication: Bool = false
+        @Pulse var canCheckCompletion: Bool = false
     }
     
-    private let validatorNicknameUseCase: ValidatorNickname
+    private let validativeNicknameUseCase: ValidativeNickname
+    private let generateNicknameUseCase: GenerativeNickname
     
     var initialState: State = State()
     
-    init(useCase: ValidatorNickname) {
+    init(profile: UserInfo? = nil,
+         validativeNicknameUseCase: ValidativeNickname,
+         generateNicknameUseCase: GenerativeNickname) {
         print(#function, #line, "LifeCycle Test ProfileSetup Reactor Created" )
-        self.validatorNicknameUseCase = useCase
+        self.validativeNicknameUseCase = validativeNicknameUseCase
+        self.generateNicknameUseCase = generateNicknameUseCase
+        self.setDefaultProfile(profile)
+    }
+    
+    private func setDefaultProfile(_ profile: UserInfo?) {
+        if let profile {
+            self.action.onNext(.setPreviousProfile(profile))
+        } else {
+            self.action.onNext(.generatorName)
+        }
     }
     
     deinit {
@@ -42,8 +73,23 @@ class ProfileSetupViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         
         switch action {
-        case .checkNickname(let name):
+        case .duplicateCheck(let name):
             return nickNameValidCheck(name: name)
+        case .generatorName:
+            return generatorName()
+        case let .setPreviousProfile(profile):
+            return .just(.updatePreviousProfile(profile))
+        case let .setName(name):
+            return .concat([
+                .just(Mutation.updateName(name)),
+                .just(.updateDuplication(nil)),
+                isDuplicateCheckAvailable(name: name)
+            ])
+        case let .setImage(image):
+            return .concat([
+                .just(Mutation.updateImage(image)),
+                isCompleteAvailable(image: image)
+            ])
         }
     }
     
@@ -52,12 +98,28 @@ class ProfileSetupViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case .nameCheck(let isOverlap):
-            newState.nameOverlap = isOverlap
-        case .notifyMessage(let message):
+        case let .updateDuplication(isDuplication):
+            newState.isDuplicationName = isDuplication
+        case let .notifyMessage(message):
             newState.message = message
-        case .setLoading(let isLoad):
+        case let .setLoading(isLoad):
             newState.isLoading = isLoad
+        case let .randomName(name):
+            newState.name = name
+            newState.generatorName = name
+        case let .updatePreviousProfile(profile):
+            newState.name = profile?.name
+            newState.previousProfile = profile
+        
+        case let .updateName(name):
+            newState.name = name
+        case let .updateImage(image):
+            newState.image = image
+            
+        case let .isDuplicationEnabled(isEnabled):
+            newState.canCheckDuplication = isEnabled
+        case let .isCompletionEnalbed(isEnabled):
+            newState.canCheckCompletion = isEnabled
         }
         
         return newState
@@ -67,8 +129,6 @@ class ProfileSetupViewReactor: Reactor {
         switch err {
         case NetworkError.notConnected:
             return AppError.networkError.info
-        case let err as NickNameValidator.ValidatorError:
-            return err.info
         default:
             return AppError.unknownError.info
         }
@@ -77,12 +137,29 @@ class ProfileSetupViewReactor: Reactor {
 
 extension ProfileSetupViewReactor {
     
+    private func generatorName() -> Observable<Mutation> {
+        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
+        
+        let generatorName = generateNicknameUseCase.executue()
+            .asObservable()
+            .compactMap({ $0 })
+            .map { Mutation.randomName($0)}
+            .catch { [weak self] err in
+                return Observable.just(Mutation.notifyMessage(message: self?.handleError(err: err)))
+            }
+        
+        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
+        return Observable.concat([loadingOn,
+                                  generatorName,
+                                  loadingOff])
+    }
+    
     private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let nicknameValidator = validatorNicknameUseCase.validatorNickname(name)
+        let nicknameValidator = validativeNicknameUseCase.checkNickname(name)
             .asObservable()
-            .map { Mutation.nameCheck(isOverlap: $0)}
+            .map { Mutation.updateDuplication($0)}
             .catch { [weak self] err in
                 return Observable.just(Mutation.notifyMessage(message: self?.handleError(err: err)))
             }
@@ -91,6 +168,32 @@ extension ProfileSetupViewReactor {
         return Observable.concat([loadingOn,
                                   nicknameValidator,
                                   loadingOff])
+    }
+    
+    private func isDuplicateCheckAvailable(name: String?) -> Observable<Mutation> {
+        guard let name,
+              Validator.checkNickname(name) else {
+            return .just(Mutation.isDuplicationEnabled(false))
+        }
+        
+        if let previousName = self.currentState.previousProfile?.name {
+            let isChangedName = previousName != name
+            return .just(Mutation.isDuplicationEnabled(isChangedName))
+        } else {
+            return .just(Mutation.isDuplicationEnabled(true))
+        }
+    }
+    
+    private func isCompleteAvailable(image: UIImage?) -> Observable<Mutation> {
+        guard let previousName = self.currentState.previousProfile?.name,
+              let inputName = self.currentState.name else {
+            return .empty()
+        }
+        
+        let isUnchangedName = previousName == inputName
+        let isValidName = currentState.isDuplicationName == true
+        
+        return .just(Mutation.isCompletionEnalbed(isUnchangedName || isValidName))
     }
 }
 

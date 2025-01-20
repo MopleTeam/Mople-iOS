@@ -6,7 +6,7 @@ protocol KeyboardResponsive: AnyObject {
     var superView: UIView { get }
     var floatingView: UIView { get }
     var scrollView: UIScrollView { get }
-    var overlappingView: UIView { get }
+    var overlappingView: UIView? { get }
     var floatingViewBottom: Constraint? { get set }
     func setupKeyboardEvent()
     func removeKeyboardObserver()
@@ -14,6 +14,10 @@ protocol KeyboardResponsive: AnyObject {
 
 #warning("contentView와 겹치는 부분이 발생하는 경우 대비")
 extension KeyboardResponsive where Self: UIViewController {
+    var overlappingView: UIView? {
+        return nil
+    }
+    
     func setupKeyboardEvent() {
         
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
@@ -55,7 +59,7 @@ extension KeyboardResponsive where Self: UIViewController {
             let animationOptions = UIView.AnimationOptions(rawValue: curve)
             updateBottomInset(duration, animationOptions, UIScreen.getAdditionalBottomInset())
         }
-        scrollView.contentOffset.y = 0
+        resetOverlabSettings()
     }
     
     private func updateBottomInset(_ duration: CGFloat,_ option: UIView.AnimationOptions,_ inset: CGFloat) {
@@ -67,6 +71,7 @@ extension KeyboardResponsive where Self: UIViewController {
     }
     
     private func handleOverlab(_ threshold: CGFloat) {
+        guard let overlappingView else { return }
         let floatingViewFrame = superView.convert(floatingView.frame,
                                                   from: floatingView.superview)
         
@@ -77,6 +82,11 @@ extension KeyboardResponsive where Self: UIViewController {
         if newOffset > 0 {
             scrollView.contentOffset.y = newOffset + threshold
         }
+    }
+    
+    private func resetOverlabSettings() {
+        guard let _ = overlappingView else { return }
+        scrollView.contentOffset.y = 0
     }
 }
 

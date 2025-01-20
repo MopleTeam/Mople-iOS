@@ -25,7 +25,7 @@ final class DefaultLocationService: NSObject, CLLocationManagerDelegate, Locatio
     
     private func setupLocationManager() {
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer 
+        locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
     }
     
     private func requestPremission() {
@@ -63,6 +63,7 @@ extension DefaultLocationService {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         locationSubject.onNext(nil)
+        locationSubject.onCompleted()
         print("Location error: \(error.localizedDescription)")
     }
 }

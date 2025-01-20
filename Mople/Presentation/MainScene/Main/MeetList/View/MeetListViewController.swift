@@ -111,6 +111,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         
         let responseMeets = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$meetList))
             .map { $0.1 }
+            .share()
         
         responseMeets
             .asDriver(onErrorJustReturn: [])

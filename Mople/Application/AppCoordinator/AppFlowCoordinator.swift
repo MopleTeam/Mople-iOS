@@ -48,7 +48,7 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     private func loginFlowStart() {
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
-        let flow = loginSceneDIContainer.makeLoginFlowCoordinator(navigationController: navigationController)
+        let flow = loginSceneDIContainer.makeAuthFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
     }
 }

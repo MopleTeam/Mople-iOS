@@ -18,13 +18,13 @@ extension UIImageView {
         var image: UIImage {
             switch self {
             case .meet:
-                    .meet
+                    .defaultMeet
             case .user:
-                    .meet
+                    .defaultUser
             case .weather:
                     .weather
             case .history:
-                    .meet
+                    .defaultMeet
             }
         }
     }

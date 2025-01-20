@@ -47,7 +47,7 @@ final class PastPlanTableCell: UITableViewCell {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
         imageView.layer.makeLine(width: 1)
-        imageView.image = .meet
+        imageView.image = .defaultMeet
         return imageView
     }()
     

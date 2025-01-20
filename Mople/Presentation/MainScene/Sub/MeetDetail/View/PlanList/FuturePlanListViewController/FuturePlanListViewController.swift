@@ -19,18 +19,22 @@ final class FuturePlanListViewController: BaseViewController, View {
     
     private var userID = UserInfoStorage.shared.userInfo?.id
     private var parentReactor: MeetDetailViewReactor?
-    private var planCount: Int = 0
+    
+    private lazy var countView: CountView = {
+        let view = CountView(title: "예정된 약속",
+                             frame: .init(width: tableView.bounds.width,
+                                          height: 64))
+        view.setFont(font: FontStyle.Body1.medium,
+                     textColor: ColorStyle.Gray._04)
+        view.setSpacing(16)
+        return view
+    }()
     
     private let tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .grouped)
+        let table = UITableView()
         table.backgroundColor = .clear
         table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
-        table.sectionFooterHeight = 8
-        table.tableHeaderView = UIView(frame: .init(x: 0,
-                                                    y: 0,
-                                                    width: table.bounds.width,
-                                                    height: 28))
         return table
     }()
         
@@ -59,6 +63,11 @@ final class FuturePlanListViewController: BaseViewController, View {
         setupUI()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.tableHeaderView = countView
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
         setLayout()
@@ -82,7 +91,6 @@ final class FuturePlanListViewController: BaseViewController, View {
     private func setupTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(FuturePlanTableCell.self, forCellReuseIdentifier: FuturePlanTableCell.reuseIdentifier)
-        self.tableView.register(MeetPlanTableHeaderView.self, forHeaderFooterViewReuseIdentifier: MeetPlanTableHeaderView.reuseIdentifier)
     }
     
     func bind(reactor: FuturePlanListViewReactor) {
@@ -96,6 +104,7 @@ final class FuturePlanListViewController: BaseViewController, View {
         
         let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$plans))
             .map { $0.1 }
+            .share()
         
         responsePlans
             .asDriver(onErrorJustReturn: [])
@@ -108,9 +117,6 @@ final class FuturePlanListViewController: BaseViewController, View {
         
         responsePlans
             .asDriver(onErrorJustReturn: [])
-            .do(onNext: { [weak self] plans in
-                self?.planCount = plans.count
-            })
             .drive(self.tableView.rx.items(cellIdentifier: FuturePlanTableCell.reuseIdentifier, cellType: FuturePlanTableCell.self)) { [weak self] index, item, cell in
                 
                 guard let self else { return }
@@ -126,6 +132,15 @@ final class FuturePlanListViewController: BaseViewController, View {
             }
             .disposed(by: disposeBag)
         
+        responsePlans
+            .asDriver(onErrorJustReturn: [])
+            .map({ $0.count })
+            .filter({ $0 > 0 })
+            .drive(with: self, onNext: { vc, count in
+                vc.countView.countText = "\(count)개"
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isLoading in
@@ -136,20 +151,6 @@ final class FuturePlanListViewController: BaseViewController, View {
 }
 
 extension FuturePlanListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: MeetPlanTableHeaderView.reuseIdentifier) as! MeetPlanTableHeaderView
-        header.setLabel(title: "예정된 약속", count: planCount)
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 36
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         guard scrollView.contentOffset.y < -60 else { return }
         reactor?.action.onNext(.requestPlanList)

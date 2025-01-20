@@ -8,6 +8,19 @@
 import Foundation
 import RxSwift
 
+enum AppError: Error {
+    case networkError, unknownError
+    
+    var info: String {
+        switch self {
+        case .networkError:
+            "네트워크 연결을 확인해주세요."
+        case .unknownError:
+            "잠시 후 다시 시도해주세요."
+        }
+    }
+}
+
 protocol AppNetworkService {
     func basicRequest<T: Decodable, E: ResponseRequestable>(endpoint: E) -> Single<T> where E.Response == T
     
@@ -36,37 +49,41 @@ final class DefaultAppNetWorkService: AppNetworkService {
     func authenticatedRequest<E: ResponseRequestable>(
         endpointClosure: @escaping () throws -> E
     ) -> Single<E.Response> where E.Response: Decodable {
-        return Single.deferred {
-            do {
-                let endpoint = try endpointClosure()
-                return self.dataTransferService.request(with: endpoint)
-            } catch {
-                return .error(error)
-            }
-        }.retry { err in
-            err.flatMap { err -> Single<Void> in
-                if err is DataTransferError {
-                    return self.reissueToken()
-                } else {
-                    return .error(err)
+        return retryWithToken(
+            Single.deferred {
+                do {
+                    let endpoint = try endpointClosure()
+                    return self.dataTransferService.request(with: endpoint)
+                } catch {
+                    return .error(error)
                 }
-            }.take(1)
-        }
+            }
+        )
     }
-    
+        
     /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
     /// - Response 값이 없는 (Void)
     func authenticatedRequest<E: ResponseRequestable>(
         endpointClosure: @escaping () throws -> E
     ) -> Single<Void> where E.Response == Void {
-        return Single.deferred {
-            do {
-                let endpoint = try endpointClosure()
-                return self.dataTransferService.request(with: endpoint)
-            } catch {
-                return .error(error)
+        return retryWithToken(
+            Single.deferred {
+                do {
+                    let endpoint = try endpointClosure()
+                    return self.dataTransferService.request(with: endpoint)
+                } catch {
+                    return .error(error)
+                }
             }
-        }.retry { err in
+        )
+    }
+}
+
+extension DefaultAppNetWorkService {
+    
+    #warning("액세스 토큰 만료 여기서 구분")
+    private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
+        return source.retry { err in
             err.flatMap { err -> Single<Void> in
                 if err is DataTransferError {
                     return self.reissueToken()
@@ -76,19 +93,13 @@ final class DefaultAppNetWorkService: AppNetworkService {
             }.take(1)
         }
     }
-}
-
-extension DefaultAppNetWorkService {
     
-    #warning("재발급 실패 로직 여기서 처리")
+    #warning("리트라이 토큰 만료 여기서 구분")
     private func reissueToken() -> Single<Void> {
         return Single.deferred {
             guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
-                print(#function, #line, "# 2 : 재발급 토근 없음" )
                 return .error(TokenError.noJWTToken)
             }
-            
-            print(#function, #line, "# 2 : 재발급 토근 요청" )
             
             return self.dataTransferService
                 .request(with: refreshEndpoint)

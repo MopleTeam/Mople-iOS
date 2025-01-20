@@ -122,6 +122,7 @@ final class HomePlanCollectionViewController: BaseViewController, View {
         
         let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$plans))
             .map { $0.1 }
+            .share()
         
         responsePlans
             .map { [Section(model: (), items: $0)] }

@@ -18,7 +18,16 @@ final class PastPlanListViewController: BaseViewController, View {
     var disposeBag = DisposeBag()
     
     private var parentReactor: MeetDetailViewReactor?
-    private var reviewCount: Int = 0
+
+    private lazy var countView: CountView = {
+        let view = CountView(title: "예정된 약속",
+                             frame: .init(width: tableView.bounds.width,
+                                          height: 64))
+        view.setFont(font: FontStyle.Body1.medium,
+                     textColor: ColorStyle.Gray._04)
+        view.setSpacing(16)
+        return view
+    }()
     
     private let tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
@@ -54,6 +63,11 @@ final class PastPlanListViewController: BaseViewController, View {
         setupUI()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.tableHeaderView = countView
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
         setLayout()
@@ -77,7 +91,6 @@ final class PastPlanListViewController: BaseViewController, View {
     private func setupTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(PastPlanTableCell.self, forCellReuseIdentifier: PastPlanTableCell.reuseIdentifier)
-        self.tableView.register(MeetPlanTableHeaderView.self, forHeaderFooterViewReuseIdentifier: MeetPlanTableHeaderView.reuseIdentifier)
     }
     
     func bind(reactor: PastPlanListViewReactor) {
@@ -86,6 +99,7 @@ final class PastPlanListViewController: BaseViewController, View {
         
         let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$reviews))
             .map { $0.1 }
+            .share()
         
         
         responsePlans
@@ -99,13 +113,19 @@ final class PastPlanListViewController: BaseViewController, View {
         
         responsePlans
             .asDriver(onErrorJustReturn: [])
-            .do(onNext: { [weak self] reviews in
-                self?.reviewCount = reviews.count
-            })
             .drive(self.tableView.rx.items(cellIdentifier: PastPlanTableCell.reuseIdentifier, cellType: PastPlanTableCell.self)) { index, item, cell in
                 cell.configure(viewModel: .init(review: item))
                 cell.selectionStyle = .none
             }
+            .disposed(by: disposeBag)
+        
+        responsePlans
+            .asDriver(onErrorJustReturn: [])
+            .map({ $0.count })
+            .filter({ $0 > 0 })
+            .drive(with: self, onNext: { vc, count in
+                vc.countView.countText = "\(count)개"
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
@@ -119,20 +139,6 @@ final class PastPlanListViewController: BaseViewController, View {
 }
 
 extension PastPlanListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: MeetPlanTableHeaderView.reuseIdentifier) as! MeetPlanTableHeaderView
-        header.setLabel(title: "지난 약속", count: reviewCount)
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 36
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
-    
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         guard scrollView.contentOffset.y < -60 else { return }
         reactor?.action.onNext(.requestReviewList)

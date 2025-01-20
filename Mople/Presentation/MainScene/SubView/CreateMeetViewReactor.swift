@@ -8,17 +8,19 @@
 import UIKit
 import ReactorKit
 
+
+
 final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case requestMeetCreate(group: (title: String?, image: UIImage?))
+        case requestMeetCreate(group: (title: String, image: UIImage?))
         case endProcess
     }
     
     enum Mutation {
         case responseMeet
         case notifyMessage(message: String?)
-        case setLoading(isLoad: Bool)
+        case notifyLoadingState(Bool)
     }
     
     struct State {
@@ -29,11 +31,14 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     var initialState: State = State()
     
     private let createMeetUseCase: CreateMeet
+    private let imageUploadUseCase: ImageUpload
     private weak var navigator: NavigationCloseable?
     
     init(createMeetUseCase: CreateMeet,
+         imageUploadUseCase: ImageUpload,
          navigator: NavigationCloseable) {
         self.createMeetUseCase = createMeetUseCase
+        self.imageUploadUseCase = imageUploadUseCase
         self.navigator = navigator
         logLifeCycle()
     }
@@ -61,7 +66,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
             navigator?.dismiss()
         case .notifyMessage(let message):
             newState.message = message
-        case .setLoading(let isLoad):
+        case .notifyLoadingState(let isLoad):
             newState.isLoading = isLoad
         }
         
@@ -70,39 +75,30 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
 }
 
 extension CreateMeetViewReactor {
-    private func createMeet(title: String?, image: UIImage?) -> Observable<Mutation> {
-        let validCheck = titleValidCheck(title: title)
-        
-        guard validCheck.valid else {
-            return .just(.notifyMessage(message: validCheck.message))
-        }
-    
-        let loadStart = Observable.just(Mutation.setLoading(isLoad: true))
-        
+    private func createMeet(title: String, image: UIImage?) -> Observable<Mutation> {
+        let loadingEnd = Observable.just(Mutation.notifyLoadingState(false))
+            .filter { [weak self] _ in self?.currentState.isLoading == true }
+            
         #warning("오류 발생 시 문제 해결")
-        let createMeet = createMeetUseCase.createMeet(title: title!, image: image)
+        let createMeet = imageUploadUseCase.uploadImage(image)
+            .flatMap { [weak self] imagePath -> Single<Meet> in
+                guard let self else { return .error(AppError.unknownError)}
+                return self.createMeetUseCase.createMeet(title: title,
+                                                         imagePath: imagePath)
+            }
             .asObservable()
             .observe(on: MainScheduler.instance)
             .do(onNext: { [weak self] in self?.notificationNewMeet($0) })
             .map { _ in Mutation.responseMeet }
             .catch { err in .just(.notifyMessage(message: "오류 발생")) }
+            .concat(loadingEnd)
+            .share()
         
-        let loadEnd = Observable.just(Mutation.setLoading(isLoad: false))
+        let loading = Observable.just(Mutation.notifyLoadingState(true))
+            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
+            .take(until: createMeet)
             
-        return Observable.concat([loadStart,
-                                  createMeet,
-                                  loadEnd])
-    }
-    
-    private func titleValidCheck(title: String?) -> (valid: Bool, message: String) {
-        let valid = MeetTitleValidator.validator(title)
-        
-        switch valid {
-        case .success:
-            return (true, valid.info)
-        default:
-            return (false, valid.info)
-        }
+        return .merge([createMeet, loading])
     }
     
     private func notificationNewMeet(_ meet: Meet) {

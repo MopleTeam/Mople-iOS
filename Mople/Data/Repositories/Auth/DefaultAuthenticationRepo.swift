@@ -1,0 +1,30 @@
+//
+//  DefaultLoginRepository.swift
+//  Group
+//
+//  Created by CatSlave on 10/23/24.
+//
+
+import RxSwift
+
+final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
+    func signIn(social: SocialInfo) -> Single<Void> {
+        let endpoint = APIEndpoints.executeSignIn(platform: social.provider,
+                                                  identityToken: social.token,
+                                                  email: social.email)
+        
+        return self.networkService.basicRequest(endpoint: endpoint)
+            .map {
+                KeyChainService.shared.saveToken($0)
+            }
+    }
+    
+    func signUp(requestModel: SignUpRequest) -> Single<Void> {
+        let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
+        
+        return networkService.basicRequest(endpoint: endpoint)
+            .map {
+                KeyChainService.shared.saveToken($0)
+            }
+    }
+}

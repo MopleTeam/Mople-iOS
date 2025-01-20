@@ -8,7 +8,10 @@
 import UIKit
 
 protocol CommonSceneFactory {
-    func makeProfileSetupReactor() -> ProfileSetupViewReactor
+    func makeImageUploadUseCase() -> ImageUpload
+    func makeUserInfoManagementUseCase() -> UserInfoManagement
+    func makeProfileSetupReactor(profile: UserInfo?,
+                                 shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
     func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
     func makePlanCreateCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
     func makePlanDetailCoordinator(planId: Int) -> BaseCoordinator
@@ -24,17 +27,46 @@ final class CommonDIContainer: CommonSceneFactory {
 }
 
 extension CommonDIContainer {
+    
+    // MARK: - 이미지 업로드 유즈케이스
+    func makeImageUploadUseCase() -> ImageUpload {
+        return ImageUploadUseCase(
+            imageUploadRepo: makeImageUploadRepo()
+        )
+    }
+    
+    private func makeImageUploadRepo() -> ImageUploadRepo {
+        return DefaultImageUploadRepo(networkService: appNetworkService)
+    }
+    
+    // MARK: - 유저 정보 유즈케이스
+    func makeUserInfoManagementUseCase() -> UserInfoManagement {
+        return UserInfoManagementUseCase(userInfoRepo: makeUserInfoRepo())
+    }
+    
+    private func makeUserInfoRepo() -> UserInfoRepo {
+        return DefaultUserInfoRepo(networkService: appNetworkService)
+    }
+    
+    
     // MARK: - 프로필 설정 공통 리액터
-    func makeProfileSetupReactor() -> ProfileSetupViewReactor {
-        return .init(useCase: makeNicknameValidationUseCase())
+    func makeProfileSetupReactor(profile: UserInfo?,
+                                 shouldGenerateNickname: Bool) -> ProfileSetupViewReactor {
+        return .init(profile: profile,
+                     validativeNicknameUseCase: makeValidateNicknameUseCase(),
+                     generateNicknameUseCase: makeGenerateNicknameUseCase())
     }
     
-    private func makeNicknameValidationUseCase() -> ValidatorNickname {
-        return ValidatorNicknameUseCase(repo: makeNicknameValidationRepo())
+    private func makeValidateNicknameUseCase() -> ValidativeNickname {
+        return NicknameManagerUseCase(nickNameRepo: makeNicknameManagerRepo())
     }
     
-    private func makeNicknameValidationRepo() -> NicknameValidationRepo {
-        return DefaultNicknameValidationRepo(networkService: appNetworkService)
+    private func makeGenerateNicknameUseCase() -> GenerativeNickname {
+        return GenerateNicknameUseCase(nickNameRepo: makeNicknameManagerRepo())
+    }
+    
+    private func makeNicknameManagerRepo() -> NicknameRepo {
+        return DefaultNicknameManagerRepo(networkService: appNetworkService)
     }
     
     // MARK: - 그룹 생성 화면
@@ -44,21 +76,17 @@ extension CommonDIContainer {
     }
     
     private func makeCreateMeetViewReactor(navigator: NavigationCloseable) -> CreateMeetViewReactor {
-        return .init(createMeetUseCase: makeCreateMeetUseCase(), // CreateGroupMock()
+        return .init(createMeetUseCase: makeCreateMeetUseCase(),
+                     imageUploadUseCase: makeImageUploadUseCase(),
                      navigator: navigator)
     }
     
     private func makeCreateMeetUseCase() -> CreateMeet {
-        return CreateMeetUseCase(imageUploadRepo: makeImageUploadRepo(),
-                                  createMeetRepo: makeCreateMeetRepo())
+        return CreateMeetUseCase(createMeetRepo: makeCreateMeetRepo())
     }
     
-    private func makeImageUploadRepo() -> ImageUploadRepo {
-        return DefaultImageUploadRepo(networkService: appNetworkService)
-    }
-    
-    private func makeCreateMeetRepo() -> CreateMeetRepo {
-        return DefaultCreateMeetRepo(networkService: appNetworkService)
+    private func makeCreateMeetRepo() -> MeetCommandRepo {
+        return DefaultMeetCommandRepo(networkService: appNetworkService)
     }
     
     // MARK: - 일정 생성 플로우

@@ -54,27 +54,17 @@ extension ProfileSceneDIContainer {
 extension ProfileSceneDIContainer {
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        navigator: NavigationCloseable) -> ProfileEditViewController {
-        return ProfileEditViewController(profile: previousProfile,
-                                         profileSetupReactor: commonFacoty.makeProfileSetupReactor(),
-                                         editProfileReactor: makeProfileEditViewReactor(navigator: navigator))
+        return ProfileEditViewController(
+            profile: previousProfile,
+            profileSetupReactor: commonFacoty.makeProfileSetupReactor(profile: previousProfile,
+                                                                      shouldGenerateNickname: false),
+            editProfileReactor: makeProfileEditViewReactor(navigator: navigator))
     }
     
     private func makeProfileEditViewReactor(navigator: NavigationCloseable) -> ProfileEditViewReactor {
-        return .init(profileEditUseCase: ProfileEditMock(),
+        return .init(userInfoManagementUseCase: UserInfoManagementMock(),
+                     imageUploadUseCase: ImageUploadMock(),
                      navigator: navigator)
-    }
-    
-    private func makeProfileEditUseCase() -> ProfileEdit {
-        return ProfileEditUseCase(imageUploadRepo: makeImageUploadRepo(),
-                                  profileEditRepo: makeProfileEditRepo())
-    }
-    
-    private func makeImageUploadRepo() -> ImageUploadRepo {
-        return DefaultImageUploadRepo(networkService: appNetworkService)
-    }
-    
-    private func makeProfileEditRepo() -> ProfileEditRepo {
-        return DefaultProfileEditRepo(networkService: appNetworkService)
     }
 }
 

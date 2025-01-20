@@ -103,6 +103,7 @@ final class HomeViewController: DefaultViewController, View {
         super.init()
         self.reactor = reactor
         addPlanListView(reactor: reactor)
+        setNotification(reactor: reactor)
     }
     
     required init?(coder: NSCoder) {
@@ -192,6 +193,18 @@ final class HomeViewController: DefaultViewController, View {
         case .emptyMeet:
             self.showEmptyMeetAlert()
         }
+    }
+    
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addPlanObservable()
+            .map { Reactor.Action.updatePlan($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        EventService.shared.addMeetObservable()
+            .map { Reactor.Action.updateMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
 

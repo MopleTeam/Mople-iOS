@@ -6,16 +6,25 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import ReactorKit
 
-final class PlanDetailViewController: TitleNaviViewController, View {
+final class PlanDetailViewController: TitleNaviViewController, View, KeyboardResponsive {
     
     typealias Reactor = PlanDetailViewReactor
     
     var disposeBag = DisposeBag()
     
-    private let scrollView: UIScrollView = {
+    // MARK: - Handle KeyboardEvent
+    var superView: UIView { self.view }
+    var floatingView: UIView { textFieldStackview }
+    var scrollView: UIScrollView { mainView }
+    var floatingViewBottom: Constraint?
+    
+    // MARK: - UI Components
+    
+    private let mainView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
         return view
@@ -31,22 +40,52 @@ final class PlanDetailViewController: TitleNaviViewController, View {
         return view
     }()
     
-    private let tableView: AutoSizingTableView = {
-        let table = AutoSizingTableView(frame: .zero, style: .grouped)
-        table.isScrollEnabled = false
-        table.backgroundColor = .clear
-        table.showsVerticalScrollIndicator = false
-        table.separatorStyle = .none
-        return table
+    private let commentContainer = UIView()
+    
+    private var commentView: CommentListViewController?
+    
+    private lazy var sendButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setImage(image: .sendArrow,
+                     imagePlacement: .all,
+                     contentPadding: 0)
+        btn.setBgColor(normalColor: ColorStyle.App.primary,
+                       disabledColor: ColorStyle.Primary.disable)
+        btn.setRadius(20)
+        btn.isEnabled = false
+        return btn
+    }()
+    
+    private let textField: DefaultTextField = {
+        let textField = DefaultTextField()
+        textField.setPlaceholder("댓글을 입력해주세요")
+//        textField.setInputTextField(view: <#T##UIView#>, mode: <#T##DefaultTextField.ViewMode#>)
+        return textField
+    }()
+    
+    private lazy var textFieldStackview: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [textField, sendButton])
+        sv.axis = .horizontal
+        sv.spacing = 12
+        sv.alignment = .center
+        sv.distribution = .fill
+        return sv
     }()
 
     init(reactor: PlanDetailViewReactor, title: String?) {
         super.init(title: title)
         self.reactor = reactor
+        addChild(reactor: reactor)
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func addChild(reactor: Reactor) {
+        let vc = CommentListViewController(reactor: reactor)
+        commentView = vc
+        add(child: vc, container: commentContainer)
     }
 
     override func viewDidLoad() {
@@ -55,27 +94,38 @@ final class PlanDetailViewController: TitleNaviViewController, View {
         setAction()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupKeyboardEvent()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        removeKeyboardObserver()
+    }
+    
     private func initalSetup() {
         setLayout()
         setNavi()
-        test()
+        setupKeyboardDismissGestrue()
     }
     
     private func setLayout() {
-        self.view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
+        self.view.addSubview(mainView)
+        self.view.addSubview(textFieldStackview)
+        mainView.addSubview(contentView)
         contentView.addSubview(planInfoView)
         contentView.addSubview(borderView)
-        contentView.addSubview(tableView)
+        contentView.addSubview(commentContainer)
 
-        scrollView.snp.makeConstraints { make in
+        mainView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
-            make.bottom.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
-            make.edges.equalTo(scrollView.contentLayoutGuide)
-            make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
+            make.edges.equalTo(mainView.contentLayoutGuide)
+            make.width.equalTo(mainView.frameLayoutGuide.snp.width)
         }
         
         planInfoView.snp.makeConstraints { make in
@@ -88,15 +138,32 @@ final class PlanDetailViewController: TitleNaviViewController, View {
             make.height.equalTo(8)
         }
         
-        tableView.snp.makeConstraints { make in
+        commentContainer.snp.makeConstraints { make in
             make.top.equalTo(borderView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+            
+        textFieldStackview.snp.makeConstraints { make in
+            make.top.equalTo(mainView.snp.bottom).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.height.equalTo(56)
+            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+                .inset(UIScreen.getAdditionalBottomInset()).constraint
+        }
+        
+        textField.snp.makeConstraints { make in
+            make.height.equalToSuperview()
+        }
+        
+        sendButton.snp.makeConstraints { make in
+            make.size.equalTo(40)
         }
     }
     
     private func setNavi() {
         self.naviBar.setBarItem(type: .left, image: .backArrow)
+        self.naviBar.setBarItem(type: .right, image: .blackMenu)
     }
     
     func bind(reactor: PlanDetailViewReactor) {
@@ -125,143 +192,37 @@ final class PlanDetailViewController: TitleNaviViewController, View {
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func test() {
-        tableView.register(ComentTableCell.self, forCellReuseIdentifier: ComentTableCell.reuseIdentifier)
         
-        let array = Array(1...10)
-            .map { index in
-                Meet.mock(id: index, creatorId: 1)
-            }
+        self.textField.rx.isEditMode
+            .do(onNext: { print(#function, #line, "키보드 : \($0)" ) })
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isEditing in
+                vc.handlePresentSendButton(isEditing)
+            })
+            .disposed(by: disposeBag)
         
-        Observable.just(array)
-            .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: ComentTableCell.reuseIdentifier, cellType: ComentTableCell.self)) { index, item, cell in
-                cell.hideLine(isLast: array.count-1 == index)
-                cell.selectionStyle = .none
-            }
+        self.textField.rx.text
+            .compactMap { $0 }
+            .map { $0.count > 0 }
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isEnabled in
+                vc.sendButton.isEnabled = isEnabled
+            })
             .disposed(by: disposeBag)
     }
-}
-
-final class ComentTableCell: UITableViewCell {
-    private let profileView: ParticipantImageView = {
-        let view = ParticipantImageView()
-        view.setContentHuggingPriority(.required, for: .horizontal)
-        view.setContentCompressionResistancePriority(.required, for: .horizontal)
-        return view
-    }()
     
-    private let nameLabel: UILabel = {
-        let label = UILabel()
-        label.font = FontStyle.Body1.semiBold
-        label.textColor = ColorStyle.Gray._08
-        label.text = "이름댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd"
-        label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
-        return label
-    }()
-    
-    private let timeLabel: UILabel = {
-        let label = UILabel()
-        label.font = FontStyle.Body2.regular
-        label.textColor = ColorStyle.Gray._04
-        label.setContentHuggingPriority(.init(1), for: .horizontal)
-        label.text = "시간댓글"
-        return label
-    }()
-    
-    private let menuButton: UIButton = {
-        let button = UIButton()
-        button.setImage(.menu, for: .normal)
-        return button
-    }()
-    
-    private let commentLabel: UILabel = {
-        let label = UILabel()
-        label.font = FontStyle.Body1.medium
-        label.textColor = ColorStyle.Gray._03
-        label.numberOfLines = 0
-        label.text = "댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd댓글fasdkfjhasdkjfhskdjalfkljasdhlkjasdfjkasdhfjkashdfjkashdfkjlhaskjdhaskljfhkasjd"
-        return label
-    }()
-    
-    private lazy var commentHeaderView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [nameLabel, timeLabel, menuButton])
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .center
-        sv.distribution = .fill
-        return sv
-    }()
-    
-    private lazy var commentView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentLabel])
-        sv.axis = .vertical
-        sv.spacing = 8
-        sv.alignment = .fill
-        sv.distribution = .fill
-        return sv
-    }()
-    
-    private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [profileView, commentView])
-        sv.axis = .horizontal
-        sv.spacing = 12
-        sv.alignment = .top
-        sv.distribution = .fill
-        return sv
-    }()
-    
-    private let borderView: UIView = {
-        let view = UIView()
-        view.layer.makeLine(width: 1)
-        return view
-    }()
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setLayout()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        borderView.isHidden = false
-    }
-    
-    private func setLayout() {
-        self.contentView.addSubview(mainStackView)
-        self.contentView.addSubview(borderView)
-        
-        mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(20)
-        }
-        
-        profileView.snp.makeConstraints { make in
-            make.size.equalTo(32)
-        }
-        
-        commentHeaderView.snp.makeConstraints { make in
-            make.height.equalTo(24)
-        }
-        
-        commentLabel.snp.makeConstraints { make in
-            make.height.greaterThanOrEqualTo(20)
-        }
-        
-        borderView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview()
-            make.height.equalTo(1)
-        }
+    private func handlePresentSendButton(_ isEditing: Bool) {
+        self.sendButton.isHidden = !isEditing
     }
 }
 
-extension ComentTableCell {
-    public func hideLine(isLast: Bool) {
-        borderView.isHidden = isLast
+extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    private func setupKeyboardDismissGestrue() {
+        setupPanKeyboardDismiss()
+        setupTapKeyboardDismiss()
     }
 }

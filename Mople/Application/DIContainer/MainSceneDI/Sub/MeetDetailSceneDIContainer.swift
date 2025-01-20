@@ -60,8 +60,8 @@ extension MeetDetailSceneDIContainer {
         return FetchMeetDetailUseCase(meetDetailRepo: makeMeetDetailRepo())
     }
     
-    private func makeMeetDetailRepo() -> MeetDetailRepo {
-        return DefaultMeetDetailRepo(networkService: appNetworkService)
+    private func makeMeetDetailRepo() -> MeetQueryRepo {
+        return DefaultMeetQueryRepo(networkService: appNetworkService)
     }
     
     
@@ -83,18 +83,17 @@ extension MeetDetailSceneDIContainer {
         return FetchMeetFuturePlanUsecase(meetPlanRepo: makeFuturePlanListRepo())
     }
     
-    private func makeFuturePlanListRepo() -> MeetPlanListRepo {
-        return DefaultMeetPlanListRepo(networkService: appNetworkService)
+    private func makeFuturePlanListRepo() -> PlanQueryRepo {
+        return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
     
     private func makeParticipationPlanUseCase() -> RequestParticipationPlan {
         return RequestParticipationPlanUseCase(participationRepo: makeParticipationPlanRepo())
     }
     
-    private func makeParticipationPlanRepo() -> ParticipationPlanRepo {
-        return DefaultParticipationPlanRepo(networkService: appNetworkService)
+    private func makeParticipationPlanRepo() -> PlanCommandRepo {
+        return DefaultPlanCommandRepo(networkService: appNetworkService)
     }
-    
     
     // MARK: - 리뷰리스트 뷰
     func makePastPlanListViewController() -> PastPlanListViewController {

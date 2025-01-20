@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class CreateGroupRepositoryMock: CreateMeetRepo {
+final class CreateGroupRepositoryMock: MeetCommandRepo {
     func createMeet(_ meet: CreateMeetRequest) -> Single<MeetResponse> {
         return .just(.init(meetId: 999,
                            meetName: "테스트",

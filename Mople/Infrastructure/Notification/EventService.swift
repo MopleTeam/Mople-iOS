@@ -37,6 +37,7 @@ final class EventService {
     
     
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
+        print(#function, #line, "payload : \(payload)" )
         NotificationCenter.default.post(name: payload.notiName,
                                         object: nil,
                                         userInfo: [payloadKey:payload,
@@ -44,19 +45,20 @@ final class EventService {
     }
     
     func addMeetObservable() -> Observable<MeetPayload> {
-        return makeObservable()
+        return makeObservable(name: .meet)
     }
 
     func addPlanObservable() -> Observable<PlanPayload> {
-        return makeObservable()
+        return makeObservable(name: .plan)
     }
     
     func addUserInfoObservable() -> Observable<UserInfoPayload> {
-        return makeObservable()
+        return makeObservable(name: .userInfo)
     }
     
-    private func makeObservable<T>() -> Observable<T> {
-        return NotificationCenter.default.rx.notification(.meet, object: nil)
+    private func makeObservable<T>(name: Notification.Name) -> Observable<T> {
+        return NotificationCenter.default.rx.notification(name, object: nil)
+            .share(replay: 1)
             .compactMap { [weak self] in
                 guard let self,
                       let sender = $0.userInfo?[self.senderKey] as? String,

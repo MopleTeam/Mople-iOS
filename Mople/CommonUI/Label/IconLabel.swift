@@ -16,9 +16,8 @@ enum IconAlignment {
 final class IconLabel: UIView {
     
     var text: String? {
-        didSet {
-            infoLabel.text = text
-        }
+        get { infoLabel.text }
+        set { infoLabel.text = newValue}
     }
         
     private let imageContainerView: UIView = {

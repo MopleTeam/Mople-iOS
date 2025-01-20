@@ -30,8 +30,8 @@ final class AppDIContainer {
 extension AppDIContainer {
     
     // MARK: - 로그인 플로우
-    func makeLoginSceneDIContainer() -> LoginSceneDIContainer {
-        return LoginSceneDIContainer(appNetworkService: appNetworkService,
+    func makeLoginSceneDIContainer() -> AuthSceneDIContainer {
+        return AuthSceneDIContainer(appNetworkService: appNetworkService,
                                      commonFactory: commonDIContainer)
     }
     

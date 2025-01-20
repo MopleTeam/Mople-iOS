@@ -245,7 +245,7 @@ extension APIEndpoints {
 
 // MARK: - Search Location
 extension APIEndpoints {
-    static func searchLoaction(_ locationRequest: SearchLocationReqeust) throws -> Endpoint<SearchPlaceResultResponse> {
+    static func searchPlace(_ locationRequest: SearchLocationReqeust) throws -> Endpoint<SearchPlaceResultResponse> {
         return try Endpoint(path: "location/kakao",
                             authenticationType: .accessToken,
                             method: .post,

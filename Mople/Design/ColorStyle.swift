@@ -51,8 +51,6 @@ struct ColorStyle {
         static let _05: UIColor = .init(hexCode: "999999")
         static let _06: UIColor = .init(hexCode: "CCCCCC")
         static let _07: UIColor = .init(hexCode: "DCDCDC")
-        static let _08: UIColor = .init(hexCode: "3E4145")
-
     }
 }
 

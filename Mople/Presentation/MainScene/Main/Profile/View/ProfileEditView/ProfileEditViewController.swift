@@ -35,8 +35,7 @@ class ProfileEditViewController: TitleNaviViewController, View {
     private let profileContainerView = UIView()
     
     private lazy var profileSetupView: ProfileSetupViewController = {
-        let viewController = ProfileSetupViewController(type: .edit(previousProfile: previousProfile),
-                                                        reactor: profileSetupReactor,
+        let viewController = ProfileSetupViewController(reactor: profileSetupReactor,
                                                         lodingObserver: loadingObservable.asObserver(),
                                                         completionObserver: completionObservable.asObserver())
         return viewController

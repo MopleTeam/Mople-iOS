@@ -54,8 +54,8 @@ extension MeetListSceneDIConatiner: MeetListSceneDependencies {
         return FetchMeetListUseCase(meetListRepo: makeMeetListRepo())
     }
     
-    private func makeMeetListRepo() -> MeetListRepo {
-        return DefaultMeetListRepo(networkService: appNetworkService)
+    private func makeMeetListRepo() -> MeetQueryRepo {
+        return DefaultMeetQueryRepo(networkService: appNetworkService)
     }
     
     

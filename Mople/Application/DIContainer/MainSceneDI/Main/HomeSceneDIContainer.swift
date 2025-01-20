@@ -20,6 +20,7 @@ protocol HomeSceneDependencies {
 final class HomeSceneDIContainer {
         
     private let appNetworkService: AppNetworkService
+    private let notificationService = DefaultNotificationService()
     private let commonFactory: CommonSceneFactory
 
     init(appNetworkService: AppNetworkService,
@@ -47,7 +48,7 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
     
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
         return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
-                               notificationService: makeNotificationService(),
+                               notificationService: notificationService,
                                coordinator: coordinator)
     }
     
@@ -55,13 +56,10 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
         return FetchRecentPlanUseCase(recentPlanRepo: makeRecentPlanRepo())
     }
     
-    private func makeRecentPlanRepo() -> RecentPlanListRepo {
-        return DefaultRecentPlanListRepo(networkServbice: appNetworkService)
+    private func makeRecentPlanRepo() -> PlanQueryRepo {
+        return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
-    
-    private func makeNotificationService() -> NotificationService {
-        return DefaultNotificationService()
-    }
+
         
     // MARK: - 그룹 생성 화면
     func makeMeetCreateViewController(navigator: NavigationCloseable) -> CreateMeetViewController {

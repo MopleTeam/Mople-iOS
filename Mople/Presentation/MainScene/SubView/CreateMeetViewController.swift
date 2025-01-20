@@ -24,7 +24,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     var superView: UIView { self.view }
     var floatingView: UIView { self.completionButton }
     var scrollView: UIScrollView { self.mainView }
-    var overlappingView: UIView { self.inputTextField }
+    var overlappingView: UIView? { self.textFieldView }
     var floatingViewBottom: Constraint?
     
     // MARK: - Manager
@@ -56,7 +56,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     
     private let thumnailView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = .meet
+        imageView.image = .defaultMeet
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
         imageView.clipsToBounds = true
@@ -71,7 +71,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
         return imageView
     }()
     
-    private let inputTextField: LabeledTextFieldView = {
+    private let textFieldView: LabeledTextFieldView = {
         let textField = LabeledTextFieldView(title: TextStyle.CreateGroup.groupTitle,
                                               placeholder: TextStyle.CreateGroup.placeholder,
                                               maxTextCount: 30)
@@ -90,7 +90,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [imageContainerView, inputTextField])
+        let sv = UIStackView(arrangedSubviews: [imageContainerView, textFieldView])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill
@@ -189,9 +189,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     // MARK: - Binding
     func bind(reactor: CreateMeetViewReactor) {
         self.completionButton.rx.controlEvent(.touchUpInside)
-            .compactMap({ [weak self] in
-                self?.makeMeet()
-            })
+            .compactMap({ [weak self] in self?.makeMeet() })
             .map { Reactor.Action.requestMeetCreate(group: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -220,7 +218,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     // MARK: - Gesture Setup
     private func setGesture() {
         setImageGestrue()
-        setupTapKeyboardDismiss()
+        setupKeyboardDismissGestrue()
     }
     
     private func setImageGestrue() {
@@ -237,17 +235,34 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     // MARK: - Observer Setup
     private func setObserver() {
         imageObserver
-            .map({ $0 ?? .meet })
-            .asDriver(onErrorJustReturn: .meet)
+            .map({ $0 ?? .defaultMeet })
+            .asDriver(onErrorJustReturn: .defaultMeet)
             .drive(self.thumnailView.rx.image)
+            .disposed(by: disposeBag)
+        
+        completionButton.rx.controlEvent(.touchUpInside)
+            .map({ _ in true })
+            .asDriver(onErrorJustReturn: true)
+            .drive(self.textFieldView.textField.rx.isResign)
+            .disposed(by: disposeBag)
+        
+        textFieldView.textField.rx.text
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .map({ $0.count > 1 })
+            .drive(with: self, onNext: { vc, isEnabled in
+                vc.completionButton.isEnabled = isEnabled
+            })
             .disposed(by: disposeBag)
     }
 }
 
 // MARK: - 그룹 생성 및 적용
 extension CreateMeetViewController {
-    private func makeMeet() -> (String?, UIImage?) {
-        let nickName = inputTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    private func makeMeet() -> (String, UIImage?)? {
+        guard let nickName = textFieldView.text?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+            return nil
+        }
         let image = try? imageObserver.value()
         return (nickName, image)
     }

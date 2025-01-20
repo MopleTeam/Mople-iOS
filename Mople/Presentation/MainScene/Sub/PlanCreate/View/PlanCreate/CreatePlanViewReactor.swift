@@ -155,15 +155,16 @@ extension CreatePlanViewReactor {
     private func createPlan(_ plan: CreatePlanRequest) -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let updatePlan = createPlanUseCase.createPlan(with: plan)
+        let uploadPlan = createPlanUseCase.createPlan(with: plan)
             .asObservable()
             .observe(on: MainScheduler.instance)
+            .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
             .map { Mutation.responsePlanCreation($0) }
         
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
         
         return Observable.concat([loadingStart,
-                                  updatePlan,
+                                  uploadPlan,
                                   loadingStop])
     }
     
@@ -193,6 +194,11 @@ extension CreatePlanViewReactor {
     private func checkValidDate(_ date: Date) throws -> Date {
         guard date > DateManager.addFiveMinutes(Date()) else { throw DateError.invalid }
         return date
+    }
+    
+    private func notificationNewPlan(_ plan: Plan) {
+        EventService.shared.postItem(.created(plan),
+                                     from: self)
     }
 }
 

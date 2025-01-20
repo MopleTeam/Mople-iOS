@@ -19,7 +19,7 @@ final class MeetListTableCell: UITableViewCell {
                            color: ColorStyle.Gray._01)
         view.setSpacing(12)
         return view
-    }()//ThumbnailTitleView(type: .detail(size: .small))
+    }()
     
     private let scheduleLabel: UILabel = {
         let label = UILabel()

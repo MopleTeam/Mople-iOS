@@ -43,8 +43,8 @@ extension PlanDetailSceneDIContainer {
         return FetchPlanDetailUseCase(planRepo: makePlanDetailRepo())
     }
     
-    func makePlanDetailRepo() -> PlanDetailRepo {
-        return DefaultPlanDetailRepo(networkService: appNetworkService)
+    func makePlanDetailRepo() -> PlanQueryRepo {
+        return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
 }
 
