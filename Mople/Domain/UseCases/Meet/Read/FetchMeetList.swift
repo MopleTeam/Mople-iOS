@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol FetchMeetList {
-    func fetchMeetList() -> Single<[Meet]>
+    func execute() -> Single<[Meet]>
 }
 
 final class FetchMeetListUseCase: FetchMeetList {
@@ -20,7 +20,7 @@ final class FetchMeetListUseCase: FetchMeetList {
         self.meetListRepo = meetListRepo
     }
     
-    func fetchMeetList() -> Single<[Meet]> {
+    func execute() -> Single<[Meet]> {
         return meetListRepo.fetchMeetList()
             .map { $0.map { response in
                 response.toDomain() }

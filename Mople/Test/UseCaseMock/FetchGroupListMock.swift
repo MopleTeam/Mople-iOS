@@ -25,7 +25,7 @@ final class FetchGroupListMock: FetchMeetList {
         return list
     }
     
-    func fetchMeetList() -> Single<[Meet]> {
+    func execute() -> Single<[Meet]> {
         return Observable.just(getMockData())
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .asSingle()

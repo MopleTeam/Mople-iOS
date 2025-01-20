@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 protocol ImageUpload {
-    func uploadImage(_ image: UIImage?) -> Single<String?>
+    func execute(_ image: UIImage?) -> Single<String?>
 }
 
 final class ImageUploadUseCase: ImageUpload {
@@ -20,7 +20,7 @@ final class ImageUploadUseCase: ImageUpload {
         self.imageUploadRepo = imageUploadRepo
     }
     
-    func uploadImage(_ image: UIImage?) -> RxSwift.Single<String?> {
+    func execute(_ image: UIImage?) -> RxSwift.Single<String?> {
         return Single.deferred { [weak self] in
             guard let self else { return .error(AppError.unknownError) }
             

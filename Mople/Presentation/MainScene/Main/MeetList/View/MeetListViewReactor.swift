@@ -65,7 +65,7 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
 extension MeetListViewReactor {
     private func fetchMeetList() -> Observable<Mutation> {
         
-        let fetchData = fetchUseCase.fetchMeetList()
+        let fetchData = fetchUseCase.execute()
             .asObservable()
             .map { Mutation.fetchMeetList(groupList: $0) }
         

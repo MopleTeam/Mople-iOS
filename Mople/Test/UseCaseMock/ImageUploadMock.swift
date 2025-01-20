@@ -9,11 +9,9 @@ import UIKit
 import RxSwift
 
 final class ImageUploadMock: ImageUpload {
-    func uploadImage(_ image: UIImage?) -> Single<String?> {
+    func execute(_ image: UIImage?) -> Single<String?> {
         return Observable.just("테스트")
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()
     }
-    
-    
 }

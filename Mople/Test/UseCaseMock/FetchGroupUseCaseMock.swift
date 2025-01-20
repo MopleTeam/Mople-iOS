@@ -8,7 +8,7 @@
 import RxSwift
 
 final class fetchMeetUseCaseMock: FetchMeetDetail {
-    func fetchMeetDetail(meetId: Int) -> Single<Meet> {
+    func execute(meetId: Int) -> Single<Meet> {
         return Observable.just(.mock(id: meetId, creatorId: 10))
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()

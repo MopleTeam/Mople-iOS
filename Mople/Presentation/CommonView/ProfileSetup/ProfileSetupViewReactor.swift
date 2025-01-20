@@ -157,7 +157,7 @@ extension ProfileSetupViewReactor {
     private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let nicknameValidator = validativeNicknameUseCase.checkNickname(name)
+        let nicknameValidator = validativeNicknameUseCase.execute(name)
             .asObservable()
             .map { Mutation.updateDuplication($0)}
             .catch { [weak self] err in

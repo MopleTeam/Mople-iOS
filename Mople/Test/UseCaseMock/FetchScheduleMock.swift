@@ -22,7 +22,7 @@ final class FetchScheduleMock: FetchPlanList {
         return scheduleArray
     }
    
-    func fetchPlanList() -> Single<[Plan]> {
+    func execute() -> Single<[Plan]> {
         print(#function, #line)
         
         return Observable.just(getEvents())

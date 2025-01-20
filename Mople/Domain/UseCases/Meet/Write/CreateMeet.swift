@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 protocol CreateMeet {
-    func createMeet(title: String, imagePath: String?) -> Single<Meet>
+    func execute(title: String, imagePath: String?) -> Single<Meet>
 }
 
 final class CreateMeetUseCase: CreateMeet {
@@ -20,7 +20,7 @@ final class CreateMeetUseCase: CreateMeet {
         self.createMeetRepo = createMeetRepo
     }
     
-    func createMeet(title: String,
+    func execute(title: String,
                     imagePath: String?) -> Single<Meet> {
         return self.createMeetRepo
             .createMeet(.init(name: title,

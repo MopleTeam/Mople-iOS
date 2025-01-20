@@ -32,10 +32,10 @@
 		5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9142C89D56D00403980 /* UIView+Identifier.swift */; };
 		5211F91A2C89E39600403980 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5211F9192C89E39600403980 /* Kingfisher */; };
 		5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */; };
-		5214F8802D2BA97F00E8CE9C /* FuturePlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87F2D2BA97F00E8CE9C /* FuturePlanTableCell.swift */; };
-		5214F8822D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift */; };
-		5214F8892D2BB08500E8CE9C /* FuturePlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8882D2BB08500E8CE9C /* FuturePlanListViewReactor.swift */; };
-		5214F88C2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */; };
+		5214F8802D2BA97F00E8CE9C /* MeetPlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */; };
+		5214F8822D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */; };
+		5214F8892D2BB08500E8CE9C /* MeetPlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */; };
+		5214F88C2D2BB11A00E8CE9C /* FetchMeetPlanList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */; };
 		5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */; };
 		5214F8932D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8922D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift */; };
 		5214F8952D2BF91B00E8CE9C /* UserInfoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8942D2BF91B00E8CE9C /* UserInfoStorage.swift */; };
@@ -53,9 +53,9 @@
 		5214F8B92D2C9FCB00E8CE9C /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8B82D2C9FCB00E8CE9C /* Review.swift */; };
 		5214F8BC2D2CA09200E8CE9C /* ReviewMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8BB2D2CA09200E8CE9C /* ReviewMock.swift */; };
 		5214F8BE2D2CA24B00E8CE9C /* FetchReviewMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8BD2D2CA24B00E8CE9C /* FetchReviewMock.swift */; };
-		5214F8C12D2CA38C00E8CE9C /* PastPlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C02D2CA38C00E8CE9C /* PastPlanTableCell.swift */; };
-		5214F8C32D2CAB5000E8CE9C /* PastPlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C22D2CAB5000E8CE9C /* PastPlanListViewReactor.swift */; };
-		5214F8C52D2CADD100E8CE9C /* PastPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C42D2CADD100E8CE9C /* PastPlanTableCellModel.swift */; };
+		5214F8C12D2CA38C00E8CE9C /* MeetReviewTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */; };
+		5214F8C32D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C22D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift */; };
+		5214F8C52D2CADD100E8CE9C /* MeetReviewTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */; };
 		5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */; };
 		5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */; };
 		521917582CEB088B00696292 /* CreateMeetViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521917572CEB088B00696292 /* CreateMeetViewReactor.swift */; };
@@ -66,7 +66,7 @@
 		522649712D37F3EA00E38029 /* AutoSizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522649702D37F3EA00E38029 /* AutoSizingTableView.swift */; };
 		52266BF22CBCF605007D03EB /* ProfileSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF12CBCF604007D03EB /* ProfileSetupViewController.swift */; };
 		52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */; };
-		52266BFA2CBD474D007D03EB /* UserInfoManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* UserInfoManagement.swift */; };
+		52266BFA2CBD474D007D03EB /* EditUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* EditUserInfo.swift */; };
 		52266BFC2CBD482F007D03EB /* UserInfoManagementMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* UserInfoManagementMock.swift */; };
 		5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */; };
 		5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */; };
@@ -77,7 +77,7 @@
 		5231DF4C2D2FA23000D52529 /* BaseRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */; };
 		5231DF4E2D2FA8EF00D52529 /* DefaultMeetQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4D2D2FA8EF00D52529 /* DefaultMeetQueryRepo.swift */; };
 		5231DF502D2FA91F00D52529 /* MeetQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF4F2D2FA91F00D52529 /* MeetQueryRepo.swift */; };
-		5231DF572D2FAA2300D52529 /* FetchReviewListRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */; };
+		5231DF572D2FAA2300D52529 /* ReviewQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF562D2FAA2300D52529 /* ReviewQueryRepo.swift */; };
 		5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */; };
 		5231DF7A2D2FE63600D52529 /* SearchLocationReqeust.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */; };
 		5231DF7D2D2FE77800D52529 /* SearchPlaceRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF7C2D2FE77800D52529 /* SearchPlaceRepo.swift */; };
@@ -159,7 +159,6 @@
 		528484162C6B86F600D50C6A /* BaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528484152C6B86F600D50C6A /* BaseButton.swift */; };
 		5285E6A62CD9A63C00B855CB /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6A52CD9A63C00B855CB /* Token.swift */; };
 		5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */; };
-		5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6B92CDA09AA00B855CB /* CommentDTO.swift */; };
 		5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6BC2CDA0BCA00B855CB /* Comment.swift */; };
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
 		5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */; };
@@ -249,8 +248,8 @@
 		52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */; };
 		52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */; };
 		52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */; };
-		52D864892D2A93DF000F8378 /* FuturePlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */; };
-		52D8648B2D2A9400000F8378 /* PastPlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */; };
+		52D864892D2A93DF000F8378 /* MeetPlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864882D2A93DF000F8378 /* MeetPlanListViewController.swift */; };
+		52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */; };
 		52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864912D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift */; };
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -286,12 +285,22 @@
 		52EC04BD2D38C13900000C99 /* CommentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04BC2D38C13900000C99 /* CommentListViewController.swift */; };
 		52EC04C02D38CCC800000C99 /* CountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04BF2D38CCC800000C99 /* CountView.swift */; };
 		52EC04C22D391B4700000C99 /* CommentListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04C12D391B4700000C99 /* CommentListViewReactor.swift */; };
-		52EC04C52D391BA100000C99 /* CommentManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04C42D391BA100000C99 /* CommentManagement.swift */; };
+		52EC04C52D391BA100000C99 /* FetchCommentList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04C42D391BA100000C99 /* FetchCommentList.swift */; };
 		52EC04C82D3BF05900000C99 /* ImageUploadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04C72D3BF05900000C99 /* ImageUploadMock.swift */; };
 		52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04CA2D3BF4DA00000C99 /* ImageUpload.swift */; };
 		52EC04CE2D3E0DAA00000C99 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04CD2D3E0DAA00000C99 /* SignIn.swift */; };
 		52EC04DA2D3E1B7A00000C99 /* GenerativeNickname.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04D92D3E1B7A00000C99 /* GenerativeNickname.swift */; };
 		52EC04DC2D3E1BA800000C99 /* ValidativeNickname.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04DB2D3E1BA800000C99 /* ValidativeNickname.swift */; };
+		52EC04E02D3E2AB800000C99 /* FetchReviewDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */; };
+		52EC04E22D3E2BCC00000C99 /* FetchUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04E12D3E2BCC00000C99 /* FetchUserInfo.swift */; };
+		52EC04E92D3E5AEF00000C99 /* CreateComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04E82D3E5AEF00000C99 /* CreateComment.swift */; };
+		52EC04EC2D3E5B3100000C99 /* CommentQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EB2D3E5B3100000C99 /* CommentQueryRepo.swift */; };
+		52EC04EF2D3E5C9100000C99 /* CommentResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */; };
+		52EC04F22D3E601500000C99 /* DefaultCommentQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04F12D3E601500000C99 /* DefaultCommentQueryRepo.swift */; };
+		52EC04F72D3E76BF00000C99 /* LoadingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04F62D3E76BF00000C99 /* LoadingState.swift */; };
+		52EC04FA2D3E7A3C00000C99 /* FetchCommentListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04F92D3E7A3C00000C99 /* FetchCommentListMock.swift */; };
+		52EC04FC2D3E7A4F00000C99 /* CommentMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04FB2D3E7A4F00000C99 /* CommentMock.swift */; };
+		52EC04FE2D3E811000000C99 /* CommentTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */; };
 		52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */; };
 		52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */; };
 		52F83A4A2D34D820003DD790 /* HomeSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A492D34D820003DD790 /* HomeSceneDIContainer.swift */; };
@@ -343,10 +352,10 @@
 		5211F9122C89CEF800403980 /* ParticipantImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantImageView.swift; sourceTree = "<group>"; };
 		5211F9142C89D56D00403980 /* UIView+Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Identifier.swift"; sourceTree = "<group>"; };
 		5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanCollectionCellViewModel.swift; sourceTree = "<group>"; };
-		5214F87F2D2BA97F00E8CE9C /* FuturePlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanTableCell.swift; sourceTree = "<group>"; };
-		5214F8812D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanTableCellModel.swift; sourceTree = "<group>"; };
-		5214F8882D2BB08500E8CE9C /* FuturePlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanListViewReactor.swift; sourceTree = "<group>"; };
-		5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetFuturePlan.swift; sourceTree = "<group>"; };
+		5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCell.swift; sourceTree = "<group>"; };
+		5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCellModel.swift; sourceTree = "<group>"; };
+		5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListViewReactor.swift; sourceTree = "<group>"; };
+		5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetPlanList.swift; sourceTree = "<group>"; };
 		5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetFuturePlanMock.swift; sourceTree = "<group>"; };
 		5214F8922D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserInfoEntity+Mapping.swift"; sourceTree = "<group>"; };
 		5214F8942D2BF91B00E8CE9C /* UserInfoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoStorage.swift; sourceTree = "<group>"; };
@@ -364,9 +373,9 @@
 		5214F8B82D2C9FCB00E8CE9C /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		5214F8BB2D2CA09200E8CE9C /* ReviewMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewMock.swift; sourceTree = "<group>"; };
 		5214F8BD2D2CA24B00E8CE9C /* FetchReviewMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewMock.swift; sourceTree = "<group>"; };
-		5214F8C02D2CA38C00E8CE9C /* PastPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanTableCell.swift; sourceTree = "<group>"; };
-		5214F8C22D2CAB5000E8CE9C /* PastPlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanListViewReactor.swift; sourceTree = "<group>"; };
-		5214F8C42D2CADD100E8CE9C /* PastPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanTableCellModel.swift; sourceTree = "<group>"; };
+		5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewTableCell.swift; sourceTree = "<group>"; };
+		5214F8C22D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewReactor.swift; sourceTree = "<group>"; };
+		5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewTableCellModel.swift; sourceTree = "<group>"; };
 		5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParticipationPlanMock.swift; sourceTree = "<group>"; };
 		5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceTableCellModel.swift; sourceTree = "<group>"; };
 		521917572CEB088B00696292 /* CreateMeetViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetViewReactor.swift; sourceTree = "<group>"; };
@@ -377,7 +386,7 @@
 		522649702D37F3EA00E38029 /* AutoSizingTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSizingTableView.swift; sourceTree = "<group>"; };
 		52266BF12CBCF604007D03EB /* ProfileSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupViewController.swift; sourceTree = "<group>"; };
 		52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewReactor.swift; sourceTree = "<group>"; };
-		52266BF92CBD474D007D03EB /* UserInfoManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoManagement.swift; sourceTree = "<group>"; };
+		52266BF92CBD474D007D03EB /* EditUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserInfo.swift; sourceTree = "<group>"; };
 		52266BFB2CBD482F007D03EB /* UserInfoManagementMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoManagementMock.swift; sourceTree = "<group>"; };
 		5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateLabel.swift; sourceTree = "<group>"; };
 		5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAlertControl.swift; sourceTree = "<group>"; };
@@ -388,7 +397,7 @@
 		5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRepositories.swift; sourceTree = "<group>"; };
 		5231DF4D2D2FA8EF00D52529 /* DefaultMeetQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultMeetQueryRepo.swift; sourceTree = "<group>"; };
 		5231DF4F2D2FA91F00D52529 /* MeetQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetQueryRepo.swift; sourceTree = "<group>"; };
-		5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewListRepo.swift; sourceTree = "<group>"; };
+		5231DF562D2FAA2300D52529 /* ReviewQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewQueryRepo.swift; sourceTree = "<group>"; };
 		5231DF762D2FCC4A00D52529 /* RequestParticipationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParticipationPlan.swift; sourceTree = "<group>"; };
 		5231DF792D2FE63600D52529 /* SearchLocationReqeust.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationReqeust.swift; sourceTree = "<group>"; };
 		5231DF7C2D2FE77800D52529 /* SearchPlaceRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceRepo.swift; sourceTree = "<group>"; };
@@ -466,7 +475,6 @@
 		528484152C6B86F600D50C6A /* BaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseButton.swift; sourceTree = "<group>"; };
 		5285E6A52CD9A63C00B855CB /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		5285E6B02CD9F41300B855CB /* UserInfoDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoDTO.swift; sourceTree = "<group>"; };
-		5285E6B92CDA09AA00B855CB /* CommentDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentDTO.swift; sourceTree = "<group>"; };
 		5285E6BC2CDA0BCA00B855CB /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ConvertDate.swift"; sourceTree = "<group>"; };
@@ -551,8 +559,8 @@
 		52D8646B2D2A35CF000F8378 /* FetchMeetDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetDetail.swift; sourceTree = "<group>"; };
 		52D8646D2D2A364A000F8378 /* FetchGroupUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchGroupUseCaseMock.swift; sourceTree = "<group>"; };
 		52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSegmentedControl.swift; sourceTree = "<group>"; };
-		52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuturePlanListViewController.swift; sourceTree = "<group>"; };
-		52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastPlanListViewController.swift; sourceTree = "<group>"; };
+		52D864882D2A93DF000F8378 /* MeetPlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListViewController.swift; sourceTree = "<group>"; };
+		52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewController.swift; sourceTree = "<group>"; };
 		52D864912D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPlanTableCellModel.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
 		52E0E8052D30B957002213FF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
@@ -582,12 +590,22 @@
 		52EC04BC2D38C13900000C99 /* CommentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewController.swift; sourceTree = "<group>"; };
 		52EC04BF2D38CCC800000C99 /* CountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountView.swift; sourceTree = "<group>"; };
 		52EC04C12D391B4700000C99 /* CommentListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewReactor.swift; sourceTree = "<group>"; };
-		52EC04C42D391BA100000C99 /* CommentManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentManagement.swift; sourceTree = "<group>"; };
+		52EC04C42D391BA100000C99 /* FetchCommentList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchCommentList.swift; sourceTree = "<group>"; };
 		52EC04C72D3BF05900000C99 /* ImageUploadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadMock.swift; sourceTree = "<group>"; };
 		52EC04CA2D3BF4DA00000C99 /* ImageUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUpload.swift; sourceTree = "<group>"; };
 		52EC04CD2D3E0DAA00000C99 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
 		52EC04D92D3E1B7A00000C99 /* GenerativeNickname.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeNickname.swift; sourceTree = "<group>"; };
 		52EC04DB2D3E1BA800000C99 /* ValidativeNickname.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidativeNickname.swift; sourceTree = "<group>"; };
+		52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewDetail.swift; sourceTree = "<group>"; };
+		52EC04E12D3E2BCC00000C99 /* FetchUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUserInfo.swift; sourceTree = "<group>"; };
+		52EC04E82D3E5AEF00000C99 /* CreateComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateComment.swift; sourceTree = "<group>"; };
+		52EC04EB2D3E5B3100000C99 /* CommentQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentQueryRepo.swift; sourceTree = "<group>"; };
+		52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentResponse.swift; sourceTree = "<group>"; };
+		52EC04F12D3E601500000C99 /* DefaultCommentQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCommentQueryRepo.swift; sourceTree = "<group>"; };
+		52EC04F62D3E76BF00000C99 /* LoadingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingState.swift; sourceTree = "<group>"; };
+		52EC04F92D3E7A3C00000C99 /* FetchCommentListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchCommentListMock.swift; sourceTree = "<group>"; };
+		52EC04FB2D3E7A4F00000C99 /* CommentMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentMock.swift; sourceTree = "<group>"; };
+		52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableCellModel.swift; sourceTree = "<group>"; };
 		52F1535A2D04ACD0001A7BF5 /* Collection+SafeElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeElement.swift"; sourceTree = "<group>"; };
 		52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePlanViewReactor.swift; sourceTree = "<group>"; };
 		52F83A492D34D820003DD790 /* HomeSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSceneDIContainer.swift; sourceTree = "<group>"; };
@@ -792,8 +810,8 @@
 		5214F87E2D2BA96E00E8CE9C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				5214F87F2D2BA97F00E8CE9C /* FuturePlanTableCell.swift */,
-				5214F8812D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift */,
+				5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */,
+				5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -834,6 +852,7 @@
 				5214F8A52D2C40C700E8CE9C /* MeetMock.swift */,
 				5214F8A72D2C418500E8CE9C /* PlaceMock.swift */,
 				5214F8BB2D2CA09200E8CE9C /* ReviewMock.swift */,
+				52EC04FB2D3E7A4F00000C99 /* CommentMock.swift */,
 			);
 			path = MockModel;
 			sourceTree = "<group>";
@@ -849,8 +868,8 @@
 		5214F8BF2D2CA38300E8CE9C /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8C02D2CA38C00E8CE9C /* PastPlanTableCell.swift */,
-				5214F8C42D2CADD100E8CE9C /* PastPlanTableCellModel.swift */,
+				5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */,
+				5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -952,7 +971,7 @@
 		5231DF552D2FAA1200D52529 /* Review */ = {
 			isa = PBXGroup;
 			children = (
-				5231DF562D2FAA2300D52529 /* FetchReviewListRepo.swift */,
+				5231DF562D2FAA2300D52529 /* ReviewQueryRepo.swift */,
 			);
 			path = Review;
 			sourceTree = "<group>";
@@ -978,9 +997,8 @@
 		5231DF612D2FBDCE00D52529 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
-				52EC04D92D3E1B7A00000C99 /* GenerativeNickname.swift */,
-				52EC04DB2D3E1BA800000C99 /* ValidativeNickname.swift */,
-				52266BF92CBD474D007D03EB /* UserInfoManagement.swift */,
+				52EC04E32D3E2D3700000C99 /* Nickname */,
+				52EC04E42D3E2D3E00000C99 /* UserInfo */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -1022,8 +1040,8 @@
 		5235B7122D2E6722006BEAF3 /* PlanList */ = {
 			isa = PBXGroup;
 			children = (
-				52D864862D2A9385000F8378 /* FuturePlanListViewController */,
-				52D864872D2A93C3000F8378 /* PastPlanListViewController */,
+				52D864862D2A9385000F8378 /* MeetPlanListViewController */,
+				52D864872D2A93C3000F8378 /* MeetReviewListViewController */,
 			);
 			path = PlanList;
 			sourceTree = "<group>";
@@ -1245,6 +1263,7 @@
 				5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */,
 				529CCD472D3232370041CBB7 /* FetchPlanDetailMock.swift */,
 				52EC04C72D3BF05900000C99 /* ImageUploadMock.swift */,
+				52EC04F92D3E7A3C00000C99 /* FetchCommentListMock.swift */,
 			);
 			path = UseCaseMock;
 			sourceTree = "<group>";
@@ -1376,14 +1395,6 @@
 			path = User;
 			sourceTree = "<group>";
 		};
-		5285E6B82CDA099E00B855CB /* Comment */ = {
-			isa = PBXGroup;
-			children = (
-				5285E6B92CDA09AA00B855CB /* CommentDTO.swift */,
-			);
-			path = Comment;
-			sourceTree = "<group>";
-		};
 		5285E6E12CDC342D00B855CB /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -1456,6 +1467,7 @@
 		528D27C92C7A3ACC00178F14 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				52EC04F82D3E77B100000C99 /* LoadingState */,
 				52F83A7F2D363E3A003DD790 /* Transition */,
 				52F83A822D363E8A003DD790 /* Navigation */,
 				52F83A642D354588003DD790 /* LifeCycleLog */,
@@ -1493,20 +1505,20 @@
 			isa = PBXGroup;
 			children = (
 				529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */,
-				529CCD542D323FD10041CBB7 /* View */,
+				529CCD542D323FD10041CBB7 /* PlanDetail */,
+				52EC04F32D3E6CC500000C99 /* ReviewDetail */,
+				52EC04E72D3E322900000C99 /* Common */,
 			);
 			path = PlanDetail;
 			sourceTree = "<group>";
 		};
-		529CCD542D323FD10041CBB7 /* View */ = {
+		529CCD542D323FD10041CBB7 /* PlanDetail */ = {
 			isa = PBXGroup;
 			children = (
 				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
 				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
-				52EC04B82D38C0D700000C99 /* CommentListView */,
-				529CCD5B2D3269F70041CBB7 /* PlanInfoView */,
 			);
-			path = View;
+			path = PlanDetail;
 			sourceTree = "<group>";
 		};
 		529CCD5B2D3269F70041CBB7 /* PlanInfoView */ = {
@@ -1559,6 +1571,7 @@
 				5231DF412D2F96CF00D52529 /* Meet */,
 				5231DF422D2F971500D52529 /* Plan */,
 				5231DF552D2FAA1200D52529 /* Review */,
+				52EC04EA2D3E5B0C00000C99 /* Comment */,
 				5231DF3E2D2F96A600D52529 /* Image */,
 				5231DF7B2D2FE77100D52529 /* SearchPlace */,
 			);
@@ -1709,6 +1722,7 @@
 		52C857B72D0862CB00765FB3 /* Response */ = {
 			isa = PBXGroup;
 			children = (
+				52EC04ED2D3E5B6A00000C99 /* Comment */,
 				5214F8AD2D2C9B1300E8CE9C /* Review */,
 				5285E6A92CD9D74000B855CB /* Error */,
 				5285E6AE2CD9F3DE00B855CB /* User */,
@@ -1736,7 +1750,6 @@
 			children = (
 				521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */,
 				52C857B52D082AFB00765FB3 /* PlanResponse.swift */,
-				5285E6B82CDA099E00B855CB /* Comment */,
 			);
 			path = Plan;
 			sourceTree = "<group>";
@@ -1881,7 +1894,6 @@
 			children = (
 				52F83A652D354C06003DD790 /* MeetDetail */,
 				5235B7132D2E672D006BEAF3 /* MeetSetup */,
-				5235B7122D2E6722006BEAF3 /* PlanList */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1939,24 +1951,24 @@
 			path = SegmentControl;
 			sourceTree = "<group>";
 		};
-		52D864862D2A9385000F8378 /* FuturePlanListViewController */ = {
+		52D864862D2A9385000F8378 /* MeetPlanListViewController */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8882D2BB08500E8CE9C /* FuturePlanListViewReactor.swift */,
-				52D864882D2A93DF000F8378 /* FuturePlanListViewController.swift */,
+				5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */,
+				52D864882D2A93DF000F8378 /* MeetPlanListViewController.swift */,
 				5214F87E2D2BA96E00E8CE9C /* Cell */,
 			);
-			path = FuturePlanListViewController;
+			path = MeetPlanListViewController;
 			sourceTree = "<group>";
 		};
-		52D864872D2A93C3000F8378 /* PastPlanListViewController */ = {
+		52D864872D2A93C3000F8378 /* MeetReviewListViewController */ = {
 			isa = PBXGroup;
 			children = (
-				5214F8C22D2CAB5000E8CE9C /* PastPlanListViewReactor.swift */,
-				52D8648A2D2A9400000F8378 /* PastPlanListViewController.swift */,
+				5214F8C22D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift */,
+				52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */,
 				5214F8BF2D2CA38300E8CE9C /* Cell */,
 			);
-			path = PastPlanListViewController;
+			path = MeetReviewListViewController;
 			sourceTree = "<group>";
 		};
 		52D9651C2D23B726000610B2 /* Keyboard */ = {
@@ -2082,6 +2094,7 @@
 				5231DF482D2FA1B300D52529 /* Meet */,
 				5231DF3A2D2F967300D52529 /* Plan */,
 				52E0E8092D30ED5F002213FF /* Review */,
+				52EC04F02D3E5FD500000C99 /* Comment */,
 				52EC04D02D3E158900000C99 /* Image */,
 				52EC04D12D3E159000000C99 /* SearchPlace */,
 			);
@@ -2126,6 +2139,7 @@
 			isa = PBXGroup;
 			children = (
 				52EC04BA2D38C10800000C99 /* CommentTableCell.swift */,
+				52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -2141,7 +2155,8 @@
 		52EC04C32D391B6B00000C99 /* Comment */ = {
 			isa = PBXGroup;
 			children = (
-				52EC04C42D391BA100000C99 /* CommentManagement.swift */,
+				52EC04C42D391BA100000C99 /* FetchCommentList.swift */,
+				52EC04E82D3E5AEF00000C99 /* CreateComment.swift */,
 			);
 			path = Comment;
 			sourceTree = "<group>";
@@ -2182,7 +2197,7 @@
 		52EC04D22D3E174100000C99 /* Read */ = {
 			isa = PBXGroup;
 			children = (
-				5214F88B2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift */,
+				5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */,
 				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
 				5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */,
 				529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */,
@@ -2220,6 +2235,7 @@
 			isa = PBXGroup;
 			children = (
 				5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */,
+				52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */,
 			);
 			path = Read;
 			sourceTree = "<group>";
@@ -2247,6 +2263,90 @@
 				5214F89B2D2C0A4D00E8CE9C /* DefaultUserInfoRepo.swift */,
 			);
 			path = Profile;
+			sourceTree = "<group>";
+		};
+		52EC04E32D3E2D3700000C99 /* Nickname */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04D92D3E1B7A00000C99 /* GenerativeNickname.swift */,
+				52EC04DB2D3E1BA800000C99 /* ValidativeNickname.swift */,
+			);
+			path = Nickname;
+			sourceTree = "<group>";
+		};
+		52EC04E42D3E2D3E00000C99 /* UserInfo */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04E12D3E2BCC00000C99 /* FetchUserInfo.swift */,
+				52266BF92CBD474D007D03EB /* EditUserInfo.swift */,
+			);
+			path = UserInfo;
+			sourceTree = "<group>";
+		};
+		52EC04E52D3E2FA000000C99 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				526B985C2CEDBBF6002488C5 /* PlanCreate */,
+				52818C5C2D1804240001E30B /* SearchLocation */,
+				529CCD522D323FAF0041CBB7 /* PlanDetail */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		52EC04E62D3E2FAD00000C99 /* Meet */ = {
+			isa = PBXGroup;
+			children = (
+				52D864502D29FC47000F8378 /* MeetDetail */,
+			);
+			path = Meet;
+			sourceTree = "<group>";
+		};
+		52EC04E72D3E322900000C99 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04B82D38C0D700000C99 /* CommentListView */,
+				529CCD5B2D3269F70041CBB7 /* PlanInfoView */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		52EC04EA2D3E5B0C00000C99 /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04EB2D3E5B3100000C99 /* CommentQueryRepo.swift */,
+			);
+			path = Comment;
+			sourceTree = "<group>";
+		};
+		52EC04ED2D3E5B6A00000C99 /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */,
+			);
+			path = Comment;
+			sourceTree = "<group>";
+		};
+		52EC04F02D3E5FD500000C99 /* Comment */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04F12D3E601500000C99 /* DefaultCommentQueryRepo.swift */,
+			);
+			path = Comment;
+			sourceTree = "<group>";
+		};
+		52EC04F32D3E6CC500000C99 /* ReviewDetail */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ReviewDetail;
+			sourceTree = "<group>";
+		};
+		52EC04F82D3E77B100000C99 /* LoadingState */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04F62D3E76BF00000C99 /* LoadingState.swift */,
+			);
+			path = LoadingState;
 			sourceTree = "<group>";
 		};
 		52F83A502D34D872003DD790 /* CommonDI */ = {
@@ -2330,6 +2430,7 @@
 			children = (
 				52D864582D29FDBC000F8378 /* MeetDetailViewReactor.swift */,
 				52D864562D29FD89000F8378 /* MeetDetailViewController.swift */,
+				5235B7122D2E6722006BEAF3 /* PlanList */,
 			);
 			path = MeetDetail;
 			sourceTree = "<group>";
@@ -2346,10 +2447,8 @@
 		52F83A682D354CC0003DD790 /* Sub */ = {
 			isa = PBXGroup;
 			children = (
-				529CCD522D323FAF0041CBB7 /* PlanDetail */,
-				52D864502D29FC47000F8378 /* MeetDetail */,
-				526B985C2CEDBBF6002488C5 /* PlanCreate */,
-				52818C5C2D1804240001E30B /* SearchLocation */,
+				52EC04E62D3E2FAD00000C99 /* Meet */,
+				52EC04E52D3E2FA000000C99 /* Plan */,
 			);
 			path = Sub;
 			sourceTree = "<group>";
@@ -2522,7 +2621,7 @@
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
 				52F83A4A2D34D820003DD790 /* HomeSceneDIContainer.swift in Sources */,
 				52EA6E1D2CF8C62700EFD753 /* FCMTokenUploadRepo.swift in Sources */,
-				5231DF572D2FAA2300D52529 /* FetchReviewListRepo.swift in Sources */,
+				5231DF572D2FAA2300D52529 /* ReviewQueryRepo.swift in Sources */,
 				524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */,
 				52B87E3A2C6B2D440026B601 /* UIFont+CustomFont.swift in Sources */,
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
@@ -2535,6 +2634,7 @@
 				52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */,
 				52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */,
 				52BBF6B52CE1C77700564F11 /* TextStyle.swift in Sources */,
+				52EC04E22D3E2BCC00000C99 /* FetchUserInfo.swift in Sources */,
 				527A3E9B2C836290007FE63B /* ProfileViewController.swift in Sources */,
 				529A26062C96A781009F4CFA /* RecentPlanFooterView.swift in Sources */,
 				52818C5E2D1808140001E30B /* SearchPlaceViewController.swift in Sources */,
@@ -2546,7 +2646,7 @@
 				5231DF7F2D2FE78700D52529 /* DefaultSearchPlaceRepo.swift in Sources */,
 				52EA6E062CF7F22900EFD753 /* SignUpViewReactor.swift in Sources */,
 				52D8642C2D26416D000F8378 /* DetailPlaceViewController.swift in Sources */,
-				5214F8C12D2CA38C00E8CE9C /* PastPlanTableCell.swift in Sources */,
+				5214F8C12D2CA38C00E8CE9C /* MeetReviewTableCell.swift in Sources */,
 				52266BF22CBCF605007D03EB /* ProfileSetupViewController.swift in Sources */,
 				52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */,
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
@@ -2591,7 +2691,6 @@
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */,
-				5285E6BA2CDA09AA00B855CB /* CommentDTO.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
@@ -2602,19 +2701,19 @@
 				52CB41DE2CA2EC2B0071679D /* PlanTableSectionModel.swift in Sources */,
 				52818C902D1C469F0001E30B /* SearchPlaceTableCell.swift in Sources */,
 				521091E02D0FAC3800DD0407 /* RecentPlanResponse.swift in Sources */,
-				5214F88C2D2BB11A00E8CE9C /* FetchMeetFuturePlan.swift in Sources */,
+				5214F88C2D2BB11A00E8CE9C /* FetchMeetPlanList.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
 				52EA6E022CF7B88D00EFD753 /* NicknameRepo.swift in Sources */,
-				5214F8C52D2CADD100E8CE9C /* PastPlanTableCellModel.swift in Sources */,
-				52EC04C52D391BA100000C99 /* CommentManagement.swift in Sources */,
+				5214F8C52D2CADD100E8CE9C /* MeetReviewTableCellModel.swift in Sources */,
+				52EC04C52D391BA100000C99 /* FetchCommentList.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
 				52D8645B2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
 				5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
 				521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */,
-				5214F8822D2BA98C00E8CE9C /* FuturePlanTableCellModel.swift in Sources */,
+				5214F8822D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
@@ -2626,6 +2725,7 @@
 				52818C652D182AEB0001E30B /* SearchPlace.swift in Sources */,
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				523645392C8FFF9F009E0784 /* FetchGroupListMock.swift in Sources */,
+				52EC04EF2D3E5C9100000C99 /* CommentResponse.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */,
 				52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */,
@@ -2642,6 +2742,7 @@
 				52EA6E082CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift in Sources */,
 				526B985E2CEDBC03002488C5 /* CreatePlanViewController.swift in Sources */,
 				5214F8A42D2C408900E8CE9C /* UserInfoMock.swift in Sources */,
+				52EC04F72D3E76BF00000C99 /* LoadingState.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultAuthenticationRepo.swift in Sources */,
 				52EC04BB2D38C10800000C99 /* CommentTableCell.swift in Sources */,
@@ -2656,11 +2757,12 @@
 				5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
+				52EC04FC2D3E7A4F00000C99 /* CommentMock.swift in Sources */,
 				5226496A2D37946300E38029 /* MapView.swift in Sources */,
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,
 				529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */,
 				52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */,
-				52D8648B2D2A9400000F8378 /* PastPlanListViewController.swift in Sources */,
+				52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* NicknameManagerRepoMock.swift in Sources */,
 				5214F8B92D2C9FCB00E8CE9C /* Review.swift in Sources */,
 				52741ECF2D14E00D00C249A6 /* PlanTimePickerViewController.swift in Sources */,
@@ -2677,7 +2779,7 @@
 				523645332C8FFDEB009E0784 /* FetchMeetList.swift in Sources */,
 				52C7A4A82CAED102009DB5B9 /* CALayer+Ext.swift in Sources */,
 				52CB0B472C7308A8002B6D20 /* Endpoint.swift in Sources */,
-				52D864892D2A93DF000F8378 /* FuturePlanListViewController.swift in Sources */,
+				52D864892D2A93DF000F8378 /* MeetPlanListViewController.swift in Sources */,
 				525DFCED2CC8E95500835312 /* DefaultNicknameManagerRepo.swift in Sources */,
 				52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */,
 				5214F8A62D2C40C700E8CE9C /* MeetMock.swift in Sources */,
@@ -2689,7 +2791,7 @@
 				5214F89A2D2C060400E8CE9C /* UserInfoRepo.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
 				52D864362D289613000F8378 /* CommonDIContainer.swift in Sources */,
-				52266BFA2CBD474D007D03EB /* UserInfoManagement.swift in Sources */,
+				52266BFA2CBD474D007D03EB /* EditUserInfo.swift in Sources */,
 				5211F9052C86E71500403980 /* HomeViewReactor.swift in Sources */,
 				5236453F2C900E12009E0784 /* MeetListTableCell.swift in Sources */,
 				529CCD5D2D326A070041CBB7 /* PlanInfoView.swift in Sources */,
@@ -2698,14 +2800,16 @@
 				52CE87C52CEC38E400EBD85D /* MeetTitleValidator.swift in Sources */,
 				52BBF6AE2CE0590C00564F11 /* UIScreen+NotchSize.swift in Sources */,
 				525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */,
-				5214F8802D2BA97F00E8CE9C /* FuturePlanTableCell.swift in Sources */,
+				5214F8802D2BA97F00E8CE9C /* MeetPlanTableCell.swift in Sources */,
 				5214F8A22D2C407A00E8CE9C /* HomeModelMock.swift in Sources */,
 				5214F8AF2D2C9B2900E8CE9C /* ReviewResponse.swift in Sources */,
+				52EC04E92D3E5AEF00000C99 /* CreateComment.swift in Sources */,
 				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
 				5231DF7D2D2FE77800D52529 /* SearchPlaceRepo.swift in Sources */,
 				52818C6D2D194C940001E30B /* PlaceInfo.swift in Sources */,
 				52818C672D1836E90001E30B /* DefaultTextField.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* CalendarPlanTableViewController.swift in Sources */,
+				52EC04FA2D3E7A3C00000C99 /* FetchCommentListMock.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				52818C602D181CBB0001E30B /* SearchNaviBar.swift in Sources */,
 				52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */,
@@ -2715,12 +2819,13 @@
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				52EC04BD2D38C13900000C99 /* CommentListViewController.swift in Sources */,
 				52C857B22D081DE800765FB3 /* CreatePlanRequest.swift in Sources */,
+				52EC04F22D3E601500000C99 /* DefaultCommentQueryRepo.swift in Sources */,
 				52EC04DC2D3E1BA800000C99 /* ValidativeNickname.swift in Sources */,
 				527A3E972C83627C007FE63B /* MeetListViewController.swift in Sources */,
 				5214F8952D2BF91B00E8CE9C /* UserInfoStorage.swift in Sources */,
 				5231DF3C2D2F968000D52529 /* DefaultPlanCommandRepo.swift in Sources */,
 				5214F8932D2BF77300E8CE9C /* UserInfoEntity+Mapping.swift in Sources */,
-				5214F8892D2BB08500E8CE9C /* FuturePlanListViewReactor.swift in Sources */,
+				5214F8892D2BB08500E8CE9C /* MeetPlanListViewReactor.swift in Sources */,
 				52E0E8062D30B957002213FF /* LocationService.swift in Sources */,
 				52CE87CE2CEC5AC400EBD85D /* ImageUploadRepositoryMock.swift in Sources */,
 				522649662D37288200E38029 /* EventService.swift in Sources */,
@@ -2729,13 +2834,15 @@
 				52818C692D19462B0001E30B /* PlaceInfoResponse.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
+				52EC04FE2D3E811000000C99 /* CommentTableCellModel.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
-				5214F8C32D2CAB5000E8CE9C /* PastPlanListViewReactor.swift in Sources */,
+				5214F8C32D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift in Sources */,
 				5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */,
 				5214F8A82D2C418500E8CE9C /* PlaceMock.swift in Sources */,
 				52C857BF2D086C9B00765FB3 /* Weather.swift in Sources */,
 				52F83A5C2D34FD5F003DD790 /* CalendarFlowCoordinator.swift in Sources */,
 				52BBF6882CDF5D3500564F11 /* FontStyle.swift in Sources */,
+				52EC04E02D3E2AB800000C99 /* FetchReviewDetail.swift in Sources */,
 				52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */,
 				52D864522D29FC7D000F8378 /* MeetDetailSceneCoordinator.swift in Sources */,
 				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
@@ -2752,6 +2859,7 @@
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */,
+				52EC04EC2D3E5B3100000C99 /* CommentQueryRepo.swift in Sources */,
 				5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */,
 				5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */,
 				5211F9002C86B37B00403980 /* CardButton.swift in Sources */,

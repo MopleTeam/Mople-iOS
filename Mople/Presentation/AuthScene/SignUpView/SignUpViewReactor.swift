@@ -28,18 +28,18 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
     
     private let signUpUseCase: SignUp
     private let imageUploadUseCase: ImageUpload
+    private let fetchUserInfo: FetchUserInfo
     private var coordinator: AuthFlowCoordinating
-    private let userInfoManagementUseCase: UserInfoManagement
     
     var initialState: State = State()
     
     init(imageUploadUseCase: ImageUpload,
          signUpUseCase: SignUp,
-         userInfoManagementUseCase: UserInfoManagement,
+         fetchUserInfo: FetchUserInfo,
          coordinator: AuthFlowCoordinating) {
         self.signUpUseCase = signUpUseCase
         self.imageUploadUseCase = imageUploadUseCase
-        self.userInfoManagementUseCase = userInfoManagementUseCase
+        self.fetchUserInfo = fetchUserInfo
         self.coordinator = coordinator
         logLifeCycle()
     }
@@ -88,7 +88,7 @@ extension SignUpViewReactor {
 
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let createProfile = imageUploadUseCase.uploadImage(image)
+        let createProfile = imageUploadUseCase.execute(image)
             .flatMap { [weak self] imagePath in
                 guard let self else { return .error(AppError.unknownError)}
                 return self.signUpUseCase
@@ -96,7 +96,7 @@ extension SignUpViewReactor {
             }
             .flatMap({ [weak self] in
                 guard let self else { throw AppError.unknownError }
-                return self.userInfoManagementUseCase.fetchUserInfo()
+                return self.fetchUserInfo.execute()
             })
             .asObservable()
             .map({ _ in Mutation.singUpCompleted })

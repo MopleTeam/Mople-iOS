@@ -50,7 +50,7 @@ extension AuthSceneDIContainer {
     #warning("Mock")
     private func makeSignInViewReacotr(coordinator: AuthFlowCoordinating) -> SignInViewReactor {
         return SignInViewReactor(signInUseCase: makeSignInUseCase(),
-                                 userInfoManagementUseCase: commonFactory.makeUserInfoManagementUseCase(),
+                                 fetchUserInfoUseCase: makeFetchUserInfoUseCase(),
                                  coordinator: coordinator)
     }
     
@@ -77,7 +77,7 @@ extension AuthSceneDIContainer {
                                    coordinator: AuthFlowCoordinating) -> SignUpViewReactor {
         return .init(imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
                      signUpUseCase: makeSignUpUseCase(socialInfo: socialInfo),
-                     userInfoManagementUseCase: commonFactory.makeUserInfoManagementUseCase(),
+                     fetchUserInfo: makeFetchUserInfoUseCase(),
                      coordinator: coordinator)
     }
     
@@ -89,6 +89,14 @@ extension AuthSceneDIContainer {
 
 // MARK: - Common
 extension AuthSceneDIContainer {
+    private func makeFetchUserInfoUseCase() -> FetchUserInfo {
+        return FetchUserInfoUseCase(userInfoRepo: makeUserInfoRepo())
+    }
+    
+    private func makeUserInfoRepo() -> UserInfoRepo {
+        return DefaultUserInfoRepo(networkService: appNetworkService)
+    }
+    
     private func makeAuthenticationRepo() -> AuthenticationRepo {
         return DefaultAuthenticationRepo(networkService: appNetworkService)
     }

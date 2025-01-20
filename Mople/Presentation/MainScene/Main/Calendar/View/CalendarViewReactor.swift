@@ -135,7 +135,7 @@ extension CalendarViewReactor {
     private func fetchData() -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
 
-        let fetchAndProcess = fetchUseCase.fetchPlanList()
+        let fetchAndProcess = fetchUseCase.execute()
             .asObservable()
             .map { schedules -> (scheduleList: [PlanTableSectionModel], eventDateList: [Date]) in
                 let scheduleList = self.makeTableSectionModels(schedules)

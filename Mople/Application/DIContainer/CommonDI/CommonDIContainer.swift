@@ -9,7 +9,6 @@ import UIKit
 
 protocol CommonSceneFactory {
     func makeImageUploadUseCase() -> ImageUpload
-    func makeUserInfoManagementUseCase() -> UserInfoManagement
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
     func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
@@ -38,16 +37,6 @@ extension CommonDIContainer {
     private func makeImageUploadRepo() -> ImageUploadRepo {
         return DefaultImageUploadRepo(networkService: appNetworkService)
     }
-    
-    // MARK: - 유저 정보 유즈케이스
-    func makeUserInfoManagementUseCase() -> UserInfoManagement {
-        return UserInfoManagementUseCase(userInfoRepo: makeUserInfoRepo())
-    }
-    
-    private func makeUserInfoRepo() -> UserInfoRepo {
-        return DefaultUserInfoRepo(networkService: appNetworkService)
-    }
-    
     
     // MARK: - 프로필 설정 공통 리액터
     func makeProfileSetupReactor(profile: UserInfo?,

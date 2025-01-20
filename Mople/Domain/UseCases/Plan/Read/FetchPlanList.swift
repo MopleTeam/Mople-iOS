@@ -9,6 +9,6 @@ import Foundation
 import RxSwift
 
 protocol FetchPlanList {
-    func fetchPlanList() -> Single<[Plan]>
+    func execute() -> Single<[Plan]>
 }
 

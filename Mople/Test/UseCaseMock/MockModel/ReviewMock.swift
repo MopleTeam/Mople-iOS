@@ -5,7 +5,6 @@
 //  Created by CatSlave on 1/7/25.
 //
 import Foundation
-import RxSwift
 
 extension Review {
     private static func getRandomImages() -> [String] {

@@ -8,9 +8,9 @@
 import UIKit
 import RxSwift
 
-final class UserInfoManagementMock: UserInfoManagement {
+final class UserInfoManagementMock: EditUserInfo {
     
-    func editProfile(nickname: String, imagePath: String?) -> Single<Void> {
+    func execute(nickname: String, imagePath: String?) -> Single<Void> {
         return Observable.just(())
             .delay(.seconds(3), scheduler: MainScheduler.instance)
             .asSingle()

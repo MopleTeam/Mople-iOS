@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol SearchPlace {
-    func executu(query: String,
+    func execute(query: String,
                  x: Double?,
                  y: Double?) -> Single<SearchPlaceResult>
 }
@@ -21,7 +21,7 @@ final class SearchPlaceUseCase: SearchPlace {
         self.searchPlaceRepo = searchPlaceRepo
     }
     
-    func executu(query: String,
+    func execute(query: String,
                  x: Double?,
                  y: Double?) -> Single<SearchPlaceResult> {
         

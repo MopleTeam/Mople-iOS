@@ -241,6 +241,13 @@ extension APIEndpoints {
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
+    
+    static func fetchReviewDetail(reviewId: Int) throws -> Endpoint<ReviewResponse> {
+        return try Endpoint(path: "review/\(reviewId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
 }
 
 // MARK: - Search Location
@@ -251,5 +258,23 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParametersEncodable: locationRequest)
+    }
+}
+
+// MARK: - 댓글
+extension APIEndpoints {
+    static func fetchCommentList(postId: Int) throws -> Endpoint<[CommentResponse]> {
+        return try Endpoint(path: "comment/\(postId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
+    static func createComment(postId: Int, comment: String) throws -> Endpoint<Void> {
+        return try Endpoint(path: "comment/\(postId)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            bodyParameters: ["contents": comment])
     }
 }

@@ -8,17 +8,17 @@
 import RxSwift
 
 protocol FetchReviewList {
-    func fetchReviewList(meetId: Int) -> Single<[Review]>
+    func execute(meetId: Int) -> Single<[Review]>
 }
 
-final class fetchReviewListUseCase: FetchReviewList {
-    let reviewListRepo: FetchReviewListRepo
+final class FetchReviewListUseCase: FetchReviewList {
+    let reviewListRepo: ReviewQueryRepo
     
-    init(reviewListRepo: FetchReviewListRepo) {
+    init(reviewListRepo: ReviewQueryRepo) {
         self.reviewListRepo = reviewListRepo
     }
     
-    func fetchReviewList(meetId: Int) -> Single<[Review]> {
+    func execute(meetId: Int) -> Single<[Review]> {
         return reviewListRepo.fetchReviewList(meetId)
             .map { $0.map { response in
                 response.toDomain() }

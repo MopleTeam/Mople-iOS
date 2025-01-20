@@ -80,10 +80,10 @@ extension CreateMeetViewReactor {
             .filter { [weak self] _ in self?.currentState.isLoading == true }
             
         #warning("오류 발생 시 문제 해결")
-        let createMeet = imageUploadUseCase.uploadImage(image)
+        let createMeet = imageUploadUseCase.execute(image)
             .flatMap { [weak self] imagePath -> Single<Meet> in
                 guard let self else { return .error(AppError.unknownError)}
-                return self.createMeetUseCase.createMeet(title: title,
+                return self.createMeetUseCase.execute(title: title,
                                                          imagePath: imagePath)
             }
             .asObservable()

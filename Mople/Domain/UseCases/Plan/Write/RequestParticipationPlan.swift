@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol RequestParticipationPlan {
-    func requestParticipationPlan(planId: Int,
+    func execute(planId: Int,
                                   isJoining: Bool) -> Single<Void>
 }
 
@@ -19,8 +19,8 @@ final class RequestParticipationPlanUseCase: RequestParticipationPlan {
         self.participationRepo = participationRepo
     }
     
-    func requestParticipationPlan(planId: Int,
-                                  isJoining: Bool) -> Single<Void> {
+    func execute(planId: Int,
+                 isJoining: Bool) -> Single<Void> {
         participationRepo.requestParticipationPlan(planId: planId,
                                                    isJoining: isJoining)
     }

@@ -124,6 +124,11 @@ extension DateManager {
 
 // MARK: - 추출
 extension DateManager {
+    
+    static func numberOfTimeBetween(_ date: Date) -> DateComponents {
+        return calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: Date(), to: date)
+    }
+    
     static func numberOfDaysBetween(_ date: Date) -> Int {
         let scheduleDate = startOfDay(date)
         let result = calendar.dateComponents([.day], from: Date(), to: scheduleDate)

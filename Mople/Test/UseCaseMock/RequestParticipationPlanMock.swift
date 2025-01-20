@@ -8,7 +8,7 @@
 import RxSwift
 
 final class RequsetParticipationPlanUseCaseMock: RequestParticipationPlan {
-    func requestParticipationPlan(planId: Int, isJoining: Bool) -> Single<Void> {
+    func execute(planId: Int, isJoining: Bool) -> Single<Void> {
         return Observable.just(())
             .delay(.seconds(1), scheduler: MainScheduler.instance)
             .asSingle()

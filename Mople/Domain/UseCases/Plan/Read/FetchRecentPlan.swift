@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol FetchRecentPlan {
-    func fetchRecentPlan() -> Single<RecentPlan>
+    func execute() -> Single<RecentPlan>
 }
 
 final class FetchRecentPlanUseCase: FetchRecentPlan {
@@ -18,7 +18,7 @@ final class FetchRecentPlanUseCase: FetchRecentPlan {
         self.recentPlanRepo = recentPlanRepo
     }
     
-    func fetchRecentPlan() -> Single<RecentPlan> {
+    func execute() -> Single<RecentPlan> {
         return recentPlanRepo.fetchRecentPlanList()
             .map { $0.toDomain() }
     }

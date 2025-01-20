@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchMeetDetail {
-    func fetchMeetDetail(meetId: Int) -> Single<Meet>
+    func execute(meetId: Int) -> Single<Meet>
 }
 
 final class FetchMeetDetailUseCase: FetchMeetDetail {
@@ -19,7 +19,7 @@ final class FetchMeetDetailUseCase: FetchMeetDetail {
         self.meetDetailRepo = meetDetailRepo
     }
     
-    func fetchMeetDetail(meetId: Int) -> Single<Meet> {
+    func execute(meetId: Int) -> Single<Meet> {
         return meetDetailRepo.fetchMeetDetail(meetId: meetId)
             .map { $0.toDomain()  }
     }

@@ -114,7 +114,7 @@ extension HomeViewReactor {
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let fetchSchedules = fetchRecentScheduleUseCase.fetchRecentPlan()
+        let fetchSchedules = fetchRecentScheduleUseCase.execute()
             .asObservable()
             .map { Mutation.responseRecentPlan(schedules: $0) }
         
@@ -168,7 +168,6 @@ extension HomeViewReactor {
 // MARK: - 일정 생성 알림 수신
 extension HomeViewReactor {
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
-        print(#function, #line, "payload : \(payload)" )
         var planList = currentState.plans
         
         switch payload {

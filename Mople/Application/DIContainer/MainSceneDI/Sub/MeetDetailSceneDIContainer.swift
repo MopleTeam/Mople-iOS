@@ -10,8 +10,8 @@ import UIKit
 protocol MeetDetailSceneDependencies {
     // MARK: - View
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> DetailMeetViewController
-    func makeFuturePlanListViewController(coordinator: MeetDetailCoordination) -> FuturePlanListViewController
-    func makePastPlanListViewController() -> PastPlanListViewController
+    func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController
+    func makeMeetReviewListViewController() -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetDetailCoordination) -> MeetSetupViewController
     
@@ -66,24 +66,24 @@ extension MeetDetailSceneDIContainer {
     
     
     // MARK: - 예정된 일정리스트 뷰
-    func makeFuturePlanListViewController(coordinator: MeetDetailCoordination) -> FuturePlanListViewController {
-        return FuturePlanListViewController(
-            reactor: makeFuturePlanListViewReactor(coordinator: coordinator),
+    func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController {
+        return MeetPlanListViewController(
+            reactor: makeMeetPlanListViewReactor(coordinator: coordinator),
             parentReactor: mainReactor)
     }
     
-    private func makeFuturePlanListViewReactor(coordinator: MeetDetailCoordination) -> FuturePlanListViewReactor {
-        return .init(fetchPlanUseCase: makeFetchFuturePlanUsecase(),
+    private func makeMeetPlanListViewReactor(coordinator: MeetDetailCoordination) -> MeetPlanListViewReactor {
+        return .init(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
                      participationPlanUseCase: makeParticipationPlanUseCase(),
                      coordinator: coordinator,
                      meetID: meetId)
     }
     
-    private func makeFetchFuturePlanUsecase() -> FetchMeetFuturePlan {
-        return FetchMeetFuturePlanUsecase(meetPlanRepo: makeFuturePlanListRepo())
+    private func makeFetchMeetPlanUsecase() -> FetchMeetPlanList {
+        return FetchMeetPlanListUsecase(meetPlanRepo: makeMeetPlanListRepo())
     }
     
-    private func makeFuturePlanListRepo() -> PlanQueryRepo {
+    private func makeMeetPlanListRepo() -> PlanQueryRepo {
         return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
     
@@ -96,21 +96,21 @@ extension MeetDetailSceneDIContainer {
     }
     
     // MARK: - 리뷰리스트 뷰
-    func makePastPlanListViewController() -> PastPlanListViewController {
-        return PastPlanListViewController(reactor: makePastPlanListViewReactor(),
+    func makeMeetReviewListViewController() -> MeetReviewListViewController {
+        return MeetReviewListViewController(reactor: makeMeetReviewListViewReactor(),
                                           parentReactor: mainReactor)
     }
     
-    private func makePastPlanListViewReactor() -> PastPlanListViewReactor {
+    private func makeMeetReviewListViewReactor() -> MeetReviewListViewReactor {
         return .init(fetchReviewUseCase: makeFetchReviewListUsecase(),
                      meetID: meetId)
     }
     
     private func makeFetchReviewListUsecase() -> FetchReviewList {
-        return fetchReviewListUseCase(reviewListRepo: makeReviewRepo())
+        return FetchReviewListUseCase(reviewListRepo: makeReviewRepo())
     }
     
-    private func makeReviewRepo() -> FetchReviewListRepo {
+    private func makeReviewRepo() -> ReviewQueryRepo {
         return DefaultFetchReviewListRepo(networkService: appNetworkService)
     }
     

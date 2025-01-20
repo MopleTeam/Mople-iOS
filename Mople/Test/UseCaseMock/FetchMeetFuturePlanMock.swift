@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class FetchMeetFuturePlanMock: FetchMeetFuturePlan {
+final class FetchMeetFuturePlanMock: FetchMeetPlanList {
     
     private func getEvents() -> [Plan] {
         print(#function, #line)
@@ -25,7 +25,7 @@ final class FetchMeetFuturePlanMock: FetchMeetFuturePlan {
         return planArray
     }
     
-    func fetchPlanList(meetId: Int) -> Single<[Plan]> {
+    func execute(meetId: Int) -> Single<[Plan]> {
         return Observable.just(getEvents())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()

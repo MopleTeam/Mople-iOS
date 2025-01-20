@@ -12,7 +12,7 @@ import RxSwift
 
 final class FetchRecentScheduleMock: FetchRecentPlan {
     
-    func fetchRecentPlan() -> Single<RecentPlan> {
+    func execute() -> Single<RecentPlan> {
         return  Observable.just(RecentPlan.mock())
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .asSingle()

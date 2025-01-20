@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 final class FetchPlanDetailMock: FetchPlanDetail {
-    func fetchPlanDetail(planId: Int) -> Single<Plan> {
+    func execute(planId: Int) -> Single<Plan> {
         return Observable.just(Plan.mock(id: planId,
                                          date: Date(),
                                          creatorId: 103))
