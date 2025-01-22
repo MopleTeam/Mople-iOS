@@ -9,16 +9,18 @@ import Foundation
 
 struct ReviewResponse: Decodable {
     var meetId: Int?
+    var reviewId: Int?
+    var postId: Int?
     var creatorId: Int?
+    var reviewName: String?
+    var address: String?
+    var title: String?
+    var reviewDateTime: String?
     var meetName: String?
     var meetImage: String?
-    var reviewId: Int?
-    var reviewName: String?
-    var reviewDateTime: String?
-    var participantsCount: Int?
-    var address: String?
     var lat: Double?
     var lot: Double?
+    var participantsCount: Int?
     var images: [String]?
 }
 
@@ -32,6 +34,7 @@ extension ReviewResponse {
                      date: date,
                      participantsCount: participantsCount,
                      address: address,
+                     addressTitle: title,
                      images: images ?? [],
                      meet: .init(id: meetId,
                                  name: meetName,

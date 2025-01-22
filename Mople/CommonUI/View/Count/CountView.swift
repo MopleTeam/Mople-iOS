@@ -47,12 +47,8 @@ final class CountView: UIView {
     }()
     
     // MARK: - LifeCycle
-    init(title: String? = nil,
-         frame: CGSize = .zero) {
-        super.init(frame: .init(x: 0,
-                                y: 0,
-                                width: frame.width,
-                                height: frame.height))
+    init(title: String? = nil) {
+        super.init(frame: .zero)
         self.titleText = title
         setupUI()
     }

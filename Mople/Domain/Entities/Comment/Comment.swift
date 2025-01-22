@@ -14,4 +14,11 @@ struct Comment: Hashable, Equatable {
     var writerThumbnailPath: String?
     var comment: String?
     var createdDate: Date?
+    
+    static func < (lhs: Comment, rhs: Comment) -> Bool {
+        guard let lhsDate = lhs.createdDate,
+              let rhsDate = rhs.createdDate else { return false }
+        
+        return lhsDate < rhsDate
+    }
 }

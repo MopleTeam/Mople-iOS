@@ -30,13 +30,13 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
     
     private let signInUseCase: SignIn
     private let fetchUserInfoUseCase: FetchUserInfo
-    private let coordinator: AuthFlowCoordinating
+    private weak var coordinator: AuthFlowCoordination?
     
     var initialState: State = State()
     
     init(signInUseCase: SignIn,
          fetchUserInfoUseCase: FetchUserInfo,
-         coordinator: AuthFlowCoordinating) {
+         coordinator: AuthFlowCoordination) {
         self.signInUseCase = signInUseCase
         self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.coordinator = coordinator
@@ -57,9 +57,9 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
         case let .setLoading(isLoad):
             newState.isLoading = isLoad
         case let .moveToProfileSetup(socialInfo):
-            coordinator.pushSignUpView(socialInfo)
+            coordinator?.pushSignUpView(socialInfo)
         case .moveToMain:
-            coordinator.presentMainFlow()
+            coordinator?.presentMainFlow()
         }
   
         return newState

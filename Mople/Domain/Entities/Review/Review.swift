@@ -14,6 +14,7 @@ struct Review {
     var date: Date?
     var participantsCount: Int?
     var address: String?
+    var addressTitle: String?
     var images: [String]
     var meet: MeetSummary?
     var location: Location?

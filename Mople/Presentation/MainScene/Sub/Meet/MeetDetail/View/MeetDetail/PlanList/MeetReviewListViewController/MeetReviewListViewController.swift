@@ -20,12 +20,11 @@ final class MeetReviewListViewController: BaseViewController, View {
     private var parentReactor: MeetDetailViewReactor?
 
     private lazy var countView: CountView = {
-        let view = CountView(title: "예정된 약속",
-                             frame: .init(width: tableView.bounds.width,
-                                          height: 64))
+        let view = CountView(title: "지난 약속")
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: ColorStyle.Gray._04)
         view.setSpacing(16)
+        view.frame.size.height = 64
         return view
     }()
     
@@ -94,13 +93,17 @@ final class MeetReviewListViewController: BaseViewController, View {
     }
     
     func bind(reactor: MeetReviewListViewReactor) {
+        tableView.rx.itemSelected
+            .map({ Reactor.Action.selectedReview(index: $0.row) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         let viewDidLayout = self.rx.viewDidLayoutSubviews
             .take(1)
         
         let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$reviews))
             .map { $0.1 }
             .share()
-        
         
         responsePlans
             .asDriver(onErrorJustReturn: [])

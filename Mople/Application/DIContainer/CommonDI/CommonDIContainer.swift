@@ -13,7 +13,8 @@ protocol CommonSceneFactory {
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
     func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
     func makePlanCreateCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
-    func makePlanDetailCoordinator(planId: Int) -> BaseCoordinator
+    func makePlanDetailCoordinator(postId: Int,
+                                   type: PlanDetailType) -> BaseCoordinator
 }
 
 final class CommonDIContainer: CommonSceneFactory {
@@ -87,8 +88,11 @@ extension CommonDIContainer {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailCoordinator(planId: Int) -> BaseCoordinator {
-        let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService, planId: planId)
-        return planDetailDI.makePlanDetailCoordinator()
+    func makePlanDetailCoordinator(postId: Int,
+                                   type: PlanDetailType) -> BaseCoordinator {
+        print(#function, #line, "#55 : \(type) ")
+        let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      postId: postId)
+        return planDetailDI.makePlanDetailCoordinator(type: type)
     }
 }

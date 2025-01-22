@@ -12,7 +12,7 @@ protocol CalendarSceneDependencies {
     func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
     
     // MARK: - Flow
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator
+    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator
 }
 
 final class CalendarSceneDIContainer {
@@ -47,7 +47,7 @@ extension CalendarSceneDIContainer: CalendarSceneDependencies {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(planId: planId)
+    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator {
+        return commonFactory.makePlanDetailCoordinator(postId: postId, type: .plan)
     }
 }

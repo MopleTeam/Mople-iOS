@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol MeetListFlowCoordination {
+protocol MeetListFlowCoordination: AnyObject {
     func presentMeetCreateView()
     func presentMeetDetailView(meetId: Int)
 }

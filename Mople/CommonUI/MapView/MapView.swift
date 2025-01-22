@@ -27,7 +27,7 @@ final class MapView: UIView {
     init(isScroll: Bool = false) {
         super.init(frame: .zero)
         setLayout()
-        mapView.isScrollGestureEnabled = isScroll
+        setMapView(isScroll)
     }
     
     required init?(coder: NSCoder) {
@@ -40,6 +40,18 @@ final class MapView: UIView {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func setMapView(_ isScroll: Bool) {
+        self.mapView.isScrollGestureEnabled = isScroll
+        self.mapView.gestureRecognizers?.forEach({ $0.delegate = self })
+    }
+}
+
+extension MapView: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
 

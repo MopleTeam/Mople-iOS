@@ -110,8 +110,6 @@ final class HomePlanCollectionViewController: BaseViewController, View {
 
     // MARK: - Binding
     func bind(reactor: HomeViewReactor) {
-        let dataSource = configureDataSource()
-        
         footerTapObserver
             .map({ _ in Reactor.Action.presentCalendaer })
             .bind(to: reactor.action)
@@ -127,7 +125,7 @@ final class HomePlanCollectionViewController: BaseViewController, View {
         responsePlans
             .map { [Section(model: (), items: $0)] }
             .asDriver(onErrorJustReturn: [])
-            .drive(self.collectionView.rx.items(dataSource: dataSource))
+            .drive(self.collectionView.rx.items(dataSource: configureDataSource()))
             .disposed(by: disposeBag)
         
         responsePlans

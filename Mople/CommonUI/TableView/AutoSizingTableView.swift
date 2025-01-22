@@ -16,6 +16,7 @@ final class AutoSizingTableView: UITableView {
     
     override var contentSize: CGSize {
         didSet {
+            print(#function, #line, "Path : # 55 ")
             self.invalidateIntrinsicContentSize()
         }
     }

@@ -14,7 +14,7 @@ protocol HomeSceneDependencies {
     
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator
+    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator
 }
 
 final class HomeSceneDIContainer {
@@ -72,7 +72,7 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(planId: planId)
+    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator {
+        return commonFactory.makePlanDetailCoordinator(postId: postId, type: .plan)
     }
 }

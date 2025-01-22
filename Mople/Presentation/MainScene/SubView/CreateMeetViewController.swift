@@ -11,7 +11,8 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CreateMeetViewController: TitleNaviViewController, View, KeyboardResponsive {
+final class CreateMeetViewController: TitleNaviViewController, View, TransformKeyboardResponsive {
+    
     
     typealias Reactor = CreateMeetViewReactor
     
@@ -21,10 +22,8 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
     // MARK: - Handle KeyboardEvent
-    var superView: UIView { self.view }
+    var adjustableView: UIView { self.mainStackView }
     var floatingView: UIView { self.completionButton }
-    var scrollView: UIScrollView { self.mainView }
-    var overlappingView: UIView? { self.textFieldView }
     var floatingViewBottom: Constraint?
     
     // MARK: - Manager
@@ -44,13 +43,6 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     private let imageTapGesture = UITapGestureRecognizer()
     
     // MARK: - UI Components
-    private let mainView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.showsVerticalScrollIndicator = false
-        return scrollView
-    }()
-    
-    private let contentView = UIView()
     
     private let imageContainerView = UIView()
     
@@ -137,36 +129,16 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
     
     private func setupLayout() {
         self.view.backgroundColor = ColorStyle.Default.white
-        self.view.addSubview(mainView)
+        self.view.addSubview(mainStackView)
         self.view.addSubview(completionButton)
-        self.mainView.addSubview(contentView)
-        self.contentView.addSubview(mainStackView)
         self.imageContainerView.addSubview(thumnailView)
         self.imageContainerView.addSubview(imageEditIcon)
-        
-        mainView.snp.makeConstraints { make in
-            make.top.equalTo(titleViewBottom)
-            make.bottom.horizontalEdges.equalToSuperview()
-        }
-        
-        contentView.snp.makeConstraints { make in
-            make.edges.equalTo(mainView.contentLayoutGuide)
-            make.width.equalTo(mainView.frameLayoutGuide.snp.width)
-        }
-        
-        mainStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview()
-        }
-        
-        completionButton.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.height.equalTo(56)
-            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-                .inset(UIScreen.getAdditionalBottomInset()).constraint
-        }
 
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalTo(titleViewBottom)
+            make.horizontalEdges.equalToSuperview().inset(20)
+        }
+    
         imageContainerView.snp.makeConstraints { make in
             make.height.equalTo(160)
         }
@@ -179,6 +151,13 @@ final class CreateMeetViewController: TitleNaviViewController, View, KeyboardRes
         imageEditIcon.snp.makeConstraints { make in
             make.bottom.trailing.equalTo(thumnailView).offset(6)
             make.size.equalTo(24)
+        }
+        
+        completionButton.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.height.equalTo(56)
+            floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+                .inset(UIScreen.getDefatulBottomInset()).constraint
         }
     }
     

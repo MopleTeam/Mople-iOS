@@ -256,7 +256,8 @@ extension CreatePlanViewController {
 extension CreatePlanViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
     var tapGestureShouldCancelTouchesInView: Bool { false }
     
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
     

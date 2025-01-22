@@ -149,7 +149,7 @@ final class ProfileSetupViewController: UIViewController, View {
 
         mainStackView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.getAdditionalBottomInset())
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(UIScreen.getDefatulBottomInset())
         }
 
         profileImageView.snp.makeConstraints { make in

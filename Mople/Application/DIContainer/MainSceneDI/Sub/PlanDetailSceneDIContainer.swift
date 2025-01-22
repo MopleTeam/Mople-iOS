@@ -9,41 +9,48 @@ import UIKit
 import RxSwift
 
 protocol PlanDetailSceneDependencies {
-    func makePlanDetailViewController() -> PlanDetailViewController
+    func makePlanDetailViewController(type: PlanDetailType,
+                                      coordinator: PlanDetailCoordination) -> PlanDetailViewController
     func makeCommentListViewController() -> CommentListViewController
+    func makePhotoListViewController(imagePaths: [String]) -> PhotoListViewController
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     
     private let appNetworkService: AppNetworkService
-    private let planId: Int
-    private var loadingObserver: LoadingStateDelegate?
+    private let postId: Int
+    private var mainReactor: PlanDetailViewReactor?
     
     init(appNetworkService: AppNetworkService,
-         planId: Int) {
+         postId: Int) {
         self.appNetworkService = appNetworkService
-        self.planId = planId
+        self.postId = postId
     }
     
-    func makePlanDetailCoordinator() -> PlanDetailFlowCoordinator {
+    func makePlanDetailCoordinator(type: PlanDetailType) -> PlanDetailFlowCoordinator {
         return .init(dependencies: self,
-                     navigationController: AppNaviViewController())
+                     navigationController: AppNaviViewController(),
+                     type: type)
     }
 }
 
 extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 상세
-    func makePlanDetailViewController() -> PlanDetailViewController {
+    func makePlanDetailViewController(type: PlanDetailType,
+                                      coordinator: PlanDetailCoordination) -> PlanDetailViewController {
         return .init(title: "약속 상세",
-                     reactor: makePlanDetailViewReactor())
-    }
+                     reactor: makePlanDetailViewReactor(type: type,
+                                                        coordinator: coordinator))    }
     
-    private func makePlanDetailViewReactor() -> PlanDetailViewReactor {
-        let reactor = PlanDetailViewReactor(planId: planId,
-                                            fetchPlanDetailUseCase: makeFetchPlanDetailUsecase())
-        loadingObserver = reactor
-        return reactor
+    private func makePlanDetailViewReactor(type: PlanDetailType,
+                                           coordinator: PlanDetailCoordination) -> PlanDetailViewReactor {
+        mainReactor = PlanDetailViewReactor(type: type,
+                                             postId: postId,
+                                             fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(),
+                                             fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(),
+                                             coordinator: coordinator)
+        return mainReactor!
     }
     
     private func makeFetchPlanDetailUsecase() -> FetchPlanDetail {
@@ -54,15 +61,39 @@ extension PlanDetailSceneDIContainer {
         return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
     
+    private func makeFetchReviewDetailUseCase() -> FetchReviewDetail {
+        return FetchReviewDetailUseCase(reviewListRepo: makeFetchReviewDetailRepo())
+    }
+    
+    private func makeFetchReviewDetailRepo() -> ReviewQueryRepo {
+        return DefaultReviewQueryRepo(networkService: appNetworkService)
+    }
+    
+    // MARK: - 포토뷰
+    func makePhotoListViewController(imagePaths: [String]) -> PhotoListViewController {
+        return .init(reactor: makePhotoListViewReactor(imagePaths: imagePaths))
+    }
+    
+    private func makePhotoListViewReactor(imagePaths: [String]) -> PhotoListViewReactor {
+        let reactor = PhotoListViewReactor(imagePaths: imagePaths)
+        return reactor
+    }
+    
+    
     // MARK: - 댓글뷰
     func makeCommentListViewController() -> CommentListViewController {
-        return .init(reactor: makeCommentListViewReactor(),
-                     loadingObserver: loadingObserver)
+        return .init(reactor: makeCommentListViewReactor())
     }
     
     private func makeCommentListViewReactor() -> CommentListViewReactor {
-        return .init(postId: planId,
-                     fetchCommentListUseCase: makeFetchCommentListUseCase())
+        let reactor = CommentListViewReactor(postId: postId,
+                                             fetchCommentListUseCase: makeFetchCommentListUseCase(),
+                                             createCommentUseCase: makeCreateCommentUseCase(),
+                                             deleteCommentUseCase: makeDeleteCommentUseCase(),
+                                             editCommentUseCase: makeEditCommentUseCase(),
+                                             delegate: mainReactor!)
+        mainReactor?.setCommentListDelegate(reactor)
+        return reactor
     }
     
     private func makeFetchCommentListUseCase() -> FetchCommentList {
@@ -71,6 +102,22 @@ extension PlanDetailSceneDIContainer {
     
     private func makeFetchCommentListRepo() -> CommentQueryRepo {
         return DefaultCommentQueryRepo(networkService: appNetworkService)
+    }
+    
+    private func makeCreateCommentUseCase() -> CreateComment {
+        return CreateCommentUseCase(createCommentRepo: makeCommentCommandRepo())
+    }
+    
+    private func makeDeleteCommentUseCase() -> DeleteComment {
+        return DeleteCommentUseCase(deleteCommentRepo: makeCommentCommandRepo())
+    }
+    
+    private func makeEditCommentUseCase() -> EditComment {
+        return EditCommentUseCase(editCommentRepo: makeCommentCommandRepo())
+    }
+    
+    private func makeCommentCommandRepo() -> CommentCommandRepo {
+        return DefaultCommentCommandRepo(networkService: appNetworkService)
     }
 }
 

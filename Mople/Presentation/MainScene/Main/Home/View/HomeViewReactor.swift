@@ -41,7 +41,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     
     private let fetchRecentScheduleUseCase: FetchRecentPlan
     private let notificationService: NotificationService
-    private let coordinator: HomeFlowCoordinator
+    private weak var coordinator: HomeFlowCoordinator?
     
     var initialState: State = State()
     
@@ -135,19 +135,19 @@ extension HomeViewReactor {
         guard !currentState.plans.isEmpty,
               let lastDate = currentState.plans.last?.date else { return .empty() }
         let startOfDay = DateManager.startOfDay(lastDate)
-        coordinator.pushCalendarView(lastRecentDate: startOfDay)
+        coordinator?.pushCalendarView(lastRecentDate: startOfDay)
         return .empty()
     }
     
     private func presentMeetCreateView() -> Observable<Mutation> {
-        coordinator.presentMeetCreateView()
+        coordinator?.presentMeetCreateView()
         return .empty()
     }
     
     private func presentPlanCreateView() -> Observable<Mutation> {
         let meetList = currentState.meetList
         guard meetList.isEmpty == false else { return .just(.handleHomeError(error: .emptyMeet)) }
-        coordinator.presentPlanCreateView(meetList: meetList)
+        coordinator?.presentPlanCreateView(meetList: meetList)
         return .empty()
     }
 }

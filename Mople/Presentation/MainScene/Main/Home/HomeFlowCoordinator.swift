@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol HomeFlowCoordination {
+protocol HomeFlowCoordination: AnyObject {
     func presentMeetCreateView()
     func presentPlanCreateView(meetList: [MeetSummary])
     func presentPlanDetailView(planId: Int)
@@ -46,7 +46,7 @@ extension HomeFlowCoordinator: HomeFlowCoordination {
     }
     
     func presentPlanDetailView(planId: Int) {
-        let planDetailCoordinates = dependencies.makePlanDetailFlowCoordinator(planId: planId)
+        let planDetailCoordinates = dependencies.makePlanDetailFlowCoordinator(postId: planId)
         self.start(coordinator: planDetailCoordinates)
         self.navigationController.presentWithTransition(planDetailCoordinates.navigationController)
     }

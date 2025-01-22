@@ -29,14 +29,14 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
     private let signUpUseCase: SignUp
     private let imageUploadUseCase: ImageUpload
     private let fetchUserInfo: FetchUserInfo
-    private var coordinator: AuthFlowCoordinating
+    private var coordinator: AuthFlowCoordination
     
     var initialState: State = State()
     
     init(imageUploadUseCase: ImageUpload,
          signUpUseCase: SignUp,
          fetchUserInfo: FetchUserInfo,
-         coordinator: AuthFlowCoordinating) {
+         coordinator: AuthFlowCoordination) {
         self.signUpUseCase = signUpUseCase
         self.imageUploadUseCase = imageUploadUseCase
         self.fetchUserInfo = fetchUserInfo

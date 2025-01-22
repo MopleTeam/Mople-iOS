@@ -10,24 +10,25 @@ import SnapKit
 import RxSwift
 import ReactorKit
 
-final class PlanDetailViewController: TitleNaviViewController, View, KeyboardResponsive {
+final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
+    
     
     typealias Reactor = PlanDetailViewReactor
     
     var disposeBag = DisposeBag()
     
     // MARK: - Handle KeyboardEvent
-    var superView: UIView { self.view }
-    var floatingView: UIView { textFieldStackview }
-    var scrollView: UIScrollView { mainView }
+    var floatingView: UIView { chatingTextFieldView }
     var floatingViewBottom: Constraint?
+    var scrollView: UIScrollView { mainScrollView }
+    var startOffsetY: CGFloat = .zero
     
     // MARK: - Observable
     private var loadingObserver: PublishSubject<Bool> = .init()
     
     // MARK: - UI Components
     
-    private let mainView: UIScrollView = {
+    private let mainScrollView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
         return view
@@ -37,40 +38,33 @@ final class PlanDetailViewController: TitleNaviViewController, View, KeyboardRes
     
     private let planInfoView = PlanInfoView()
     
-    private let borderView: UIView = {
+    private(set) var photoContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = ColorStyle.BG.secondary
+        view.backgroundColor = ColorStyle.Default.white
+        view.isHidden = true
         return view
     }()
     
-    private(set) var commentContainer = UIView()
-        
-    private lazy var sendButton: BaseButton = {
-        let btn = BaseButton()
-        btn.setImage(image: .sendArrow,
-                     imagePlacement: .all,
-                     contentPadding: 0)
-        btn.setBgColor(normalColor: ColorStyle.App.primary,
-                       disabledColor: ColorStyle.Primary.disable)
-        btn.setRadius(20)
-        btn.isEnabled = false
-        return btn
+    private(set) var commentContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = ColorStyle.Default.white
+        return view
     }()
     
-    private let textField: DefaultTextField = {
-        let textField = DefaultTextField()
-        textField.setPlaceholder("댓글을 입력해주세요")
-//        textField.setInputTextField(view: <#T##UIView#>, mode: <#T##DefaultTextField.ViewMode#>)
-        return textField
-    }()
-    
-    private lazy var textFieldStackview: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [textField, sendButton])
-        sv.axis = .horizontal
-        sv.spacing = 12
-        sv.alignment = .center
+    private lazy var mainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [planInfoView, photoContainer, commentContainer])
+        sv.axis = .vertical
+        sv.spacing = 8
+        sv.alignment = .fill
         sv.distribution = .fill
+        sv.backgroundColor = ColorStyle.BG.secondary
         return sv
+    }()
+    
+    private let chatingTextFieldView: ChatingTextFieldView = {
+        let chatingView = ChatingTextFieldView()
+        chatingView.backgroundColor = ColorStyle.Default.white
+        return chatingView
     }()
 
     init(title: String?,
@@ -102,78 +96,112 @@ final class PlanDetailViewController: TitleNaviViewController, View, KeyboardRes
     private func initalSetup() {
         setLayout()
         setNavi()
+        setScrollView()
         setupKeyboardDismissGestrue()
     }
     
     private func setLayout() {
-        self.view.addSubview(mainView)
-        self.view.addSubview(textFieldStackview)
-        mainView.addSubview(contentView)
-        contentView.addSubview(planInfoView)
-        contentView.addSubview(borderView)
-        contentView.addSubview(commentContainer)
-
-        mainView.snp.makeConstraints { make in
+        self.view.addSubview(mainScrollView)
+        self.view.addSubview(chatingTextFieldView)
+        mainScrollView.addSubview(contentView)
+        contentView.addSubview(mainStackView)
+    
+        mainScrollView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview()
+//            adjustableViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+//                .inset(UIScreen.getDefatulBottomInset() + 56).constraint
         }
         
         contentView.snp.makeConstraints { make in
-            make.edges.equalTo(mainView.contentLayoutGuide)
-            make.width.equalTo(mainView.frameLayoutGuide.snp.width)
+            make.top.horizontalEdges.equalTo(mainScrollView.contentLayoutGuide)
+            make.bottom.equalTo(mainScrollView.contentLayoutGuide)
+            make.width.equalTo(mainScrollView.frameLayoutGuide.snp.width)
         }
         
-        planInfoView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
+        mainStackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
-        borderView.snp.makeConstraints { make in
-            make.top.equalTo(planInfoView.snp.bottom)
+        chatingTextFieldView.snp.makeConstraints { make in
+            make.top.equalTo(mainScrollView.snp.bottom)
             make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(8)
-        }
-        
-        commentContainer.snp.makeConstraints { make in
-            make.top.equalTo(borderView.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
-            make.bottom.equalToSuperview()
-        }
-            
-        textFieldStackview.snp.makeConstraints { make in
-            make.top.equalTo(mainView.snp.bottom).offset(16)
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.height.equalTo(56)
             floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-                .inset(UIScreen.getAdditionalBottomInset()).constraint
+                .inset(UIScreen.getDefatulBottomInset()).constraint
         }
-        
-        textField.snp.makeConstraints { make in
-            make.height.equalToSuperview()
-        }
-        
-        sendButton.snp.makeConstraints { make in
-            make.size.equalTo(40)
-        }
+    }
+    
+    private func setScrollView() {
+        self.mainScrollView.delegate = self
     }
     
     private func setNavi() {
         self.naviBar.setBarItem(type: .left, image: .backArrow)
         self.naviBar.setBarItem(type: .right, image: .blackMenu)
     }
-    
+
     func bind(reactor: PlanDetailViewReactor) {
+        outputBind(reactor: reactor)
+        handleCommentCommand(reactor: reactor)
+        handleParentChildLoading(reactor: reactor)
+    }
+    
+    private func setAction() {
+        self.naviBar.leftItemEvent
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    public func showPhotoView() {
+        photoContainer.isHidden = false
+        self.photoContainer.snp.makeConstraints { make in
+            make.height.equalTo(207)
+        }
+    }
+}
+
+// MARK: - Handle Reactor
+extension PlanDetailViewController {
+    private func outputBind(reactor: Reactor) {
         let viewDidLayout = self.rx.viewDidLayoutSubviews
             .take(1)
         
-        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$plan))
+        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$planInfo))
             .map({ $0.1 })
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, plan in
-                vc.planInfoView.configure(with: .init(plan: plan))
+            .drive(with: self, onNext: { vc, viewModel in
+                vc.planInfoView.configure(with: viewModel)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func handleCommentCommand(reactor: Reactor) {
+        let keyboardSended = chatingTextFieldView.rx.keyboardSendButtonTapped
+        let buttonSended = chatingTextFieldView.rx.sendButtonTapped
         
+        [keyboardSended, buttonSended].forEach {
+            $0.map { comment in
+                Reactor.Action.createComment(comment)
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        }
+        
+        reactor.pulse(\.$createdComment)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, task in
+                guard let _ = task else { return }
+                vc.chatingTextFieldView.rx.text.onNext(nil)
+                vc.mainScrollView.scrollToBottom(animated: false)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleParentChildLoading(reactor: Reactor) {
         Observable.merge(reactor.pulse(\.$isLoading),
                          reactor.pulse(\.$isCommentLoading))
         .skip(1)
@@ -197,45 +225,22 @@ final class PlanDetailViewController: TitleNaviViewController, View, KeyboardRes
         .drive(self.rx.isLoading)
         .disposed(by: disposeBag)
     }
-    
-    private func setAction() {
-        self.naviBar.leftItemEvent
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.dismiss(animated: true)
-            })
-            .disposed(by: disposeBag)
-        
-        self.textField.rx.isEditMode
-            .do(onNext: { print(#function, #line, "키보드 : \($0)" ) })
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isEditing in
-                vc.handlePresentSendButton(isEditing)
-            })
-            .disposed(by: disposeBag)
-        
-        self.textField.rx.text
-            .compactMap { $0 }
-            .map { $0.count > 0 }
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isEnabled in
-                vc.sendButton.isEnabled = isEnabled
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func handlePresentSendButton(_ isEditing: Bool) {
-        self.sendButton.isHidden = !isEditing
-    }
 }
 
 extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
+    private func setupKeyboardDismissGestrue() {
+        setupTapKeyboardDismiss()
+    }
+}
+
+extension PlanDetailViewController: UIScrollViewDelegate {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        print(#function, #line, "Path ")
+        startOffsetY = scrollView.contentOffset.y
     }
     
-    private func setupKeyboardDismissGestrue() {
-        setupPanKeyboardDismiss()
-        setupTapKeyboardDismiss()
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        print(#function, #line, "Path ")
+        startOffsetY = scrollView.contentOffset.y
     }
 }

@@ -79,7 +79,7 @@ class SignUpViewController: DefaultViewController, View {
         profileContainerView.snp.makeConstraints { make in
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
-            make.bottom.equalToSuperview().inset(UIScreen.getAdditionalBottomInset())
+            make.bottom.equalToSuperview().inset(UIScreen.getDefatulBottomInset())
         }
     }
     

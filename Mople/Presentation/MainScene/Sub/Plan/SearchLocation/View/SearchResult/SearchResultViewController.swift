@@ -19,9 +19,8 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
     private var isSearchHistory = false
     
     private lazy var countView: CountView = {
-        let view = CountView(title: "최근 검색",
-                             frame:.init(width: tableView.bounds.width,
-                                         height: 50))
+        let view = CountView(title: "최근 검색")
+        view.frame.size.height = 50
         return view
     }()
 

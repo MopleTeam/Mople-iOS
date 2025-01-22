@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol AuthFlowCoordinating {
+protocol AuthFlowCoordination: AnyObject {
     func pushSignUpView(_ socialInfo: SocialInfo)
     func presentMainFlow()
 }
 
-final class AuthSceneCoordinator: BaseCoordinator, AuthFlowCoordinating {
+final class AuthSceneCoordinator: BaseCoordinator, AuthFlowCoordination {
     
     private let dependencies: AUthSceneDependencies
     

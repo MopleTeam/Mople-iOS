@@ -123,7 +123,7 @@ extension MeetPlanListViewReactor {
     private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedPlan = currentState.plans[safe: index],
               let planId = selectedPlan.id else { return .empty() }
-        self.coordinator?.pushPlanDetailView(planId: planId)
+        self.coordinator?.pushPlanDetailView(postId: planId, type: .plan)
         return .empty()
     }
 }

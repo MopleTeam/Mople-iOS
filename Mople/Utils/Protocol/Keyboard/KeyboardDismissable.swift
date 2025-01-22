@@ -36,11 +36,9 @@ extension KeyboardDismissable where Self: UIViewController {
     private func gestureBind(gestrue: UIGestureRecognizer, targetState: UIGestureRecognizer.State) {
         gestrue.rx.event
             .asDriver()
-            .drive(with: self, onNext: { vc, gesture in
-                print(#function, #line, "#2 : \(gestrue.state)" )
-                if case gesture.state = targetState {
-                    vc.view.endEditing(true)
-                }
+            .filter({ $0.state == targetState })
+            .drive(with: self, onNext: { vc, _ in
+                vc.view.endEditing(true)
             })
             .disposed(by: disposeBag)
     }

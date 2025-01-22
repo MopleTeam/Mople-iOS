@@ -23,7 +23,7 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     private let fetchUseCase: FetchMeetList
-    private let coordinator: MeetListFlowCoordination
+    private weak var coordinator: MeetListFlowCoordination?
     var initialState: State = State()
     
     init(fetchUseCase: FetchMeetList,
@@ -75,7 +75,7 @@ extension MeetListViewReactor {
     private func presentMeetDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedGroup = currentState.meetList[safe: index],
               let id = selectedGroup.meetSummary?.id else { return .empty() }
-        coordinator.presentMeetDetailView(meetId: id)
+        coordinator?.presentMeetDetailView(meetId: id)
         return .empty()
     }
 }

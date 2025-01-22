@@ -11,6 +11,7 @@ import ReactorKit
 final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        case selectedReview(index: Int)
         case requestReviewList
     }
     
@@ -27,11 +28,14 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     var initialState: State = State()
     
     private let fetchReviewUseCase: FetchReviewList
+    private weak var coordinator: MeetDetailCoordination?
     private let meedId: Int
     
     init(fetchReviewUseCase: FetchReviewList,
+         coordinator: MeetDetailCoordination,
          meetID: Int) {
         self.fetchReviewUseCase = fetchReviewUseCase
+        self.coordinator = coordinator
         self.meedId = meetID
         logLifeCycle()
         action.onNext(.requestReviewList)
@@ -45,6 +49,8 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .requestReviewList:
             return fetchReviewList()
+        case let .selectedReview(index):
+            return presentReviewDetailView(index: index)
         }
     }
     
@@ -76,6 +82,13 @@ extension MeetReviewListViewReactor {
         return Observable.concat([loadingStart,
                                   fetchPlanList,
                                   loadingStop])
+    }
+    
+    private func presentReviewDetailView(index: Int) -> Observable<Mutation> {
+        guard let selectedReview = currentState.reviews[safe: index],
+              let reviewId = selectedReview.id else { return .empty() }
+        self.coordinator?.pushPlanDetailView(postId: reviewId, type: .review)
+        return .empty()
     }
 }
 

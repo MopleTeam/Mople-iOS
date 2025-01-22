@@ -20,13 +20,12 @@ final class MeetPlanListViewController: BaseViewController, View {
     private var userID = UserInfoStorage.shared.userInfo?.id
     private var parentReactor: MeetDetailViewReactor?
     
-    private lazy var countView: CountView = {
-        let view = CountView(title: "예정된 약속",
-                             frame: .init(width: tableView.bounds.width,
-                                          height: 64))
+    private let countView: CountView = {
+        let view = CountView(title: "예정된 약속")
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: ColorStyle.Gray._04)
         view.setSpacing(16)
+        view.frame.size.height = 64
         return view
     }()
     
@@ -65,7 +64,7 @@ final class MeetPlanListViewController: BaseViewController, View {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.tableHeaderView = countView
+        tableView.tableHeaderView = countView // 테이블뷰의 크기가 정해진 다음 할당해야 경고가 발생하지 않음
     }
     
     // MARK: - UI Setup

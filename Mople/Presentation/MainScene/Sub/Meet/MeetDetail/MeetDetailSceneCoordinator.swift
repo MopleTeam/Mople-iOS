@@ -10,7 +10,8 @@ import UIKit
 protocol MeetDetailCoordination: AnyObject {
     func swicthPlanListPage(isFuture: Bool)
     func pushMeetSetupView(meet: Meet)
-    func pushPlanDetailView(planId: Int)
+    func pushPlanDetailView(postId: Int,
+                            type: PlanDetailType)
     func popView()
     func endFlow()
 }
@@ -35,7 +36,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     
     private func setPageViews() {
         planListVC = dependencies.makeMeetPlanListViewController(coordinator: self)
-        reviewListVC = dependencies.makeMeetReviewListViewController()
+        reviewListVC = dependencies.makeMeetReviewListViewController(coordinator: self)
         self.detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
     }
     
@@ -76,8 +77,11 @@ extension MeetDetailSceneCoordinator {
 
 // MARK: - Push Flow
 extension MeetDetailSceneCoordinator {
-    func pushPlanDetailView(planId: Int) {
-        let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(planId: planId)
+    func pushPlanDetailView(postId: Int,
+                            type: PlanDetailType) {
+        print(#function, #line, "#55 : \(type) ")
+        let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
+                                                                                   type: type)
         self.start(coordinator: planDetailFlowCoordinator)
         self.navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
     }

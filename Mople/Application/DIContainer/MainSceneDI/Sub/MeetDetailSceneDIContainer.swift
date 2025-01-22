@@ -11,12 +11,13 @@ protocol MeetDetailSceneDependencies {
     // MARK: - View
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> DetailMeetViewController
     func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController
-    func makeMeetReviewListViewController() -> MeetReviewListViewController
+    func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetDetailCoordination) -> MeetSetupViewController
     
     // MARK: - Flow
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator
+    func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PlanDetailType) -> BaseCoordinator
 }
 
 final class MeetDetailSceneDIContainer: MeetDetailSceneDependencies {
@@ -96,13 +97,16 @@ extension MeetDetailSceneDIContainer {
     }
     
     // MARK: - 리뷰리스트 뷰
-    func makeMeetReviewListViewController() -> MeetReviewListViewController {
-        return MeetReviewListViewController(reactor: makeMeetReviewListViewReactor(),
-                                          parentReactor: mainReactor)
+    func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController {
+        return MeetReviewListViewController(
+            reactor: makeMeetReviewListViewReactor(coordinator: coordinator),
+            parentReactor: mainReactor
+        )
     }
     
-    private func makeMeetReviewListViewReactor() -> MeetReviewListViewReactor {
+    private func makeMeetReviewListViewReactor(coordinator: MeetDetailCoordination) -> MeetReviewListViewReactor {
         return .init(fetchReviewUseCase: makeFetchReviewListUsecase(),
+                     coordinator: coordinator,
                      meetID: meetId)
     }
     
@@ -111,11 +115,12 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeReviewRepo() -> ReviewQueryRepo {
-        return DefaultFetchReviewListRepo(networkService: appNetworkService)
+        return DefaultReviewQueryRepo(networkService: appNetworkService)
     }
     
     // MARK: - 모임 설정 뷰
-    func makeMeetSetupViewController(meet: Meet, coordinator: MeetDetailCoordination) -> MeetSetupViewController {
+    func makeMeetSetupViewController(meet: Meet,
+                                     coordinator: MeetDetailCoordination) -> MeetSetupViewController {
         return .init(title: "모임 설정",
                      reactor: makeMeetSetupViewReactor(meet: meet, coordinator: coordinator))
     }
@@ -126,7 +131,10 @@ extension MeetDetailSceneDIContainer {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(planId: Int) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(planId: planId)
+    func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PlanDetailType) -> BaseCoordinator {
+        print(#function, #line, "#55 : \(type) ")
+        return commonFactory.makePlanDetailCoordinator(postId: postId,
+                                                       type: type)
     }
 }

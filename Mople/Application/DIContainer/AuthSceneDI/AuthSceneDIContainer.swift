@@ -8,9 +8,9 @@
 import UIKit
 
 protocol AUthSceneDependencies {
-    func makeSignInViewController(coordinator: AuthFlowCoordinating) -> SignInViewController
+    func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController
     func makeSignUpViewController(socialInfo: SocialInfo,
-                                  coordinator: AuthFlowCoordinating) -> SignUpViewController
+                                  coordinator: AuthFlowCoordination) -> SignUpViewController
 }
 
 final class AuthSceneDIContainer: AUthSceneDependencies {
@@ -37,7 +37,7 @@ final class AuthSceneDIContainer: AUthSceneDependencies {
 // MARK: - Login
 extension AuthSceneDIContainer {
     
-    func makeSignInViewController(coordinator: AuthFlowCoordinating) -> SignInViewController {
+    func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController {
         let signInView = SignInViewController(reactor: makeSignInViewReacotr(coordinator: coordinator))
         setAppleLoginProvider(signInView)
         return signInView
@@ -48,7 +48,7 @@ extension AuthSceneDIContainer {
     }
     
     #warning("Mock")
-    private func makeSignInViewReacotr(coordinator: AuthFlowCoordinating) -> SignInViewReactor {
+    private func makeSignInViewReacotr(coordinator: AuthFlowCoordination) -> SignInViewReactor {
         return SignInViewReactor(signInUseCase: makeSignInUseCase(),
                                  fetchUserInfoUseCase: makeFetchUserInfoUseCase(),
                                  coordinator: coordinator)
@@ -64,7 +64,7 @@ extension AuthSceneDIContainer {
 // MARK: - Profile Setup
 extension AuthSceneDIContainer {
     func makeSignUpViewController(socialInfo: SocialInfo,
-                                  coordinator: AuthFlowCoordinating) -> SignUpViewController {
+                                  coordinator: AuthFlowCoordination) -> SignUpViewController {
         return SignUpViewController(
             profileSetupReactor: commonFactory
                 .makeProfileSetupReactor(profile: nil,
@@ -74,7 +74,7 @@ extension AuthSceneDIContainer {
     }
     
     private func makeSignUpReactor(socialInfo: SocialInfo,
-                                   coordinator: AuthFlowCoordinating) -> SignUpViewReactor {
+                                   coordinator: AuthFlowCoordination) -> SignUpViewReactor {
         return .init(imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
                      signUpUseCase: makeSignUpUseCase(socialInfo: socialInfo),
                      fetchUserInfo: makeFetchUserInfoUseCase(),
