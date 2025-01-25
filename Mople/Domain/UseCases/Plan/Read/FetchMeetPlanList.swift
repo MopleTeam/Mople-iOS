@@ -12,7 +12,8 @@ protocol FetchMeetPlanList {
 }
 
 final class FetchMeetPlanListUsecase: FetchMeetPlanList {
-    let meetPlanRepo: PlanQueryRepo
+    private let meetPlanRepo: PlanQueryRepo
+    private let userID = UserInfoStorage.shared.userInfo?.id
     
     init(meetPlanRepo: PlanQueryRepo) {
         self.meetPlanRepo = meetPlanRepo
@@ -22,6 +23,11 @@ final class FetchMeetPlanListUsecase: FetchMeetPlanList {
         return meetPlanRepo.fetchMeetPlanList(meetId)
             .map { $0.map { response in
                 response.toDomain() }
+            }
+            .map { $0.map { [weak self] plan in
+                var verifyPlan = plan
+                verifyPlan.verifyCreator(self?.userID)
+                return verifyPlan }
             }
     }
 }

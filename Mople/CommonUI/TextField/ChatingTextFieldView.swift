@@ -38,7 +38,7 @@ final class ChatingTextFieldView: UIView {
         sv.alignment = .center
         sv.distribution = .fill
         sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        sv.layoutMargins = .init(top: 16, left: 20, bottom: 0, right: 20)
         return sv
     }()
     
@@ -100,6 +100,10 @@ extension Reactive where Base: ChatingTextFieldView {
     
     var isResign: Binder<Bool> {
         return base.textField.rx.isResign
+    }
+    
+    var isEditMode: Observable<Bool> {
+        return base.textField.rx.isEditMode
     }
     
     var sendButtonTapped: Observable<String> {

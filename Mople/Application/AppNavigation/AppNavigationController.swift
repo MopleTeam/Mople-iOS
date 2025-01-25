@@ -19,7 +19,6 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
     // MARK: - Transition
     var presentTransition: AppTransition = .init(type: .present)
     var dismissTransition: AppTransition = .init(type: .dismiss)
-    
 
     init(type: NaviType = .sub) {
         self.type = type
@@ -39,6 +38,15 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
         self.navigationBar.isHidden = true
         guard type == .sub else { return }
         setupTransition()
+    }
+    
+    public func setupTransitionCompletion(transitionType: TransitionType, _ completion: (() -> Void)?) {
+        switch transitionType {
+        case .present:
+            presentTransition.setGestureCompletion(completion: completion)
+        case .dismiss:
+            dismissTransition.setGestureCompletion(completion: completion)
+        }
     }
 }
 

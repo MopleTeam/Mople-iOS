@@ -33,7 +33,6 @@ struct HomePlanCollectionCellViewModel {
 
 extension HomePlanCollectionCellViewModel {
     init(plan: Plan) {
-        print(#function, #line, "#5 : \(plan)" )
         self.title = plan.title
         self.meet = plan.meet
         self.date = plan.date

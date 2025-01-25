@@ -16,15 +16,14 @@ final class MeetPlanListViewController: BaseViewController, View {
     typealias Reactor = MeetPlanListViewReactor
     
     var disposeBag = DisposeBag()
-    
-    private var userID = UserInfoStorage.shared.userInfo?.id
+        
     private var parentReactor: MeetDetailViewReactor?
     
     private let countView: CountView = {
         let view = CountView(title: "예정된 약속")
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: ColorStyle.Gray._04)
-        view.setSpacing(16)
+        view.setBottomInset(16)
         view.frame.size.height = 64
         return view
     }()
@@ -116,14 +115,17 @@ final class MeetPlanListViewController: BaseViewController, View {
         
         responsePlans
             .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: MeetPlanTableCell.reuseIdentifier, cellType: MeetPlanTableCell.self)) { [weak self] index, item, cell in
-                
-                guard let self else { return }
+            .drive(self.tableView.rx.items(
+                cellIdentifier: MeetPlanTableCell.reuseIdentifier,
+                cellType: MeetPlanTableCell.self)
+            ) { index, item, cell in
 
-                cell.configure(viewModel: .init(plan: item), userID: self.userID)
+                cell.configure(viewModel: .init(plan: item))
+                cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
                 
                 cell.rx.completed
+                    .compactMap({ item.id })
                     .map { Reactor.Action.updateParticipants(id: $0,
                                                              isJoining: item.isParticipating) }
                     .bind(to: reactor.action)

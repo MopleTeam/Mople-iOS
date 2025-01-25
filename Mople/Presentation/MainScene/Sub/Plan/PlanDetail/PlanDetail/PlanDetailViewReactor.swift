@@ -8,9 +8,10 @@
 import Foundation
 import ReactorKit
 
-protocol CommentListDelegate {
+protocol CommentListDelegate: AnyObject {
+    func setStartOffsetY(_ offsetY: CGFloat)
     func commentListLoading(_ isLoading: Bool)
-    func createdComment()
+    func editComment(_ comment: String)
 }
 
 enum PlanDetailType {
@@ -23,9 +24,16 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         case loadPlanInfo(_ planId: Int)
         case loadReviewInfo(_ reviewId: Int)
+        case endFlow
+        
+        // CommentVC -> PlanVC
         case commentLoading(_ isLoading: Bool)
-        case createComment(_ comment: String)
-        case notifyCommentCreation
+        case editComment(_ comment: String)
+        case setStartOffsetY(_ offsetY: CGFloat)
+        
+        // PlanVC -> CommentVC
+        case writeComment(_ comment: String)
+        case notifyCancleEditComment
     }
     
     enum Mutation {
@@ -33,7 +41,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case notifyPlanInfoLoading(_ isLoading: Bool)
         case notifyCommentLoading(_ isLoading: Bool)
         case notifyMessage(_ message: String)
-        case createdComment
+        case editComment(_ comment: String?)
+        case updateStartOffsetY(_ offsetY: CGFloat)
     }
     
     struct State {
@@ -41,14 +50,15 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isLoading: Bool = false
         @Pulse var isCommentLoading: Bool = false
         @Pulse var message: String?
-        @Pulse var createdComment: Void?
+        @Pulse var editComment: String?
+        @Pulse var startOffsetY: CGFloat = .zero
     }
     
     private let fetchPlanDetailUsecase: FetchPlanDetail
     private let fetchReviewDetailUseCase: FetchReviewDetail
     private let postId: Int
     private weak var coordinator: PlanDetailCoordination?
-    private var commentListCommands: CommentListCommands?
+    private weak var commentListCommands: CommentListCommands?
     
     var initialState: State = State()
     
@@ -79,10 +89,17 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             return fetchReviewDetail(reviewId)
         case let .commentLoading(isLoad):
             return .just(.notifyCommentLoading(isLoad))
-        case let .createComment(comment):
-            return self.createComment(comment)
-        case .notifyCommentCreation:
-            return .just(.createdComment)
+        case let .writeComment(comment):
+            return self.writeComment(comment)
+        case let .editComment(comment):
+            return .just(.editComment(comment))
+        case .notifyCancleEditComment:
+            return cancleEditComment()
+        case let .setStartOffsetY(offsetY):
+            return .just(.updateStartOffsetY(offsetY))
+        case .endFlow:
+            self.coordinator?.endFlow()
+            return .empty()
         }
     }
     
@@ -99,8 +116,10 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             newState.message = message
         case let .notifyCommentLoading(isLoad):
             newState.isCommentLoading = isLoad
-        case .createdComment:
-            newState.createdComment = ()
+        case let .editComment(comment):
+            newState.editComment = comment
+        case let .updateStartOffsetY(offset):
+            newState.startOffsetY = offset
         }
         
         return newState
@@ -130,11 +149,7 @@ extension PlanDetailViewReactor {
             .observe(on: MainScheduler.instance)
             .do(onNext: { [weak self] in
                 guard !$0.images.isEmpty else { return }
-                self?.coordinator?.showPhotoView(imagePaths: ["https://picsum.photos/id/\(Int.random(in: 1...100))/200/300",
-                                                              "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300",
-                                                              "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300",
-                                                              "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300",
-                                                              "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"])
+                self?.commentListCommands?.addPhotoList(["https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"])
             })
             .map { Mutation.updatePlanInfo(.init(review: $0)) }
         
@@ -147,12 +162,18 @@ extension PlanDetailViewReactor {
 }
 
 extension PlanDetailViewReactor: CommentListDelegate  {
-    func createdComment() {
-        action.onNext(.notifyCommentCreation)
-    }
-
+    
     func commentListLoading(_ isLoading: Bool) {
+        print(#function, #line, "Path : # loading State \(isLoading) ")
         action.onNext(.commentLoading(isLoading))
+    }
+    
+    func editComment(_ comment: String) {
+        action.onNext(.editComment(comment))
+    }
+    
+    func setStartOffsetY(_ offsetY: CGFloat) {
+        action.onNext(.setStartOffsetY(offsetY))
     }
 }
 
@@ -161,8 +182,19 @@ extension PlanDetailViewReactor {
         self.commentListCommands = delegate
     }
     
-    private func createComment(_ comment: String) -> Observable<Mutation> {
-        self.commentListCommands?.createComment(comment: comment)
+    private func writeComment(_ comment: String) -> Observable<Mutation> {
+        Observable.just(comment)
+            .delay(.milliseconds(100), scheduler: MainScheduler.instance)
+            .do(onNext: { [weak self] comment in
+                self?.commentListCommands?.writeComment(comment: comment)
+            })
+            .flatMap { _ in
+                return Observable<Mutation>.empty()
+            }
+    }
+    
+    private func cancleEditComment() -> Observable<Mutation> {
+        self.commentListCommands?.cancleEditComment()
         return .empty()
     }
 }

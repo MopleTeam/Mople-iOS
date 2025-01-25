@@ -12,38 +12,21 @@ import ReactorKit
 
 final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
     
-    
     typealias Reactor = PlanDetailViewReactor
     
     var disposeBag = DisposeBag()
     
     // MARK: - Handle KeyboardEvent
+    var scrollView: UIScrollView? { commentListView?.tableView }
     var floatingView: UIView { chatingTextFieldView }
     var floatingViewBottom: Constraint?
-    var scrollView: UIScrollView { mainScrollView }
     var startOffsetY: CGFloat = .zero
     
     // MARK: - Observable
     private var loadingObserver: PublishSubject<Bool> = .init()
     
     // MARK: - UI Components
-    
-    private let mainScrollView: UIScrollView = {
-        let view = UIScrollView()
-        view.showsVerticalScrollIndicator = false
-        return view
-    }()
-    
-    private let contentView = UIView()
-    
     private let planInfoView = PlanInfoView()
-    
-    private(set) var photoContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = ColorStyle.Default.white
-        view.isHidden = true
-        return view
-    }()
     
     private(set) var commentContainer: UIView = {
         let view = UIView()
@@ -51,15 +34,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
         return view
     }()
     
-    private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [planInfoView, photoContainer, commentContainer])
-        sv.axis = .vertical
-        sv.spacing = 8
-        sv.alignment = .fill
-        sv.distribution = .fill
-        sv.backgroundColor = ColorStyle.BG.secondary
-        return sv
-    }()
+    public var commentListView: CommentListViewController?
     
     private let chatingTextFieldView: ChatingTextFieldView = {
         let chatingView = ChatingTextFieldView()
@@ -84,55 +59,43 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        print(#function, #line, "Path : # view will ")
         super.viewWillAppear(animated)
         setupKeyboardEvent()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
+        print(#function, #line, "Path : # view disappear ")
         super.viewDidDisappear(animated)
         removeKeyboardObserver()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.commentListView?.setHeaderView(planInfoView)
     }
     
     private func initalSetup() {
         setLayout()
         setNavi()
-        setScrollView()
         setupKeyboardDismissGestrue()
     }
     
     private func setLayout() {
-        self.view.addSubview(mainScrollView)
+        self.view.addSubview(commentContainer)
         self.view.addSubview(chatingTextFieldView)
-        mainScrollView.addSubview(contentView)
-        contentView.addSubview(mainStackView)
-    
-        mainScrollView.snp.makeConstraints { make in
+        
+        commentContainer.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview()
-//            adjustableViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-//                .inset(UIScreen.getDefatulBottomInset() + 56).constraint
         }
-        
-        contentView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(mainScrollView.contentLayoutGuide)
-            make.bottom.equalTo(mainScrollView.contentLayoutGuide)
-            make.width.equalTo(mainScrollView.frameLayoutGuide.snp.width)
-        }
-        
-        mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
+
         chatingTextFieldView.snp.makeConstraints { make in
-            make.top.equalTo(mainScrollView.snp.bottom)
+            make.top.equalTo(commentContainer.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             floatingViewBottom = make.bottom.equalTo(self.view.safeAreaLayoutGuide)
                 .inset(UIScreen.getDefatulBottomInset()).constraint
         }
-    }
-    
-    private func setScrollView() {
-        self.mainScrollView.delegate = self
     }
     
     private func setNavi() {
@@ -141,6 +104,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
 
     func bind(reactor: PlanDetailViewReactor) {
+        inputBind(reactor: reactor)
         outputBind(reactor: reactor)
         handleCommentCommand(reactor: reactor)
         handleParentChildLoading(reactor: reactor)
@@ -154,27 +118,32 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
             })
             .disposed(by: disposeBag)
     }
-    
-    public func showPhotoView() {
-        photoContainer.isHidden = false
-        self.photoContainer.snp.makeConstraints { make in
-            make.height.equalTo(207)
-        }
-    }
 }
 
 // MARK: - Handle Reactor
 extension PlanDetailViewController {
+    private func inputBind(reactor: Reactor) {
+//        self.chatingTextFieldView.rx.isEditMode
+//            .filter { [weak self] in
+//                $0 == false &&
+//            })
+//            .disposed(by: disposeBag)
+    }
+    
     private func outputBind(reactor: Reactor) {
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$planInfo))
-            .map({ $0.1 })
+        reactor.pulse(\.$planInfo)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, viewModel in
                 vc.planInfoView.configure(with: viewModel)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$startOffsetY)
+            .asDriver(onErrorJustReturn: .zero)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, offsetY in
+                vc.startOffsetY = offsetY
             })
             .disposed(by: disposeBag)
     }
@@ -185,20 +154,25 @@ extension PlanDetailViewController {
         
         [keyboardSended, buttonSended].forEach {
             $0.map { comment in
-                Reactor.Action.createComment(comment)
+                Reactor.Action.writeComment(comment)
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         }
         
-        reactor.pulse(\.$createdComment)
+        reactor.pulse(\.$editComment)
+            .skip(1)
             .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, task in
-                guard let _ = task else { return }
-                vc.chatingTextFieldView.rx.text.onNext(nil)
-                vc.mainScrollView.scrollToBottom(animated: false)
+            .drive(with: self, onNext: { vc, comment in
+                vc.setEditComment(comment)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setEditComment(_ comment: String?) {
+        let hasComment = comment != nil
+        chatingTextFieldView.rx.text.onNext(comment)
+        chatingTextFieldView.rx.isResign.onNext(!hasComment)
     }
     
     private func handleParentChildLoading(reactor: Reactor) {
@@ -217,12 +191,14 @@ extension PlanDetailViewController {
                                  reactor.pulse(\.$isCommentLoading))
         .skip(1)
         .filter { isPlanInfoLoaded, isCommentLoaded  in
-            isPlanInfoLoaded == false &&
-            isCommentLoaded == false
+            !isPlanInfoLoaded && !isCommentLoaded
         }
         .map { _ in false }
         .asDriver(onErrorJustReturn: false)
-        .drive(self.rx.isLoading)
+        .drive(with: self, onNext: { vc, _ in
+            vc.rx.isLoading.onNext(false)
+            vc.chatingTextFieldView.rx.text.onNext(nil)
+        })
         .disposed(by: disposeBag)
     }
 }
@@ -231,16 +207,13 @@ extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDele
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
     }
+    
+    func dismissCompletion() {
+        print(#function, #line)
+        guard self.reactor?.currentState.editComment != nil else { return }
+        self.reactor?.action.onNext(.notifyCancleEditComment)
+        self.chatingTextFieldView.rx.text.onNext(nil)
+    }
 }
 
-extension PlanDetailViewController: UIScrollViewDelegate {
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print(#function, #line, "Path ")
-        startOffsetY = scrollView.contentOffset.y
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        print(#function, #line, "Path ")
-        startOffsetY = scrollView.contentOffset.y
-    }
-}
+

@@ -8,7 +8,7 @@
 import UIKit
 
 final class AutoSizingTableView: UITableView {
-    
+
     override var intrinsicContentSize: CGSize {
         self.layoutIfNeeded()
         return self.contentSize

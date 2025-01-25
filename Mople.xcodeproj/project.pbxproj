@@ -120,9 +120,7 @@
 		525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD042CCB640000835312 /* KakaoSDKCommon */; };
 		525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD062CCB640000835312 /* KakaoSDKUser */; };
 		5268BA2B2D3EF892000C5F3A /* ChatingTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA2A2D3EF892000C5F3A /* ChatingTextFieldView.swift */; };
-		5268BA2E2D3F09FC000C5F3A /* PhotoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA2D2D3F09FC000C5F3A /* PhotoListViewController.swift */; };
 		5268BA312D3F0BAA000C5F3A /* PhotoCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA302D3F0BAA000C5F3A /* PhotoCollectionCell.swift */; };
-		5268BA332D3F1676000C5F3A /* PhotoListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA322D3F1676000C5F3A /* PhotoListViewReactor.swift */; };
 		5268BA382D3F71D0000C5F3A /* CommentCommandRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA372D3F71D0000C5F3A /* CommentCommandRepo.swift */; };
 		5268BA3A2D3F7321000C5F3A /* DefaultCommentCommandRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA392D3F7321000C5F3A /* DefaultCommentCommandRepo.swift */; };
 		5268BA3E2D3F7585000C5F3A /* DeleteComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268BA3D2D3F7585000C5F3A /* DeleteComment.swift */; };
@@ -190,6 +188,9 @@
 		529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */; };
 		529CCD5D2D326A070041CBB7 /* PlanInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD5C2D326A070041CBB7 /* PlanInfoView.swift */; };
 		529CCD5F2D3278E00041CBB7 /* PlanInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD5E2D3278E00041CBB7 /* PlanInfoViewModel.swift */; };
+		52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */; };
+		52A6A04F2D42CC520041CDE9 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04E2D42CC520041CDE9 /* PhotoCollectionViewCell.swift */; };
+		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
 		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
 		52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63A2C77655200DA2D75 /* AuthenticationRepo.swift */; };
 		52B6F63F2C77677700DA2D75 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */; };
@@ -446,9 +447,7 @@
 		525DFCFD2CCA13A900835312 /* PolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyViewController.swift; sourceTree = "<group>"; };
 		525DFCFF2CCA13B000835312 /* NotifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyViewController.swift; sourceTree = "<group>"; };
 		5268BA2A2D3EF892000C5F3A /* ChatingTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatingTextFieldView.swift; sourceTree = "<group>"; };
-		5268BA2D2D3F09FC000C5F3A /* PhotoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoListViewController.swift; sourceTree = "<group>"; };
 		5268BA302D3F0BAA000C5F3A /* PhotoCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionCell.swift; sourceTree = "<group>"; };
-		5268BA322D3F1676000C5F3A /* PhotoListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoListViewReactor.swift; sourceTree = "<group>"; };
 		5268BA372D3F71D0000C5F3A /* CommentCommandRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCommandRepo.swift; sourceTree = "<group>"; };
 		5268BA392D3F7321000C5F3A /* DefaultCommentCommandRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCommentCommandRepo.swift; sourceTree = "<group>"; };
 		5268BA3D2D3F7585000C5F3A /* DeleteComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteComment.swift; sourceTree = "<group>"; };
@@ -514,6 +513,9 @@
 		529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailViewReactor.swift; sourceTree = "<group>"; };
 		529CCD5C2D326A070041CBB7 /* PlanInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanInfoView.swift; sourceTree = "<group>"; };
 		529CCD5E2D3278E00041CBB7 /* PlanInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanInfoViewModel.swift; sourceTree = "<group>"; };
+		52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableHeader.swift; sourceTree = "<group>"; };
+		52A6A04E2D42CC520041CDE9 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
 		52B6F63A2C77655200DA2D75 /* AuthenticationRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationRepo.swift; sourceTree = "<group>"; };
 		52B6F63E2C77677700DA2D75 /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
@@ -1205,16 +1207,6 @@
 			path = PolicyView;
 			sourceTree = "<group>";
 		};
-		5268BA2C2D3F09E1000C5F3A /* PhotoListView */ = {
-			isa = PBXGroup;
-			children = (
-				5268BA322D3F1676000C5F3A /* PhotoListViewReactor.swift */,
-				5268BA2D2D3F09FC000C5F3A /* PhotoListViewController.swift */,
-				5268BA2F2D3F0BA1000C5F3A /* Cell */,
-			);
-			path = PhotoListView;
-			sourceTree = "<group>";
-		};
 		5268BA2F2D3F0BA1000C5F3A /* Cell */ = {
 			isa = PBXGroup;
 			children = (
@@ -1573,9 +1565,8 @@
 			children = (
 				529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */,
 				529CCD542D323FD10041CBB7 /* PlanDetail */,
-				5268BA2C2D3F09E1000C5F3A /* PhotoListView */,
 				52EC04B82D38C0D700000C99 /* CommentListView */,
-				529CCD5B2D3269F70041CBB7 /* PlanInfoView */,
+				52A6A0472D426B440041CDE9 /* PlanInfo */,
 			);
 			path = PlanDetail;
 			sourceTree = "<group>";
@@ -1589,21 +1580,47 @@
 			path = PlanDetail;
 			sourceTree = "<group>";
 		};
-		529CCD5B2D3269F70041CBB7 /* PlanInfoView */ = {
-			isa = PBXGroup;
-			children = (
-				529CCD5E2D3278E00041CBB7 /* PlanInfoViewModel.swift */,
-				529CCD5C2D326A070041CBB7 /* PlanInfoView.swift */,
-			);
-			path = PlanInfoView;
-			sourceTree = "<group>";
-		};
 		529D7B912CDE14BD00BE77BE /* Comment */ = {
 			isa = PBXGroup;
 			children = (
 				5285E6BC2CDA0BCA00B855CB /* Comment.swift */,
 			);
 			path = Comment;
+			sourceTree = "<group>";
+		};
+		52A6A0472D426B440041CDE9 /* PlanInfo */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD5E2D3278E00041CBB7 /* PlanInfoViewModel.swift */,
+				529CCD5C2D326A070041CBB7 /* PlanInfoView.swift */,
+			);
+			path = PlanInfo;
+			sourceTree = "<group>";
+		};
+		52A6A04B2D42A5DF0041CDE9 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
+		52A6A0502D42D4410041CDE9 /* CommentCell */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04BA2D38C10800000C99 /* CommentTableCell.swift */,
+				52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */,
+			);
+			path = CommentCell;
+			sourceTree = "<group>";
+		};
+		52A6A0512D42D4460041CDE9 /* PhotoContainerCell */ = {
+			isa = PBXGroup;
+			children = (
+				52A6A04E2D42CC520041CDE9 /* PhotoCollectionViewCell.swift */,
+				5268BA2F2D3F0BA1000C5F3A /* Cell */,
+			);
+			path = PhotoContainerCell;
 			sourceTree = "<group>";
 		};
 		52A7876F2D02666C00A633B3 /* MeetSelectView */ = {
@@ -2198,7 +2215,9 @@
 			children = (
 				52EC04C12D391B4700000C99 /* CommentListViewReactor.swift */,
 				52EC04BC2D38C13900000C99 /* CommentListViewController.swift */,
+				52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */,
 				52EC04B92D38C0ED00000C99 /* Cell */,
+				52A6A04B2D42A5DF0041CDE9 /* Header */,
 			);
 			path = CommentListView;
 			sourceTree = "<group>";
@@ -2206,8 +2225,8 @@
 		52EC04B92D38C0ED00000C99 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				52EC04BA2D38C10800000C99 /* CommentTableCell.swift */,
-				52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */,
+				52A6A0502D42D4410041CDE9 /* CommentCell */,
+				52A6A0512D42D4460041CDE9 /* PhotoContainerCell */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -2770,6 +2789,7 @@
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				52E8E4502CA3F2AA007A5447 /* ObservableType+Pairwise.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
+				52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */,
 				524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
@@ -2821,7 +2841,6 @@
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				5268BA3E2D3F7585000C5F3A /* DeleteComment.swift in Sources */,
 				52CE87C92CEC3FED00EBD85D /* ImageUploadRepo.swift in Sources */,
-				5268BA2E2D3F09FC000C5F3A /* PhotoListViewController.swift in Sources */,
 				5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */,
 				52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */,
@@ -2888,6 +2907,7 @@
 				5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */,
 				52818C692D19462B0001E30B /* PlaceInfoResponse.swift in Sources */,
 				52E2382B2C7457DB0066C9A3 /* AppDIContainer.swift in Sources */,
+				52A6A04F2D42CC520041CDE9 /* PhotoCollectionViewCell.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				52EC04FE2D3E811000000C99 /* CommentTableCellModel.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* Kingfisher+LoadImage.swift in Sources */,
@@ -2912,7 +2932,6 @@
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
 				5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
-				5268BA332D3F1676000C5F3A /* PhotoListViewReactor.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */,
 				52EC04EC2D3E5B3100000C99 /* CommentQueryRepo.swift in Sources */,
@@ -2934,6 +2953,7 @@
 				52CE87C72CEC3F9200EBD85D /* MeetCommandRepo.swift in Sources */,
 				520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* AuthSceneCoordinator.swift in Sources */,
+				52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EC04C82D3BF05900000C99 /* ImageUploadMock.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* FCMTokenManager.swift in Sources */,

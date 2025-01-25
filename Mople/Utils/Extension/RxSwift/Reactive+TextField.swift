@@ -13,6 +13,8 @@ extension Reactive where Base: UITextField {
         return Binder(self.base) { textField, isResign in
             if isResign {
                 textField.resignFirstResponder()
+            } else {
+                textField.becomeFirstResponder()
             }
         }
     }

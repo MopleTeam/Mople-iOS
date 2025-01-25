@@ -125,12 +125,24 @@ final class MapInfoView: UIView {
     private func setLabel() {
         titleLable.text = place.title ?? "이름없음"
         addressLabel.text = place.roadAddress
-        setDistanceLabel(place.distance)
+        setDistanceLabel()
     }
     
-    private func setDistanceLabel(_ distance: Int?) {
-        guard let distance else { return }
-        distanceLabel.text = "\(distance)m"
+    private func setDistanceLabel() {
+        guard let distance = place.distance else { return }
+        
+        switch distance {
+        case ..<1000:
+            distanceLabel.text = "\(distance)m"
+        case 1000...:
+            let kilometers = Double(distance) / 1000
+            let rounded = round(kilometers * 10) / 10
+            let roundedDistance = Int(rounded)
+            distanceLabel.text = "\(roundedDistance)km"
+        default:
+            break
+        }
+        
     }
     
     private func setMapView() {

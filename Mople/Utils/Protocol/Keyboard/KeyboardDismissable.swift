@@ -13,10 +13,13 @@ protocol KeyboardDismissable {
     var tapGestureShouldCancelTouchesInView: Bool { get }
     func setupTapKeyboardDismiss()
     func setupPanKeyboardDismiss()
+    func dismissCompletion()
 }
 
 extension KeyboardDismissable where Self: UIViewController {
     var tapGestureShouldCancelTouchesInView: Bool { true }
+    
+    func dismissCompletion() { }
     
     func setupTapKeyboardDismiss() {
         let backgroundTapGesture = UITapGestureRecognizer()
@@ -39,6 +42,7 @@ extension KeyboardDismissable where Self: UIViewController {
             .filter({ $0.state == targetState })
             .drive(with: self, onNext: { vc, _ in
                 vc.view.endEditing(true)
+                vc.dismissCompletion()
             })
             .disposed(by: disposeBag)
     }

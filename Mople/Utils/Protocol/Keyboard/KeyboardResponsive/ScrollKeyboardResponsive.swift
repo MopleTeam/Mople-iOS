@@ -8,13 +8,14 @@
 import UIKit
 
 protocol ScrollKeyboardResponsive: KeyboardResponsive {
-    var scrollView: UIScrollView { get }
+    var scrollView: UIScrollView? { get }
     var startOffsetY: CGFloat { get set }
 }
 
 extension ScrollKeyboardResponsive where Self: UIViewController {
     private var isScroll: Bool {
-        scrollView.bounds.height < scrollView.contentSize.height
+        guard let scrollView else { return false }
+        return scrollView.bounds.height < scrollView.contentSize.height
     }
     
     func setupKeyboardEvent() {
@@ -36,32 +37,40 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
     }
     
     private func handleKeyboardShow(_ sender: Notification) {
+        print(#function, #line, "Path : # isScroll \(isScroll) ")
         let currentScrollState = isScroll
-        
-        guard let keyBoardheight = getKeyboardHeight(from: sender),
+        guard let keyboardHeight = getKeyboardHeight(from: sender),
               let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
 
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
-            self?.floatingViewBottom?.update(inset: keyBoardheight)
+            self?.floatingViewBottom?.update(inset: keyboardHeight)
         }
-            
-        guard currentScrollState else { return }
-        startOffsetY = scrollView.contentOffset.y
-        scrollView.contentOffset.y += keyBoardheight
+        print(#function, #line, "Path : # isScroll \(isScroll) ")
+
+        handleContentOffset(isScroll: currentScrollState,
+                            keyboardHeight: keyboardHeight)
     }
 
     private func handleKeyboardHide(_ sender: Notification) {
         guard let duration = getKeyboardDuration(from: sender),
-              let animation = getKeyboardAnimation(from: sender) else { return }
-
+              let animation = getKeyboardAnimation(from: sender),
+              let scrollView else { return }
+        
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
             guard let self else { return }
             self.floatingViewBottom?.update(inset: UIScreen.getDefatulBottomInset())
-            self.scrollView.contentOffset.y = self.startOffsetY
+            scrollView.contentOffset.y = self.startOffsetY
         }
+    }
+    
+    private func handleContentOffset(isScroll: Bool, keyboardHeight: CGFloat) {
+        guard isScroll,
+              let scrollView else { return }
+        startOffsetY = scrollView.contentOffset.y
+        scrollView.contentOffset.y += keyboardHeight
     }
     
     private func handleKeyboard(duration: CGFloat,

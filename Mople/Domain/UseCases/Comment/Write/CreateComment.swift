@@ -14,6 +14,7 @@ protocol CreateComment {
 final class CreateCommentUseCase: CreateComment {
     
     private let createCommentRepo: CommentCommandRepo
+    private let userId = UserInfoStorage.shared.userInfo?.id
     
     init(createCommentRepo: CommentCommandRepo) {
         self.createCommentRepo = createCommentRepo
@@ -25,6 +26,11 @@ final class CreateCommentUseCase: CreateComment {
             .createComment(postId: postId, comment: comment)
             .map { $0.map { reponse in
                 reponse.toDomain()}
+            }
+            .map { $0.map { [weak self] review in
+                var verifyReview = review
+                verifyReview.verifyWriter(self?.userId)
+                return verifyReview }
             }
     }
 }

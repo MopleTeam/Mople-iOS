@@ -63,7 +63,7 @@ final class CountView: UIView {
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalToSuperview().inset(0)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().inset(0)
         }
@@ -89,9 +89,9 @@ extension CountView {
         countLabel.textColor = textColor
     }
     
-    public func setSpacing(_ space: CGFloat) {
+    public func setBottomInset(_ inset: CGFloat) {
         mainStackView.snp.updateConstraints { make in
-            make.bottom.equalToSuperview().inset(space)
+            make.bottom.equalToSuperview().inset(inset)
         }
     }
 }

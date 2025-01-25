@@ -12,6 +12,21 @@ protocol TransformKeyboardResponsive: KeyboardResponsive {
 }
 
 extension TransformKeyboardResponsive where Self: UIViewController {
+    
+    var floatingViewFrame: CGRect {
+        containerView.convert(floatingView.frame,
+                              from: floatingView.superview)
+    }
+    
+    var adjustableViewFrame: CGRect {
+        containerView.convert(adjustableView.frame,
+                              from: adjustableView.superview)
+    }
+    
+    var overlapOffsetY: CGFloat {
+        adjustableViewFrame.maxY - floatingViewFrame.minY + threshold
+    }
+    
     func setupKeyboardEvent() {
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
                                                object: nil,
@@ -28,20 +43,6 @@ extension TransformKeyboardResponsive where Self: UIViewController {
     func removeKeyboardObserver() {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    private var floatingViewFrame: CGRect {
-        containerView.convert(floatingView.frame,
-                              from: floatingView.superview)
-    }
-    
-    private var adjustableViewFrame: CGRect {
-        containerView.convert(adjustableView.frame,
-                              from: adjustableView.superview)
-    }
-    
-    private var overlapOffsetY: CGFloat {
-        adjustableViewFrame.maxY - floatingViewFrame.minY + threshold
     }
     
     private func handleKeyboardShow(_ sender: Notification) {

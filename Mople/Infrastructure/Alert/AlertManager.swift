@@ -34,11 +34,14 @@ final class AlertManager {
         message: String = "",
         preferredStyle: UIAlertController.Style = .actionSheet,
         actions: [UIAlertAction],
+        cancleCompletion: ((UIAlertAction) -> Void)? = nil,
         completion: (() -> Void)? = nil
     ) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredStyle)
         actions.forEach { alert.addAction($0) }
-        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: { action in
+            cancleCompletion?(action)
+        }))
         currentVC?.present(alert, animated: true, completion: completion)
     }
 }

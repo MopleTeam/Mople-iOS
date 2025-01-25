@@ -7,12 +7,12 @@
 
 import UIKit
 
+enum TransitionType {
+    case present
+    case dismiss
+}
+
 final class AppTransition: NSObject {
-    
-    enum TransitionType {
-        case present
-        case dismiss
-    }
     
     // MARK: - Present, Dismiss 애니메이션 용도
     private var transitionContext: UIViewControllerContextTransitioning?
@@ -24,11 +24,16 @@ final class AppTransition: NSObject {
     private weak var currentView: UIView?
     private weak var viewController: UIViewController?
     private weak var previousViewController: UIViewController?
+    private var completion: (() -> Void)?
     
     // MARK: - LifeCycle
     init(type: TransitionType) {
         self.type = type
         super.init()
+    }
+    
+    public func setGestureCompletion(completion: (() -> Void)?) {
+        self.completion = completion
     }
 }
 
@@ -141,6 +146,7 @@ extension AppTransition: UIGestureRecognizerDelegate {
         }, completion: { [weak self] _ in
             currentView.removeFromSuperview()
             self?.viewController?.dismiss(animated: false)
+            self?.completion?()
         })
     }
     

@@ -23,7 +23,7 @@ final class MeetReviewListViewController: BaseViewController, View {
         let view = CountView(title: "지난 약속")
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: ColorStyle.Gray._04)
-        view.setSpacing(16)
+        view.setBottomInset(16)
         view.frame.size.height = 64
         return view
     }()

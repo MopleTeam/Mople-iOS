@@ -12,14 +12,13 @@ protocol PlanDetailSceneDependencies {
     func makePlanDetailViewController(type: PlanDetailType,
                                       coordinator: PlanDetailCoordination) -> PlanDetailViewController
     func makeCommentListViewController() -> CommentListViewController
-    func makePhotoListViewController(imagePaths: [String]) -> PhotoListViewController
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     
     private let appNetworkService: AppNetworkService
-    private let postId: Int
     private var mainReactor: PlanDetailViewReactor?
+    private let postId: Int
     
     init(appNetworkService: AppNetworkService,
          postId: Int) {
@@ -68,18 +67,7 @@ extension PlanDetailSceneDIContainer {
     private func makeFetchReviewDetailRepo() -> ReviewQueryRepo {
         return DefaultReviewQueryRepo(networkService: appNetworkService)
     }
-    
-    // MARK: - 포토뷰
-    func makePhotoListViewController(imagePaths: [String]) -> PhotoListViewController {
-        return .init(reactor: makePhotoListViewReactor(imagePaths: imagePaths))
-    }
-    
-    private func makePhotoListViewReactor(imagePaths: [String]) -> PhotoListViewReactor {
-        let reactor = PhotoListViewReactor(imagePaths: imagePaths)
-        return reactor
-    }
-    
-    
+
     // MARK: - 댓글뷰
     func makeCommentListViewController() -> CommentListViewController {
         return .init(reactor: makeCommentListViewReactor())

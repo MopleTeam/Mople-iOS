@@ -19,6 +19,12 @@ struct Plan: Hashable, Equatable {
     let meet: MeetSummary?
     let location: Location?
     let weather: Weather?
+    var isCreator: Bool = false
+    
+    var startOfDate: Date? {
+        guard let date = date else { return nil }
+        return DateManager.startOfDay(date)
+    }
     
     static func < (lhs: Plan, rhs: Plan) -> Bool {
         guard let lhsDate = lhs.date,
@@ -29,9 +35,10 @@ struct Plan: Hashable, Equatable {
 }
 
 extension Plan {
-    var startOfDate: Date? {
-        guard let date = date else { return nil }
-        return DateManager.startOfDay(date)
+    mutating func verifyCreator(_ userId: Int?) {
+        guard let creatorId,
+              let userId else { return }
+        isCreator = creatorId == userId
     }
 }
 

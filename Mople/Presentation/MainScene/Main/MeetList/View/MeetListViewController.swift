@@ -28,10 +28,9 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         table.separatorStyle = .none
         table.backgroundColor = ColorStyle.BG.primary
         table.showsVerticalScrollIndicator = false
-        table.tableHeaderView = .init(frame: .init(x: 0,
-                                                   y: 0,
-                                                   width: table.bounds.width,
-                                                   height: 28))
+        table.tableHeaderView = .init(frame: .init(origin: .zero,
+                                                   size: .init(width: 0,
+                                                               height: 28)))
         table.clipsToBounds = true
         return table
     }()
@@ -130,6 +129,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
             .disposed(by: disposeBag)
     }
 }
+
 
 
 

@@ -96,4 +96,8 @@ extension Reactive where Base: SearchNaviBar {
     var backEvent: ControlEvent<Void> {
         base.backButton.rx.controlEvent(.touchUpInside)
     }
+    
+    var isEditMode: Observable<Bool> {
+        return base.searchTextField.rx.isEditMode
+    }
 }

@@ -114,6 +114,16 @@ class SearchPlaceViewController: SearchNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        searchBar.rx.isEditMode
+            .filter { [weak self] isEdit in
+                guard let self else { return false }
+                let isActiveDetailView = !self.detailPlaceContainer.isHidden
+                return isActiveDetailView && isEdit
+            }
+            .map({ _ in Reactor.Action.endProcess })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)

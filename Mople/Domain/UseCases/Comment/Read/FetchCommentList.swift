@@ -14,6 +14,7 @@ protocol FetchCommentList {
 final class FetchCommentListUseCase: FetchCommentList {
     
     private let fetchCommentListRepo: CommentQueryRepo
+    private let userId = UserInfoStorage.shared.userInfo?.id
     
     init(fetchCommentListRepo: CommentQueryRepo) {
         self.fetchCommentListRepo = fetchCommentListRepo
@@ -23,6 +24,11 @@ final class FetchCommentListUseCase: FetchCommentList {
         fetchCommentListRepo.fetchCommentList(postId: postId)
             .map { $0.map { response in
                 response.toDomain() }
+            }
+            .map { $0.map { [weak self] review in
+                var verifyReview = review
+                verifyReview.verifyWriter(self?.userId)
+                return verifyReview }
             }
     }
 }

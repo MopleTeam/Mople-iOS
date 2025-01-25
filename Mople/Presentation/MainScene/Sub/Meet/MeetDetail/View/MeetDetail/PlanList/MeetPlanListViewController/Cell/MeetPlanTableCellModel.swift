@@ -15,6 +15,7 @@ struct MeetPlanTableCellModel {
     let weather: Weather?
     let postUserID: Int?
     let isParticipant: Bool?
+    let isCreator: Bool
     
     var dateString: String? {
         return DateManager.toString(date: date, format: .dot)
@@ -36,5 +37,6 @@ extension MeetPlanTableCellModel {
         self.weather = plan.weather
         self.isParticipant = plan.isParticipating
         self.postUserID = plan.creatorId
+        self.isCreator = plan.isCreator
     }
 }

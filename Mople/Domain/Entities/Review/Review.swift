@@ -18,4 +18,13 @@ struct Review {
     var images: [String]
     var meet: MeetSummary?
     var location: Location?
+    var isCreator: Bool = false
+}
+
+extension Review {
+    mutating func verifyCreator(_ userId: Int?) {
+        guard let creatorId,
+              let userId else { return }
+        isCreator = creatorId == userId
+    }
 }

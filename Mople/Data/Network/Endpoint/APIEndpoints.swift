@@ -288,7 +288,7 @@ extension APIEndpoints {
     static func editComment(postId: Int,
                             commentId: Int,
                             comment: String) throws -> Endpoint<[CommentResponse]> {
-        return try Endpoint(path: "comment/\(commentId)",
+        return try Endpoint(path: "comment/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),

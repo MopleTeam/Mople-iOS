@@ -7,7 +7,6 @@
 
 import UIKit
 import RxSwift
-import RxRelay
 import RxCocoa
 import SnapKit
 
@@ -138,37 +137,34 @@ final class MeetPlanTableCell: UITableViewCell {
         }
     }
 
-    public func configure(viewModel: MeetPlanTableCellModel, userID: Int?) {
+    public func configure(viewModel: MeetPlanTableCellModel) {
         self.planId = viewModel.id
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.weatherView.configure(with: .init(weather: viewModel.weather))
-        self.resolveUserView(userID: userID,
-                             postUserID: viewModel.postUserID,
+        self.resolveUserView(isCreator: viewModel.isCreator,
                              isParticipant: viewModel.isParticipant,
                              planDate: viewModel.date)
     }
     
-    private func resolveUserView(userID: Int?,
-                                 postUserID: Int?,
+    private func resolveUserView(isCreator: Bool,
                                  isParticipant: Bool?,
                                  planDate: Date?) {
-        let isPostUser = userID == postUserID
-        handleTitlePostIcon(isPostUser: isPostUser)
-        handleCompletdButton(isPostUser: isPostUser,
+        handleTitlePostIcon(isCreator: isCreator)
+        handleCompletdButton(isCreator: isCreator,
                              isParticipant: isParticipant,
                              planDate: planDate)
     }
     
-    private func handleTitlePostIcon(isPostUser: Bool) {
-        self.titleLabel.hideIcon(isHide: !isPostUser)
+    private func handleTitlePostIcon(isCreator: Bool) {
+        self.titleLabel.hideIcon(isHide: !isCreator)
     }
     
-    private func handleCompletdButton(isPostUser: Bool,
+    private func handleCompletdButton(isCreator: Bool,
                                       isParticipant: Bool?,
                                       planDate: Date?) {
-        guard isPostUser == false,
+        guard isCreator == false,
               let isParticipant,
               let planDate else { return  removeCompletionButton() }
                 
@@ -213,11 +209,9 @@ extension MeetPlanTableCell {
 }
 
 extension Reactive where Base: MeetPlanTableCell {
-    var completed: Observable<Int> {
+    var completed: ControlEvent<Void> {
                 
         return base.completdButton.rx.controlEvent(.touchUpInside)
-            .compactMap { base.planId }
-            .debug("joining")
     }
 }
 

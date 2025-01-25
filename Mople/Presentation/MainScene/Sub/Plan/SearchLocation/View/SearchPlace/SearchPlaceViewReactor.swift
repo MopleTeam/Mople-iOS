@@ -131,7 +131,7 @@ extension SearchPlaceViewReactor {
             .filter { [weak self] _ in self?.currentState.isLoading == true }
         
         let location = locationService.updateLocation()
-                .timeout(.seconds(10), scheduler: MainScheduler.instance)
+                .timeout(.seconds(5), scheduler: MainScheduler.instance)
                 .map { Mutation.setUserLocation($0) }
                 .catchAndReturn(Mutation.setUserLocation(nil))
                 .concat(loadingEnd)
@@ -155,8 +155,8 @@ extension SearchPlaceViewReactor {
         let userLocation = currentState.userLocation
         #warning("에러 처리")
         let requestSearch = searchUseCase.execute(query: query,
-                                                                x: userLocation?.longitude,
-                                                                y: userLocation?.latitude)
+                                                  x: userLocation?.longitude,
+                                                  y: userLocation?.latitude)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .filter({ [weak self] response in
@@ -176,7 +176,12 @@ extension SearchPlaceViewReactor {
     private func showDetailPlcae(index: Int) -> Observable<Mutation> {
         guard let result = currentState.searchResult,
               result.places.count > index,
-              let selectedPlace = result.places[safe: index] else { return .empty() }
+              var selectedPlace = result.places[safe: index] else { return .empty() }
+        
+        if result.isCached {
+            cachedPlaceUpdateDistance(place: &selectedPlace)
+        }
+        
         coordinator?.showDetailPlaceView(place: selectedPlace)
         queryStorage.addPlace(selectedPlace)
         return Observable.just(()) // 화면 전환이 되기 전 검색어 업데이트 방지
@@ -196,6 +201,11 @@ extension SearchPlaceViewReactor {
         
         queryStorage.deletePlace(deletedHisotry)
         return fetchCahcedPlace()
+    }
+    
+    private func cachedPlaceUpdateDistance(place: inout PlaceInfo) {
+        guard let userLocation = self.currentState.userLocation else { return }
+        place.updateDistance(userLocation: userLocation)
     }
 }
 
