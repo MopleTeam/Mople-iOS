@@ -9,15 +9,13 @@ import UIKit
 
 protocol ScrollKeyboardResponsive: KeyboardResponsive {
     var scrollView: UIScrollView? { get }
+    var scrollViewHeight: CGFloat? { get set }
     var startOffsetY: CGFloat { get set }
+    var remainingOffsetY: CGFloat { get set }
 }
 
 extension ScrollKeyboardResponsive where Self: UIViewController {
-    private var isScroll: Bool {
-        guard let scrollView else { return false }
-        return scrollView.bounds.height < scrollView.contentSize.height
-    }
-    
+ 
     func setupKeyboardEvent() {
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
                                                object: nil,
@@ -37,20 +35,15 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
     }
     
     private func handleKeyboardShow(_ sender: Notification) {
-        print(#function, #line, "Path : # isScroll \(isScroll) ")
-        let currentScrollState = isScroll
-        guard let keyboardHeight = getKeyboardHeight(from: sender),
+        guard let height = getKeyboardHeight(from: sender),
               let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
-
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
-            self?.floatingViewBottom?.update(inset: keyboardHeight)
+            self?.floatingViewBottom?.update(inset: height)
         }
-        print(#function, #line, "Path : # isScroll \(isScroll) ")
-
-        handleContentOffset(isScroll: currentScrollState,
-                            keyboardHeight: keyboardHeight)
+        handleContentOffsetY(height)
+        setKeyboardHeight(height)
     }
 
     private func handleKeyboardHide(_ sender: Notification) {
@@ -58,6 +51,7 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
               let animation = getKeyboardAnimation(from: sender),
               let scrollView else { return }
         
+        keyboardHeight = nil
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
             guard let self else { return }
@@ -65,14 +59,7 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
             scrollView.contentOffset.y = self.startOffsetY
         }
     }
-    
-    private func handleContentOffset(isScroll: Bool, keyboardHeight: CGFloat) {
-        guard isScroll,
-              let scrollView else { return }
-        startOffsetY = scrollView.contentOffset.y
-        scrollView.contentOffset.y += keyboardHeight
-    }
-    
+
     private func handleKeyboard(duration: CGFloat,
                                 option: UIView.AnimationOptions,
                                 animation: @escaping (() -> Void)) {
@@ -87,5 +74,48 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
                 self.view.layoutIfNeeded()
             }
         )
+    }
+}
+
+extension ScrollKeyboardResponsive where Self: UIViewController {
+    private var isScroll: Bool {
+        guard let scrollView,
+              let scrollViewHeight else { return false }
+        return scrollViewHeight < scrollView.contentSize.height
+    }
+    
+    private func handleContentOffsetY(_ height: CGFloat) {
+        guard isScroll,
+              let scrollView else { return }
+        
+        if keyboardHeight == nil {
+            startOffsetY = scrollView.contentOffset.y
+            scrollView.contentOffset.y += height
+        } else {
+            let diffOffsetY = getKeyboardHeightDiff(height)
+            self.setRemaingOffsetY(scrollView: scrollView,
+                                   offsetY: diffOffsetY)
+            self.setContentOffsetY(scrollView: scrollView,
+                                   offsetY: diffOffsetY)
+        }
+    }
+    
+    private func setContentOffsetY(scrollView: UIScrollView,
+                                   offsetY: CGFloat) {
+        if scrollView.isBottom() {
+            scrollView.contentOffset.y += remainingOffsetY
+        } else {
+            scrollView.contentOffset.y += offsetY
+        }
+    }
+    
+    private func setRemaingOffsetY(scrollView: UIScrollView,
+                                   offsetY: CGFloat) {
+        guard offsetY > 0 else { return }
+        let contentHeight = scrollView.contentSize.height
+        let maxY = scrollView.contentOffsetMaxY
+        let calculateOffsetY = contentHeight - maxY
+        remainingOffsetY = calculateOffsetY.truncatingRemainder(dividingBy: offsetY)
+        remainingOffsetY.negate()
     }
 }

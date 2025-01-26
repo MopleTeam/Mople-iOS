@@ -9,6 +9,7 @@ import UIKit
 
 protocol TransformKeyboardResponsive: KeyboardResponsive {
     var adjustableView: UIView { get }
+    var overlapOffsetY: CGFloat? { get set }
 }
 
 extension TransformKeyboardResponsive where Self: UIViewController {
@@ -23,7 +24,7 @@ extension TransformKeyboardResponsive where Self: UIViewController {
                               from: adjustableView.superview)
     }
     
-    var overlapOffsetY: CGFloat {
+    var calculateOverlap: CGFloat {
         adjustableViewFrame.maxY - floatingViewFrame.minY + threshold
     }
     
@@ -46,43 +47,26 @@ extension TransformKeyboardResponsive where Self: UIViewController {
     }
     
     private func handleKeyboardShow(_ sender: Notification) {
-        guard let keyBoardheight = getKeyboardHeight(from: sender),
+        guard let height = getKeyboardHeight(from: sender),
               let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
-        
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
-            self?.floatingViewBottom?.update(inset: keyBoardheight)
+            self?.floatingViewBottom?.update(inset: height)
         }
-        handleOverlab(isRespon: true)
+        handleOverlab(height: height)
+        setKeyboardHeight(height)
     }
 
     private func handleKeyboardHide(_ sender: Notification) {
         guard let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
+        keyboardHeight = nil
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
             self?.floatingViewBottom?.update(inset: UIScreen.getDefatulBottomInset())
-            self?.handleOverlab(isRespon: false)
+            self?.resetScrollViewTransform()
         }
-    }
-    
-    private func handleOverlab(isRespon: Bool) {
-        if isRespon {
-            adjustScrollViewTransform()
-        } else {
-            resetScrollViewTransform()
-        }
-    }
-    
-    private func adjustScrollViewTransform() {
-        guard overlapOffsetY > 0 else { return }
-        adjustableView.transform = CGAffineTransform(translationX: 0, y: -overlapOffsetY)
-    }
-    
-    private func resetScrollViewTransform() {
-        guard !adjustableView.transform.isIdentity else { return }
-        self.adjustableView.transform = .identity
     }
     
     private func handleKeyboard(duration: CGFloat,
@@ -97,5 +81,39 @@ extension TransformKeyboardResponsive where Self: UIViewController {
                 self.view.layoutIfNeeded()
             }
         )
+    }
+}
+
+extension TransformKeyboardResponsive where Self: UIViewController {
+    private func handleOverlab(height : CGFloat) {
+        if overlapOffsetY == nil {
+            setTransform()
+        } else {
+            handleKeyboardHeight(height)
+        }
+    }
+    
+    private func setTransform() {
+        guard calculateOverlap > 0 else { return }
+        overlapOffsetY = -calculateOverlap
+        adjustableView.transform = CGAffineTransform(translationX: 0, y: -calculateOverlap)
+    }
+    
+    private func handleKeyboardHeight(_ height: CGFloat) {
+        guard let overlapOffsetY else { return }
+        let diffOffsetY = getKeyboardHeightDiff(height)
+        
+        if diffOffsetY > 0 {
+            let calculateOverlapOffsetY : CGFloat = overlapOffsetY - diffOffsetY
+            adjustableView.transform = CGAffineTransform(translationX: 0,
+                                                         y: calculateOverlapOffsetY)
+        } else {
+            adjustableView.transform = CGAffineTransform(translationX: 0, y: overlapOffsetY)
+        }
+    }
+    
+    private func resetScrollViewTransform() {
+        guard !adjustableView.transform.isIdentity else { return }
+        self.adjustableView.transform = .identity
     }
 }

@@ -112,7 +112,7 @@ final class CommentTableCell: UITableViewCell {
         self.contentView.addSubview(borderView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(20)
+            make.edges.equalToSuperview().inset(20).priority(.high)
         }
         
         profileView.snp.makeConstraints { make in

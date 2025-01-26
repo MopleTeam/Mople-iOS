@@ -17,10 +17,14 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     var disposeBag = DisposeBag()
     
     // MARK: - Handle KeyboardEvent
+    var keyboardHeight: CGFloat?
+    var keyboardHeightDiff: CGFloat?
     var scrollView: UIScrollView? { commentListView?.tableView }
+    var scrollViewHeight: CGFloat?
     var floatingView: UIView { chatingTextFieldView }
     var floatingViewBottom: Constraint?
     var startOffsetY: CGFloat = .zero
+    var remainingOffsetY: CGFloat = .zero
     
     // MARK: - Observable
     private var loadingObserver: PublishSubject<Bool> = .init()
@@ -54,6 +58,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.commentListView?.setHeaderView(planInfoView)
         initalSetup()
         setAction()
     }
@@ -72,7 +77,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.commentListView?.setHeaderView(planInfoView)
+        updateScrollViewHeight()
     }
     
     private func initalSetup() {
@@ -120,6 +125,14 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
 }
 
+// MARK: - Helper
+extension PlanDetailViewController {
+    private func updateScrollViewHeight() {
+        guard scrollViewHeight == nil else { return }
+        self.scrollViewHeight = commentContainer.bounds.height
+    }
+}
+
 // MARK: - Handle Reactor
 extension PlanDetailViewController {
     private func inputBind(reactor: Reactor) {
@@ -143,7 +156,7 @@ extension PlanDetailViewController {
             .asDriver(onErrorJustReturn: .zero)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, offsetY in
-                vc.startOffsetY = offsetY
+                vc.setStartOffsetY(offsetY)
             })
             .disposed(by: disposeBag)
     }
@@ -200,6 +213,13 @@ extension PlanDetailViewController {
             vc.chatingTextFieldView.rx.text.onNext(nil)
         })
         .disposed(by: disposeBag)
+    }
+}
+
+extension PlanDetailViewController {
+    private func setStartOffsetY(_ offsetY: CGFloat) {
+        guard let keyboardHeight else { return }
+        self.startOffsetY = offsetY - keyboardHeight
     }
 }
 

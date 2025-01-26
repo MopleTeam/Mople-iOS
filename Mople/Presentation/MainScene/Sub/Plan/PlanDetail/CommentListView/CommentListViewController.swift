@@ -177,6 +177,10 @@ extension CommentListViewController: UITableViewDelegate {
         return 68
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print(#function, #line, "offset test scroll : \(scrollView.contentOffset.y)" )
+    }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         reactor?.action.onNext(.notifyStartOffsetY(scrollView.contentOffset.y))
     }

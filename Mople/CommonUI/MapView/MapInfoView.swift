@@ -132,7 +132,7 @@ final class MapInfoView: UIView {
         guard let distance = place.distance else { return }
         
         switch distance {
-        case ..<1000:
+        case 1..<1000:
             distanceLabel.text = "\(distance)m"
         case 1000...:
             let kilometers = Double(distance) / 1000
@@ -140,9 +140,9 @@ final class MapInfoView: UIView {
             let roundedDistance = Int(rounded)
             distanceLabel.text = "\(roundedDistance)km"
         default:
+            distanceLabel.isHidden = true
             break
         }
-        
     }
     
     private func setMapView() {

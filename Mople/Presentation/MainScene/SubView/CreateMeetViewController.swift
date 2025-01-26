@@ -22,6 +22,9 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
     // MARK: - Handle KeyboardEvent
+    var keyboardHeight: CGFloat?
+    var keyboardHeightDiff: CGFloat?
+    var overlapOffsetY: CGFloat? 
     var adjustableView: UIView { self.mainStackView }
     var floatingView: UIView { self.completionButton }
     var floatingViewBottom: Constraint?

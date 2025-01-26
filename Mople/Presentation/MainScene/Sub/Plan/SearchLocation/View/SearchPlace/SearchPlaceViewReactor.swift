@@ -131,11 +131,11 @@ extension SearchPlaceViewReactor {
             .filter { [weak self] _ in self?.currentState.isLoading == true }
         
         let location = locationService.updateLocation()
-                .timeout(.seconds(5), scheduler: MainScheduler.instance)
-                .map { Mutation.setUserLocation($0) }
-                .catchAndReturn(Mutation.setUserLocation(nil))
-                .concat(loadingEnd)
-                .share()
+            .timeout(.seconds(5), scheduler: MainScheduler.instance)
+            .map { Mutation.setUserLocation($0) }
+            .catchAndReturn(Mutation.setUserLocation(nil))
+            .concat(loadingEnd)
+            .share()
         
         let loading = Observable.just(Mutation.notifyLoadingState(true))
             .delay(.milliseconds(500), scheduler: MainScheduler.instance)
@@ -177,11 +177,7 @@ extension SearchPlaceViewReactor {
         guard let result = currentState.searchResult,
               result.places.count > index,
               var selectedPlace = result.places[safe: index] else { return .empty() }
-        
-        if result.isCached {
-            cachedPlaceUpdateDistance(place: &selectedPlace)
-        }
-        
+        selectedPlace.updateDistance(userLocation: currentState.userLocation)
         coordinator?.showDetailPlaceView(place: selectedPlace)
         queryStorage.addPlace(selectedPlace)
         return Observable.just(()) // 화면 전환이 되기 전 검색어 업데이트 방지
@@ -201,11 +197,6 @@ extension SearchPlaceViewReactor {
         
         queryStorage.deletePlace(deletedHisotry)
         return fetchCahcedPlace()
-    }
-    
-    private func cachedPlaceUpdateDistance(place: inout PlaceInfo) {
-        guard let userLocation = self.currentState.userLocation else { return }
-        place.updateDistance(userLocation: userLocation)
     }
 }
 

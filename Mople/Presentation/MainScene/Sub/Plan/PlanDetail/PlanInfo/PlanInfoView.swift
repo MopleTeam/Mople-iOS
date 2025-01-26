@@ -18,7 +18,7 @@ final class PlanInfoView: UIView {
     
     private var location: Location?
     
-    private let height: CGFloat = 407
+    private let height: CGFloat = 399
 
     // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
@@ -114,7 +114,7 @@ final class PlanInfoView: UIView {
     init() {
         super.init(frame: .init(origin: .zero,
                                 size: .init(width: 0,
-                                            height: 399)))
+                                            height: height)))
         setLayout()
         setInfoLabel()
     }

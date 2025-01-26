@@ -11,13 +11,15 @@ import RxCocoa
 import SnapKit
 
 class TitleNaviViewController: DefaultViewController {
-
+    
     // MARK: - Variables
     public var titleViewBottom: ConstraintItem {
         return naviBar.snp.bottom
     }
-        
+    
     // MARK: - UI Components
+    private let superTopView = UIView()
+    
     private(set) var naviBar = TitleNaviBar()
 
     // MARK: - LifeCycle
@@ -37,18 +39,33 @@ class TitleNaviViewController: DefaultViewController {
     
     // MARK: - UI Setup
     private func initialsetup() {
-        setupUI()
+        setLayer()
         setNavigation()
+        setupUI()
     }
     
-    private func setupUI() {
+    private func setLayer() {
         self.view.backgroundColor = ColorStyle.Default.white
+        self.view.addSubview(superTopView)
         self.view.addSubview(naviBar)
+        
 
+        superTopView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(self.naviBar.snp.top)
+        }
+        
         naviBar.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide)
             make.horizontalEdges.equalToSuperview()
             make.height.equalTo(56)
+        }
+    }
+    
+    private func setupUI() {
+        [superTopView, naviBar].forEach {
+            $0.backgroundColor = ColorStyle.Default.white
+            $0.layer.zPosition = 1
         }
     }
     
