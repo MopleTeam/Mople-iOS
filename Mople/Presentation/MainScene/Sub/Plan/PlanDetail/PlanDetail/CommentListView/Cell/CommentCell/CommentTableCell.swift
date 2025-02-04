@@ -17,8 +17,8 @@ final class CommentTableCell: UITableViewCell {
     
     var menuTapped: (() -> Void)?
     
-    private let profileView: ParticipantImageView = {
-        let view = ParticipantImageView()
+    private let profileView: ProfileView = {
+        let view = ProfileView()
         view.setContentHuggingPriority(.required, for: .horizontal)
         view.setContentCompressionResistancePriority(.required, for: .horizontal)
         return view
@@ -104,6 +104,7 @@ final class CommentTableCell: UITableViewCell {
     override func prepareForReuse() {
         print(#function, #line, "셀 재사용" )
         super.prepareForReuse()
+        profileView.cancleImageLoad()
         borderView.isHidden = false
     }
     

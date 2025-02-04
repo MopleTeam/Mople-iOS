@@ -11,6 +11,8 @@ protocol CommonSceneFactory {
     func makeImageUploadUseCase() -> ImageUpload
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
+    func makeMemberListViewController(type: MemberListViewType,
+                                      coordinator: MemberListCoordination) -> MemberListViewController
     func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator
     func makePlanDetailCoordinator(postId: Int,
@@ -77,6 +79,21 @@ extension CommonDIContainer {
     
     private func makeCreateMeetRepo() -> MeetCommandRepo {
         return DefaultMeetCommandRepo(networkService: appNetworkService)
+    }
+    
+    // MARK: - 멤버 리스트 화면
+    func makeMemberListViewController(type: MemberListViewType,
+                                      coordinator: MemberListCoordination) -> MemberListViewController {
+        return MemberListViewController(title: "참여자 목록",
+                                        reactor: makeMemberListViewReactor(type: type,
+                                                                           coordinator: coordinator))
+    }
+    
+    private func makeMemberListViewReactor(type: MemberListViewType,
+                                           coordinator: MemberListCoordination) -> MemberListViewReactor {
+        return .init(type: type,
+                     fetchPlanMemberUseCase: FetchPlanMemberMock(),
+                     coordinator: coordinator)
     }
     
     // MARK: - 일정 생성 플로우

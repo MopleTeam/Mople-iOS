@@ -29,6 +29,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         }
         
         enum Flow {
+            case memberList
             case placeDetailView
             case editPlanView
             case endFlow
@@ -157,12 +158,14 @@ extension PlanDetailViewReactor {
     
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
-        case .endFlow:
-            coordinator?.endFlow()
+        case .memberList:
+            coordinator?.pushMemberListView()
+        case .placeDetailView:
+            coordinator?.pushPlaceDetailView(place: placeInfo!)
         case .editPlanView:
             coordinator?.presentPlanEditFlow(plan: plan!)
-        case .placeDetailView:
-            coordinator?.presentPlaceDetailView(place: placeInfo!)
+        case .endFlow:
+            coordinator?.endFlow()
         }
         
         return .empty()

@@ -12,11 +12,7 @@ import RxCocoa
 
 final class PlanInfoView: UIView {
     
-    typealias Reactor = PlanDetailViewReactor
-    
     // MARK: - Variables
-    var disposeBag = DisposeBag()
-    
     private var location: Location?
     
     private let height: CGFloat = 399
@@ -41,6 +37,7 @@ final class PlanInfoView: UIView {
     fileprivate let membersButton: UIButton = {
         let btn = UIButton()
         btn.setContentHuggingPriority(.required, for: .vertical)
+        btn.backgroundColor = .systemRed
         return btn
     }()
     
@@ -48,6 +45,7 @@ final class PlanInfoView: UIView {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 24, height: 24))
         label.setTitleTopPadding(4)
+        label.isUserInteractionEnabled = false
         return label
     }()
     
@@ -61,6 +59,7 @@ final class PlanInfoView: UIView {
         let label = IconLabel(icon: .date,
                               iconSize: .init(width: 24, height: 24))
         label.setTitleTopPadding(4)
+        label.backgroundColor = .systemBlue
         return label
     }()
     
@@ -68,6 +67,7 @@ final class PlanInfoView: UIView {
         let label = IconLabel(icon: .place,
                               iconSize: .init(width: 24, height: 24))
         label.setTitleTopPadding(4)
+        label.backgroundColor = .systemMint
         return label
     }()
 
@@ -164,6 +164,7 @@ final class PlanInfoView: UIView {
         selectImage.snp.makeConstraints { make in
             make.size.equalTo(20)
             make.leading.equalTo(countInfoLabel.snp.trailing).offset(4)
+            make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
         

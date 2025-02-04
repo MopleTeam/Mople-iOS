@@ -8,7 +8,8 @@
 import UIKit
 
 protocol PlanDetailCoordination: AnyObject {
-    func presentPlaceDetailView(place: PlaceInfo)
+    func pushMemberListView()
+    func pushPlaceDetailView(place: PlaceInfo)
     func presentPlanEditFlow(plan: Plan)
     func endFlow()
 }
@@ -49,15 +50,24 @@ extension PlanDetailFlowCoordinator {
     }
 }
 
+// MARK: - 멤버 리스트
+extension PlanDetailFlowCoordinator: MemberListCoordination {
+    func pushMemberListView() {
+        let view = dependencies.makeMemberListViewController(coordinator: self)
+        navigationController.pushViewController(view, animated: true)
+    }
+}
+
+// MARK: - 상세 지도
 extension PlanDetailFlowCoordinator: PlaceDetailCoordination {
-    func presentPlaceDetailView(place: PlaceInfo) {
+    func pushPlaceDetailView(place: PlaceInfo) {
         let view = dependencies.makePlaceDetailViewController(place: place,
                                                               coordinator: self)
         navigationController.pushViewController(view, animated: true)
     }
 }
 
-// MARK: - 일정 편집 플로우
+// MARK: - Present(플로우 전환)
 extension PlanDetailFlowCoordinator {
     func presentPlanEditFlow(plan: Plan) {
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
@@ -66,6 +76,7 @@ extension PlanDetailFlowCoordinator {
     }
 }
 
+// MARK: - 플로우 종료
 extension PlanDetailFlowCoordinator {
     func endFlow() {
         self.navigationController.dismiss(animated: true) { [weak self] in

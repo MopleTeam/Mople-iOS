@@ -143,6 +143,12 @@ extension PlanDetailViewController {
 // MARK: - Handle Reactor
 extension PlanDetailViewController {
     private func inputBind(reactor: Reactor) {
+        self.planInfoView.rx.memberTapped
+            .do(onNext: { _ in print(#function, #line, "멤버 버튼 탭" ) })
+            .map { Reactor.Action.flow(.memberList) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         self.planInfoView.rx.mapTapped
             .map { Reactor.Action.flow(.placeDetailView) }
             .bind(to: reactor.action)
@@ -254,12 +260,13 @@ extension PlanDetailViewController {
 }
 
 extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
+    var tapGestureShouldCancelTouchesInView: Bool { false }
+    
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
     }
     
     func dismissCompletion() {
-        print(#function, #line)
         guard self.reactor?.currentState.editComment != nil else { return }
         self.reactor?.action.onNext(.parentCommand(.cancleEditing))
         self.chatingTextFieldView.rx.text.onNext(nil)

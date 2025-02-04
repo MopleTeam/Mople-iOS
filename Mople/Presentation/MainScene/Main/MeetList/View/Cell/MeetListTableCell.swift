@@ -75,6 +75,7 @@ final class MeetListTableCell: UITableViewCell {
     }
 }
 
+#warning("모델로 분리")
 extension MeetListTableCell {
     private enum DateStatus {
         case past(_ days: Int)

@@ -17,6 +17,9 @@ protocol PlanDetailSceneDependencies {
     // MARK: - 이동 뷰
     func makePlaceDetailViewController(place: PlaceInfo,
                                        coordinator: PlaceDetailCoordination) -> PlaceDetailViewController
+    func makeMemberListViewController(coordinator: MemberListCoordination) -> MemberListViewController
+    
+    // MARK: - 이동 플로우
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
 }
 
@@ -124,7 +127,7 @@ extension PlanDetailSceneDIContainer {
 // MARK: - 이동 뷰
 extension PlanDetailSceneDIContainer {
     
-    // MARK: - View
+    // MARK: - 상세 지도
     func makePlaceDetailViewController(place: PlaceInfo,
                                        coordinator: PlaceDetailCoordination) -> PlaceDetailViewController {
         return PlaceDetailViewController(title: "상세 지도",
@@ -138,7 +141,15 @@ extension PlanDetailSceneDIContainer {
                                   coordinator: coordinator)
     }
     
-    // MARK: - Flow
+    // MARK: - 멤버 리스트
+    func makeMemberListViewController(coordinator: MemberListCoordination) -> MemberListViewController {
+        return commonFactory.makeMemberListViewController(type: .planMember(id: postId),
+                                                          coordinator: coordinator)
+    }
+}
+
+// MARK: - 이동 플로우
+extension PlanDetailSceneDIContainer {
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
         return commonFactory.makePlanCreateCoordinator(type: .edit(plan))
     }

@@ -202,7 +202,7 @@ extension CreatePlanViewReactor {
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
             .flatMap({ _ in Observable<Mutation>.empty() })
         
-        return withDeferredLoading(task: uploadPlan) { [weak self] in
+        return requestWithLoading(task: uploadPlan) { [weak self] in
             self?.coordinator?.endFlow()
         }
     }
@@ -214,14 +214,13 @@ extension CreatePlanViewReactor {
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
             .flatMap({ _ in Observable<Mutation>.empty() })
         
-        return withDeferredLoading(task: editPlan) { [weak self] in
+        return requestWithLoading(task: editPlan) { [weak self] in
             self?.coordinator?.endFlow()
         }
     }
     
-    /// 작업 완료 후 일정시간 뒤 로딩종료
-    private func withDeferredLoading(task: Observable<Mutation>,
-                                     completion: (() -> Void)? = nil) -> Observable<Mutation> {
+    private func requestWithLoading(task: Observable<Mutation>,
+                                    completion: (() -> Void)? = nil) -> Observable<Mutation> {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let loadingStop = Observable.just(())

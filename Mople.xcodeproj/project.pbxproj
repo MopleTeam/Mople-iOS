@@ -30,7 +30,7 @@
 		5211F9082C86F2DB00403980 /* HomePlanCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9072C86F2DB00403980 /* HomePlanCollectionCell.swift */; };
 		5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */; };
 		5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */; };
-		5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9122C89CEF800403980 /* ParticipantImageView.swift */; };
+		5211F9132C89CEF800403980 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9122C89CEF800403980 /* ProfileView.swift */; };
 		5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9142C89D56D00403980 /* UIView+Identifier.swift */; };
 		5211F91A2C89E39600403980 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5211F9192C89E39600403980 /* Kingfisher */; };
 		5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */; };
@@ -71,6 +71,17 @@
 		52266BFA2CBD474D007D03EB /* EditUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BF92CBD474D007D03EB /* EditUserInfo.swift */; };
 		52266BFC2CBD482F007D03EB /* EditUserInfoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52266BFB2CBD482F007D03EB /* EditUserInfoMock.swift */; };
 		5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */; };
+		522958322D51FFA200AE4EC3 /* FetchPlanMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958312D51FFA200AE4EC3 /* FetchPlanMember.swift */; };
+		522958352D52005200AE4EC3 /* MemberInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958342D52005200AE4EC3 /* MemberInfo.swift */; };
+		522958372D52005C00AE4EC3 /* PlanMemberList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958362D52005C00AE4EC3 /* PlanMemberList.swift */; };
+		5229583A2D52014C00AE4EC3 /* MemberInfoRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958392D52014C00AE4EC3 /* MemberInfoRepo.swift */; };
+		5229583C2D52022100AE4EC3 /* MemberInfoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5229583B2D52022100AE4EC3 /* MemberInfoMock.swift */; };
+		5229583E2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5229583D2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift */; };
+		522958402D52077800AE4EC3 /* MemberInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5229583F2D52077800AE4EC3 /* MemberInfoView.swift */; };
+		522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958432D5207C300AE4EC3 /* MemberListViewController.swift */; };
+		522958462D5207CE00AE4EC3 /* MemberListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */; };
+		522958492D52080900AE4EC3 /* MemberListTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958482D52080900AE4EC3 /* MemberListTableCell.swift */; };
+		5229584B2D52099500AE4EC3 /* MemberListTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5229584A2D52099500AE4EC3 /* MemberListTableCellModel.swift */; };
 		5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6802D41508A0028AF62 /* TransformKeyboardResponsive.swift */; };
 		5231B6832D4150C50028AF62 /* ScrollKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6822D4150C50028AF62 /* ScrollKeyboardResponsive.swift */; };
 		5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */; };
@@ -370,7 +381,7 @@
 		5211F9072C86F2DB00403980 /* HomePlanCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanCollectionCell.swift; sourceTree = "<group>"; };
 		5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AddChild.swift"; sourceTree = "<group>"; };
 		5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Snaping.swift"; sourceTree = "<group>"; };
-		5211F9122C89CEF800403980 /* ParticipantImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantImageView.swift; sourceTree = "<group>"; };
+		5211F9122C89CEF800403980 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		5211F9142C89D56D00403980 /* UIView+Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Identifier.swift"; sourceTree = "<group>"; };
 		5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanCollectionCellViewModel.swift; sourceTree = "<group>"; };
 		5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCell.swift; sourceTree = "<group>"; };
@@ -410,6 +421,17 @@
 		52266BF92CBD474D007D03EB /* EditUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserInfo.swift; sourceTree = "<group>"; };
 		52266BFB2CBD482F007D03EB /* EditUserInfoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserInfoMock.swift; sourceTree = "<group>"; };
 		5228A27E2CC10D22004956F7 /* DuplicateLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateLabel.swift; sourceTree = "<group>"; };
+		522958312D51FFA200AE4EC3 /* FetchPlanMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanMember.swift; sourceTree = "<group>"; };
+		522958342D52005200AE4EC3 /* MemberInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberInfo.swift; sourceTree = "<group>"; };
+		522958362D52005C00AE4EC3 /* PlanMemberList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanMemberList.swift; sourceTree = "<group>"; };
+		522958392D52014C00AE4EC3 /* MemberInfoRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberInfoRepo.swift; sourceTree = "<group>"; };
+		5229583B2D52022100AE4EC3 /* MemberInfoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberInfoMock.swift; sourceTree = "<group>"; };
+		5229583D2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanMemberListMock.swift; sourceTree = "<group>"; };
+		5229583F2D52077800AE4EC3 /* MemberInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberInfoView.swift; sourceTree = "<group>"; };
+		522958432D5207C300AE4EC3 /* MemberListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListViewController.swift; sourceTree = "<group>"; };
+		522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListViewReactor.swift; sourceTree = "<group>"; };
+		522958482D52080900AE4EC3 /* MemberListTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListTableCell.swift; sourceTree = "<group>"; };
+		5229584A2D52099500AE4EC3 /* MemberListTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListTableCellModel.swift; sourceTree = "<group>"; };
 		5231B6802D41508A0028AF62 /* TransformKeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformKeyboardResponsive.swift; sourceTree = "<group>"; };
 		5231B6822D4150C50028AF62 /* ScrollKeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollKeyboardResponsive.swift; sourceTree = "<group>"; };
 		5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAlertControl.swift; sourceTree = "<group>"; };
@@ -899,6 +921,7 @@
 				5214F8A72D2C418500E8CE9C /* PlaceMock.swift */,
 				5214F8BB2D2CA09200E8CE9C /* ReviewMock.swift */,
 				52EC04FB2D3E7A4F00000C99 /* CommentMock.swift */,
+				5229583B2D52022100AE4EC3 /* MemberInfoMock.swift */,
 			);
 			path = MockModel;
 			sourceTree = "<group>";
@@ -943,6 +966,59 @@
 				52F83A632D354565003DD790 /* ViewController */,
 			);
 			path = ViewController;
+			sourceTree = "<group>";
+		};
+		522958302D51FF6A00AE4EC3 /* Member */ = {
+			isa = PBXGroup;
+			children = (
+				522958312D51FFA200AE4EC3 /* FetchPlanMember.swift */,
+			);
+			path = Member;
+			sourceTree = "<group>";
+		};
+		522958332D52004600AE4EC3 /* Member */ = {
+			isa = PBXGroup;
+			children = (
+				522958342D52005200AE4EC3 /* MemberInfo.swift */,
+				522958362D52005C00AE4EC3 /* PlanMemberList.swift */,
+			);
+			path = Member;
+			sourceTree = "<group>";
+		};
+		522958382D5200DB00AE4EC3 /* Member */ = {
+			isa = PBXGroup;
+			children = (
+				522958392D52014C00AE4EC3 /* MemberInfoRepo.swift */,
+			);
+			path = Member;
+			sourceTree = "<group>";
+		};
+		522958412D5207A800AE4EC3 /* CreateMeetView */ = {
+			isa = PBXGroup;
+			children = (
+				521917572CEB088B00696292 /* CreateMeetViewReactor.swift */,
+				527DBE2E2CE8965A008BB20E /* CreateMeetViewController.swift */,
+			);
+			path = CreateMeetView;
+			sourceTree = "<group>";
+		};
+		522958422D5207B300AE4EC3 /* MemberListView */ = {
+			isa = PBXGroup;
+			children = (
+				522958472D5207EE00AE4EC3 /* Cell */,
+				522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */,
+				522958432D5207C300AE4EC3 /* MemberListViewController.swift */,
+			);
+			path = MemberListView;
+			sourceTree = "<group>";
+		};
+		522958472D5207EE00AE4EC3 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				522958482D52080900AE4EC3 /* MemberListTableCell.swift */,
+				5229584A2D52099500AE4EC3 /* MemberListTableCellModel.swift */,
+			);
+			path = Cell;
 			sourceTree = "<group>";
 		};
 		5231B67F2D41506B0028AF62 /* KeyboardResponsive */ = {
@@ -1126,7 +1202,8 @@
 				52741EC42D116A5600C249A6 /* Thumbnail */,
 				521091EB2D1021A500DD0407 /* Weather */,
 				5236452F2C8EE518009E0784 /* DefaultEmptyView.swift */,
-				5211F9122C89CEF800403980 /* ParticipantImageView.swift */,
+				5211F9122C89CEF800403980 /* ProfileView.swift */,
+				5229583F2D52077800AE4EC3 /* MemberInfoView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1334,6 +1411,7 @@
 			children = (
 				5214F89D2D2C403200E8CE9C /* MockModel */,
 				527A3E6B2C82CA8F007FE63B /* SignUpUseCaseMock.swift */,
+				5229583D2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift */,
 				52EBAF6A2D4D1ED50085727B /* SignInUseCaseMock.swift */,
 				523645362C8FFE9F009E0784 /* FetchRecentScheduleMock.swift */,
 				5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */,
@@ -1366,8 +1444,8 @@
 		527DBE2D2CE89360008BB20E /* SubView */ = {
 			isa = PBXGroup;
 			children = (
-				521917572CEB088B00696292 /* CreateMeetViewReactor.swift */,
-				527DBE2E2CE8965A008BB20E /* CreateMeetViewController.swift */,
+				522958422D5207B300AE4EC3 /* MemberListView */,
+				522958412D5207A800AE4EC3 /* CreateMeetView */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -1680,6 +1758,7 @@
 		52B6F63C2C77655C00DA2D75 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				522958382D5200DB00AE4EC3 /* Member */,
 				52EC04DD2D3E1E5900000C99 /* Auth */,
 				5231DF3F2D2F96B000D52529 /* Profile */,
 				5231DF412D2F96CF00D52529 /* Meet */,
@@ -2125,6 +2204,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				522958332D52004600AE4EC3 /* Member */,
 				529CCD442D3231430041CBB7 /* Review */,
 				529CCD432D32312A0041CBB7 /* Account */,
 				521091D82D0FA5F000DD0407 /* Meet */,
@@ -2169,6 +2249,7 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
+				522958302D51FF6A00AE4EC3 /* Member */,
 				5231DF602D2FBDC200D52529 /* Auth */,
 				5231DF612D2FBDCE00D52529 /* Profile */,
 				5231DF652D2FBE7200D52529 /* Meet */,
@@ -2405,7 +2486,6 @@
 			isa = PBXGroup;
 			children = (
 				526B985C2CEDBBF6002488C5 /* PlanCreate */,
-				52818C5C2D1804240001E30B /* SearchLocation */,
 				529CCD522D323FAF0041CBB7 /* PlanDetail */,
 			);
 			path = Plan;
@@ -2543,6 +2623,7 @@
 		52F83A682D354CC0003DD790 /* Sub */ = {
 			isa = PBXGroup;
 			children = (
+				52818C5C2D1804240001E30B /* SearchLocation */,
 				52EC04E62D3E2FAD00000C99 /* Meet */,
 				52EC04E52D3E2FA000000C99 /* Plan */,
 			);
@@ -2783,6 +2864,8 @@
 				52E238372C76530D0066C9A3 /* SignInViewReactor.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */,
 				52818C8A2D1C40D60001E30B /* SearchPlaceViewReactor.swift in Sources */,
+				522958372D52005C00AE4EC3 /* PlanMemberList.swift in Sources */,
+				522958322D51FFA200AE4EC3 /* FetchPlanMember.swift in Sources */,
 				52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */,
 				52E238482C7733320066C9A3 /* AppNetworkService.swift in Sources */,
 				5211F8F62C84234800403980 /* DefaultTabBarController.swift in Sources */,
@@ -2800,6 +2883,7 @@
 				52D864592D29FDBC000F8378 /* MeetDetailViewReactor.swift in Sources */,
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
+				5229583C2D52022100AE4EC3 /* MemberInfoMock.swift in Sources */,
 				52D864922D2BA2DF000F8378 /* CalendarPlanTableCellModel.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
@@ -2821,6 +2905,7 @@
 				5214F8C52D2CADD100E8CE9C /* MeetReviewTableCellModel.swift in Sources */,
 				52EC04C52D391BA100000C99 /* FetchCommentList.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
+				5229583E2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift in Sources */,
 				52D8645B2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
 				5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */,
@@ -2845,6 +2930,7 @@
 				5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */,
 				52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */,
 				52CE87CC2CEC40D000EBD85D /* CreateMeet.swift in Sources */,
+				5229583A2D52014C00AE4EC3 /* MemberInfoRepo.swift in Sources */,
 				52E0E80B2D30ED73002213FF /* DefaultReviewQueryRepo.swift in Sources */,
 				5259B01F2CA03F96006B2711 /* CalendarViewReactor.swift in Sources */,
 				52E238432C76E9B00066C9A3 /* AppFlowCoordinator.swift in Sources */,
@@ -2857,11 +2943,13 @@
 				52EA6E082CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift in Sources */,
 				526B985E2CEDBC03002488C5 /* CreatePlanViewController.swift in Sources */,
 				52EBAF6B2D4D1ED50085727B /* SignInUseCaseMock.swift in Sources */,
+				522958462D5207CE00AE4EC3 /* MemberListViewReactor.swift in Sources */,
 				5214F8A42D2C408900E8CE9C /* UserInfoMock.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoDTO.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultAuthenticationRepo.swift in Sources */,
 				52EC04BB2D38C10800000C99 /* CommentTableCell.swift in Sources */,
 				529CCD462D3232020041CBB7 /* FetchPlanDetail.swift in Sources */,
+				522958352D52005200AE4EC3 /* MemberInfo.swift in Sources */,
 				52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */,
 				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
 				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
@@ -2872,6 +2960,7 @@
 				5231DF342D2F2A1E00D52529 /* DefaultAlertControl.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
+				5229584B2D52099500AE4EC3 /* MemberListTableCellModel.swift in Sources */,
 				52EC04FC2D3E7A4F00000C99 /* CommentMock.swift in Sources */,
 				5226496A2D37946300E38029 /* MapView.swift in Sources */,
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,
@@ -2881,6 +2970,7 @@
 				52FE68622D5085C2009EC8EC /* PlaceDetailViewController.swift in Sources */,
 				525DFCF42CC8F54E00835312 /* NicknameManagerRepoMock.swift in Sources */,
 				5214F8B92D2C9FCB00E8CE9C /* Review.swift in Sources */,
+				522958402D52077800AE4EC3 /* MemberInfoView.swift in Sources */,
 				52741ECF2D14E00D00C249A6 /* PlanTimePickerViewController.swift in Sources */,
 				5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
@@ -2890,6 +2980,7 @@
 				52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */,
 				52EA6DFB2CF78F9D00EFD753 /* SocialInfo.swift in Sources */,
+				522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */,
 				5231DF4C2D2FA23000D52529 /* BaseRepositories.swift in Sources */,
@@ -2968,7 +3059,7 @@
 				52EC04E02D3E2AB800000C99 /* FetchReviewDetail.swift in Sources */,
 				52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */,
 				52D864522D29FC7D000F8378 /* MeetDetailFlowCoordinator.swift in Sources */,
-				5211F9132C89CEF800403980 /* ParticipantImageView.swift in Sources */,
+				5211F9132C89CEF800403980 /* ProfileView.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */,
 				52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */,
 				52F83A532D34F1CD003DD790 /* HomeFlowCoordinator.swift in Sources */,
@@ -3001,6 +3092,7 @@
 				52CE87C72CEC3F9200EBD85D /* MeetCommandRepo.swift in Sources */,
 				520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* AuthSceneCoordinator.swift in Sources */,
+				522958492D52080900AE4EC3 /* MemberListTableCell.swift in Sources */,
 				52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EC04C82D3BF05900000C99 /* ImageUploadMock.swift in Sources */,
