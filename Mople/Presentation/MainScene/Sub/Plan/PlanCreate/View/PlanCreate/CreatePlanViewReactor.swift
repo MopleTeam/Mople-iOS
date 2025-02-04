@@ -8,6 +8,11 @@
 import Foundation
 import ReactorKit
 
+enum PlanCreationType {
+    case create([MeetSummary])
+    case edit(Plan)
+}
+
 final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     
     enum DateError: Error {
@@ -41,7 +46,9 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         
         case setValue(SetValue)
         case flowAction(FlowAction)
-        case fetchMeetList(_ meets: [MeetSummary])
+        
+        case fetchPreviousPlan(Plan)
+        case fetchMeetList([MeetSummary])
         case requestPlanCreation
     }
     
@@ -55,8 +62,8 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         }
         
         case updateValue(UpdateValue)
+        case updatePreviousPlan(Plan)
         case updateMeetList(_ meets: [MeetSummary])
-        case responsePlanCreation(_ plan: Plan)
         case notifyLoadingState(_ isLoading: Bool)
         case notifyMessage(_ message: String)
     }
@@ -70,29 +77,38 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var meets: [MeetSummary] = []
         @Pulse var isLoading: Bool = false
         @Pulse var message: String?
+        @Pulse var previousPlan: Plan?
         
-        var isAllFieldsFilled: Bool {
-            return seletedMeet != nil &&
-            planTitle != nil &&
-            planTitle?.isEmpty == false &&
-            selectedDay != nil &&
-            selectedTime != nil &&
-            selectedPlace != nil
+        var canComplete: Bool {
+            guard planTitle?.isEmpty == false else { return false }
+            
+            if let previousPlan {
+                return isChanged(previousPlan: previousPlan)
+            } else {
+                return isFilled()
+            }
         }
     }
     
+    // MARK: - Variable
+    private let type: PlanCreationType
+    
     private let createPlanUseCase: CreatePlan
+    private let editPlanUseCase: EditPlan
     private weak var coordinator: PlanCreateCoordination?
     
     var initialState: State = State()
     
     init(createPlanUseCase: CreatePlan,
-         meetList: [MeetSummary],
+         editPlanUseCase: EditPlan,
+         type: PlanCreationType,
          coordinator: PlanCreateCoordination) {
         self.createPlanUseCase = createPlanUseCase
+        self.editPlanUseCase = editPlanUseCase
         self.coordinator = coordinator
+        self.type = type
+        handleViewType()
         logLifeCycle()
-        self.action.onNext(.fetchMeetList(meetList))
     }
     
     deinit {
@@ -104,11 +120,13 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         case let .setValue(value):
             return self.handleSetValueAction(value)
         case .requestPlanCreation:
-            return self.requestPlanCreation()
+            return self.handleCreation()
         case let .fetchMeetList(meets):
             return .just(.updateMeetList(meets))
         case .flowAction(let action):
             return self.handleFlowAction(action)
+        case let .fetchPreviousPlan(plan):
+            return .just(.updatePreviousPlan(plan))
         }
     }
     
@@ -121,73 +139,129 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             self.handleValueMutation(&newState, value: value)
         case .updateMeetList(let meets):
             newState.meets = meets
-        case .responsePlanCreation(let plan):
-            self.coordinator?.endFlow()
         case .notifyLoadingState(let isLoad):
             newState.isLoading = isLoad
         case let .notifyMessage(message):
             newState.message = message
+        case let .updatePreviousPlan(plan):
+            setPreviousPlan(state: &newState, plan)
         }
         
         return newState
+    }
+    
+    private func setPreviousPlan(state: inout State, _ plan: Plan) {
+        guard let meet = plan.meet,
+              let title = plan.title,
+              let date = plan.date else { return }
+        
+        let day = date.toDateComponents()
+        let time = date.getTime()
+        let place = UploadPlace(plan: plan)
+        
+        state.seletedMeet = meet
+        state.planTitle = title
+        state.selectedDay = day
+        state.selectedTime = time
+        state.selectedPlace = place
+        state.previousPlan = plan
+    }
+    
+    private func handleViewType() {
+        switch type {
+        case let .create(meets):
+            action.onNext(.fetchMeetList(meets))
+        case let .edit(plan):
+            action.onNext(.fetchPreviousPlan(plan))
+        }
     }
 }
 
 extension CreatePlanViewReactor {
     
-#warning("에러 처리")
-    private func requestPlanCreation() -> Observable<Mutation> {
-        do {
-            guard let planCreationForm = try buliderPlanCreation() else { throw DateError.invalid }
-            return self.createPlan(planCreationForm)
-        } catch {
-            if let err = error as? DateError {
-                return .just(.notifyMessage(err.info))
-            } else {
-                return .just(.notifyMessage("Unknown Error"))
-            }
+    private func handleCreation() -> Observable<Mutation> {
+        guard let planCreationForm = try? buliderPlanCreation() else {
+            return .just(.notifyMessage(DateError.invalid.info))
+        }
+        
+        switch type {
+        case .create:
+            return createPlan(planCreationForm)
+        case .edit:
+            return editPlan(planCreationForm)
         }
     }
 }
 
 // MARK: - 일정 생성 및 일정 유효성 체크
 extension CreatePlanViewReactor {
-    private func createPlan(_ plan: CreatePlanRequest) -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
-        
+    private func createPlan(_ plan: PlanRequest) -> Observable<Mutation> {
         let uploadPlan = createPlanUseCase.execute(with: plan)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
-            .map { Mutation.responsePlanCreation($0) }
+            .flatMap({ _ in Observable<Mutation>.empty() })
         
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart,
-                                  uploadPlan,
-                                  loadingStop])
+        return withDeferredLoading(task: uploadPlan) { [weak self] in
+            self?.coordinator?.endFlow()
+        }
     }
     
-    private func buliderPlanCreation() throws -> CreatePlanRequest? {
+    private func editPlan(_ plan: PlanRequest) -> Observable<Mutation> {
+        let editPlan = editPlanUseCase.execute(with: plan)
+            .asObservable()
+            .observe(on: MainScheduler.instance)
+            .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
+            .flatMap({ _ in Observable<Mutation>.empty() })
+        
+        return withDeferredLoading(task: editPlan) { [weak self] in
+            self?.coordinator?.endFlow()
+        }
+    }
+    
+    /// 작업 완료 후 일정시간 뒤 로딩종료
+    private func withDeferredLoading(task: Observable<Mutation>,
+                                     completion: (() -> Void)? = nil) -> Observable<Mutation> {
+        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
+        
+        let loadingStop = Observable.just(())
+            .do(onNext: { completion?() })
+            .flatMap({ _ -> Observable<Mutation> in
+                return .just(.notifyLoadingState(false))
+            })
+        
+        return .concat([loadingStart,
+                        task,
+                        loadingStop])
+    }
+    
+    private func buliderPlanCreation() throws -> PlanRequest? {
         guard let date = try self.createDate(),
-              let meetId = currentState.seletedMeet?.id,
               let name = currentState.planTitle,
               let location = currentState.selectedPlace else { return nil }
         
-        return .init(meetId: meetId,
+        let requestType: PlanRequestType
+        
+        switch type {
+        case .create:
+            guard let meetId = currentState.seletedMeet?.id else { return nil }
+            requestType = .create(meetId: meetId)
+        case let .edit(plan):
+            guard let planId = plan.id else { return nil }
+            requestType = .edit(planId: planId)
+        }
+        
+        return .init(type: requestType,
                      name: name,
                      date: DateManager.toServerDateString(date),
                      place: location)
     }
     
     private func createDate() throws -> Date? {
-        guard let date = currentState.selectedDay,
+        guard let day = currentState.selectedDay,
               let time = currentState.selectedTime,
-              let combineDate = DateComponents(year: date.year,
-                                               month: date.month,
-                                               day: date.day,
-                                               hour: time.hour,
-                                               minute: time.minute).toDate() else { return nil }
+              let combineDate = DateManager.combineDayAndTime(day: day,
+                                                              time: time) else { return nil }
         return try checkValidDate(combineDate)
     }
     
@@ -197,8 +271,14 @@ extension CreatePlanViewReactor {
     }
     
     private func notificationNewPlan(_ plan: Plan) {
-        EventService.shared.postItem(.created(plan),
-                                     from: self)
+        switch type {
+        case .create:
+            EventService.shared.postItem(.created(plan),
+                                         from: self)
+        case .edit:
+            EventService.shared.postItem(.updated(plan),
+                                         from: self)
+        }
     }
 }
 
@@ -263,6 +343,31 @@ extension CreatePlanViewReactor {
             coordinator?.endFlow()
         }
         return .empty()
+    }
+}
+
+extension CreatePlanViewReactor.State {
+    private func isFilled() -> Bool {
+        return seletedMeet != nil &&
+        planTitle != nil &&
+        selectedDay != nil &&
+        selectedTime != nil &&
+        selectedPlace != nil
+    }
+    
+    private func isChanged(previousPlan: Plan) -> Bool {
+        guard let selectedDay,
+              let selectedTime,
+              let selectedDate = DateManager.combineDayAndTime(day: selectedDay,
+                                                               time: selectedTime) else {
+            return false
+        }
+        
+        print(#function, #line, "selectedPlace : \(selectedPlace), previousPlace: \(UploadPlace(plan: previousPlan))" )
+        
+        return planTitle != previousPlan.title ||
+        selectedDate != previousPlan.date ||
+        selectedPlace != UploadPlace(plan: previousPlan)
     }
 }
 

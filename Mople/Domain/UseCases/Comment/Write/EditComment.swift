@@ -25,7 +25,6 @@ final class EditCommentUseCase: EditComment {
     func execute(postId: Int,
                  commentId: Int,
                  comment: String) -> Single<[Comment]> {
-        print(#function, #line, "Path : # Edit Comment UseCase ")
         return editCommentRepo
             .editComment(postId: postId,
                          commentId: commentId,

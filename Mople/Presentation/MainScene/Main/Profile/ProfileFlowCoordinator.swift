@@ -29,10 +29,6 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
         profileVC = dependencies.makeProfileViewController(coordinator: self)
         navigationController.pushViewController(profileVC!, animated: false)
     }
-    
-    override func dismiss() {
-        self.navigationController.dismiss(animated: true)
-    }
 }
 
 // MARK: - 뷰 이동

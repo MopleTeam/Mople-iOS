@@ -28,4 +28,10 @@ final class DefaultCommentCommandRepo:BaseRepositories, CommentCommandRepo {
                                          comment: comment)
         }
     }
+    
+    func reportComment(_ comment: ReportCommentRequest) -> Single<Void> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.reportComment(reportComment: comment)
+        }
+    }
 }

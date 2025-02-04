@@ -8,6 +8,10 @@
 import Foundation
 import ReactorKit
 
+protocol MeetSetupCoordination: AnyObject {
+    func pop()
+}
+
 final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -27,11 +31,10 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     
     var initialState: State = State()
     
-    #warning("셋업 화면 전용으로 분리하기")
-    private weak var coordinator: MeetDetailCoordination?
+    private weak var coordinator: MeetSetupCoordination?
     
     init(meet: Meet,
-         coordinator: MeetDetailCoordination) {
+         coordinator: MeetSetupCoordination) {
         action.onNext(.setMeet(meet))
         self.coordinator = coordinator
         logLifeCycle()
@@ -46,7 +49,7 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         case let .setMeet(Meet):
             return self.setMeetInfo(Meet)
         case .popView:
-            coordinator?.popView()
+            coordinator?.pop()
             return .empty()
         }
     }

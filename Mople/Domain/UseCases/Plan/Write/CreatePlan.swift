@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol CreatePlan {
-    func execute(with plan: CreatePlanRequest) -> Single<Plan>
+    func execute(with plan: PlanRequest) -> Single<Plan>
 }
 
 final class CreatePlanUseCase: CreatePlan {
@@ -18,8 +18,12 @@ final class CreatePlanUseCase: CreatePlan {
         self.createPlanRepo = createPlanRepo
     }
     
-    func execute(with plan: CreatePlanRequest) -> Single<Plan> {
+    func execute(with plan: PlanRequest) -> Single<Plan> {
         return createPlanRepo.createPlan(plan)
-            .map { $0.toDomain() }
+            .map {
+                var plan = $0.toDomain()
+                plan.isCreator = true
+                return plan
+            }
     }
 }

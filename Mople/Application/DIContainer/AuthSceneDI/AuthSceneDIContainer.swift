@@ -47,7 +47,7 @@ extension AuthSceneDIContainer {
         self.appleLoginService.setPresentationContextProvider(view)
     }
     
-    #warning("Mock")
+    // 테스트 모드
     private func makeSignInViewReacotr(coordinator: AuthFlowCoordination) -> SignInViewReactor {
         return SignInViewReactor(signInUseCase: makeSignInUseCase(),
                                  fetchUserInfoUseCase: makeFetchUserInfoUseCase(),

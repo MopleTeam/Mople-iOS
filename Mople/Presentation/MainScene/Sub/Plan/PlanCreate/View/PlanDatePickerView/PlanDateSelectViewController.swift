@@ -87,6 +87,18 @@ final class PlanDateSelectViewController: BaseViewController, View {
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        let viewDidLayout = self.rx.viewDidLayoutSubviews
+            .take(1)
+        
+        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$selectedDay))
+            .compactMap { $0.1 }
+            .asDriver(onErrorJustReturn: today.toDateComponents())
+            .drive(with: self, onNext: { vc, selectedDate in
+                vc.selectedDate = selectedDate
+                vc.moveToYearComponents()
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
@@ -135,11 +147,13 @@ extension PlanDateSelectViewController: UIPickerViewDataSource, UIPickerViewDele
         case 0:
             let selectedYear = years[row]
             guard selectedYear != self.selectedDate.year else { return }
-            self.moveToYearComponents(on: selectedYear)
+            self.selectedDate.year = selectedYear
+            self.moveToYearComponents()
         case 1:
             let selectedMonth = months[row]
             guard selectedMonth != self.selectedDate.month else { return }
-            self.moveToMonthComponents(on: selectedMonth)
+            self.selectedDate.month = selectedMonth
+            self.moveToMonthComponents()
         case 2:
             self.selectedDate.day = dates[row]
         default:
@@ -200,7 +214,7 @@ extension PlanDateSelectViewController {
             self.pickerView.reloadComponent(1)
         }
         self.pickerView.reloadComponent(2)
-        setSelectedDate()
+        selectDate()
     }
     
     /// 로우 업데이트
@@ -211,8 +225,7 @@ extension PlanDateSelectViewController {
     }
     
     /// 년도 피커뷰 조작 시 날짜 유효성을 거친 후 업데이트
-    private func moveToYearComponents(on selectedYear: Int) {
-        selectedDate.year = selectedYear
+    private func moveToYearComponents() {
         let isFuture = self.isValidFutureDate()
         updateSelectedDay()
         updateMonth(isFuture: isFuture)
@@ -220,8 +233,7 @@ extension PlanDateSelectViewController {
     }
     
     /// 월 피커뷰 조작 시 날짜 유효성을 거친 후 업데이트
-    private func moveToMonthComponents(on selectedMonth: Int) {
-        selectedDate.month = selectedMonth
+    private func moveToMonthComponents() {
         let isFuture = self.isValidFutureDate()
         updateSelectedDay()
         updateDay(isFuture: isFuture)
@@ -232,14 +244,9 @@ extension PlanDateSelectViewController {
 // MARK: - 선택 값 업데이트
 extension PlanDateSelectViewController {
     
-    /// 선택할 값 셋팅
-    private func setSelectedDate(on dateComponents: DateComponents? = nil) {
-        self.selectDate(dateComponents ?? selectedDate)
-    }
-    
     /// 들어온 값이 있는 날짜인지 체크 후 Row 변경
-    private func selectDate(_ dateComponents: DateComponents) {
-        let dateIndex = getDateIndex(on: dateComponents)
+    private func selectDate() {
+        let dateIndex = getDateIndex(on: selectedDate)
         
         updateSelectedDate(yearIndex: dateIndex.year,
                         monthIndex: dateIndex.month,

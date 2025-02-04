@@ -13,4 +13,5 @@ protocol CommentCommandRepo {
     func editComment(postId: Int,
                      commentId: Int,
                      comment: String) -> Single<[CommentResponse]>
+    func reportComment(_ comment: ReportCommentRequest) -> Single<Void>
 }

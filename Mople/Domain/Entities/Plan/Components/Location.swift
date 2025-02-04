@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 struct Location: Hashable {
     let longitude: Double?

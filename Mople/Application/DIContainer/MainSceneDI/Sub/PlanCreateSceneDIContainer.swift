@@ -18,13 +18,16 @@ protocol PlanCreateSceneDependencies {
 final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
 
     private let appNetworkService: AppNetworkService
+    private let commonFactory: CommonSceneFactory
     private var commonReactor: CreatePlanViewReactor?
-    private let meetList: [MeetSummary]
+    private let type: PlanCreationType
     
     init(appNetworkService: AppNetworkService,
-         meetList: [MeetSummary]) {
+         commonFactory: CommonSceneFactory,
+         type: PlanCreationType) {
         self.appNetworkService = appNetworkService
-        self.meetList = meetList
+        self.commonFactory = commonFactory
+        self.type = type
     }
     
     func makePlanCreateFlowCoordinator() -> BaseCoordinator {
@@ -35,7 +38,8 @@ final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
 
 extension PlanCreateSceneDIContainer {
     func makeSearchLocationCoordinator() -> BaseCoordinator {
-        let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService)
+        let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
+                                                              commonFactory: commonFactory)
         return searchLoactionDI.makeSearchLocationFlowCoordinator()
     }
 }
@@ -43,7 +47,7 @@ extension PlanCreateSceneDIContainer {
 extension PlanCreateSceneDIContainer {
     func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController {
         makeCommonReactor(coordinator: coordinator)
-        return CreatePlanViewController(title: "일정 생성",
+        return CreatePlanViewController(title: getViewTitle(),
                                         reactor: commonReactor)
     }
     
@@ -64,7 +68,8 @@ extension PlanCreateSceneDIContainer {
 extension PlanCreateSceneDIContainer {
     private func makeCommonReactor(coordinator: PlanCreateCoordination) {
         commonReactor = .init(createPlanUseCase: makeCreatePlanUseCase(),
-                              meetList: meetList,
+                              editPlanUseCase: makeEditPlanUseCase(),
+                              type: type,
                               coordinator: coordinator)
     }
     
@@ -72,7 +77,23 @@ extension PlanCreateSceneDIContainer {
         return CreatePlanUseCase(createPlanRepo: makeCreatePlanRepo())
     }
     
+    private func makeEditPlanUseCase() -> EditPlan {
+        return EditPlanUseCase(editPlanRepo: makeCreatePlanRepo())
+    }
+    
     private func makeCreatePlanRepo() -> PlanCommandRepo {
         return DefaultPlanCommandRepo(networkService: appNetworkService)
+    }
+}
+
+// MARK: - Hpler
+extension PlanCreateSceneDIContainer {
+    private func getViewTitle() -> String {
+        switch type {
+        case .create:
+            return "일정 생성"
+        case .edit:
+            return "일정 수정"
+        }
     }
 }

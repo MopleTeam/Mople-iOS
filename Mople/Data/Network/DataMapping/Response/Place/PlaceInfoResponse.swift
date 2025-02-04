@@ -28,8 +28,8 @@ extension PlaceInfoResponse {
     private func getLocation() -> Location? {
         guard let x,
               let y,
-              let longitude = Double(x),
-              let latitude = Double(y) else { return .defaultLocation }
+              let longitude = Double(x)?.roundedTo8DecimalPlaces(),
+              let latitude = Double(y)?.roundedTo8DecimalPlaces() else { return .defaultLocation }
         
         return .init(longitude: longitude,
                      latitude: latitude)
@@ -54,5 +54,8 @@ extension PlaceInfoResponse {
     }
 }
 
-
-
+extension Double {
+    func roundedTo8DecimalPlaces() -> Double {
+        (self * 100_000_000).rounded() / 100_000_000
+    }
+}

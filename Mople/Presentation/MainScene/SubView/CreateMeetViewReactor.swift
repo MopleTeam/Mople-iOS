@@ -8,7 +8,9 @@
 import UIKit
 import ReactorKit
 
-
+protocol MeetCreateViewCoordination: AnyObject {
+    func dismiss()
+}
 
 final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     
@@ -32,14 +34,14 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     
     private let createMeetUseCase: CreateMeet
     private let imageUploadUseCase: ImageUpload
-    private weak var navigator: NavigationCloseable?
+    private weak var coordinator: MeetCreateViewCoordination?
     
     init(createMeetUseCase: CreateMeet,
          imageUploadUseCase: ImageUpload,
-         navigator: NavigationCloseable) {
+         coordinator: MeetCreateViewCoordination) {
         self.createMeetUseCase = createMeetUseCase
         self.imageUploadUseCase = imageUploadUseCase
-        self.navigator = navigator
+        self.coordinator = coordinator
         logLifeCycle()
     }
     
@@ -52,7 +54,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case .requestMeetCreate(let group):
             return self.createMeet(title: group.title, image: group.image)
         case .endProcess:
-            self.navigator?.dismiss()
+            self.coordinator?.dismiss()
             return .empty()
         }
     }
@@ -63,7 +65,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case .responseMeet:
-            navigator?.dismiss()
+            coordinator?.dismiss()
         case .notifyMessage(let message):
             newState.message = message
         case .notifyLoadingState(let isLoad):

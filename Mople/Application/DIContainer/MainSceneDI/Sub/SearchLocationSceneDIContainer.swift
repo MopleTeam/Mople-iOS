@@ -10,16 +10,19 @@ import UIKit
 protocol SearchPlaceSceneDependencies {
     func makeSearchLocationViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController
     func makeSearchResultViewController() -> SearchResultViewController
-    func makeDetailLocationViewController(place: PlaceInfo) -> DetailPlaceViewController
+    func makeDetailLocationViewController() -> PlaceSelectViewController
 }
 
 final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
 
     private let appNetworkService: AppNetworkService
+    private let commonFactory: CommonSceneFactory
     private var commonReactor: SearchPlaceViewReactor?
     
-    init(appNetworkService: AppNetworkService) {
+    init(appNetworkService: AppNetworkService,
+         commonFactory: CommonSceneFactory) {
         self.appNetworkService = appNetworkService
+        self.commonFactory = commonFactory
     }
     
     func makeSearchLocationFlowCoordinator() -> BaseCoordinator {
@@ -39,8 +42,8 @@ extension SearchLocationSceneDIContainer {
         return .init(reactor: commonReactor)
     }
     
-    func makeDetailLocationViewController(place: PlaceInfo) -> DetailPlaceViewController {
-        return DetailPlaceViewController(reactor: commonReactor, place: place)
+    func makeDetailLocationViewController() -> PlaceSelectViewController {
+        return PlaceSelectViewController(reactor: commonReactor)
     }
 }
 

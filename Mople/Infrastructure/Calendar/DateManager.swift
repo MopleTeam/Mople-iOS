@@ -188,6 +188,14 @@ extension DateManager {
         convertDate.hour = hour % 12
         return convertDate
     }
+    
+    static func combineDayAndTime(day: DateComponents, time: DateComponents) -> Date? {
+        return DateComponents(year: day.year,
+                              month: day.month,
+                              day: day.day,
+                              hour: time.hour,
+                              minute: time.minute).toDate()
+    }
 }
 
 // MARK: - 문자열 전환

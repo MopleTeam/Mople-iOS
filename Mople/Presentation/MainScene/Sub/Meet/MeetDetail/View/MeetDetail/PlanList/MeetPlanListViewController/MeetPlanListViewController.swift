@@ -92,28 +92,30 @@ final class MeetPlanListViewController: BaseViewController, View {
     }
     
     func bind(reactor: MeetPlanListViewReactor) {
+        setInput(reactor: reactor)
+        setOutput(reactor: reactor)
+        setNotification(reactor: reactor)
+    }
+    
+    private func setInput(reactor: Reactor) {
         tableView.rx.itemSelected
             .map({ Reactor.Action.selectedPlan(index: $0.row) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$plans))
-            .map { $0.1 }
-            .share()
-        
-        responsePlans
+    }
+    
+    private func setOutput(reactor: Reactor) {
+        reactor.pulse(\.$plans)
             .asDriver(onErrorJustReturn: [])
-            .map({ $0.isEmpty })
-            .drive(with: self, onNext: { vc, isEmpty in
+            .drive(with: self, onNext: { vc, planList in
+                let isEmpty = planList.isEmpty
                 vc.emptyPlanView.isHidden = !isEmpty
                 vc.tableView.isHidden = isEmpty
+                vc.setPlanCountLabel(planList: planList)
             })
             .disposed(by: disposeBag)
         
-        responsePlans
+        reactor.pulse(\.$plans)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(
                 cellIdentifier: MeetPlanTableCell.reuseIdentifier,
@@ -121,25 +123,14 @@ final class MeetPlanListViewController: BaseViewController, View {
             ) { index, item, cell in
 
                 cell.configure(viewModel: .init(plan: item))
-                cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
-                
-                cell.rx.completed
-                    .compactMap({ item.id })
-                    .map { Reactor.Action.updateParticipants(id: $0,
-                                                             isJoining: item.isParticipating) }
-                    .bind(to: reactor.action)
-                    .disposed(by: cell.disposeBag)
+                cell.completeTapped = { [weak self] in
+                    guard let planId = item.id else { return }
+                    let action = Reactor.Action.updateParticipants(id: planId,
+                                                                   isJoining: item.isParticipating)
+                    self?.reactor?.action.onNext(action)
+                }
             }
-            .disposed(by: disposeBag)
-        
-        responsePlans
-            .asDriver(onErrorJustReturn: [])
-            .map({ $0.count })
-            .filter({ $0 > 0 })
-            .drive(with: self, onNext: { vc, count in
-                vc.countView.countText = "\(count)개"
-            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
@@ -148,6 +139,18 @@ final class MeetPlanListViewController: BaseViewController, View {
                 vc.parentReactor?.action.onNext(.planLoading(isLoading))
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addPlanObservable()
+            .map { Reactor.Action.updatePlan($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setPlanCountLabel(planList: [Plan]) {
+        guard planList.isEmpty == false else { return }
+        countView.countText = "\(planList.count)개"
     }
 }
 

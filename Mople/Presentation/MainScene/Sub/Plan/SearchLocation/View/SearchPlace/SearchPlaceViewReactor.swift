@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import CoreLocation
 import ReactorKit
 
 enum SearchError: Error {
@@ -34,22 +33,24 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         case updateUserLocation
         case fetchCahcedPlace
         case searchPlace(query: String?)
-        case showDetailPlace(index: Int)
+        case selectedPlace(index: Int)
         case deletePlace(index: Int)
         case endProcess
-        case selectedPlace(_ place: PlaceInfo)
+        case completed
     }
     
     enum Mutation {
-        case setUserLocation(_ location: CLLocationCoordinate2D?)
+        case setUserLocation(_ location: Location?)
         case setPlace(_ result: PlaceSearchResult)
         case notifyLoadingState(_ isLoading: Bool)
         case handleSearchError(error: SearchError?)
+        case updateSelectedPlace(PlaceInfo?)
     }
     
     struct State {
         @Pulse var searchResult: PlaceSearchResult?
-        @Pulse var userLocation: CLLocationCoordinate2D?
+        @Pulse var selectedPlace: PlaceInfo?
+        @Pulse var userLocation: Location?
         @Pulse var error: SearchError?
         @Pulse var isLoading: Bool = false
     }
@@ -86,15 +87,19 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
             return self.fetchCahcedPlace()
         case let .searchPlace(query):
             return self.searchPlace(query: query)
-        case let .showDetailPlace(index):
-            return self.showDetailPlcae(index: index)
+        case let .selectedPlace(index):
+            return self.updateSelectedPlace(index: index)
         case let .deletePlace(index):
             return self.deleteHistory(index: index)
         case .endProcess:
             self.coordinator?.endProcess()
             return .empty()
-        case let .selectedPlace(place):
-            self.coordinator?.completedProcess(selectedPlace: place)
+        case .completed:
+            if let selectedPlace = currentState.selectedPlace {
+                self.coordinator?.completedProcess(selectedPlace: selectedPlace)
+            } else {
+                // 에러 출력
+            }
             return .empty()
         }
     }
@@ -112,6 +117,9 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
             newState.isLoading = isLoading
         case let .setUserLocation(location):
             newState.userLocation = location
+        case let .updateSelectedPlace(placeInfo):
+            newState.selectedPlace = placeInfo
+            coordinator?.showDetailPlaceView()
         }
         
         return newState
@@ -131,11 +139,9 @@ extension SearchPlaceViewReactor {
             .filter { [weak self] _ in self?.currentState.isLoading == true }
         
         let location = locationService.updateLocation()
-            .timeout(.seconds(5), scheduler: MainScheduler.instance)
             .map { Mutation.setUserLocation($0) }
-            .catchAndReturn(Mutation.setUserLocation(nil))
             .concat(loadingEnd)
-            .share()
+            .share(replay: 1)
         
         let loading = Observable.just(Mutation.notifyLoadingState(true))
             .delay(.milliseconds(500), scheduler: MainScheduler.instance)
@@ -173,20 +179,34 @@ extension SearchPlaceViewReactor {
                                   loadingStop])
     }
         
-    private func showDetailPlcae(index: Int) -> Observable<Mutation> {
-        guard let result = currentState.searchResult,
-              result.places.count > index,
-              var selectedPlace = result.places[safe: index] else { return .empty() }
-        selectedPlace.updateDistance(userLocation: currentState.userLocation)
-        coordinator?.showDetailPlaceView(place: selectedPlace)
-        queryStorage.addPlace(selectedPlace)
-        return Observable.just(()) // 화면 전환이 되기 전 검색어 업데이트 방지
+    private func updateSelectedPlace(index: Int) -> Observable<Mutation> {
+        
+        let selectedPlace = self.selectedPlace(index: index)
+        
+        let updateSelectedPlace = Observable.just(selectedPlace)
+            .map { Mutation.updateSelectedPlace($0) }
+        
+        let updatedCachedPlace = Observable.just(selectedPlace)
+            .compactMap { $0 }
+            .do { [weak self] in
+                self?.queryStorage.addPlace($0)
+            }
+            .filter({ [weak self] _ in self?.currentState.searchResult?.isCached == true })
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self,
-                      result.isCached == true else { return .empty() }
+                guard let self else { return .empty() }
                 return self.fetchCahcedPlace()
             }
+            
+        return Observable.concat([updateSelectedPlace, updatedCachedPlace])
+    }
+    
+    private func selectedPlace(index: Int) -> PlaceInfo? {
+        guard let result = currentState.searchResult,
+              result.places.count > index else { return nil }
+        var selectedPlace = result.places[safe: index]
+        selectedPlace?.updateDistance(userLocation: currentState.userLocation)
+        return selectedPlace
     }
     
     private func deleteHistory(index: Int) -> Observable<Mutation>  {

@@ -28,11 +28,9 @@ final class UserInfoStorage {
     func fetchUserInfo() {
         guard let userInfoEntity = userInfoData.first else { return }
         self.userInfo = userInfoEntity.toDomain()
-        print(#function, #line, "#3 프로필 업데이트 \(self.userInfo)" )
     }
     
     func addEntity(_ userInfo: UserInfo) {
-        print(#function, #line, "#3 프로필 추가 \(userInfo)" )
         self.userInfo = userInfo
         try! realmDB.write({
             realmDB.add(UserInfoEntity(userInfo))
@@ -47,5 +45,18 @@ final class UserInfoStorage {
         })
     }
     
+    func updateLocation(_ location: Location) {
+        guard let userInfo = userInfoData.first,
+              let longitude = userInfo.longitude,
+              let latitude = userInfo.latitude else { return }
+        
+        try! realmDB.write({
+            userInfo.updateLocation(longitude: longitude,
+                                    latitude: latitude)
+        })
+        
+        self.userInfo?.location = .init(longitude: longitude,
+                                        latitude: latitude)
+    }
 }
 

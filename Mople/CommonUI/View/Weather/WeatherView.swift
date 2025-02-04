@@ -142,9 +142,7 @@ final class WeatherView: UIView {
     public func configure(with viewModel: WeatherViewModel?) {
         guard let viewModel = viewModel else { return }
         setWeatherView(hasWeather: viewModel.hasWeatherInfo)
-        if viewModel.hasWeatherInfo {
-            setWeatherInfoView(with: viewModel)
-        }
+        setWeatherInfoView(with: viewModel)
     }
     
     private func setWeatherView(hasWeather: Bool) {
@@ -180,5 +178,6 @@ extension WeatherView {
         cityLabel.text = cityName
     }
 }
+
 
 

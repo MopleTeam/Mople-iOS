@@ -10,7 +10,7 @@ import UIKit
 protocol MeetListSceneDependencies {
     // MARK: - View
     func makeMeetListViewController(coordinator: MeetListFlowCoordination) -> MeetListViewController
-    func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
+    func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     
     // MARK: - Flow
     func makeMeetDetailFlowCoordiantor(meetId: Int) -> BaseCoordinator
@@ -67,7 +67,7 @@ extension MeetListSceneDIConatiner: MeetListSceneDependencies {
         return meetDetailDI.makeMeetDetailCoordinator()
     }
     
-    func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(navigator: navigator)
+    func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
+        return commonFactory.makeCreateMeetViewController(coordinator: coordinator)
     }
 }

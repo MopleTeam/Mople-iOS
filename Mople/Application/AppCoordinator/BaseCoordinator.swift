@@ -57,11 +57,22 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
     }
     
     func dismiss() {
-        
+        self.navigationController.dismiss(animated: true)
     }
     
     func pop() {
-        
+        self.navigationController.popViewController(animated: true)
+    }
+}
+
+// MARK: - Gesture
+extension BaseCoordinator {
+    func setDismissGestureCompletion() {
+        self.navigationController.setupDismissCompletion { [weak self] in
+            guard let self else { return }
+            self.clearUp()
+            self.parentCoordinator?.didFinish(coordinator: self)
+        }
     }
 }
 

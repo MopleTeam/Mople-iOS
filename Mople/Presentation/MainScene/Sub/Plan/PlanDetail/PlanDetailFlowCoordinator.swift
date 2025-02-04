@@ -8,10 +8,12 @@
 import UIKit
 
 protocol PlanDetailCoordination: AnyObject {
+    func presentPlaceDetailView(place: PlaceInfo)
+    func presentPlanEditFlow(plan: Plan)
     func endFlow()
 }
 
-final class PlanDetailFlowCoordinator: BaseCoordinator {
+final class PlanDetailFlowCoordinator: BaseCoordinator, PlanDetailCoordination {
     
     private let dependencies: PlanDetailSceneDependencies
     private let planType: PlanDetailType
@@ -28,14 +30,6 @@ final class PlanDetailFlowCoordinator: BaseCoordinator {
     override func start() {
         let planDetailVC = makePlanDetailViewController()
         navigationController.pushViewController(planDetailVC, animated: false)
-    }
-    
-    private func setDismissGestureCompletion() {
-        self.navigationController.setupTransitionCompletion(transitionType: .dismiss) { [weak self] in
-            guard let self else { return }
-            self.clearUp()
-            self.parentCoordinator?.didFinish(coordinator: self)
-        }
     }
 }
 
@@ -55,7 +49,24 @@ extension PlanDetailFlowCoordinator {
     }
 }
 
-extension PlanDetailFlowCoordinator: PlanDetailCoordination {
+extension PlanDetailFlowCoordinator: PlaceDetailCoordination {
+    func presentPlaceDetailView(place: PlaceInfo) {
+        let view = dependencies.makePlaceDetailViewController(place: place,
+                                                              coordinator: self)
+        navigationController.pushViewController(view, animated: true)
+    }
+}
+
+// MARK: - 일정 편집 플로우
+extension PlanDetailFlowCoordinator {
+    func presentPlanEditFlow(plan: Plan) {
+        let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
+        self.start(coordinator: flow)
+        self.navigationController.presentWithTransition(flow.navigationController)
+    }
+}
+
+extension PlanDetailFlowCoordinator {
     func endFlow() {
         self.navigationController.dismiss(animated: true) { [weak self] in
             guard let self else { return }

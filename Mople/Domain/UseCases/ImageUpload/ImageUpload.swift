@@ -20,7 +20,7 @@ final class ImageUploadUseCase: ImageUpload {
         self.imageUploadRepo = imageUploadRepo
     }
     
-    func execute(_ image: UIImage?) -> RxSwift.Single<String?> {
+    func execute(_ image: UIImage?) -> Single<String?> {
         return Single.deferred { [weak self] in
             guard let self else { return .error(AppError.unknownError) }
             

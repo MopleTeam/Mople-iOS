@@ -10,7 +10,7 @@ import Foundation
 protocol HomeSceneDependencies {
     // MARK: - View
     func makeHomeViewController(coordinator: HomeFlowCoordinator) -> HomeViewController
-    func makeMeetCreateViewController(navigator: NavigationCloseable) -> CreateMeetViewController
+    func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
@@ -46,6 +46,7 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
         return HomeViewController(reactor: makeHomeViewReactor(coordinator: coordinator))
     }
     
+    // 테스트 모드
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
         return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
                                notificationService: notificationService,
@@ -62,13 +63,13 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
 
         
     // MARK: - 그룹 생성 화면
-    func makeMeetCreateViewController(navigator: NavigationCloseable) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(navigator: navigator)
+    func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
+        return commonFactory.makeCreateMeetViewController(coordinator: coordinator)
     }
     
     // MARK: - 일정 생성 플로우
     func makePlanCreateFlowCoordinator(meetList: [MeetSummary]) -> BaseCoordinator {
-        return commonFactory.makePlanCreateCoordinator(meetList: meetList)
+        return commonFactory.makePlanCreateCoordinator(type: .create(meetList))
     }
     
     // MARK: - 일정 상세 뷰

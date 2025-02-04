@@ -11,8 +11,8 @@ protocol CommonSceneFactory {
     func makeImageUploadUseCase() -> ImageUpload
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
-    func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController
-    func makePlanCreateCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
+    func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
+    func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator
     func makePlanDetailCoordinator(postId: Int,
                                    type: PlanDetailType) -> BaseCoordinator
 }
@@ -60,15 +60,15 @@ extension CommonDIContainer {
     }
     
     // MARK: - 그룹 생성 화면
-    func makeCreateMeetViewController(navigator: NavigationCloseable) -> CreateMeetViewController {
+    func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
         return CreateMeetViewController(title: TextStyle.CreateGroup.title,
-                                        reactor: makeCreateMeetViewReactor(navigator: navigator))
+                                        reactor: makeCreateMeetViewReactor(coordinator: coordinator))
     }
     
-    private func makeCreateMeetViewReactor(navigator: NavigationCloseable) -> CreateMeetViewReactor {
+    private func makeCreateMeetViewReactor(coordinator: MeetCreateViewCoordination) -> CreateMeetViewReactor {
         return .init(createMeetUseCase: makeCreateMeetUseCase(),
                      imageUploadUseCase: makeImageUploadUseCase(),
-                     navigator: navigator)
+                     coordinator: coordinator)
     }
     
     private func makeCreateMeetUseCase() -> CreateMeet {
@@ -80,10 +80,11 @@ extension CommonDIContainer {
     }
     
     // MARK: - 일정 생성 플로우
-    func makePlanCreateCoordinator(meetList: [MeetSummary]) -> BaseCoordinator {
+    func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
-            meetList: meetList)
+            commonFactory: self,
+            type: type)
         return planCreateDI.makePlanCreateFlowCoordinator()
     }
     
@@ -92,6 +93,7 @@ extension CommonDIContainer {
                                    type: PlanDetailType) -> BaseCoordinator {
         print(#function, #line, "#55 : \(type) ")
         let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: self,
                                                       postId: postId)
         return planDetailDI.makePlanDetailCoordinator(type: type)
     }

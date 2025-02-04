@@ -14,7 +14,7 @@ protocol HomeFlowCoordination: AnyObject {
     func pushCalendarView(lastRecentDate: Date)
 }
 
-final class HomeFlowCoordinator: BaseCoordinator {
+final class HomeFlowCoordinator: BaseCoordinator, HomeFlowCoordination {
     
     private let dependencies: HomeSceneDependencies
     
@@ -27,18 +27,18 @@ final class HomeFlowCoordinator: BaseCoordinator {
         let homeVC = dependencies.makeHomeViewController(coordinator: self)
         self.navigationController.pushViewController(homeVC, animated: false)
     }
-    
-    override func dismiss() {
-        self.navigationController.dismiss(animated: true)
+}
+
+// MARK: - 뷰 이동
+extension HomeFlowCoordinator: MeetCreateViewCoordination  {
+    func presentMeetCreateView() {
+        let meetCreateVC = dependencies.makeMeetCreateViewController(coordinator: self)
+        self.navigationController.presentWithTransition(meetCreateVC)
     }
 }
 
-extension HomeFlowCoordinator: HomeFlowCoordination {
-    func presentMeetCreateView() {
-        let meetCreateVC = dependencies.makeMeetCreateViewController(navigator: self)
-        self.navigationController.presentWithTransition(meetCreateVC)
-    }
-    
+// MARK: - Flow 이동
+extension HomeFlowCoordinator {
     func presentPlanCreateView(meetList: [MeetSummary]) {
         let planCreateFlowCoordiator = dependencies.makePlanCreateFlowCoordinator(meetList: meetList)
         self.start(coordinator: planCreateFlowCoordiator)
@@ -50,9 +50,13 @@ extension HomeFlowCoordinator: HomeFlowCoordination {
         self.start(coordinator: planDetailCoordinates)
         self.navigationController.presentWithTransition(planDetailCoordinates.navigationController)
     }
-    
+}
+
+// MARK: - 탭바 이동
+extension HomeFlowCoordinator {
     func pushCalendarView(lastRecentDate: Date) {
         guard let mainCoordination = self.parentCoordinator as? MainCoordination else { return }
         mainCoordination.changeCalendarTap(date: lastRecentDate)
     }
 }
+

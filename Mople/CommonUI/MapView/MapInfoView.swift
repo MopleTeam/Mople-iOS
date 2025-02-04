@@ -8,11 +8,49 @@
 import UIKit
 import SnapKit
 
+struct MapInfoViewModel {
+    let title: String?
+    let address: String?
+    let location: Location?
+    private let distance: Int?
+    
+    var distanceText: String? {
+        guard let distance = distance else { return nil }
+        
+        switch distance {
+        case 1..<1000:
+            return "\(distance)m"
+        case 1000...:
+            let kilometers = Double(distance) / 1000
+            let rounded = round(kilometers * 10) / 10
+            let roundedDistance = Int(rounded)
+            return "\(roundedDistance)km"
+        default:
+            return nil
+        }
+    }
+}
+
+extension MapInfoViewModel {
+    init(place: PlaceInfo) {
+        self.title = place.title
+        self.address = place.roadAddress
+        self.location = place.location
+        self.distance = place.distance
+    }
+}
+
 final class MapInfoView: UIView {
     
-    private let place: PlaceInfo
+    enum ViewType {
+        case basic
+        case select
+    }
+        
+    private var location: Location?
     
-    private let mapView = MapView(isScroll: true)
+    private let mapView = MapView(isScroll: true,
+                                  isZoom: true)
     
     private let titleLable: UILabel = {
         let label = UILabel()
@@ -66,7 +104,7 @@ final class MapInfoView: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [placeInfoStackView, selectedButton])
+        let sv = UIStackView(arrangedSubviews: [placeInfoStackView])
         sv.axis = .vertical
         sv.spacing = 20
         sv.alignment = .fill
@@ -80,13 +118,12 @@ final class MapInfoView: UIView {
         return sv
     }()
     
-    init(place: PlaceInfo) {
+    init(type: ViewType = .basic) {
         print(#function, #line, "LifeCycle Test DetailPlaceViewController Created" )
-        self.place = place
         super.init(frame: .zero)
-        self.initalSetup()
+        initalSetup(type)
     }
-    
+
     deinit {
         print(#function, #line, "LifeCycle Test DetailPlaceViewController Deinit" )
     }
@@ -100,9 +137,18 @@ final class MapInfoView: UIView {
         setMapView()
     }
     
-    private func initalSetup() {
+    private func initalSetup(_ type: ViewType) {
+        setTypeConfigure(type)
         setLayout()
-        setLabel()
+    }
+    
+    private func setTypeConfigure(_ type: ViewType) {
+        guard case .select = type else { return }
+        mainStackView.addArrangedSubview(selectedButton)
+        
+        selectedButton.snp.makeConstraints { make in
+            make.height.equalTo(56)
+        }
     }
     
     private func setLayout() {
@@ -116,37 +162,25 @@ final class MapInfoView: UIView {
         mainStackView.snp.makeConstraints { make in
             make.horizontalEdges.bottom.equalToSuperview()
         }
-        
-        selectedButton.snp.makeConstraints { make in
-            make.height.equalTo(56)
-        }
-    }
-    
-    private func setLabel() {
-        titleLable.text = place.title ?? "이름없음"
-        addressLabel.text = place.roadAddress
-        setDistanceLabel()
-    }
-    
-    private func setDistanceLabel() {
-        guard let distance = place.distance else { return }
-        
-        switch distance {
-        case 1..<1000:
-            distanceLabel.text = "\(distance)m"
-        case 1000...:
-            let kilometers = Double(distance) / 1000
-            let rounded = round(kilometers * 10) / 10
-            let roundedDistance = Int(rounded)
-            distanceLabel.text = "\(roundedDistance)km"
-        default:
-            distanceLabel.isHidden = true
-            break
-        }
     }
     
     private func setMapView() {
-        mapView.initializeMap(location: place.location ?? .defaultLocation,
+        mapView.initializeMap(location: location ?? .defaultLocation,
                               offset: .init(x: 0, y: -(mainStackView.bounds.height / 2)))
+    }
+    
+    public func setConfigure(_ viewModel: MapInfoViewModel) {
+        self.location = viewModel.location
+        titleLable.text = viewModel.title
+        addressLabel.text = viewModel.address
+        setDistanceLabel(distanceText: viewModel.distanceText)
+    }
+    
+    private func setDistanceLabel(distanceText: String?) {
+        if let distanceText {
+            distanceLabel.text = distanceText
+        } else {
+            distanceLabel.isHidden = true
+        }
     }
 }

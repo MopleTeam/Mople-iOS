@@ -62,7 +62,7 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeProfileEditViewReactor(navigator: NavigationCloseable) -> ProfileEditViewReactor {
-        return .init(userInfoManagementUseCase: UserInfoManagementMock(),
+        return .init(userInfoManagementUseCase: EditUserInfoMock(),
                      imageUploadUseCase: ImageUploadMock(),
                      navigator: navigator)
     }

@@ -172,16 +172,16 @@ extension HomeViewReactor {
         
         switch payload {
         case let .created(plan):
-            self.addMeet(&planList, plan: plan)
+            self.addPlan(&planList, plan: plan)
         case let .updated(plan):
-            self.updatedMeet(&planList, plan: plan)
+            self.updatePlan(&planList, plan: plan)
         case let .deleted(plan):
-            self.deleteMeet(&planList, plan: plan)
+            self.deletePlan(&planList, plan: plan)
         }
         return .just(.updatePlanList(planList))
     }
     
-    private func addMeet(_ planList: inout [Plan], plan: Plan) {
+    private func addPlan(_ planList: inout [Plan], plan: Plan) {
         planList.append(plan)
         planList.sort(by: <)
         
@@ -190,15 +190,16 @@ extension HomeViewReactor {
         }
     }
     
-    private func updatedMeet(_ planList: inout [Plan], plan: Plan) {
+    private func updatePlan(_ planList: inout [Plan], plan: Plan) {
         guard let updatedIndex = planList.firstIndex(where: {
             $0.id == plan.id
         }) else { return }
         
         planList[updatedIndex] = plan
+        planList.sort(by: <)
     }
     
-    private func deleteMeet(_ planList: inout [Plan], plan: Plan) {
+    private func deletePlan(_ planList: inout [Plan], plan: Plan) {
         planList.removeAll { $0.id == plan.id }
     }
 }

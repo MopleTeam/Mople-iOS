@@ -14,10 +14,11 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         case selectedPlan(index: Int)
         case requestPlanList
         case updateParticipants(id: Int, isJoining: Bool)
+        case updatePlan(_ planPayload: PlanPayload)
     }
     
     enum Mutation {
-        case fetchPlanList(plans: [Plan])
+        case fetchPlanList([Plan])
         case notifyLoadingState(_ isLoading: Bool)
         case updatePlanParticipant(planId: Int)
     }
@@ -54,11 +55,13 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .requestPlanList:
-            fetchPlanList()
+            return fetchPlanList()
         case let .updateParticipants(id, isJoining):
-            requestParticipationPlan(planId: id, isJoining: isJoining)
+            return requestParticipationPlan(planId: id, isJoining: isJoining)
         case let .selectedPlan(index):
-            presentPlanDetailView(index: index)
+            return presentPlanDetailView(index: index)
+        case let .updatePlan(payload):
+            return handlePlanPayload(payload)
         }
     }
     
@@ -90,7 +93,7 @@ extension MeetPlanListViewReactor {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let fetchPlanList = fetchPlanUseCase.execute(meetId: meedId)
-            .map({ Mutation.fetchPlanList(plans: $0) })
+            .map({ Mutation.fetchPlanList($0) })
             .asObservable()
         
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
@@ -128,3 +131,37 @@ extension MeetPlanListViewReactor {
     }
 }
 
+// MARK: - 일정 생성 알림 수신
+extension MeetPlanListViewReactor {
+    private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
+        var planList = currentState.plans
+        
+        switch payload {
+        case let .created(plan):
+            self.addPlan(&planList, plan: plan)
+        case let .updated(plan):
+            self.updatePlan(&planList, plan: plan)
+        case let .deleted(plan):
+            self.deletePlan(&planList, plan: plan)
+        }
+        return .just(.fetchPlanList(planList))
+    }
+    
+    private func addPlan(_ planList: inout [Plan], plan: Plan) {
+        planList.append(plan)
+        planList.sort(by: <)
+    }
+    
+    private func updatePlan(_ planList: inout [Plan], plan: Plan) {
+        guard let updatedIndex = planList.firstIndex(where: {
+            $0.id == plan.id
+        }) else { return }
+        
+        planList[updatedIndex] = plan
+        planList.sort(by: <)
+    }
+    
+    private func deletePlan(_ planList: inout [Plan], plan: Plan) {
+        planList.removeAll { $0.id == plan.id }
+    }
+}

@@ -96,7 +96,7 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
             .disposed(by: disposeBag)
         
         tableView.rx.itemSelected
-            .map({ Reactor.Action.showDetailPlace(index: $0.row) })
+            .map({ Reactor.Action.selectedPlace(index: $0.row) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

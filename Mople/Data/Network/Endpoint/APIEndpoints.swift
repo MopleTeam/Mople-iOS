@@ -60,7 +60,8 @@ extension APIEndpoints {
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
-                            bodyParameters: ["token": fcmToken])
+                            bodyParameters: ["token": fcmToken,
+                                             "subscribe": "true"])
     }
 }
 
@@ -187,19 +188,13 @@ extension APIEndpoints {
 
 // MARK: - Plan
 extension APIEndpoints {
+    
+    // MARK: - Fetch
     static func fetchPlan(planId: Int) throws -> Endpoint<PlanResponse> {
         return try Endpoint(path: "plan/detail/\(planId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
-    }
-    
-    static func createPlan(_ plan: CreatePlanRequest) throws -> Endpoint<PlanResponse> {
-        return try Endpoint(path: "plan/create",
-                            authenticationType: .accessToken,
-                            method: .post,
-                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParametersEncodable: plan)
     }
     
     static func fetchRecentPlan() throws -> Endpoint<RecentPlanResponse> {
@@ -218,6 +213,7 @@ extension APIEndpoints {
         
     }
     
+    // MARK: - CRUD
     static func joinPlan(planId: Int) throws -> Endpoint<Void> {
         return try Endpoint(path: "plan/join/\(planId)",
                             authenticationType: .accessToken,
@@ -231,6 +227,24 @@ extension APIEndpoints {
                             method: .delete,
                             headerParameters: HTTPHeader.getReceiveAllHeader())
     }
+    
+    static func createPlan(_ plan: PlanRequest) throws -> Endpoint<PlanResponse> {
+        return try Endpoint(path: "plan/create",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParametersEncodable: plan)
+    }
+    
+    static func editPlan(_ plan: PlanRequest) throws -> Endpoint<PlanResponse> {
+        return try Endpoint(path: "plan/update",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParametersEncodable: plan)
+    }
+    
+    
 }
 
 // MARK: - Review
@@ -252,7 +266,7 @@ extension APIEndpoints {
 
 // MARK: - Search Location
 extension APIEndpoints {
-    static func searchPlace(_ locationRequest: SearchLocationReqeust) throws -> Endpoint<SearchPlaceResultResponse> {
+    static func searchPlace(_ locationRequest: SearchLocationRequest) throws -> Endpoint<SearchPlaceResultResponse> {
         return try Endpoint(path: "location/kakao",
                             authenticationType: .accessToken,
                             method: .post,
@@ -293,5 +307,13 @@ extension APIEndpoints {
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParameters: ["contents": comment])
+    }
+    
+    static func reportComment(reportComment: ReportCommentRequest) throws -> Endpoint<Void> {
+        return try Endpoint(path: "comment/report",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            bodyParametersEncodable: reportComment)
     }
 }

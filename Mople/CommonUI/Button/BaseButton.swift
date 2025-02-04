@@ -58,6 +58,7 @@ extension BaseButton {
     public func setLayoutMargins(inset: NSDirectionalEdgeInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)) {
         self.configuration?.contentInsets = inset
     }
+    
     public func setImage(image: UIImage?,
                          imagePlacement: NSDirectionalRectEdge = .trailing,
                          contentPadding: CGFloat = 0) {

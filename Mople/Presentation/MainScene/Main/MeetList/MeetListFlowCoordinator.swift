@@ -26,19 +26,18 @@ final class MeetListFlowCoordinator: BaseCoordinator, MeetListFlowCoordination {
         let meetListVC = dependency.makeMeetListViewController(coordinator: self)
         self.navigationController.pushViewController(meetListVC, animated: false)
     }
-    
-    override func dismiss() {
-        self.navigationController.dismiss(animated: true)
+}
+
+// MARK: - View
+extension MeetListFlowCoordinator: MeetCreateViewCoordination {
+    func presentMeetCreateView() {
+        let meetCreateVC = dependency.makeCreateMeetViewController(coordinator: self)
+        self.navigationController.presentWithTransition(meetCreateVC)
     }
 }
 
-// MARK: - Flow Navigation (Present/Dismiss)
+// MARK: - Flow
 extension MeetListFlowCoordinator{
-    func presentMeetCreateView() {
-        let meetCreateVC = dependency.makeCreateMeetViewController(navigator: self)
-        self.navigationController.presentWithTransition(meetCreateVC)
-    }
-    
     func presentMeetDetailView(meetId: Int) {
         let meetDetailFlowCoordinator = dependency.makeMeetDetailFlowCoordiantor(meetId: meetId)
         self.start(coordinator: meetDetailFlowCoordinator)

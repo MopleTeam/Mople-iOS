@@ -9,20 +9,29 @@ import UIKit
 import RxSwift
 
 protocol PlanDetailSceneDependencies {
+    // MARK: - 기본 뷰
     func makePlanDetailViewController(type: PlanDetailType,
                                       coordinator: PlanDetailCoordination) -> PlanDetailViewController
     func makeCommentListViewController() -> CommentListViewController
+    
+    // MARK: - 이동 뷰
+    func makePlaceDetailViewController(place: PlaceInfo,
+                                       coordinator: PlaceDetailCoordination) -> PlaceDetailViewController
+    func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     
     private let appNetworkService: AppNetworkService
+    private let commonFactory: CommonSceneFactory
     private var mainReactor: PlanDetailViewReactor?
     private let postId: Int
     
     init(appNetworkService: AppNetworkService,
+         commonFactory: CommonSceneFactory,
          postId: Int) {
         self.appNetworkService = appNetworkService
+        self.commonFactory = commonFactory
         self.postId = postId
     }
     
@@ -33,14 +42,17 @@ final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     }
 }
 
+// MARK: - 기본 뷰
 extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 상세
     func makePlanDetailViewController(type: PlanDetailType,
                                       coordinator: PlanDetailCoordination) -> PlanDetailViewController {
-        return .init(title: "약속 상세",
+        
+        return .init(title: type == .plan ? "일정 상세" : "약속 후기",
                      reactor: makePlanDetailViewReactor(type: type,
-                                                        coordinator: coordinator))    }
+                                                        coordinator: coordinator))
+    }
     
     private func makePlanDetailViewReactor(type: PlanDetailType,
                                            coordinator: PlanDetailCoordination) -> PlanDetailViewReactor {
@@ -106,6 +118,29 @@ extension PlanDetailSceneDIContainer {
     
     private func makeCommentCommandRepo() -> CommentCommandRepo {
         return DefaultCommentCommandRepo(networkService: appNetworkService)
+    }
+}
+
+// MARK: - 이동 뷰
+extension PlanDetailSceneDIContainer {
+    
+    // MARK: - View
+    func makePlaceDetailViewController(place: PlaceInfo,
+                                       coordinator: PlaceDetailCoordination) -> PlaceDetailViewController {
+        return PlaceDetailViewController(title: "상세 지도",
+                                         reactor: makePlaceDetailViewReactor(place: place,
+                                                                             coordinator: coordinator))
+    }
+    
+    private func makePlaceDetailViewReactor(place: PlaceInfo, coordinator: PlaceDetailCoordination) -> PlaceDetailReactor {
+        return PlaceDetailReactor(place: place,
+                                  locationService: DefaultLocationService(),
+                                  coordinator: coordinator)
+    }
+    
+    // MARK: - Flow
+    func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
+        return commonFactory.makePlanCreateCoordinator(type: .edit(plan))
     }
 }
 

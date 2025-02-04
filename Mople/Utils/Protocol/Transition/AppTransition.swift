@@ -87,15 +87,14 @@ extension AppTransition: UIViewControllerAnimatedTransitioning {
 
 extension AppTransition: UIGestureRecognizerDelegate {
     func setupDismissGesture(for viewController: UIViewController) {
-        print(#function, #line, "Path : # 적용 ")
         self.viewController = viewController
-        let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture))
+        let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handlePanGesture))
+        gesture.edges = .left
         gesture.delegate = self
         viewController.view.addGestureRecognizer(gesture)
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
-        print(#function, #line, "Path : # 제스처 실행 ")
         guard let view = gesture.view,
               let presentingVC = viewController?.presentingViewController else { return }
         
@@ -110,7 +109,7 @@ extension AppTransition: UIGestureRecognizerDelegate {
             if let presentingView = presentingVC.view {
                 view.superview?.insertSubview(presentingView, belowSubview: view)
                 presentingView.frame = view.frame
-                presentingView.frame.origin.x = -presentingView.frame.width * 0.3 // Start at the left edge of current view
+                presentingView.frame.origin.x = -presentingView.frame.width * 0.3
             }
         case .changed:
             guard let presentingView = previousViewController?.view else { return }
@@ -172,28 +171,13 @@ extension AppTransition: UIGestureRecognizerDelegate {
     
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         
-        guard let panGesture = gestureRecognizer as? UIPanGestureRecognizer,
-              let viewController else { return false }
+        guard let viewController else { return false }
 
         switch viewController {
         case let navi as UINavigationController:
-            guard navi.viewControllers.count == 1 else { return false }
-            return panGestureShouldBegin(panGesture, recognizer: gestureRecognizer)
+            return navi.viewControllers.count == 1
         default :
-            return panGestureShouldBegin(panGesture, recognizer: gestureRecognizer)
+            return true
         }
-    }
-    
-    private func panGestureShouldBegin(_ gesture: UIPanGestureRecognizer, recognizer: UIGestureRecognizer) -> Bool {
-        let location = gesture.location(in: recognizer.view)
-        let translation = gesture.translation(in: recognizer.view)
-        let edgeSize: CGFloat = 50
-        
-        // 왼쪽 가장자리에서만 제스처 시작 허용 및 수평 방향 제스처만 허용
-        let isEdgeLocation = location.x <= edgeSize
-        let isHorizontalPan = abs(translation.x) > abs(translation.y)
-        let isRightDirection = translation.x > 0
-        
-        return isEdgeLocation && isHorizontalPan && isRightDirection
     }
 }

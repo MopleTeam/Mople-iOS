@@ -24,10 +24,12 @@ final class MapView: UIView {
         return mapView
     }()
     
-    init(isScroll: Bool = false) {
+    init(isScroll: Bool = false,
+         isZoom: Bool = false) {
         super.init(frame: .zero)
         setLayout()
-        setMapView(isScroll)
+        setMapView(isScroll: isScroll,
+                   isZoom: isZoom)
     }
     
     required init?(coder: NSCoder) {
@@ -42,8 +44,9 @@ final class MapView: UIView {
         }
     }
     
-    private func setMapView(_ isScroll: Bool) {
+    private func setMapView(isScroll: Bool, isZoom: Bool) {
         self.mapView.isScrollGestureEnabled = isScroll
+        self.mapView.isZoomGestureEnabled = isZoom
         self.mapView.gestureRecognizers?.forEach({ $0.delegate = self })
     }
 }
@@ -51,7 +54,9 @@ final class MapView: UIView {
 extension MapView: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
+        
+        let isEdgeGesture = otherGestureRecognizer is UIScreenEdgePanGestureRecognizer
+        return isEdgeGesture == false
     }
 }
 
@@ -64,7 +69,7 @@ extension MapView {
         let position = NMGLatLng(lat: lat, lng: lng)
         self.moveMap(position: position)
         self.addMarker(position: position)
-        self.centerMapWithUIOffset(offset)
+        self.centerMapWithUIOffset(offset) 
     }
     
     private func moveMap(position: NMGLatLng) {

@@ -13,7 +13,7 @@ protocol MeetDetailSceneDependencies {
     func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController
     func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
-                                     coordinator: MeetDetailCoordination) -> MeetSetupViewController
+                                     coordinator: MeetSetupCoordination) -> MeetSetupViewController
     
     // MARK: - Flow
     func makePlanDetailFlowCoordinator(postId: Int,
@@ -120,12 +120,14 @@ extension MeetDetailSceneDIContainer {
     
     // MARK: - 모임 설정 뷰
     func makeMeetSetupViewController(meet: Meet,
-                                     coordinator: MeetDetailCoordination) -> MeetSetupViewController {
+                                     coordinator: MeetSetupCoordination) -> MeetSetupViewController {
         return .init(title: "모임 설정",
-                     reactor: makeMeetSetupViewReactor(meet: meet, coordinator: coordinator))
+                     reactor: makeMeetSetupViewReactor(meet: meet,
+                                                       coordinator: coordinator))
     }
     
-    private func makeMeetSetupViewReactor(meet: Meet, coordinator: MeetDetailCoordination) -> MeetSetupViewReactor {
+    private func makeMeetSetupViewReactor(meet: Meet,
+                                          coordinator: MeetSetupCoordination) -> MeetSetupViewReactor {
         return .init(meet: meet,
                      coordinator: coordinator)
     }

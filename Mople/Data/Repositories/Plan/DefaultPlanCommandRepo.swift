@@ -9,7 +9,7 @@ import RxSwift
 
 final class DefaultPlanCommandRepo: BaseRepositories, PlanCommandRepo {
     
-    func createPlan(_ plan: CreatePlanRequest) -> Single<PlanResponse> {
+    func createPlan(_ plan: PlanRequest) -> Single<PlanResponse> {
         return self.networkService.authenticatedRequest {
             try APIEndpoints.createPlan(plan)
         }
@@ -19,6 +19,12 @@ final class DefaultPlanCommandRepo: BaseRepositories, PlanCommandRepo {
                                   isJoining: Bool) -> Single<Void> {
         return self.networkService.authenticatedRequest {
             try isJoining ? APIEndpoints.leavePlan(planId: planId) : APIEndpoints.joinPlan(planId: planId)
+        }
+    }
+    
+    func editPlan(_ plan: PlanRequest) -> Single<PlanResponse> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.editPlan(plan)
         }
     }
 }

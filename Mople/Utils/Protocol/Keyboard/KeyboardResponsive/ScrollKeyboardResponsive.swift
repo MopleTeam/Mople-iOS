@@ -56,6 +56,7 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
                        option: animation) { [weak self] in
             guard let self else { return }
             self.floatingViewBottom?.update(inset: UIScreen.getDefatulBottomInset())
+            print(#function, #line, "hide start offset scroll view : \(startOffsetY)" )
             scrollView.contentOffset.y = self.startOffsetY
         }
     }
@@ -90,6 +91,7 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
         
         if keyboardHeight == nil {
             startOffsetY = scrollView.contentOffset.y
+            print(#function, #line, "show start offset scroll view : \(startOffsetY)" )
             scrollView.contentOffset.y += height
         } else {
             let diffOffsetY = getKeyboardHeightDiff(height)

@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol SearchPlaceRepo {
-    func search(_ locationRequset: SearchLocationReqeust) -> Single<SearchPlaceResultResponse>
+    func search(_ locationRequset: SearchLocationRequest) -> Single<SearchPlaceResultResponse>
 }

@@ -29,7 +29,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     private let contentView = UIView()
     
-    private let groupSelectView: LabeledButtonView = {
+    private let meetSelectView: LabeledButtonView = {
         let btn = LabeledButtonView(title: TextStyle.CreatePlan.group,
                                     inputText: TextStyle.CreatePlan.groupInfo)
         return btn
@@ -83,10 +83,12 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
-            groupSelectView, planTitleView, dateSelectView,
+            meetSelectView, planTitleView, dateSelectView,
             timeSelectView, placeSelectView, emptyView
         ])
         stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .fill
         stackView.spacing = 24
         return stackView
     }()
@@ -156,20 +158,37 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     }
     
     private func inputBind(_ reactor: CreatePlanViewReactor) {
+        reactor.pulse(\.$previousPlan)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, _ in
+                vc.meetSelectView.rx.isEnabled.onNext(false)
+                vc.completeButton.title = "일정 수정"
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$seletedMeet)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0?.name }
-            .drive(groupSelectView.rx.selectedText)
+            .drive(meetSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedDay)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0?.toDate() })
-            .map({
-                print(#function, #line, "#3 : \($0)" )
-                return DateManager.toString(date: $0, format: .simple)
-            })
+            .map({ DateManager.toString(date: $0, format: .simple) })
             .drive(dateSelectView.rx.selectedText)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$planTitle)
+            .filter { [weak self] _ in
+                guard let text = self?.planTitleView.text else { return true }
+                return text.isEmpty
+            }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, title in
+                vc.planTitleView.rx.text.onNext(title)
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$selectedTime)
@@ -196,7 +215,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
         
         reactor.state
-            .map { $0.isAllFieldsFilled }
+            .map { $0.canComplete }
             .bind(to: completeButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
@@ -208,6 +227,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
 
     private func outputBind(_ reactor: CreatePlanViewReactor) {
         planTitleView.textField.rx.text
+            .skip(1)
             .compactMap { $0 }
             .map({ Reactor.Action.setValue(.name($0)) })
             .bind(to: reactor.action)
@@ -225,7 +245,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.groupSelectView.button.rx.controlEvent(.touchUpInside)
+        self.meetSelectView.button.rx.controlEvent(.touchUpInside)
             .map({ Reactor.Action.flowAction(.groupSelectView) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

@@ -19,7 +19,8 @@ extension TransitionControllable where Self: UIViewController {
         dismissTransition.setupDismissGesture(for: self)
     }
     
-    func presentWithTransition(_ viewControllerToPresent: UIViewController, completion: (() -> Void)? = nil) {
+    func presentWithTransition(_ viewControllerToPresent: UIViewController,
+                               completion: (() -> Void)? = nil) {
         viewControllerToPresent.transitioningDelegate = self
         present(viewControllerToPresent, animated: true, completion: completion)
     }

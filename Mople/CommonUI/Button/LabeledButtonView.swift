@@ -28,7 +28,8 @@ final class LabeledButtonView: UIView {
     private(set) lazy var button: BaseButton = {
         let btn = BaseButton()
         btn.setButtonAlignment(.left)
-        btn.setBgColor(normalColor: ColorStyle.BG.input)
+        btn.setBgColor(normalColor: ColorStyle.BG.input,
+                       disabledColor: ColorStyle.Input.disable)
         btn.setRadius(8)
         btn.setLayoutMargins()
         return btn
@@ -102,18 +103,16 @@ extension LabeledButtonView {
     }
 }
 
-// MARK: - 외부 설정
-extension LabeledButtonView {
-
-    public func setLayoutMargins(inset: NSDirectionalEdgeInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)) {
-        button.setLayoutMargins(inset: inset)
-    }
-}
-
 extension Reactive where Base: LabeledButtonView {
     var selectedText: Binder<String?> {
         return Binder(self.base) { button, text in
             button.setSelectedTextText(text ?? button.defaultText)
+        }
+    }
+    
+    var isEnabled: Binder<Bool> {
+        return Binder(self.base) { button, enabled in
+            button.button.isEnabled = enabled
         }
     }
 }

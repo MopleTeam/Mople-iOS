@@ -27,6 +27,7 @@ final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
          dependencies: PlanCreateSceneDependencies) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+        setDismissGestureCompletion()
     }
     
     override func start() {

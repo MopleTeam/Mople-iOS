@@ -12,10 +12,10 @@ import SnapKit
 
 final class MeetPlanTableCell: UITableViewCell {
     
-    public var disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
+    
+    var completeTapped: (() -> Void)?
         
-    fileprivate var planId: Int?
-
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
@@ -50,7 +50,7 @@ final class MeetPlanTableCell: UITableViewCell {
 
     private let weatherView = WeatherView()
 
-    fileprivate let completdButton: BaseButton = {
+    private let completdButton: BaseButton = {
         let btn = BaseButton()
         btn.setBgColor(normalColor: ColorStyle.App.primary,
                        selectedColor: ColorStyle.App.tertiary,
@@ -138,17 +138,16 @@ final class MeetPlanTableCell: UITableViewCell {
     }
 
     public func configure(viewModel: MeetPlanTableCellModel) {
-        self.planId = viewModel.id
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.weatherView.configure(with: .init(weather: viewModel.weather))
-        self.resolveUserView(isCreator: viewModel.isCreator,
+        self.handleViewType(isCreator: viewModel.isCreator,
                              isParticipant: viewModel.isParticipant,
                              planDate: viewModel.date)
     }
     
-    private func resolveUserView(isCreator: Bool,
+    private func handleViewType(isCreator: Bool,
                                  isParticipant: Bool?,
                                  planDate: Date?) {
         handleTitlePostIcon(isCreator: isCreator)
@@ -208,10 +207,4 @@ extension MeetPlanTableCell {
     }
 }
 
-extension Reactive where Base: MeetPlanTableCell {
-    var completed: ControlEvent<Void> {
-                
-        return base.completdButton.rx.controlEvent(.touchUpInside)
-    }
-}
 

@@ -10,13 +10,15 @@ import RxSwift
 import CoreLocation
 
 protocol LocationService {
-    func updateLocation() -> Observable<CLLocationCoordinate2D?>
+    func updateLocation() -> Observable<Location?>
 }
 final class DefaultLocationService: NSObject, CLLocationManagerDelegate, LocationService {
     
-    let locationManager = CLLocationManager()
+    private let locationManager = CLLocationManager()
+    private let savedLocation = UserInfoStorage.shared.userInfo?.location
+    private let locationSubject = PublishSubject<Location?>()
+    private let authorizationSubject = PublishSubject<Void>()
     
-    private let locationSubject = PublishSubject<CLLocationCoordinate2D?>()
 
     override init() {
         super.init()
@@ -28,42 +30,69 @@ final class DefaultLocationService: NSObject, CLLocationManagerDelegate, Locatio
         locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
     }
     
-    private func requestPremission() {
-        self.locationManager.requestWhenInUseAuthorization()
+    private func requestLocationWithTimeout() -> Observable<Location?> {
+        return self.locationSubject.asObservable()
+            .do(onSubscribed: { [weak self] in
+                self?.locationManager.requestLocation()
+            })
+            .timeout(.seconds(1), scheduler: MainScheduler.instance)
+            .catchAndReturn(savedLocation)
+    }
+    
+    private func requestPremission() -> Observable<Location?> {
+        return self.authorizationSubject
+            .do(onSubscribed: { [weak self] in
+                self?.locationManager.requestWhenInUseAuthorization()
+            })
+            .flatMap { [weak self] _ -> Observable<Location?> in
+                guard let self else { return .empty() }
+                return self.requestLocationWithTimeout()
+            }
     }
 }
 
 extension DefaultLocationService {
-    func updateLocation() -> Observable<CLLocationCoordinate2D?> {
+    func updateLocation() -> Observable<Location?> {
         switch locationManager.authorizationStatus {
         case .authorizedWhenInUse:
-            locationManager.requestLocation()
+            return requestLocationWithTimeout()
         case .notDetermined:
-            requestPremission()
+            return requestPremission()
         default:
-            break
+            return .empty()
         }
-        
-        return self.locationSubject.asObservable()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        locationSubject.onNext(locations.first?.coordinate)
+        guard let userLocation = locations.first?.coordinate else {
+            locationSubject.onCompleted()
+            return
+        }
+        let location: Location = .init(longitude: userLocation.longitude,
+                                       latitude: userLocation.latitude)
+        updateUserLocation(location)
+        locationSubject.onNext(location)
         locationSubject.onCompleted()
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
-        case .authorizedWhenInUse:
-            locationManager.requestLocation()
-        default:
+        case .authorizedWhenInUse, .authorizedAlways:
+            authorizationSubject.onNext(())
+            authorizationSubject.onCompleted()
+        case .notDetermined:
             break
+        default:
+            authorizationSubject.onCompleted()
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        locationSubject.onNext(nil)
+        locationSubject.onNext(savedLocation)
         locationSubject.onCompleted()
-        print("Location error: \(error.localizedDescription)")
+    }
+    
+    private func updateUserLocation(_ location: Location) {
+        UserInfoStorage.shared.updateLocation(location)
     }
 }

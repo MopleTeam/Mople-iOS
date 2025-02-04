@@ -8,8 +8,6 @@
 import Foundation
 import RxSwift
 
-
-
 final class FetchRecentScheduleMock: FetchRecentPlan {
     
     func execute() -> Single<RecentPlan> {
