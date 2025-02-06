@@ -292,8 +292,8 @@ extension PlanDetailViewController {
         switch type {
         case .plan:
             alertActions = [editPlan(), deletePlan()]
-        case .review:
-            alertActions = [editReview()]
+        case let .review(isReviewed):
+            alertActions = [editReview(isReviewed: isReviewed)]
         }
 
         alertManager.showActionSheet(actions: alertActions)
@@ -302,7 +302,7 @@ extension PlanDetailViewController {
     // MARK: - 일정 편집
     private func editPlan() -> UIAlertAction {
         return alertManager.makeAction(title: "일정 수정") { [weak self] in
-            let action = Reactor.Action.flow(.editPlanView)
+            let action = Reactor.Action.flow(.editPlan)
             self?.reactor?.action.onNext(action)
         }
     }
@@ -315,9 +315,12 @@ extension PlanDetailViewController {
     }
     
     // MARK: - 후기 편집
-    private func editReview() -> UIAlertAction {
-        return alertManager.makeAction(title: "후기 수정") {
-            
+    private func editReview(isReviewed: Bool) -> UIAlertAction {
+        let title = isReviewed ? "후기 작성" : "후기 수정"
+        
+        return alertManager.makeAction(title: title) { [weak self] in
+            let action = Reactor.Action.flow(.editReview)
+            self?.reactor?.action.onNext(action)
         }
     }
     

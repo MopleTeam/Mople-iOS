@@ -8,12 +8,12 @@
 import Foundation
 
 struct CommentResponse: Decodable {
-    var commentId: Int?
-    var writerId: Int
-    var writerName: String?
-    var writerImage: String?
-    var content: String?
-    var time: String?
+    let commentId: Int?
+    let writerId: Int
+    let writerName: String?
+    let writerImage: String?
+    let content: String?
+    let time: String?
 }
 
 extension CommentResponse {

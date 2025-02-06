@@ -7,9 +7,9 @@
 
 import RxSwift
 
-final class FetchPlanMemberMock: FetchPlanMember {
-    func execute(planId: Int) -> Single<PlanMemberList> {
-        return Observable.just(PlanMemberList.mock())
+final class FetchPlanMemberMock: FetchMemberList {
+    func execute(type: MemberListType) -> Single<MemberList> {
+        return Observable.just(MemberList.mock())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()
     }

@@ -8,20 +8,20 @@
 import Foundation
 
 struct ReviewResponse: Decodable {
-    var meetId: Int?
-    var reviewId: Int?
-    var postId: Int?
-    var creatorId: Int?
-    var reviewName: String?
-    var address: String?
-    var title: String?
-    var reviewDateTime: String?
-    var meetName: String?
-    var meetImage: String?
-    var lat: Double?
-    var lot: Double?
-    var participantsCount: Int?
-    var images: [String]?
+    let meetId: Int?
+    let reviewId: Int?
+    let postId: Int?
+    let creatorId: Int?
+    let reviewName: String?
+    let address: String?
+    let title: String?
+    let reviewDateTime: String?
+    let meetName: String?
+    let meetImage: String?
+    let lat: Double?
+    let lot: Double?
+    let participantsCount: Int?
+    let images: [String]?
 }
 
 extension ReviewResponse {

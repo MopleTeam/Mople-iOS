@@ -24,11 +24,12 @@ enum MemberPositionType {
     }
 }
 
+#warning("영어, 한글, 숫자 정렬법 정리")
 struct MemberInfo: Equatable {
     let memberId: Int?
     let nickname: String?
     let imagePath: String?
-    var position: MemberPositionType?
+    var position: MemberPositionType = .member
     
     static func < (lhs: MemberInfo, rhs: MemberInfo) -> Bool {
         guard let lhsName = lhs.nickname,
@@ -59,5 +60,9 @@ struct MemberInfo: Equatable {
         default:
             return 4
         }
+    }
+    
+    mutating func updatePosition(_ position: MemberPositionType) {
+        self.position = position
     }
 }

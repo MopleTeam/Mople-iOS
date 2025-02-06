@@ -11,10 +11,10 @@ protocol MemberListCoordination: AnyObject {
     func pop()
 }
 
-enum MemberListViewType {
-    case meetMember(id: Int)
-    case planMember(id: Int)
-    case reviewMember(id: Int)
+enum MemberListType {
+    case meet(id: Int)
+    case plan(id: Int)
+    case review(id: Int)
 }
 
 final class MemberListViewReactor: Reactor {
@@ -36,24 +36,26 @@ final class MemberListViewReactor: Reactor {
     
     var initialState: State = State()
     
-    private let fetchPlanMemberUseCase: FetchPlanMember
+    private let fetchPlanMemberUseCase: FetchMemberList
+    private let type: MemberListType
     private weak var coordinator: MemberListCoordination?
     
-    init(type: MemberListViewType,
-         fetchPlanMemberUseCase: FetchPlanMember,
+    init(type: MemberListType,
+         fetchPlanMemberUseCase: FetchMemberList,
          coordinator: MemberListCoordination) {
         self.fetchPlanMemberUseCase = fetchPlanMemberUseCase
         self.coordinator = coordinator
-        handleViewType(type)
+        self.type = type
+        handleViewType()
     }
     
-    private func handleViewType(_ type: MemberListViewType) {
+    private func handleViewType() {
         switch type {
-        case .meetMember(_):
+        case .meet(_):
             break
-        case let .planMember(id):
+        case let .plan(id):
             action.onNext(.fetchPlanMemeber(id: id))
-        case .reviewMember(_):
+        case .review(_):
             break
         }
     }
@@ -81,7 +83,9 @@ final class MemberListViewReactor: Reactor {
         
         return newState
     }
-    
+}
+
+extension MemberListViewReactor {
     private func sortMembersByPosition(_ members: [MemberInfo]) -> [MemberInfo] {
         let hostMember = members.filter {
             $0.position == .host || $0.position == .owner
@@ -97,7 +101,7 @@ final class MemberListViewReactor: Reactor {
 
 extension MemberListViewReactor {
     private func fetchPlanMember(id: Int) -> Observable<Mutation> {
-        let fetchPlanMember = fetchPlanMemberUseCase.execute(planId: id)
+        let fetchPlanMember = fetchPlanMemberUseCase.execute(type: type)
             .asObservable()
             .map { Mutation.updateMember($0.membsers) }
         

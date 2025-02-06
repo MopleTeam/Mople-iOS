@@ -9,7 +9,7 @@ import Foundation
 
 enum PlanDetailType {
     case plan
-    case review
+    case review(isReviewed: Bool)
 }
 
 struct CommonPlanModel {
@@ -28,6 +28,6 @@ extension CommonPlanModel {
     init(reveiw: Review) {
         self.id = reveiw.id
         self.isCreator = reveiw.isCreator
-        self.type = .review
+        self.type = .review(isReviewed: reveiw.isReviewd)
     }
 }

@@ -63,12 +63,6 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         return btn
     }()
     
-    private let emptyView: UIView = {
-        let view = UIView()
-        view.setContentHuggingPriority(.defaultLow, for: .vertical)
-        return view
-    }()
-    
     private let completeButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.CreatePlan.completedTitle,
@@ -84,8 +78,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
             meetSelectView, planTitleView, dateSelectView,
-            timeSelectView, placeSelectView, emptyView
-        ])
+            timeSelectView, placeSelectView])
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.distribution = .fill
@@ -135,7 +128,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         
         mainStackView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview().inset(20)
-            make.bottom.equalTo(completeButton.snp.top)
+            make.bottom.lessThanOrEqualTo(completeButton.snp.top)
         }
         
         completeButton.snp.makeConstraints { make in

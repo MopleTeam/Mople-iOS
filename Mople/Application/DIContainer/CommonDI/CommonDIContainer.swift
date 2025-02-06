@@ -9,14 +9,16 @@ import UIKit
 
 protocol CommonSceneFactory {
     func makeImageUploadUseCase() -> ImageUpload
+    func makeFetchReviewDetailUseCase() -> FetchReviewDetail
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
-    func makeMemberListViewController(type: MemberListViewType,
+    func makeMemberListViewController(type: MemberListType,
                                       coordinator: MemberListCoordination) -> MemberListViewController
     func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator
     func makePlanDetailCoordinator(postId: Int,
                                    type: PlanDetailType) -> BaseCoordinator
+    func makeReviewEditCoordinator(reviewId: Int) -> BaseCoordinator
 }
 
 final class CommonDIContainer: CommonSceneFactory {
@@ -39,6 +41,15 @@ extension CommonDIContainer {
     
     private func makeImageUploadRepo() -> ImageUploadRepo {
         return DefaultImageUploadRepo(networkService: appNetworkService)
+    }
+    
+    // MARK: - 리뷰 정보 유즈케이스
+    func makeFetchReviewDetailUseCase() -> FetchReviewDetail {
+        return FetchReviewDetailUseCase(reviewListRepo: makeFetchReviewDetailRepo())
+    }
+    
+    private func makeFetchReviewDetailRepo() -> ReviewQueryRepo {
+        return DefaultReviewQueryRepo(networkService: appNetworkService)
     }
     
     // MARK: - 프로필 설정 공통 리액터
@@ -82,14 +93,14 @@ extension CommonDIContainer {
     }
     
     // MARK: - 멤버 리스트 화면
-    func makeMemberListViewController(type: MemberListViewType,
+    func makeMemberListViewController(type: MemberListType,
                                       coordinator: MemberListCoordination) -> MemberListViewController {
         return MemberListViewController(title: "참여자 목록",
                                         reactor: makeMemberListViewReactor(type: type,
                                                                            coordinator: coordinator))
     }
     
-    private func makeMemberListViewReactor(type: MemberListViewType,
+    private func makeMemberListViewReactor(type: MemberListType,
                                            coordinator: MemberListCoordination) -> MemberListViewReactor {
         return .init(type: type,
                      fetchPlanMemberUseCase: FetchPlanMemberMock(),
@@ -108,10 +119,19 @@ extension CommonDIContainer {
     // MARK: - 일정 상세 뷰
     func makePlanDetailCoordinator(postId: Int,
                                    type: PlanDetailType) -> BaseCoordinator {
-        print(#function, #line, "#55 : \(type) ")
         let planDetailDI = PlanDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: self,
+                                                      type: type,
                                                       postId: postId)
-        return planDetailDI.makePlanDetailCoordinator(type: type)
+        return planDetailDI.makePlanDetailCoordinator()
+    }
+    
+    // MARK: - 리뷰 편집 플로우
+    func makeReviewEditCoordinator(reviewId: Int) -> BaseCoordinator {
+        let reviewEditDI = ReviewEditSceneDIContainer(
+            appNetworkService: appNetworkService,
+            commonFactory: self,
+            reviewId: reviewId)
+        return reviewEditDI.makeReviewEditCoordinator()
     }
 }

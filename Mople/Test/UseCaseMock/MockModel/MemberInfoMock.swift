@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension PlanMemberList {
+extension MemberList {
     static func mock() -> Self {
         let creatorId: Int = 1
         

@@ -170,9 +170,12 @@ final class MeetReviewTableCell: UITableViewCell {
         photoCountLabel.text = "\(count)"
     }
     
+    #warning("리뷰 이미지 반환 시 따옴표가 중복되어 반환되고 있음, 요청 상태")
     private func setImageInfo(imagePaths: [String]) {
         guard !imagePaths.isEmpty,
               let firstImagePath = imagePaths.first else { return }
+        print(#function, #line, "firstImagePath : \(firstImagePath)" )
+
         _ = photoView.kfSetimage(firstImagePath,
                                  defaultImageType: .history)
         

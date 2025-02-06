@@ -19,6 +19,7 @@ struct Review {
     var meet: MeetSummary?
     var location: Location?
     var isCreator: Bool = false
+    var isReviewd: Bool = false
 }
 
 extension Review {

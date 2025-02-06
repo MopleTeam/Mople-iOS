@@ -29,7 +29,6 @@ extension UIImageView {
         }
     }
     
-    #warning("현재 기본 사진이 유저로 표시되어 있음, 모델, 히스토리 용, 날씨 필요")
     func kfSetimage(_ path: String?,
                     defaultImageType: DefaultImageType) -> DownloadTask? {
         guard let path = path,
@@ -37,6 +36,7 @@ extension UIImageView {
             self.image = defaultImageType.image
             return nil
         }
+        
         self.kf.indicatorType = .activity
         
         return self.kf.setImage(

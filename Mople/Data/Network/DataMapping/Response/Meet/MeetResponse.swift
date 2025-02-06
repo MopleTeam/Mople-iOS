@@ -8,13 +8,13 @@
 import Foundation
 
 struct MeetResponse: Decodable {
-    var meetId: Int?
-    var meetName: String?
-    var meetImage: String?
-    var sinceDays: Int?
-    var creatorId: Int?
-    var memberCount: Int?
-    var lastPlanDay: String?
+    let meetId: Int?
+    let meetName: String?
+    let meetImage: String?
+    let sinceDays: Int?
+    let creatorId: Int?
+    let memberCount: Int?
+    let lastPlanDay: String?
 }
 
 extension MeetResponse {

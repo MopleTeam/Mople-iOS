@@ -11,19 +11,17 @@ protocol PlanDetailCoordination: AnyObject {
     func pushMemberListView()
     func pushPlaceDetailView(place: PlaceInfo)
     func presentPlanEditFlow(plan: Plan)
+    func presentReviewEditFlow()
     func endFlow()
 }
 
 final class PlanDetailFlowCoordinator: BaseCoordinator, PlanDetailCoordination {
     
     private let dependencies: PlanDetailSceneDependencies
-    private let planType: PlanDetailType
     
     init(dependencies: PlanDetailSceneDependencies,
-         navigationController: AppNaviViewController,
-         type: PlanDetailType) {
+         navigationController: AppNaviViewController) {
         self.dependencies = dependencies
-        self.planType = type
         super.init(navigationController: navigationController)
         setDismissGestureCompletion()
     }
@@ -36,8 +34,7 @@ final class PlanDetailFlowCoordinator: BaseCoordinator, PlanDetailCoordination {
 
 extension PlanDetailFlowCoordinator {
     private func makePlanDetailViewController() -> PlanDetailViewController {
-        let planDetailVC = dependencies.makePlanDetailViewController(type: planType,
-                                                                     coordinator: self)
+        let planDetailVC = dependencies.makePlanDetailViewController(coordinator: self)
         let commentListContainer = planDetailVC.commentContainer
         self.addCommentListView(parentVC: planDetailVC, container: commentListContainer)
         return planDetailVC
@@ -71,6 +68,12 @@ extension PlanDetailFlowCoordinator: PlaceDetailCoordination {
 extension PlanDetailFlowCoordinator {
     func presentPlanEditFlow(plan: Plan) {
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
+        self.start(coordinator: flow)
+        self.navigationController.presentWithTransition(flow.navigationController)
+    }
+    
+    func presentReviewEditFlow() {
+        let flow = dependencies.makeReviewEditFlowCoordinator()
         self.start(coordinator: flow)
         self.navigationController.presentWithTransition(flow.navigationController)
     }

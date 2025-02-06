@@ -64,7 +64,7 @@ final class CommentListViewController: BaseViewController, View {
     private func setTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         tableView.register(CommentTableCell.self, forCellReuseIdentifier: CommentTableCell.reuseIdentifier)
-        tableView.register(PhotoCollectionViewCell.self, forCellReuseIdentifier: PhotoCollectionViewCell.reuseIdentifier)
+        tableView.register(PhotoViewTableCell.self, forCellReuseIdentifier: PhotoViewTableCell.reuseIdentifier)
         tableView.register(CommentTableHeader.self, forHeaderFooterViewReuseIdentifier: CommentTableHeader.reuseIdentifier)
     }
     
@@ -133,9 +133,9 @@ extension CommentListViewController {
         return cell
     }
     
-    private func makePhotoContainerCell(_ imagePaths: [String?]) -> PhotoCollectionViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: PhotoCollectionViewCell.reuseIdentifier) as! PhotoCollectionViewCell
-        cell.setImagePaths(imagePaths)
+    private func makePhotoContainerCell(_ imagePaths: [String]) -> PhotoViewTableCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: PhotoViewTableCell.reuseIdentifier) as! PhotoViewTableCell
+        cell.configure(imagePaths)
         return cell
     }
 }
@@ -155,7 +155,13 @@ extension CommentListViewController: UITableViewDelegate {
         guard let dataSource else { return nil}
         let model = dataSource.sectionModels[section]
         header.setTitle(model.type.title)
-        header.setCount(model.items.count)
+        
+        if case .photo(let images) = model.items.first {
+            header.setCount(images.count)
+        } else {
+            header.setCount(model.items.count)
+        }
+
         return header
     }
     

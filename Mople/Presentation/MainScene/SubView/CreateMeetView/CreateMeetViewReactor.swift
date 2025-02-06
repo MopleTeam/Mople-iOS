@@ -20,12 +20,12 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        case responseMeet
         case notifyMessage(message: String?)
-        case notifyLoadingState(Bool)
+        case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
-    struct State {
+    struct State: LoadingState {
         @Pulse var message: String?
         @Pulse var isLoading: Bool = false
     }
@@ -64,24 +64,38 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case .responseMeet:
-            coordinator?.dismiss()
-        case .notifyMessage(let message):
+        case let .notifyMessage(message):
             newState.message = message
-        case .notifyLoadingState(let isLoad):
+        case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
+        case let .catchError(error):
+            handleError(state: &newState,
+                        error: error)
         }
         
         return newState
+    }
+    
+    private func handleError(state: inout State, error: Error) {
+        
+    }
+}
+
+extension CreateMeetViewReactor: LoadingReactor {
+    var loadingState: LoadingState { initialState }
+    
+    func updateLoadingState(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchError(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }
 
 extension CreateMeetViewReactor {
     private func createMeet(title: String, image: UIImage?) -> Observable<Mutation> {
-        let loadingEnd = Observable.just(Mutation.notifyLoadingState(false))
-            .filter { [weak self] _ in self?.currentState.isLoading == true }
-            
-        #warning("오류 발생 시 문제 해결")
+
         let createMeet = imageUploadUseCase.execute(image)
             .flatMap { [weak self] imagePath -> Single<Meet> in
                 guard let self else { return .error(AppError.unknownError)}
@@ -90,17 +104,15 @@ extension CreateMeetViewReactor {
             }
             .asObservable()
             .observe(on: MainScheduler.instance)
-            .do(onNext: { [weak self] in self?.notificationNewMeet($0) })
-            .map { _ in Mutation.responseMeet }
-            .catch { err in .just(.notifyMessage(message: "오류 발생")) }
-            .concat(loadingEnd)
-            .share()
-        
-        let loading = Observable.just(Mutation.notifyLoadingState(true))
-            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
-            .take(until: createMeet)
+            .flatMap({ [weak self] meet -> Observable<Mutation> in
+                self?.notificationNewMeet(meet)
+                return .empty()
+            })
             
-        return .merge([createMeet, loading])
+        return requestWithLoading(task: createMeet) { [weak self] in
+            guard let self else { return }
+            self.coordinator?.dismiss()
+        }
     }
     
     private func notificationNewMeet(_ meet: Meet) {

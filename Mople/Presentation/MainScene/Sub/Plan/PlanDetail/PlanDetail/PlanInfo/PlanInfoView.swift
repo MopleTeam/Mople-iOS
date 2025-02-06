@@ -15,6 +15,8 @@ final class PlanInfoView: UIView {
     // MARK: - Variables
     private var location: Location?
     
+    private var hasMapView: Bool = false
+    
     private let height: CGFloat = 399
 
     // MARK: - UI Components
@@ -37,7 +39,6 @@ final class PlanInfoView: UIView {
     fileprivate let membersButton: UIButton = {
         let btn = UIButton()
         btn.setContentHuggingPriority(.required, for: .vertical)
-        btn.backgroundColor = .systemRed
         return btn
     }()
     
@@ -59,7 +60,6 @@ final class PlanInfoView: UIView {
         let label = IconLabel(icon: .date,
                               iconSize: .init(width: 24, height: 24))
         label.setTitleTopPadding(4)
-        label.backgroundColor = .systemBlue
         return label
     }()
     
@@ -67,11 +67,10 @@ final class PlanInfoView: UIView {
         let label = IconLabel(icon: .place,
                               iconSize: .init(width: 24, height: 24))
         label.setTitleTopPadding(4)
-        label.backgroundColor = .systemMint
         return label
     }()
 
-    private let mapView: MapView = {
+    private lazy var mapView: MapView = {
         let view = MapView()
         view.layer.cornerRadius = 8
         view.layer.makeLine(width: 1)
@@ -100,7 +99,7 @@ final class PlanInfoView: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [headerStackView, subStackView, mapView])
+        let sv = UIStackView(arrangedSubviews: [headerStackView, subStackView])
         sv.axis = .vertical
         sv.distribution = .fill
         sv.alignment = .fill
@@ -112,13 +111,14 @@ final class PlanInfoView: UIView {
     }()
     
     // MARK: - Gesture
-    fileprivate let mapTapGesture = UITapGestureRecognizer()
+    fileprivate lazy var mapTapGesture = UITapGestureRecognizer()
     
     // MARK: - LifeCycle
-    init() {
+    init(hasMapView: Bool = true) {
         super.init(frame: .init(origin: .zero,
                                 size: .init(width: 0,
                                             height: height)))
+        self.hasMapView = hasMapView
         initalSetup()
     }
     
@@ -167,10 +167,6 @@ final class PlanInfoView: UIView {
             make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
         }
-        
-        mapView.snp.makeConstraints { make in
-            make.height.equalTo(160)
-        }
     }
     
     private func setInfoLabel() {
@@ -180,10 +176,7 @@ final class PlanInfoView: UIView {
         }
     }
     
-    private func setMapTapGesture() {
-        mapView.addGestureRecognizer(mapTapGesture)
-    }
-
+   
     public func configure(with plan: PlanInfoViewModel) {
         print(#function, #line)
         thumbnailView.configure(with: .init(meetSummary: plan.meet))
@@ -191,8 +184,25 @@ final class PlanInfoView: UIView {
         dateInfoLabel.text = plan.dateString
         countInfoLabel.text = plan.participantsCountText
         placeInfoLabel.text = plan.fullAddress
-        mapView.initializeMap(location: plan.location ?? .defaultLocation)
+        setMapView(plan.location)
     }
+}
+
+// MARK: - MapView
+extension PlanInfoView {
+    private func setMapView(_ location: Location) {
+        guard hasMapView else { return }
+        
+        mainStackView.addArrangedSubview(mapView)
+        mapView.snp.makeConstraints { make in
+            make.height.equalTo(160)
+        }
+    }
+    
+    private func setMapTapGesture() {
+        mapView.addGestureRecognizer(mapTapGesture)
+    }
+    
 }
 
 extension Reactive where Base: PlanInfoView {

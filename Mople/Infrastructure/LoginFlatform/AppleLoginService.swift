@@ -18,6 +18,7 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
     
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
     private var singlnObserver: ((SingleEvent<SocialInfo>) -> Void)?
+    private var testObserver: PublishSubject<SocialInfo> = .init()
     
     override init() {
         super.init()
@@ -98,3 +99,4 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
         KeyChainService.shared.getEmail()
     }
 }
+

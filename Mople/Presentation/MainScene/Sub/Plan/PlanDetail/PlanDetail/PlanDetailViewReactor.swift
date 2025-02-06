@@ -31,7 +31,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         enum Flow {
             case memberList
             case placeDetailView
-            case editPlanView
+            case editPlan
+            case editReview
             case endFlow
         }
         
@@ -162,8 +163,10 @@ extension PlanDetailViewReactor {
             coordinator?.pushMemberListView()
         case .placeDetailView:
             coordinator?.pushPlaceDetailView(place: placeInfo!)
-        case .editPlanView:
+        case .editPlan:
             coordinator?.presentPlanEditFlow(plan: plan!)
+        case .editReview:
+            coordinator?.presentReviewEditFlow()
         case .endFlow:
             coordinator?.endFlow()
         }

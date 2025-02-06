@@ -135,7 +135,6 @@ extension MeetDetailSceneDIContainer {
     // MARK: - 일정 상세 뷰
     func makePlanDetailFlowCoordinator(postId: Int,
                                        type: PlanDetailType) -> BaseCoordinator {
-        print(#function, #line, "#55 : \(type) ")
         return commonFactory.makePlanDetailCoordinator(postId: postId,
                                                        type: type)
     }

@@ -147,6 +147,15 @@ extension APIEndpoints {
                              bodyEncoder: multipartFormEncoder)
     }
     
+    static func uploadReviewImage(_ imageDatas: [Data]) -> Endpoint<Void> {
+        let boundary = UUID().uuidString
+        let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
+        return try! Endpoint(path: "image/review/review",
+                             method: .post,
+                             headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
+                             bodyParameters: ["image": imageDatas],
+                             bodyEncoder: multipartFormEncoder)
+    }
 }
 
 // MARK: - 파이어베이스 토큰 저장
@@ -315,5 +324,25 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
                             bodyParametersEncodable: reportComment)
+    }
+}
+
+extension APIEndpoints {
+    static func fetchMember(type: MemberListType) throws -> Endpoint<MemberListResponse> { // 모델 변경
+        return try Endpoint(path: getFetchMemberPath(type: type),
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
+    private static func getFetchMemberPath(type: MemberListType) -> String {
+        switch type {
+        case let .meet(id):
+            return "meet/members/\(id)"
+        case let .plan(id):
+            return "plan/participants/\(id)"
+        case let .review(id):
+            return "review/participants/\(id)"
+        }
     }
 }

@@ -14,7 +14,7 @@ struct PlanInfoViewModel {
     let address: String?
     let addressTitle: String?
     let meet: MeetSummary?
-    let location: Location?
+    let location: Location
     
     var participantsCountText: String? {
         guard let particiapantsCount else { return nil }
@@ -43,7 +43,7 @@ extension PlanInfoViewModel {
         self.address = plan.address
         self.addressTitle = plan.addressTitle
         self.meet = plan.meet
-        self.location = plan.location
+        self.location = plan.location ?? .defaultLocation
     }
     
     #warning("타이틀 추가 필요")
@@ -54,6 +54,6 @@ extension PlanInfoViewModel {
         self.address = review.address
         self.addressTitle = review.addressTitle
         self.meet = review.meet
-        self.location = review.location
+        self.location = review.location ?? .defaultLocation
     }
 }

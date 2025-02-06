@@ -87,7 +87,8 @@ extension MeetReviewListViewReactor {
     private func presentReviewDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedReview = currentState.reviews[safe: index],
               let reviewId = selectedReview.id else { return .empty() }
-        self.coordinator?.pushPlanDetailView(postId: reviewId, type: .review)
+        self.coordinator?.pushPlanDetailView(postId: reviewId,
+                                             type: .review(isReviewed: selectedReview.isReviewd))
         return .empty()
     }
 }

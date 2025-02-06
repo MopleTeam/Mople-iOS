@@ -10,8 +10,7 @@ import RxSwift
 
 protocol PlanDetailSceneDependencies {
     // MARK: - 기본 뷰
-    func makePlanDetailViewController(type: PlanDetailType,
-                                      coordinator: PlanDetailCoordination) -> PlanDetailViewController
+    func makePlanDetailViewController(coordinator: PlanDetailCoordination) -> PlanDetailViewController
     func makeCommentListViewController() -> CommentListViewController
     
     // MARK: - 이동 뷰
@@ -21,6 +20,7 @@ protocol PlanDetailSceneDependencies {
     
     // MARK: - 이동 플로우
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
+    func makeReviewEditFlowCoordinator() -> BaseCoordinator
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
@@ -28,20 +28,22 @@ final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
     private var mainReactor: PlanDetailViewReactor?
+    private let type: PlanDetailType
     private let postId: Int
     
     init(appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory,
+         type: PlanDetailType,
          postId: Int) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
+        self.type = type
         self.postId = postId
     }
     
-    func makePlanDetailCoordinator(type: PlanDetailType) -> PlanDetailFlowCoordinator {
+    func makePlanDetailCoordinator() -> PlanDetailFlowCoordinator {
         return .init(dependencies: self,
-                     navigationController: AppNaviViewController(),
-                     type: type)
+                     navigationController: AppNaviViewController())
     }
 }
 
@@ -49,21 +51,27 @@ final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
 extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 상세
-    func makePlanDetailViewController(type: PlanDetailType,
-                                      coordinator: PlanDetailCoordination) -> PlanDetailViewController {
-        
-        return .init(title: type == .plan ? "일정 상세" : "약속 후기",
+    func makePlanDetailViewController(coordinator: PlanDetailCoordination) -> PlanDetailViewController {
+        return .init(title: getPlanViewTitle(),
                      reactor: makePlanDetailViewReactor(type: type,
                                                         coordinator: coordinator))
+    }
+    
+    private func getPlanViewTitle() -> String {
+        if case .plan = type {
+            return "일정 상세"
+        } else {
+            return "약속 후기"
+        }
     }
     
     private func makePlanDetailViewReactor(type: PlanDetailType,
                                            coordinator: PlanDetailCoordination) -> PlanDetailViewReactor {
         mainReactor = PlanDetailViewReactor(type: type,
-                                             postId: postId,
-                                             fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(),
-                                             fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(),
-                                             coordinator: coordinator)
+                                            postId: postId,
+                                            fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(),
+                                            fetchReviewDetailUseCase: commonFactory.makeFetchReviewDetailUseCase(),
+                                            coordinator: coordinator)
         return mainReactor!
     }
     
@@ -73,14 +81,6 @@ extension PlanDetailSceneDIContainer {
     
     private func makePlanDetailRepo() -> PlanQueryRepo {
         return DefaultPlanQueryRepo(networkService: appNetworkService)
-    }
-    
-    private func makeFetchReviewDetailUseCase() -> FetchReviewDetail {
-        return FetchReviewDetailUseCase(reviewListRepo: makeFetchReviewDetailRepo())
-    }
-    
-    private func makeFetchReviewDetailRepo() -> ReviewQueryRepo {
-        return DefaultReviewQueryRepo(networkService: appNetworkService)
     }
 
     // MARK: - 댓글뷰
@@ -143,8 +143,16 @@ extension PlanDetailSceneDIContainer {
     
     // MARK: - 멤버 리스트
     func makeMemberListViewController(coordinator: MemberListCoordination) -> MemberListViewController {
-        return commonFactory.makeMemberListViewController(type: .planMember(id: postId),
+        return commonFactory.makeMemberListViewController(type: getMemberListType(),
                                                           coordinator: coordinator)
+    }
+    
+    private func getMemberListType() -> MemberListType {
+        if case .plan = type {
+            return .plan(id: postId)
+        } else {
+            return .review(id: postId)
+        }
     }
 }
 
@@ -152,6 +160,10 @@ extension PlanDetailSceneDIContainer {
 extension PlanDetailSceneDIContainer {
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
         return commonFactory.makePlanCreateCoordinator(type: .edit(plan))
+    }
+    
+    func makeReviewEditFlowCoordinator() -> BaseCoordinator {
+        return commonFactory.makeReviewEditCoordinator(reviewId: postId)
     }
 }
 
