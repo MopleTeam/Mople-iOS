@@ -17,8 +17,7 @@ protocol AppleLoginService {
 final class DefaultAppleLoginService: NSObject, AppleLoginService {
     
     private weak var presentationContextProvider: ASAuthorizationControllerPresentationContextProviding?
-    private var singlnObserver: ((SingleEvent<SocialInfo>) -> Void)?
-    private var testObserver: PublishSubject<SocialInfo> = .init()
+    private var loginObserver: ((SingleEvent<SocialInfo>) -> Void)?
     
     override init() {
         super.init()
@@ -46,7 +45,7 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
             authorizationController.presentationContextProvider = self.presentationContextProvider
             authorizationController.performRequests()
             
-            self.singlnObserver = single
+            self.loginObserver = single
             
             return Disposables.create()
         }
@@ -63,20 +62,20 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
             print(#function, #line, "# 29 : \(appleIDCredential.email)" )
             
             guard let email = fetchAppleEmail(appleIDCredential.email) else {
-                singlnObserver?(.failure(LoginError.appleAccountError))
+                loginObserver?(.failure(LoginError.appleAccountError))
                 return
             }
 
-            singlnObserver?(.success(.init(provider: LoginPlatform.apple.rawValue,
+            loginObserver?(.success(.init(provider: LoginPlatform.apple.rawValue,
                                            token: identityCode,
                                            email: email)))
         } else {
-            singlnObserver?(.failure(LoginError.appleAccountError))
+            loginObserver?(.failure(LoginError.appleAccountError))
         }
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        singlnObserver?(.failure(LoginError.completeError))
+        loginObserver?(.failure(LoginError.completeError))
     }
     
     private func fetchAppleEmail(_ email: String?) -> String? {

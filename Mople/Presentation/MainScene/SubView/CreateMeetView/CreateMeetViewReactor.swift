@@ -81,18 +81,6 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
-extension CreateMeetViewReactor: LoadingReactor {
-    var loadingState: LoadingState { initialState }
-    
-    func updateLoadingState(_ isLoading: Bool) -> Mutation {
-        return .updateLoadingState(isLoading)
-    }
-    
-    func catchError(_ error: Error) -> Mutation {
-        return .catchError(error)
-    }
-}
-
 extension CreateMeetViewReactor {
     private func createMeet(title: String, image: UIImage?) -> Observable<Mutation> {
 
@@ -118,5 +106,17 @@ extension CreateMeetViewReactor {
     private func notificationNewMeet(_ meet: Meet) {
         EventService.shared.postItem(.created(meet),
                                      from: self)
+    }
+}
+
+extension CreateMeetViewReactor: LoadingReactor {
+    var loadingState: LoadingState { currentState }
+    
+    func updateLoadingState(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchError(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

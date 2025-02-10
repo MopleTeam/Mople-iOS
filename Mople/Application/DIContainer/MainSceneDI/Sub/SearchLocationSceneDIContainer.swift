@@ -51,7 +51,7 @@ extension SearchLocationSceneDIContainer {
 extension SearchLocationSceneDIContainer {
     private func makeCommonReactor(coordinator: SearchPlaceCoordination) {
         commonReactor = .init(searchLocationUseCase: makeSearchLocationUseCase(),
-                              locationService: makeLocationService(),
+                              locationService: DefaultLocationService(),
                               queryStorage: DefaultSearchedPlaceStorage(),
                               coordinator: coordinator)
     }
@@ -62,9 +62,5 @@ extension SearchLocationSceneDIContainer {
     
     private func makeSearchLocationRepo() -> SearchPlaceRepo {
         return DefaultSearchPlaceRepo(networkService: appNetworkService)
-    }
-    
-    private func makeLocationService() -> LocationService {
-        return DefaultLocationService()
     }
 }

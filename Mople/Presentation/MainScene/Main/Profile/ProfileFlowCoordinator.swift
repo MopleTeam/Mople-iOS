@@ -31,15 +31,8 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
     }
 }
 
-// MARK: - 뷰 이동
+// MARK: - Push
 extension ProfileFlowCoordinator {
-    
-    func presentEditView(previousProfile: UserInfo) {
-        let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
-                                                                         navigator: self)
-        self.navigationController.presentWithTransition(profileEditView)
-    }
-    
     func presentNotifyView() {
         let notifyView = dependencies.makeNotifyViewController()
         self.navigationController.pushViewController(notifyView, animated: false)
@@ -55,7 +48,14 @@ extension ProfileFlowCoordinator {
     }
 }
 
-
+// MARK: - Present
+extension ProfileFlowCoordinator {
+    func presentEditView(previousProfile: UserInfo) {
+        let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
+                                                                         navigator: self)
+        self.navigationController.presentWithTransition(profileEditView)
+    }
+}
 
 
 

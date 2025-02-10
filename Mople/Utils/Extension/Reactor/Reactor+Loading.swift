@@ -18,7 +18,6 @@ protocol LoadingReactor: AnyObject {
     func catchError(_ error: Error) -> Mutation
 }
 
-// 프로토콜 익스텐션으로 공통 기능 구현
 extension LoadingReactor {
 
     func requestWithLoading(task: Observable<Mutation>,
@@ -26,11 +25,9 @@ extension LoadingReactor {
                             completionScheduler: ImmediateSchedulerType = MainScheduler.instance,
                             completionDealy: RxTimeInterval = .never,
                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
-        
-        let loadingStop = loadingStop(completion: completion)
-        
+                
         let newTask = task
-            .concat(loadingStop)
+            .concat(loadingStop(completion: completion))
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
@@ -51,16 +48,15 @@ extension LoadingReactor {
     }
     
     private func loadingStop(scheduler: ImmediateSchedulerType = MainScheduler.instance,
-                                           delay: RxTimeInterval = .seconds(0),
-                                           completion: (() -> Void)? = nil) -> Observable<Mutation> {
+                             delay: RxTimeInterval = .seconds(0),
+                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
+        print(#function, #line)
         return Observable.just(updateLoadingState(false))
             .delay(delay, scheduler: MainScheduler.instance)
             .observe(on: scheduler)
             .flatMap({ [weak self] mutation -> Observable<Mutation> in
+                guard let self, self.loadingState.isLoading else { return .empty() }
                 completion?()
-                guard let self, self.loadingState.isLoading else {
-                    return .empty()
-                }
                 return .just(mutation)
             })
     }

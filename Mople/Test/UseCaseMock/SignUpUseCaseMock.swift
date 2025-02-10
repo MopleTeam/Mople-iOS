@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 final class SignUpUseCaseMock: SignUp {
-    func execute(nickname: String, imagePath: String?) -> RxSwift.Single<Void> {
+    func execute(request: SignUpRequest) -> RxSwift.Single<Void> {
         return Single.just(())
 
     }

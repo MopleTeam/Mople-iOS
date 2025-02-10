@@ -53,7 +53,7 @@ final class ProfileSetupViewController: UIViewController, View {
         return imageView
     }()
     
-    private let nameView: LabeledTextFieldView = {
+    private let nameTextFieldView: LabeledTextFieldView = {
         let textField = LabeledTextFieldView(title: TextStyle.ProfileSetup.nameTitle,
                                               placeholder: TextStyle.ProfileSetup.typingName,
                                               maxTextCount: 15)
@@ -93,7 +93,7 @@ final class ProfileSetupViewController: UIViewController, View {
     }()
     
     private lazy var nameStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [nameView, nameCheckContanierView])
+        let sv = UIStackView(arrangedSubviews: [nameTextFieldView, nameCheckContanierView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -175,7 +175,7 @@ final class ProfileSetupViewController: UIViewController, View {
     }
 
     private func setupTextField() {
-        nameView.setInputTextField(view: duplicateButton, mode: .right)
+        nameTextFieldView.setInputTextField(view: duplicateButton, mode: .right)
      }
     
     // MARK: - 외부 바인딩
@@ -185,9 +185,9 @@ final class ProfileSetupViewController: UIViewController, View {
     }
     
     private func setInput(reactor: Reactor) {
-        self.nameView.textField.rx.editEvent
+        self.nameTextFieldView.textField.rx.editEvent
             .map({ [weak self] in
-                self?.nameView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+                self?.nameTextFieldView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             })
             .map { Reactor.Action.setName($0) }
             .bind(to: reactor.action)
@@ -200,7 +200,7 @@ final class ProfileSetupViewController: UIViewController, View {
             .disposed(by: disposeBag)
         
         self.duplicateButton.rx.controlEvent(.touchUpInside)
-            .compactMap({ _ in self.nameView.text })
+            .compactMap({ _ in self.nameTextFieldView.text })
             .map { Reactor.Action.duplicateCheck(name: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -298,7 +298,7 @@ extension ProfileSetupViewController : UITextFieldDelegate {
 extension ProfileSetupViewController {
     public func setRandomNickname(_ name: String) {
         duplicateButton.isEnabled = true
-        nameView.text = name
+        nameTextFieldView.text = name
     }
 }
 
@@ -336,7 +336,7 @@ extension ProfileSetupViewController {
     private func handleValidName(_ isDuplicate: Bool?) {
         if let isDuplicate {
             nameCheckLabel.rx.isOverlap.onNext(isDuplicate)
-            nameView.textField.rx.isResign.onNext(!isDuplicate)
+            nameTextFieldView.textField.rx.isResign.onNext(!isDuplicate)
             duplicateButton.isEnabled = false
             completionButton.isEnabled = !isDuplicate
         } else {
@@ -361,7 +361,7 @@ extension ProfileSetupViewController {
     private func setProfile(_ profile: UserInfo) {
         _ = self.profileImageView.kfSetimage(profile.imagePath,
                                              defaultImageType: .user)
-        nameView.text = profile.name
+        nameTextFieldView.text = profile.name
     }
 }
 
@@ -370,4 +370,6 @@ extension ProfileSetupViewController: KeyboardDismissable {
         setupTapKeyboardDismiss()
     }
 }
+
+
 

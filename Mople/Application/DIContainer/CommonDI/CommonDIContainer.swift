@@ -8,8 +8,13 @@
 import UIKit
 
 protocol CommonSceneFactory {
+    // MARK: - UseCase
     func makeImageUploadUseCase() -> ImageUpload
+    func makeValidateNicknameUseCase() -> ValidationNickname
+    
     func makeFetchReviewDetailUseCase() -> FetchReviewDetail
+    
+    
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor
     func makeMemberListViewController(type: MemberListType,
@@ -56,19 +61,19 @@ extension CommonDIContainer {
     func makeProfileSetupReactor(profile: UserInfo?,
                                  shouldGenerateNickname: Bool) -> ProfileSetupViewReactor {
         return .init(profile: profile,
-                     validativeNicknameUseCase: makeValidateNicknameUseCase(),
-                     generateNicknameUseCase: makeGenerateNicknameUseCase())
+                     validativeNickname: makeValidateNicknameUseCase(),
+                     generateNickname: makeGenerateNicknameUseCase())
     }
     
-    private func makeValidateNicknameUseCase() -> ValidativeNickname {
-        return NicknameManagerUseCase(nickNameRepo: makeNicknameManagerRepo())
+    func makeValidateNicknameUseCase() -> ValidationNickname {
+        return ValidationNicknameUseCase(validationNicknameRepo: makeNicknameManagerRepo())
     }
     
-    private func makeGenerateNicknameUseCase() -> GenerativeNickname {
-        return GenerateNicknameUseCase(nickNameRepo: makeNicknameManagerRepo())
+    func makeGenerateNicknameUseCase() -> CreationNickname {
+        return CreationNicknameUseCase(nickNameRepo: makeNicknameManagerRepo())
     }
     
-    private func makeNicknameManagerRepo() -> NicknameRepo {
+    func makeNicknameManagerRepo() -> NicknameRepo {
         return DefaultNicknameManagerRepo(networkService: appNetworkService)
     }
     

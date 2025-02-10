@@ -84,7 +84,7 @@ extension ReviewEditViewReactor {
 }
 
 extension ReviewEditViewReactor: LoadingReactor {
-    var loadingState: LoadingState { initialState }
+    var loadingState: LoadingState { currentState }
     
     func updateLoadingState(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

@@ -9,19 +9,16 @@ import UIKit
 import RxSwift
 
 protocol SignUp {
-    func execute(nickname: String, imagePath: String?) -> Single<Void>
+    func execute(request: SignUpRequest) -> Single<Void>
 }
 
 final class SignUpUseCase: SignUp {
 
     private let authenticationRepo: AuthenticationRepo
-    private let platForm: SocialInfo
     
-    init(authenticationRepo: AuthenticationRepo,
-         platForm: SocialInfo) {
+    init(authenticationRepo: AuthenticationRepo) {
         print(#function, #line, "LifeCycle Test SignInUseCase Created" )
         self.authenticationRepo = authenticationRepo
-        self.platForm = platForm
     }
     
     deinit {
@@ -29,10 +26,7 @@ final class SignUpUseCase: SignUp {
     }
     
     // MARK: - SignUp
-    func execute(nickname: String,
-                imagePath: String?) -> Single<Void> {
-        return self.authenticationRepo.signUp(requestModel: .init(social: platForm,
-                                                                  nickname: nickname,
-                                                                  imagePath: imagePath))
+    func execute(request: SignUpRequest) -> Single<Void> {
+        return self.authenticationRepo.signUp(requestModel: request)
     }
 }

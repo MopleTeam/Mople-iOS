@@ -26,7 +26,7 @@ final class ImageUploadUseCase: ImageUpload {
             
             do {
                 guard let imageData = try Data.imageDataCompressed(uiImage: image) else {
-                    return .error(AppError.unknownError)//.just(nil)
+                    return .just(nil)
                 }
                 return self.imageUploadRepo.uploadImage(image: imageData, path: .profile)
             } catch {

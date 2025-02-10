@@ -16,14 +16,7 @@ class SignUpViewController: DefaultViewController, View {
     typealias Reactor = SignUpViewReactor
     
     var disposeBag = DisposeBag()
-    
-    // MARK: - Sub Reactor
-    let profileSetupReactor: ProfileSetupViewReactor
-    
-    // MARK: - Observable
-    private let completionObservable: PublishSubject<(nickname: String, image: UIImage?)> = .init()
-    private let loadingObservable: PublishSubject<Bool> = .init()
-    
+ 
     // MARK: - UI Components
     private let mainTitle: UILabel = {
         let label = UILabel()
@@ -34,19 +27,13 @@ class SignUpViewController: DefaultViewController, View {
         return label
     }()
     
-    private let profileContainerView = UIView()
+    private let profileSetupView = ProfileSetupView(type: .create)
     
-    private lazy var profileSetupView: ProfileSetupViewController = {
-        let viewController = ProfileSetupViewController(reactor: profileSetupReactor,
-                                                        lodingObserver: loadingObservable.asObserver(),
-                                                        completionObserver: completionObservable.asObserver())
-        return viewController
-    }()
-    
+    // MARK: - Alert
+    private let alertManager = AlertManager.shared
+
     // MARK: - LifeCycle
-    init(profileSetupReactor: ProfileSetupViewReactor,
-         signUpReactor: SignUpViewReactor) {
-        self.profileSetupReactor = profileSetupReactor
+    init(signUpReactor: SignUpViewReactor) {
         super.init()
         self.reactor = signUpReactor
     }
@@ -57,53 +44,88 @@ class SignUpViewController: DefaultViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        initalSetup()
+    }
+    
+    private func initalSetup() {
+        setLayout()
+        setAction()
+        setupKeyboardDismissGestrue()
     }
     
     // MARK: - UI Setup
-    private func setupUI() {
-        setupLayout()
-        addProfileSetupView()
-    }
-
-    private func setupLayout() {
+    private func setLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainTitle)
-        self.view.addSubview(profileContainerView)
+        self.view.addSubview(profileSetupView)
 
         mainTitle.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).inset(28)
             make.horizontalEdges.equalToSuperview().inset(20)
         }
 
-        profileContainerView.snp.makeConstraints { make in
+        profileSetupView.snp.makeConstraints { make in
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
             make.bottom.equalToSuperview().inset(UIScreen.getDefatulBottomInset())
         }
     }
     
-    private func addProfileSetupView() {
-        addChild(profileSetupView)
-        profileContainerView.addSubview(profileSetupView.view)
-        profileSetupView.didMove(toParent: self)
-        profileSetupView.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+    // MARK: - Binding
+    func bind(reactor: SignUpViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
     }
     
-    // MARK: - Binding
-    #warning("랜덤 닉네임 받는 로직이 viewwillappear로 되어 있었으나 reactor init에서 처리하게 바꿨음 추후 이상있으면 확인 없으면 warning 제거")
-    func bind(reactor: SignUpViewReactor) {
-        loadingObservable
-            .map({ Reactor.Action.setLoading(isLoad: $0) })
+    private func inputBind(_ reactor: Reactor) {
+        profileSetupView.rx.editName
+            .compactMap({ $0 })
+            .map { Reactor.Action.setNickname($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        completionObservable
-            .debug()
-            .map { Reactor.Action.singUp(name: $0.nickname, image: $0.image) }
+        profileSetupView.rx.duplicateTapped
+            .map { Reactor.Action.duplicateCheck }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        profileSetupView.rx.completeTapped
+            .map { Reactor.Action.complete }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$creationNickname)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, name in
+                vc.profileSetupView.setNickname(name)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$profileImage)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, image in
+                vc.profileSetupView.setImage(image)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$canDuplicateCheck)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.profileSetupView.rx.isDuplicateEnable)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isValidNickname)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.profileSetupView.rx.isDuplicate)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$message)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
+            .drive(with: self, onNext: { vc, message in
+                vc.alertManager.showAlert(message: message)
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
@@ -111,6 +133,38 @@ class SignUpViewController: DefaultViewController, View {
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
+    
+    private func setAction() {
+        profileSetupView.rx.imageViewTapped
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                vc.showPhotos()
+            })
+            .disposed(by: disposeBag)
+    }
 }
 
+extension SignUpViewController: KeyboardDismissable {
+    private func setupKeyboardDismissGestrue() {
+        setupTapKeyboardDismiss()
+    }
+}
+
+// MARK: - 이미지 선택
+extension SignUpViewController {
+    private func showPhotos() {
+        let selectPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
+        let defaultPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
+        
+        alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
+    }
+    
+    private func presentPhotos() {
+        self.reactor?.action.onNext(.showImagePicker)
+    }
+    
+    private func setDefaultImage() {
+        self.reactor?.action.onNext(.resetImage)
+    }
+}
 

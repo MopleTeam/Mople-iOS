@@ -8,6 +8,11 @@
 import UIKit
 import ReactorKit
 
+enum ProfileSetupType {
+    case create(SocialInfo)
+    case update(UserInfo)
+}
+
 class ProfileSetupViewReactor: Reactor {
 
     enum Action {
@@ -44,17 +49,17 @@ class ProfileSetupViewReactor: Reactor {
         @Pulse var canCheckCompletion: Bool = false
     }
     
-    private let validativeNicknameUseCase: ValidativeNickname
-    private let generateNicknameUseCase: GenerativeNickname
+    private let validativeNickname: ValidationNickname
+    private var generateNickname: CreationNickname?
     
     var initialState: State = State()
     
     init(profile: UserInfo? = nil,
-         validativeNicknameUseCase: ValidativeNickname,
-         generateNicknameUseCase: GenerativeNickname) {
+         validativeNickname: ValidationNickname,
+         generateNickname: CreationNickname? = nil) {
         print(#function, #line, "LifeCycle Test ProfileSetup Reactor Created" )
-        self.validativeNicknameUseCase = validativeNicknameUseCase
-        self.generateNicknameUseCase = generateNicknameUseCase
+        self.validativeNickname = validativeNickname
+        self.generateNickname = generateNickname
         self.setDefaultProfile(profile)
     }
     
@@ -80,16 +85,9 @@ class ProfileSetupViewReactor: Reactor {
         case let .setPreviousProfile(profile):
             return .just(.updatePreviousProfile(profile))
         case let .setName(name):
-            return .concat([
-                .just(Mutation.updateName(name)),
-                .just(.updateDuplication(nil)),
-                isDuplicateCheckAvailable(name: name)
-            ])
+            return updateNickname(name)
         case let .setImage(image):
-            return .concat([
-                .just(Mutation.updateImage(image)),
-                isCompleteAvailable(image: image)
-            ])
+            return updateImage(image)
         }
     }
     
@@ -138,9 +136,11 @@ class ProfileSetupViewReactor: Reactor {
 extension ProfileSetupViewReactor {
     
     private func generatorName() -> Observable<Mutation> {
+        guard let generateNickname else { return .empty() }
+        
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let generatorName = generateNicknameUseCase.executue()
+        let generatorName = generateNickname.executue()
             .asObservable()
             .compactMap({ $0 })
             .map { Mutation.randomName($0)}
@@ -149,6 +149,7 @@ extension ProfileSetupViewReactor {
             }
         
         let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
+        
         return Observable.concat([loadingOn,
                                   generatorName,
                                   loadingOff])
@@ -157,7 +158,7 @@ extension ProfileSetupViewReactor {
     private func nickNameValidCheck(name: String) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
         
-        let nicknameValidator = validativeNicknameUseCase.execute(name)
+        let nicknameValidator = validativeNickname.execute(name)
             .asObservable()
             .map { Mutation.updateDuplication($0)}
             .catch { [weak self] err in
@@ -168,6 +169,27 @@ extension ProfileSetupViewReactor {
         return Observable.concat([loadingOn,
                                   nicknameValidator,
                                   loadingOff])
+    }
+    
+    private func updateNickname(_ name: String?) -> Observable<Mutation> {
+        let updateName = Observable.just(Mutation.updateName(name))
+        
+        let resetDuplication = Observable.just(Mutation.updateDuplication(nil))
+        
+        let updateDuplicateAvailable = isDuplicateCheckAvailable(name: name)
+        
+        return .concat([updateName,
+                        resetDuplication,
+                        updateDuplicateAvailable])
+    }
+    
+    private func updateImage(_ image: UIImage?) -> Observable<Mutation> {
+        let updateImage = Observable.just(Mutation.updateImage(image))
+        
+        let updateCompleteAvailable = isCompleteAvailable()
+        
+        return .concat([updateImage,
+                        updateCompleteAvailable])
     }
     
     private func isDuplicateCheckAvailable(name: String?) -> Observable<Mutation> {
@@ -184,7 +206,7 @@ extension ProfileSetupViewReactor {
         }
     }
     
-    private func isCompleteAvailable(image: UIImage?) -> Observable<Mutation> {
+    private func isCompleteAvailable() -> Observable<Mutation> {
         guard let previousName = self.currentState.previousProfile?.name,
               let inputName = self.currentState.name else {
             return .empty()

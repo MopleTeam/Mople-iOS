@@ -10,7 +10,7 @@ import UIKit
 protocol AUthSceneDependencies {
     func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController
     func makeSignUpViewController(socialInfo: SocialInfo,
-                                  coordinator: AuthFlowCoordination) -> SignUpViewController
+                                  coordinator: SignUpCoordination) -> SignUpViewController
 }
 
 final class AuthSceneDIContainer: AUthSceneDependencies {
@@ -64,26 +64,30 @@ extension AuthSceneDIContainer {
 // MARK: - Profile Setup
 extension AuthSceneDIContainer {
     func makeSignUpViewController(socialInfo: SocialInfo,
-                                  coordinator: AuthFlowCoordination) -> SignUpViewController {
+                                  coordinator: SignUpCoordination) -> SignUpViewController {
         return SignUpViewController(
-            profileSetupReactor: commonFactory
-                .makeProfileSetupReactor(profile: nil,
-                                         shouldGenerateNickname: true),
             signUpReactor: makeSignUpReactor(socialInfo: socialInfo,
                                              coordinator: coordinator))
     }
     
     private func makeSignUpReactor(socialInfo: SocialInfo,
-                                   coordinator: AuthFlowCoordination) -> SignUpViewReactor {
-        return .init(imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
-                     signUpUseCase: makeSignUpUseCase(socialInfo: socialInfo),
-                     fetchUserInfo: makeFetchUserInfoUseCase(),
+                                   coordinator: SignUpCoordination) -> SignUpViewReactor {
+        return .init(signUpUseCase: makeSignUpUseCase(),
+                     imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
+                     validationNickname: commonFactory.makeValidateNicknameUseCase(),
+                     creationNickname: makeCreationNicknameUseCase(),
+                     photoService: DefaultPhotoService(),
+                     socialInfo: socialInfo,
                      coordinator: coordinator)
     }
     
-    private func makeSignUpUseCase(socialInfo: SocialInfo) -> SignUp {
-        return SignUpUseCase(authenticationRepo: makeAuthenticationRepo(),
-                             platForm: socialInfo)
+    private func makeSignUpUseCase() -> SignUp {
+        return SignUpUseCase(authenticationRepo: makeAuthenticationRepo())
+    }
+    
+    private func makeCreationNicknameUseCase() -> CreationNickname {
+        let repo = DefaultNicknameManagerRepo(networkService: appNetworkService)
+        return CreationNicknameUseCase(nickNameRepo: repo)
     }
 }
 

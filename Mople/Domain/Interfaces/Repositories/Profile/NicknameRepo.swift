@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol NicknameRepo {
-    func generatorNickname() -> Single<Data>
+    func creationNickname() -> Single<Data>
     func isNicknameExists(_ name: String) -> Single<Data>
 }
 

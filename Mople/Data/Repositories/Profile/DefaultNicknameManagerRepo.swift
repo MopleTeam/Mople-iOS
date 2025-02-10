@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 final class DefaultNicknameManagerRepo: BaseRepositories, NicknameRepo {
-    func generatorNickname() -> Single<Data> {
+    func creationNickname() -> Single<Data> {
         let endpoint = APIEndpoints.getRandomNickname()
         return networkService.basicRequest(endpoint: endpoint)
     }

@@ -18,7 +18,7 @@ final class NicknameManagerRepoMock: NicknameRepo {
     }
     
     
-    func generatorNickname() -> Single<Data> {
+    func creationNickname() -> Single<Data> {
         return Single.just("랜덤닉네임".data(using: .utf8) ?? Data())
             .delay(.seconds(1), scheduler: MainScheduler.instance)
     }

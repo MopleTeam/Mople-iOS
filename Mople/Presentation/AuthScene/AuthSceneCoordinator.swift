@@ -38,7 +38,7 @@ extension AuthSceneCoordinator {
 }
 
 // MARK: - 메인 뷰 전환
-extension AuthSceneCoordinator {
+extension AuthSceneCoordinator: SignUpCoordination {
     
     func presentMainFlow() {
         print(#function, #line, "# 30 로그인 성공" )

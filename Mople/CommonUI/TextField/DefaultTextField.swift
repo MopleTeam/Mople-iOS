@@ -142,6 +142,13 @@ extension Reactive where Base: DefaultTextField {
         base.inputTextField.rx.controlEvent(.editingChanged)
     }
     
+    var editText: Observable<String?> {
+        editEvent
+            .compactMap({ _ in
+                base.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+            })
+    }
+
     var returnEvent: ControlEvent<Void> {
         base.inputTextField.rx.controlEvent(.editingDidEndOnExit)
     }

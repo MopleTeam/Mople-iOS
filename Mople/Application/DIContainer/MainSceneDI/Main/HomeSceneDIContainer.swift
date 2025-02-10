@@ -20,7 +20,6 @@ protocol HomeSceneDependencies {
 final class HomeSceneDIContainer {
         
     private let appNetworkService: AppNetworkService
-    private let notificationService = DefaultNotificationService()
     private let commonFactory: CommonSceneFactory
 
     init(appNetworkService: AppNetworkService,
@@ -49,7 +48,7 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
     // 테스트 모드
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
         return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
-                               notificationService: notificationService,
+                               notificationService: DefaultNotificationService(),
                                coordinator: coordinator)
     }
     

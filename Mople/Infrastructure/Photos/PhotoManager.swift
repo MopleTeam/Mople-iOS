@@ -68,33 +68,50 @@ extension PhotoManager: PHPickerViewControllerDelegate {
     }
 }
 
-final class PhotoService {
+protocol PhotoService {
+    func presentImagePicker() -> Single<[UIImage]>
+}
+
+final class DefaultPhotoService: PhotoService {
+
+    private var imageObserver: ((SingleEvent<[UIImage]>) -> Void)?
     
-    private var photoObserver: PublishSubject<[UIImage]> = .init()
-    private var photoTest: Single<[UIImage]> = .just( [])
+    private let limit: Int
     
-    public func requestPhotoLibraryPermission() -> Observable<[UIImage]> {
+    init(limit: Int = 1) {
+        self.limit = limit
+    }
+    
+    public func presentImagePicker() -> Single<[UIImage]> {
+        return Single.create { [weak self] emitter in
+            guard let self else { return Disposables.create() }
+            requestPhotoLibraryPermission()
+            self.imageObserver = emitter
+            return Disposables.create()
+        }
+    }
+    
+    private func requestPhotoLibraryPermission() {
         PHPhotoLibrary.requestAuthorization { [weak self] status in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 switch status {
                 case .authorized, .limited:
-                    print("사진 라이브러리 접근 권한이 허용되었습니다.")
                     self.configureImagePicker()
                 case .denied, .restricted:
+                    //
                     print("사진 라이브러리 접근 권한이 거부되었습니다.")
                 default:
                     break
                 }
             }
         }
-        return photoObserver
     }
     
     private func configureImagePicker() {
         guard let topView = UIApplication.shared.topVC else { return}
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 1
+        configuration.selectionLimit = limit
         configuration.filter = .images
         let pickerViewController = PHPickerViewController(configuration: configuration)
         pickerViewController.delegate = self
@@ -102,24 +119,38 @@ final class PhotoService {
     }
 }
 
-extension PhotoService: PHPickerViewControllerDelegate {
+extension DefaultPhotoService: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        let pickerResults: [UIImage] = results.compactMap { [weak self] result in
-            return self?.convertToUIImage(result.itemProvider)
+        print(#function, #line)
+        
+        let group = DispatchGroup()
+        var imageList: [UIImage] = []
+        
+        results.forEach { result in
+            group.enter()
+            convertToUIImage(result.itemProvider) { image in
+                DispatchQueue.main.async {
+                    if let image {
+                        imageList.append(image)
+                    }
+                    group.leave()
+                }
+            }
         }
-        self.photoObserver.onNext(pickerResults)
-        picker.dismiss(animated: true)
+        
+        group.notify(queue: .main) { [weak self] in
+            self?.imageObserver?(.success(imageList))
+            picker.dismiss(animated: true)
+        }
     }
     
-    private func convertToUIImage(_ provider: NSItemProvider) -> UIImage? {
-        var convertImage: UIImage?
-        guard provider.canLoadObject(ofClass: UIImage.self) else { return nil }
+    private func convertToUIImage(_ provider: NSItemProvider, completion: @escaping (UIImage?) -> Void) {
+        guard provider.canLoadObject(ofClass: UIImage.self) else { return }
         
         provider.loadObject(ofClass: UIImage.self) { image, error in
-            guard error == nil,
-                  let image = image as? UIImage else { return }
-            convertImage = image
+            completion(image as? UIImage)
         }
-        return convertImage
     }
 }
+
+
