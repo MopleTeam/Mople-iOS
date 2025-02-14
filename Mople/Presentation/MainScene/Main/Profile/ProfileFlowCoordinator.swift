@@ -9,15 +9,15 @@ import UIKit
 
 protocol ProfileCoordination: AnyObject {
     func presentEditView(previousProfile: UserInfo)
-    func presentNotifyView()
-    func presentPolicyView()
+    func pushNotifyView()
+    func pushPolicyView()
     func logout()
 }
 
 final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
     
     private let dependencies: ProfileSceneDependencies
-    private(set) var profileVC: ProfileViewController?
+    private var profileVC: ProfileViewController?
     
     init(navigationController: AppNaviViewController,
          dependencies: ProfileSceneDependencies) {
@@ -33,12 +33,12 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
 
 // MARK: - Push
 extension ProfileFlowCoordinator {
-    func presentNotifyView() {
+    func pushNotifyView() {
         let notifyView = dependencies.makeNotifyViewController()
         self.navigationController.pushViewController(notifyView, animated: false)
     }
     
-    func presentPolicyView() {
+    func pushPolicyView() {
         let policyView = dependencies.makePolicyViewController()
         self.navigationController.pushViewController(policyView, animated: false)
     }
@@ -49,11 +49,16 @@ extension ProfileFlowCoordinator {
 }
 
 // MARK: - Present
-extension ProfileFlowCoordinator {
+extension ProfileFlowCoordinator: ProfileEditViewCoordinator {
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
-                                                                         navigator: self)
+                                                                         coordinator: self)
         self.navigationController.presentWithTransition(profileEditView)
+    }
+    
+    func complete() {
+        profileVC?.fetchProfile()
+        dismiss()
     }
 }
 

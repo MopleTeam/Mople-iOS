@@ -11,13 +11,9 @@ struct SignUpRequest: Encodable {
     var socialProvider: String?
     var providerToken: String?
     var email: String?
-    var nickname: String? {
-        didSet {
-            print(#function, #line, "닉네임 인풋 : \(nickname)" )
-        }
-    }
-    let deviceType: String = "IOS"
+    var nickname: String?
     var image: String?
+    let deviceType: String = "IOS"
 }
 
 extension SignUpRequest {

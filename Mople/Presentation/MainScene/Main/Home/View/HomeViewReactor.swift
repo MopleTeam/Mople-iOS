@@ -114,7 +114,12 @@ extension HomeViewReactor {
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let fetchSchedules = fetchRecentScheduleUseCase.execute()
+        let fetchSchedules = Observable.just(())//
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .flatMap({ [weak self] _ -> Single<RecentPlan> in
+                guard let self else { return .never() }
+                return fetchRecentScheduleUseCase.execute()
+            })
             .asObservable()
             .map { Mutation.responseRecentPlan(schedules: $0) }
         
@@ -124,8 +129,6 @@ extension HomeViewReactor {
                                   fetchSchedules,
                                   loadingStop])
     }
-    
-    
 }
 
 // MARK: - Flow

@@ -9,6 +9,11 @@ import Foundation
 import RxSwift
 
 final class ImageUploadRepositoryMock: ImageUploadRepo {
+    func uploadReviewImages(id: Int,
+                            images: [Data]) -> Single<Void> {
+        return Single.just(())
+    }
+    
     func uploadImage(image: Data, path: ImageUploadPath) -> Single<String?> {
         let photoPath = "https://picsum.photos/id/1/200/300"
         

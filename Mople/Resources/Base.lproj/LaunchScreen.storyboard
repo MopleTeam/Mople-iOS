@@ -18,16 +18,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchScreenIcon" translatesAutoresizingMaskIntoConstraints="NO" id="SB0-yQ-6MV">
-                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="SB0-yQ-6MV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="7en-Uq-WEc"/>
-                            <constraint firstItem="SB0-yQ-6MV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="D21-i7-LpW"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="SB0-yQ-6MV" secondAttribute="bottom" id="eCm-rh-KWd"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="SB0-yQ-6MV" secondAttribute="trailing" id="rKC-FH-T67"/>
+                            <constraint firstItem="SB0-yQ-6MV" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="Kxf-gJ-mx7"/>
+                            <constraint firstAttribute="bottom" secondItem="SB0-yQ-6MV" secondAttribute="bottom" id="bRK-CL-Vv6"/>
+                            <constraint firstAttribute="trailing" secondItem="SB0-yQ-6MV" secondAttribute="trailing" id="fsC-nH-FW3"/>
+                            <constraint firstItem="SB0-yQ-6MV" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="jMa-KT-qcT"/>
                         </constraints>
                     </view>
                 </viewController>

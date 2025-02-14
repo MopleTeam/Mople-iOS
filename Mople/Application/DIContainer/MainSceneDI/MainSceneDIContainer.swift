@@ -20,7 +20,7 @@ final class MainSceneDIContainer: MainSceneDependencies {
     private var FCMTokenManager: FCMTokenManager?
 
     private let appNetworkService: AppNetworkService
-    let commonFactory: CommonSceneFactory
+    private let commonFactory: CommonSceneFactory
 
     init(appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory,

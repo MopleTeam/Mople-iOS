@@ -105,6 +105,10 @@ extension TitleNaviBar {
         titleLable.text = title
     }
     
+    public func setTitleColor(_ color: UIColor) {
+        titleLable.textColor = color
+    }
+    
     public func setBarItem(type: ButtonType, image: UIImage) {
         switch type {
         case .left:

@@ -1,6 +1,7 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 protocol KeyboardResponsive: AnyObject {
     var keyboardHeight: CGFloat? { get set }
@@ -9,11 +10,29 @@ protocol KeyboardResponsive: AnyObject {
     var floatingView: UIView { get }
     var floatingViewBottom: Constraint? { get }
     var threshold: CGFloat { get }
+    var disposeBag: DisposeBag { get }
+    func handleKeyboardShow(_ sender: Notification)
+    func handleKeyboardHide(_ sender: Notification)
 }
 
 extension KeyboardResponsive where Self: UIViewController {
     var containerView: UIView { self.view }
     var threshold: CGFloat { 10 }
+    
+    func setupKeyboardEvent() {
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+            .subscribe(onNext: {[weak self] notification in
+                self?.handleKeyboardShow(notification)
+            })
+            .disposed(by: disposeBag)
+        
+        NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+            .subscribe(onNext: {[weak self] notification in
+                self?.handleKeyboardHide(notification)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     
     func getKeyboardHeightDiff(_ height: CGFloat) -> CGFloat {
         guard let keyboardHeight else { return .zero }
@@ -27,13 +46,12 @@ extension KeyboardResponsive where Self: UIViewController {
             keyboardHeightDiff.negate()
             return keyboardHeightDiff
         }
-        
     }
     
     func getKeyboardHeight(from notification: Notification) -> CGFloat? {
         guard let keyboardSize = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey]
                 as? CGRect else { return nil }
-        return keyboardSize.height - UIScreen.getNotchSize() + threshold
+        return keyboardSize.height + threshold
     }
     
     func getKeyboardDuration(from notification: Notification) -> TimeInterval? {

@@ -7,14 +7,6 @@
 
 import UIKit
 
-protocol SignInListener {
-    func signIn()
-}
-
-protocol SignOutListener {
-    func signOut()
-}
-
 final class AppFlowCoordinator: BaseCoordinator {
     
     private let appDIContainer: AppDIContainer
@@ -25,38 +17,49 @@ final class AppFlowCoordinator: BaseCoordinator {
         super.init(navigationController: navigationController)
     }
     
-    
     override func start() {
-        fadeOut { [weak self] in
-            self?.checkEntry()
-        }
+        let launchView = appDIContainer.makeLaunchViewController(coordinator: self)
+        self.navigationController.pushViewController(launchView, animated: false)
     }
-    
-    private func checkEntry() {
-        if KeyChainService.shared.hasToken() {
-            self.mainFlowStart()
-        } else {
-            self.loginFlowStart()
-        }
-    }
-    
-    private func mainFlowStart(isFirstStart: Bool = false) {
+}
+
+// MARK: - 런치 스크린
+protocol LaunchCoordination: AnyObject {
+    func mainFlowStart(isFirstStart: Bool)
+    func loginFlowStart()
+}
+
+extension AppFlowCoordinator: LaunchCoordination {
+    func mainFlowStart(isFirstStart: Bool = false) {
+        self.navigationController.viewControllers.removeAll()
         let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isFirstStart: isFirstStart)
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
     }
     
-    private func loginFlowStart() {
+    func loginFlowStart() {
+        print(#function, #line)
+        self.navigationController.viewControllers.removeAll()
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
         let flow = loginSceneDIContainer.makeAuthFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
     }
 }
 
+// MARK: - 로그인
+protocol SignInListener {
+    func signIn()
+}
+
 extension AppFlowCoordinator: SignInListener {
     func signIn() {
         mainFlowStart(isFirstStart: true)
     }
+}
+
+// MARK: - 로그아웃, 회원탈퇴
+protocol SignOutListener {
+    func signOut()
 }
 
 extension AppFlowCoordinator: SignOutListener {

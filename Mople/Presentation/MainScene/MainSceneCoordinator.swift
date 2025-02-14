@@ -25,7 +25,7 @@ final class MainSceneCoordinator: BaseCoordinator {
     
     override func start() {
         tabBarController.setViewControllers(getTabs(), animated: false)
-        navigationController.pushViewController(tabBarController, animated: true)
+        navigationController.pushViewController(tabBarController, animated: false)
     }
     
     private func getTabs() -> [UIViewController] {

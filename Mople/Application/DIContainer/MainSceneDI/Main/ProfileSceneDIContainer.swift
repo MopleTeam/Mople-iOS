@@ -11,7 +11,7 @@ protocol ProfileSceneDependencies {
     // MARK: - View
     func makeProfileViewController(coordinator: ProfileCoordination) -> ProfileViewController
     func makeProfileEditViewController(previousProfile: UserInfo,
-                                       navigator: NavigationCloseable) -> ProfileEditViewController
+                                       coordinator: ProfileEditViewCoordinator) -> ProfileEditViewController
     func makeNotifyViewController() -> NotifyViewController
     func makePolicyViewController() -> PolicyViewController
 }
@@ -53,18 +53,26 @@ extension ProfileSceneDIContainer {
 // MARK: - 프로필 편집 View
 extension ProfileSceneDIContainer {
     func makeProfileEditViewController(previousProfile: UserInfo,
-                                       navigator: NavigationCloseable) -> ProfileEditViewController {
+                                       coordinator: ProfileEditViewCoordinator) -> ProfileEditViewController {
         return ProfileEditViewController(
-            profile: previousProfile,
-            profileSetupReactor: commonFacoty.makeProfileSetupReactor(profile: previousProfile,
-                                                                      shouldGenerateNickname: false),
-            editProfileReactor: makeProfileEditViewReactor(navigator: navigator))
+            editProfileReactor: makeProfileEditViewReactor(previousProfile: previousProfile,
+                                                           coordinator: coordinator))
     }
     
-    private func makeProfileEditViewReactor(navigator: NavigationCloseable) -> ProfileEditViewReactor {
-        return .init(editUserInfo: EditUserInfoMock(),
-                     imageUpload: ImageUploadMock(),
-                     navigator: navigator)
+    private func makeProfileEditViewReactor(previousProfile: UserInfo,
+                                            coordinator: ProfileEditViewCoordinator) -> ProfileEditViewReactor {
+        return .init(previousProfile: previousProfile,
+                     editProfile: makeEditProfileUseCase(),
+                     imageUpload: commonFacoty.makeImageUploadUseCase(),
+                     validationNickname: commonFacoty.makeDuplicateNicknameUseCase(),
+                     photoService: DefaultPhotoService(),
+                     coordinator: coordinator)
+    }
+    
+    private func makeEditProfileUseCase() -> EditProfile {
+        return EditProfileUseCase(
+            userInfoRepo: DefaultUserInfoRepo(networkService: appNetworkService)
+        )
     }
 }
 

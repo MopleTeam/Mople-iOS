@@ -125,8 +125,8 @@ final class SignInViewController: DefaultViewController, View {
         mainStackView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(20)
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
-                .inset(UIScreen.getDefatulBottomInset())
+            make.bottom.equalToSuperview()
+                .inset(UIScreen.getBottomSafeAreaHeight())
         }
         
         titleStackView.snp.makeConstraints { make in

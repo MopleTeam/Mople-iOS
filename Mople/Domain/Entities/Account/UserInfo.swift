@@ -13,3 +13,10 @@ struct UserInfo: Hashable, Equatable {
     var imagePath: String?
     var location: Location?
 }
+
+extension UserInfo {
+    mutating func updateProfile(_ profile: UserInfo) {
+        self.name = profile.name
+        self.imagePath = profile.imagePath
+    }
+}

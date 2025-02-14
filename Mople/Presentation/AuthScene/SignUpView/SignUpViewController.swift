@@ -16,6 +16,9 @@ class SignUpViewController: DefaultViewController, View {
     typealias Reactor = SignUpViewReactor
     
     var disposeBag = DisposeBag()
+    
+    // MARK: - Variables
+    private var hasImage: Bool = false
  
     // MARK: - UI Components
     private let mainTitle: UILabel = {
@@ -28,6 +31,7 @@ class SignUpViewController: DefaultViewController, View {
     }()
     
     private let profileSetupView = ProfileSetupView(type: .create)
+    
     
     // MARK: - Alert
     private let alertManager = AlertManager.shared
@@ -67,7 +71,8 @@ class SignUpViewController: DefaultViewController, View {
         profileSetupView.snp.makeConstraints { make in
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
-            make.bottom.equalToSuperview().inset(UIScreen.getDefatulBottomInset())
+            make.bottom.equalToSuperview()
+                .inset(UIScreen.getBottomSafeAreaHeight())
         }
     }
     
@@ -107,6 +112,7 @@ class SignUpViewController: DefaultViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, image in
                 vc.profileSetupView.setImage(image)
+                vc.setHasImageState(image)
             })
             .disposed(by: disposeBag)
         
@@ -156,7 +162,11 @@ extension SignUpViewController {
         let selectPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
         let defaultPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
         
-        alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
+        if hasImage {
+            alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
+        } else {
+            alertManager.showActionSheet(actions: [selectPhotoAction])
+        }
     }
     
     private func presentPhotos() {
@@ -165,6 +175,10 @@ extension SignUpViewController {
     
     private func setDefaultImage() {
         self.reactor?.action.onNext(.resetImage)
+    }
+    
+    private func setHasImageState(_ image: Any?) {
+        hasImage = image != nil
     }
 }
 

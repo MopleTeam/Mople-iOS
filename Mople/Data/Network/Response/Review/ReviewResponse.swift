@@ -35,7 +35,7 @@ extension ReviewResponse {
                      participantsCount: participantsCount,
                      address: address,
                      addressTitle: title,
-                     images: images ?? [],
+                     imagePaths: images ?? [],
                      meet: .init(id: meetId,
                                  name: meetName,
                                  imagePath: meetImage),

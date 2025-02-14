@@ -16,10 +16,10 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
         case setNickname(String)
-        case resetImage
         case duplicateCheck
         case createNickname
         case showImagePicker
+        case resetImage
         case complete
     }
     
@@ -35,21 +35,18 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
     
     struct State: LoadingState {
         @Pulse var creationNickname: String?
+        @Pulse var profileImage: UIImage?
         @Pulse var canDuplicateCheck: Bool = false
         @Pulse var isValidNickname: Bool?
-        @Pulse var isLoading: Bool = false {
-            didSet {
-                print(#function, #line, "로딩 상태 : \(isLoading)" )
-            }
-        }
+        @Pulse var isLoading: Bool = false
         @Pulse var message: String?
-        @Pulse var profileImage: UIImage?
     }
     
     private let signUpUseCase: SignUp
     private let imageUploadUseCase: ImageUpload
-    private let validationNickname: ValidationNickname
+    private let validationNickname: CheckDuplicateNickname
     private let creationNickname: CreationNickname
+    private let fetchUserInfo: FetchUserInfo
     private let photoService: PhotoService
     private weak var coordinator: SignUpCoordination?
     private var signUpModel: SignUpRequest?
@@ -58,8 +55,9 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
     
     init(signUpUseCase: SignUp,
          imageUploadUseCase: ImageUpload,
-         validationNickname: ValidationNickname,
+         validationNickname: CheckDuplicateNickname,
          creationNickname: CreationNickname,
+         fetchUserInfo: FetchUserInfo,
          photoService: PhotoService,
          socialInfo: SocialInfo,
          coordinator: SignUpCoordination) {
@@ -67,6 +65,7 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         self.imageUploadUseCase = imageUploadUseCase
         self.validationNickname = validationNickname
         self.creationNickname = creationNickname
+        self.fetchUserInfo = fetchUserInfo
         self.photoService = photoService
         self.coordinator = coordinator
         initalSetup(socialInfo)
@@ -139,6 +138,8 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Observable
 extension SignUpViewReactor {
+    
+    // MARK: - 랜덤 닉네임 생성
     private func creationNickName() -> Observable<Mutation> {
         print(#function, #line)
         let createNickname = creationNickname.executue()
@@ -154,16 +155,7 @@ extension SignUpViewReactor {
         return requestWithLoading(task: createNickname)
     }
     
-    private func nickNameValidCheck() -> Observable<Mutation> {
-        print(#function, #line)
-        guard let name = signUpModel?.nickname else { return .empty() }
-        let checkValidation = validationNickname.execute(name)
-            .asObservable()
-            .map { Mutation.updateValidState($0)}
-
-        return requestWithLoading(task: checkValidation)
-    }
-    
+    // MARK: - 닉네임 정규식 검사 및 업데이트
     private func updateNickname(_ name: String) -> Observable<Mutation> {
         print(#function, #line)
         let resetDuplication = Observable
@@ -175,6 +167,20 @@ extension SignUpViewReactor {
                         updateDuplicateAvailable])
     }
     
+    private func checkDuplicateAvaliable(name: String) -> Observable<Mutation> {
+        print(#function, #line)
+        let canCheckDuplicate = Validator.checkNickname(name)
+        setNickname(isValidName: canCheckDuplicate,
+                    name: name)
+        return .just(.updateDuplicateAvaliable(canCheckDuplicate))
+    }
+    
+    private func setNickname(isValidName: Bool, name: String) {
+        guard isValidName else { return }
+        self.signUpModel?.nickname = name
+    }
+    
+    // MARK: - 이미지 업데이트
     private func updateImage() -> Observable<Mutation> {
         print(#function, #line)
         return photoService.presentImagePicker()
@@ -187,17 +193,31 @@ extension SignUpViewReactor {
         return .just(.updateImage(nil))
     }
     
+    // MARK: - 닉네임 중복검사
+    private func nickNameValidCheck() -> Observable<Mutation> {
+        print(#function, #line)
+        guard let name = signUpModel?.nickname else { return .empty() }
+        let checkValidation = validationNickname.execute(name)
+            .asObservable()
+            .map { Mutation.updateValidState($0)}
+
+        return requestWithLoading(task: checkValidation)
+    }
+
+    // MARK: - 회원가입
     private func requsetSignUp() -> Observable<Mutation> {
         print(#function, #line)
         let image = currentState.profileImage
 
         let signUp = imageUploadUseCase.execute(image)
             .flatMap { [weak self] imagePath -> Single<Void> in
-                guard let self,
-                      var signUpModel else { return .never() }
-                signUpModel.image = imagePath
-                return self.signUpUseCase.execute(request: signUpModel)
+                guard let self else { return .never() }
+                return self.signUp(imagePath)
             }
+            .flatMap({ [weak self] _ -> Single<Void> in
+                guard let self else { return .never() }
+                return self.fetchUserInfo.execute()
+            })
             .asObservable()
             .flatMap({ _ in Observable<Mutation>.empty() })
         
@@ -206,20 +226,10 @@ extension SignUpViewReactor {
         }
     }
     
-    private func checkDuplicateAvaliable(name: String) -> Observable<Mutation> {
-        print(#function, #line)
-        let canCheckDuplicate = Validator.checkNickname(name)
-        setNickname(isValidName: canCheckDuplicate,
-                    name: name)
-        return .just(.updateDuplicateAvaliable(canCheckDuplicate))
-    }
-}
-
-// MARK: - Helper
-extension SignUpViewReactor {
-    private func setNickname(isValidName: Bool, name: String) {
-        guard isValidName else { return }
-        self.signUpModel?.nickname = name
+    private func signUp(_ imagePath: String?) -> Single<Void> {
+        guard var signUpModel else { return .never() }
+        signUpModel.image = imagePath
+        return self.signUpUseCase.execute(request: signUpModel)
     }
 }
 

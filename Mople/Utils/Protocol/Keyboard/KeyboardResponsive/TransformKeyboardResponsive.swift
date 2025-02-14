@@ -28,25 +28,7 @@ extension TransformKeyboardResponsive where Self: UIViewController {
         adjustableViewFrame.maxY - floatingViewFrame.minY + threshold
     }
     
-    func setupKeyboardEvent() {
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification,
-                                               object: nil,
-                                               queue: .main) { [weak self] notification in
-            self?.handleKeyboardShow(notification)
-        }
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification,
-                                               object: nil,
-                                               queue: .main) { [weak self] notification in
-            self?.handleKeyboardHide(notification)
-        }
-    }
-    
-    func removeKeyboardObserver() {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    private func handleKeyboardShow(_ sender: Notification) {
+    func handleKeyboardShow(_ sender: Notification) {
         guard let height = getKeyboardHeight(from: sender),
               let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
@@ -58,13 +40,13 @@ extension TransformKeyboardResponsive where Self: UIViewController {
         setKeyboardHeight(height)
     }
 
-    private func handleKeyboardHide(_ sender: Notification) {
+    func handleKeyboardHide(_ sender: Notification) {
         guard let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
         keyboardHeight = nil
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
-            self?.floatingViewBottom?.update(inset: UIScreen.getDefatulBottomInset())
+            self?.floatingViewBottom?.update(inset: UIScreen.getBottomSafeAreaHeight())
             self?.resetScrollViewTransform()
         }
     }

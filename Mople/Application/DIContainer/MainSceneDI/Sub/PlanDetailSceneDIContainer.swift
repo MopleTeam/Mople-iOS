@@ -16,11 +16,14 @@ protocol PlanDetailSceneDependencies {
     // MARK: - 이동 뷰
     func makePlaceDetailViewController(place: PlaceInfo,
                                        coordinator: PlaceDetailCoordination) -> PlaceDetailViewController
-    func makeMemberListViewController(coordinator: MemberListCoordination) -> MemberListViewController
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
+    func makePhotoBookViewController(images: [UIImage],
+                                     index: Int,
+                                     coordinator: NavigationCloseable) -> PhotoBookViewController
     
     // MARK: - 이동 플로우
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
-    func makeReviewEditFlowCoordinator() -> BaseCoordinator
+    func makeReviewEditFlowCoordinator(review: Review) -> BaseCoordinator
 }
 
 final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
@@ -142,7 +145,7 @@ extension PlanDetailSceneDIContainer {
     }
     
     // MARK: - 멤버 리스트
-    func makeMemberListViewController(coordinator: MemberListCoordination) -> MemberListViewController {
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
         return commonFactory.makeMemberListViewController(type: getMemberListType(),
                                                           coordinator: coordinator)
     }
@@ -154,16 +157,29 @@ extension PlanDetailSceneDIContainer {
             return .review(id: postId)
         }
     }
+    
+    // MARK: - 포토북
+    func makePhotoBookViewController(images: [UIImage],
+                                     index: Int,
+                                     coordinator: NavigationCloseable) -> PhotoBookViewController {
+        return PhotoBookViewController(title: "함께한 순간",
+                                       photoList: images,
+                                       selectedIndex: index,
+                                       coordinator: coordinator)
+    }
 }
 
 // MARK: - 이동 플로우
 extension PlanDetailSceneDIContainer {
+    
+    // MARK: - 일정 편집
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
         return commonFactory.makePlanCreateCoordinator(type: .edit(plan))
     }
     
-    func makeReviewEditFlowCoordinator() -> BaseCoordinator {
-        return commonFactory.makeReviewEditCoordinator(reviewId: postId)
+    // MARK: - 리뷰 편집
+    func makeReviewEditFlowCoordinator(review: Review) -> BaseCoordinator {
+        return commonFactory.makeReviewEditCoordinator(review: review)
     }
 }
 

@@ -10,5 +10,7 @@ import RxSwift
 
 protocol ImageUploadRepo {
     func uploadImage(image: Data, path: ImageUploadPath) -> Single<String?>
+    func uploadReviewImages(id: Int,
+                            images: [Data]) -> Single<Void>
 }
 

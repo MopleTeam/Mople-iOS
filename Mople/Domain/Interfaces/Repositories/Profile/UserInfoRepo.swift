@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol UserInfoRepo {
-    func getUserInfo() -> Single<UserInfoDTO>
-    func editProfile(nickname: String, imagePath: String?) -> Single<Void>
+    func getUserInfo() -> Single<Void>
+    func editProfile(requestModel: ProfileEditRequest) -> Single<Void>
 }
 

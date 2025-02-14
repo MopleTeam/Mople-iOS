@@ -29,6 +29,17 @@ final class AppDIContainer {
 // MARK: - Make DIContainer
 extension AppDIContainer {
     
+    // MARK: - 런치 스크린
+    func makeLaunchViewController(coordinator: LaunchCoordination) -> LaunchViewController {
+        return LaunchViewController(
+            viewModel: makeLaunchViewModel(coordinator: coordinator))
+    }
+    
+    private func makeLaunchViewModel(coordinator: LaunchCoordination) -> LaunchViewModel {
+        return DefaultLaunchViewModel(fetchUserInfo: commonDIContainer.makeFetchUserInfoUseCase(),
+                                      coordinator: coordinator)
+    }
+
     // MARK: - 로그인 플로우
     func makeLoginSceneDIContainer() -> AuthSceneDIContainer {
         return AuthSceneDIContainer(appNetworkService: appNetworkService,

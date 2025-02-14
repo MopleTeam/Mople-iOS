@@ -37,8 +37,8 @@ final class ChatingTextFieldView: UIView {
         sv.spacing = 12
         sv.alignment = .center
         sv.distribution = .fill
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 16, left: 20, bottom: 0, right: 20)
+//        sv.isLayoutMarginsRelativeArrangement = true
+//        sv.layoutMargins = .init(top: 16, left: 20, bottom: 0, right: 20)
         return sv
     }()
     
@@ -56,7 +56,9 @@ final class ChatingTextFieldView: UIView {
         self.addSubview(textFieldStackview)
         
         textFieldStackview.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview().inset(16)
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview()
         }
         
         textField.snp.makeConstraints { make in

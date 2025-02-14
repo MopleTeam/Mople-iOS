@@ -194,28 +194,48 @@ struct JSONBodyEncoder: BodyEncoder {
 struct MultipartBodyEncoder: BodyEncoder {
     var boundary: String
     
-    // 하나의 키에 여러 데이터를 어떻게 넣을까?
-    // 단순히 value에 배열을 받아서 하나의 키로 통일시키면 된다.
     func encode(_ parameters: [String : Any]) -> Data? {
-        let parts = parameters.compactMap { (key, value) -> MultipartForm.Part? in
-            
-            switch value {
-            case let value as Data:
-                return MultipartForm.Part(name: key,
-                                          data: value,
-                                          filename: "Profile",
-                                          contentType: "image/jpeg")
-            case let value as [Data]:
-                return nil // nil 대신 하나의 키에 추가하는 로직 추가
-            default:
-                return nil
-            }
-        }
+ 
+        let parts = parameters.flatMap { (key, value) -> [MultipartForm.Part] in
+               if checkCollection(value) {
+                   guard let datas = value as? [Data] else { return [] }
+                   return makeDataArrayPart((key, datas))
+               } else {
+                   guard let singlePart = makeSinglePart((key, value)) else { return [] }
+                   return [singlePart]
+               }
+           }
         
         let form = MultipartForm(parts: parts, boundary: boundary)
-        print(#function, #line, "# 29 form데이터 : \(form)" )
-        print(#function, #line, "# 30 formType : \(form.contentType), boundary: \(form.boundary)" )
         return form.bodyData
+    }
+    
+    private func makeDataArrayPart(_ parameter: (key: String, value: [Data])) -> [MultipartForm.Part] {
+        parameter.value.map {
+            MultipartForm.Part(name: parameter.key,
+                               data: $0,
+                               filename: "Review",
+                               contentType: "image/jpeg")
+        }
+    }
+    
+    private func makeSinglePart(_ parameter: (key: String, value: Any)) -> MultipartForm.Part? {
+        switch parameter.value {
+        case let value as Data:
+            return .init(name: parameter.key,
+                         data: value,
+                         filename: "Profile",
+                         contentType: "image/jpeg")
+        case let value as String:
+            return .init(name: parameter.key,
+                         value: value)
+        default:
+            return nil
+        }
+    }
+    
+    private func checkCollection<T>(_ value: T) -> Bool {
+        return value is Array<Any>
     }
 }
 
@@ -225,5 +245,6 @@ struct AsciiBodyEncoder: BodyEncoder {
         return parameters.queryString.data(using: String.Encoding.ascii, allowLossyConversion: true)
     }
 }
+
 
 

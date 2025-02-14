@@ -18,4 +18,10 @@ final class DefaultReviewQueryRepo: BaseRepositories, ReviewQueryRepo {
             try APIEndpoints.fetchReviewDetail(reviewId: reviewId)
         }
     }
+    
+    func fetchReviewImage(_ reviewId: Int) -> Single<[ReviewImageResponse]> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.fetchReviewImage(reviewId: reviewId)
+        }
+    }
 }

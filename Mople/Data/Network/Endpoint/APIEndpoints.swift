@@ -109,14 +109,12 @@ extension APIEndpoints {
 // MARK: - Profile
 extension APIEndpoints {
     
-    static func setupProfile(nickname: String,
-                             imagePath: String?) throws -> Endpoint<Void> {
+    static func setupProfile(requestModel: ProfileEditRequest) throws -> Endpoint<UserInfoDTO> {
         return try Endpoint(path: "user/info",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["profileImg" : imagePath ?? NSNull(),
-                                             "nickname" : nickname])
+                            bodyParametersEncodable: requestModel)
     }
     
     static func checkNickname(_ name: String) -> Endpoint<Data> {
@@ -137,24 +135,30 @@ extension APIEndpoints {
 // MARK: - 이미지 업로드
 extension APIEndpoints {
     static func uploadImage(_ imageData: Data,
-                            folderPath: ImageUploadPath) -> Endpoint<String?> {
+                            folderPath: ImageUploadPath) throws -> Endpoint<String?> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
-        return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
+        return try Endpoint(path: "image/upload/\(folderPath.rawValue)",
+                             authenticationType: .accessToken,
                              method: .post,
                              headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
                              bodyParameters: ["image": imageData],
                              bodyEncoder: multipartFormEncoder)
     }
     
-    static func uploadReviewImage(_ imageDatas: [Data]) -> Endpoint<Void> {
+    static func uploadReviewImage(id: Int,
+                                  imageDatas: [Data]) throws -> Endpoint<Void> {
+        print(#function, #line, "dataCount : \(imageDatas.count)" )
+        print(#function, #line, "id : \(id)" )
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
-        return try! Endpoint(path: "image/review/review",
-                             method: .post,
-                             headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
-                             bodyParameters: ["image": imageDatas],
-                             bodyEncoder: multipartFormEncoder)
+        return try Endpoint(path: "image/review/review",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
+                            bodyParameters: ["reviewId": "\(id)",
+                                             "images": imageDatas],
+                            bodyEncoder: multipartFormEncoder)
     }
 }
 
@@ -271,6 +275,22 @@ extension APIEndpoints {
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
+    
+    static func fetchReviewImage(reviewId: Int) throws -> Endpoint<[ReviewImageResponse]> {
+        return try Endpoint(path: "review/images/\(reviewId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
+    static func deleteReviewImage(reviewId: Int, imageIds: [String]) throws -> Endpoint<Void> {
+        return try Endpoint(path: "review/images/\(reviewId)",
+                            authenticationType: .accessToken,
+                            method: .delete,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["reviewImages": imageIds]
+        )
+    }
 }
 
 // MARK: - Search Location
@@ -338,11 +358,11 @@ extension APIEndpoints {
     private static func getFetchMemberPath(type: MemberListType) -> String {
         switch type {
         case let .meet(id):
-            return "meet/members/\(id)"
+            return "meet/members/\(id ?? 0)"
         case let .plan(id):
-            return "plan/participants/\(id)"
+            return "plan/participants/\(id ?? 0)"
         case let .review(id):
-            return "review/participants/\(id)"
+            return "review/participants/\(id ?? 0)"
         }
     }
 }

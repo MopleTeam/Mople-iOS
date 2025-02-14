@@ -28,8 +28,8 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isLoading: Bool = false
     }
     
-    private let signInUseCase: SignIn
-    private let fetchUserInfoUseCase: FetchUserInfo
+    private let signIn: SignIn
+    private let fetchUserInfo: FetchUserInfo
     private weak var coordinator: AuthFlowCoordination?
     
     var initialState: State = State()
@@ -37,8 +37,8 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
     init(signInUseCase: SignIn,
          fetchUserInfoUseCase: FetchUserInfo,
          coordinator: AuthFlowCoordination) {
-        self.signInUseCase = signInUseCase
-        self.fetchUserInfoUseCase = fetchUserInfoUseCase
+        self.signIn = signInUseCase
+        self.fetchUserInfo = fetchUserInfoUseCase
         self.coordinator = coordinator
         logLifeCycle()
     }
@@ -84,10 +84,10 @@ extension SignInViewReactor {
     private func executeSignIn(platform: LoginPlatform) -> Observable<Mutation> {
         let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
                 
-        let loginTask = signInUseCase.execute(platform: platform)
+        let loginTask = signIn.execute(platform: platform)
             .flatMap({ [weak self] in
                 guard let self else { throw AppError.unknownError }
-                return self.fetchUserInfoUseCase.execute()
+                return self.fetchUserInfo.execute()
             })
             .asObservable()
             .map { Mutation.moveToMain }

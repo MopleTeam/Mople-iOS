@@ -26,9 +26,5 @@ final class FetchUserInfoUseCase: FetchUserInfo {
     
     func execute() -> Single<Void> {
         return self.userInfoRepo.getUserInfo()
-            .observe(on: MainScheduler.instance)
-            .map {
-                UserInfoStorage.shared.addEntity($0.toDomain())
-            }
     }
 }

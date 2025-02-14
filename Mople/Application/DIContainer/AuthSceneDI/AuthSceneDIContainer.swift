@@ -46,11 +46,10 @@ extension AuthSceneDIContainer {
     private func setAppleLoginProvider(_ view: UIViewController) {
         self.appleLoginService.setPresentationContextProvider(view)
     }
-    
-    // 테스트 모드
+
     private func makeSignInViewReacotr(coordinator: AuthFlowCoordination) -> SignInViewReactor {
         return SignInViewReactor(signInUseCase: makeSignInUseCase(),
-                                 fetchUserInfoUseCase: makeFetchUserInfoUseCase(),
+                                 fetchUserInfoUseCase: commonFactory.makeFetchUserInfoUseCase(),
                                  coordinator: coordinator)
     }
     
@@ -74,8 +73,9 @@ extension AuthSceneDIContainer {
                                    coordinator: SignUpCoordination) -> SignUpViewReactor {
         return .init(signUpUseCase: makeSignUpUseCase(),
                      imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
-                     validationNickname: commonFactory.makeValidateNicknameUseCase(),
+                     validationNickname: commonFactory.makeDuplicateNicknameUseCase(),
                      creationNickname: makeCreationNicknameUseCase(),
+                     fetchUserInfo: commonFactory.makeFetchUserInfoUseCase(),
                      photoService: DefaultPhotoService(),
                      socialInfo: socialInfo,
                      coordinator: coordinator)
@@ -91,17 +91,10 @@ extension AuthSceneDIContainer {
     }
 }
 
-// MARK: - Common
 extension AuthSceneDIContainer {
-    private func makeFetchUserInfoUseCase() -> FetchUserInfo {
-        return FetchUserInfoUseCase(userInfoRepo: makeUserInfoRepo())
-    }
-    
-    private func makeUserInfoRepo() -> UserInfoRepo {
-        return DefaultUserInfoRepo(networkService: appNetworkService)
-    }
-    
     private func makeAuthenticationRepo() -> AuthenticationRepo {
         return DefaultAuthenticationRepo(networkService: appNetworkService)
     }
 }
+
+

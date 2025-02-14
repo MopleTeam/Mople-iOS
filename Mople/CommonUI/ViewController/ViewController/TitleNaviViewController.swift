@@ -79,6 +79,16 @@ class TitleNaviViewController: DefaultViewController {
     }
 }
 
+// MARK: - 배경 설정
+extension TitleNaviViewController {
+    public func setBlackBackground() {
+        self.superTopView.backgroundColor = .black
+        self.view.backgroundColor = .black
+        self.naviBar.backgroundColor = .black
+        self.naviBar.setTitleColor(ColorStyle.Default.white)
+    }
+}
+
 // MARK: - 네비게이션 아이템 설정
 extension TitleNaviViewController {
     public func setBarItem(type: TitleNaviBar.ButtonType, image: UIImage = .backArrow) {

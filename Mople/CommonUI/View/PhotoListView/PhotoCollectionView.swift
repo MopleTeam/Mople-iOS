@@ -13,7 +13,8 @@ final class PhotoCollectionView: UIView {
     
     private let lineSpacing: CGFloat = 4
     private let cellColumns: CGFloat = 3
-    private var imagePaths: [String] = []
+    private var images: [UIImage] = []
+    private var maxPhotoCount: Int = 5
     fileprivate var isEditMode: Bool
     
     fileprivate let cellSelectedRelay: PublishRelay<Int> = .init()
@@ -61,23 +62,23 @@ final class PhotoCollectionView: UIView {
             make.edges.equalToSuperview()
         }
     }
-    
-    public func setImagePaths(_ imagePaths: [String]) {
-        self.imagePaths = imagePaths
+
+    public func setImage(images: [UIImage]) {
+        self.images = images
         self.collectionView.reloadData()
     }
 }
 
 extension PhotoCollectionView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imagePaths.count
+        return images.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoCollectionCell.reuseIdentifier,
             for: indexPath) as! PhotoCollectionCell
-        cell.configure(imagePath: imagePaths[indexPath.item])
+        cell.configure(image: images[indexPath.item])
         
         if isEditMode {
             cell.setEditMode()
@@ -105,7 +106,8 @@ extension PhotoCollectionView: UICollectionViewDataSource {
         guard isEditMode else { return .zero }
         var cellSize = getCellSize()
         cellSize.width += 20
-        return cellSize
+        let canAddPhoto = images.count < maxPhotoCount
+        return canAddPhoto ? cellSize : .zero
     }
 }
 
@@ -121,7 +123,8 @@ extension PhotoCollectionView: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let leftInset: CGFloat = isEditMode ? lineSpacing : 20
+        let canAddPhoto = images.count < maxPhotoCount
+        let leftInset: CGFloat = isEditMode && canAddPhoto ? lineSpacing : 20
         return UIEdgeInsets(top: 20, left: leftInset, bottom: 20, right: 20)
     }
     
@@ -141,10 +144,15 @@ extension PhotoCollectionView {
 
 extension Reactive where Base: PhotoCollectionView {
     var selectPhoto: Observable<Int> {
+        
         return base.cellSelectedRelay.asObservable()
+            .do(onNext: { _ in
+                print(#function, #line, "선택 버튼 잘 눌림" )
+            })
             .filter { [weak base] _ in
                 base?.isEditMode == false
             }
+   
     }
     
     var appPhotos: Observable<Void> {
@@ -156,6 +164,9 @@ extension Reactive where Base: PhotoCollectionView {
     
     var deletePhotos: Observable<Int> {
         return base.deleteButtonRelay.asObservable()
+            .do(onNext: { _ in
+                print(#function, #line, "삭제 버튼 잘 눌림" )
+            })
             .filter { [weak base] _ in
                 base?.isEditMode == true
             }

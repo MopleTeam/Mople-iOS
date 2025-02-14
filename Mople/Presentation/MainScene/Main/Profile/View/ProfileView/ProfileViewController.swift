@@ -250,13 +250,13 @@ final class ProfileViewController: TitleNaviViewController, View {
 extension ProfileViewController {
     private func setProfile(_ profile: UserInfo) {
         profileNameButton.title = profile.name
-        _ = profileImageView.kfSetimage(profile.imagePath, defaultImageType: .meet)
+        profileImageView.kfSetimage(profile.imagePath, defaultImageType: .user)
     }
 }
 
 extension ProfileViewController {
     public func fetchProfile() {
-        reactor?.action.onNext(.readUserInfo)
+        reactor?.action.onNext(.fetchUserInfo)
     }
 }
 

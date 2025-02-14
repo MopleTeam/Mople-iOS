@@ -92,7 +92,7 @@ final class ThumbnailView: UIView {
     }
 
     private func loadImage(_ path: String?) {
-        _ = thumbnailView.kfSetimage(path, defaultImageType: .meet)
+        thumbnailView.kfSetimage(path, defaultImageType: .meet)
     }
 }
 

@@ -14,8 +14,9 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
                                                   email: social.email)
         
         return self.networkService.basicRequest(endpoint: endpoint)
-            .map {
+            .flatMap {
                 KeyChainService.shared.saveToken($0)
+                return .just(())
             }
     }
     
@@ -23,8 +24,9 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
         let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
         
         return networkService.basicRequest(endpoint: endpoint)
-            .map {
+            .flatMap {
                 KeyChainService.shared.saveToken($0)
+                return .just(())
             }
     }
 }

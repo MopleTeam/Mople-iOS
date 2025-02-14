@@ -18,7 +18,7 @@ final class ProfileSetupView: UIView {
     // MARK: - UI Components
     private let imageContainerView = UIView()
     
-    private let profileImageView: UIImageView = {
+    fileprivate let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .defaultIProfile
         imageView.contentMode = .scaleAspectFill
@@ -130,8 +130,7 @@ final class ProfileSetupView: UIView {
         self.nameCheckContanierView.addSubview(nameCheckLabel)
 
         mainStackView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(self.safeAreaLayoutGuide).inset(UIScreen.getDefatulBottomInset())
+            make.edges.equalToSuperview()
         }
 
         profileImageView.snp.makeConstraints { make in
@@ -167,7 +166,7 @@ final class ProfileSetupView: UIView {
 // MARK: - Hlper
 extension ProfileSetupView {
     public func setProfile(_ profile: UserInfo) {
-        _ = self.profileImageView.kfSetimage(profile.imagePath,
+        profileImageView.kfSetimage(profile.imagePath,
                                              defaultImageType: .user)
         setNickname(profile.name)
     }
@@ -179,6 +178,18 @@ extension ProfileSetupView {
     public func setImage(_ image: UIImage?) {
         profileImageView.image = image ?? .defaultUser
     }
+    
+    fileprivate func setDuplicate(_ isDuplicate: Bool?) {
+       if let isDuplicate {
+           nameCheckLabel.rx.isOverlap.onNext(isDuplicate)
+           nameTextFieldView.textField.rx.isResign.onNext(!isDuplicate)
+           duplicateButton.isEnabled = false
+           completeButton.isEnabled = !isDuplicate
+       } else {
+           nameCheckLabel.isHidden = true
+           completeButton.isEnabled = false
+       }
+   }
 }
 
 // MARK: - Reactive
@@ -186,7 +197,7 @@ extension Reactive where Base: ProfileSetupView {
     var editName: Observable<String?> {
         return base.nameTextFieldView.textField.rx.editText
     }
-
+    
     var imageViewTapped: Observable<Void> {
         return base.imageTapGesture.rx.event
             .map { _ in }
@@ -203,32 +214,16 @@ extension Reactive where Base: ProfileSetupView {
     }
     
     var isDuplicateEnable: Binder<Bool> {
-        return Binder(base) { base, enable in
-            base.duplicateButton.isEnabled = enable
-        }
+        return base.duplicateButton.rx.isEnabled
     }
     
     var isCompleteEnable: Binder<Bool> {
-        return Binder(base) { base, enable in
-            base.completeButton.isEnabled = enable
-        }
+        return base.completeButton.rx.isEnabled
     }
     
     var isDuplicate: Binder<Bool?> {
         return Binder(base) { base, isDuplicate in
-            self.setDuplicate(isDuplicate)
-        }
-    }
-    
-    private func setDuplicate(_ isDuplicate: Bool?) {
-        if let isDuplicate {
-            base.nameCheckLabel.rx.isOverlap.onNext(isDuplicate)
-            base.nameTextFieldView.textField.rx.isResign.onNext(!isDuplicate)
-            base.duplicateButton.isEnabled = false
-            base.completeButton.isEnabled = !isDuplicate
-        } else {
-            base.nameCheckLabel.isHidden = true
-            base.completeButton.isEnabled = false
+            base.setDuplicate(isDuplicate)
         }
     }
 }

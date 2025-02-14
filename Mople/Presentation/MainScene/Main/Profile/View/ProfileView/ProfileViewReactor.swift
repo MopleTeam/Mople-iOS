@@ -8,15 +8,10 @@
 import UIKit
 import ReactorKit
 
-struct ProfileUpdateModel {
-    var currentProfile: UserInfo
-    var completedAction: () -> Void
-}
-
 final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case readUserInfo
+        case fetchUserInfo
         case editProfile
         case presentNotifyView
         case presentPolicyView
@@ -38,7 +33,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     init(coordinator: ProfileCoordination) {
         self.coordinator = coordinator
-        action.onNext(.readUserInfo)
+        action.onNext(.fetchUserInfo)
         logLifeCycle()
     }
     
@@ -48,8 +43,8 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .readUserInfo:
-            return self.getProfile()
+        case .fetchUserInfo:
+            return self.fetchProfile()
         case .editProfile:
             return presentEditView()
         case .presentNotifyView:
@@ -79,7 +74,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
 extension ProfileViewReactor {
     
     #warning("프로필 없는 경우(?) 처리")
-    private func getProfile() -> Observable<Mutation> {
+    private func fetchProfile() -> Observable<Mutation> {
         guard let userInfo = UserInfoStorage.shared.userInfo else { return .empty() }
         return .just(.fetchUserInfo(userInfo))
     }
@@ -92,13 +87,13 @@ extension ProfileViewReactor {
     
     /// 코디네이터에게 알림관리 뷰로 이동요청
     private func presentNotifyView() -> Observable<Mutation> {
-        coordinator?.presentNotifyView()
+        coordinator?.pushNotifyView()
         return Observable.empty()
     }
     
     /// 코디네이터에게 개인정보 처리방침 뷰로 이동요청
     private func presentPolicyView() -> Observable<Mutation> {
-        coordinator?.presentPolicyView()
+        coordinator?.pushPolicyView()
         return Observable.empty()
     }
     

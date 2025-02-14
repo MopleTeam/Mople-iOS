@@ -12,24 +12,22 @@ protocol ReviewEditSceneDependencies {
     func makePlanDetailViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewContoller
     
     // MARK: - 이동 뷰
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     
 }
 
 final class ReviewEditSceneDIContainer: ReviewEditSceneDependencies {
-    
+
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
-    private let reviewId: Int
-    private let isReviewed: Bool
+    private let review: Review
     
     init(appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory,
-         reviewId: Int,
-         isReviewed: Bool = false) {
+         review: Review) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
-        self.reviewId = reviewId
-        self.isReviewed = isReviewed
+        self.review = review
     }
     
     func makeReviewEditCoordinator() -> ReviewEditFlowCoordinator {
@@ -38,18 +36,54 @@ final class ReviewEditSceneDIContainer: ReviewEditSceneDependencies {
     }
 }
 
+// MARK: - 기본 뷰
 extension ReviewEditSceneDIContainer {
     func makePlanDetailViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewContoller {
-        let title = isReviewed ? "후기 수정" : "후기 작성"
+        let title = review.isReviewd ? "후기 수정" : "후기 작성"
         return .init(title: title,
-                     reactor: makePlanDetailViewReactor(coordinator: coordinator))
+                     reactor: makePlanDetailViewReactor(review: review,
+                                                        coordinator: coordinator))
     }
     
-    private func makePlanDetailViewReactor(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewReactor {
-        return .init(reviewId: reviewId,
-                     fetchReviewDetail: commonFactory.makeFetchReviewDetailUseCase(),
+    private func makePlanDetailViewReactor(review: Review,
+                                           coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewReactor {
+        return .init(review: review,
+                     fetchReviewImage: makeFetchReviewImageUseCase(),
+                     deleteReviewImage: makeDeleteReviewUseCase(),
+                     imageUpload: makeReviewImageUploadUseCase(),
+                     photoService: DefaultPhotoService(),
                      coordinator: coordinator)
     }
     
+    private func makeFetchReviewImageUseCase() -> FetchReviewImage {
+        return FetchReviewImageUseCase(reviewListRepo: makeReviewQueryRepo())
+    }
     
+    private func makeReviewQueryRepo() -> ReviewQueryRepo {
+        return DefaultReviewQueryRepo(networkService: appNetworkService)
+    }
+    
+    private func makeDeleteReviewUseCase() -> DeleteReviewImage {
+        return DeleteReviewImageUseCase(repo: makeReviewCommandRepo())
+    }
+    
+    private func makeReviewCommandRepo() -> ReviewCommandRepo {
+        return DefaultReviewCommnadRepo(networkService: appNetworkService)
+    }
+    
+    private func makeReviewImageUploadUseCase() -> ReviewImageUpload {
+        return ReviewImageUploadUseCase(repo: makeReviewUploadRepo())
+    }
+    
+    private func makeReviewUploadRepo() -> ImageUploadRepo {
+        return DefaultImageUploadRepo(networkService: appNetworkService)
+    }
+}
+
+// MARK: - 이동 뷰
+extension ReviewEditSceneDIContainer {
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
+        return commonFactory.makeMemberListViewController(type: .review(id: review.id),
+                                                          coordinator: coordinator)
+    }
 }

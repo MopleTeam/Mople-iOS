@@ -5,9 +5,9 @@
 //  Created by CatSlave on 1/7/25.
 //
 
-import Foundation
+import UIKit
 
-struct Review {
+struct Review: Equatable {
     var creatorId: Int?
     var id: Int?
     var name: String?
@@ -15,11 +15,19 @@ struct Review {
     var participantsCount: Int?
     var address: String?
     var addressTitle: String?
-    var images: [String]
+    var imagePaths: [String]
     var meet: MeetSummary?
     var location: Location?
     var isCreator: Bool = false
     var isReviewd: Bool = false
+    var images: [UIImage] = []
+    
+    static func < (lhs: Review, rhs: Review) -> Bool {
+        guard let lhsDate = lhs.date,
+              let rhsDate = rhs.date else { return false }
+        
+        return lhsDate < rhsDate
+    }
 }
 
 extension Review {

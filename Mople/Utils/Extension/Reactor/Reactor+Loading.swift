@@ -27,11 +27,11 @@ extension LoadingReactor {
                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
                 
         let newTask = task
-            .concat(loadingStop(completion: completion))
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
             }
+            .concat(loadingStop(completion: completion))
             .share(replay: 1)
         
         let loadingStart = Observable.just(updateLoadingState(true))
@@ -54,8 +54,7 @@ extension LoadingReactor {
         return Observable.just(updateLoadingState(false))
             .delay(delay, scheduler: MainScheduler.instance)
             .observe(on: scheduler)
-            .flatMap({ [weak self] mutation -> Observable<Mutation> in
-                guard let self, self.loadingState.isLoading else { return .empty() }
+            .flatMap({ mutation -> Observable<Mutation> in
                 completion?()
                 return .just(mutation)
             })

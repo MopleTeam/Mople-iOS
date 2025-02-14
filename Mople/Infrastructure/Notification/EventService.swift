@@ -4,13 +4,13 @@
 //
 //  Created by CatSlave on 1/15/25.
 //
-import Foundation
+import UIKit
 import RxSwift
 
 // MARK: - 아이템 타입
 typealias MeetPayload = EventService.Payload<Meet>
 typealias PlanPayload = EventService.Payload<Plan>
-typealias UserInfoPayload = EventService.Payload<UserInfo>
+typealias ReviewPayload = EventService.Payload<Review>
 
 final class EventService {
     
@@ -26,7 +26,7 @@ final class EventService {
             switch T.self {
             case is Meet.Type: return .meet
             case is Plan.Type: return .plan
-            case is UserInfo.Type: return .userInfo
+            case is Review.Type: return .review
             default: return .init("Default")
             }
         }
@@ -35,9 +35,7 @@ final class EventService {
     private let payloadKey = "payload"
     private let senderKey = "sender"
     
-    
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
-        print(#function, #line, "payload : \(payload)" )
         NotificationCenter.default.post(name: payload.notiName,
                                         object: nil,
                                         userInfo: [payloadKey:payload,
@@ -52,8 +50,8 @@ final class EventService {
         return makeObservable(name: .plan)
     }
     
-    func addUserInfoObservable() -> Observable<UserInfoPayload> {
-        return makeObservable(name: .userInfo)
+    func addReviewObservable() -> Observable<ReviewPayload> {
+        return makeObservable(name: .review)
     }
     
     private func makeObservable<T>(name: Notification.Name) -> Observable<T> {
@@ -76,5 +74,5 @@ final class EventService {
 extension Notification.Name {
     static let meet = Notification.Name(String(describing: Meet.self))
     static let plan = Notification.Name(String(describing: Plan.self))
-    static let userInfo = Notification.Name(String(describing: UserInfo.self))
+    static let review = Notification.Name(String(describing: Review.self))
 }

@@ -37,12 +37,12 @@ struct TextStyle {
     }
     
     enum ProfileCreate {
-        static let completedTitle = "서비스 시작하기"
+        static let completedTitle = "모플 시작하기"
     }
     
     enum ProfileEdit {
         static let title = "프로필 수정"
-        static let completedTitle = "수정"
+        static let completedTitle = "저장"
     }
     
     enum Home {

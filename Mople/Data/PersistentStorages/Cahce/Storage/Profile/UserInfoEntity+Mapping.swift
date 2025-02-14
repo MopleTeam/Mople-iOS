@@ -42,5 +42,10 @@ extension UserInfoEntity {
         self.longitude = longitude
         self.latitude = latitude
     }
+    
+    func updateProfile(_ profile: UserInfo) {
+        self.name = profile.name
+        self.imagePath = profile.imagePath
+    }
 }
 

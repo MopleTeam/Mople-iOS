@@ -19,6 +19,10 @@ final class UserInfoStorage {
     
     private(set) var userInfo: UserInfo?
     
+    public var hasUserInfo: Bool {
+        return userInfo != nil
+    }
+    
     private let realmDB = try! Realm()
     
     private var userInfoData: Results<UserInfoEntity> {
@@ -47,8 +51,8 @@ final class UserInfoStorage {
     
     func updateLocation(_ location: Location) {
         guard let userInfo = userInfoData.first,
-              let longitude = userInfo.longitude,
-              let latitude = userInfo.latitude else { return }
+              let longitude = location.longitude,
+              let latitude = location.latitude else { return }
         
         try! realmDB.write({
             userInfo.updateLocation(longitude: longitude,
@@ -57,6 +61,16 @@ final class UserInfoStorage {
         
         self.userInfo?.location = .init(longitude: longitude,
                                         latitude: latitude)
+    }
+    
+    func updateProfile(_ profile: UserInfo) {
+        guard let userInfo = userInfoData.first else { return }
+        
+        try! realmDB.write({
+            userInfo.updateProfile(profile)
+        })
+        
+        self.userInfo?.updateProfile(profile)
     }
 }
 
