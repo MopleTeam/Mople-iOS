@@ -30,7 +30,6 @@ struct PlanResponse: Decodable {
 
 extension PlanResponse {
     func toDomain() -> Plan {
-        print(#function, #line, "#5 : \(self)" )
         let date = DateManager.parseServerDate(string: self.planTime)
         
         return .init(id: planId,

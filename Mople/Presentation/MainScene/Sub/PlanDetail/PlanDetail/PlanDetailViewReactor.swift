@@ -145,6 +145,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         return newState
     }
+    
+    
 }
 
 // MARK: - 액션 핸들링
@@ -322,9 +324,12 @@ extension PlanDetailViewReactor {
         switch action {
         case let .plan(payload):
             guard case .updated(let plan) = payload else { return .empty() }
+            self.plan = plan
+            self.placeInfo = .init(plan: plan)
             return .just(.updatePlan(plan))
         case let .review(payload):
             guard case .updated(let review) = payload else { return .empty() }
+            self.review = review
             commentListCommands?.addPhotoList(review.images)
             return .empty()
         }

@@ -263,7 +263,6 @@ extension PlanDetailViewController {
 }
 
 extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
-    var tapGestureShouldCancelTouchesInView: Bool { false }
     
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
@@ -319,7 +318,7 @@ extension PlanDetailViewController {
     
     // MARK: - 후기 편집
     private func editReview(isReviewed: Bool) -> UIAlertAction {
-        let title = isReviewed ? "후기 작성" : "후기 수정"
+        let title = isReviewed ? "후기 수정" : "후기 작성"
         
         return alertManager.makeAction(title: title) { [weak self] in
             let action = Reactor.Action.flow(.editReview)

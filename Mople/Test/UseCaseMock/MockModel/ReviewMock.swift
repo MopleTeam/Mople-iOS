@@ -22,7 +22,8 @@ extension Review {
               address: "서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1",
               imagePaths: getRandomImages(),
               meet: .mock(id: 1),
-              location: .mock())
+              location: .mock(),
+              isReviewd: false)
     }
 }
 

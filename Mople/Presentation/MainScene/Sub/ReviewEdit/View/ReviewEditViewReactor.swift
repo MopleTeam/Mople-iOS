@@ -153,10 +153,16 @@ extension ReviewEditViewReactor {
         return requestWithLoading(task: requestUpdate) { [weak self] in
             guard let self else { return }
             let images = currentState.images.map { $0.image }
-            review.images = images
+            updateReviewState(images: images)
             notificationUpdateImage()
             coordiantor?.endFlow()
         }
+    }
+    
+    private func updateReviewState(images: [UIImage]) {
+        review.state = .updated(photos: images)
+        review.images = images
+        review.isReviewd = true
     }
     
     private func requestAppImage(id: Int) -> Observable<Void> {
@@ -222,8 +228,7 @@ extension ReviewEditViewReactor {
     /// - Parameter images: 편집된 사진
     /// - Returns: 기존의 사진이 삭제되었거나 새로운 사진이 추가되었다면 true
     private func checkNewImage(_ images: [ImageWrapper]) -> Bool {
-        let existingImageCount = currentState.review?.images.count ?? 0
-        let isDeleteExistingImage = images.count < existingImageCount
+        let isDeleteExistingImage = images.count < existingImageIds.count
         let isAddedImage = images.contains { $0.isNew == true }
         return isDeleteExistingImage || isAddedImage
     }

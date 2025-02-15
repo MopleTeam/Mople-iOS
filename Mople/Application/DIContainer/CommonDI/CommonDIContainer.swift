@@ -57,7 +57,7 @@ extension CommonDIContainer {
     
     // MARK: - 리뷰 정보 유즈케이스
     func makeFetchReviewDetailUseCase() -> FetchReviewDetail {
-        return FetchReviewDetailUseCase(reviewListRepo: makeFetchReviewDetailRepo())
+        return FetchReviewDetailUseCase(repo: makeFetchReviewDetailRepo())
     }
     
     private func makeFetchReviewDetailRepo() -> ReviewQueryRepo {

@@ -205,6 +205,10 @@
 		528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoManager.swift */; };
 		529528772D317A360095ACCD /* Data+Compressed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529528762D317A360095ACCD /* Data+Compressed.swift */; };
 		529629172D5EC66500003F66 /* PhotoBookCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529629162D5EC66500003F66 /* PhotoBookCollectionCell.swift */; };
+		5296291B2D5F4B5100003F66 /* ReportRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5296291A2D5F4B5100003F66 /* ReportRequest.swift */; };
+		5296291F2D5F4F6700003F66 /* ReportRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5296291E2D5F4F6700003F66 /* ReportRepo.swift */; };
+		529629212D5F4FA100003F66 /* DefaultReportRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529629202D5F4FA100003F66 /* DefaultReportRepo.swift */; };
+		529629242D5F501D00003F66 /* ReportPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529629232D5F501D00003F66 /* ReportPost.swift */; };
 		529A26062C96A781009F4CFA /* RecentPlanFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
@@ -574,6 +578,10 @@
 		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		529528762D317A360095ACCD /* Data+Compressed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Compressed.swift"; sourceTree = "<group>"; };
 		529629162D5EC66500003F66 /* PhotoBookCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoBookCollectionCell.swift; sourceTree = "<group>"; };
+		5296291A2D5F4B5100003F66 /* ReportRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRequest.swift; sourceTree = "<group>"; };
+		5296291E2D5F4F6700003F66 /* ReportRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRepo.swift; sourceTree = "<group>"; };
+		529629202D5F4FA100003F66 /* DefaultReportRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultReportRepo.swift; sourceTree = "<group>"; };
+		529629232D5F501D00003F66 /* ReportPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPost.swift; sourceTree = "<group>"; };
 		529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanFooterView.swift; sourceTree = "<group>"; };
 		529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanDetail.swift; sourceTree = "<group>"; };
 		529CCD472D3232370041CBB7 /* FetchPlanDetailMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanDetailMock.swift; sourceTree = "<group>"; };
@@ -1704,6 +1712,38 @@
 			path = Protocol;
 			sourceTree = "<group>";
 		};
+		529629192D5F4B4200003F66 /* Report */ = {
+			isa = PBXGroup;
+			children = (
+				5296291A2D5F4B5100003F66 /* ReportRequest.swift */,
+			);
+			path = Report;
+			sourceTree = "<group>";
+		};
+		5296291C2D5F4D9000003F66 /* Report */ = {
+			isa = PBXGroup;
+			children = (
+				529629202D5F4FA100003F66 /* DefaultReportRepo.swift */,
+			);
+			path = Report;
+			sourceTree = "<group>";
+		};
+		5296291D2D5F4F4B00003F66 /* Report */ = {
+			isa = PBXGroup;
+			children = (
+				5296291E2D5F4F6700003F66 /* ReportRepo.swift */,
+			);
+			path = Report;
+			sourceTree = "<group>";
+		};
+		529629222D5F501000003F66 /* Report */ = {
+			isa = PBXGroup;
+			children = (
+				529629232D5F501D00003F66 /* ReportPost.swift */,
+			);
+			path = Report;
+			sourceTree = "<group>";
+		};
 		529A26042C96A776009F4CFA /* FooterView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1849,6 +1889,7 @@
 				522958382D5200DB00AE4EC3 /* Member */,
 				5231DF3E2D2F96A600D52529 /* Image */,
 				5231DF7B2D2FE77100D52529 /* SearchPlace */,
+				5296291D2D5F4F4B00003F66 /* Report */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -2030,6 +2071,7 @@
 		52C857B82D0862DB00765FB3 /* Request */ = {
 			isa = PBXGroup;
 			children = (
+				529629192D5F4B4200003F66 /* Report */,
 				52AD4B6D2D5B1BF400FCA929 /* Profile */,
 				520043F92D4E7E9600845521 /* Comment */,
 				5231DF782D2FE62400D52529 /* SearchLocation */,
@@ -2362,6 +2404,7 @@
 				522958302D51FF6A00AE4EC3 /* Member */,
 				52EC04C92D3BF4D200000C99 /* ImageUpload */,
 				52818C632D182AE00001E30B /* SearchPlace */,
+				529629222D5F501000003F66 /* Report */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -2398,6 +2441,7 @@
 				52B8E11A2D5341F100F7FF59 /* Member */,
 				52EC04D02D3E158900000C99 /* Image */,
 				52EC04D12D3E159000000C99 /* SearchPlace */,
+				5296291C2D5F4D9000003F66 /* Report */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -2952,6 +2996,7 @@
 				5236452D2C8EDCEF009E0784 /* TitleNaviViewController.swift in Sources */,
 				52EC04C22D391B4700000C99 /* CommentListViewReactor.swift in Sources */,
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
+				529629242D5F501D00003F66 /* ReportPost.swift in Sources */,
 				527A3E6C2C82CA8F007FE63B /* SignUpUseCaseMock.swift in Sources */,
 				5214F8BE2D2CA24B00E8CE9C /* FetchReviewMock.swift in Sources */,
 				52EC04C02D38CCC800000C99 /* CountView.swift in Sources */,
@@ -3004,6 +3049,7 @@
 				52EC04C52D391BA100000C99 /* FetchCommentList.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
 				5229583E2D5202CC00AE4EC3 /* FetchPlanMemberListMock.swift in Sources */,
+				529629212D5F4FA100003F66 /* DefaultReportRepo.swift in Sources */,
 				52D8645B2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift in Sources */,
 				523645292C8E522A009E0784 /* IconLabel.swift in Sources */,
 				5231DF772D2FCC4A00D52529 /* RequestParticipationPlan.swift in Sources */,
@@ -3068,6 +3114,7 @@
 				523E76132D5CF32600BD22CB /* Observable+ImageList.swift in Sources */,
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,
 				529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */,
+				5296291F2D5F4F6700003F66 /* ReportRepo.swift in Sources */,
 				52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */,
 				52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */,
 				52FE68622D5085C2009EC8EC /* PlaceDetailViewController.swift in Sources */,
@@ -3138,6 +3185,7 @@
 				5231DF502D2FA91F00D52529 /* MeetQueryRepo.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				52EC04BD2D38C13900000C99 /* CommentListViewController.swift in Sources */,
+				5296291B2D5F4B5100003F66 /* ReportRequest.swift in Sources */,
 				52C857B22D081DE800765FB3 /* PlanRequest.swift in Sources */,
 				523E76212D5D462100BD22CB /* DeleteReviewImage.swift in Sources */,
 				52EC04F22D3E601500000C99 /* DefaultCommentQueryRepo.swift in Sources */,

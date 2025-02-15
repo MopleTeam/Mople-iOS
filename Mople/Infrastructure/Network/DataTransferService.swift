@@ -11,8 +11,9 @@ import RxSwift
 enum DataTransferError: Error {
     case parsing(Error)
     case networkFailure(NetworkError)
-    case httpRespon(statusCode: Int, errorResponse: ErrorResponse?)
+    case tokenExpired
     case noResponse
+    case unknownError(Error)
 }
 
 protocol DataTransferService {
@@ -62,19 +63,6 @@ final class DefaultDataTransferService {
 }
 
 extension DefaultDataTransferService: DataTransferService {
-    
-    private func performBaseRequest<E: ResponseRequestable, T>(endpoint: E,
-                                                               transform: @escaping (Data?) throws -> T) -> Single<T> {
-        self.networkService.request(endpoint: endpoint)
-            .map(transform)
-            .catch { err in
-                if let err = err as? NetworkError {
-                    throw self.errorResolver.resolve(error: err)
-                } else {
-                    throw err
-                }
-            }
-    }
 
     /// 리턴값이 있는 요청
     func request<E: ResponseRequestable>(
@@ -90,6 +78,19 @@ extension DefaultDataTransferService: DataTransferService {
         with endpoint: E
     ) -> Single<Void> where E.Response == Void {
         return performBaseRequest(endpoint: endpoint) { _ in }
+    }
+    
+    private func performBaseRequest<E: ResponseRequestable, T>(endpoint: E,
+                                                               transform: @escaping (Data?) throws -> T) -> Single<T> {
+        self.networkService.request(endpoint: endpoint)
+            .map(transform)
+            .catch { err in
+                if let err = err as? NetworkError {
+                    throw self.errorResolver.resolve(error: err)
+                } else {
+                    throw err
+                }
+            }
     }
     
     // MARK: - Private
@@ -122,11 +123,19 @@ final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
 class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     func resolve(error: NetworkError) -> DataTransferError {
         switch error {
-        case .error(let statusCode,let data):
-            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
-            return .httpRespon(statusCode: statusCode, errorResponse: errorResponse)
+        case let .error(statusCode, data):
+            _ = try? JSONDecoder().decode(ErrorResponse.self, from: data) // 서버에서 전달하는 메세지 (현재 사용 X)
+            return handleErrorStatus(code: statusCode, err: error)
         default:
             return .networkFailure(error)
+        }
+    }
+    
+    private func handleErrorStatus(code: Int, err: Error) -> DataTransferError {
+        switch code {
+        case 400: .tokenExpired
+        case 404: .noResponse
+        default : .unknownError(err)
         }
     }
 }

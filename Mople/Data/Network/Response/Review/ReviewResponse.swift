@@ -15,18 +15,19 @@ struct ReviewResponse: Decodable {
     let reviewName: String?
     let address: String?
     let title: String?
-    let reviewDateTime: String?
+    let reviewTime: String?
     let meetName: String?
     let meetImage: String?
     let lat: Double?
     let lot: Double?
     let participantsCount: Int?
     let images: [String]?
+    let register: Bool?
 }
 
 extension ReviewResponse {
     func toDomain() -> Review {
-        let date = DateManager.parseServerDate(string: self.reviewDateTime)
+        let date = DateManager.parseServerDate(string: self.reviewTime)
         
         return .init(creatorId: creatorId,
                      id: reviewId,
@@ -40,6 +41,7 @@ extension ReviewResponse {
                                  name: meetName,
                                  imagePath: meetImage),
                      location: .init(longitude: lot,
-                                     latitude: lat))
+                                     latitude: lat),
+                     isReviewd: register ?? false)
     }
 }

@@ -20,7 +20,7 @@ enum LoginError: Error {
     
     var info: String? {
         switch self {
-        case .notFoundInfo(let message):
+        case .notFoundInfo:
             return "회원정보를 찾을 수 없습니다."
         case .appleAccountError:
             return "설정에서 Apple 로그인 연동 해제 후\n다시 시도해 주세요."
@@ -99,21 +99,11 @@ final class SignInUseCase: SignIn {
     
     private func handleTransferError(_ error: DataTransferError, socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
-        case .httpRespon(let statusCode, _):
-            switch statusCode {
-            case 404:
-                if let socialLoginResult {
-                    return .notFoundInfo(result: socialLoginResult)
-                } else {
-                    return .completeError
-                }
-            default:
-                return .appError(error: .unknownError)
-            }
-        case .parsing, .noResponse:
-                return .appError(error: .unknownError)
-        case .networkFailure:
-            return .appError(error: .networkError)
+        case .noResponse:
+            guard let socialLoginResult else { return .completeError }
+            return .notFoundInfo(result: socialLoginResult)
+        default:
+            return .appError(error: .unknownError)
         }
     }
 }

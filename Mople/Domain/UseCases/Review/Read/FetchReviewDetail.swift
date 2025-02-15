@@ -13,15 +13,15 @@ protocol FetchReviewDetail {
 
 final class FetchReviewDetailUseCase: FetchReviewDetail {
     
-    private let reviewListRepo: ReviewQueryRepo
+    private let repo: ReviewQueryRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
     
-    init(reviewListRepo: ReviewQueryRepo) {
-        self.reviewListRepo = reviewListRepo
+    init(repo: ReviewQueryRepo) {
+        self.repo = repo
     }
     
     func execute(reviewId: Int) -> Single<Review> {
-        return reviewListRepo.fetchReviewDetail(reviewId)
+        return repo.fetchReviewDetail(reviewId)
             .map { $0.toDomain() }
             .map { [weak self] review in
                 var verifyReview = review

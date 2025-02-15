@@ -167,19 +167,21 @@ final class MeetReviewTableCell: UITableViewCell {
     
     
     private func setImageInfo(viewModel: MeetReviewTableCellModel) {
-        if viewModel.updatedImage.isEmpty == false {
-            let updatedImage = viewModel.updatedImage
-            photoView.image = updatedImage.first
-            setCountInfo(updatedImage.count)
-        } else if viewModel.imagePaths.isEmpty == false {
-            let imagePaths = viewModel.imagePaths
-            photoView.kfSetimage(imagePaths.first!,
+        
+        switch viewModel.state {
+        case .initial:
+            guard let firstImagePath = viewModel.imagePaths.first else { return }
+            photoView.kfSetimage(firstImagePath,
                                  defaultImageType: .history)
-            setCountInfo(imagePaths.count)
+            setCountInfo(viewModel.imagePaths.count)
+        case let .updated(photos):
+            photoView.image = photos.first ?? .defaultMeet
+            setCountInfo(photos.count)
         }
     }
     
     private func setCountInfo(_ count: Int) {
+        guard count > 0 else { return }
         photoCountLabel.isHidden = false
         photoCountLabel.text = "\(count)"
     }

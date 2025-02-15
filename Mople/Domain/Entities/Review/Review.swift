@@ -7,6 +7,11 @@
 
 import UIKit
 
+enum ReviewState: Equatable {
+    case initial
+    case updated(photos: [UIImage])
+}
+
 struct Review: Equatable {
     var creatorId: Int?
     var id: Int?
@@ -19,8 +24,9 @@ struct Review: Equatable {
     var meet: MeetSummary?
     var location: Location?
     var isCreator: Bool = false
-    var isReviewd: Bool = false
+    var isReviewd: Bool
     var images: [UIImage] = []
+    var state: ReviewState = .initial
     
     static func < (lhs: Review, rhs: Review) -> Bool {
         guard let lhsDate = lhs.date,

@@ -300,7 +300,7 @@ extension CommentListViewReactor {
         let sectionItem = SectionItem.photo(photos)
         let sectionModel = CommentTableSectionModel(type: .photoList, items: [sectionItem])
         let addedSection = addSectionModel(model: sectionModel)
-        return .just(Mutation.fetchedSectionModel(addedSection))
+        return .just(.fetchedSectionModel(addedSection))
     }
     
     /// 섹션유무에 따라서 업데이트 or 추가
@@ -308,7 +308,20 @@ extension CommentListViewReactor {
         var sectionModels = currentState.sectionModels
         if let sectionIndex = sectionModels.firstIndex(
             where: { $0.type == model.type }) {
-            sectionModels[sectionIndex] = model
+            switch model.type {
+            case .commentList:
+                sectionModels[sectionIndex] = model
+            case .photoList:
+                guard case .photo(let image) = model.items.first else {
+                    return sectionModels
+                }
+                if image.isEmpty {
+                    sectionModels.remove(at: sectionIndex)
+                } else {
+                    sectionModels[sectionIndex] = model
+                }
+            }
+            
         } else {
             handleAddSectionModel(model, models: &sectionModels)
         }
@@ -334,7 +347,6 @@ extension CommentListViewReactor {
 // MARK: - 부모뷰 명령
 extension CommentListViewReactor: CommentListCommands {
     func addPhotoList(_ photos: [UIImage]) {
-        guard photos.isEmpty == false else { return }
         action.onNext(.parentCommand(.addPhotoList(photos)))
     }
     

@@ -43,7 +43,7 @@ struct PlanRequest: Encodable {
             try container.encode(meetId, forKey: .meetId)
         case let .edit(planId):
             try container.encode(planId, forKey: .planId)
-        }
+        }   
     }
 }
 

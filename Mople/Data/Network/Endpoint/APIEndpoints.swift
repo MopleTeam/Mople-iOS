@@ -347,6 +347,7 @@ extension APIEndpoints {
     }
 }
 
+// MARK: - 멤버 리스트
 extension APIEndpoints {
     static func fetchMember(type: MemberListType) throws -> Endpoint<MemberListResponse> { // 모델 변경
         return try Endpoint(path: getFetchMemberPath(type: type),
@@ -363,6 +364,26 @@ extension APIEndpoints {
             return "plan/participants/\(id ?? 0)"
         case let .review(id):
             return "review/participants/\(id ?? 0)"
+        }
+    }
+}
+
+extension APIEndpoints {
+    static func report(type: ReportType) throws -> Endpoint<Void> {
+        return try Endpoint(path: getReportPath(type: type),
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader())
+    }
+    
+    private static func getReportPath(type: ReportType) -> String {
+        switch type {
+        case .plan:
+            return "plan/report"
+        case .review:
+            return "review/report"
+        case .comment:
+            return "comment/report"
         }
     }
 }

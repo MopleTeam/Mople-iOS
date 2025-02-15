@@ -146,9 +146,6 @@ extension Reactive where Base: PhotoCollectionView {
     var selectPhoto: Observable<Int> {
         
         return base.cellSelectedRelay.asObservable()
-            .do(onNext: { _ in
-                print(#function, #line, "선택 버튼 잘 눌림" )
-            })
             .filter { [weak base] _ in
                 base?.isEditMode == false
             }
@@ -164,9 +161,6 @@ extension Reactive where Base: PhotoCollectionView {
     
     var deletePhotos: Observable<Int> {
         return base.deleteButtonRelay.asObservable()
-            .do(onNext: { _ in
-                print(#function, #line, "삭제 버튼 잘 눌림" )
-            })
             .filter { [weak base] _ in
                 base?.isEditMode == true
             }

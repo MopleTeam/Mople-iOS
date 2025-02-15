@@ -125,10 +125,6 @@ final class MeetReviewListViewController: BaseViewController, View {
         responsePlans
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: MeetReviewTableCell.reuseIdentifier, cellType: MeetReviewTableCell.self)) { index, item, cell in
-                let count = item.images.count
-                let title = item.name
-                
-                print(#function, #line, "title : \(title), count: \(count)" )
                 cell.configure(viewModel: .init(review: item))
                 cell.selectionStyle = .none
             }
