@@ -19,7 +19,7 @@ final class ReviewEditViewReactor: Reactor {
         case deleteImage(Int)
         case showImagePicker
         case fetchReview(Review)
-        case fetchImage
+        case loadImage
         case updateReview
         case flow(Flow)
     }
@@ -32,7 +32,7 @@ final class ReviewEditViewReactor: Reactor {
         case catchError(Error)
     }
     
-    struct State: LoadingState {
+    struct State {
         @Pulse var images: [ImageWrapper] = []
         @Pulse var review: Review?
         @Pulse var canComplete: Bool = false
@@ -43,7 +43,6 @@ final class ReviewEditViewReactor: Reactor {
     var initialState: State = State()
     
     private var review: Review
-    private let fetchReviewImage: FetchReviewImage
     private let deleteReviewImage: DeleteReviewImage
     private let imageUpload: ReviewImageUpload
     private let photoService: PhotoService
@@ -51,13 +50,11 @@ final class ReviewEditViewReactor: Reactor {
     private var existingImageIds: [String] = []
     
     init(review: Review,
-         fetchReviewImage: FetchReviewImage,
          deleteReviewImage: DeleteReviewImage,
          imageUpload: ReviewImageUpload,
          photoService: PhotoService,
          coordinator: ReviewEditViewCoordination) {
         self.review = review
-        self.fetchReviewImage = fetchReviewImage
         self.deleteReviewImage = deleteReviewImage
         self.imageUpload = imageUpload
         self.photoService = photoService
@@ -69,8 +66,8 @@ final class ReviewEditViewReactor: Reactor {
         switch action {
         case let .fetchReview(review):
             return .just(.updateReviewInfo(review))
-        case .fetchImage:
-            return fetchImage()
+        case .loadImage:
+            return loadImage()
         case let .deleteImage(index):
             return deleteImage(index: index)
         case let .flow(action):
@@ -109,34 +106,26 @@ final class ReviewEditViewReactor: Reactor {
     
     private func initalSetup() {
         action.onNext(.fetchReview(review))
-        action.onNext(.fetchImage)
+        action.onNext(.loadImage)
     }
 }
 
 extension ReviewEditViewReactor {
     
     // MARK: - 이미지 불러오기
-    private func fetchImage() -> Observable<Mutation> {
-        guard let id = review.id else { return .empty() }
+    private func loadImage() -> Observable<Mutation> {
+        guard review.images.isEmpty == false else { return .empty() }
         
-        let fetchImage = fetchReviewImage.execute(reviewId: id)
-            .asObservable()
-            .flatMap { [weak self] reviewImage -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return loadReviewImages(reviewImage)
-            }
+        let imageObservers: [Observable<ImageWrapper>] = Observable.reviewImagesTaskBuilder(review.images)
         
-        return requestWithLoading(task: fetchImage)
-    }
-    
-    private func loadReviewImages(_ reviewImage: [ReviewImage]) -> Observable<Mutation> {
-        let imageObservers: [Observable<ImageWrapper>] = Observable.reviewImagesTaskBuilder(reviewImage)
-        return Observable.zip(imageObservers)
+        let updateImage = Observable.zip(imageObservers)
             .do(onNext: { [weak self] images in
                 let ids = images.compactMap { $0.id }
                 self?.existingImageIds = ids
             })
             .map { Mutation.updateImage($0) }
+        
+        return requestWithLoading(task: updateImage)
     }
     
     // MARK: - 이미지 편집하기
@@ -152,17 +141,10 @@ extension ReviewEditViewReactor {
         
         return requestWithLoading(task: requestUpdate) { [weak self] in
             guard let self else { return }
-            let images = currentState.images.map { $0.image }
-            updateReviewState(images: images)
+            print(#function, #line)
             notificationUpdateImage()
             coordiantor?.endFlow()
         }
-    }
-    
-    private func updateReviewState(images: [UIImage]) {
-        review.state = .updated(photos: images)
-        review.images = images
-        review.isReviewd = true
     }
     
     private func requestAppImage(id: Int) -> Observable<Void> {
@@ -242,8 +224,7 @@ extension ReviewEditViewReactor {
 // MARK: - Notification
 extension ReviewEditViewReactor {
     private func notificationUpdateImage() {
-        EventService.shared.postItem(.updated(review),
-                                     from: self)
+        EventService.shared.post(name: .review)
     }
 }
 
@@ -261,13 +242,11 @@ extension ReviewEditViewReactor {
 }
 
 extension ReviewEditViewReactor: LoadingReactor {
-    var loadingState: LoadingState { currentState }
-    
-    func updateLoadingState(_ isLoading: Bool) -> Mutation {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }
     
-    func catchError(_ error: Error) -> Mutation {
+    func catchErrorMutation(_ error: Error) -> Mutation {
         return .catchError(error)
     }
 }

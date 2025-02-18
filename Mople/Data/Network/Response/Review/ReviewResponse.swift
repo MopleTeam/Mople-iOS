@@ -21,22 +21,24 @@ struct ReviewResponse: Decodable {
     let lat: Double?
     let lot: Double?
     let participantsCount: Int?
-    let images: [String]?
+    let images: [ReviewImageResponse]?
     let register: Bool?
 }
 
 extension ReviewResponse {
     func toDomain() -> Review {
         let date = DateManager.parseServerDate(string: self.reviewTime)
+        let images = self.images?.compactMap({ $0.toDomain() })
         
         return .init(creatorId: creatorId,
                      id: reviewId,
+                     postId: postId,
                      name: reviewName,
                      date: date,
                      participantsCount: participantsCount,
                      address: address,
                      addressTitle: title,
-                     imagePaths: images ?? [],
+                     images: images ?? [],
                      meet: .init(id: meetId,
                                  name: meetName,
                                  imagePath: meetImage),

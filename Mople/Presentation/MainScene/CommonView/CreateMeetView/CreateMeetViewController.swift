@@ -164,10 +164,9 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             .disposed(by: disposeBag)
         
         completionButton.rx.controlEvent(.touchUpInside)
-            .do(onNext: { [weak self] _ in
-                self?.view.endEditing(true)
-            })
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
             .map { Reactor.Action.createMeet }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

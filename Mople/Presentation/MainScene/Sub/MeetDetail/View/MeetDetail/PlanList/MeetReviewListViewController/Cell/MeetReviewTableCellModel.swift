@@ -11,8 +11,8 @@ struct MeetReviewTableCellModel {
     let title: String?
     let date: Date?
     let participantCount: Int?
-    let imagePaths: [String]
-    var state: ReviewState
+    let imagePath: String?
+    let imageCount: Int
     
     var dateString: String? {
         return DateManager.toString(date: date, format: .dot)
@@ -30,7 +30,7 @@ extension MeetReviewTableCellModel {
         self.title = review.name
         self.date = review.date
         self.participantCount = review.participantsCount
-        self.imagePaths = review.imagePaths
-        self.state = review.state
+        self.imagePath = review.images.first?.path
+        self.imageCount = review.images.count
     }
 }

@@ -30,7 +30,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case catchError(Error)
     }
     
-    struct State: LoadingState {
+    struct State {
         @Pulse var image: UIImage?
         @Pulse var canComplete: Bool = false
         @Pulse var message: String?
@@ -169,13 +169,11 @@ extension CreateMeetViewReactor {
 }
 
 extension CreateMeetViewReactor: LoadingReactor {
-    var loadingState: LoadingState { currentState }
-    
-    func updateLoadingState(_ isLoading: Bool) -> Mutation {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }
     
-    func catchError(_ error: Error) -> Mutation {
+    func catchErrorMutation(_ error: Error) -> Mutation {
         return .catchError(error)
     }
 }

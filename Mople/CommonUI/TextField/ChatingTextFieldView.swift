@@ -13,7 +13,7 @@ final class ChatingTextFieldView: UIView {
     
     private var disposeBag = DisposeBag()
     
-    fileprivate let sendButton: BaseButton = {
+    public let sendButton: BaseButton = {
         let btn = BaseButton()
         btn.setImage(image: .sendArrow,
                      imagePlacement: .all)

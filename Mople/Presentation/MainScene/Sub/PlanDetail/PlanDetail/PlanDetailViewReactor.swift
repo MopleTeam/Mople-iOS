@@ -8,11 +8,12 @@
 import UIKit
 import ReactorKit
 
-protocol CommentListDelegate: AnyObject {
+protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
+    func editComment(_ comment: String?)
     func setCommentListTableOffsetY(_ offsetY: CGFloat)
-    func commentListLoading(_ isLoading: Bool)
-    func editComment(_ comment: String)
     func showPhotoBook(index: Int)
+    func updateLoadingState(_ isLoading: Bool)
+    func catchError(_ error: Error)
 }
 
 final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
@@ -25,13 +26,14 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         enum ChildEvent {
             case commentLoading(_ isLoading: Bool)
-            case editComment(_ comment: String)
+            case editComment(_ comment: String?)
             case changedOffsetY(_ offsetY: CGFloat)
+            case catchError(Error)
         }
         
         enum Update {
             case plan(PlanPayload)
-            case review(ReviewPayload)
+            case review
         }
         
         enum Flow {
@@ -46,7 +48,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case childEvent(ChildEvent)
         case update(Update)
         case flow(Flow)
-        case loadPlanInfo(id: Int, type: PlanDetailType)
+        case loadPlanInfo(type: PlanDetailType)
     }
     
     enum Mutation {
@@ -58,10 +60,11 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case updateChildEvent(ChildEvent)
         
-        case planInfoLoading(_ isLoading: Bool)
+        case updateLoadingState(_ isLoading: Bool)
         case updatePlan(_ Plan: Plan)
         case updateReview(_ review: Review)
         case notifyMessage(_ message: String)
+        case catchError(Error)
     }
     
     struct State {
@@ -69,13 +72,13 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var planInfo: PlanInfoViewModel?
         @Pulse var isLoading: Bool = false
         @Pulse var isCommentLoading: Bool = false
-        @Pulse var message: String?
         @Pulse var editComment: String?
         @Pulse var startOffsetY: CGFloat = .zero
+        @Pulse var message: String?
     }
     
     // MARK: - Variable
-    private let postId: Int
+    private let id: Int
     private var plan: Plan?
     private var review: Review?
     private var placeInfo: PlaceInfo?
@@ -95,24 +98,22 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - LifeCycle
     init(type: PlanDetailType,
-         postId: Int,
+         id: Int,
          fetchPlanDetailUseCase: FetchPlanDetail,
          fetchReviewDetailUseCase: FetchReviewDetail,
          coordinator: PlanDetailCoordination) {
         self.fetchPlanDetailUsecase = fetchPlanDetailUseCase
         self.fetchReviewDetailUseCase = fetchReviewDetailUseCase
         self.coordinator = coordinator
-        self.postId = postId
-        self.action.onNext(.loadPlanInfo(id: postId,
-                                         type: type))
+        self.id = id
+        self.action.onNext(.loadPlanInfo(type: type))
         logLifeCycle()
     }
                             		
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .loadPlanInfo(id, type):
-            return handleLoad(postId: id,
-                              type: type)
+        case let .loadPlanInfo(type):
+            return handleLoad(type: type)
         case let .parentCommand(command):
             return handleParentCommand(command)
         case let .childEvent(event):
@@ -137,27 +138,30 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             newState.commonPlanModel = .init(reveiw: review)
         case let .notifyMessage(message):
             newState.message = message
-        case let .planInfoLoading(isLoading):
+        case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .updateChildEvent(event):
             handleChildMutation(&newState, event)
+        case let .catchError(err):
+            handleError(state: &newState, error: err)
         }
         
         return newState
     }
     
-    
+    private func handleError(state: inout State, error: Error) {
+        
+    }
 }
 
 // MARK: - 액션 핸들링
 extension PlanDetailViewReactor {
-    private func handleLoad(postId: Int,
-                            type: PlanDetailType) -> Observable<Mutation> {
+    private func handleLoad(type: PlanDetailType) -> Observable<Mutation> {
         switch type {
         case .plan:
-            return fetchPlanDetail(postId)
+            return fetchPlanDetail()
         case .review:
-            return fetchReviewDetail(postId)
+            return fetchReviewDetail()
         }
     }
     
@@ -186,6 +190,8 @@ extension PlanDetailViewReactor {
             return .just(.updateChildEvent(.editComment(comment)))
         case let .changedOffsetY(offsetY):
             return .just(.updateChildEvent(.changedOffsetY(offsetY)))
+        case let .catchError(err):
+            return .just(.catchError(err))
         }
     }
     
@@ -216,69 +222,72 @@ extension PlanDetailViewReactor {
 // MARK: - 데이터 로드
 extension PlanDetailViewReactor {
     #warning("데이터 못찾으면 뒤로가기")
-    private func fetchPlanDetail(_ planId: Int) -> Observable<Mutation> {
-        let fetchPlan = fetchPlanDetailUsecase.execute(planId: planId)
+    private func fetchPlanDetail() -> Observable<Mutation> {
+        
+        let fetchPlan = fetchPlanDetailUsecase.execute(planId: id)
             .asObservable()
             .do(onNext: { [weak self] in
                 self?.plan = $0
                 self?.placeInfo = .init(plan: $0)
+                self?.fetchCommentList($0.id)
             })
             .map { Mutation.updatePlan($0) }
 
-        return fetchWithLoading(fetchPlan)
+        return requestWithLoading(task: fetchPlan)
     }
     
-    private func fetchReviewDetail(_ reviewId: Int) -> Observable<Mutation> {
-        print(#function, #line)
-        let fetchReview = fetchReviewDetailUseCase.execute(reviewId: reviewId)
+    private func fetchReviewDetail() -> Observable<Mutation> {
+
+        let fetchReview = fetchReviewDetailUseCase.execute(reviewId: id)
             .asObservable()
-            .do(onNext: { [weak self] in
-                self?.review = $0
-                self?.placeInfo = .init(review: $0)
-            })
             .flatMap { [weak self] review -> Observable<Mutation> in
                 guard let self else { return .empty() }
+                self.review = review
+                self.placeInfo = .init(review: review)
+                self.fetchCommentList(review.postId)
                 let fetchReview = Observable<Mutation>.just(.updateReview(review))
-                let fetchPhoto = fetchReviewImages(review.imagePaths)
+                let fetchPhoto = fetchReviewImages(review.images)
                 return Observable.concat([fetchPhoto, fetchReview])
             }
         
-        return fetchWithLoading(fetchReview)
+        return requestWithLoading(task: fetchReview)
     }
     
-    private func fetchReviewImages(_ paths: [String]) -> Observable<Mutation> {
-        let urlList = paths.compactMap { URL(string: $0) }
-        let imageObservers: [Observable<UIImage?>] = Observable.imagesTaskBuilder(imageUrls: urlList)
-        return Observable.zip(imageObservers)
-            .map({ images in
-                images.compactMap { $0 }
-            })
-            .flatMap { [weak self] images -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                self.review?.images = images
-                self.commentListCommands?.addPhotoList(images)
-                return .empty()
-            }
+    private func fetchReviewImages(_ reviewImages: [ReviewImage]) -> Observable<Mutation> {
+        let imagePaths = reviewImages.compactMap { $0.path }
+        let imageUrls = imagePaths.compactMap { URL(string: $0) }
+        let imageObservers: [Observable<UIImage?>] = Observable.imagesTaskBuilder(imageUrls: imageUrls)
+        
+        if imageObservers.isEmpty == false {
+            return Observable.zip(imageObservers)
+                .map({ images in
+                    images.compactMap { $0 }
+                })
+                .flatMap { [weak self] images -> Observable<Mutation> in
+                    guard let self else { return .empty() }
+                    self.commentListCommands?.addPhotoList(images)
+                    return .empty()
+                }
+        } else {
+            self.commentListCommands?.addPhotoList([])
+            return .empty()
+        }
+        
     }
     
-    private func fetchWithLoading(_ task: Observable<Mutation>) -> Observable<Mutation> {
-        let startLoad = Observable.just(Mutation.planInfoLoading(true))
-        
-        let endLoad = Observable.just(Mutation.planInfoLoading(false))
-        
-        return Observable.concat([startLoad,
-                                  task,
-                                  endLoad])
+    private func fetchCommentList(_ postId: Int?) {
+        guard let postId else { return }
+        commentListCommands?.fetchCommentList(postId: postId)
     }
 }
 
-// MARK: - 댓글 리액터 명령
+// MARK: - 자식 -> 부모
 extension PlanDetailViewReactor: CommentListDelegate  {
-    func commentListLoading(_ isLoading: Bool) {
+    func updateLoadingState(_ isLoading: Bool) {
         action.onNext(.childEvent(.commentLoading(isLoading)))
     }
     
-    func editComment(_ comment: String) {
+    func editComment(_ comment: String?) {
         action.onNext(.childEvent(.editComment(comment)))
     }
     
@@ -288,14 +297,20 @@ extension PlanDetailViewReactor: CommentListDelegate  {
     
     func showPhotoBook(index: Int) {
         print(#function, #line)
-        guard let photoList = review?.images,
-              photoList.isEmpty == false else { return }
+        guard let reviewImages = review?.images,
+              reviewImages.isEmpty == false else { return }
+        
+        let imagePaths = reviewImages.compactMap { $0.path }
         coordinator?.pushPhotoView(index: index,
-                                   images: photoList)
+                                   imagePaths: imagePaths)
+    }
+    
+    func catchError(_ error: Error) {
+        action.onNext(.childEvent(.catchError(error)))
     }
 }
 
-// MARK: - 댓글 리액터 요청
+// MARK: - 부모 -> 자식
 extension PlanDetailViewReactor {
     public func setCommentListDelegate(_ delegate: CommentListCommands) {
         self.commentListCommands = delegate
@@ -307,13 +322,13 @@ extension PlanDetailViewReactor {
             .do(onNext: { [weak self] comment in
                 self?.commentListCommands?.writeComment(comment: comment)
             })
-            .flatMap { _ in
-                return Observable<Mutation>.empty()
+            .flatMap { _ -> Observable<Mutation> in
+                return .empty()
             }
     }
     
     private func cancleEditComment() -> Observable<Mutation> {
-        self.commentListCommands?.cancleEditComment()
+        self.commentListCommands?.completeEditComment()
         return .just(.updateChildEvent(.editComment(nil)))
     }
 }
@@ -322,16 +337,20 @@ extension PlanDetailViewReactor {
 extension PlanDetailViewReactor {
     private func handleUpdate(_ action: Action.Update) -> Observable<Mutation> {
         switch action {
-        case let .plan(payload):
-            guard case .updated(let plan) = payload else { return .empty() }
-            self.plan = plan
-            self.placeInfo = .init(plan: plan)
-            return .just(.updatePlan(plan))
-        case let .review(payload):
-            guard case .updated(let review) = payload else { return .empty() }
-            self.review = review
-            commentListCommands?.addPhotoList(review.images)
-            return .empty()
+        case .plan:
+            return fetchPlanDetail()
+        case .review:
+            return fetchReviewDetail()
         }
+    }
+}
+
+extension PlanDetailViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

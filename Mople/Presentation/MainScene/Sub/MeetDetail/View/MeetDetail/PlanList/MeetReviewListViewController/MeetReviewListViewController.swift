@@ -148,8 +148,8 @@ final class MeetReviewListViewController: BaseViewController, View {
     }
     
     private func setNotification(_ reactor: Reactor) {
-        EventService.shared.addReviewObservable()
-            .map { Reactor.Action.updateReview($0) }
+        EventService.shared.receiveObservable(name: .review)
+            .map { Reactor.Action.requestReviewList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

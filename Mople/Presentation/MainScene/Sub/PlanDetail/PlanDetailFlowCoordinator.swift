@@ -11,7 +11,7 @@ protocol PlanDetailCoordination: AnyObject {
     func pushMemberListView()
     func pushPlaceDetailView(place: PlaceInfo)
     func pushPhotoView(index: Int,
-                       images: [UIImage])
+                       imagePaths: [String])
     func presentPlanEditFlow(plan: Plan)
     func presentReviewEditFlow(review: Review)
     func endFlow()
@@ -60,9 +60,9 @@ extension PlanDetailFlowCoordinator: MemberListViewCoordination {
 // MARK: - 포토북
 extension PlanDetailFlowCoordinator {
     func pushPhotoView(index: Int,
-                       images: [UIImage]) {
+                       imagePaths: [String]) {
         print(#function, #line)
-        let view = dependencies.makePhotoBookViewController(images: images,
+        let view = dependencies.makePhotoBookViewController(imagePaths: imagePaths,
                                                             index: index,
                                                             coordinator: self)
         navigationController.pushViewController(view, animated: true)

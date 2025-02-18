@@ -21,6 +21,7 @@ final class ImageUploadUseCase: ImageUpload {
     }
     
     func execute(_ image: UIImage?) -> Single<String?> {
+        print(#function, #line)
         return Single.deferred { [weak self] in
             guard let self else { return .error(AppError.unknownError) }
             

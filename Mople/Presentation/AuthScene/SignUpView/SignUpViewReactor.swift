@@ -33,7 +33,7 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         case catchError(Error)
     }
     
-    struct State: LoadingState {
+    struct State {
         @Pulse var creationNickname: String?
         @Pulse var profileImage: UIImage?
         @Pulse var canDuplicateCheck: Bool = false
@@ -235,13 +235,11 @@ extension SignUpViewReactor {
 
 // MARK: - Loading
 extension SignUpViewReactor: LoadingReactor {
-    var loadingState: LoadingState { currentState }
-    
-    func updateLoadingState(_ isLoading: Bool) -> Mutation {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }
     
-    func catchError(_ error: Error) -> Mutation {
+    func catchErrorMutation(_ error: Error) -> Mutation {
         return .catchError(error)
     }
 }

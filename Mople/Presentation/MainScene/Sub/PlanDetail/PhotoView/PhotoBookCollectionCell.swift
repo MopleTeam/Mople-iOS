@@ -33,8 +33,9 @@ final class PhotoBookCollectionCell: UICollectionViewCell {
         }
     }
     
-    public func setPhoto(_ photo: UIImage) {
-        imageView.image = photo
+    public func setPhoto(_ path: String) {
+        imageView.kfSetimage(path,
+                             defaultImageType: .history)
     }
 }
 

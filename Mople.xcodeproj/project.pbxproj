@@ -122,7 +122,6 @@
 		523E76192D5D43B000BD22CB /* ReviewImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76182D5D43B000BD22CB /* ReviewImage.swift */; };
 		523E761B2D5D43DE00BD22CB /* ReviewCommandRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E761A2D5D43DE00BD22CB /* ReviewCommandRepo.swift */; };
 		523E761D2D5D445800BD22CB /* DefaultReviewCommnadRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E761C2D5D445800BD22CB /* DefaultReviewCommnadRepo.swift */; };
-		523E761F2D5D45B500BD22CB /* FetchReviewImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E761E2D5D45B500BD22CB /* FetchReviewImage.swift */; };
 		523E76212D5D462100BD22CB /* DeleteReviewImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76202D5D462100BD22CB /* DeleteReviewImage.swift */; };
 		523E76232D5D598700BD22CB /* ReviewImageUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76222D5D598700BD22CB /* ReviewImageUpload.swift */; };
 		523E76272D5EA4B800BD22CB /* PhotoBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76262D5EA4B800BD22CB /* PhotoBookViewController.swift */; };
@@ -133,6 +132,7 @@
 		524E33D12C804C7A004B15FC /* NickNameValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D02C804C7A004B15FC /* NickNameValidator.swift */; };
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */; };
+		5250C2C22D649A2000D89548 /* Reactor+Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5250C2C12D649A2000D89548 /* Reactor+Child.swift */; };
 		5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */; };
 		5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0092C9C5C81006B2711 /* TitleNaviBar.swift */; };
 		5259B00D2C9FD316006B2711 /* CalendarPlanTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B00C2C9FD316006B2711 /* CalendarPlanTableViewController.swift */; };
@@ -499,7 +499,6 @@
 		523E76182D5D43B000BD22CB /* ReviewImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewImage.swift; sourceTree = "<group>"; };
 		523E761A2D5D43DE00BD22CB /* ReviewCommandRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewCommandRepo.swift; sourceTree = "<group>"; };
 		523E761C2D5D445800BD22CB /* DefaultReviewCommnadRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultReviewCommnadRepo.swift; sourceTree = "<group>"; };
-		523E761E2D5D45B500BD22CB /* FetchReviewImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewImage.swift; sourceTree = "<group>"; };
 		523E76202D5D462100BD22CB /* DeleteReviewImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteReviewImage.swift; sourceTree = "<group>"; };
 		523E76222D5D598700BD22CB /* ReviewImageUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewImageUpload.swift; sourceTree = "<group>"; };
 		523E76262D5EA4B800BD22CB /* PhotoBookViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoBookViewController.swift; sourceTree = "<group>"; };
@@ -510,6 +509,7 @@
 		524E33D02C804C7A004B15FC /* NickNameValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NickNameValidator.swift; sourceTree = "<group>"; };
 		524E33D32C80508C004B15FC /* AlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManager.swift; sourceTree = "<group>"; };
 		524E33DA2C80C1F4004B15FC /* ErrorResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponseDTO.swift; sourceTree = "<group>"; };
+		5250C2C12D649A2000D89548 /* Reactor+Child.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactor+Child.swift"; sourceTree = "<group>"; };
 		5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthPickerViewController.swift; sourceTree = "<group>"; };
 		5259B0092C9C5C81006B2711 /* TitleNaviBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleNaviBar.swift; sourceTree = "<group>"; };
 		5259B00C2C9FD316006B2711 /* CalendarPlanTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarPlanTableViewController.swift; sourceTree = "<group>"; };
@@ -995,6 +995,7 @@
 			isa = PBXGroup;
 			children = (
 				5221B1322D5432E3004859C9 /* Reactor+Loading.swift */,
+				5250C2C12D649A2000D89548 /* Reactor+Child.swift */,
 			);
 			path = Reactor;
 			sourceTree = "<group>";
@@ -2585,7 +2586,6 @@
 			children = (
 				5214F8AB2D2C9ACC00E8CE9C /* FetchReviewList.swift */,
 				52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */,
-				523E761E2D5D45B500BD22CB /* FetchReviewImage.swift */,
 			);
 			path = Read;
 			sourceTree = "<group>";
@@ -3166,7 +3166,6 @@
 				5214F8802D2BA97F00E8CE9C /* MeetPlanTableCell.swift in Sources */,
 				5214F8A22D2C407A00E8CE9C /* HomeModelMock.swift in Sources */,
 				5214F8AF2D2C9B2900E8CE9C /* ReviewResponse.swift in Sources */,
-				523E761F2D5D45B500BD22CB /* FetchReviewImage.swift in Sources */,
 				52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */,
 				52EC04E92D3E5AEF00000C99 /* CreateComment.swift in Sources */,
 				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
@@ -3223,6 +3222,7 @@
 				52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */,
 				52F83A532D34F1CD003DD790 /* HomeFlowCoordinator.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
+				5250C2C22D649A2000D89548 /* Reactor+Child.swift in Sources */,
 				52B8E11F2D53449E00F7FF59 /* MemberListResponse.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,

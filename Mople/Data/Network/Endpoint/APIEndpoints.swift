@@ -61,7 +61,7 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
                             bodyParameters: ["token": fcmToken,
-                                             "subscribe": "true"])
+                                             "subscribe": true])
     }
 }
 
@@ -135,11 +135,10 @@ extension APIEndpoints {
 // MARK: - 이미지 업로드
 extension APIEndpoints {
     static func uploadImage(_ imageData: Data,
-                            folderPath: ImageUploadPath) throws -> Endpoint<String?> {
+                            folderPath: ImageUploadPath) -> Endpoint<String?> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
-        return try Endpoint(path: "image/upload/\(folderPath.rawValue)",
-                             authenticationType: .accessToken,
+        return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
                              method: .post,
                              headerParameters: HTTPHeader.getMultipartFormDataHeader(boundary),
                              bodyParameters: ["image": imageData],
@@ -271,13 +270,6 @@ extension APIEndpoints {
     
     static func fetchReviewDetail(reviewId: Int) throws -> Endpoint<ReviewResponse> {
         return try Endpoint(path: "review/\(reviewId)",
-                            authenticationType: .accessToken,
-                            method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
-    }
-    
-    static func fetchReviewImage(reviewId: Int) throws -> Endpoint<[ReviewImageResponse]> {
-        return try Endpoint(path: "review/images/\(reviewId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())

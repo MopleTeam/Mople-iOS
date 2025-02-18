@@ -48,19 +48,10 @@ extension ReviewEditSceneDIContainer {
     private func makePlanDetailViewReactor(review: Review,
                                            coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewReactor {
         return .init(review: review,
-                     fetchReviewImage: makeFetchReviewImageUseCase(),
                      deleteReviewImage: makeDeleteReviewUseCase(),
                      imageUpload: makeReviewImageUploadUseCase(),
                      photoService: DefaultPhotoService(),
                      coordinator: coordinator)
-    }
-    
-    private func makeFetchReviewImageUseCase() -> FetchReviewImage {
-        return FetchReviewImageUseCase(reviewListRepo: makeReviewQueryRepo())
-    }
-    
-    private func makeReviewQueryRepo() -> ReviewQueryRepo {
-        return DefaultReviewQueryRepo(networkService: appNetworkService)
     }
     
     private func makeDeleteReviewUseCase() -> DeleteReviewImage {

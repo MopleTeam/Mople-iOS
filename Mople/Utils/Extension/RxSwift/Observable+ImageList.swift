@@ -29,8 +29,8 @@ extension Observable where Element == ImageWrapper {
     static func reviewImagesTaskBuilder(_ reviewImages: [ReviewImage]) -> [Observable<Element>] {
         return reviewImages.map { reviewImage in
             Observable<ImageWrapper>.create { emitter in
-                guard let imagePath = reviewImage.reviewImage,
-                      let id = reviewImage.imageId,
+                guard let imagePath = reviewImage.path,
+                      let id = reviewImage.id,
                       let url = URL(string: imagePath) else { return Disposables.create() }
                 
                 let task = url.fetchImage { image in

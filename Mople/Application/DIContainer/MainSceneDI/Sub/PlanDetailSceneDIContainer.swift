@@ -17,7 +17,7 @@ protocol PlanDetailSceneDependencies {
     func makePlaceDetailViewController(place: PlaceInfo,
                                        coordinator: PlaceDetailCoordination) -> PlaceDetailViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
-    func makePhotoBookViewController(images: [UIImage],
+    func makePhotoBookViewController(imagePaths: [String],
                                      index: Int,
                                      coordinator: NavigationCloseable) -> PhotoBookViewController
     
@@ -71,7 +71,7 @@ extension PlanDetailSceneDIContainer {
     private func makePlanDetailViewReactor(type: PlanDetailType,
                                            coordinator: PlanDetailCoordination) -> PlanDetailViewReactor {
         mainReactor = PlanDetailViewReactor(type: type,
-                                            postId: postId,
+                                            id: postId,
                                             fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(),
                                             fetchReviewDetailUseCase: commonFactory.makeFetchReviewDetailUseCase(),
                                             coordinator: coordinator)
@@ -92,8 +92,7 @@ extension PlanDetailSceneDIContainer {
     }
     
     private func makeCommentListViewReactor() -> CommentListViewReactor {
-        let reactor = CommentListViewReactor(postId: postId,
-                                             fetchCommentListUseCase: makeFetchCommentListUseCase(),
+        let reactor = CommentListViewReactor(fetchCommentListUseCase: makeFetchCommentListUseCase(),
                                              createCommentUseCase: makeCreateCommentUseCase(),
                                              deleteCommentUseCase: makeDeleteCommentUseCase(),
                                              editCommentUseCase: makeEditCommentUseCase(),
@@ -159,11 +158,11 @@ extension PlanDetailSceneDIContainer {
     }
     
     // MARK: - 포토북
-    func makePhotoBookViewController(images: [UIImage],
+    func makePhotoBookViewController(imagePaths: [String],
                                      index: Int,
                                      coordinator: NavigationCloseable) -> PhotoBookViewController {
         return PhotoBookViewController(title: "함께한 순간",
-                                       photoList: images,
+                                       imagePaths: imagePaths,
                                        selectedIndex: index,
                                        coordinator: coordinator)
     }

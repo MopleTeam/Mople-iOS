@@ -229,7 +229,6 @@ extension PlanDetailViewController {
         .asDriver(onErrorJustReturn: false)
         .drive(with: self, onNext: { vc, _ in
             vc.rx.isLoading.onNext(false)
-            vc.chatingTextFieldView.rx.text.onNext(nil)
         })
         .disposed(by: disposeBag)
     }
@@ -240,8 +239,8 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addReviewObservable()
-            .map { Reactor.Action.update(.review($0)) }
+        EventService.shared.receiveObservable(name: .review)
+            .map { Reactor.Action.update(.review) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -251,6 +250,7 @@ extension PlanDetailViewController {
 // MARK: - Helper
 extension PlanDetailViewController {
     private func setEditComment(_ comment: String?) {
+        print(#function, #line)
         let hasComment = comment != nil
         chatingTextFieldView.rx.text.onNext(comment)
         chatingTextFieldView.rx.isResign.onNext(!hasComment)
@@ -264,6 +264,15 @@ extension PlanDetailViewController {
 
 extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
     
+    var tapGestureShouldCancelTouchesInView: Bool { false }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view is UIButton {
+            return false
+        }
+        return true
+    }
+    
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
     }
@@ -271,7 +280,6 @@ extension PlanDetailViewController: KeyboardDismissable, UIGestureRecognizerDele
     func dismissCompletion() {
         guard self.reactor?.currentState.editComment != nil else { return }
         self.reactor?.action.onNext(.parentCommand(.cancleEditing))
-        self.chatingTextFieldView.rx.text.onNext(nil)
     }
 }
 
@@ -339,3 +347,4 @@ extension PlanDetailViewController {
         
     }
 }
+

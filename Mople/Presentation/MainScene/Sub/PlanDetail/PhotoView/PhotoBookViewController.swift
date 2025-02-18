@@ -13,7 +13,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     private weak var coordinator: NavigationCloseable?
     
     // MARK: - Variables
-    private let photoList: [UIImage]
+    private let imagePaths: [String]
     private let startIndex: Int
     private var isStart: Bool = false
     
@@ -38,10 +38,10 @@ final class PhotoBookViewController: TitleNaviViewController {
     
     // MARK: - Life Cycle
     init(title: String?,
-         photoList: [UIImage],
+         imagePaths: [String],
          selectedIndex: Int,
          coordinator: NavigationCloseable) {
-        self.photoList = photoList
+        self.imagePaths = imagePaths
         self.startIndex = selectedIndex
         super.init(title: title)
         self.coordinator = coordinator
@@ -111,14 +111,14 @@ final class PhotoBookViewController: TitleNaviViewController {
 extension PhotoBookViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        photoList.count
+        imagePaths.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoBookCollectionCell.reuseIdentifier,
             for: indexPath) as! PhotoBookCollectionCell
-        cell.setPhoto(photoList[indexPath.item])
+        cell.setPhoto(imagePaths[indexPath.item])
         return cell
     }
 }
@@ -146,7 +146,7 @@ extension PhotoBookViewController: UIScrollViewDelegate {
     }
     
     private func setIndicatorLabel(_ pageIndex: Int) {
-        indicatorLabel.text = "\(pageIndex)/\(photoList.count)"
+        indicatorLabel.text = "\(pageIndex)/\(imagePaths.count)"
     }
 }
 

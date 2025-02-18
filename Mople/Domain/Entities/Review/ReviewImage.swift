@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ReviewImage {
-    var imageId: Int?
-    var reviewImage: String?
+struct ReviewImage: Equatable {
+    var id: Int?
+    var path: String?
 }

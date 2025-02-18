@@ -227,7 +227,9 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
         
         completeButton.rx.controlEvent(.touchUpInside)
-            .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
             .map({ Reactor.Action.requestPlanCreation })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

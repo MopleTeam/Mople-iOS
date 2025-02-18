@@ -10,5 +10,4 @@ import RxSwift
 protocol ReviewQueryRepo {
     func fetchReviewList(_ meetId: Int) -> Single<[ReviewResponse]>
     func fetchReviewDetail(_ reviewId: Int) -> Single<ReviewResponse>
-    func fetchReviewImage(_ reviewId: Int) -> Single<[ReviewImageResponse]>
 }

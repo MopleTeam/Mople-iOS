@@ -95,6 +95,9 @@ class SignUpViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
         
         profileSetupView.rx.completeTapped
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
             .map { Reactor.Action.complete }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -159,8 +162,8 @@ extension SignUpViewController: KeyboardDismissable {
 // MARK: - 이미지 선택
 extension SignUpViewController {
     private func showPhotos() {
-        let selectPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
-        let defaultPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
+        let defaultPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
+        let selectPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
         
         if hasImage {
             alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])

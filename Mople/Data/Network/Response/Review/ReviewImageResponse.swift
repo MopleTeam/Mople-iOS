@@ -9,12 +9,12 @@ import Foundation
 
 struct ReviewImageResponse: Decodable {
     var imageId: Int?
-    var reviewImage: String?
+    var reviewImg: String?
 }
 
 extension ReviewImageResponse {
     func toDomain() -> ReviewImage {
-        return .init(imageId: imageId,
-                     reviewImage: reviewImage)
+        return .init(id: imageId,
+                     path: reviewImg)
     }
 }

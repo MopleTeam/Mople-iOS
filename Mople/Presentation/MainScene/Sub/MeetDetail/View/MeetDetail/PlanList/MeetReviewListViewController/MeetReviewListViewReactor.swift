@@ -11,7 +11,6 @@ import ReactorKit
 final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case updateReview(ReviewPayload)
         case selectedReview(index: Int)
         case requestReviewList
     }
@@ -52,8 +51,6 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
             return fetchReviewList()
         case let .selectedReview(index):
             return presentReviewDetailView(index: index)
-        case let .updateReview(review):
-            return updateReview(review)
         }
     }
     
@@ -96,14 +93,3 @@ extension MeetReviewListViewReactor {
     }
 }
 
-// MARK: - 노티피케이션 수신
-extension MeetReviewListViewReactor {
-    private func updateReview(_ payload: ReviewPayload) -> Observable<Mutation> {
-        guard case .updated(let review) = payload else { return .empty() }
-        let currentReviewList: [Review] = self.currentState.reviews
-        let updateReviewList = currentReviewList.map {
-            return $0.id == review.id ? review : $0
-        }
-        return .just(.fetchReviewList(reviews: updateReviewList))
-    }
-}

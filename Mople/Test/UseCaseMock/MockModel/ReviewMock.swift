@@ -20,7 +20,7 @@ extension Review {
               date: Date().addingTimeInterval(-3600 * (24 * Double(Int.random(in: 6...100)))),
               participantsCount: Int.random(in: 1...10),
               address: "서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1 서울 강남구 선릉로100길 1",
-              imagePaths: getRandomImages(),
+              images: [],
               meet: .mock(id: 1),
               location: .mock(),
               isReviewd: false)

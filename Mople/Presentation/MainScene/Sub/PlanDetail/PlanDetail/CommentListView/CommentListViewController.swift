@@ -202,9 +202,10 @@ extension CommentListViewController {
                                                          style: .destructive,
                                                          completion: deleteComment)
         
-        alertManager.showActionSheet(actions: [editAction, deleteAction]) { [weak self] _ in
+        alertManager.showActionSheet(actions: [editAction, deleteAction],
+                                     cancleCompletion: { [weak self] _ in
             self?.reactor?.action.onNext(.selctedComment(comment: nil))
-        }
+        })
     }
     
     private func editComment() {
