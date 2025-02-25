@@ -9,6 +9,6 @@ import Foundation
 
 struct MeetSummary: Hashable {
     let id: Int?
-    let name: String?
-    let imagePath: String?
+    var name: String?
+    var imagePath: String?
 }

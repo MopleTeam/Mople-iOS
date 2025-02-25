@@ -15,8 +15,14 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     typealias Reactor = MeetSetupViewReactor
     
+    // MARK: - Variables
     var disposeBag = DisposeBag()
+    private var isHost: Bool = false
     
+    // MARK: - Alert
+    private let alertService = TestAlertManager.shared
+    
+    // MARK: - UI Components
     private let thumbnailImage: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
@@ -71,10 +77,11 @@ final class MeetSetupViewController: TitleNaviViewController, View {
                        color: ColorStyle.Gray._06)
         label.setSpacing(4)
         label.setIconAligment(.right)
+        label.isUserInteractionEnabled = false
         return label
     }()
     
-    private let leaveButton: BaseButton = {
+    private let deleteButton: BaseButton = {
         let btn = BaseButton()
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
@@ -84,7 +91,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     }()
     
     private lazy var headerStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [thumbnailImage, meetNameButton, spaceView])
+        let sv = UIStackView(arrangedSubviews: [thumbnailImage, meetNameButton])
         sv.axis = .horizontal
         sv.spacing = 12
         sv.alignment = .center
@@ -96,7 +103,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let sv = UIStackView(arrangedSubviews: [headerStackView, sinceDayLabel])
         sv.axis = .vertical
         sv.spacing = 24
-        sv.alignment = .fill
+        sv.alignment = .leading
         sv.distribution = .fill
         sv.backgroundColor = ColorStyle.Default.white
         sv.isLayoutMarginsRelativeArrangement = true
@@ -105,7 +112,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [subStackView, memberListButton, leaveButton])
+        let sv = UIStackView(arrangedSubviews: [subStackView, memberListButton, deleteButton])
         sv.axis = .vertical
         sv.spacing  = 8
         sv.alignment = .fill
@@ -114,6 +121,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         return sv
     }()
     
+    // MARK: - LifeCycle
     init(title: String?,
          reactor: MeetSetupViewReactor) {
         super.init(title: title)
@@ -131,6 +139,12 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     private func initalSetup() {
         setLayout()
+        setDeleteButtonAction()
+    }
+    
+    // MARK: - UI Setup
+    private func setLayout() {
+        setupUI()
         setupNavi()
     }
     
@@ -139,8 +153,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         self.setBarItem(type: .right, image: .invite)
     }
     
-    
-    private func setLayout() {
+    private func setupUI() {
         self.view.addSubview(mainStackView)
         self.memberListButton.addSubview(memberCountLabel)
         
@@ -151,13 +164,14 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         
         sinceDayLabel.snp.makeConstraints { make in
             make.height.equalTo(44)
+            make.horizontalEdges.equalToSuperview().inset(20)
         }
         
         thumbnailImage.snp.makeConstraints { make in
             make.size.equalTo(40)
         }
         
-        [memberListButton, leaveButton].forEach {
+        [memberListButton, deleteButton].forEach {
             $0.snp.makeConstraints { make in
                 make.height.equalTo(56)
             }
@@ -169,12 +183,31 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         }
     }
     
+    // MARK: - Bind
     func bind(reactor: MeetSetupViewReactor) {
+        inputBind(reactor: reactor)
+        outputBind(reactor: reactor)
+        setNotification(reactor: reactor)
+    }
+    
+    private func inputBind(reactor: Reactor) {
         naviBar.leftItemEvent
-            .map { Reactor.Action.popView }
+            .map { Reactor.Action.flow(.pop) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        memberListButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.memberList) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        meetNameButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.editMeet) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func outputBind(reactor: Reactor) {
         reactor.pulse(\.$meet)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
@@ -186,11 +219,75 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         reactor.pulse(\.$isHost)
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isHost in
+                vc.isHost = isHost
                 vc.setLeaveButtonText(isHost: isHost)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, isLoading in
+                vc.rx.isLoading.onNext(isLoading)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$message)
+            .compactMap { $0 }
+            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
+            .drive(with: self, onNext: { vc, message in
+                vc.alertService.showAlert(title: message)
             })
             .disposed(by: disposeBag)
     }
     
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addMeetObservable()
+            .compactMap({ payload -> Meet? in
+                guard case .updated(let meet) = payload else { return nil }
+                return meet
+            })
+            .map { Reactor.Action.editMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Action
+    private func setDeleteButtonAction() {
+        deleteButton.rx.controlEvent(.touchUpInside)
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.handleDeleteMeet()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleDeleteMeet() {
+        if isHost {
+            showDeleteAlert()
+        } else {
+            reactor?.action.onNext(.deleteMeet)
+        }
+    }
+    
+    // MARK: - Alert
+    private func showDeleteAlert() {
+        let action: DefaultAction = .init(text: "모임삭제",
+                                          tintColor: ColorStyle.Default.white,
+                                          bgColor: ColorStyle.App.secondary,
+                                          completion: { [weak self] in
+            self?.reactor?.action.onNext(.deleteMeet)
+        })
+        
+        alertService.showAlert(title: "모임을 삭제할까요?",
+                               subTitle: "해당 모임에 대한 모든 기록을 복구할 수 없어요",
+                               addAction: [action])
+    }
+}
+
+// MARK: - State 적용
+extension MeetSetupViewController {
     private func setMeetInfo(_ meet: Meet) {
         thumbnailImage.kfSetimage(meet.meetSummary?.imagePath,
                                   defaultImageType: .meet)
@@ -200,7 +297,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     }
     
     private func setLeaveButtonText(isHost: Bool) {
-        leaveButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
+        deleteButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
                              font: FontStyle.Title3.medium,
                              normalColor: isHost ? ColorStyle.Default.red : ColorStyle.Gray._01)
     }
@@ -213,34 +310,9 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     private func setSinceLabel(_ sinceDayCount: Int?) {
         let sinceCount = String(sinceDayCount ?? 0)
         let text = "우리가 추억을 쌓은지 \(sinceCount) 일째"
-        let defaultAttributed = getAttributedString(text: text)
-        setHighlightText(attributedString: defaultAttributed, highlightText: sinceCount)
-        sinceDayLabel.attributedText = defaultAttributed
-    }
-    
-    private func getAttributedString(text: String) -> NSMutableAttributedString {
-        let attributedString = NSMutableAttributedString(string: text)
-        attributedString.addAttributes(.textAttributes(font: FontStyle.Body1.medium,
-                                                  color: ColorStyle.Gray._04),
-                                       range: .init(location: 0, length: text.count))
-        return attributedString
-    }
-    
-    private func setHighlightText(attributedString: NSMutableAttributedString,
-                                  highlightText: String) {
-        guard let range = attributedString.string.range(of: highlightText) else { return }
-        attributedString.addAttributes(.textAttributes(font: FontStyle.Body1.bold,
-                                                       color: ColorStyle.App.primary),
-                                       range: .init(range, in: attributedString.string))
+        sinceDayLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: text,
+                                                                                   highlightText: sinceCount,
+                                                                                   highlightFont: FontStyle.Body1.bold)
     }
 }
 
-extension [NSAttributedString.Key: Any] {
-    static func textAttributes(font: UIFont,
-                               color: UIColor) -> Self {
-        return [
-            .font: font,
-            .foregroundColor: color
-        ]
-    }
-}

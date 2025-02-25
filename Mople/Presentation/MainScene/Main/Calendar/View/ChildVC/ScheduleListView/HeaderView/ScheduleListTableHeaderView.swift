@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class CalendarPlanTableHeaderView: UITableViewHeaderFooterView {
+final class ScheduleListTableHeaderView: UITableViewHeaderFooterView {
 
     // MARK: - UI Components
     private let titleLabel: UILabel = {

@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 final class CreatePlanMock: CreatePlan {
-    func execute(with plan: PlanRequest) -> Single<Plan> {
+    func execute(request: PlanRequest) -> Single<Plan> {
         return Observable.just(())
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .map { _ in

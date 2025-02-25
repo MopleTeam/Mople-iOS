@@ -16,13 +16,17 @@ protocol LoadingReactor: AnyObject {
 extension LoadingReactor {
 
     func requestWithLoading(task: Observable<Mutation>,
+                            minimumExecutionTime: RxTimeInterval = .seconds(0),
                             defferredLoadingDelay: RxTimeInterval = .milliseconds(300),
                             completionScheduler: ImmediateSchedulerType = MainScheduler.instance,
                             completionDealy: RxTimeInterval = .seconds(0),
                             completeMutation: Mutation? = nil,
                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
-                
-        let newTask = task
+        
+        let executionTimer = Observable<Int>.timer(minimumExecutionTime, scheduler: MainScheduler.instance)
+        
+        let newTask = Observable.zip(task, executionTimer)
+            .map { $0.0 }
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
@@ -32,7 +36,7 @@ extension LoadingReactor {
                                 completeMutation: completeMutation,
                                 completion: completion))
             .share(replay: 1)
-        
+
         let loadingStart = Observable.just(updateLoadingMutation(true))
             .delay(defferredLoadingDelay, scheduler: MainScheduler.instance)
             .take(until: newTask)
@@ -63,4 +67,5 @@ extension LoadingReactor {
             })
     }
 }
+
 

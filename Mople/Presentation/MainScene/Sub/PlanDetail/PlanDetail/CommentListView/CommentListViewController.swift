@@ -17,8 +17,10 @@ final class CommentListViewController: BaseViewController, View {
     typealias Reactor = CommentListViewReactor
     
     var disposeBag = DisposeBag()
-    
+
+    // MARK: - Alert
     private let alertManager = AlertManager.shared
+
     private var dataSource: RxTableViewSectionedReloadDataSource<CommentTableSectionModel>?
     
     private(set) var tableView: UITableView = {
@@ -85,6 +87,7 @@ final class CommentListViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$createdCompletion)
+            .delay(.milliseconds(20), scheduler: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, _ in
@@ -195,38 +198,42 @@ extension CommentListViewController {
     
     // MARK: - 작성자 본인인 경우(편집, 삭제)
     private func showEditCommentAlert() {
-        print(#function, #line, "Path : # 알림창 표시 ")
-        let editAction = alertManager.makeAction(title: "댓글 수정", completion: editComment)
-       
-        let deleteAction = alertManager.makeAction(title: "댓글 삭제",
-                                                         style: .destructive,
-                                                         completion: deleteComment)
-        
-        alertManager.showActionSheet(actions: [editAction, deleteAction],
+        alertManager.showActionSheet(actions: [editComment(), deleteComment()],
                                      cancleCompletion: { [weak self] _ in
             self?.reactor?.action.onNext(.selctedComment(comment: nil))
         })
     }
     
-    private func editComment() {
-        reactor?.action.onNext(.childEvent(.editComment))
+    private func editComment() -> UIAlertAction {
+        return alertManager.makeAction(title: "댓글 수정",
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.childEvent(.editComment))
+        })
     }
     
-    private func deleteComment() {
-        reactor?.action.onNext(.deleteComment)
+    private func deleteComment() -> UIAlertAction {
+        return alertManager.makeAction(title: "댓글 삭제",
+                                       style: .destructive,
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.deleteComment)
+        })
     }
     
     // MARK: - 작성자가 아닌 경우(신고)
     private func showReportCommentAlert() {
-//        let reportCommentAction = alertManager.makeAction(title: "댓글 신고",
-//                                                        style: .destructive,
-//                                                        completion: editComment)
-//        
-//        alertManager.showActionSheet(actions: [reportCommentAction])
+        alertManager.showActionSheet(actions: [reportComment()],
+                                     cancleCompletion: { [weak self] _ in
+            print(#function, #line, "Path : # 댓글 편집 취소 ")
+            self?.reactor?.action.onNext(.selctedComment(comment: nil))
+        })
     }
     
-    private func reportComment(id: Int) {
-        
+    private func reportComment() -> UIAlertAction {
+        return alertManager.makeAction(title: "댓글 신고",
+                                       style: .destructive,
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.childEvent(.reportComment))
+        })
     }
 }
 

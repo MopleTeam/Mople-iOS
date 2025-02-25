@@ -27,6 +27,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     
     // MARK: - Manager
     private let alertManager = AlertManager.shared
+    private let toastMessageManager = ToastManager.shared
     
     // MARK: - Observable
     private var loadingObserver: PublishSubject<Bool> = .init()
@@ -184,6 +185,14 @@ extension PlanDetailViewController {
                 vc.setStartOffsetY(offsetY)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$reported)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, _ in
+                vc.toastMessageManager.presentToast(text: "신고 접수가 완료되었습니다")
+            })
+            .disposed(by: disposeBag)
     }
     
     private func handleCommentCommand(reactor: Reactor) {
@@ -303,7 +312,7 @@ extension PlanDetailViewController {
         case .plan:
             alertActions = [editPlan(), deletePlan()]
         case let .review(isReviewed):
-            alertActions = [editReview(isReviewed: isReviewed)]
+            alertActions = [editReview(isReviewed), deleteReview()]
         }
 
         alertManager.showActionSheet(actions: alertActions)
@@ -311,40 +320,58 @@ extension PlanDetailViewController {
     
     // MARK: - 일정 편집
     private func editPlan() -> UIAlertAction {
-        return alertManager.makeAction(title: "일정 수정") { [weak self] in
+        return alertManager.makeAction(title: "일정 수정",
+                                       completion: { [weak self] in
             let action = Reactor.Action.flow(.editPlan)
             self?.reactor?.action.onNext(action)
-        }
+        })
     }
     
     private func deletePlan() -> UIAlertAction {
         return alertManager.makeAction(title: "일정 삭세",
-                                       style: .destructive) {
-            
-        }
+                                       style: .destructive,
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.deletePost)
+        })
     }
     
     // MARK: - 후기 편집
-    private func editReview(isReviewed: Bool) -> UIAlertAction {
+    private func editReview(_ isReviewed: Bool) -> UIAlertAction {
         let title = isReviewed ? "후기 수정" : "후기 작성"
         
-        return alertManager.makeAction(title: title) { [weak self] in
+        return alertManager.makeAction(title: title,
+                                       completion: { [weak self] in
             let action = Reactor.Action.flow(.editReview)
             self?.reactor?.action.onNext(action)
-        }
+        })
+    }
+    
+    private func deleteReview() -> UIAlertAction {
+        return alertManager.makeAction(title: "후기 삭세",
+                                       style: .destructive,
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.deletePost)
+        })
     }
     
     // MARK: - 작성자가 아닌 경우(신고)
     private func showReportPlanAlert(type: PlanDetailType) {
-        let reportCommentAction = alertManager.makeAction(title: "일정 신고",
-                                                          style: .destructive,
-                                                          completion: reportPlan)
-
-//        alertManager.showActionSheet(actions: [reportCommentAction])
+        alertManager.showActionSheet(actions: [reportPlan(type: type)])
     }
     
-    private func reportPlan() {
+    private func reportPlan(type: PlanDetailType) -> UIAlertAction {
+        let title: String
+        if case .plan = type {
+            title = "일정 신고"
+        } else {
+            title = "후기 신고"
+        }
         
+        return alertManager.makeAction(title: title,
+                                       style: .destructive,
+                                       completion: { [weak self] in
+            self?.reactor?.action.onNext(.reportPost)
+        })
     }
 }
 

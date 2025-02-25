@@ -18,7 +18,7 @@ struct CommentResponse: Decodable {
 
 extension CommentResponse {
     func toDomain() -> Comment {
-        let date = DateManager.parseServerDate(string: self.time)
+        let date = DateManager.parseServerFullDate(string: self.time)
         
         return .init(id: commentId,
                      writerId: writerId,

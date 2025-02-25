@@ -8,7 +8,7 @@ import UIKit
 import ReactorKit
 
 protocol CommentListCommands: AnyObject {
-    func fetchCommentList(postId: Int)
+    func fetchComment(postId: Int)
     func writeComment(comment: String)
     func completeEditComment()
     func addPhotoList(_ photoPaths: [UIImage])
@@ -31,6 +31,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
             case editComment
             case offsetChanged(_ offsetY: CGFloat)
             case selectedPhoto(Int)
+            case reportComment
         }
 
         case parentCommand(ParentCommand)
@@ -40,8 +41,14 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
+        enum ParentRequest {
+            case createdComment
+            case editedComment
+            case reportComment
+        }
+        
         case fetchedSectionModel([CommentTableSectionModel])
-        case createCompletion
+        case requestParent(ParentRequest)
     }
     
     struct State {
@@ -55,6 +62,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     private let createCommentUseCase: CreateComment
     private let deleteCommentUseCase: DeleteComment
     private let editCommentUseCase: EditComment
+    private let reportUseCase: ReportPost
     private weak var delegate: CommentListDelegate?
     private var postId: Int?
     private var selectedComment: Comment?
@@ -63,11 +71,13 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
          createCommentUseCase: CreateComment,
          deleteCommentUseCase: DeleteComment,
          editCommentUseCase: EditComment,
+         reportUseCase: ReportPost,
          delegate: CommentListDelegate) {
         self.fetchCommentListUseCase = fetchCommentListUseCase
         self.createCommentUseCase = createCommentUseCase
         self.deleteCommentUseCase = deleteCommentUseCase
         self.editCommentUseCase = editCommentUseCase
+        self.reportUseCase = reportUseCase
         self.delegate = delegate
         logLifeCycle()
     }
@@ -98,10 +108,26 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
             if models.isEmpty == false {
                 newState.sectionModels = models
             }
-        case .createCompletion:
-            newState.createdCompletion = ()
+        case let .requestParent(request):
+            handleDelegate(state: &newState,
+                           request: request)
         }
         return newState
+    }
+    
+    private func handleDelegate(state: inout State,
+                                request: Mutation.ParentRequest) {
+        switch request {
+        case .createdComment:
+            state.createdCompletion = ()
+            delegate?.editComment(nil)
+        case .editedComment:
+            selectedComment = nil
+            delegate?.editComment(nil)
+        case .reportComment:
+            selectedComment = nil
+            delegate?.reportComment()
+        }
     }
 }
 
@@ -112,11 +138,12 @@ extension CommentListViewReactor {
     private func handleParentCommand(_ command: Action.ParentCommand) -> Observable<Mutation> {
         switch command {
         case let .fetchCommentList(postId):
-            return fetchCommentList(postId: postId)
+            return fetchCommentListWithLoading(postId: postId)
         case let .writeComment(comment):
             return handleWriteComment(comment: comment)
         case let .addPhotoList(photoList):
-            return addPhotoSectionModel(photoList)
+            let addSection = addPhotoSectionModel(photoList)
+            return .just(addSection)
         }
     }
     
@@ -129,6 +156,8 @@ extension CommentListViewReactor {
             return changedCommentListTableOffsetY(offsetY)
         case let .selectedPhoto(index):
             return showPhotoBook(index: index)
+        case .reportComment:
+            return reportComment()
         }
     }
     
@@ -153,19 +182,22 @@ extension CommentListViewReactor {
 // MARK: - 데이터 로드
 extension CommentListViewReactor {
     
-    private func fetchCommentList(postId: Int) -> Observable<Mutation> {
+    private func fetchCommentListWithLoading(postId: Int) -> Observable<Mutation> {
         
         updatePostId(postId)
-        
-        let fetchComment = fetchCommentListUseCase.execute(postId: postId)
+        let fetchComment = fetchCommentList(postId: postId)
+        return requestWithLoading(task: fetchComment)
+    }
+    
+    private func fetchCommentList(postId: Int) -> Observable<Mutation> {
+        return fetchCommentListUseCase.execute(postId: postId)
             .asObservable()
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                return addCommentSectionModel(comments)
+                let addSection = addCommentSectionModel(comments)
+                return .just(addSection)
             })
-        
-        return requestWithLoading(task: fetchComment)
     }
     
     private func updatePostId(_ postId: Int)  {
@@ -198,16 +230,12 @@ extension CommentListViewReactor {
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                return addCommentSectionModel(comments)
+                let addSection = addCommentSectionModel(comments)
+                let requestParent = Mutation.requestParent(.createdComment)
+                return .of(addSection, requestParent)
             })
 
-        return requestWithLoading(task: createComment,
-                                  defferredLoadingDelay: .seconds(0),
-                                  completionDealy: .milliseconds(20),
-                                  completeMutation: .createCompletion,
-                                  completion: { [weak self] in
-            self?.delegate?.editComment(nil)
-        })
+        return requestWithLoading(task: createComment)
     }
     
     private func editComment(commentId: Int,
@@ -226,16 +254,12 @@ extension CommentListViewReactor {
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                return addCommentSectionModel(comments)
+                let addSection = addCommentSectionModel(comments)
+                let requestParent = Mutation.requestParent(.editedComment)
+                return .of(addSection, requestParent)
             })
         
-        return requestWithLoading(task: editComment,
-                                  defferredLoadingDelay: .seconds(0),
-                                  completionDealy: .milliseconds(20),
-                                  completion: { [weak self] in
-            self?.delegate?.editComment(nil)
-            self?.selectedComment = nil
-        })
+        return requestWithLoading(task: editComment)
     }
     
     private func deleteComment() -> Observable<Mutation> {
@@ -254,8 +278,18 @@ extension CommentListViewReactor {
                 return fetchCommentList(postId: postId)
             }
         
-        return requestWithLoading(task: deleteComment,
-                                  completionDealy: .milliseconds(20))
+        return requestWithLoading(task: deleteComment)
+    }
+    
+    private func reportComment() -> Observable<Mutation> {
+        guard let id = self.selectedComment?.id else { return .empty() }
+        
+        let reportComment = reportUseCase
+            .execute(type: .comment(id: id), reason: nil)
+            .asObservable()
+            .flatMap { Observable<Mutation>.just(.requestParent(.reportComment)) }
+        
+        return requestWithLoading(task: reportComment)
     }
 }
 
@@ -269,18 +303,18 @@ extension CommentListViewReactor {
 
 // MARK: - 리스트 섹션 모델
 extension CommentListViewReactor {
-    private func addCommentSectionModel(_ comment: [Comment]) -> Observable<Mutation> {
+    private func addCommentSectionModel(_ comment: [Comment]) -> Mutation {
         let sectionItems = comment.map { SectionItem.comment($0) }
         let sectionModel = CommentTableSectionModel(type: .commentList, items: sectionItems)
         let addedSection = addSectionModel(model: sectionModel)
-        return .just(.fetchedSectionModel(addedSection))
+        return .fetchedSectionModel(addedSection)
     }
     
-    private func addPhotoSectionModel(_ photos: [UIImage]) -> Observable<Mutation> {
+    private func addPhotoSectionModel(_ photos: [UIImage]) -> Mutation {
         let sectionItem = SectionItem.photo(photos)
         let sectionModel = CommentTableSectionModel(type: .photoList, items: [sectionItem])
         let addedSection = addSectionModel(model: sectionModel)
-        return .just(.fetchedSectionModel(addedSection))
+        return .fetchedSectionModel(addedSection)
     }
     
     /// 섹션유무에 따라서 업데이트 or 추가
@@ -329,7 +363,7 @@ extension CommentListViewReactor {
 // MARK: - 부모뷰 명령
 extension CommentListViewReactor: CommentListCommands {
     
-    func fetchCommentList(postId: Int) {
+    func fetchComment(postId: Int) {
         action.onNext(.parentCommand(.fetchCommentList(postId: postId)))
     }
     

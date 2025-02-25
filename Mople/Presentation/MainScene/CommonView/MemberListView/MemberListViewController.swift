@@ -49,11 +49,6 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         initalSetup()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.tableHeaderView = countView
-    }
-    
     private func initalSetup() {
         setNaviItem()
         setupTableView()

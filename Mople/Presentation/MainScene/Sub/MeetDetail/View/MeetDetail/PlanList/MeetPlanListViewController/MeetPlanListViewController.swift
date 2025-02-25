@@ -120,11 +120,12 @@ final class MeetPlanListViewController: BaseViewController, View {
             .drive(self.tableView.rx.items(
                 cellIdentifier: MeetPlanTableCell.reuseIdentifier,
                 cellType: MeetPlanTableCell.self)
-            ) { index, item, cell in
-
+            ) { [weak self] index, item, cell in
+                print(#function, #line, "Path : # 일정 셀 관리 ")
                 cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
-                cell.completeTapped = { [weak self] in
+                cell.completeTapped = {
+                    print(#function, #line, "Path : # 참여버튼 클릭 ")
                     guard let planId = item.id else { return }
                     let action = Reactor.Action.updateParticipants(id: planId,
                                                                    isJoining: item.isParticipating)
@@ -160,5 +161,6 @@ extension MeetPlanListViewController: UITableViewDelegate {
         reactor?.action.onNext(.requestPlanList)
     }
 }
+
 
 

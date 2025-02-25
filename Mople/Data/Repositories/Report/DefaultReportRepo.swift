@@ -8,9 +8,9 @@
 import RxSwift
 
 final class DefaultReportRepo: BaseRepositories, ReportRepo {
-    func reportPost(type: ReportType) -> Single<Void> {
+    func reportPost(request: ReportRequest) -> Single<Void> {
         networkService.authenticatedRequest {
-            return try APIEndpoints.report(type: type)
+            return try APIEndpoints.report(request: request)
         }
     }
 }

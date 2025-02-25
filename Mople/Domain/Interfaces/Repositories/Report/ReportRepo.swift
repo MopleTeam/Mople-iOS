@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol ReportRepo {
-    func reportPost(type: ReportType) -> Single<Void>
+    func reportPost(request: ReportRequest) -> Single<Void>
 }

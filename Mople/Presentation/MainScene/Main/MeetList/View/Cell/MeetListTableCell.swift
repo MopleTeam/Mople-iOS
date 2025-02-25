@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class MeetListTableCell: UITableViewCell {
-        
+            
     private let thumbnailView: ThumbnailView = {
         let view = ThumbnailView(thumbnailSize: 56,
                                       thumbnailRadius: 12)
@@ -71,33 +71,47 @@ final class MeetListTableCell: UITableViewCell {
 
     public func configure(with viewModel: ThumbnailViewModel) {
         thumbnailView.configure(with: viewModel)
-        scheduleLabel.text = checkScheduleStatus(date: viewModel.lastPlanDate).message
+        formatDateStatusLabel(date: viewModel.lastPlanDate)
+    }
+    
+    private func formatDateStatusLabel(date: Date?) {
+        let status = checkScheduleStatus(date: date)
+        switch status {
+        case .present:
+            scheduleLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: status.message,
+                                                                                       highlightText: "오늘")
+        case let .future(day):
+            scheduleLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: status.message,
+                                                                                       highlightText: "D-\(day)")
+        case .past, .none:
+            scheduleLabel.text = status.message
+        }
     }
 }
 
-#warning("모델로 분리")
 extension MeetListTableCell {
+    
     private enum DateStatus {
-        case past(_ days: Int)
+        case past(_ day: Int)
         case present
-        case future(_ days: Int)
+        case future(_ day: Int)
         case none
         
         var message: String {
             switch self {
-            case .past(let days):
-                return "마지막 약속으로부터 \(abs(days))일 지났어요."
+            case let .past(day):
+                return "마지막 약속으로부터 \(abs(day))일 지났어요."
             case .present:
-                return "오늘은 약속일이에요."
-            case .future(let days):
-                return "약속일까지 \(days)일 남았어요."
+                return "오늘 약속된 일정이 있어요"
+            case let .future(day):
+                return "D-\(day) 약속된 일정이 있어요."
             case .none:
                 return "새로운 일정을 추가해보세요."
             }
         }
     }
     
-    private func checkScheduleStatus(date: Date?) -> DateStatus{
+    private func checkScheduleStatus(date: Date?) -> DateStatus {
         guard let date else { return .none }
         
         let days = DateManager.numberOfDaysBetween(date)

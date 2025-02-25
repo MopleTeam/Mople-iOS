@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class CalenadrPalnTableCell: UITableViewCell {
+final class ScheduleListTableCell: UITableViewCell {
  
     // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
@@ -101,7 +101,7 @@ final class CalenadrPalnTableCell: UITableViewCell {
         }
     }
 
-    public func configure(viewModel: CalendarPlanTableCellModel) {
+    public func configure(viewModel: ScheduleListTableCellModel) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))

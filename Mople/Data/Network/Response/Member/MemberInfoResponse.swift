@@ -10,13 +10,13 @@ import Foundation
 struct MemberInfoResponse: Decodable {
     let memberId: Int?
     let nickname: String?
-    let image: String?
+    let profileImg: String?
 }
 
 extension MemberInfoResponse {
     func toDomain() -> MemberInfo {
         return .init(memberId: memberId,
                      nickname: nickname,
-                     imagePath: image)
+                     imagePath: profileImg)
     }
 }

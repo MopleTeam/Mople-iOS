@@ -58,28 +58,20 @@ extension AlertManager {
 
 struct DefaultAction {
     
-    enum DefaultStyle {
-        case cancle, check
-        
-        var text: String {
-            switch self {
-            case .cancle: "취소"
-            case .check: "확인"
-            }
-        }
-    }
-    
     var text: String
-    var completion: (() -> Void)?
     var tintColor: UIColor = ColorStyle.Gray._01
     var bgColor: UIColor = ColorStyle.App.tertiary
+    var completion: (() -> Void)?
     
-    static func defaultButton(style: DefaultStyle,
-                              completion: (() -> Void)? = nil) -> Self {
-        return .init(text: style.text,
-                     completion: completion,
-                     tintColor: ColorStyle.Gray._01,
-                     bgColor: ColorStyle.App.tertiary)
+    init(text: String = "아니오",
+         tintColor: UIColor = ColorStyle.Gray._01,
+         bgColor: UIColor = ColorStyle.App.tertiary,
+         completion: (() -> Void)? = nil) {
+        
+        self.text = text
+        self.completion = completion
+        self.tintColor = tintColor
+        self.bgColor = bgColor
     }
 }
 
@@ -94,9 +86,9 @@ final class TestAlertManager {
     }
     
     func showAlert(title: String,
-                   subTitle: String?,
-                   defaultAction: DefaultAction = .defaultButton(style: .cancle),
-                   addAction: [DefaultAction]) {
+                   subTitle: String? = nil,
+                   defaultAction: DefaultAction = .init(),
+                   addAction: [DefaultAction] = []) {
         let alert = DefaultAlertControl(title: title,
                                         subTitle: subTitle,
                                         defaultAction: defaultAction,

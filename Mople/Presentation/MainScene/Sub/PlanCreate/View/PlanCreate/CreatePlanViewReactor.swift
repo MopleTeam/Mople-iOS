@@ -180,23 +180,23 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
 extension CreatePlanViewReactor {
     
     private func handleCreation() -> Observable<Mutation> {
-        guard let planCreationForm = try? buliderPlanCreation() else {
+        guard let request = try? buliderPlanRequset() else {
             return .just(.notifyMessage(DateError.invalid.info))
         }
         
         switch type {
         case .create:
-            return createPlan(planCreationForm)
+            return createPlan(request: request)
         case .edit:
-            return editPlan(planCreationForm)
+            return editPlan(request: request)
         }
     }
 }
 
 // MARK: - 일정 생성 및 일정 유효성 체크
 extension CreatePlanViewReactor {
-    private func createPlan(_ plan: PlanRequest) -> Observable<Mutation> {
-        let uploadPlan = createPlanUseCase.execute(with: plan)
+    private func createPlan(request: PlanRequest) -> Observable<Mutation> {
+        let uploadPlan = createPlanUseCase.execute(request: request)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
@@ -207,8 +207,8 @@ extension CreatePlanViewReactor {
         }
     }
     
-    private func editPlan(_ plan: PlanRequest) -> Observable<Mutation> {
-        let editPlan = editPlanUseCase.execute(with: plan)
+    private func editPlan(request: PlanRequest) -> Observable<Mutation> {
+        let editPlan = editPlanUseCase.execute(request: request)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
@@ -234,7 +234,7 @@ extension CreatePlanViewReactor {
                         loadingStop])
     }
     
-    private func buliderPlanCreation() throws -> PlanRequest? {
+    private func buliderPlanRequset() throws -> PlanRequest? {
         guard let date = try self.createDate(),
               let name = currentState.planTitle,
               let location = currentState.selectedPlace else { return nil }

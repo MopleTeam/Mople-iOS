@@ -92,7 +92,7 @@ final class MeetPlanTableCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupUI()
+        initalSetup()
     }
     
     required init?(coder: NSCoder) {
@@ -104,6 +104,10 @@ final class MeetPlanTableCell: UITableViewCell {
         super.prepareForReuse()
         addCompletionButton()
         disposeBag = DisposeBag()
+    }
+    
+    private func initalSetup() {
+        setupUI()
     }
     
     private func setupUI() {
@@ -135,6 +139,16 @@ final class MeetPlanTableCell: UITableViewCell {
         completdButton.snp.makeConstraints { make in
             make.height.equalTo(52).priority(.high)
         }
+    }
+    
+    // MARK: - Action
+    private func setAction() {
+        print(#function, #line, "Path : # 버튼 설정하기 ")
+        completdButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { tableCell, _ in
+                tableCell.completeTapped?()
+            })
+            .disposed(by: disposeBag)
     }
 
     public func configure(viewModel: MeetPlanTableCellModel) {
@@ -184,6 +198,7 @@ extension MeetPlanTableCell {
     }
     
     private func isAlreadyParticipated(_ isParticipant: Bool) {
+        setAction()
         completdButton.setTitle(font: FontStyle.Body1.semiBold,
                                 normalColor: ColorStyle.Default.white,
                                 selectedColor: ColorStyle.Gray._03)
@@ -206,5 +221,6 @@ extension MeetPlanTableCell {
         completdButton.isEnabled = true
     }
 }
+
 
 

@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol EditPlan {
-    func execute(with plan: PlanRequest) -> Single<Plan>
+    func execute(request: PlanRequest) -> Single<Plan>
 }
 
 final class EditPlanUseCase: EditPlan {
@@ -18,8 +18,8 @@ final class EditPlanUseCase: EditPlan {
         self.editPlanRepo = editPlanRepo
     }
     
-    func execute(with plan: PlanRequest) -> Single<Plan> {
-        return editPlanRepo.editPlan(plan)
+    func execute(request: PlanRequest) -> Single<Plan> {
+        return editPlanRepo.editPlan(request: request)
             .map {
                 var plan = $0.toDomain()
                 plan.isCreator = true

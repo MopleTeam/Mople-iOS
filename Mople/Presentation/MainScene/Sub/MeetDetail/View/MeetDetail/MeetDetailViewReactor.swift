@@ -14,6 +14,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetInfo(id: Int)
         case switchPage(isFuture: Bool)
         case pushMeetSetupView
+        case editMeet(Meet)
         case planLoading(_ isLoading: Bool)
         case reviewLoading(_ isLoading: Bool)
         case endFlow
@@ -61,6 +62,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             return .empty()
         case let .planLoading(isLoading):
             return .just(.notifyPlanLoading(isLoading))
+        case let .editMeet(meet):
+            return .just(.setMeetInfo(meet: meet))
         case let .reviewLoading(isLoading):
             return .just(.notifyReviewLoading(isLoading))
         case .pushMeetSetupView:

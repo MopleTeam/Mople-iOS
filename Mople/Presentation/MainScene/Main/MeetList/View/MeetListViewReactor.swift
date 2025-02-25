@@ -90,8 +90,8 @@ extension MeetListViewReactor {
             self.addMeet(&meetList, meet: meet)
         case let .updated(meet):
             self.updatedMeet(&meetList, meet: meet)
-        case let .deleted(meet):
-            self.deleteMeet(&meetList, meet: meet)
+        case let .deleted(id):
+            self.deleteMeet(&meetList, meetId: id)
         }
         return .just(.fetchMeetList(groupList: meetList))
     }
@@ -108,7 +108,7 @@ extension MeetListViewReactor {
         meetList[updatedMeetIndex] = meet
     }
     
-    private func deleteMeet(_ meetList: inout [Meet], meet: Meet) {
-        meetList.removeAll { $0.meetSummary?.id == meet.meetSummary?.id }
+    private func deleteMeet(_ meetList: inout [Meet], meetId: Int) {
+        meetList.removeAll { $0.meetSummary?.id == meetId }
     }
 }

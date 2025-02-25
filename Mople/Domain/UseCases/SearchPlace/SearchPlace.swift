@@ -26,7 +26,7 @@ final class SearchPlaceUseCase: SearchPlace {
                  y: Double?) -> Single<SearchPlaceResult> {
         
         return searchPlaceRepo
-            .search(.init(query: query, x: x, y: y))
+            .search(request: .init(query: query, x: x, y: y))
             .map { $0.toDomain() }
     }
 }

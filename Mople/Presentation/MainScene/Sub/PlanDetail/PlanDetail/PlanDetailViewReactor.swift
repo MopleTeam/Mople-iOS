@@ -12,8 +12,7 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
     func editComment(_ comment: String?)
     func setCommentListTableOffsetY(_ offsetY: CGFloat)
     func showPhotoBook(index: Int)
-    func updateLoadingState(_ isLoading: Bool)
-    func catchError(_ error: Error)
+    func reportComment()
 }
 
 final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
@@ -28,6 +27,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             case commentLoading(_ isLoading: Bool)
             case editComment(_ comment: String?)
             case changedOffsetY(_ offsetY: CGFloat)
+            case reportComment
             case catchError(Error)
         }
         
@@ -48,6 +48,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case childEvent(ChildEvent)
         case update(Update)
         case flow(Flow)
+        case deletePost
+        case reportPost
         case loadPlanInfo(type: PlanDetailType)
     }
     
@@ -63,6 +65,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateLoadingState(_ isLoading: Bool)
         case updatePlan(_ Plan: Plan)
         case updateReview(_ review: Review)
+        case completeReport
         case notifyMessage(_ message: String)
         case catchError(Error)
     }
@@ -74,24 +77,33 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isCommentLoading: Bool = false
         @Pulse var editComment: String?
         @Pulse var startOffsetY: CGFloat = .zero
+        @Pulse var reported: Void?
         @Pulse var message: String?
     }
     
     // MARK: - Variable
     private let id: Int
+    private let type: PlanDetailType
     private var plan: Plan?
     private var review: Review?
     private var placeInfo: PlaceInfo?
     
-    // MARK: - UseCase
+    // MARK: - Plan UseCase
     private let fetchPlanDetailUsecase: FetchPlanDetail
+    private let deletePlanUseCase: DeletePlan
+    
+    // MARK: - Review UseCase
     private let fetchReviewDetailUseCase: FetchReviewDetail
+    private let deleteReviewUseCase: DeleteReview
+    
+    // MARK: - Report
+    private let reportUseCase: ReportPost
     
     // MARK: - Coordinator
     private weak var coordinator: PlanDetailCoordination?
     
     // MARK: - Commands
-    private weak var commentListCommands: CommentListCommands?
+    public weak var commentListCommands: CommentListCommands?
     
     // MARK: - State
     var initialState: State = State()
@@ -101,11 +113,18 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
          id: Int,
          fetchPlanDetailUseCase: FetchPlanDetail,
          fetchReviewDetailUseCase: FetchReviewDetail,
+         deletePlanUseCase: DeletePlan,
+         deleteReviewUseCase: DeleteReview,
+         reportUseCase: ReportPost,
          coordinator: PlanDetailCoordination) {
         self.fetchPlanDetailUsecase = fetchPlanDetailUseCase
         self.fetchReviewDetailUseCase = fetchReviewDetailUseCase
+        self.deletePlanUseCase = deletePlanUseCase
+        self.deleteReviewUseCase = deleteReviewUseCase
+        self.reportUseCase = reportUseCase
         self.coordinator = coordinator
         self.id = id
+        self.type = type
         self.action.onNext(.loadPlanInfo(type: type))
         logLifeCycle()
     }
@@ -121,7 +140,11 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case let .flow(action):
             return handleFlowAction(action)
         case let .update(action):
-            return handleUpdate(action)
+            return receiveNotifycation(action)
+        case .deletePost:
+            return deletePost()
+        case .reportPost:
+            return reportPost()
         }
     }
     
@@ -142,6 +165,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             newState.isLoading = isLoading
         case let .updateChildEvent(event):
             handleChildMutation(&newState, event)
+        case .completeReport:
+            newState.reported = ()
         case let .catchError(err):
             handleError(state: &newState, error: err)
         }
@@ -168,7 +193,7 @@ extension PlanDetailViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
         case .memberList:
-            coordinator?.pushMemberListView()
+            handlePushMemberList()
         case .placeDetailView:
             coordinator?.pushPlaceDetailView(place: placeInfo!)
         case .editPlan:
@@ -178,8 +203,18 @@ extension PlanDetailViewReactor {
         case .endFlow:
             coordinator?.endFlow()
         }
-        
         return .empty()
+    }
+    
+    private func handlePushMemberList() {
+        switch type {
+        case .plan:
+            guard let planId = plan?.id else { break }
+            coordinator?.pushMemberListView(postId: planId)
+        case .review:
+            guard let reviewPostId = review?.postId else { break }
+            coordinator?.pushMemberListView(postId: reviewPostId)
+        }
     }
     
     private func handleChildAction(_ event: Action.ChildEvent) -> Observable<Mutation> {
@@ -190,6 +225,8 @@ extension PlanDetailViewReactor {
             return .just(.updateChildEvent(.editComment(comment)))
         case let .changedOffsetY(offsetY):
             return .just(.updateChildEvent(.changedOffsetY(offsetY)))
+        case .reportComment:
+            return .just(.completeReport)
         case let .catchError(err):
             return .just(.catchError(err))
         }
@@ -272,21 +309,56 @@ extension PlanDetailViewReactor {
             self.commentListCommands?.addPhotoList([])
             return .empty()
         }
+    }
+    
+    private func deletePost() -> Observable<Mutation> {
         
+        let deletePost = Observable.just(type)
+            .flatMap { [weak self] type -> Single<Void> in
+                guard let self else { return .never() }
+                switch type {
+                case .plan:
+                    return deletePlanUseCase.execute(id: id)
+                case .review:
+                    return deleteReviewUseCase.exectue(id: id)
+                }
+            }
+            .flatMap { Observable<Mutation>.empty() }
+        
+        return requestWithLoading(task: deletePost,
+                                  completion: { [weak self] in
+            self?.sendNotifycation()
+            self?.coordinator?.endFlow()
+        })
+    }
+    
+    private func reportPost() -> Observable<Mutation> {
+        
+        let reportPost = Observable.just(type)
+            .flatMap { [weak self] type -> Single<Void> in
+                guard let self else { return .never() }
+                switch type {
+                case .plan:
+                    return reportUseCase.execute(type: .plan(id: id),
+                                                 reason: nil)
+                case .review:
+                    return reportUseCase.execute(type: .review(id: id),
+                                                 reason: nil)
+                }
+            }
+            .flatMap { Observable<Mutation>.just(.completeReport) }
+        
+        return requestWithLoading(task: reportPost)
     }
     
     private func fetchCommentList(_ postId: Int?) {
         guard let postId else { return }
-        commentListCommands?.fetchCommentList(postId: postId)
+        commentListCommands?.fetchComment(postId: postId)
     }
 }
 
 // MARK: - 자식 -> 부모
 extension PlanDetailViewReactor: CommentListDelegate  {
-    func updateLoadingState(_ isLoading: Bool) {
-        action.onNext(.childEvent(.commentLoading(isLoading)))
-    }
-    
     func editComment(_ comment: String?) {
         action.onNext(.childEvent(.editComment(comment)))
     }
@@ -305,17 +377,22 @@ extension PlanDetailViewReactor: CommentListDelegate  {
                                    imagePaths: imagePaths)
     }
     
-    func catchError(_ error: Error) {
+    func reportComment() {
+        action.onNext(.childEvent(.reportComment))
+    }
+    
+    func updateLoadingState(_ isLoading: Bool, index: Int) {
+        print(#function, #line, "isLoading : \(isLoading)" )
+        action.onNext(.childEvent(.commentLoading(isLoading)))
+    }
+    
+    func catchError(_ error: Error, index: Int) {
         action.onNext(.childEvent(.catchError(error)))
     }
 }
 
 // MARK: - 부모 -> 자식
-extension PlanDetailViewReactor {
-    public func setCommentListDelegate(_ delegate: CommentListCommands) {
-        self.commentListCommands = delegate
-    }
-    
+extension PlanDetailViewReactor {    
     private func writeComment(_ comment: String) -> Observable<Mutation> {
         Observable.just(comment)
             .delay(.milliseconds(100), scheduler: MainScheduler.instance)
@@ -333,9 +410,11 @@ extension PlanDetailViewReactor {
     }
 }
 
-// MARK: - 노티피케이션 수신
+// MARK: - 노티피케이션
 extension PlanDetailViewReactor {
-    private func handleUpdate(_ action: Action.Update) -> Observable<Mutation> {
+    
+    // 수신
+    private func receiveNotifycation(_ action: Action.Update) -> Observable<Mutation> {
         switch action {
         case .plan:
             return fetchPlanDetail()
@@ -343,7 +422,19 @@ extension PlanDetailViewReactor {
             return fetchReviewDetail()
         }
     }
+    
+    // 발신
+    private func sendNotifycation() {
+        switch type {
+        case .plan:
+            EventService.shared.postItem(PlanPayload.deleted(id: id),
+                                         from: self)
+        case .review:
+            EventService.shared.post(name: .review)
+        }
+    }
 }
+
 
 extension PlanDetailViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
@@ -354,3 +445,4 @@ extension PlanDetailViewReactor: LoadingReactor {
         return .catchError(error)
     }
 }
+

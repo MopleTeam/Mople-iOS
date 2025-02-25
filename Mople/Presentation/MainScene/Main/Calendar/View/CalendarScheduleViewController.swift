@@ -12,18 +12,22 @@ import ReactorKit
 
 final class CalendarScheduleViewController: TitleNaviViewController, View {
     
-    typealias Reactor = CalendarViewReactor
+    typealias Reactor = CalendarScheduleViewReactor
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
         
     // MARK: - Observer
-    #warning("캘린더 페이징 처리와 함께 고쳐야 함")
     private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
+    public let panGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
     
-    #warning("reactor외의 용도로 만드는 이유")
-    // reactor는 제스처 업데이트와 같이 짧은 시간에 많은 값이 들어가는 경우 재진입 이슈 발생
-    private let verticalGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
+    // MARK: - Gesture
+    public let scopeGesture: UIPanGestureRecognizer = {
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        return panGesture
+    }()
     
     // MARK: - UI Components
     private let headerButton: UIButton = {
@@ -44,21 +48,14 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         return header
     }()
     
-    // 캘린더
-    private let calendarContainer: UIView = {
+    public let calendarContainer: UIView = {
         let view = UIView()
         view.layer.zPosition = 2
         return view
     }()
-    
-    private var calendarView: CalendarViewController?
-    
-    // 스케쥴 리스트 테이블 뷰
-    private let scheduleListContainer = UIView()
-    
-    private var scheduleListTableView: CalendarPlanTableViewController?
-    
-    // 구분선
+        
+    public let scheduleListContainer = UIView()
+        
     private let borderView: UIView = {
         let view = UIView()
         view.backgroundColor = ColorStyle.Default.white
@@ -67,22 +64,11 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         return view
     }()
     
-    // MARK: - Gesture
-    private lazy var scopeGesture: UIPanGestureRecognizer = {
-        [unowned self] in
-        let panGesture = UIPanGestureRecognizer()
-        panGesture.delegate = self
-        panGesture.minimumNumberOfTouches = 1
-        panGesture.maximumNumberOfTouches = 2
-        return panGesture
-    }()
-    
     // MARK: - LifeCycle
     init(title: String,
-         reactor: CalendarViewReactor) {
+         reactor: CalendarScheduleViewReactor) {
         super.init(title: title)
         self.reactor = reactor
-        addChildVC(reactor: reactor)
     }
     
     required init?(coder: NSCoder) {
@@ -101,26 +87,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         print(#function, #line)
         super.viewWillDisappear(animated)
         resetPresentDate()
-    }
-    
-    // MARK: - Child VC
-    private func addChildVC(reactor: Reactor) {
-        addCalendarView(reactor: reactor)
-        addPlanTableView(reactor: reactor)
-    }
-    
-    private func addCalendarView(reactor: Reactor) {
-        let vc = CalendarViewController(reactor: reactor,
-                                        verticalGestureObserver: verticalGestureObserver)
-        vc.view.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
-        calendarView = vc
-        add(child: vc, container: calendarContainer)
-    }
-    
-    private func addPlanTableView(reactor: Reactor) {
-        let vc = CalendarPlanTableViewController(reactor: reactor)
-        scheduleListTableView = vc
-        add(child: vc, container: scheduleListContainer)
     }
     
     // MARK: - UI Setup
@@ -160,7 +126,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         }
         
         scheduleListContainer.snp.makeConstraints { make in
-            make.top.equalTo(calendarContainer.snp.bottom)
+            make.top.equalTo(view.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
         
@@ -172,12 +138,20 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     // MARK: - Binding
-    func bind(reactor: CalendarViewReactor) {
+    func bind(reactor: CalendarScheduleViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$changedPage)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, dateComponents in
+                vc.setHeaderLabel(dateComponents)
+            })
+            .disposed(by: disposeBag)
+
         reactor.pulse(\.$calendarHeight)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
@@ -193,15 +167,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
                 vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$changedPage)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
-            .drive(with: self, onNext: { vc, dateComponents in
-                vc.setHeaderLabel(dateComponents)
-            })
-            .disposed(by: disposeBag)
-        
+
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isLoad in
@@ -243,13 +209,13 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         
         scopeGesture.rx.event
             .asDriver()
-            .drive(verticalGestureObserver)
+            .drive(panGestureObserver)
             .disposed(by: disposeBag)
     }
     
     private func setGesture() {
+        scopeGesture.delegate = self
         self.view.addGestureRecognizer(scopeGesture)
-        self.scheduleListTableView?.panGestureRequire(scopeGesture)
     }
 }
 
@@ -307,7 +273,7 @@ extension CalendarScheduleViewController {
     
     private func updateMainView(_ scope: ScopeType) {
         UIView.animate(withDuration: 0.33) {
-            self.hideScheduleListTableView(scope: scope)
+            self.hideScheduleListView(scope: scope)
             self.updateHeaderView(scope: scope)
             self.updateBackgroundColor(scope: scope)
             self.naviItemChange(scope: scope)
@@ -323,8 +289,13 @@ extension CalendarScheduleViewController {
         }
     }
     
-    private func hideScheduleListTableView(scope: ScopeType) {
-        scheduleListTableView?.updateConstraints(isHide: scope == .month)
+    private func hideScheduleListView(scope: ScopeType) {
+        let baseLine = scope == .month ? view.snp.bottom : calendarContainer.snp.bottom
+        
+        scheduleListContainer.snp.remakeConstraints({ make in
+            make.top.equalTo(baseLine)
+            make.horizontalEdges.bottom.equalToSuperview()
+        })
     }
     
     private func updateBackgroundColor(scope: ScopeType) {
@@ -370,9 +341,4 @@ extension CalendarScheduleViewController {
         presentEventObserver.accept(nil)
     }
 }
-
-
-// Warning once only: UITableView was told to layout its visible cells and other contents without being in the view hierarchy (the table view or one of its superviews has not been added to a window). This may cause bugs by forcing views inside the table view to load and perform layout without accurate information (e.g. table view bounds, trait collection, layout margins, safe area insets, etc), and will also cause unnecessary performance overhead due to extra layout passes. Make a symbolic breakpoint at UITableViewAlertForLayoutOutsideViewHierarchy to catch this in the debugger and see what caused this to occur, so you can avoid this action altogether if possible, or defer it until the table view has been added to a window. Table view: <UITableView: 0x10e022a00; frame = (0 0; 375 314); clipsToBounds = YES; gestureRecognizers = <NSArray: 0x30304b930>; animations = { bounds.size=<CABasicAnimation: 0x303abeda0>; position=<CABasicAnimation: 0x303abee20>; }; backgroundColor = UIExtendedGrayColorSpace 0 0; layer = <CALayer: 0x303e6b420>; contentOffset: {0, 0}; contentSize: {375, 6868.3333352406862}; adjustedContentInset: {0, 0, 83, 0}; dataSource: <RxCocoa.RxTableViewDataSourceProxy: 0x301aac660>>
-
-
 

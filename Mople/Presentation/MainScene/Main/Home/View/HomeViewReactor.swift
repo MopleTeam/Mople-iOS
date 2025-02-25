@@ -178,8 +178,8 @@ extension HomeViewReactor {
             self.addPlan(&planList, plan: plan)
         case let .updated(plan):
             self.updatePlan(&planList, plan: plan)
-        case let .deleted(plan):
-            self.deletePlan(&planList, plan: plan)
+        case let .deleted(id):
+            self.deletePlan(&planList, planId: id)
         }
         return .just(.updatePlanList(planList))
     }
@@ -202,8 +202,8 @@ extension HomeViewReactor {
         planList.sort(by: <)
     }
     
-    private func deletePlan(_ planList: inout [Plan], plan: Plan) {
-        planList.removeAll { $0.id == plan.id }
+    private func deletePlan(_ planList: inout [Plan], planId: Int) {
+        planList.removeAll { $0.id == planId }
     }
 }
 
@@ -211,16 +211,38 @@ extension HomeViewReactor {
 extension HomeViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
         var meetList = currentState.meetList
+        var planList = currentState.plans
+        
+        appleMeetChanged(payload: payload,
+                         meetList: &meetList,
+                         planList: &planList)
         
         switch payload {
-        case let .created(meet):
-            self.addMeet(&meetList, meet: meet)
-        case let .deleted(meet):
-            self.deleteMeet(&meetList, meet: meet)
-        default:
-            break
+        case .created:
+            return .just(.updateMeetList(meetList))
+        case .updated, .deleted:
+            let planUpdated = Mutation.updatePlanList(planList)
+            let meetUpdated = Mutation.updateMeetList(meetList)
+            return .of(planUpdated, meetUpdated)
         }
-        return .just(.updateMeetList(meetList))
+    }
+    
+    private func appleMeetChanged(payload: MeetPayload,
+                                  meetList: inout [MeetSummary],
+                                  planList: inout [Plan]) {
+        switch payload {
+        case let .created(meet):
+            addMeet(&meetList,
+                    meet: meet)
+        case let .updated(meet):
+            editMeet(&meetList,
+                     &planList,
+                     editMeet: meet)
+        case let .deleted(id):
+            deleteMeet(&meetList,
+                       &planList,
+                       meetId: id)
+        }
     }
     
     private func addMeet(_ meetList: inout [MeetSummary], meet: Meet) {
@@ -228,7 +250,40 @@ extension HomeViewReactor {
         meetList.insert(meetSummary, at: 0)
     }
     
-    private func deleteMeet(_ meetList: inout [MeetSummary], meet: Meet) {
-        meetList.removeAll { $0.id == meet.meetSummary?.id }
+    private func editMeet(_ meetList: inout [MeetSummary],
+                          _ planList: inout [Plan],
+                          editMeet: Meet) {
+        planList = changePlanMeetInfo(planList: planList,
+                                      editMeet: editMeet)
+        
+        meetList = replaceMeet(meetList: meetList,
+                               editMeet: editMeet)
+    }
+    
+    private func changePlanMeetInfo(planList: [Plan],
+                                    editMeet: Meet) -> [Plan] {
+        return planList.map({
+            var plan = $0
+            guard plan.meet?.id == editMeet.meetSummary?.id else { return $0 }
+            plan.meet?.name = editMeet.meetSummary?.name
+            plan.meet?.imagePath = editMeet.meetSummary?.imagePath
+            return plan
+        })
+    }
+    
+    private func replaceMeet(meetList: [MeetSummary],
+                             editMeet: Meet) -> [MeetSummary] {
+        meetList.map({
+            guard $0.id == editMeet.meetSummary?.id,
+                  let meetSummary = editMeet.meetSummary else { return $0 }
+            return meetSummary
+        })
+    }
+    
+    private func deleteMeet(_ meetList: inout [MeetSummary],
+                            _ planList: inout [Plan],
+                            meetId: Int) {
+        planList.removeAll { $0.meet?.id == meetId }
+        meetList.removeAll { $0.id == meetId }
     }
 }

@@ -17,7 +17,7 @@ protocol MeetDetailCoordination: AnyObject {
 
 final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination {
     private let dependencies: MeetDetailSceneDependencies
-    private var detailMeetVC: DetailMeetViewController?
+    private var detailMeetVC: MeetDetailViewController?
     private var planListVC: MeetPlanListViewController?
     private var reviewListVC: MeetReviewListViewController?
     
@@ -25,6 +25,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
          navigationController: AppNaviViewController) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+        setDismissGestureCompletion()
     }
     
     override func start() {
@@ -36,7 +37,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     private func setPageViews() {
         planListVC = dependencies.makeMeetPlanListViewController(coordinator: self)
         reviewListVC = dependencies.makeMeetReviewListViewController(coordinator: self)
-        self.detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
+        detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
     }
 }
 
@@ -49,16 +50,34 @@ extension MeetDetailSceneCoordinator {
         
         let direction: UIPageViewController.NavigationDirection = isFuture ? .reverse : .forward
         
-        self.detailMeetVC?.pageController.setViewControllers([vc], direction: direction, animated: true)
+        detailMeetVC?.pageController.setViewControllers([vc], direction: direction, animated: true)
     }
 }
 
-// MARK: - View
+// MARK: - 미팅 설정 뷰
 extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     func pushMeetSetupView(meet: Meet) {
         let vc = dependencies.makeMeetSetupViewController(meet: meet,
                                                           coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
+        navigationController.pushViewController(vc, animated: true)
+    }
+}
+
+// MARK: - 미팅 수정 뷰
+extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
+    func pushEditMeetView(previousMeet: Meet) {
+        let vc = dependencies.makeEditMeetViewController(previousMeet: previousMeet,
+                                                         coordinator: self)
+        
+        navigationController.pushViewController(vc, animated: true)
+    }
+}
+
+// MARK: - 멤버 리스트 뷰
+extension MeetDetailSceneCoordinator: MemberListViewCoordination {
+    func pushMemberListView() {
+        let vc = dependencies.makeMemberListViewController(coordinator: self)
+        navigationController.pushViewController(vc, animated: true)
     }
 }
 
@@ -68,21 +87,21 @@ extension MeetDetailSceneCoordinator {
                             type: PlanDetailType) {
         let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
                                                                                    type: type)
-        self.start(coordinator: planDetailFlowCoordinator)
-        self.navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
+        start(coordinator: planDetailFlowCoordinator)
+        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
     }
 }
 
 // MARK: - End Flow
 extension MeetDetailSceneCoordinator {
     func endFlow() {
-        self.navigationController.dismiss(animated: true) { [weak self] in
+        navigationController.dismiss(animated: true) { [weak self] in
             self?.clear()
         }
     }
     
     private func clear() {
-        self.clearUp()
-        self.parentCoordinator?.didFinish(coordinator: self)
+        clearUp()
+        parentCoordinator?.didFinish(coordinator: self)
     }
 }

@@ -8,70 +8,56 @@
 import RxSwift
 
 protocol ChildLoadingDelegate {
-    func updateLoadingState(_ isLoading: Bool)
-    func catchError(_ error: Error)
+    func updateLoadingState(_ isLoading: Bool, index: Int)
+    func catchError(_ error: Error, index: Int)
 }
 
 protocol ChildLoadingReactor: AnyObject {
     associatedtype Mutation
     var parent: ChildLoadingDelegate? { get }
+    var index: Int { get }
 }
 
 extension ChildLoadingReactor {
+    
+    var index: Int { 1 }
 
     func requestWithLoading(task: Observable<Mutation>,
-                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300),
-                            completionScheduler: ImmediateSchedulerType = MainScheduler.instance,
-                            completionDealy: RxTimeInterval = .never,
-                            completeMutation: Mutation? = nil,
-                            completion: (() -> Void)? = nil) -> Observable<Mutation> {
+                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300)
+    ) -> Observable<Mutation> {
+        
+        let loadingStop = Observable.just(())
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                print(#function, #line, "로딩 종료" )
+                guard let self else { return .empty() }
+                parent?.updateLoadingState(false, index: index)
+                return .empty()
+            }
                 
         let newTask = task
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
             }
-            .concat(loadingStop(scheduler: completionScheduler,
-                                delay: completionDealy,
-                                mutation: completeMutation,
-                                completion: completion))
+            .concat(loadingStop)
             .share(replay: 1)
         
         let loadingStart = Observable.just(())
             .delay(defferredLoadingDelay, scheduler: MainScheduler.instance)
+            .take(until: newTask)
             .flatMap({ [weak self] _ -> Observable<Mutation> in
-                self?.parent?.updateLoadingState(true)
+                guard let self else { return .empty() }
+                parent?.updateLoadingState(true, index: index)
                 return .empty()
             })
-            .take(until: newTask)
-        
-        return .merge([newTask, loadingStart])
+            
+        return .merge([loadingStart, newTask])
     }
     
     private func catchError(_ error: Error) -> Observable<Mutation> {
-        parent?.updateLoadingState(false)
-        parent?.catchError(error)
+        parent?.updateLoadingState(false, index: index)
+        parent?.catchError(error, index: index)
         return .empty()
     }
-    
-    private func loadingStop(scheduler: ImmediateSchedulerType = MainScheduler.instance,
-                             delay: RxTimeInterval = .seconds(0),
-                             mutation: Mutation? = nil,
-                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
-        print(#function, #line)
-        return Observable.just(())
-            .do(onNext: { _ in
-                completion?()
-            })
-            .delay(delay, scheduler: MainScheduler.instance)
-            .observe(on: scheduler)
-            .flatMap({ [weak self] _ -> Observable<Mutation> in
-                self?.parent?.updateLoadingState(false)
-                if let mutation {
-                    return .just(mutation)
-                } else {
-                    return .empty()
-                }
-            })
-    }
 }
+

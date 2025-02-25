@@ -68,6 +68,9 @@ extension MeetListSceneDIConatiner: MeetListSceneDependencies {
     }
     
     func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(coordinator: coordinator)
+        return commonFactory.makeCreateMeetViewController(isFlow: false,
+                                                          isEdit: false,
+                                                          type: .create,
+                                                          coordinator: coordinator)
     }
 }

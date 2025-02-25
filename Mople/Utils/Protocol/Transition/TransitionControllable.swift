@@ -7,13 +7,15 @@
 
 import UIKit
 
+// MARK: - 플로우 용도
 protocol TransitionControllable: NSObject, UIViewControllerTransitioningDelegate {
-    var presentTransition: AppTransition { get set }
-    var dismissTransition: AppTransition { get set }
+    var presentTransition: AppTransition { get }
+    var dismissTransition: AppTransition { get }
     func setupTransition()
 }
 
 extension TransitionControllable where Self: UIViewController {
+    
     func setupTransition() {
         modalPresentationStyle = .fullScreen
         dismissTransition.setupDismissGesture(for: self)
@@ -23,5 +25,24 @@ extension TransitionControllable where Self: UIViewController {
                                completion: (() -> Void)? = nil) {
         viewControllerToPresent.transitioningDelegate = self
         present(viewControllerToPresent, animated: true, completion: completion)
+    }
+}
+
+// MARK: - 뷰 Dismiss 제스처 용도
+protocol DismissTansitionControllabel: NSObject {
+    var dismissTransition: AppTransition { get }
+    func setupTransition()
+}
+
+extension DismissTansitionControllabel where Self: UIViewController {
+    
+    func setupTransition() {
+        guard self.navigationController == nil else {
+            print(#function, #line, "Path : # 네비 있음 ")
+            return
+        }
+        print(#function, #line, "네비 없음" )
+        modalPresentationStyle = .fullScreen
+        dismissTransition.setupDismissGesture(for: self)
     }
 }

@@ -16,7 +16,7 @@ struct Plan: Hashable, Equatable {
     var isParticipating: Bool = false
     let addressTitle: String?
     let address: String?
-    let meet: MeetSummary?
+    var meet: MeetSummary?
     let location: Location?
     let weather: Weather?
     var isCreator: Bool = false

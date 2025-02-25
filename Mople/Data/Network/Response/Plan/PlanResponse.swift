@@ -15,7 +15,7 @@ struct PlanResponse: Decodable {
     let meetImage: String?
     let planName: String?
     let planAddress: String?
-    let title: String? // 서버 이름과 맞춰야 함
+    let title: String? 
     let creatorId: Int?
     let planTime: String?
     let planMemberCount: Int?
@@ -30,7 +30,7 @@ struct PlanResponse: Decodable {
 
 extension PlanResponse {
     func toDomain() -> Plan {
-        let date = DateManager.parseServerDate(string: self.planTime)
+        let date = DateManager.parseServerFullDate(string: self.planTime)
         
         return .init(id: planId,
                      creatorId: creatorId,

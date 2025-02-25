@@ -22,7 +22,7 @@ final class DefaultUserInfoRepo: BaseRepositories, UserInfoRepo {
     
     func editProfile(requestModel: ProfileEditRequest) -> Single<Void> {
         let editProfile = networkService.authenticatedRequest {
-            try APIEndpoints.setupProfile(requestModel: requestModel)
+            try APIEndpoints.setupProfile(request: requestModel)
         }
         
         return editProfile

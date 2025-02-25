@@ -32,12 +32,12 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     var initialState: State = State()
     
     private let fetchPlanUseCase: FetchMeetPlanList
-    private let participationPlanUseCase: RequestParticipationPlan
+    private let participationPlanUseCase: ParticipationPlan
     private weak var coordinator: MeetDetailCoordination?
     private let meedId: Int
     
     init(fetchPlanUseCase: FetchMeetPlanList,
-         participationPlanUseCase: RequestParticipationPlan,
+         participationPlanUseCase: ParticipationPlan,
          coordinator: MeetDetailCoordination,
          meetID: Int) {
         self.fetchPlanUseCase = fetchPlanUseCase
@@ -109,10 +109,10 @@ extension MeetPlanListViewReactor {
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let requestParticipation = Observable.just(isJoining)
-            .flatMap { [weak self] isJoining in
-                guard let self = self else { throw AppError.unknownError }
+            .flatMap { [weak self] isJoining -> Single<Void> in
+                guard let self = self else { return .never() }
                 return self.participationPlanUseCase.execute(planId: planId,
-                                                                              isJoining: isJoining)
+                                                             isJoining: isJoining)
             }
             .map { Mutation.updatePlanParticipant(planId: planId) }
         
@@ -141,8 +141,8 @@ extension MeetPlanListViewReactor {
             self.addPlan(&planList, plan: plan)
         case let .updated(plan):
             self.updatePlan(&planList, plan: plan)
-        case let .deleted(plan):
-            self.deletePlan(&planList, plan: plan)
+        case let .deleted(id):
+            self.deletePlan(&planList, planId: id)
         }
         return .just(.fetchPlanList(planList))
     }
@@ -161,7 +161,7 @@ extension MeetPlanListViewReactor {
         planList.sort(by: <)
     }
     
-    private func deletePlan(_ planList: inout [Plan], plan: Plan) {
-        planList.removeAll { $0.id == plan.id }
+    private func deletePlan(_ planList: inout [Plan], planId: Int) {
+        planList.removeAll { $0.id == planId }
     }
 }

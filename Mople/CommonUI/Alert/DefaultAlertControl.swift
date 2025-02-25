@@ -129,7 +129,7 @@ extension DefaultAlertControl {
     }
     
     private func actionButtonBulider(action: DefaultAction,
-                                     dismissAnimated: Bool = false) -> BaseButton {
+                                     dismissAnimated: Bool = true) -> BaseButton {
         let btn = BaseButton()
         btn.setTitle(text: action.text,
                      font: FontStyle.Title3.semiBold,
@@ -143,7 +143,8 @@ extension DefaultAlertControl {
         return btn
     }
     
-    private func makeAction(_ action: (() -> Void)?, dismissAnimated: Bool) -> UIAction {
+    private func makeAction(_ action: (() -> Void)?,
+                            dismissAnimated: Bool) -> UIAction {
         return .init { [weak self] _ in
             self?.dismiss(animated: dismissAnimated,
                           completion: action)

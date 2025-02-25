@@ -17,7 +17,7 @@ final class DefaultMeetQueryRepo: BaseRepositories, MeetQueryRepo {
     
     func fetchMeetDetail(meetId: Int) -> Single<MeetResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetDetail(meetId)
+            try APIEndpoints.fetchMeetDetail(id: meetId)
         }
     }
 }

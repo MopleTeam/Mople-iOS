@@ -19,7 +19,7 @@ final class EventService {
     enum Payload<T> {
         case created(T)
         case updated(T)
-        case deleted(T)
+        case deleted(id: Int)
         
         var notiName: Notification.Name {
             switch T.self {

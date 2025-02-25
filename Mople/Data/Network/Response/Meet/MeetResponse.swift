@@ -19,7 +19,7 @@ struct MeetResponse: Decodable {
 
 extension MeetResponse {
     func toDomain() -> Meet {
-        let date = DateManager.parseServerDate(string: lastPlanDay)
+        let date = DateManager.parseServerFullDate(string: lastPlanDay)
         
         return .init(meetSummary: .init(id: meetId,
                                         name: meetName,

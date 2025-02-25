@@ -27,7 +27,7 @@ struct ReviewResponse: Decodable {
 
 extension ReviewResponse {
     func toDomain() -> Review {
-        let date = DateManager.parseServerDate(string: self.reviewTime)
+        let date = DateManager.parseServerFullDate(string: self.reviewTime)
         let images = self.images?.compactMap({ $0.toDomain() })
         
         return .init(creatorId: creatorId,

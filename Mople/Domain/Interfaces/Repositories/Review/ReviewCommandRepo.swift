@@ -9,4 +9,5 @@ import RxSwift
 
 protocol ReviewCommandRepo {
     func deleteReviewImage(reviewId: Int, imageIds: [String]) -> Single<Void>
+    func deleteReview(id: Int) -> Single<Void>
 }

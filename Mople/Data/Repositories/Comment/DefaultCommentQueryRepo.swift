@@ -10,7 +10,7 @@ import RxSwift
 final class DefaultCommentQueryRepo: BaseRepositories, CommentQueryRepo {
     func fetchCommentList(postId: Int) -> Single<[CommentResponse]> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchCommentList(postId: postId)
+            try APIEndpoints.fetchCommentList(id: postId)
         }
     }
 }

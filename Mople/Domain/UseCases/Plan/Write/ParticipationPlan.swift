@@ -7,12 +7,12 @@
 
 import RxSwift
 
-protocol RequestParticipationPlan {
+protocol ParticipationPlan {
     func execute(planId: Int,
-                                  isJoining: Bool) -> Single<Void>
+                 isJoining: Bool) -> Single<Void>
 }
 
-final class RequestParticipationPlanUseCase: RequestParticipationPlan {
+final class ParticipationPlanUseCase: ParticipationPlan {
     let participationRepo: PlanCommandRepo
     
     init(participationRepo: PlanCommandRepo) {
@@ -21,7 +21,7 @@ final class RequestParticipationPlanUseCase: RequestParticipationPlan {
     
     func execute(planId: Int,
                  isJoining: Bool) -> Single<Void> {
-        participationRepo.requestParticipationPlan(planId: planId,
+        participationRepo.participationPlan(planId: planId,
                                                    isJoining: isJoining)
     }
 }

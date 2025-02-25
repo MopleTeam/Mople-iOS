@@ -32,16 +32,16 @@ final class PlanDetailSceneDIContainer: PlanDetailSceneDependencies {
     private let commonFactory: CommonSceneFactory
     private var mainReactor: PlanDetailViewReactor?
     private let type: PlanDetailType
-    private let postId: Int
+    private let id: Int
     
     init(appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory,
          type: PlanDetailType,
-         postId: Int) {
+         id: Int) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
         self.type = type
-        self.postId = postId
+        self.id = id
     }
     
     func makePlanDetailCoordinator() -> PlanDetailFlowCoordinator {
@@ -71,19 +71,32 @@ extension PlanDetailSceneDIContainer {
     private func makePlanDetailViewReactor(type: PlanDetailType,
                                            coordinator: PlanDetailCoordination) -> PlanDetailViewReactor {
         mainReactor = PlanDetailViewReactor(type: type,
-                                            id: postId,
+                                            id: id,
                                             fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(),
                                             fetchReviewDetailUseCase: commonFactory.makeFetchReviewDetailUseCase(),
+                                            deletePlanUseCase: makeDeletePlanUseCase(),
+                                            deleteReviewUseCase: makeDeleteReviewUseCase(),
+                                            reportUseCase: commonFactory.makeReportUseCase(),
                                             coordinator: coordinator)
         return mainReactor!
     }
     
     private func makeFetchPlanDetailUsecase() -> FetchPlanDetail {
-        return FetchPlanDetailUseCase(planRepo: makePlanDetailRepo())
+        return FetchPlanDetailUseCase(
+            planRepo: DefaultPlanQueryRepo(networkService: appNetworkService)
+        )
     }
     
-    private func makePlanDetailRepo() -> PlanQueryRepo {
-        return DefaultPlanQueryRepo(networkService: appNetworkService)
+    private func makeDeletePlanUseCase() -> DeletePlan {
+        return DeletePlanUseCase(
+            repo: DefaultPlanCommandRepo(networkService: appNetworkService)
+        )
+    }
+    
+    private func makeDeleteReviewUseCase() -> DeleteReview {
+        return DeleteReviewUseCase(
+            repo: DefaultReviewCommnadRepo(networkService: appNetworkService)
+        )
     }
 
     // MARK: - 댓글뷰
@@ -96,8 +109,9 @@ extension PlanDetailSceneDIContainer {
                                              createCommentUseCase: makeCreateCommentUseCase(),
                                              deleteCommentUseCase: makeDeleteCommentUseCase(),
                                              editCommentUseCase: makeEditCommentUseCase(),
+                                             reportUseCase: commonFactory.makeReportUseCase(),
                                              delegate: mainReactor!)
-        mainReactor?.setCommentListDelegate(reactor)
+        mainReactor?.commentListCommands = reactor
         return reactor
     }
     
@@ -151,9 +165,9 @@ extension PlanDetailSceneDIContainer {
     
     private func getMemberListType() -> MemberListType {
         if case .plan = type {
-            return .plan(id: postId)
+            return .plan(id: id)
         } else {
-            return .review(id: postId)
+            return .review(id: id)
         }
     }
     

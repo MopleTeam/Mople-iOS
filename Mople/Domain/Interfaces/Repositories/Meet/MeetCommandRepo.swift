@@ -8,5 +8,9 @@
 import RxSwift
 
 protocol MeetCommandRepo {
-    func createMeet(_ meet: CreateMeetRequest) -> Single<MeetResponse>
+    func createMeet(reqeust: CreateMeetRequest) -> Single<MeetResponse>
+    func editMeet(id: Int,
+                  reqeust: CreateMeetRequest) -> Single<MeetResponse>
+    func deleteMeet(id: Int) -> Single<Void>
+    func leaveMeet(id: Int) -> Single<Void>
 }

@@ -15,7 +15,7 @@ enum ReportType {
 
 struct ReportRequest: Encodable {
     let type: ReportType
-    let reason: String
+    let reason: String?
     
     enum CodingKeys: String, CodingKey {
         case planId, reviewId, commentId, reason

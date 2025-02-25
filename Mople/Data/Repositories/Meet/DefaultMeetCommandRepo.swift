@@ -9,10 +9,30 @@ import Foundation
 import RxSwift
 
 final class DefaultMeetCommandRepo: BaseRepositories, MeetCommandRepo {
-    func createMeet(_ meet: CreateMeetRequest) -> Single<MeetResponse> {
-        print(#function, #line, "#5 image save url: \(meet.image)" )
-        return self.networkService.authenticatedRequest {
-            try APIEndpoints.createMeet(meet)
+    
+    func createMeet(reqeust: CreateMeetRequest) -> Single<MeetResponse> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.createMeet(request: reqeust)
+        }
+    }
+    
+    func editMeet(id: Int,
+                  reqeust: CreateMeetRequest) -> Single<MeetResponse> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.editMeet(id: id,
+                                      request: reqeust)
+        }
+    }
+    
+    func deleteMeet(id: Int) -> Single<Void> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.deleteMeet(id: id)
+        }
+    }
+    
+    func leaveMeet(id: Int) -> Single<Void> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.leaveMeet(id: id)
         }
     }
 }

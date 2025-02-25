@@ -177,3 +177,4 @@ extension SignInViewController: ASAuthorizationControllerPresentationContextProv
         return self.view.window!
     }
 }
+

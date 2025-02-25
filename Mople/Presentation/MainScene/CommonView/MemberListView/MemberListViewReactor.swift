@@ -38,28 +38,17 @@ final class MemberListViewReactor: Reactor {
     
     var initialState: State = State()
     
-    private let fetchPlanMemberUseCase: FetchMemberList
+    private let fetchMemberUseCase: FetchMemberList
     private let type: MemberListType
     private weak var coordinator: MemberListViewCoordination?
     
     init(type: MemberListType,
-         fetchPlanMemberUseCase: FetchMemberList,
+         fetchMemberUseCase: FetchMemberList,
          coordinator: MemberListViewCoordination) {
-        self.fetchPlanMemberUseCase = fetchPlanMemberUseCase
+        self.fetchMemberUseCase = fetchMemberUseCase
         self.coordinator = coordinator
         self.type = type
-        handleViewType()
-    }
-    
-    private func handleViewType() {
-        switch type {
-        case .meet(_):
-            break
-        case let .plan(id):
-            action.onNext(.fetchPlanMemeber)
-        case .review(_):
-            break
-        }
+        initalSetup()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -85,6 +74,10 @@ final class MemberListViewReactor: Reactor {
         
         return newState
     }
+    
+    private func initalSetup() {
+        action.onNext(.fetchPlanMemeber)
+    }
 }
 
 extension MemberListViewReactor {
@@ -103,11 +96,11 @@ extension MemberListViewReactor {
 
 extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
-        let fetchPlanMember = fetchPlanMemberUseCase.execute(type: type)
+        let fetchMember = fetchMemberUseCase.execute(type: type)
             .asObservable()
             .map { Mutation.updateMember($0.membsers) }
         
-        return fetchWithLoading(fetchPlanMember)
+        return fetchWithLoading(fetchMember)
     }
 }
 

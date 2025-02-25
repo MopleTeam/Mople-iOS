@@ -52,6 +52,10 @@ struct ColorStyle {
         static let _06: UIColor = .init(hexCode: "CCCCCC")
         static let _07: UIColor = .init(hexCode: "DCDCDC")
     }
+    
+    enum Toast {
+        static let defaultColor: UIColor = .init(hexCode: "1B1B1B")
+    }
 }
 
 

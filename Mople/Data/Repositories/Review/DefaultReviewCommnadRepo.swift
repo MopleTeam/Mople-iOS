@@ -13,4 +13,10 @@ final class DefaultReviewCommnadRepo: BaseRepositories, ReviewCommandRepo {
             try APIEndpoints.deleteReviewImage(reviewId: reviewId, imageIds: imageIds)
         }
     }
+    
+    func deleteReview(id: Int) -> Single<Void> {
+        networkService.authenticatedRequest {
+            try APIEndpoints.deleteReview(id: id)
+        }
+    }
 }

@@ -8,9 +8,9 @@
 import RxSwift
 
 final class DefaultSearchPlaceRepo: BaseRepositories, SearchPlaceRepo {
-    func search(_ locationRequset: SearchLocationRequest) -> Single<SearchPlaceResultResponse> {
+    func search(request: SearchLocationRequest) -> Single<SearchPlaceResultResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.searchPlace(locationRequset)
+            try APIEndpoints.searchPlace(request: request)
         }
     }
 }

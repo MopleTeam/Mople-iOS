@@ -12,6 +12,7 @@ enum DateStringFormat {
     case dot
     case simple
     case time
+    case month
 }
 
 final class DateManager {
@@ -32,14 +33,14 @@ final class DateManager {
         return format
     }()
     
-    static let detailDateFormatter: DateFormatter = {
+    static let fullDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
         return dateFormatter
     }()
     
-    static let simpleDateFormatter: DateFormatter = {
+    static let basicDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy년 MM월 dd일"
@@ -52,7 +53,6 @@ final class DateManager {
         formatter.dateFormat = "yyyy. MM. dd E"
         return formatter
     }()
-
     
     static let timeDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -61,9 +61,22 @@ final class DateManager {
         return formatter
     }()
     
-    static let serverDateFormatter: DateFormatter = {
+    static let monthDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyyMM"
+        return formatter
+    }()
+    
+    static let fullServerDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+    
+    static let simpleServerDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
 
@@ -168,9 +181,14 @@ extension DateManager {
         return calendar.date(byAdding: .minute, value: -5, to: date) ?? Date()
     }
     
-    static func parseServerDate(string: String?) -> Date? {
+    static func parseServerFullDate(string: String?) -> Date? {
         guard let string else { return nil }
-        return DateManager.serverDateFormatter.date(from: string)
+        return DateManager.fullServerDateFormatter.date(from: string)
+    }
+    
+    static func parseServerSimpleDate(string: String?) -> Date? {
+        guard let string else { return nil }
+        return DateManager.basicDateFormatter.date(from: string)
     }
     
     static func convertTo24Hour(_ date: DateComponents) -> DateComponents {
@@ -201,7 +219,7 @@ extension DateManager {
 // MARK: - 문자열 전환
 extension DateManager {
     static func toServerDateString(_ date: Date) -> String {
-        return DateManager.serverDateFormatter.string(from: date)
+        return DateManager.fullServerDateFormatter.string(from: date)
     }
     
     static func toString(date: Date?,
@@ -209,13 +227,15 @@ extension DateManager {
         guard let date else { return nil }
         switch format {
         case .full:
-            return DateManager.detailDateFormatter.string(from: date)
+            return DateManager.fullDateFormatter.string(from: date)
         case .simple:
-            return DateManager.simpleDateFormatter.string(from: date)
+            return DateManager.basicDateFormatter.string(from: date)
         case .time:
             return addPeriodPrefix(on: date)
         case .dot:
             return DateManager.dotDateFormat.string(from: date)
+        case .month:
+            return DateManager.monthDateFormatter.string(from: date)
         }
     }
     
@@ -236,6 +256,10 @@ extension DateManager {
 extension Date {
     func toDateComponents() -> DateComponents {
         return DateManager.calendar.dateComponents([.year, .month, .day], from: self)
+    }
+    
+    func toMonthComponents() -> DateComponents {
+        return DateManager.calendar.dateComponents([.year, .month], from: self)
     }
     
     func getTime() -> DateComponents {

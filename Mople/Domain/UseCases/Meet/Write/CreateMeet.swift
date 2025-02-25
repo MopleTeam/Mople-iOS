@@ -5,7 +5,7 @@
 //  Created by CatSlave on 11/19/24.
 //
 
-import UIKit
+import Foundation
 import RxSwift
 
 protocol CreateMeet {
@@ -22,7 +22,7 @@ final class CreateMeetUseCase: CreateMeet {
     
     func execute(requset: CreateMeetRequest) -> Single<Meet> {
         return self.createMeetRepo
-            .createMeet(requset)
+            .createMeet(reqeust: requset)
             .map { $0.toDomain() }
     }
 }

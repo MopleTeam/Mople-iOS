@@ -51,8 +51,9 @@ final class IconLabel: UIView {
     }()
     
     init(icon: UIImage?,
-         iconSize: CGSize) {
-        super.init(frame: .zero)
+         iconSize: CGSize,
+         frame: CGRect = .zero) {
+        super.init(frame: frame)
         setupUI(iconSize: iconSize)
         setupIcon(icon)
     }
@@ -69,7 +70,6 @@ final class IconLabel: UIView {
         self.addSubview(mainStackView)
         self.labelContainerView.addSubview(infoLabel)
         self.imageContainerView.addSubview(imageView)
-//        self.clipsToBounds = true
         
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

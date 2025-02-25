@@ -15,13 +15,13 @@ final class DefaultPlanQueryRepo: BaseRepositories, PlanQueryRepo {
     
     func fetchPlanDetail(planId: Int) -> Single<PlanResponse> {
         self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchPlan(planId: planId)
+            try APIEndpoints.fetchPlan(id: planId)
         }
     }
     
     func fetchMeetPlanList(_ meetId: Int) -> Single<[PlanResponse]> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetPlan(meetId: meetId)
+            try APIEndpoints.fetchMeetPlan(id: meetId)
         }
     }
 }

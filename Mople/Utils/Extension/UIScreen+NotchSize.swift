@@ -9,7 +9,11 @@ import UIKit
 
 extension UIScreen {
     
-    static let defaultBottomInset: CGFloat = 28
+    private static let defaultBottomInset: CGFloat = 28
+    
+    private static func getNotchSize() -> CGFloat {
+        return UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+    }
 
     /// 기본 바텀 인셋
     /// - 노치 O : 노치 사이즈
@@ -18,10 +22,6 @@ extension UIScreen {
         return hasNotch() ? getNotchSize() : defaultBottomInset
     }
 
-    static func getNotchSize() -> CGFloat {
-        return UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
-    }
-    
     static func hasNotch() -> Bool {
         return (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0) > 0
     }

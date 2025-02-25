@@ -13,7 +13,7 @@ import ReactorKit
 
 final class YearMonthPickerViewController: BaseViewController, View {
     
-    typealias Reactor = CalendarViewReactor
+    typealias Reactor = CalendarScheduleViewReactor
     
     // MARK: - Variables
     var disposeBag: DisposeBag = DisposeBag()
@@ -67,7 +67,7 @@ final class YearMonthPickerViewController: BaseViewController, View {
     }
     
     // MARK: - Bind
-    func bind(reactor: CalendarViewReactor) {
+    func bind(reactor: CalendarScheduleViewReactor) {
         selectedDateObserver
             .observe(on: MainScheduler.instance)
             .map { Reactor.Action.requestPageSwitch(dateComponents: $0) }

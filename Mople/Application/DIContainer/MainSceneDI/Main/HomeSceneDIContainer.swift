@@ -63,7 +63,10 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
         
     // MARK: - 그룹 생성 화면
     func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(coordinator: coordinator)
+        return commonFactory.makeCreateMeetViewController(isFlow: false,
+                                                          isEdit: false,
+                                                          type: .create,
+                                                          coordinator: coordinator)
     }
     
     // MARK: - 일정 생성 플로우

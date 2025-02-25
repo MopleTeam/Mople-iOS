@@ -8,7 +8,7 @@
 import UIKit
 
 protocol PlanDetailCoordination: AnyObject {
-    func pushMemberListView()
+    func pushMemberListView(postId: Int)
     func pushPlaceDetailView(place: PlaceInfo)
     func pushPhotoView(index: Int,
                        imagePaths: [String])
@@ -51,7 +51,7 @@ extension PlanDetailFlowCoordinator {
 
 // MARK: - 멤버 리스트
 extension PlanDetailFlowCoordinator: MemberListViewCoordination {
-    func pushMemberListView() {
+    func pushMemberListView(postId: Int) {
         let view = dependencies.makeMemberListViewController(coordinator: self)
         navigationController.pushViewController(view, animated: true)
     }

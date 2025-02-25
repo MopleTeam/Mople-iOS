@@ -9,13 +9,13 @@ import RxSwift
 final class DefaultReviewQueryRepo: BaseRepositories, ReviewQueryRepo {
     func fetchReviewList(_ meetId: Int) -> Single<[ReviewResponse]> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetReview(meetId: meetId)
+            try APIEndpoints.fetchMeetReview(id: meetId)
         }
     }
     
     func fetchReviewDetail(_ reviewId: Int) -> Single<ReviewResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchReviewDetail(reviewId: reviewId)
+            try APIEndpoints.fetchReviewDetail(id: reviewId)
         }
     }
 }

@@ -10,7 +10,7 @@ import RxSwift
 final class DefaultCommentCommandRepo:BaseRepositories, CommentCommandRepo {
     func createComment(postId: Int, comment: String) -> Single<[CommentResponse]> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.createComment(postId: postId,
+            try APIEndpoints.createComment(id: postId,
                                            comment: comment)
         }
     }
@@ -26,12 +26,6 @@ final class DefaultCommentCommandRepo:BaseRepositories, CommentCommandRepo {
             try APIEndpoints.editComment(postId: postId,
                                          commentId: commentId,
                                          comment: comment)
-        }
-    }
-    
-    func reportComment(_ comment: ReportCommentRequest) -> Single<Void> {
-        return self.networkService.authenticatedRequest {
-            try APIEndpoints.reportComment(reportComment: comment)
         }
     }
 }

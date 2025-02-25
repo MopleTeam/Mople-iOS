@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class DetailMeetViewController: TitleNaviViewController, View {
+final class MeetDetailViewController: TitleNaviViewController, View {
     typealias Reactor = MeetDetailViewReactor
     
     var disposeBag: DisposeBag = DisposeBag()
@@ -128,7 +128,12 @@ final class DetailMeetViewController: TitleNaviViewController, View {
     }
     
     func bind(reactor: MeetDetailViewReactor) {
-        
+        inputBind(reactor: reactor)
+        outputBind(reactor: reactor)
+        setNotification(reactor: reactor)
+    }
+    
+    private func inputBind(reactor: Reactor) {
         self.naviBar.leftItemEvent
             .map { Reactor.Action.endFlow }
             .bind(to: reactor.action)
@@ -144,7 +149,9 @@ final class DetailMeetViewController: TitleNaviViewController, View {
             })
             .bind(to: reactor.action)
             .disposed(by: disposeBag) })
-        
+    }
+    
+    private func outputBind(reactor: Reactor) {
         let viewDidLayout = self.rx.viewDidLayoutSubviews
             .take(1)
         
@@ -182,10 +189,20 @@ final class DetailMeetViewController: TitleNaviViewController, View {
         .asDriver(onErrorJustReturn: false)
         .drive(self.rx.isLoading)
         .disposed(by: disposeBag)
-            
+    }
+    
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addMeetObservable()
+            .compactMap({ payload -> Meet? in
+                guard case .updated(let meet) = payload else { return nil }
+                return meet
+            })
+            .map { Reactor.Action.editMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
-extension DetailMeetViewController: UIPageViewControllerDelegate {
+extension MeetDetailViewController: UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         print(#function, #line, "#3" )
     }

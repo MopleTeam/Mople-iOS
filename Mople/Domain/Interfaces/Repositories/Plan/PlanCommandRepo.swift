@@ -9,8 +9,9 @@ import Foundation
 import RxSwift
 
 protocol PlanCommandRepo {
-    func createPlan(_ plan: PlanRequest) -> Single<PlanResponse>
-    func requestParticipationPlan(planId: Int,
+    func createPlan(request: PlanRequest) -> Single<PlanResponse>
+    func participationPlan(planId: Int,
                                   isJoining: Bool) -> Single<Void>
-    func editPlan(_ plan: PlanRequest) -> Single<PlanResponse>
+    func editPlan(request: PlanRequest) -> Single<PlanResponse>
+    func deletePlan(id: Int) -> Single<Void>
 }

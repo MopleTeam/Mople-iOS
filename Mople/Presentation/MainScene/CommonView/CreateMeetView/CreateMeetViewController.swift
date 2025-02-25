@@ -11,17 +11,17 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CreateMeetViewController: TitleNaviViewController, View, TransformKeyboardResponsive {
+final class CreateMeetViewController: TitleNaviViewController, View, TransformKeyboardResponsive, DismissTansitionControllabel {
     
     typealias Reactor = CreateMeetViewReactor
     
     var disposeBag = DisposeBag()
     
-    var presentTransition: AppTransition = .init(type: .present)
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
     // MARK: - Variables
     private var hasImage: Bool = false
+    private let isEditMode: Bool
     
     // MARK: - Handle KeyboardEvent
     var keyboardHeight: CGFloat?
@@ -66,8 +66,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     
     private let completionButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.CreateGroup.completedTitle,
-                     font: FontStyle.Title3.semiBold,
+        btn.setTitle(font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Default.white)
         btn.setBgColor(normalColor: ColorStyle.App.primary,
                        disabledColor: ColorStyle.Primary.disable)
@@ -83,10 +82,18 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         return sv
     }()
     
-    init(title: String?,
+    init(isFlow: Bool,
+         isEdit: Bool,
+         title: String?,
          reactor: CreateMeetViewReactor) {
+        self.isEditMode = isEdit
         super.init(title: title)
         self.reactor = reactor
+        configureTransition(isNeed: !isFlow)
+    }
+    
+    private func configureTransition(isNeed: Bool) {
+        guard isNeed else { return }
         setupTransition()
     }
     
@@ -109,6 +116,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     private func setupUI() {
         setupLayout()
         setNaviItem()
+        setTitle()
     }
     
     private func setupLayout() {
@@ -149,6 +157,11 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     private func setNaviItem() {
         self.setBarItem(type: .left)
     }
+    
+    private func setTitle() {
+        let title = isEditMode ? "저장" : TextStyle.CreateGroup.completedTitle
+        completionButton.title = title
+    }
 
     // MARK: - Binding
     func bind(reactor: CreateMeetViewReactor) {
@@ -164,6 +177,9 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             .disposed(by: disposeBag)
         
         completionButton.rx.controlEvent(.touchUpInside)
+            .do(onNext: { [weak self]_ in
+                self?.view.endEditing(true)
+            })
             .throttle(.seconds(1),
                       latest: false,
                       scheduler: MainScheduler.instance)
@@ -182,6 +198,14 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         reactor.pulse(\.$canComplete)
             .asDriver(onErrorJustReturn: false)
             .drive(completionButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$previousMeet)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, meet in
+                vc.setPreviousMeet(meet)
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
@@ -248,6 +272,15 @@ extension CreateMeetViewController {
     }
 }
 
+// MARK: - 모임 프로필 수정
+extension CreateMeetViewController {
+    private func setPreviousMeet(_ meet: Meet) {
+        thumnailView.kfSetimage(meet.meetSummary?.imagePath,
+                                defaultImageType: .meet)
+        textFieldView.text = meet.meetSummary?.name
+    }
+}
+
 // MARK: - 키보드
 extension CreateMeetViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
@@ -257,16 +290,5 @@ extension CreateMeetViewController: KeyboardDismissable, UIGestureRecognizerDele
     
     private func setupKeyboardDismissGestrue() {
         setupTapKeyboardDismiss()
-    }
-}
-
-// MARK: - 화면이동 애니메이션
-extension CreateMeetViewController: TransitionControllable {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return presentTransition
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return dismissTransition
     }
 }

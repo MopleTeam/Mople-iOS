@@ -12,14 +12,12 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileEditViewController: TitleNaviViewController, View {
+class ProfileEditViewController: TitleNaviViewController, View, DismissTansitionControllabel {
     typealias Reactor = ProfileEditViewReactor
     
     var disposeBag = DisposeBag()
 
     // MARK: - Transition
-    var presentTransition: AppTransition = .init(type: .present)
-    
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
     // MARK: - Variables
@@ -189,15 +187,5 @@ extension ProfileEditViewController {
     
     private func setHasImageState(_ image: Any?) {
         hasImage = image != nil
-    }
-}
-
-extension ProfileEditViewController: TransitionControllable {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return presentTransition
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return dismissTransition
     }
 }

@@ -47,7 +47,6 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
          reactor: MeetListViewReactor) {
         super.init(title: title)
         self.reactor = reactor
-        setNotification(reactor: reactor)
     }
 
     required init?(coder: NSCoder) {
@@ -91,20 +90,21 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(MeetListTableCell.self, forCellReuseIdentifier: MeetListTableCell.reuseIdentifier)
     }
-    
-    private func setNotification(reactor: Reactor) {
-        EventService.shared.addMeetObservable()
-            .map { Reactor.Action.updateMeet($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+
+    func bind(reactor: MeetListViewReactor) {
+        inputBind(reactor: reactor)
+        outputBind(reactor: reactor)
+        setNotification(reactor: reactor)
     }
     
-    func bind(reactor: MeetListViewReactor) {
+    private func inputBind(reactor: Reactor) {
         tableView.rx.itemSelected
             .map({ Reactor.Action.selectMeet(index: $0.row) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func outputBind(reactor: Reactor) {
         let viewDidLayout = self.rx.viewDidLayoutSubviews
             .take(1)
         
@@ -126,6 +126,13 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
                 cell.configure(with: .init(meet: item))
                 cell.selectionStyle = .none
             }
+            .disposed(by: disposeBag)
+    }
+    
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addMeetObservable()
+            .map { Reactor.Action.updateMeet($0) }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 }

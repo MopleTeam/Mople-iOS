@@ -9,11 +9,14 @@ import UIKit
 
 protocol MeetDetailSceneDependencies {
     // MARK: - View
-    func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> DetailMeetViewController
+    func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController
     func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController
     func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetSetupCoordination) -> MeetSetupViewController
+    func makeEditMeetViewController(previousMeet: Meet,
+                                    coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     
     // MARK: - Flow
     func makePlanDetailFlowCoordinator(postId: Int,
@@ -46,7 +49,7 @@ final class MeetDetailSceneDIContainer: MeetDetailSceneDependencies {
 extension MeetDetailSceneDIContainer {
     
     // MARK: - Main
-    func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> DetailMeetViewController {
+    func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController {
         makeDetailMeetViewReactor(coordinator: coordinator)
         return .init(title: nil, reactor: mainReactor)
     }
@@ -88,8 +91,8 @@ extension MeetDetailSceneDIContainer {
         return DefaultPlanQueryRepo(networkService: appNetworkService)
     }
     
-    private func makeParticipationPlanUseCase() -> RequestParticipationPlan {
-        return RequestParticipationPlanUseCase(participationRepo: makeParticipationPlanRepo())
+    private func makeParticipationPlanUseCase() -> ParticipationPlan {
+        return ParticipationPlanUseCase(participationRepo: makeParticipationPlanRepo())
     }
     
     private func makeParticipationPlanRepo() -> PlanCommandRepo {
@@ -129,7 +132,35 @@ extension MeetDetailSceneDIContainer {
     private func makeMeetSetupViewReactor(meet: Meet,
                                           coordinator: MeetSetupCoordination) -> MeetSetupViewReactor {
         return .init(meet: meet,
+                     deleteMeetUseCase: makeDeleteMeetUseCase(),
+                     leaveMeetUseCase: makeLeaveMeetUseCase(),
                      coordinator: coordinator)
+    }
+    
+    private func makeDeleteMeetUseCase() -> DeleteMeet {
+        return DeleteMeetUseCase(
+            repo: DefaultMeetCommandRepo(networkService: appNetworkService)
+        )
+    }
+    
+    private func makeLeaveMeetUseCase() -> LeaveMeet {
+        return LeaveMeetUseCase(
+            repo: DefaultMeetCommandRepo(networkService: appNetworkService)
+        )
+    }
+    
+    // MARK: - 모임 수정 뷰
+    func makeEditMeetViewController(previousMeet: Meet, coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
+        return commonFactory.makeCreateMeetViewController(isFlow: true,
+                                                          isEdit: true,
+                                                          type: .edit(previousMeet),
+                                                          coordinator: coordinator)
+    }
+    
+    // MARK: - 멤버 리스트 뷰
+    func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
+        return commonFactory.makeMemberListViewController(type: .meet(id: meetId),
+                                                          coordinator: coordinator)
     }
     
     // MARK: - 일정 상세 뷰

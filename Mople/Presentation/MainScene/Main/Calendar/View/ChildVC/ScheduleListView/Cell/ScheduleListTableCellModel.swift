@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CalendarPlanTableCellModel {
+struct ScheduleListTableCellModel {
     let title: String?
     let meet: MeetSummary?
     let participantCount: Int?
@@ -20,11 +20,18 @@ struct CalendarPlanTableCellModel {
     }
 }
 
-extension CalendarPlanTableCellModel {
+extension ScheduleListTableCellModel {
     init(plan: Plan) {
         self.title = plan.title
         self.meet = plan.meet
         self.participantCount = plan.participantCount
         self.weather = plan.weather
+    }
+    
+    init(testPlan: MonthlyPlan) {
+        self.title = testPlan.title
+        self.meet = testPlan.meet
+        self.participantCount = testPlan.memberCount
+        self.weather = testPlan.weather
     }
 }

@@ -5,36 +5,60 @@
 //  Created by CatSlave on 9/22/24.
 //
 
-import ReactorKit
 import UIKit
+import ReactorKit
 
-final class CalendarViewReactor: Reactor, LifeCycleLoggable {
+protocol CalendarReactorDelegate: AnyObject, ChildLoadingDelegate {
+    func updatePage(_ month: DateComponents)
+    func updatePlanMonthList(_ list: [DateComponents])
+    func updateCalendarHeight(_ height: CGFloat)
+    func updateScope(_ scope: ScopeType)
+    func selectedDate(date: Date)
+}
+
+protocol SchduleListReactorDelegate: AnyObject, ChildLoadingDelegate {
+    func scrollToDate(date: Date)
+}
+
+final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
     
-    typealias SelectDate = CalendarViewController.SelectDate
     typealias ScopeChangeType = CalendarViewController.ScopeChangeType
     
     enum Action {
-        case fetchData
-        case calendarHeightChanged(height: CGFloat)
+        enum CalendarActions {
+            case changedPage(DateComponents)
+        }
+        
+        case calendarAction(CalendarActions)
+        
+        case calendarHeightChanged(CGFloat)
         case requestPageSwitch(dateComponents: DateComponents)
         case requestScopeSwitch(type: ScopeChangeType)
-        case scopeChanged(scope: ScopeType)
+        case scopeChanged(ScopeType)
         case pageChanged(page: DateComponents)
-        case dateSelected(selectDate: SelectDate)
+        case dateSelected(selectDate: (selectedDate: Date?, isScroll: Bool))
         case sharedTableViewDate(date: Date)
         case requestPresentEvent(lastRecentDate: Date)
         case tableViewInteracting(isScroll: Bool)
     }
     
     enum Mutation {
-        case loadScheduleList(scheduleList: [PlanTableSectionModel])
+        enum CalendarEvents {
+            case updatePage(DateComponents)
+        }
+        
+        case calendarEvent(CalendarEvents)
+        
+        case switchPage(_ dateComponents: DateComponents)
+
+        
+        case loadScheduleList(scheduleList: [ScheduleListSectionModel])
         case loadEventDateList(eventDateList: [Date])
         case setCalendarHeight(_ height: CGFloat)
-        case switchPage(_ dateComponents: DateComponents)
         case switchScope(_ type: ScopeChangeType)
         case notifyChangedScope(_ scope: ScopeType)
         case notifyChangedPage(_ page: DateComponents)
-        case notifySelectdDate(_ selectDate: SelectDate?)
+        case notifySelectdDate(_ selectDate: (selectedDate: Date?, isScroll: Bool)?)
         case notifyTableViewDate(_ date: Date)
         case notifyPresentEvent(_ dateComponents: Date?)
         case notifyLoadingState(_ isLoading: Bool)
@@ -42,14 +66,14 @@ final class CalendarViewReactor: Reactor, LifeCycleLoggable {
     }
     
     struct State {
-        @Pulse var schedules: [PlanTableSectionModel] = []
+        @Pulse var schedules: [ScheduleListSectionModel] = []
         @Pulse var events: [Date] = []
         @Pulse var calendarHeight: CGFloat?
         @Pulse var switchPage: DateComponents?
         @Pulse var switchScope: ScopeChangeType? = nil
         @Pulse var scope: ScopeType = .month
         @Pulse var changedPage: DateComponents?
-        @Pulse var selectedDate: SelectDate?
+        @Pulse var selectedDate: (selectedDate: Date?, isScroll: Bool)?
         @Pulse var tableViewDate: Date?
         @Pulse var presentDate: Date?
         @Pulse var isLoading: Bool = false
@@ -60,20 +84,27 @@ final class CalendarViewReactor: Reactor, LifeCycleLoggable {
 
     var initialState: State = State()
     
+    // MARK: - Commands
+    public weak var calendarCommands: CalendarCommands?
+    public weak var scheduleListCommands: ScheduleListCommands?
+    
+    // MARK: - LifeCycle
     init(fetchUseCase: FetchPlanList) {
         self.fetchUseCase = fetchUseCase
         logLifeCycle()
-        action.onNext(.fetchData)
     }
     
     deinit {
         logLifeCycle()
     }
     
+    // MARK: - Mutate
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .fetchData:
-            return fetchData()
+        case let .calendarAction(action):
+            return handleCalendarAction(action)
+            
+
         case .calendarHeightChanged(let height):
             return .just(.setCalendarHeight(height))
         case .requestPageSwitch(let date):
@@ -95,11 +126,25 @@ final class CalendarViewReactor: Reactor, LifeCycleLoggable {
         }
     }
     
+    private func handleCalendarAction(_ action: Action.CalendarActions) -> Observable<Mutation> {
+        switch action {
+        case let .changedPage(page):
+            return .just(.calendarEvent(.updatePage(page)))
+        }
+    }
+    
+    // MARK: - Reduce
     func reduce(state: State, mutation: Mutation) -> State {
         
         var newState = state
         
         switch mutation {
+        case let .calendarEvent(event):
+            handleCalendarEvent(state: &newState,
+                                event: event)
+            
+            
+            
         case .loadScheduleList(let scheduleList):
             newState.schedules = scheduleList.sorted(by: <)
         case .loadEventDateList(let eventList):
@@ -127,31 +172,16 @@ final class CalendarViewReactor: Reactor, LifeCycleLoggable {
         }
         return newState
     }
+    
+    private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
+        switch event {
+        case let .updatePage(page):
+            state.changedPage = page
+        }
+    }
 }
 
-extension CalendarViewReactor {
-    
-    /// 스케줄 데이터 및 이벤트 목록 얻기
-    private func fetchData() -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
-
-        let fetchAndProcess = fetchUseCase.execute()
-            .asObservable()
-            .map { schedules -> (scheduleList: [PlanTableSectionModel], eventDateList: [Date]) in
-                let scheduleList = self.makeTableSectionModels(schedules)
-                let eventDateList = self.makeEventList(schedules)
-                return (scheduleList, eventDateList)
-            }
-            .flatMap { result -> Observable<Mutation> in
-                let scheduleListMutation = Mutation.loadScheduleList(scheduleList: result.scheduleList)
-                let eventDateListMutation = Mutation.loadEventDateList(eventDateList: result.eventDateList)
-                return Observable.of(scheduleListMutation, eventDateListMutation)
-            }
-    
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart, fetchAndProcess, loadingStop])
-    }
+extension CalendarScheduleViewReactor {
     
     /// 홈뷰에서 표시된 마지막 날짜가 넘어옴
     /// 캘린더뷰, 테이블뷰로 공유
@@ -163,35 +193,49 @@ extension CalendarViewReactor {
     }
     
     /// 캘린더 선택 날짜 일정 테이블뷰로 공유
-    private func syncDateToTable(on selectDate: SelectDate) -> Observable<Mutation> {
+    private func syncDateToTable(on selectDate: (selectedDate: Date?, isScroll: Bool)) -> Observable<Mutation> {
         guard !currentState.isTableViewInteracting else { return Observable.empty() }
         return Observable.just(Mutation.notifySelectdDate(selectDate))
     }
 }
 
-// MARK: - Helper
-extension CalendarViewReactor {
-    
-    
-    /// 서버로부터 전달된 일정 데이터를 테이블뷰 모델로 전환
-    /// - Parameter schedules: 서버에서 받아온 일정 데이터
-    /// - Returns: 일정 데이터를 일정별로 나누어서 리턴
-    private func makeTableSectionModels(_ schedules: [Plan]) -> [PlanTableSectionModel] {
-        let grouped = Dictionary(grouping: schedules) { schedule -> Date? in
-            return schedule.startOfDate
-        }
-        return grouped.map { PlanTableSectionModel(date: $0.key, items: $0.value) }
+extension CalendarScheduleViewReactor: CalendarReactorDelegate {
+    func updateCalendarHeight(_ height: CGFloat) {
+        action.onNext(.calendarHeightChanged(height))
     }
     
-    #warning("날짜 중복검사 시에는 날짜의 시작시간으로 초기화하는 것이 옳다. (startOfDay)")
-    /// 서버로부터 전달된 일정 데이터에서 이벤트만 추출
-    /// - Returns: 중복값을 제거 후 전달
-    private func makeEventList(_ schedules: [Plan]) -> [Date] {
-        let eventArray = schedules.compactMap { $0.startOfDate }
-        let withOutDuplicate = Set(eventArray)
-        return Array(withOutDuplicate)
+    func updateScope(_ scope: ScopeType) {
+        action.onNext(.scopeChanged(scope))
+    }
+    
+    func updatePlanMonthList(_ list: [DateComponents]) {
+        scheduleListCommands?.updatePlanMonthList(list)
+    }
+    
+    func updatePage(_ month: DateComponents) {
+        action.onNext(.calendarAction(.changedPage(month)))
+        scheduleListCommands?.moveToPage(on: month)
+    }
+    
+    func selectedDate(date: Date) {
+        scheduleListCommands?.selectedDate(on: date)
     }
 }
 
+extension CalendarScheduleViewReactor: SchduleListReactorDelegate {
+    func scrollToDate(date: Date) {
+        calendarCommands?.scrollToDate(on: date)
+    }
+}
+
+extension CalendarScheduleViewReactor: ChildLoadingDelegate {
+    func updateLoadingState(_ isLoading: Bool, index: Int) {
+        
+    }
+    
+    func catchError(_ error: any Error, index: Int) {
+        
+    }
+}
 
 

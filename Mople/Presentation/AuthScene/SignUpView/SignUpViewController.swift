@@ -108,6 +108,7 @@ class SignUpViewController: DefaultViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, name in
                 vc.profileSetupView.setNickname(name)
+                vc.profileSetupView.rx.isDuplicateEnable.onNext(true)
             })
             .disposed(by: disposeBag)
         

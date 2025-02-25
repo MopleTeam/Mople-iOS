@@ -14,7 +14,7 @@ final class ImageUploadRepositoryMock: ImageUploadRepo {
         return Single.just(())
     }
     
-    func uploadImage(image: Data, path: ImageUploadPath) -> Single<String?> {
+    func uploadImage(data: Data, path: ImageUploadPath) -> Single<String?> {
         let photoPath = "https://picsum.photos/id/1/200/300"
         
 //        return Single.just(photoPath.data(using: .utf8) ?? Data())

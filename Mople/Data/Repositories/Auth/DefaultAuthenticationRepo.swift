@@ -21,7 +21,7 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
     }
     
     func signUp(requestModel: SignUpRequest) -> Single<Void> {
-        let endpoint = APIEndpoints.executeSignUp(requestModel: requestModel)
+        let endpoint = APIEndpoints.executeSignUp(request: requestModel)
         
         return networkService.basicRequest(endpoint: endpoint)
             .flatMap {

@@ -8,7 +8,8 @@
 import RxSwift
 
 protocol ReportPost {
-    func execute(type: ReportType) -> Single<Void>
+    func execute(type: ReportType,
+                 reason: String?) -> Single<Void>
 }
 
 final class ReportPostUseCase: ReportPost {
@@ -19,8 +20,10 @@ final class ReportPostUseCase: ReportPost {
         self.repo = repo
     }
     
-    func execute(type: ReportType) -> Single<Void> {
-        return repo.reportPost(type: type)
+    func execute(type: ReportType,
+                 reason: String? = nil) -> Single<Void> {
+        let request: ReportRequest = .init(type: type, reason: reason)
+        return repo.reportPost(request: request)
     }
 }
 

@@ -12,20 +12,20 @@ import RxCocoa
 import ReactorKit
 import RxDataSources
 
-final class CalendarPlanTableViewController: BaseViewController, View {
+final class ScheduleListViewController: BaseViewController, View {
     
-    typealias Reactor = CalendarViewReactor
+    typealias Reactor = ScheduleListReactor
     
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
     // isSystemDragging 주간 달력을 넘기거나, 선택 시 스크롤 애니메이션(true)로 진행되는데 이 때, 스크롤 되면서 선택되는 것을 방지하기 위함
-    private var isSystemDragging = false
-    private var dataSource: RxTableViewSectionedReloadDataSource<PlanTableSectionModel>?
+    private var isUserDragging = false
+    private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleListSectionModel>?
     private var visibleHeaders: [UIView] = []
 
     // MARK: - Observable
-    private let dateSyncObserver: PublishRelay<Date?> = .init()
+    private let dateSyncObserver: PublishRelay<Date> = .init()
     private let userInteractingObserver: BehaviorRelay<Bool> = .init(value: false)
     
     // MARK: - UI Components
@@ -77,93 +77,128 @@ final class CalendarPlanTableViewController: BaseViewController, View {
     private func setLayout() {
         self.view.backgroundColor = .clear
         view.addSubview(tableView)
-        view.addSubview(emptyPlanView)
         
-        tableView.snp.makeConstraints(hideTableView(_:))
-        
-        emptyPlanView.snp.makeConstraints { make in
-            make.verticalEdges.equalTo(self.view.safeAreaLayoutGuide)
-            make.horizontalEdges.equalToSuperview()
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
     private func setupTableView() {
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
-        self.tableView.register(CalenadrPalnTableCell.self, forCellReuseIdentifier: CalenadrPalnTableCell.reuseIdentifier)
-        self.tableView.register(CalendarPlanTableHeaderView.self, forHeaderFooterViewReuseIdentifier: CalendarPlanTableHeaderView.reuseIdentifier)
+        self.tableView.register(ScheduleListTableCell.self, forCellReuseIdentifier: ScheduleListTableCell.reuseIdentifier)
+        self.tableView.register(ScheduleListTableHeaderView.self, forHeaderFooterViewReuseIdentifier: ScheduleListTableHeaderView.reuseIdentifier)
     }
     
-    private func setupDataSource() {
-        dataSource = RxTableViewSectionedReloadDataSource<PlanTableSectionModel>(
+    private func makeDataSource() -> RxTableViewSectionedReloadDataSource<ScheduleListSectionModel> {
+        dataSource = RxTableViewSectionedReloadDataSource<ScheduleListSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
                 
-                let cell = tableView.dequeueReusableCell(withIdentifier: CalenadrPalnTableCell.reuseIdentifier) as! CalenadrPalnTableCell
-                cell.configure(viewModel: .init(plan: item))
+                let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleListTableCell.reuseIdentifier) as! ScheduleListTableCell
+                cell.configure(viewModel: .init(testPlan: item))
                 cell.selectionStyle = .none
                 return cell
             }
         )
+        
+        return dataSource!
     }
     
     // MARK: - Bind
-    func bind(reactor: CalendarViewReactor) {
-        setupDataSource()
+    func bind(reactor: ScheduleListReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func outputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$planList)
+            .map { [weak self] planList -> [ScheduleListSectionModel] in
+                guard let self else { return [] }
+                return makeSectionModels(list: planList)
+            }
+            .asDriver(onErrorJustReturn: [])
+            .filter({ $0.isEmpty == false })
+            .drive(tableView.rx.items(dataSource: makeDataSource())) // 강한참조 확인필요
+            .disposed(by: disposeBag)
+        
         self.dateSyncObserver
-            .compactMap({ $0 })
+            .pairwise()
+            .filter({ $0 != $1 })
+            .map({ $1 })
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.sharedTableViewDate(date: $0) }
+            .map { Reactor.Action.childEvent(.scrollToDate($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        self.userInteractingObserver
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.tableViewInteracting(isScroll: $0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        // 테이블뷰 스크롤 시 캘린더에서 선택되는 날짜들이 다시 테이블로 넘어오는 것을 방지
+//        
+//        self.userInteractingObserver
+//            .observe(on: MainScheduler.instance)
+//            .map { Reactor.Action.tableViewInteracting(isScroll: $0) }
+//            .bind(to: reactor.action)
+//            .disposed(by: disposeBag)
+//        
+//        // 테이블뷰 스크롤 시 캘린더에서 선택되는 날짜들이 다시 테이블로 넘어오는 것을 방지
         self.tableView.rx.willBeginDragging
-            .do(onNext: { [weak self] _ in
-                self?.isSystemDragging = false
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.isUserDragging = true
             })
-            .map({ _ in true })
-            .asDriver(onErrorJustReturn: true)
-            .drive(userInteractingObserver)
             .disposed(by: disposeBag)
-        
+//            .do(onNext: { [weak self] _ in
+//                self?.isSystemDragging = false
+//            })
+//            .map({ _ in true })
+//            .asDriver(onErrorJustReturn: true)
+//            .drive(userInteractingObserver)
+//            .disposed(by: disposeBag)
+//        
         self.tableView.rx.didEndDecelerating
-            .map({ _ in false })
-            .asDriver(onErrorJustReturn: false)
-            .drive(userInteractingObserver)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.isUserDragging = false
+            })
             .disposed(by: disposeBag)
+//            .map({ _ in false })
+//            .asDriver(onErrorJustReturn: false)
+//            .drive(userInteractingObserver)
+//            .disposed(by: disposeBag)
+    }
+    
+    private func makeSectionModels(list: [MonthlyPlan]) -> [ScheduleListSectionModel] {
+        let grouped = Dictionary(grouping: list) { plan -> Date? in
+            guard let date = plan.date else { return nil }
+            return DateManager.startOfDay(date)
+        }
+        
+        let sorted = grouped.sorted { first, second in
+            guard let firstDate = first.key,
+                  let secondDate = second.key else { return false }
+            return firstDate < secondDate
+        }
+        
+        return sorted.map { ScheduleListSectionModel(date: $0.key, items: $0.value) }
     }
     
     #warning("데이터 받을 때 layoutsubviews 신경쓰기")
     private func inputBind(_ reactor: Reactor) {
-        reactor.pulse(\.$schedules)
-            .asDriver(onErrorJustReturn: [])
-            .drive(tableView.rx.items(dataSource: dataSource!))
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$schedules)
-            .map({ $0.isEmpty })
-            .observe(on: MainScheduler.instance)
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isEmpty in
-                vc.tableView.isHidden = isEmpty
-                vc.emptyPlanView.isHidden = !isEmpty
-            })
-            .disposed(by: disposeBag)
-        
+//        reactor.pulse(\.$schedules)
+//            .asDriver(onErrorJustReturn: [])
+//            .drive(tableView.rx.items(dataSource: dataSource!))
+//            .disposed(by: disposeBag)
+//        
+//        reactor.pulse(\.$schedules)
+//            .map({ $0.isEmpty })
+//            .observe(on: MainScheduler.instance)
+//            .asDriver(onErrorJustReturn: false)
+//            .drive(with: self, onNext: { vc, isEmpty in
+//                vc.tableView.isHidden = isEmpty
+//                vc.emptyPlanView.isHidden = !isEmpty
+//            })
+//            .disposed(by: disposeBag)
+//        
         reactor.pulse(\.$selectedDate)
+            .filter({ [weak self] _ in
+                return self?.isUserDragging == false
+            })
             .debounce(.milliseconds(10), scheduler: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
+            .compactMap({ $0 })
             .drive(with: self, onNext: { vc, selectDate in
                 vc.scrollSelectedDate(selectDate)
             })
@@ -172,13 +207,13 @@ final class CalendarPlanTableViewController: BaseViewController, View {
 }
 
 // MARK: - Table Delegate
-extension CalendarPlanTableViewController: UITableViewDelegate {
+extension ScheduleListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 203
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CalendarPlanTableHeaderView.reuseIdentifier) as! CalendarPlanTableHeaderView
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ScheduleListTableHeaderView.reuseIdentifier) as! ScheduleListTableHeaderView
         let title = dataSource?[section].title
         header.setTitle(title: title, tag: section)
         return header
@@ -199,10 +234,10 @@ extension CalendarPlanTableViewController: UITableViewDelegate {
 }
 
 // MARK: - Scroll Delegate
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard !isSystemDragging else { return }
+        guard isUserDragging else { return }
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         
@@ -215,7 +250,7 @@ extension CalendarPlanTableViewController {
 }
 
 // MARK: - 테이블 뷰 화면 표시
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     public func updateConstraints(isHide: Bool) {
         if tableView.isHidden == false {
             remakeTableView(isHide)
@@ -240,20 +275,19 @@ extension CalendarPlanTableViewController {
 }
 
 // MARK: - 테이블뷰 IndexPath 조정
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     
     /// 캘린더에서 선택된 날짜에 맞추어 테이블뷰의 IndexPath 조정
     /// - Parameter selectDate: 캘린더에서 넘어온 날짜 및 IndexPath로 Scroll시 Animate 유무
-    private func scrollSelectedDate(_ selectDate: CalendarViewController.SelectDate) {
+    private func scrollSelectedDate(_ selectDate: Date) {
         guard let models = dataSource?.sectionModels else { return }
-        guard let headerIndex = models.firstIndex(where: { $0.date == selectDate.selectedDate }) else { return }
-        isSystemDragging = true
-        tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: selectDate.isScroll)
+        guard let headerIndex = models.firstIndex(where: { $0.date == selectDate }) else { return }
+        tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
     }
 }
 
 // MARK: - Point Check
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     private func checkNearBottom(offsetY: CGFloat, contentHeight: CGFloat, threshold: CGFloat = 50) -> Bool {
         
         let tabbarHeight = self.tabBarController?.tabBar.frame.height ?? 0
@@ -270,14 +304,14 @@ extension CalendarPlanTableViewController {
 }
 
 // MARK: - Notify Calendar
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     
     private func notifyIfCrossedCenterLine() {
         guard let topHeader = visibleHeaders.first,
               let topHeaderFrame = topHeader.superview?.convert(topHeader.frame, to: self.view),
-              centerPoint(targetPoint: topHeaderFrame.origin.y) else { return }
-        
-        let foucsDate = dataSource?[topHeader.tag].date
+              centerPoint(targetPoint: topHeaderFrame.origin.y),
+              let foucsDate = dataSource?[topHeader.tag].date else { return }
+
         dateSyncObserver.accept(foucsDate)
     }
     
@@ -296,7 +330,7 @@ extension CalendarPlanTableViewController {
 }
 
 // MARK: - Gesture
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     #warning("다시 한번 알아두기")
     public func panGestureRequire(_ gesture: UIPanGestureRecognizer) {
         self.tableView.panGestureRecognizer.require(toFail: gesture)
@@ -304,9 +338,8 @@ extension CalendarPlanTableViewController {
 }
 
 // MARK: - Helper
-extension CalendarPlanTableViewController {
+extension ScheduleListViewController {
     public func checkTop() -> Bool {
-        print(#function, #line, "top : \(self.tableView.contentOffset.y <= self.tableView.contentInset.top)" )
         return self.tableView.contentOffset.y <= self.tableView.contentInset.top
     }
     
