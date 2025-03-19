@@ -9,44 +9,80 @@ import Foundation
 import ReactorKit
 
 protocol ScheduleListCommands: AnyObject {
-    func updatePlanMonthList(_ list: [DateComponents])
-    func moveToPage(on month: DateComponents)
+    func resetPlanList()
+    func updatePlanMonthList(with list: [Date])
+    func loadMonthlyPlan(on month: DateComponents)
     func selectedDate(on date: Date)
+    func editPlan(payload: PlanPayload)
+}
+
+// 요청 가능한 타입 (없음, 이전, 이후, 모두) 필터링해서 state로 넣어놓기
+// 뷰에선 받으면 scollendobserver에 nil 보내고 타입에 따라서 요청 필터링
+
+enum ScheduleFetchError: Error {
+    case dateParsingError
+}
+
+enum ScheduleFetchType {
+    case next
+    case previous
+}
+
+enum LoadState {
+    case all
+    case previous
+    case next
+    case none
 }
 
 final class ScheduleListReactor: Reactor {
     
     enum Action {
         enum ParentCommand {
+            case resetPlan
             case selectedDate(Date)
-            case loadMonthlyPlan(month: String)
+            case loadMonthlyPlan(Date)
+            case loadInitalPlan([Date])
+            case editPlanList([MonthlyPlan])
         }
         
         enum ChildEvent {
             case scrollToDate(Date)
+            case selectedPlan(MonthlyPlan)
         }
         
         case parentCommand(ParentCommand)
         case childEvent(ChildEvent)
+        case getMorePlan(ScheduleFetchType)
     }
     
     enum Mutation {
         case updateMonthlyPlan([MonthlyPlan])
         case updateSelectedDate(Date)
+        case updateAddPlanList([MonthlyPlan])
+        case editPlanList([MonthlyPlan])
+        case catchError(ScheduleFetchError)
+        case resetPlan
     }
     
     struct State {
-        // var property: TYpe
         @Pulse var planList: [MonthlyPlan] = []
         @Pulse var selectedDate: Date?
+        @Pulse var addPlanList: [MonthlyPlan] = []
+        @Pulse var reset: Void? 
     }
     
     var initialState: State = State()
     private let todayComponents = Date().toDateComponents()
     private let fetchMonthlyPlanUseCase: FetchMonthlyPlan
     private weak var delegate: SchduleListReactorDelegate?
-    private var planMonthList: [DateComponents] = []
-    private var planMonthStringList: [String] = []
+    private var currentMonth = Date().toMonthComponents().toDate()
+    private var initalDateList: [Date] = []
+    private var monthDateList: [Date] = []
+    private var loadedDateList: [Date] = []
+    private var lastLoadMonth: Date?
+    private var isLoading: Bool = false
+    private(set) var loadState: LoadState = .none
     
     init(fetchMonthlyPlanUseCase: FetchMonthlyPlan,
          delegate: SchduleListReactorDelegate) {
@@ -59,13 +95,21 @@ final class ScheduleListReactor: Reactor {
         case let .parentCommand(action):
             switch action {
             case let .loadMonthlyPlan(month):
-                return fetchMonthlyPlanWithRetry(month: month)
+                return recursionFetchMonthlyListPlan(month: [month])
             case let .selectedDate(date):
                 return .just(.updateSelectedDate(date))
+            case .resetPlan:
+                return .just(.resetPlan)
+            case let .loadInitalPlan(dateList):
+                return recursionFetchMonthlyListPlan(month: dateList)
+            case let .editPlanList(planList):
+                return .just(.editPlanList(planList))
             }
             
         case let .childEvent(event):
             return handleChildEvent(event)
+        case let .getMorePlan(type):
+            return moreFetchMonthlyPlan(type: type)
         }
     }
     
@@ -73,6 +117,10 @@ final class ScheduleListReactor: Reactor {
         switch event {
         case let .scrollToDate(date):
             delegate?.scrollToDate(date: date)
+        case let .selectedPlan(plan):
+            guard let id = plan.id else { return .empty() }
+            let type: PlanDetailType = plan.type == .plan ? .plan : .review(isReviewed: nil)
+            delegate?.selectedPlan(id: id, type: type)
         }
         
         return .empty()
@@ -85,67 +133,348 @@ final class ScheduleListReactor: Reactor {
         switch mutation {
         case let .updateMonthlyPlan(list):
             newState.planList.append(contentsOf: list)
+        case let .updateAddPlanList(list):
+            newState.planList.append(contentsOf: list)
+            newState.addPlanList = list
+        case let .editPlanList(list):
+            newState.planList = list
         case let .updateSelectedDate(date):
             newState.selectedDate = date
+        case .resetPlan:
+            newState.planList = []
+            newState.reset = ()
+        case let .catchError(err):
+            handleError(state: &newState,
+                        err: err)
         }
         
         return newState
     }
+    
+    private func handleError(state: inout State,
+                             err: ScheduleFetchError) {
+        isLoading = false
+        
+        switch err {
+        case .dateParsingError:
+            return
+        }
+    }
 }
 
 extension ScheduleListReactor: ScheduleListCommands {
-    func updatePlanMonthList(_ list: [DateComponents]) {
-        let convertDate = list.compactMap { $0.toDate() }
-        let sortedList = convertDate.sorted()
-        planMonthStringList = sortedList.compactMap({ DateManager.toString(date: $0,
-                                                                                format: .month)})
-        planMonthList = sortedList.map({ $0.toDateComponents() })
-        
-        guard let firstMonth = planMonthStringList.first else { return }
-        action.onNext(.parentCommand(.loadMonthlyPlan(month: firstMonth)))
+    func updatePlanMonthList(with list: [Date]) {
+        guard let currentMonth else { return }
+        initalDateList = list
+        resetPlanList()
+        action.onNext(.parentCommand(.loadInitalPlan(findFetchDateList(from: currentMonth))))
     }
     
-    func moveToPage(on month: DateComponents) {
-        guard let monthString = DateManager.toString(date: month.toDate(),
-                                               format: .month),
-              planMonthStringList.contains(where: { $0 == monthString }) else { return }
-        action.onNext(.parentCommand(.loadMonthlyPlan(month: monthString)))
+    func loadMonthlyPlan(on month: DateComponents) {
+        guard let monthDate = month.toDate() else { return }
+        currentMonth = monthDate
+        action.onNext(.parentCommand(.loadInitalPlan(findFetchDateList(from: monthDate))))
     }
     
     func selectedDate(on date: Date) {
         action.onNext(.parentCommand(.selectedDate(date)))
     }
+    
+    func resetPlanList() {
+        isLoading = false
+        lastLoadMonth = nil
+        monthDateList = initalDateList
+        loadedDateList.removeAll()
+        action.onNext(.parentCommand(.resetPlan))
+    }
+}
 
+// MARK: - 모임수정 알림 수신
+
+// MARK: - 일정수정 알림 수신
+extension ScheduleListReactor {
+    
+    // MARK: - 모임 변경
+    
+    // MARK: - 일정 변경
+    func editPlan(payload: PlanPayload) {
+        var planList = currentState.planList
+        
+        switch payload {
+        case let .created(plan):
+            self.updatePlan(&planList, plan: plan)
+        case let .updated(plan):
+            self.deletePlan(&planList, planId: plan.id)
+            self.updatePlan(&planList, plan: plan)
+        case let .deleted(id):
+            self.deletePlan(&planList, planId: id)
+        }
+        action.onNext(.parentCommand(.editPlanList(planList)))
+    }
+    
+    private func updatePlan(_ planList: inout [MonthlyPlan], plan: Plan) {
+        guard let newDate = plan.date else { return }
+        handleUpdate(&planList, plan: plan)
+        delegate?.updateDateList(type: .update([DateManager.startOfDay(newDate)]))
+    }
+    
+    private func handleUpdate(_ planList: inout [MonthlyPlan], plan: Plan) {
+        guard let newDate = plan.date,
+              let monthDate = newDate.toMonthComponents().toDate() else { return }
+        
+        if planList.isEmpty ||
+            isLoadedDate(on: monthDate) ||
+            isBetweenLoadedDate(on: monthDate) ||
+            isBetweenPreviousDate(on: monthDate) ||
+            isBetweenNextDate(on: monthDate) {
+            planList.append(.init(plan: plan))
+            updateLoadedList(newDate: monthDate)
+        } else {
+            updateMonthList(newDate: monthDate)
+        }
+    }
+    
+    /// 불러온 날짜에 속해있다면 추가
+    private func isLoadedDate(on newDate: Date) -> Bool {
+        let test = loadedDateList.contains(where: { DateManager.isSameMonth($0, newDate) })
+        print(#function, #line, "#0319 \(test)" )
+        return test
+    }
+    
+    /// 불러온 날짜 중 가장 작은 것, 가장 큰 것 사이에 있다면 추가
+    private func isBetweenLoadedDate(on newDate: Date) -> Bool {
+        guard let minLoadedDate = loadedDateList.min(),
+              let maxLoadedDate = loadedDateList.max() else { return true }
+        let test = DateManager.isBetween(targetDate: newDate,
+                                         startDate: minLoadedDate,
+                                         endDate: maxLoadedDate)
+        print(#function, #line, "#0319 \(test)" )
+        return test
+    }
+    
+    /// 불러온 날짜 중 가장 작은 것과 그 이전 날짜 사이라면 추가 (그 이전 날짜가 없어도 추가)
+    private func isBetweenPreviousDate(on newDate: Date) -> Bool {
+        guard let loadedDate = loadedDateList.min(),
+              let activeMonth = findLargestPreviousMonth(from: loadedDate) else { return true }
+        let test = DateManager.isBetween(targetDate: newDate,
+                                         startDate: loadedDate,
+                                         endDate: activeMonth)
+        print(#function, #line, "#0319 \(test)" )
+        return test
+    }
+    
+    /// 불러온 날짜 중 가장 큰 것과 그 이후 날짜 사이라면 추가 (그 이후 날짜가 없어도 추가)
+    private func isBetweenNextDate(on newDate: Date) -> Bool {
+        guard let loadedDate = loadedDateList.max(),
+              let activeMonth = findSmallestNextMonth(from: loadedDate) else { return true }
+        let test = DateManager.isBetween(targetDate: newDate,
+                                         startDate: loadedDate,
+                                         endDate: activeMonth)
+        print(#function, #line, "#0319 \(test)" )
+        return test
+    }
+    
+    /// 불러온 달 리스트에 추가
+    private func updateLoadedList(newDate: Date) {
+        guard loadedDateList.contains(where: { $0 == newDate }) == false else { return }
+        initalDateList.append(newDate)
+        loadedDateList.append(newDate)
+    }
+    
+    /// 위의 모든 조건에 적합하지 않다면 불러올 달 리스트에 추가
+    private func updateMonthList(newDate: Date) {
+        monthDateList.append(newDate)
+        initalDateList.append(newDate)
+        updateLoadState()
+    }
+    
+    /// 일정 삭제
+    private func deletePlan(_ planList: inout [MonthlyPlan], planId: Int?) {
+        guard let deleteIndex = getDeletePlanIndex(id: planId),
+              let deleteDate = planList[deleteIndex].date else { return }
+        planList.remove(at: deleteIndex)
+        
+        // 삭제된 날짜의 달에 잔여 데이터가 없다면 loadedDateList에서 삭제
+        guard planList.contains(where: { guard let date = $0.date else { return false }
+            return DateManager.isSameMonth(date, deleteDate) }) == false else { return }
+        
+        loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
+        delegate?.updateDateList(type: .delete([DateManager.startOfDay(deleteDate)]))
+    }
+    
+    /// 불러온 데이터에 포함되는 일정인지 체크
+    private func getDeletePlanIndex(id: Int?) -> Int? {
+        return currentState.planList.firstIndex { $0.id == id }
+    }
+    
+    // MARK: - 리뷰 변경
     
 }
 
 extension ScheduleListReactor {
     
-    /// 데이터가 적고 추가로 불러올 수 있는 달이 있다면 재귀호출
-    private func fetchMonthlyPlanWithRetry(month: String) -> Observable<Mutation> {
-        return recursiveFetchMonthlyPlan(month: month,
-                                         accumulated: [])
+    private func moreFetchMonthlyPlan(type: ScheduleFetchType) -> Observable<Mutation> {
+        guard isLoading == false,
+              let fetchDate = findFetchDate(type: type) else { return .empty() }
+        isLoading = true
+        
+        let fetchPlanObserver = recursionFetchMonthlyPlan(month: fetchDate,
+                                                          type: type)
+            .flatMap { planList -> Observable<Mutation> in
+                switch type {
+                case .next:
+                    return .just(.updateMonthlyPlan(planList))
+                case .previous:
+                    return .just(.updateAddPlanList(planList))
+                }
+            }
+
+        return requestWithLoading(task: fetchPlanObserver)
+            .do(afterCompleted: { [weak self] in
+                self?.isLoading = false
+            })
     }
     
-    private func recursiveFetchMonthlyPlan(month: String,
-                                           accumulated: [MonthlyPlan]) -> Observable<Mutation> {
-        return fetchMonthlyPlanUseCase.execute(month: month)
+    // MARK: - 초기 표시 값 불러오기
+    
+    /// 일정을 보유한 달을 받아서 API 요청
+    /// - Parameter month: 요청할 달
+    private func recursionFetchMonthlyListPlan(month: [Date]) -> Observable<Mutation> {
+        guard isLoading == false,
+              month.isEmpty == false,
+              let currentMonth else { return .empty() }
+        
+        isLoading = true
+        
+        let fetchPlanObserver = month.map {
+            let fetchType: ScheduleFetchType = currentMonth > $0 ? .previous : .next
+            return recursionFetchMonthlyPlan(month: $0,
+                                             type: fetchType)
+        }
+        
+        let fetchPlanZipObserver = Observable.zip(fetchPlanObserver)
+            .map { $0.flatMap { $0 } }
+            .map { Mutation.updateMonthlyPlan($0) }
+        
+        return requestWithLoading(task: fetchPlanZipObserver)
+            .do(afterCompleted: { [weak self] in
+                self?.isLoading = false
+            })
+    }
+    
+    /// 서버에게 일정을 요청
+    /// 받아온 일정의 수가 5개보다 적을 경우 재귀호출
+    /// - Parameters:
+    ///   - month: 요청할 달
+    ///   - accumulated: 중첩 일정 리스트
+    ///   - type: 일정을 추가로 받아올 날짜의 방향(과거 or 미래)
+    private func recursionFetchMonthlyPlan(month: Date,
+                                           accumulated: [MonthlyPlan] = [],
+                                           type: ScheduleFetchType) -> Observable<[MonthlyPlan]> {
+        
+        guard let monthString = DateManager.toString(date: month, format: .month) else {
+            return .just([])
+        }
+        
+        return fetchMonthlyPlanUseCase.execute(month: monthString)
             .asObservable()
-            .do(onNext: { [weak self] _ in
-                self?.planMonthStringList.removeAll(where: { $0 == month })
+            .do(onNext: { [weak self] planList in
+                self?.updateRemainingMonth(month: month,
+                                           planList: planList)
             })
             .map({ $0 + accumulated })
-            .flatMap { [weak self] plans -> Observable<Mutation> in
-                guard let self else { return .just(.updateMonthlyPlan(plans))}
-                
-                guard plans.count < 5,
-                      let nextMonth = planMonthStringList.first else {
-                    return .just(.updateMonthlyPlan(plans))
-                }
-                
-                return recursiveFetchMonthlyPlan(month: nextMonth,
-                                                 accumulated: plans)
+            .flatMap { [weak self] plans -> Observable<[MonthlyPlan]> in
+                guard let self else { return .just(plans)}
+                return handleRecursionFetch(type: type,
+                                            loadedList: plans)
             }
+    }
+    
+    /// 일정의 갯수가 5개 이상이라면 그대로 return
+    /// 이하라면 재귀호출
+    private func handleRecursionFetch(type: ScheduleFetchType,
+                                      loadedList:[MonthlyPlan]) -> Observable<[MonthlyPlan]> {
+        if loadedList.count < 5,
+           let fetchDate = findFetchDate(type: type) {
+            return recursionFetchMonthlyPlan(month: fetchDate,
+                                                 accumulated: loadedList,
+                                                 type: type)
+        } else {
+            return .just(loadedList)
+        }
     }
 }
 
+// MARK: - Helper
+extension ScheduleListReactor {
+    
+    /// monthList에서 date로부터 앞뒤로 가까운 날짜 리스트
+    /// - Parameter date: 타켓 날짜
+    /// - Returns: 불러올 달 리스트
+    private func findFetchDateList(from date: Date) -> [Date] {
+        return [findLargestPreviousMonth(from: date),
+                findSmallestNextMonth(from: date)].compactMap { $0 }
+    }
+    
+    /// monthList에서 마지막으로 불러온 날짜와 가까운 날짜
+    /// - Parameter type: 가까운 기준 (이전 or 다음)
+    private func findFetchDate(type: ScheduleFetchType) -> Date? {
+        guard let lastLoadMonth else { return nil }
+        switch type {
+        case .next:
+            return findSmallestNextMonth(from: lastLoadMonth)
+        case .previous:
+            return findLargestPreviousMonth(from: lastLoadMonth)
+        }
+    }
+    
+    private func findSameMonth(from date: Date) -> Date? {
+        return monthDateList.filter { $0 == date }.first
+    }
+    
+    /// monthList에서 date로부터 뒤로 가까운 날짜
+    private func findLargestPreviousMonth(from date: Date) -> Date? {
+        return monthDateList.filter { $0 < date }.max()
+    }
+    
+    /// monthList에서 date로부터 앞으로 가까운 날짜
+    private func findSmallestNextMonth(from date: Date) -> Date? {
+        return monthDateList.filter { $0 >= date }.min()
+    }
+    
+    /// monthList에서 불러온 날짜 제거 및 저장
+    /// 데이터가 있는 경우엔 불러온 리스트 및 마지막 불러온 달로 저장
+    /// 데이터가 없는 경우엔 삭제 처리
+    private func updateRemainingMonth(month: Date,
+                                      planList: [MonthlyPlan]) {
+        monthDateList.removeAll { $0 == month }
+        updateLoadState()
+        
+        if planList.isEmpty == false {
+            loadedDateList.append(month)
+            lastLoadMonth = month
+        } else {
+            initalDateList.removeAll { $0 == month }
+            delegate?.deleteMonth(month: month)
+        }
+    }
+    
+    private func updateLoadState() {
+        guard let currentDate = currentMonth else { return }
+        let isNext = monthDateList.contains { $0 > currentDate }
+        let isPrevious = monthDateList.contains { $0 < currentDate }
+        
+        loadState =
+        switch (isNext, isPrevious) {
+        case (true, true): .all
+        case (true, false): .next
+        case (false, true): .previous
+        case (false, false): .none
+        }
+    }
+}
+
+extension ScheduleListReactor: ChildLoadingReactor {
+    var parent: ChildLoadingDelegate? { delegate }
+    var index: Int { 1 }
+}

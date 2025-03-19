@@ -9,12 +9,13 @@ import Foundation
 
 protocol CalendarSceneDependencies {
     // MARK: - View
-    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController
+    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarScheduleViewController
     func makeCalendarViewController() -> CalendarViewController
     func makeScheduleListViewController() -> ScheduleListViewController
     
     // MARK: - Flow
-    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator
+    func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PlanDetailType) -> BaseCoordinator
 }
 
 final class CalendarSceneDIContainer {
@@ -41,14 +42,14 @@ final class CalendarSceneDIContainer {
 
 extension CalendarSceneDIContainer: CalendarSceneDependencies {
     // MARK: - 기본
-    func makeCalendarScheduleViewcontroller() -> CalendarScheduleViewController {
+    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarScheduleViewController {
         mainView = CalendarScheduleViewController(title: TextStyle.Tabbar.calendar,
-                                                  reactor: makeCalendarViewReactor())
+                                                  reactor: makeCalendarViewReactor(coordinator: coordinator))
         return mainView!
     }
 
-    private func makeCalendarViewReactor() -> CalendarScheduleViewReactor {
-        mainReactor = CalendarScheduleViewReactor(fetchUseCase: FetchScheduleMock())
+    private func makeCalendarViewReactor(coordinator: CalendarCoordination) -> CalendarScheduleViewReactor {
+        mainReactor = CalendarScheduleViewReactor(coordinator: coordinator)
         return mainReactor!
     }
     
@@ -95,7 +96,7 @@ extension CalendarSceneDIContainer: CalendarSceneDependencies {
     }
     
     // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId, type: .plan)
+    func makePlanDetailFlowCoordinator(postId: Int, type: PlanDetailType) -> BaseCoordinator {
+        return commonFactory.makePlanDetailCoordinator(postId: postId, type: type)
     }
 }

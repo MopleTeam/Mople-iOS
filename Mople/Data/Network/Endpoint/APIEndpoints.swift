@@ -147,8 +147,6 @@ extension APIEndpoints {
     
     static func uploadReviewImage(id: Int,
                                   imageDatas: [Data]) throws -> Endpoint<Void> {
-        print(#function, #line, "dataCount : \(imageDatas.count)" )
-        print(#function, #line, "id : \(id)" )
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
         return try Endpoint(path: "image/review/review",

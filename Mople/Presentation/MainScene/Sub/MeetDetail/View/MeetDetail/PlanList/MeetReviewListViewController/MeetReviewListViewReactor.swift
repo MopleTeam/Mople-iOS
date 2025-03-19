@@ -13,6 +13,7 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         case selectedReview(index: Int)
         case requestReviewList
+        case updateReview(ReviewPayload)
     }
     
     enum Mutation {
@@ -51,6 +52,8 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
             return fetchReviewList()
         case let .selectedReview(index):
             return presentReviewDetailView(index: index)
+        case let .updateReview(payload):
+            return handleReviewPayload(payload)
         }
     }
     
@@ -88,8 +91,42 @@ extension MeetReviewListViewReactor {
         guard let selectedReview = currentState.reviews[safe: index],
               let reviewId = selectedReview.id else { return .empty() }
         self.coordinator?.pushPlanDetailView(postId: reviewId,
-                                             type: .review(isReviewed: selectedReview.isReviewd))
+                                             type: .review(isReviewed: nil))
         return .empty()
     }
 }
 
+// MARK: - 리뷰 알림 수신
+extension MeetReviewListViewReactor {
+    private func handleReviewPayload(_ payload: ReviewPayload) -> Observable<Mutation> {
+        var reviewList = currentState.reviews
+        
+        switch payload {
+        case let .created(plan):
+            self.addReview(&reviewList, plan: plan)
+        case let .updated(plan):
+            self.updateReview(&reviewList, review: plan)
+        case let .deleted(id):
+            self.deleteReview(&reviewList, reviewId: id)
+        }
+        return .just(.fetchReviewList(reviews: reviewList))
+    }
+    
+    private func addReview(_ reviewList: inout [Review], plan: Review) {
+        reviewList.append(plan)
+        reviewList.sort(by: <)
+    }
+    
+    private func updateReview(_ reviewList: inout [Review], review: Review) {
+        guard let updatedIndex = reviewList.firstIndex(where: {
+            $0.id == review.id
+        }) else { return }
+        
+        reviewList[updatedIndex] = review
+        reviewList.sort(by: <)
+    }
+    
+    private func deleteReview(_ reviewList: inout [Review], reviewId: Int) {
+        reviewList.removeAll { $0.id == reviewId }
+    }
+}

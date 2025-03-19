@@ -18,7 +18,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     var disposeBag = DisposeBag()
         
     // MARK: - Observer
-    private let presentEventObserver: BehaviorRelay<Date?> = .init(value: nil)
+    private let monthSelectedObserver: PublishSubject<DateComponents> = .init()
     public let panGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
     
     // MARK: - Gesture
@@ -83,12 +83,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         setGesture()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        print(#function, #line)
-        super.viewWillDisappear(animated)
-        resetPresentDate()
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         setupNavi()
@@ -126,8 +120,9 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         }
         
         scheduleListContainer.snp.makeConstraints { make in
-            make.top.equalTo(view.snp.bottom)
-            make.horizontalEdges.bottom.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
         
         borderView.snp.makeConstraints { make in
@@ -141,10 +136,12 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     func bind(reactor: CalendarScheduleViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
+        setNotification(reactor: reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
-        reactor.pulse(\.$changedPage)
+        reactor.pulse(\.$changeMonth)
+            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, dateComponents in
@@ -167,33 +164,41 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
                 vc.updateMainView(scope)
             })
             .disposed(by: disposeBag)
-
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isLoad in
-                vc.rx.isLoading.onNext(isLoad)
-                vc.checkIsPresent(isLoad)
-            })
+            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
     
     private func outputBind(_ reactor: Reactor) {
         naviBar.rightItemEvent
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
+            .map { Reactor.Action.changeScope }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         naviBar.leftItemEvent
             .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestScopeSwitch(type: .buttonTap) }
+            .map { Reactor.Action.changeScope }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        monthSelectedObserver
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.changeMonth($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setNotification(reactor: Reactor) {
+        EventService.shared.addPlanObservable()
+            .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.presentEventObserver
-            .observe(on: MainScheduler.instance)
-            .compactMap({ $0 })
-            .map { Reactor.Action.requestPresentEvent(lastRecentDate: $0) }
+        EventService.shared.addMeetObservable()
+            .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -249,10 +254,12 @@ extension CalendarScheduleViewController: UIGestureRecognizerDelegate {
 // MARK: - Date Picker
 extension CalendarScheduleViewController {
     private func presentDatePicker() {
-        let datePickView = YearMonthPickerViewController(reactor: reactor)
-        
+        let defaultDate = reactor?.currentState.changeMonth ?? Date().toDateComponents()
+        let datePickView = YearMonthPickerViewController(defaultDate: defaultDate)
+        datePickView.completed = { [weak self] selectedMonth in
+            self?.monthSelectedObserver.onNext(selectedMonth)
+        }
         datePickView.modalPresentationStyle = .pageSheet
-        
         if let sheet = datePickView.sheetPresentationController {
             sheet.detents = [ .medium() ]
         }
@@ -290,11 +297,12 @@ extension CalendarScheduleViewController {
     }
     
     private func hideScheduleListView(scope: ScopeType) {
-        let baseLine = scope == .month ? view.snp.bottom : calendarContainer.snp.bottom
+        let baseLine = scope == .month ? view.safeAreaLayoutGuide.snp.bottom : calendarContainer.snp.bottom
         
         scheduleListContainer.snp.remakeConstraints({ make in
             make.top.equalTo(baseLine)
-            make.horizontalEdges.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         })
     }
     
@@ -320,25 +328,10 @@ extension CalendarScheduleViewController {
 
 // MARK: - Home View에서 넘어왔을 때의 액션
 extension CalendarScheduleViewController {
-    
-    /// 표시할 데이터가 있는 상태 : 홈뷰에서 표시한 이벤트 갯수 넘기기
     public func presentEvent(on lastRecentDate: Date) {
-        self.presentEventObserver.accept(lastRecentDate)
-    }
-    
-    #warning("홈화면에서 캘린더로 넘어올 때 테이블뷰가 윈도우에 추가되지 않은 경우 아래에 표시된 에러 발생")
-    #warning("현재는 기본 로딩이 끝난 뒤 체크하는 중 차후에 로딩이 발생하면 다시 실행됨")
-    /// 표시할 데이터가 없는 상태 : 로딩이 끝난 후 presentNextEvent count 다시 보내주기
-    private func checkIsPresent(_ isLoading: Bool) {
-        guard !isLoading,
-              let recentEventCount = presentEventObserver.value else { return }
-        presentEventObserver.accept(recentEventCount)
-    }
-    
-    /// 화면을 벗어날 때 설정값 지우기
-    private func resetPresentDate() {
-        guard presentEventObserver.value == nil else { return }
-        presentEventObserver.accept(nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.monthSelectedObserver.onNext(lastRecentDate.toDateComponents())
+        }
     }
 }
 

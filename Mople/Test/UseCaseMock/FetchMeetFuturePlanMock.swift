@@ -21,7 +21,7 @@ final class FetchMeetFuturePlanMock: FetchMeetPlanList {
         
         planArray.append(Plan.mock(id: 11, date: DateManager.subtractFiveMinutes(Date()), creatorId: 1))
         planArray.append(Plan.mock(id: 12, date: DateManager.addFiveMinutes(Date()), creatorId: 1))
-        planArray.append(Plan.mock(id: 13, date: DateManager.isNextMonth(Date()), creatorId: 103))
+        planArray.append(Plan.mock(id: 13, date: DateManager.getNextMonth(Date()), creatorId: 103))
         return planArray
     }
     

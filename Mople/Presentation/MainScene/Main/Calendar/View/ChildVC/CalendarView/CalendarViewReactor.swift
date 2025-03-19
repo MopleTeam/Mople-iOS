@@ -8,8 +8,18 @@
 import Foundation
 import ReactorKit
 
+enum EventUpdateType {
+    case update([Date])
+    case delete([Date])
+}
+
 protocol CalendarCommands: AnyObject {
+    func resetDate()
     func scrollToDate(on date: Date)
+    func changePage(on date: Date)
+    func changeScope()
+    func updateEvent(type: EventUpdateType)
+    func deleteMonth(month: Date)
 }
 
 final class CalendarViewReactor: Reactor {
@@ -17,11 +27,15 @@ final class CalendarViewReactor: Reactor {
     enum Action {
         enum ParentCommand {
             case scrollToDate(Date)
+            case changePage(Date)
+            case editDateList([Date])
+            case changeScope
         }
         
         enum ChildEvent {
             case changedCalendarHeight(CGFloat)
             case changedScope(ScopeType)
+            case changeMonth(DateComponents)
             case changedPage(DateComponents)
             case selectedDate(Date)
         }
@@ -32,18 +46,17 @@ final class CalendarViewReactor: Reactor {
     }
     
     enum Mutation {
-        enum ParentRequest {
-            case updatePlanMonth([DateComponents])
-        }
-        
+        case changeScope
+        case updatePage(Date)
         case updateScrollDate(Date)
         case updateDates([Date])
-        case requestParent(ParentRequest)
     }
     
     struct State {
         @Pulse var dates: [Date] = []
         @Pulse var scrollDate: Date?
+        @Pulse var page: Date?
+        @Pulse var changeScope: Void?
     }
     
     var initialState: State = State()
@@ -64,6 +77,12 @@ final class CalendarViewReactor: Reactor {
             switch action {
             case let .scrollToDate(date):
                 return .just(.updateScrollDate(date))
+            case .changeScope:
+                return .just(.changeScope)
+            case let .editDateList(dateList):
+                return .just(.updateDates(dateList))
+            case let .changePage(month):
+                return .just(.updatePage(month))
             }
         case .fetchDates:
             return fetchDates()
@@ -79,11 +98,12 @@ final class CalendarViewReactor: Reactor {
         switch mutation {
         case let .updateDates(dates):
             newState.dates = dates
-        case let .requestParent(request):
-            handleDelegateFromMutation(state: &newState,
-                                       request: request)
         case let .updateScrollDate(date):
             newState.scrollDate = date
+        case let .updatePage(month):
+            newState.page = month
+        case .changeScope:
+            newState.changeScope = ()
         }
         
         return newState
@@ -97,18 +117,12 @@ final class CalendarViewReactor: Reactor {
             delegate?.updateScope(scope)
         case let .changedPage(page):
             delegate?.updatePage(page)
+        case let .changeMonth(month):
+            delegate?.updateMonth(month)
         case let .selectedDate(date):
             delegate?.selectedDate(date: date)
         }
         return .empty()
-    }
-    
-    private func handleDelegateFromMutation(state: inout State,
-                                            request: Mutation.ParentRequest) {
-        switch request {
-        case let .updatePlanMonth(monthList):
-            delegate?.updatePlanMonthList(monthList)
-        }
     }
     
     private func initalSetup() {
@@ -119,29 +133,73 @@ final class CalendarViewReactor: Reactor {
 extension CalendarViewReactor {
     private func fetchDates() -> Observable<Mutation> {
         let fetchDates = fetchCalendarDatesUseCase.execute()
+            .debug("#0320")
             .asObservable()
-            .flatMap { [weak self] dateList -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let updateDateList = Mutation.updateDates(dateList)
-                let updateMonthList = parseMonthList(from: dateList)
-                return .of(updateDateList, updateMonthList)
+            .catchAndReturn([])
+            .map { [weak self] in
+                self?.updatePlanMonthList(from: $0)
+                $0.forEach { print(#function, #line, "#0320 스케줄 일정 : \($0)" ) }
+                return Mutation.updateDates($0)
             }
         
         return requestWithLoading(task: fetchDates)
     }
     
-    private func parseMonthList(from dateList: [Date]) -> Mutation {
-        let monthList = dateList.map { $0.toMonthComponents() }
-        let removeDuplicateMonth = Set(monthList)
-        return .requestParent(
-            .updatePlanMonth(Array(removeDuplicateMonth))
-        )
+    private func updatePlanMonthList(from dateList: [Date]) {
+        let monthList = dateList.compactMap { $0.toMonthComponents().toDate() }
+        let deduplicatedMonthList = Set(monthList)
+        delegate?.updatePlanMonthList(Array(deduplicatedMonthList))
     }
 }
 
 extension CalendarViewReactor: CalendarCommands {
     func scrollToDate(on date: Date) {
         action.onNext(.parentCommand(.scrollToDate(date)))
+    }
+    
+    func changePage(on date: Date) {
+        action.onNext(.parentCommand(.changePage(date)))
+    }
+    
+    func changeScope() {
+        action.onNext(.parentCommand(.changeScope))
+    }
+    
+    func deleteMonth(month: Date) {
+        var datelist = currentState.dates
+        
+        datelist.removeAll { DateManager.isSameMonth($0, month) }
+        
+        action.onNext(.parentCommand(.editDateList(datelist)))
+    }
+    
+    func updateEvent(type: EventUpdateType) {
+        var dateList = currentState.dates
+        
+        switch type {
+        case let .update(updateList):
+            updatePlan(&dateList, updateList: updateList)
+        case let .delete(deleteList):
+            deletePlan(&dateList, deleteList: deleteList)
+        }
+        
+        action.onNext(.parentCommand(.editDateList(dateList)))
+    }
+    
+    private func updatePlan(_ dateList: inout [Date], updateList: [Date]) {
+        dateList.append(contentsOf: updateList)
+    }
+    
+    private func deletePlan(_ dateList: inout [Date], deleteList: [Date]) {
+        deleteList.forEach { deleteDate in
+            guard let deleteIndex = dateList.firstIndex(where: { $0 == deleteDate }) else { return }
+            dateList.remove(at: deleteIndex)
+        }
+    }
+    
+    func resetDate() {
+
+        initalSetup()
     }
 }
 

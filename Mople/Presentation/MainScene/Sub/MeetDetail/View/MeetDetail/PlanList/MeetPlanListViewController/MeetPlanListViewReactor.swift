@@ -131,7 +131,7 @@ extension MeetPlanListViewReactor {
     }
 }
 
-// MARK: - 일정 생성 알림 수신
+// MARK: - 일정 알림 수신
 extension MeetPlanListViewReactor {
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         var planList = currentState.plans

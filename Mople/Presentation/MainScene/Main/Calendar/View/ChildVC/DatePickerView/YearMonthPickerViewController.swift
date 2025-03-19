@@ -9,17 +9,17 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
-import ReactorKit
 
-final class YearMonthPickerViewController: BaseViewController, View {
+final class YearMonthPickerViewController: BaseViewController {
     
-    typealias Reactor = CalendarScheduleViewReactor
-    
+    // MARK: - Closure
+    var completed: ((DateComponents) -> Void)?
+        
     // MARK: - Variables
-    var disposeBag: DisposeBag = DisposeBag()
+    private var disposeBag: DisposeBag = DisposeBag()
     
     private let todayComponents = DateManager.todayComponents
-    private lazy var selectedDate = todayComponents
+    private var selectedDate: DateComponents
     
     private lazy var years: [Int] = {
         let currentYear = todayComponents.year ?? 2024
@@ -29,17 +29,14 @@ final class YearMonthPickerViewController: BaseViewController, View {
     }()
     
     private let months: [Int] = Array(1...12)
-    
-    // MARK: - Observable
-    private let selectedDateObserver: PublishRelay<DateComponents> = .init()
-    
+
     // MARK: - UI Components
     private let pickerView = DefaultPickerView(title: TextStyle.DatePicker.header)
     
     // MARK: - LifeCycle
-    init(reactor: Reactor?) {
+    init(defaultDate: DateComponents) {
+        self.selectedDate = defaultDate
         super.init()
-        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -63,27 +60,8 @@ final class YearMonthPickerViewController: BaseViewController, View {
     }
     
     private func setPickerView() {
-        self.pickerView.setDelegate(delegate: self)
-    }
-    
-    // MARK: - Bind
-    func bind(reactor: CalendarScheduleViewReactor) {
-        selectedDateObserver
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.requestPageSwitch(dateComponents: $0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$changedPage))
-            .map({ $0.1 })
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, dateComponents in
-                vc.defaultSelectedDate(on: dateComponents)
-            })
-            .disposed(by: disposeBag)
+        pickerView.setDelegate(delegate: self)
+        setDefaultDate()
     }
     
     // MARK: - Action
@@ -98,8 +76,7 @@ final class YearMonthPickerViewController: BaseViewController, View {
         self.pickerView.sheetView.rx.completedEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                let selectedDate = vc.selectedDate
-                vc.selectedDateObserver.accept(selectedDate)
+                vc.completed?(vc.selectedDate)
                 vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
@@ -150,19 +127,9 @@ extension YearMonthPickerViewController: UIPickerViewDataSource, UIPickerViewDel
 
 // MARK: - Input Date
 extension YearMonthPickerViewController {
-    private func defaultSelectedDate(on dateComponents: DateComponents? = nil) {
-        print(#function, #line, "Path : # ")
-        if let dateComponents {
-            self.selectDate(dateComponents)
-        } else {
-            self.selectDate(todayComponents)
-        }
-    }
-    
-    private func selectDate(_ dateComponents: DateComponents) {
-        print(#function, #line, "Path : # ")
-        guard let year = dateComponents.year,
-              let month = dateComponents.month else { return }
+    private func setDefaultDate() {
+        guard let year = selectedDate.year,
+              let month = selectedDate.month else { return }
         
         let yearIndex = self.years.firstIndex(of: year) ?? 2025
         let monthIndex = self.months.firstIndex(of: month) ?? 1

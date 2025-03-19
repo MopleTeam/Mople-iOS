@@ -10,6 +10,7 @@ import RxSwift
 // MARK: - 아이템 타입
 typealias MeetPayload = EventService.Payload<Meet>
 typealias PlanPayload = EventService.Payload<Plan>
+typealias ReviewPayload = EventService.Payload<Review>
 
 final class EventService {
     
@@ -25,6 +26,7 @@ final class EventService {
             switch T.self {
             case is Meet.Type: return .meet
             case is Plan.Type: return .plan
+            case is Review.Type: return .review
             default: return .init("Default")
             }
         }
@@ -34,15 +36,15 @@ final class EventService {
     private let senderKey = "sender"
     
     
-    // MARK: - Void
-    func post(name: Notification.Name) {
-        NotificationCenter.default.post(name: name, object: nil)
-    }
-    
-    func receiveObservable(name: Notification.Name) -> Observable<Void> {
-        return NotificationCenter.default.rx.notification(name)
-            .map { _ in }
-    }
+//    // MARK: - Void
+//    func post(name: Notification.Name) {
+//        NotificationCenter.default.post(name: name, object: nil)
+//    }
+//    
+//    func receiveObservable(name: Notification.Name) -> Observable<Void> {
+//        return NotificationCenter.default.rx.notification(name)
+//            .map { _ in }
+//    }
     
     
     // MARK: - With Item
@@ -59,6 +61,10 @@ final class EventService {
 
     func addPlanObservable() -> Observable<PlanPayload> {
         return makeObservable(name: .plan)
+    }
+    
+    func addReviewObservable() -> Observable<ReviewPayload> {
+        return makeObservable(name: .review)
     }
     
     private func makeObservable<T>(name: Notification.Name) -> Observable<T> {

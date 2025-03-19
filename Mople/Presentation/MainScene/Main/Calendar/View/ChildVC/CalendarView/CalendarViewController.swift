@@ -33,6 +33,7 @@ final class CalendarViewController: BaseViewController, View {
     private let heightObserver: PublishRelay<CGFloat> = .init()
     private let scopeObserver: PublishRelay<ScopeType> = .init()
     private let pageObserver: PublishRelay<DateComponents> = .init()
+    private let monthObserver: PublishRelay<DateComponents> = .init()
     private let dateSelectionObserver: PublishRelay<Date> = .init()
 
     // MARK: - Gestrue
@@ -136,45 +137,22 @@ final class CalendarViewController: BaseViewController, View {
         
         reactor.pulse(\.$dates)
             .asDriver(onErrorJustReturn: [])
-            .filter({ !$0.isEmpty })
             .drive(with: self, onNext: { vc, events in
+                vc.startMode()
                 vc.updateEvents(with: events)
                 vc.setDefaulsePreDate()
             })
             .disposed(by: disposeBag)
-        
-//        reactor.pulse(\.$isTableViewInteracting)
-//            .map({ !$0 })
-//            .asDriver(onErrorJustReturn: false)
-//            .drive(calendar.rx.isUserInteractionEnabled)
-//            .disposed(by: disposeBag)
-//        
-//        reactor.pulse(\.$calendarHeight)
-//            .asDriver(onErrorJustReturn: nil)
-//            .compactMap { $0 }
-//            .drive(with: self, onNext: { vc, height in
-//                vc.updateHeight(height)
-//            })
-//            .disposed(by: disposeBag)
-//        
-//        reactor.pulse(\.$switchScope)
-//            .asDriver(onErrorJustReturn: nil)
-//            .compactMap({ $0 })
-//            .drive(with: self, onNext: { vc, type in
-//                vc.switchScope(type: type)
-//            })
-//            .disposed(by: disposeBag)
-        
-      
-//        
-//        reactor.pulse(\.$switchPage)
-//            .asDriver(onErrorJustReturn: nil)
-//            .compactMap({ $0?.toDate() })
-//            .drive(with: self, onNext: { vc, date in
-//                vc.moveToPage(on: date)
-//            })
-//            .disposed(by: disposeBag)
-//        
+     
+        reactor.pulse(\.$page)
+            .observe(on: MainScheduler.asyncInstance)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, date in
+                vc.moveToPage(on: date)
+            })
+            .disposed(by: disposeBag)
+
         reactor.pulse(\.$scrollDate)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
@@ -182,50 +160,49 @@ final class CalendarViewController: BaseViewController, View {
                 vc.selectedPresnetDate(on: date)
             })
             .disposed(by: disposeBag)
-//        
-//        reactor.pulse(\.$presentDate)
-//            .asDriver(onErrorJustReturn: nil)
-//            .compactMap({ $0 })
-//            .drive(with: self, onNext: { vc, date in
-//                vc.isSystemDragging = true
-//                vc.presentDate(on: date)
-//            })
-//            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$changeScope)
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, _ in
+                vc.switchScope(type: .buttonTap)
+            })
+            .disposed(by: disposeBag)
     }
 
     private func outputBind(_ reactor: Reactor) {
         heightObserver
-            .pairwise()
-            .filter({ $0 != $1 })
-            .observe(on: MainScheduler.instance)
-            .map({ $1 })
+            .distinctUntilChanged()
             .map { Reactor.Action.childEvent(.changedCalendarHeight($0))}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         scopeObserver
-            .pairwise()
-            .filter({ $0 != $1 })
-            .observe(on: MainScheduler.instance)
-            .map({ $1 })
+            .distinctUntilChanged()
             .map { Reactor.Action.childEvent(.changedScope($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         scopeObserver
-            .pairwise()
-            .filter({ $0 != $1 })
-            .map { $1 == .month }
+            .distinctUntilChanged()
+            .map { $0 == .month }
             .bind(to: self.view.rx.isUserInteractionEnabled)
             .disposed(by: disposeBag)
-        
+
         pageObserver
+            .filter({ [weak self] _ in
+                return self?.calendar.scope == .month
+            })
             .map { Reactor.Action.childEvent(.changedPage($0)) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        monthObserver
+            .map { Reactor.Action.childEvent(.changeMonth($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         dateSelectionObserver
-            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
             .map { Reactor.Action.childEvent(.selectedDate($0)) }
             .bind(to: reactor.action)
@@ -270,6 +247,7 @@ extension CalendarViewController: FSCalendarDelegate {
         print(#function, #line)
         setPreSelectedDateWhenMonth()
         sendCurrentPageToHeader()
+        sendCurrrentPageToTable()
     }
 
     func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
@@ -279,7 +257,7 @@ extension CalendarViewController: FSCalendarDelegate {
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         print(#function, #line)
         preSelectedDate = date
-        updateFocus(on: date)
+        switchScope(type: .dateTap)
         updateCell(on: date, isSelected: true)
     }
 
@@ -310,34 +288,14 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
     }
 }
 
-// MARK: - 셀 선택 시 액션
+// MARK: - 스코프 업데이트
 extension CalendarViewController {
+    
     enum ScopeChangeType {
         case buttonTap
         case dateTap
     }
-
-    /// 셀 선택 시 달력의 타입에 따른 액션 처리
-    private func updateFocus(on date: Date) {
-        switch calendar.scope {
-        case .month:
-            switchScope(type: .dateTap)
-        case .week:
-            notifySelectedDate(on: date)
-        @unknown default:
-            break
-        }
-    }
-
-    /// 스케줄 테이블 반영
-    private func notifySelectedDate(on date: Date) {
-        print(#function, #line)
-        dateSelectionObserver.accept(date)
-    }
-}
-
-// MARK: - 스코프 업데이트
-extension CalendarViewController {
+    
     /// 스코프에 맞춰서 캘린더 뷰 높이 조절
     private func updateHeight(_ height: CGFloat) {
         calendar.snp.updateConstraints { make in
@@ -352,7 +310,6 @@ extension CalendarViewController {
         scopeSync()
     }
 
-    
     /// 버튼으로 탭하는 경우 : 날짜 선택, 스코프 전환, empty 이벤트인 경우 handle
     /// 날짜 탭으로 하는 경우 : 스코프 전환
     /// 제스처로 전환한 경우 : none
@@ -367,11 +324,9 @@ extension CalendarViewController {
         }
     }
 
-    // 확인
     /// scope에 맞춰서 표시할 데이터 동기화
     /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
     private func scopeSync() {
-        print(#function, #line)
         switch calendar.scope {
         case .month:
             sendCurrentPageToHeader()
@@ -385,6 +340,10 @@ extension CalendarViewController {
     // 확인
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
     private func sendCurrentPageToHeader() {
+        monthObserver.accept(calendar.currentPage.toDateComponents())
+    }
+    
+    private func sendCurrrentPageToTable() {
         pageObserver.accept(calendar.currentPage.toDateComponents())
     }
 
@@ -392,6 +351,7 @@ extension CalendarViewController {
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func sendSelectedDateToTable() {
         guard let preSelectedDate else { return }
+        print(#function, #line, "#0318 선택되 날짜 : \(preSelectedDate)" )
         dateSelectionObserver.accept(preSelectedDate)
     }
 
@@ -418,6 +378,10 @@ extension CalendarViewController {
             self.dateSelectionObserver.accept(date)
         })
     }
+    
+    private func startMode() {
+        calendar.setScope(.month, animated: false)
+    }
 }
 
 // MARK: - 셀 업데이트
@@ -426,6 +390,7 @@ extension CalendarViewController {
     /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
     private func updateEvents(with events: [Date]) {
         self.events = events
+        events.forEach { print(#function, #line, "#0320 스케줄 리스트 : \($0)" ) }
         calendar.reloadData()
     }
 
@@ -455,6 +420,7 @@ extension CalendarViewController {
 
     /// 페이지 이동하기
     private func moveToPage(on date: Date, animated: Bool = false) {
+        calendar.setScope(.month, animated: false)
         self.calendar.setCurrentPage(date, animated: animated)
     }
 
@@ -585,7 +551,7 @@ extension CalendarViewController {
             return
         }
         let isNext = startOffset.x < currentOffset.x
-        let destinationDate = isNext ? DateManager.isNextMonth(currentPageDate) : DateManager.isPreviousMonth(currentPageDate)
+        let destinationDate = isNext ? DateManager.getNextMonth(currentPageDate) : DateManager.getPreviousMonth(currentPageDate)
         self.pagingResultAnimationGesture(result: .move(to: destinationDate),
                                           gesture: gesture)
     }
@@ -630,10 +596,11 @@ extension CalendarViewController {
 
     /// 이번달의 선택된 날짜또는 첫번째 이벤트 PreSelected로 설정
     private func setPreSelectedDateWhenMonth() {
-        guard calendar.scope == .month,
-              let firstEvent = currentPageFirstEventDate() else { return }
-
-        preSelectedDate = hasSelectedDateInCurrentMonth() ?? firstEvent
+        guard calendar.scope == .month else { return }
+        preSelectedDate = hasSelectedDateInCurrentMonth()
+        ?? findSameMonthDate(on: calendar.currentPage)
+        ?? findSmallestNextMonth(on: calendar.currentPage)
+        ?? findLargestPreviousDate(on: calendar.currentPage)
     }
 
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
@@ -655,13 +622,6 @@ extension CalendarViewController {
         return date
     }
 
-    /// 달력에서 첫번째 이벤트
-    private func currentPageFirstEventDate() -> Date? {
-
-        let currentPageEvnet = events.filter { DateManager.isSameMonth($0, self.calendar.currentPage) }
-        return currentPageEvnet.first
-    }
-
     /// calendar.selectedDate가 nil이라면 preSelectedDate 선택
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
@@ -673,7 +633,31 @@ extension CalendarViewController {
 
     /// 기본값으로 첫 이벤트 preSelectedDate에 할당
     private func setDefaulsePreDate() {
-        preSelectedDate = events.first ?? DateManager.startOfDay(Date())
+        let currentDate = calendar.currentPage
+        preSelectedDate = findSameMonthDate(on: currentDate)
+        ?? findSmallestNextMonth(on: currentDate)
+        ?? findLargestPreviousDate(on: currentDate)
+        if let preSelectedDate {
+            calendar.select(preSelectedDate, scrollToDate: false)
+        } else {
+            guard let selectedDate = calendar.selectedDate else { return }
+            calendar.deselect(selectedDate)
+        }
+    }
+    
+    /// date와 같은 달의 이벤트 중 가장 첫번째
+    private func findSameMonthDate(on date: Date) -> Date? {
+        return events.filter({ DateManager.isSameMonth($0, date) }).first
+    }
+    
+    /// date보다 과거 이벤트 중 가장 큰 것
+    private func findLargestPreviousDate(on date: Date) -> Date? {
+        return events.filter { $0 < date }.max()
+    }
+    
+    /// date보다 미래 이벤트 중 가장 작은 것
+    private func findSmallestNextMonth(on date: Date) -> Date? {
+        return events.filter { $0 > date }.min()
     }
 }
 

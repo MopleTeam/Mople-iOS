@@ -13,15 +13,25 @@ extension UIScrollView {
         let bottomInset = contentInset.bottom
         let boundsHeight = bounds.height
         let contentOffsetY = contentOffset.y
-        return contentOffsetY + boundsHeight + bottomInset
+        return contentOffsetY + bottomInset + min(boundsHeight, contentSize.height)
     }
     
     var contentHeight: CGFloat {
         return contentSize.height.rounded(.down)
     }
     
-    func isBottom() -> Bool {
-        return contentHeight <= contentOffsetMaxY
+    func isBottom(threshold: CGFloat = 0) -> Bool {
+        return contentHeight <= contentOffsetMaxY + threshold
+    }
+    
+    func isRefresh(threshold: CGFloat = -60) -> Bool {
+        let contentOffsetY = contentOffset.y
+        return contentOffsetY < threshold
+    }
+    
+    func isCenter() -> Bool {
+        let halfContentHeight = contentHeight / 2
+        return halfContentHeight < contentOffsetMaxY
     }
 
     func scrollToBottom(animated: Bool) {

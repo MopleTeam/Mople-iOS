@@ -9,8 +9,9 @@ import UIKit
 import ReactorKit
 
 protocol CalendarReactorDelegate: AnyObject, ChildLoadingDelegate {
-    func updatePage(_ month: DateComponents)
-    func updatePlanMonthList(_ list: [DateComponents])
+    func updatePage(_ page: DateComponents)
+    func updateMonth(_ month: DateComponents)
+    func updatePlanMonthList(_ list: [Date])
     func updateCalendarHeight(_ height: CGFloat)
     func updateScope(_ scope: ScopeType)
     func selectedDate(date: Date)
@@ -18,6 +19,9 @@ protocol CalendarReactorDelegate: AnyObject, ChildLoadingDelegate {
 
 protocol SchduleListReactorDelegate: AnyObject, ChildLoadingDelegate {
     func scrollToDate(date: Date)
+    func updateDateList(type: EventUpdateType)
+    func selectedPlan(id: Int, type: PlanDetailType)
+    func deleteMonth(month: Date)
 }
 
 final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
@@ -26,71 +30,50 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         enum CalendarActions {
-            case changedPage(DateComponents)
+            case changedMonth(DateComponents)
+            case changedHeight(CGFloat)
+            case changedScope(ScopeType)
         }
         
         case calendarAction(CalendarActions)
-        
-        case calendarHeightChanged(CGFloat)
-        case requestPageSwitch(dateComponents: DateComponents)
-        case requestScopeSwitch(type: ScopeChangeType)
-        case scopeChanged(ScopeType)
-        case pageChanged(page: DateComponents)
-        case dateSelected(selectDate: (selectedDate: Date?, isScroll: Bool))
-        case sharedTableViewDate(date: Date)
-        case requestPresentEvent(lastRecentDate: Date)
-        case tableViewInteracting(isScroll: Bool)
+        case changeScope
+        case changeMonth(DateComponents)
+        case changeLoadingState(Bool)
+        case updatePlan(PlanPayload)
+        case updateMeet(MeetPayload)
     }
     
     enum Mutation {
         enum CalendarEvents {
-            case updatePage(DateComponents)
+            case updateMonth(DateComponents)
+            case updateHeight(CGFloat)
+            case updateScope(ScopeType)
         }
         
         case calendarEvent(CalendarEvents)
-        
-        case switchPage(_ dateComponents: DateComponents)
-
-        
-        case loadScheduleList(scheduleList: [ScheduleListSectionModel])
-        case loadEventDateList(eventDateList: [Date])
-        case setCalendarHeight(_ height: CGFloat)
-        case switchScope(_ type: ScopeChangeType)
-        case notifyChangedScope(_ scope: ScopeType)
-        case notifyChangedPage(_ page: DateComponents)
-        case notifySelectdDate(_ selectDate: (selectedDate: Date?, isScroll: Bool)?)
-        case notifyTableViewDate(_ date: Date)
-        case notifyPresentEvent(_ dateComponents: Date?)
-        case notifyLoadingState(_ isLoading: Bool)
-        case notifyTableViewInteracting(_ isScroll: Bool)
+        case updateLoadingState(Bool)
     }
     
     struct State {
-        @Pulse var schedules: [ScheduleListSectionModel] = []
-        @Pulse var events: [Date] = []
         @Pulse var calendarHeight: CGFloat?
-        @Pulse var switchPage: DateComponents?
-        @Pulse var switchScope: ScopeChangeType? = nil
         @Pulse var scope: ScopeType = .month
-        @Pulse var changedPage: DateComponents?
-        @Pulse var selectedDate: (selectedDate: Date?, isScroll: Bool)?
-        @Pulse var tableViewDate: Date?
-        @Pulse var presentDate: Date?
+        @Pulse var changeMonth: DateComponents?
         @Pulse var isLoading: Bool = false
-        @Pulse var isTableViewInteracting: Bool = false
     }
-        
-    private let fetchUseCase: FetchPlanList
-
+    
+    // MARK: - Variables
     var initialState: State = State()
+    
+    // MARK: - Coordinator
+    private weak var coordinator: CalendarCoordination?
     
     // MARK: - Commands
     public weak var calendarCommands: CalendarCommands?
     public weak var scheduleListCommands: ScheduleListCommands?
     
     // MARK: - LifeCycle
-    init(fetchUseCase: FetchPlanList) {
-        self.fetchUseCase = fetchUseCase
+    init(coordinator: CalendarCoordination) {
+        self.coordinator = coordinator
         logLifeCycle()
     }
     
@@ -103,33 +86,27 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case let .calendarAction(action):
             return handleCalendarAction(action)
-            
-
-        case .calendarHeightChanged(let height):
-            return .just(.setCalendarHeight(height))
-        case .requestPageSwitch(let date):
-            return .just(.switchPage(date))
-        case .requestScopeSwitch(let type) :
-            return .just(.switchScope(type))
-        case .scopeChanged(let scope):
-            return .just(.notifyChangedScope(scope))
-        case .pageChanged(let page):
-            return .just(.notifyChangedPage(page))
-        case .dateSelected(let selectDate):
-            return syncDateToTable(on: selectDate)
-        case .sharedTableViewDate(let date):
-            return .just(.notifyTableViewDate(date))
-        case .requestPresentEvent(let lastRecentDate):
-            return syncDate(on: lastRecentDate)
-        case .tableViewInteracting(let isScroll):
-            return .just(.notifyTableViewInteracting(isScroll))
+        case let .changeMonth(month):
+            return monthChange(month)
+        case .changeScope:
+            return calendarScopeChange()
+        case let .changeLoadingState(isLoad):
+            return .just(.updateLoadingState(isLoad))
+        case let .updatePlan(payload):
+            return handlePlanPayload(payload)
+        case let .updateMeet(payload):
+            return handleMeetPayload(payload)
         }
     }
     
     private func handleCalendarAction(_ action: Action.CalendarActions) -> Observable<Mutation> {
         switch action {
-        case let .changedPage(page):
-            return .just(.calendarEvent(.updatePage(page)))
+        case let .changedMonth(page):
+            return .just(.calendarEvent(.updateMonth(page)))
+        case let .changedHeight(height):
+            return .just(.calendarEvent(.updateHeight(height)))
+        case let .changedScope(scope):
+            return .just(.calendarEvent(.updateScope(scope)))
         }
     }
     
@@ -142,79 +119,60 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case let .calendarEvent(event):
             handleCalendarEvent(state: &newState,
                                 event: event)
-            
-            
-            
-        case .loadScheduleList(let scheduleList):
-            newState.schedules = scheduleList.sorted(by: <)
-        case .loadEventDateList(let eventList):
-            newState.events = eventList.sorted()
-        case .setCalendarHeight(let height):
-            newState.calendarHeight = height
-        case .switchPage(let date):
-            newState.switchPage = date
-        case .switchScope(let type):
-            newState.switchScope = type
-        case .notifyChangedScope(let scope):
-            newState.scope = scope
-        case .notifyChangedPage(let page):
-            newState.changedPage = page
-        case .notifySelectdDate(let selectDate):
-            newState.selectedDate = selectDate
-        case .notifyTableViewDate(let date):
-            newState.tableViewDate = date
-        case .notifyPresentEvent(let date):
-            newState.presentDate = date
-        case .notifyLoadingState(let isLoading):
-            newState.isLoading = isLoading
-        case .notifyTableViewInteracting(let Enabled):
-            newState.isTableViewInteracting = Enabled
+        case let .updateLoadingState(isLoad):
+            newState.isLoading = isLoad
         }
         return newState
     }
     
     private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
         switch event {
-        case let .updatePage(page):
-            state.changedPage = page
+        case let .updateMonth(month):
+            state.changeMonth = month
+        case let .updateHeight(height):
+            state.calendarHeight = height
+        case let .updateScope(scope):
+            state.scope = scope
         }
     }
 }
 
+// MARK: - 부모 -> 자식
 extension CalendarScheduleViewReactor {
-    
-    /// 홈뷰에서 표시된 마지막 날짜가 넘어옴
-    /// 캘린더뷰, 테이블뷰로 공유
-    private func syncDate(on lastRecentDate: Date) -> Observable<Mutation> {
-        guard !currentState.schedules.isEmpty,
-              currentState.schedules.contains(where: { $0.date == lastRecentDate }) else { return Observable.empty()}
-        
-        return Observable.just(Mutation.notifyPresentEvent(lastRecentDate))
+    private func monthChange(_ month: DateComponents) -> Observable<Mutation> {
+        guard let date = month.toDate() else { return .empty() }
+        scheduleListCommands?.resetPlanList()
+        calendarCommands?.changePage(on: date)
+        return .empty()
     }
     
-    /// 캘린더 선택 날짜 일정 테이블뷰로 공유
-    private func syncDateToTable(on selectDate: (selectedDate: Date?, isScroll: Bool)) -> Observable<Mutation> {
-        guard !currentState.isTableViewInteracting else { return Observable.empty() }
-        return Observable.just(Mutation.notifySelectdDate(selectDate))
+    private func calendarScopeChange() -> Observable<Mutation> {
+        calendarCommands?.changeScope()
+        return .empty()
     }
 }
 
+// MARK: - 캘린더 액션
 extension CalendarScheduleViewReactor: CalendarReactorDelegate {
+
     func updateCalendarHeight(_ height: CGFloat) {
-        action.onNext(.calendarHeightChanged(height))
+        action.onNext(.calendarAction(.changedHeight(height)))
     }
     
     func updateScope(_ scope: ScopeType) {
-        action.onNext(.scopeChanged(scope))
+        action.onNext(.calendarAction(.changedScope(scope)))
     }
     
-    func updatePlanMonthList(_ list: [DateComponents]) {
-        scheduleListCommands?.updatePlanMonthList(list)
+    func updateMonth(_ month: DateComponents) {
+        action.onNext(.calendarAction(.changedMonth(month)))
     }
     
-    func updatePage(_ month: DateComponents) {
-        action.onNext(.calendarAction(.changedPage(month)))
-        scheduleListCommands?.moveToPage(on: month)
+    func updatePlanMonthList(_ list: [Date]) {
+        scheduleListCommands?.updatePlanMonthList(with: list)
+    }
+    
+    func updatePage(_ page: DateComponents) {
+        scheduleListCommands?.loadMonthlyPlan(on: page)
     }
     
     func selectedDate(date: Date) {
@@ -222,19 +180,51 @@ extension CalendarScheduleViewReactor: CalendarReactorDelegate {
     }
 }
 
+// MARK: - 스케줄 리스트 액션
 extension CalendarScheduleViewReactor: SchduleListReactorDelegate {
     func scrollToDate(date: Date) {
         calendarCommands?.scrollToDate(on: date)
+    }
+    
+    func selectedPlan(id: Int, type: PlanDetailType) {
+        coordinator?.pushPlanDetailView(postId: id,
+                                        type: type)
+    }
+    
+    func updateDateList(type: EventUpdateType) {
+        calendarCommands?.updateEvent(type: type)
+    }
+    
+    func deleteMonth(month: Date) {
+        calendarCommands?.deleteMonth(month: month)
     }
 }
 
 extension CalendarScheduleViewReactor: ChildLoadingDelegate {
     func updateLoadingState(_ isLoading: Bool, index: Int) {
-        
+        action.onNext(.changeLoadingState(isLoading))
     }
     
     func catchError(_ error: any Error, index: Int) {
         
+    }
+}
+
+// MARK: - 모임, 일정, 리뷰 변경사항 적용
+extension CalendarScheduleViewReactor {
+    private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
+        scheduleListCommands?.editPlan(payload: payload)
+        return .empty()
+    }
+    
+    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
+        switch payload {
+        case .deleted:
+            calendarCommands?.resetDate()
+        default:
+            break
+        }
+        return .empty()
     }
 }
 

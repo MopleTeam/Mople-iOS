@@ -157,7 +157,7 @@ final class MeetPlanListViewController: BaseViewController, View {
 
 extension MeetPlanListViewController: UITableViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        guard scrollView.contentOffset.y < -60 else { return }
+        guard scrollView.isRefresh() else { return }
         reactor?.action.onNext(.requestPlanList)
     }
 }

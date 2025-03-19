@@ -24,26 +24,30 @@ final class DateManager {
     static let calendar: Calendar = {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "ko_KR")
+        calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
         return calendar
     }()
     
     static let isoFormatter: ISO8601DateFormatter = {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        format.timeZone = TimeZone(identifier: "Asia/Seoul")
         return format
     }()
     
     static let fullDateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
-        return dateFormatter
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "YYYY.MM.dd E HH시 mm분"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        return formatter
     }()
     
     static let basicDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy년 MM월 dd일"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
@@ -51,6 +55,7 @@ final class DateManager {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyy. MM. dd E"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
@@ -58,6 +63,7 @@ final class DateManager {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "HH시 mm분"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
@@ -65,18 +71,23 @@ final class DateManager {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "yyyyMM"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
     static let fullServerDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
     
     static let simpleServerDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         return formatter
     }()
 
@@ -133,6 +144,10 @@ extension DateManager {
     static func isSameMonth(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .month)
     }
+    
+    static func isBetween(targetDate: Date, startDate: Date, endDate: Date) -> Bool {
+        return startDate <= targetDate && endDate >= targetDate
+    }
 }
 
 // MARK: - 추출
@@ -165,11 +180,11 @@ extension DateManager {
         return calendar.startOfDay(for: date)
     }
 
-    static func isNextMonth(_ date: Date) -> Date {
+    static func getNextMonth(_ date: Date) -> Date {
         return calendar.date(byAdding: .month, value: 1, to: date) ?? Date()
     }
     
-    static func isPreviousMonth(_ date: Date) -> Date {
+    static func getPreviousMonth(_ date: Date) -> Date {
         return calendar.date(byAdding: .month, value: -1, to: date) ?? Date()
     }
     
@@ -213,6 +228,10 @@ extension DateManager {
                               day: day.day,
                               hour: time.hour,
                               minute: time.minute).toDate()
+    }
+    
+    static func test() {
+        
     }
 }
 

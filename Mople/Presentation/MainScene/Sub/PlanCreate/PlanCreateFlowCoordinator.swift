@@ -38,6 +38,7 @@ final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
 
 // MARK: - Presnet VC
 extension PlanCreateFlowCoordinator {
+    #warning("뷰이동이 있는 경우의 피커뷰만 코디네이터에서 생성")
     func presentGroupSelectView() {
         let vc = dependencies.makeGroupSelectViewController()
         navigationController.present(vc, animated: true)

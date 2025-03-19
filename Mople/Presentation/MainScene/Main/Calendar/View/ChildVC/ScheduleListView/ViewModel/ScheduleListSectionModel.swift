@@ -35,3 +35,25 @@ extension ScheduleListSectionModel {
         self.items = items
     }
 }
+
+extension [ScheduleListSectionModel] {
+    static func makeSectionModels(list: [MonthlyPlan]) -> Self {
+        let sortList = list.sorted {
+            guard let date1 = $0.date,
+                  let date2 = $1.date else { return false }
+            return date1 < date2
+        }
+        let grouped = Dictionary(grouping: sortList) { plan -> Date? in
+            guard let date = plan.date else { return nil }
+            return DateManager.startOfDay(date)
+        }
+        
+        let sorted = grouped.sorted { first, second in
+            guard let firstDate = first.key,
+                  let secondDate = second.key else { return false }
+            return firstDate < secondDate
+        }
+        
+        return sorted.map { ScheduleListSectionModel(date: $0.key, items: $0.value) }
+    }
+}

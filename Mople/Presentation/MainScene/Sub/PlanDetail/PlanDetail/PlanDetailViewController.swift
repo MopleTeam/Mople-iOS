@@ -75,10 +75,10 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     private func initalSetup() {
-        setPlanInfoView()
         setLayout()
         setNavi()
         setupKeyboardDismissGestrue()
+        setPlanInfoView()
     }
     
     private func setLayout() {
@@ -111,7 +111,6 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
         inputBind(reactor: reactor)
         outputBind(reactor: reactor)
         handleCommentCommand(reactor: reactor)
-        handleLoadingState(reactor: reactor)
         setNotification(reactor: reactor)
     }
     
@@ -193,6 +192,12 @@ extension PlanDetailViewController {
                 vc.toastMessageManager.presentToast(text: "신고 접수가 완료되었습니다")
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
     }
     
     private func handleCommentCommand(reactor: Reactor) {
@@ -215,43 +220,30 @@ extension PlanDetailViewController {
             })
             .disposed(by: disposeBag)
     }
-
-    private func handleLoadingState(reactor: Reactor) {
-        Observable.merge(reactor.pulse(\.$isLoading),
-                         reactor.pulse(\.$isCommentLoading))
-        .skip(1)
-        .asDriver(onErrorJustReturn: false)
-        .filter { [weak self] isLoad in
-            self?.indicator.isAnimating == false && isLoad
-        }
-        .map { _ in true }
-        .drive(self.rx.isLoading)
-        .disposed(by: disposeBag)
-        
-        Observable.combineLatest(reactor.pulse(\.$isLoading),
-                                 reactor.pulse(\.$isCommentLoading))
-        .skip(1)
-        .filter { isPlanInfoLoaded, isCommentLoaded  in
-            !isPlanInfoLoaded && !isCommentLoaded
-        }
-        .map { _ in false }
-        .asDriver(onErrorJustReturn: false)
-        .drive(with: self, onNext: { vc, _ in
-            vc.rx.isLoading.onNext(false)
-        })
-        .disposed(by: disposeBag)
-    }
     
     private func setNotification(reactor: Reactor) {
         EventService.shared.addPlanObservable()
-            .map { Reactor.Action.update(.plan($0)) }
+            .filter({ [weak self] payload in
+                self?.filterEdit(payload: payload) ?? false
+            })
+            .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.receiveObservable(name: .review)
-            .map { Reactor.Action.update(.review) }
+        EventService.shared.addReviewObservable()
+            .filter({ [weak self] payload in
+                self?.filterEdit(payload: payload) ?? false
+            })
+            .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    private func filterEdit<T>(payload: EventService.Payload<T>) -> Bool {
+        switch payload {
+        case .updated: return true
+        default: return false
+        }
     }
 }
 
@@ -310,9 +302,11 @@ extension PlanDetailViewController {
         
         switch type {
         case .plan:
-            alertActions = [editPlan(), deletePlan()]
+            alertActions = [editPlan(),
+                            deletePlan()]
         case let .review(isReviewed):
-            alertActions = [editReview(isReviewed), deleteReview()]
+            alertActions = [editReview(isReviewed ?? false),
+                            deleteReview()]
         }
 
         alertManager.showActionSheet(actions: alertActions)

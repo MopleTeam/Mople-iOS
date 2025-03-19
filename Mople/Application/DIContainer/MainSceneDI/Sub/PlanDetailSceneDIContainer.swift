@@ -55,6 +55,7 @@ extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 상세
     func makePlanDetailViewController(coordinator: PlanDetailCoordination) -> PlanDetailViewController {
+        print(#function, #line, "Path : # 테스트 55 ")
         return .init(title: getPlanViewTitle(),
                      reactor: makePlanDetailViewReactor(type: type,
                                                         coordinator: coordinator))

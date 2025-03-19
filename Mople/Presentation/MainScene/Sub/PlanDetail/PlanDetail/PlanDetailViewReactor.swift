@@ -30,12 +30,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             case reportComment
             case catchError(Error)
         }
-        
-        enum Update {
-            case plan(PlanPayload)
-            case review
-        }
-        
+
         enum Flow {
             case memberList
             case placeDetailView
@@ -46,7 +41,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case parentCommand(ParentCommand)
         case childEvent(ChildEvent)
-        case update(Update)
+        case updatePost
         case flow(Flow)
         case deletePost
         case reportPost
@@ -57,7 +52,6 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         enum ChildEvent {
             case editComment(_ text: String?)
             case changedOffsetY(_ offsetY: CGFloat)
-            case commentLoading(_ isLoading: Bool)
         }
         
         case updateChildEvent(ChildEvent)
@@ -73,10 +67,9 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     struct State {
         @Pulse var commonPlanModel: PlanDetailModel?
         @Pulse var planInfo: PlanInfoViewModel?
-        @Pulse var isLoading: Bool = false
-        @Pulse var isCommentLoading: Bool = false
+        @Pulse var isLoading: Bool?
         @Pulse var editComment: String?
-        @Pulse var startOffsetY: CGFloat = .zero
+        @Pulse var startOffsetY: CGFloat?
         @Pulse var reported: Void?
         @Pulse var message: String?
     }
@@ -139,8 +132,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             return handleChildAction(event)
         case let .flow(action):
             return handleFlowAction(action)
-        case let .update(action):
-            return receiveNotifycation(action)
+        case .updatePost:
+            return receiveNotifycation()
         case .deletePost:
             return deletePost()
         case .reportPost:
@@ -158,7 +151,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
             newState.commonPlanModel = .init(plan: plan)
         case let .updateReview(review):
             newState.planInfo = .init(review: review)
-            newState.commonPlanModel = .init(reveiw: review)
+            newState.commonPlanModel = .init(review: review)
         case let .notifyMessage(message):
             newState.message = message
         case let .updateLoadingState(isLoading):
@@ -220,7 +213,7 @@ extension PlanDetailViewReactor {
     private func handleChildAction(_ event: Action.ChildEvent) -> Observable<Mutation> {
         switch event {
         case let .commentLoading(isLoad):
-            return .just(.updateChildEvent(.commentLoading(isLoad)))
+            return .just(.updateLoadingState(isLoad))
         case let .editComment(comment):
             return .just(.updateChildEvent(.editComment(comment)))
         case let .changedOffsetY(offsetY):
@@ -250,8 +243,6 @@ extension PlanDetailViewReactor {
             state.editComment = text
         case let .changedOffsetY(offsetY):
             state.startOffsetY = offsetY
-        case let .commentLoading(isLoad):
-            state.isCommentLoading = isLoad
         }
     }
 }
@@ -312,7 +303,6 @@ extension PlanDetailViewReactor {
     }
     
     private func deletePost() -> Observable<Mutation> {
-        
         let deletePost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
                 guard let self else { return .never() }
@@ -323,6 +313,7 @@ extension PlanDetailViewReactor {
                     return deleteReviewUseCase.exectue(id: id)
                 }
             }
+            .asObservable()
             .flatMap { Observable<Mutation>.empty() }
         
         return requestWithLoading(task: deletePost,
@@ -351,10 +342,7 @@ extension PlanDetailViewReactor {
         return requestWithLoading(task: reportPost)
     }
     
-    private func fetchCommentList(_ postId: Int?) {
-        guard let postId else { return }
-        commentListCommands?.fetchComment(postId: postId)
-    }
+ 
 }
 
 // MARK: - 자식 -> 부모
@@ -382,7 +370,6 @@ extension PlanDetailViewReactor: CommentListDelegate  {
     }
     
     func updateLoadingState(_ isLoading: Bool, index: Int) {
-        print(#function, #line, "isLoading : \(isLoading)" )
         action.onNext(.childEvent(.commentLoading(isLoading)))
     }
     
@@ -392,7 +379,12 @@ extension PlanDetailViewReactor: CommentListDelegate  {
 }
 
 // MARK: - 부모 -> 자식
-extension PlanDetailViewReactor {    
+extension PlanDetailViewReactor {
+    private func fetchCommentList(_ postId: Int?) {
+        guard let postId else { return }
+        commentListCommands?.fetchComment(postId: postId)
+    }
+    
     private func writeComment(_ comment: String) -> Observable<Mutation> {
         Observable.just(comment)
             .delay(.milliseconds(100), scheduler: MainScheduler.instance)
@@ -414,8 +406,8 @@ extension PlanDetailViewReactor {
 extension PlanDetailViewReactor {
     
     // 수신
-    private func receiveNotifycation(_ action: Action.Update) -> Observable<Mutation> {
-        switch action {
+    private func receiveNotifycation() -> Observable<Mutation> {
+        switch type {
         case .plan:
             return fetchPlanDetail()
         case .review:
@@ -430,7 +422,8 @@ extension PlanDetailViewReactor {
             EventService.shared.postItem(PlanPayload.deleted(id: id),
                                          from: self)
         case .review:
-            EventService.shared.post(name: .review)
+            EventService.shared.postItem(ReviewPayload.deleted(id: id),
+                                         from: self)
         }
     }
 }

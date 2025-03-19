@@ -148,8 +148,8 @@ final class MeetReviewListViewController: BaseViewController, View {
     }
     
     private func setNotification(_ reactor: Reactor) {
-        EventService.shared.receiveObservable(name: .review)
-            .map { Reactor.Action.requestReviewList }
+        EventService.shared.addReviewObservable()
+            .map { Reactor.Action.updateReview($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -157,7 +157,7 @@ final class MeetReviewListViewController: BaseViewController, View {
 
 extension MeetReviewListViewController: UITableViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        guard scrollView.contentOffset.y < -60 else { return }
+        guard scrollView.isRefresh() else { return }
         reactor?.action.onNext(.requestReviewList)
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 enum PlanDetailType {
     case plan
-    case review(isReviewed: Bool)
+    case review(isReviewed: Bool?)
 }
 
 struct PlanDetailModel {
@@ -23,8 +23,8 @@ extension PlanDetailModel {
         self.type = .plan
     }
     
-    init(reveiw: Review) {
-        self.isCreator = reveiw.isCreator
-        self.type = .review(isReviewed: reveiw.isReviewd)
+    init(review: Review) {
+        self.isCreator = review.isCreator
+        self.type = .review(isReviewed: review.isReviewd)
     }
 }

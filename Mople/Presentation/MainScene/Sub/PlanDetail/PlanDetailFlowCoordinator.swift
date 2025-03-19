@@ -43,6 +43,7 @@ extension PlanDetailFlowCoordinator {
     }
     
     private func addCommentListView(parentVC: PlanDetailViewController, container: UIView) {
+        
         let commentListVC = dependencies.makeCommentListViewController()
         parentVC.commentListView = commentListVC
         parentVC.add(child: commentListVC, container: container)

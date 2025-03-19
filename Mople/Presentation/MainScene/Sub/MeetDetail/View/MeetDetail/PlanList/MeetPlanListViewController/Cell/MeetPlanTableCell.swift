@@ -18,7 +18,7 @@ final class MeetPlanTableCell: UITableViewCell {
         
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Body2.medium
+        label.font = FontStyle.Body2.semiBold
         label.textColor = ColorStyle.Gray._04
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
@@ -33,7 +33,7 @@ final class MeetPlanTableCell: UITableViewCell {
     private let titleLabel: IconLabel = {
         let label = IconLabel(icon: .circlePan,
                               iconSize: .init(width: 20, height: 22))
-        label.setTitle(font: FontStyle.Title.bold,
+        label.setTitle(font: FontStyle.Title3.semiBold,
                        color: ColorStyle.Gray._01)
         label.setSpacing(4)
         return label
@@ -42,7 +42,8 @@ final class MeetPlanTableCell: UITableViewCell {
     private let countInfoLabel: IconLabel = {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
-        label.setTitle(font: FontStyle.Body2.medium, color: ColorStyle.Gray._04)
+        label.setTitle(font: FontStyle.Body2.medium,
+                       color: ColorStyle.Gray._04)
         label.setSpacing(4)
         label.setTitleTopPadding(3)
         return label
@@ -67,7 +68,7 @@ final class MeetPlanTableCell: UITableViewCell {
         sv.alignment = .center
         return sv
     }()
-    
+     
     private lazy var bodyStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [titleLabel, countInfoLabel])
         sv.axis = .vertical

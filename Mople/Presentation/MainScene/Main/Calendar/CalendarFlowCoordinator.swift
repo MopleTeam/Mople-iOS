@@ -7,17 +7,18 @@
 
 import UIKit
 
-protocol CalendarFlowCoordination {
-    
+protocol CalendarCoordination: AnyObject {
+    func pushPlanDetailView(postId: Int,
+                            type: PlanDetailType)
 }
 
-final class CalendarFlowCoordinator: BaseCoordinator {
+final class CalendarFlowCoordinator: BaseCoordinator, CalendarCoordination {
     
-    let dependency: CalendarSceneDependencies
+    private let dependencies: CalendarSceneDependencies
     
     init(navigationController: AppNaviViewController,
          dependency: CalendarSceneDependencies) {
-        self.dependency = dependency
+        self.dependencies = dependency
         super.init(navigationController: navigationController)
     }
     
@@ -27,9 +28,10 @@ final class CalendarFlowCoordinator: BaseCoordinator {
     }
 }
 
+// MARK: - 기본 뷰
 extension CalendarFlowCoordinator {
     private func makeMainViewController() -> CalendarScheduleViewController {
-        let mainVC = dependency.makeCalendarScheduleViewcontroller()
+        let mainVC = dependencies.makeCalendarScheduleViewcontroller(coordinator: self)
         let calendarContainer = mainVC.calendarContainer
         let scheduleListContainer = mainVC.scheduleListContainer
         addCalendarView(parentVC: mainVC, container: calendarContainer)
@@ -38,12 +40,23 @@ extension CalendarFlowCoordinator {
     }
     
     private func addCalendarView(parentVC: CalendarScheduleViewController, container: UIView) {
-        let calendarVC = dependency.makeCalendarViewController()
+        let calendarVC = dependencies.makeCalendarViewController()
         parentVC.add(child: calendarVC, container: container)
     }
     
     private func addScheduleListView(parentVC: CalendarScheduleViewController, container: UIView) {
-        let calendarVC = dependency.makeScheduleListViewController()
+        let calendarVC = dependencies.makeScheduleListViewController()
         parentVC.add(child: calendarVC, container: container)
+    }
+}
+
+// MARK: - Flow
+extension CalendarFlowCoordinator {
+    func pushPlanDetailView(postId: Int,
+                            type: PlanDetailType) {
+        let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
+                                                                                   type: type)
+        start(coordinator: planDetailFlowCoordinator)
+        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
     }
 }

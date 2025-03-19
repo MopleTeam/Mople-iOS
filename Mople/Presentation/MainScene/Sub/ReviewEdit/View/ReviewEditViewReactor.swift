@@ -224,7 +224,7 @@ extension ReviewEditViewReactor {
 // MARK: - Notification
 extension ReviewEditViewReactor {
     private func notificationUpdateImage() {
-        EventService.shared.post(name: .review)
+//        EventService.shared.postItem(., from: <#T##Any#>)
     }
 }
 
