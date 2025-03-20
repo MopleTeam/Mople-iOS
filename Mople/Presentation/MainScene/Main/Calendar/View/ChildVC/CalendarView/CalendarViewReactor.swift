@@ -9,8 +9,8 @@ import Foundation
 import ReactorKit
 
 enum EventUpdateType {
-    case update([Date])
-    case delete([Date])
+    case update(Date)
+    case delete(Date)
 }
 
 protocol CalendarCommands: AnyObject {
@@ -177,28 +177,25 @@ extension CalendarViewReactor: CalendarCommands {
         var dateList = currentState.dates
         
         switch type {
-        case let .update(updateList):
-            updatePlan(&dateList, updateList: updateList)
-        case let .delete(deleteList):
-            deletePlan(&dateList, deleteList: deleteList)
+        case let .update(newDate):
+            updatePlan(&dateList, newDate: newDate)
+        case let .delete(deleteDate):
+            deletePlan(&dateList, deleteDate: deleteDate)
         }
         
         action.onNext(.parentCommand(.editDateList(dateList)))
     }
     
-    private func updatePlan(_ dateList: inout [Date], updateList: [Date]) {
-        dateList.append(contentsOf: updateList)
+    private func updatePlan(_ dateList: inout [Date], newDate: Date) {
+        guard dateList.contains(where: { $0 == newDate }) == false else { return }
+        dateList.append(newDate)
     }
     
-    private func deletePlan(_ dateList: inout [Date], deleteList: [Date]) {
-        deleteList.forEach { deleteDate in
-            guard let deleteIndex = dateList.firstIndex(where: { $0 == deleteDate }) else { return }
-            dateList.remove(at: deleteIndex)
-        }
+    private func deletePlan(_ dateList: inout [Date], deleteDate: Date) {
+        dateList.removeAll { $0 == deleteDate }
     }
     
     func resetDate() {
-
         initalSetup()
     }
 }

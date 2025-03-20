@@ -35,18 +35,6 @@ final class EventService {
     private let payloadKey = "payload"
     private let senderKey = "sender"
     
-    
-//    // MARK: - Void
-//    func post(name: Notification.Name) {
-//        NotificationCenter.default.post(name: name, object: nil)
-//    }
-//    
-//    func receiveObservable(name: Notification.Name) -> Observable<Void> {
-//        return NotificationCenter.default.rx.notification(name)
-//            .map { _ in }
-//    }
-    
-    
     // MARK: - With Item
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
         NotificationCenter.default.post(name: payload.notiName,

@@ -13,7 +13,9 @@ protocol ScheduleListCommands: AnyObject {
     func updatePlanMonthList(with list: [Date])
     func loadMonthlyPlan(on month: DateComponents)
     func selectedDate(on date: Date)
+    func editMeet(payload: MeetPayload)
     func editPlan(payload: PlanPayload)
+    func editReview(payload: ReviewPayload)
 }
 
 // 요청 가능한 타입 (없음, 이전, 이후, 모두) 필터링해서 state로 넣어놓기
@@ -189,14 +191,23 @@ extension ScheduleListReactor: ScheduleListCommands {
     }
 }
 
-// MARK: - 모임수정 알림 수신
-
-// MARK: - 일정수정 알림 수신
+// MARK: - 일정, 모임, 리뷰 변경 알림 수신
 extension ScheduleListReactor {
     
-    // MARK: - 모임 변경
+    // MARK: - 페이로드 수신
+    func editMeet(payload: MeetPayload) {
+        var planList = currentState.planList
+        
+        switch payload {
+        case let .updated(meet):
+            guard let meetSummary = meet.meetSummary else { return }
+            updateMeet(&planList, meet: meetSummary)
+            break
+        default: break
+        }
+        action.onNext(.parentCommand(.editPlanList(planList)))
+    }
     
-    // MARK: - 일정 변경
     func editPlan(payload: PlanPayload) {
         var planList = currentState.planList
         
@@ -212,10 +223,34 @@ extension ScheduleListReactor {
         action.onNext(.parentCommand(.editPlanList(planList)))
     }
     
+    func editReview(payload: ReviewPayload) {
+        var planList = currentState.planList
+        
+        switch payload {
+        case let .deleted(id):
+            deletePlan(&planList, planId: id)
+        default:
+            break
+        }
+        
+        action.onNext(.parentCommand(.editPlanList(planList)))
+    }
+    
+    // MARK: - 일정 변경
+    
+    /// 미팅의 이름, 사진이 변경된 경우 일치하는 일정의 미팅 정보를 변경
+    private func updateMeet(_ planList: inout [MonthlyPlan], meet: MeetSummary) {
+        planList.indices.forEach {
+            guard planList[$0].meet?.id == meet.id else { return }
+            planList[$0].meet = meet
+        }
+    }
+    
+    /// 일정에 변경사항이 있을 경우 일치하는 일정의 값을 변경
     private func updatePlan(_ planList: inout [MonthlyPlan], plan: Plan) {
         guard let newDate = plan.date else { return }
         handleUpdate(&planList, plan: plan)
-        delegate?.updateDateList(type: .update([DateManager.startOfDay(newDate)]))
+        delegate?.updateDateList(type: .update(DateManager.startOfDay(newDate)))
     }
     
     private func handleUpdate(_ planList: inout [MonthlyPlan], plan: Plan) {
@@ -288,9 +323,11 @@ extension ScheduleListReactor {
         updateLoadState()
     }
     
+    // MARK: - 삭제
+    
     /// 일정 삭제
     private func deletePlan(_ planList: inout [MonthlyPlan], planId: Int?) {
-        guard let deleteIndex = getDeletePlanIndex(id: planId),
+        guard let deleteIndex = findPlanIndex(id: planId),
               let deleteDate = planList[deleteIndex].date else { return }
         planList.remove(at: deleteIndex)
         
@@ -299,16 +336,13 @@ extension ScheduleListReactor {
             return DateManager.isSameMonth(date, deleteDate) }) == false else { return }
         
         loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
-        delegate?.updateDateList(type: .delete([DateManager.startOfDay(deleteDate)]))
+        delegate?.updateDateList(type: .delete(DateManager.startOfDay(deleteDate)))
     }
     
-    /// 불러온 데이터에 포함되는 일정인지 체크
-    private func getDeletePlanIndex(id: Int?) -> Int? {
+    /// 현재 일정 리스트에서 삭제할 리뷰의 인덱스 얻기
+    private func findPlanIndex(id: Int?) -> Int? {
         return currentState.planList.firstIndex { $0.id == id }
     }
-    
-    // MARK: - 리뷰 변경
-    
 }
 
 extension ScheduleListReactor {

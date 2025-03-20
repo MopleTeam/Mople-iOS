@@ -41,6 +41,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case changeLoadingState(Bool)
         case updatePlan(PlanPayload)
         case updateMeet(MeetPayload)
+        case updateReview(ReviewPayload)
     }
     
     enum Mutation {
@@ -92,10 +93,12 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
             return calendarScopeChange()
         case let .changeLoadingState(isLoad):
             return .just(.updateLoadingState(isLoad))
-        case let .updatePlan(payload):
-            return handlePlanPayload(payload)
         case let .updateMeet(payload):
             return handleMeetPayload(payload)
+        case let .updatePlan(payload):
+            return handlePlanPayload(payload)
+        case let .updateReview(payload):
+            return handleReviewPayload(payload)
         }
     }
     
@@ -212,18 +215,25 @@ extension CalendarScheduleViewReactor: ChildLoadingDelegate {
 
 // MARK: - 모임, 일정, 리뷰 변경사항 적용
 extension CalendarScheduleViewReactor {
+    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
+        switch payload {
+        case .deleted:
+            calendarCommands?.resetDate()
+        case .updated:
+            scheduleListCommands?.editMeet(payload: payload)
+        default:
+            break
+        }
+        return .empty()
+    }
+    
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         scheduleListCommands?.editPlan(payload: payload)
         return .empty()
     }
     
-    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
-        switch payload {
-        case .deleted:
-            calendarCommands?.resetDate()
-        default:
-            break
-        }
+    private func handleReviewPayload(_ payload: ReviewPayload) -> Observable<Mutation> {
+        scheduleListCommands?.editReview(payload: payload)
         return .empty()
     }
 }
