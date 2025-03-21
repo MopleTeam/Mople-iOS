@@ -33,7 +33,7 @@
 		5211F91A2C89E39600403980 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5211F9192C89E39600403980 /* Kingfisher */; };
 		5214F87D2D2BA88600E8CE9C /* HomePlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanModel.swift */; };
 		5214F8802D2BA97F00E8CE9C /* MeetPlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */; };
-		5214F8822D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */; };
+		5214F8822D2BA98C00E8CE9C /* MeetPlanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* MeetPlanViewModel.swift */; };
 		5214F8892D2BB08500E8CE9C /* MeetPlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */; };
 		5214F88C2D2BB11A00E8CE9C /* FetchMeetPlanList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */; };
 		5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */; };
@@ -427,7 +427,7 @@
 		5211F9142C89D56D00403980 /* UIView+Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Identifier.swift"; sourceTree = "<group>"; };
 		5214F87C2D2BA88600E8CE9C /* HomePlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanModel.swift; sourceTree = "<group>"; };
 		5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCell.swift; sourceTree = "<group>"; };
-		5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCellModel.swift; sourceTree = "<group>"; };
+		5214F8812D2BA98C00E8CE9C /* MeetPlanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanViewModel.swift; sourceTree = "<group>"; };
 		5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListViewReactor.swift; sourceTree = "<group>"; };
 		5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetPlanList.swift; sourceTree = "<group>"; };
 		5214F88D2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchMeetFuturePlanMock.swift; sourceTree = "<group>"; };
@@ -943,7 +943,7 @@
 			isa = PBXGroup;
 			children = (
 				5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */,
-				5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */,
+				5214F8812D2BA98C00E8CE9C /* MeetPlanViewModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -3144,7 +3144,7 @@
 				52EBAF6D2D4D1FC80085727B /* FetchUserInfoMock.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
 				521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */,
-				5214F8822D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift in Sources */,
+				5214F8822D2BA98C00E8CE9C /* MeetPlanViewModel.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,

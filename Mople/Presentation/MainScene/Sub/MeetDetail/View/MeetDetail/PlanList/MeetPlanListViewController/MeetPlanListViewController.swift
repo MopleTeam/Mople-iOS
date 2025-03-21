@@ -127,6 +127,18 @@ final class MeetPlanListViewController: BaseViewController, View {
                 }
             }
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$closingPlanIndex)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, index in
+                vc.closePlan(at: index)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func closePlan(at index: Int) {
+        tableView.reloadRows(at: [.init(row: index, section: 0)], with: .none)
     }
     
     private func setNotification(reactor: Reactor) {

@@ -142,6 +142,18 @@ final class MeetPlanTableCell: UITableViewCell {
         }
     }
     
+    private func buttonSizeDown() {
+        completdButton.snp.updateConstraints { make in
+            make.height.equalTo(36).priority(.high)
+        }
+    }
+    
+    private func buttonSizeUp() {
+        completdButton.snp.updateConstraints { make in
+            make.height.equalTo(52).priority(.high)
+        }
+    }
+    
     // MARK: - Action
     private func setAction() {
         print(#function, #line, "Path : # 버튼 설정하기 ")
@@ -152,7 +164,7 @@ final class MeetPlanTableCell: UITableViewCell {
             .disposed(by: disposeBag)
     }
 
-    public func configure(viewModel: MeetPlanTableCellModel) {
+    public func configure(viewModel: MeetPlanViewModel) {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
@@ -195,6 +207,7 @@ extension MeetPlanTableCell {
         completdButton.setTitle(text: "해당 약속은 마감되었어요",
                                 font: FontStyle.Body1.medium,
                                 normalColor: ColorStyle.Gray._05)
+        buttonSizeDown()
         return false
     }
     
@@ -209,16 +222,16 @@ extension MeetPlanTableCell {
     }
     
     private func removeCompletionButton() {
-        if mainStackView.arrangedSubviews.contains(completdButton) {
-            mainStackView.removeArrangedSubview(completdButton)
-            completdButton.removeFromSuperview()
-        }
+        guard mainStackView.arrangedSubviews.contains(completdButton) else { return }
+        mainStackView.removeArrangedSubview(completdButton)
+        completdButton.removeFromSuperview()
     }
     
     private func addCompletionButton() {
-        if !mainStackView.arrangedSubviews.contains(completdButton) {
+        if mainStackView.arrangedSubviews.contains(completdButton) == false {
             mainStackView.addArrangedSubview(completdButton)
         }
+        buttonSizeUp()
         completdButton.isEnabled = true
     }
 }

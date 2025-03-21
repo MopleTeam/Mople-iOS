@@ -23,11 +23,13 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case fetchPlanList([Plan])
+        case closePlan(id: Int)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
         @Pulse var completedJoin: Void?
+        @Pulse var closingPlanIndex: Int?
     }
     
     var initialState: State = State()
@@ -76,9 +78,16 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchPlanList(plans):
             newState.plans = plans.sorted(by: <)
+        case let .closePlan(id):
+            closePlan(state: &newState, id: id)
         }
         
         return newState
+    }
+        
+    private func closePlan(state: inout State, id: Int) {
+        guard let closePlanIndex = state.plans.firstIndex(where: { $0.id == id }) else { return }
+        state.closingPlanIndex = closePlanIndex
     }
 }
 
@@ -94,22 +103,34 @@ extension MeetPlanListViewReactor {
     
     private func requestParticipationPlan(planId: Int,
                                           isJoining: Bool) -> Observable<Mutation> {
-                
-        let requestParticipation = participationPlanUseCase.execute(planId: planId,
-                                                                    isJoining: isJoining)
-            .asObservable()
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return handleParticipants(planId: planId)
-            }
         
-        return requestWithLoading(task: requestParticipation)
+        guard let planIndex = currentState.plans.firstIndex(where: { $0.id == planId }) else {
+            return .empty()
+        }
+        
+        if checkPlanTime(planIndex: planIndex) {
+            let requestParticipation = participationPlanUseCase.execute(planId: planId,
+                                                                        isJoining: isJoining)
+                .asObservable()
+                .flatMap { [weak self] _ -> Observable<Mutation> in
+                    guard let self else { return .empty() }
+                    return handleParticipants(planIndex: planIndex)
+                }
+            
+            return requestWithLoading(task: requestParticipation)
+        } else {
+            return .just(.closePlan(id: planId))
+        }
     }
     
-    private func handleParticipants(planId: Int) -> Observable<Mutation> {
+    private func checkPlanTime(planIndex: Int) -> Bool {
+        guard let planDate = currentState.plans[planIndex].date else { return false }
+        return planDate > Date()
+    }
+    
+    private func handleParticipants(planIndex: Int) -> Observable<Mutation> {
         var currentPlans = currentState.plans
-        guard let index = currentPlans.firstIndex(where: { $0.id == planId }) else { return .empty() }
-        let changePlan = currentPlans[index].updateParticipants()
+        let changePlan = currentPlans[planIndex].updateParticipants()
         postParticipants(with: changePlan)
         return .just(.fetchPlanList(currentPlans))
     }

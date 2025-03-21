@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MeetPlanTableCellModel {
+struct MeetPlanViewModel {
     let id: Int?
     let title: String?
     let date: Date?
@@ -26,7 +26,7 @@ struct MeetPlanTableCellModel {
     }
 }
 
-extension MeetPlanTableCellModel {
+extension MeetPlanViewModel {
     init(plan: Plan) {
         self.id = plan.id
         self.title = plan.title
