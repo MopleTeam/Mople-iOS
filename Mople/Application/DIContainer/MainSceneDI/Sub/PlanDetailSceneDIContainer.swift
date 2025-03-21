@@ -152,8 +152,8 @@ extension PlanDetailSceneDIContainer {
                                                                              coordinator: coordinator))
     }
     
-    private func makePlaceDetailViewReactor(place: PlaceInfo, coordinator: PlaceDetailCoordination) -> PlaceDetailReactor {
-        return PlaceDetailReactor(place: place,
+    private func makePlaceDetailViewReactor(place: PlaceInfo, coordinator: PlaceDetailCoordination) -> PlaceDetailViewReactor {
+        return PlaceDetailViewReactor(place: place,
                                   locationService: DefaultLocationService(),
                                   coordinator: coordinator)
     }

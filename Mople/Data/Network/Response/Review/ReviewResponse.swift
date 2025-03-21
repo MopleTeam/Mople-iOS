@@ -35,7 +35,7 @@ extension ReviewResponse {
                      postId: postId,
                      name: reviewName,
                      date: date,
-                     participantsCount: participantsCount,
+                     participantsCount: participantsCount ?? 0,
                      address: address,
                      addressTitle: title,
                      images: images ?? [],

@@ -42,6 +42,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case updatePlan(PlanPayload)
         case updateMeet(MeetPayload)
         case updateReview(ReviewPayload)
+//        case catchError(
     }
     
     enum Mutation {

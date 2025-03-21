@@ -23,18 +23,21 @@ extension ChildLoadingReactor {
     var index: Int { 1 }
 
     func requestWithLoading(task: Observable<Mutation>,
+                            minimumExecutionTime: RxTimeInterval = .seconds(0),
                             defferredLoadingDelay: RxTimeInterval = .milliseconds(300)
     ) -> Observable<Mutation> {
         
+        let executionTimer = Observable<Int>.timer(minimumExecutionTime, scheduler: MainScheduler.instance)
+        
         let loadingStop = Observable.just(())
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                print(#function, #line, "로딩 종료" )
                 guard let self else { return .empty() }
                 parent?.updateLoadingState(false, index: index)
                 return .empty()
             }
                 
-        let newTask = task
+        let newTask = Observable.zip(task, executionTimer)
+            .map { $0.0 }
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)

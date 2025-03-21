@@ -100,7 +100,7 @@ final class ScheduleListViewController: BaseViewController, View {
             configureCell: { dataSource, tableView, indexPath, item in
                 
                 let cell = tableView.dequeueReusableCell(withIdentifier: ScheduleListTableCell.reuseIdentifier) as! ScheduleListTableCell
-                cell.configure(viewModel: .init(testPlan: item))
+                cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
                 return cell
             }

@@ -201,6 +201,11 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        EventService.shared.addReviewObservable()
+            .map { Reactor.Action.updateReview($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action

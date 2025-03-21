@@ -36,7 +36,7 @@ extension PlanResponse {
                      creatorId: creatorId,
                      title: planName,
                      date: date,
-                     participantCount: planMemberCount,
+                     participantCount: planMemberCount ?? 0,
                      isParticipating: participant ?? false,
                      addressTitle: title,
                      address: planAddress,

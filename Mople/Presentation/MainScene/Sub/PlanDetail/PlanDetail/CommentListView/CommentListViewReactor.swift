@@ -105,9 +105,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .fetchedSectionModel(models):
-            if models.isEmpty == false {
-                newState.sectionModels = models
-            }
+            newState.sectionModels = models
         case let .requestParent(request):
             handleDelegate(state: &newState,
                            request: request)
@@ -119,6 +117,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
                                 request: Mutation.ParentRequest) {
         switch request {
         case .createdComment:
+            
             state.createdCompletion = ()
             delegate?.editComment(nil)
         case .editedComment:
@@ -230,12 +229,14 @@ extension CommentListViewReactor {
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                let addSection = addCommentSectionModel(comments)
-                let requestParent = Mutation.requestParent(.createdComment)
-                return .of(addSection, requestParent)
+                return .just(addCommentSectionModel(comments))
             })
 
-        return requestWithLoading(task: createComment)
+        return requestWithLoading(task: createComment,
+                                  minimumExecutionTime: .milliseconds(300))
+            .flatMap { addSection -> Observable<Mutation> in
+                return .of(addSection, Mutation.requestParent(.createdComment))
+            }
     }
     
     private func editComment(commentId: Int,

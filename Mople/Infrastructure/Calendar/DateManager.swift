@@ -133,6 +133,10 @@ extension DateManager {
         return calendar.isDateInToday(date)
     }
     
+    static func isPastDay(on date: Date) -> Bool {
+        return date < Date() && isToday(on: date) == false
+    }
+    
     static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .day)
     }
@@ -228,10 +232,6 @@ extension DateManager {
                               day: day.day,
                               hour: time.hour,
                               minute: time.minute).toDate()
-    }
-    
-    static func test() {
-        
     }
 }
 

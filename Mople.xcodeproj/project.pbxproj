@@ -31,7 +31,7 @@
 		5211F9132C89CEF800403980 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9122C89CEF800403980 /* ProfileView.swift */; };
 		5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9142C89D56D00403980 /* UIView+Identifier.swift */; };
 		5211F91A2C89E39600403980 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5211F9192C89E39600403980 /* Kingfisher */; };
-		5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */; };
+		5214F87D2D2BA88600E8CE9C /* HomePlanModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87C2D2BA88600E8CE9C /* HomePlanModel.swift */; };
 		5214F8802D2BA97F00E8CE9C /* MeetPlanTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */; };
 		5214F8822D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */; };
 		5214F8892D2BB08500E8CE9C /* MeetPlanListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */; };
@@ -55,7 +55,7 @@
 		5214F8BE2D2CA24B00E8CE9C /* FetchReviewMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8BD2D2CA24B00E8CE9C /* FetchReviewMock.swift */; };
 		5214F8C12D2CA38C00E8CE9C /* MeetReviewTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */; };
 		5214F8C32D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C22D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift */; };
-		5214F8C52D2CADD100E8CE9C /* MeetReviewTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */; };
+		5214F8C52D2CADD100E8CE9C /* MeetReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8C42D2CADD100E8CE9C /* MeetReviewViewModel.swift */; };
 		5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */; };
 		5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */; };
 		521917582CEB088B00696292 /* CreateMeetViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521917572CEB088B00696292 /* CreateMeetViewReactor.swift */; };
@@ -321,7 +321,7 @@
 		52D864852D2A8E79000F8378 /* DefaultSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */; };
 		52D864892D2A93DF000F8378 /* MeetPlanListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864882D2A93DF000F8378 /* MeetPlanListViewController.swift */; };
 		52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */; };
-		52D864922D2BA2DF000F8378 /* ScheduleListTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864912D2BA2DF000F8378 /* ScheduleListTableCellModel.swift */; };
+		52D864922D2BA2DF000F8378 /* ScheduleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D864912D2BA2DF000F8378 /* ScheduleListViewModel.swift */; };
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
@@ -384,7 +384,7 @@
 		52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A602D354528003DD790 /* NavigationCloseable.swift */; };
 		52F83A812D363E57003DD790 /* TransitionControllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F83A802D363E57003DD790 /* TransitionControllable.swift */; };
 		52FE68622D5085C2009EC8EC /* PlaceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FE68612D5085C2009EC8EC /* PlaceDetailViewController.swift */; };
-		52FE68642D510B86009EC8EC /* PlaceDetailVIewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FE68632D510B86009EC8EC /* PlaceDetailVIewReactor.swift */; };
+		52FE68642D510B86009EC8EC /* PlaceDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FE68632D510B86009EC8EC /* PlaceDetailViewReactor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -425,7 +425,7 @@
 		5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Snaping.swift"; sourceTree = "<group>"; };
 		5211F9122C89CEF800403980 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		5211F9142C89D56D00403980 /* UIView+Identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Identifier.swift"; sourceTree = "<group>"; };
-		5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanCollectionCellViewModel.swift; sourceTree = "<group>"; };
+		5214F87C2D2BA88600E8CE9C /* HomePlanModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePlanModel.swift; sourceTree = "<group>"; };
 		5214F87F2D2BA97F00E8CE9C /* MeetPlanTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCell.swift; sourceTree = "<group>"; };
 		5214F8812D2BA98C00E8CE9C /* MeetPlanTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanTableCellModel.swift; sourceTree = "<group>"; };
 		5214F8882D2BB08500E8CE9C /* MeetPlanListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListViewReactor.swift; sourceTree = "<group>"; };
@@ -449,7 +449,7 @@
 		5214F8BD2D2CA24B00E8CE9C /* FetchReviewMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewMock.swift; sourceTree = "<group>"; };
 		5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewTableCell.swift; sourceTree = "<group>"; };
 		5214F8C22D2CAB5000E8CE9C /* MeetReviewListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewReactor.swift; sourceTree = "<group>"; };
-		5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewTableCellModel.swift; sourceTree = "<group>"; };
+		5214F8C42D2CADD100E8CE9C /* MeetReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewViewModel.swift; sourceTree = "<group>"; };
 		5214F8CB2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParticipationPlanMock.swift; sourceTree = "<group>"; };
 		5214F8CD2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceTableCellModel.swift; sourceTree = "<group>"; };
 		521917572CEB088B00696292 /* CreateMeetViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMeetViewReactor.swift; sourceTree = "<group>"; };
@@ -706,7 +706,7 @@
 		52D864842D2A8E79000F8378 /* DefaultSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSegmentedControl.swift; sourceTree = "<group>"; };
 		52D864882D2A93DF000F8378 /* MeetPlanListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetPlanListViewController.swift; sourceTree = "<group>"; };
 		52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewController.swift; sourceTree = "<group>"; };
-		52D864912D2BA2DF000F8378 /* ScheduleListTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListTableCellModel.swift; sourceTree = "<group>"; };
+		52D864912D2BA2DF000F8378 /* ScheduleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewModel.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
 		52E0E8052D30B957002213FF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		52E0E8072D30B95D002213FF /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -763,7 +763,7 @@
 		52F83A602D354528003DD790 /* NavigationCloseable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationCloseable.swift; sourceTree = "<group>"; };
 		52F83A802D363E57003DD790 /* TransitionControllable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionControllable.swift; sourceTree = "<group>"; };
 		52FE68612D5085C2009EC8EC /* PlaceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailViewController.swift; sourceTree = "<group>"; };
-		52FE68632D510B86009EC8EC /* PlaceDetailVIewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailVIewReactor.swift; sourceTree = "<group>"; };
+		52FE68632D510B86009EC8EC /* PlaceDetailViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceDetailViewReactor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -933,7 +933,7 @@
 		5211F9062C86F2C700403980 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
-				5214F87C2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift */,
+				5214F87C2D2BA88600E8CE9C /* HomePlanModel.swift */,
 				5211F9072C86F2DB00403980 /* HomePlanCollectionCell.swift */,
 			);
 			path = Cell;
@@ -1003,7 +1003,7 @@
 			isa = PBXGroup;
 			children = (
 				5214F8C02D2CA38C00E8CE9C /* MeetReviewTableCell.swift */,
-				5214F8C42D2CADD100E8CE9C /* MeetReviewTableCellModel.swift */,
+				5214F8C42D2CADD100E8CE9C /* MeetReviewViewModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -1385,7 +1385,7 @@
 			isa = PBXGroup;
 			children = (
 				5259B01C2CA038AA006B2711 /* ScheduleListTableCell.swift */,
-				52D864912D2BA2DF000F8378 /* ScheduleListTableCellModel.swift */,
+				52D864912D2BA2DF000F8378 /* ScheduleListViewModel.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -2892,7 +2892,7 @@
 		52FE68602D508596009EC8EC /* PlaceDetail */ = {
 			isa = PBXGroup;
 			children = (
-				52FE68632D510B86009EC8EC /* PlaceDetailVIewReactor.swift */,
+				52FE68632D510B86009EC8EC /* PlaceDetailViewReactor.swift */,
 				52FE68612D5085C2009EC8EC /* PlaceDetailViewController.swift */,
 			);
 			path = PlaceDetail;
@@ -3111,7 +3111,7 @@
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				5229583C2D52022100AE4EC3 /* MemberInfoMock.swift in Sources */,
-				52D864922D2BA2DF000F8378 /* ScheduleListTableCellModel.swift in Sources */,
+				52D864922D2BA2DF000F8378 /* ScheduleListViewModel.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
@@ -3130,7 +3130,7 @@
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
 				52EA6E022CF7B88D00EFD753 /* NicknameRepo.swift in Sources */,
 				5268BA312D3F0BAA000C5F3A /* PhotoCollectionCell.swift in Sources */,
-				5214F8C52D2CADD100E8CE9C /* MeetReviewTableCellModel.swift in Sources */,
+				5214F8C52D2CADD100E8CE9C /* MeetReviewViewModel.swift in Sources */,
 				523E761D2D5D445800BD22CB /* DefaultReviewCommnadRepo.swift in Sources */,
 				52EC04C52D391BA100000C99 /* FetchCommentList.swift in Sources */,
 				52C857B62D082AFB00765FB3 /* PlanResponse.swift in Sources */,
@@ -3267,7 +3267,7 @@
 				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
 				5231DF7D2D2FE77800D52529 /* SearchPlaceRepo.swift in Sources */,
 				5221B12E2D541244004859C9 /* ReviewEditViewContoller.swift in Sources */,
-				52FE68642D510B86009EC8EC /* PlaceDetailVIewReactor.swift in Sources */,
+				52FE68642D510B86009EC8EC /* PlaceDetailViewReactor.swift in Sources */,
 				52818C6D2D194C940001E30B /* PlaceInfo.swift in Sources */,
 				52818C672D1836E90001E30B /* DefaultTextField.swift in Sources */,
 				5259B00D2C9FD316006B2711 /* ScheduleListViewController.swift in Sources */,
@@ -3329,7 +3329,7 @@
 				529CCD4A2D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift in Sources */,
 				52AD4B722D5B808D00FCA929 /* LaunchViewController.swift in Sources */,
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
-				5214F87D2D2BA88600E8CE9C /* HomePlanCollectionCellViewModel.swift in Sources */,
+				5214F87D2D2BA88600E8CE9C /* HomePlanModel.swift in Sources */,
 				5208051B2C69E2480015F6E0 /* UIColor+hexCode.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52B8E11C2D53421300F7FF59 /* DefaultFetchMemberList.swift in Sources */,

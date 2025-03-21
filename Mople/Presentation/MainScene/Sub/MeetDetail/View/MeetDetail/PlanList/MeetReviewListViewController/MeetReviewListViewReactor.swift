@@ -8,6 +8,10 @@
 import Foundation
 import ReactorKit
 
+protocol MeetReviewListCommands: AnyObject {
+    func reset()
+}
+
 final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -18,25 +22,26 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case fetchReviewList(reviews: [Review])
-        case notifyLoadingState(_ isLoading: Bool)
     }
     
     struct State {
         @Pulse var reviews: [Review] = []
-        @Pulse var isLoading: Bool = false
     }
     
     var initialState: State = State()
     
     private let fetchReviewUseCase: FetchReviewList
     private weak var coordinator: MeetDetailCoordination?
+    private weak var delegate: MeetDetailDelegate?
     private let meedId: Int
     
     init(fetchReviewUseCase: FetchReviewList,
          coordinator: MeetDetailCoordination,
+         delegate: MeetDetailDelegate,
          meetID: Int) {
         self.fetchReviewUseCase = fetchReviewUseCase
         self.coordinator = coordinator
+        self.delegate = delegate
         self.meedId = meetID
         logLifeCycle()
         action.onNext(.requestReviewList)
@@ -64,8 +69,6 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchReviewList(reviews):
             newState.reviews = reviews.sorted(by: <)
-        case let .notifyLoadingState(isLoad):
-            newState.isLoading = isLoad
         }
         
         return newState
@@ -74,25 +77,27 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
 
 extension MeetReviewListViewReactor {
     private func fetchReviewList() -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let fetchPlanList = fetchReviewUseCase.execute(meetId: meedId)
             .map({ Mutation.fetchReviewList(reviews: $0) })
             .asObservable()
-        
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart,
-                                  fetchPlanList,
-                                  loadingStop])
+                
+        return requestWithLoading(task: fetchPlanList)
     }
     
     private func presentReviewDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedReview = currentState.reviews[safe: index],
               let reviewId = selectedReview.id else { return .empty() }
         self.coordinator?.pushPlanDetailView(postId: reviewId,
-                                             type: .review(isReviewed: nil))
+                                             type: .review(isReviewed: nil),
+                                             completion: nil)
         return .empty()
+    }
+}
+
+extension MeetReviewListViewReactor: MeetReviewListCommands {
+    func reset() {
+        action.onNext(.requestReviewList)
     }
 }
 
@@ -102,19 +107,14 @@ extension MeetReviewListViewReactor {
         var reviewList = currentState.reviews
         
         switch payload {
-        case let .created(plan):
-            self.addReview(&reviewList, plan: plan)
         case let .updated(plan):
             self.updateReview(&reviewList, review: plan)
         case let .deleted(id):
             self.deleteReview(&reviewList, reviewId: id)
+        default:
+            break
         }
         return .just(.fetchReviewList(reviews: reviewList))
-    }
-    
-    private func addReview(_ reviewList: inout [Review], plan: Review) {
-        reviewList.append(plan)
-        reviewList.sort(by: <)
     }
     
     private func updateReview(_ reviewList: inout [Review], review: Review) {
@@ -129,4 +129,9 @@ extension MeetReviewListViewReactor {
     private func deleteReview(_ reviewList: inout [Review], reviewId: Int) {
         reviewList.removeAll { $0.id == reviewId }
     }
+}
+
+extension MeetReviewListViewReactor: ChildLoadingReactor {
+    var parent: ChildLoadingDelegate? { delegate }
+    var index: Int { 1 }
 }

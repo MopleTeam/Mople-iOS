@@ -230,10 +230,7 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addReviewObservable()
-            .filter({ [weak self] payload in
-                self?.filterEdit(payload: payload) ?? false
-            })
+        EventService.shared.receiveObservable(name: .writeReview)
             .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

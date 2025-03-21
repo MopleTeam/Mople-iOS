@@ -12,7 +12,7 @@ struct Plan: Hashable, Equatable {
     let creatorId: Int?
     let title: String?
     let date: Date?
-    let participantCount: Int?
+    var participantCount: Int = 0
     var isParticipating: Bool = false
     let addressTitle: String?
     let address: String?
@@ -39,6 +39,17 @@ extension Plan {
         guard let creatorId,
               let userId else { return }
         isCreator = creatorId == userId
+    }
+    
+    mutating func updateParticipants() -> Self {
+        if isParticipating {
+            isParticipating = false
+            participantCount -= 1
+        } else {
+            isParticipating = true
+            participantCount += 1
+        }
+        return self
     }
 }
 

@@ -27,7 +27,7 @@ extension CalendarPlanResponse {
             id: self.planId,
             title: self.planName,
             date: DateManager.parseServerFullDate(string: self.planTime),
-            memberCount: self.planParticipants,
+            memberCount: self.planParticipants ?? 0,
             meet: .init(id: meetId,
                         name: meetName,
                         imagePath: meetImage),

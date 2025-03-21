@@ -17,8 +17,6 @@ final class MeetReviewListViewController: BaseViewController, View {
     
     var disposeBag = DisposeBag()
     
-    private var parentReactor: MeetDetailViewReactor?
-
     private lazy var countView: CountView = {
         let view = CountView(title: "지난 약속")
         view.setFont(font: FontStyle.Body1.medium,
@@ -46,11 +44,9 @@ final class MeetReviewListViewController: BaseViewController, View {
         return view
     }()
     
-    init(reactor: MeetReviewListViewReactor,
-         parentReactor: MeetDetailViewReactor?) {
+    init(reactor: MeetReviewListViewReactor) {
         super.init()
         self.reactor = reactor
-        self.parentReactor = parentReactor
     }
     
     required init?(coder: NSCoder) {
@@ -136,13 +132,6 @@ final class MeetReviewListViewController: BaseViewController, View {
             .filter({ $0 > 0 })
             .drive(with: self, onNext: { vc, count in
                 vc.countView.countText = "\(count)개"
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isLoading in
-                vc.parentReactor?.action.onNext(.reviewLoading(isLoading))
             })
             .disposed(by: disposeBag)
     }

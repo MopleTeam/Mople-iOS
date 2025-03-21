@@ -158,7 +158,7 @@ final class MeetReviewTableCell: UITableViewCell {
         photoCountLabel.layer.cornerRadius = 10
     }
     
-    public func configure(viewModel: MeetReviewTableCellModel) {
+    public func configure(viewModel: MeetReviewViewModel) {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
@@ -166,7 +166,7 @@ final class MeetReviewTableCell: UITableViewCell {
     }
     
     
-    private func setImageInfo(viewModel: MeetReviewTableCellModel) {
+    private func setImageInfo(viewModel: MeetReviewViewModel) {
         photoView.kfSetimage(viewModel.imagePath,
                              defaultImageType: .history)
         setCountInfo(viewModel.imageCount)

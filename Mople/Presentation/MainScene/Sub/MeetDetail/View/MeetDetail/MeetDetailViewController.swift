@@ -193,11 +193,12 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     
     private func setNotification(reactor: Reactor) {
         EventService.shared.addMeetObservable()
-            .compactMap({ payload -> Meet? in
-                guard case .updated(let meet) = payload else { return nil }
-                return meet
-            })
             .map { Reactor.Action.editMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        EventService.shared.receiveObservable(name: .newDay)
+            .map { Reactor.Action.resetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

@@ -8,6 +8,10 @@
 import Foundation
 import ReactorKit
 
+protocol MeetPlanListCommands: AnyObject {
+    func reset()
+}
+
 final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -19,13 +23,10 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case fetchPlanList([Plan])
-        case notifyLoadingState(_ isLoading: Bool)
-        case updatePlanParticipant(planId: Int)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
-        @Pulse var isLoading: Bool = false
         @Pulse var completedJoin: Void?
     }
     
@@ -34,15 +35,18 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     private let fetchPlanUseCase: FetchMeetPlanList
     private let participationPlanUseCase: ParticipationPlan
     private weak var coordinator: MeetDetailCoordination?
+    private weak var delegate: MeetDetailDelegate?
     private let meedId: Int
     
     init(fetchPlanUseCase: FetchMeetPlanList,
          participationPlanUseCase: ParticipationPlan,
          coordinator: MeetDetailCoordination,
+         delegate: MeetDetailDelegate,
          meetID: Int) {
         self.fetchPlanUseCase = fetchPlanUseCase
         self.participationPlanUseCase = participationPlanUseCase
         self.coordinator = coordinator
+        self.delegate = delegate
         self.meedId = meetID
         action.onNext(.requestPlanList)
         logLifeCycle()
@@ -72,62 +76,91 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchPlanList(plans):
             newState.plans = plans.sorted(by: <)
-        case let .notifyLoadingState(isLoad):
-            newState.isLoading = isLoad
-        case let .updatePlanParticipant(planId):
-            self.updatePlanParticipant(state: &newState, planId: planId)
         }
         
         return newState
-    }
-    
-    private func updatePlanParticipant(state: inout State,
-                                       planId: Int) {
-        guard let index = state.plans.firstIndex(where: { $0.id == planId }) else { return }
-        state.plans[index].isParticipating.toggle()
     }
 }
 
 extension MeetPlanListViewReactor {
     private func fetchPlanList() -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
         let fetchPlanList = fetchPlanUseCase.execute(meetId: meedId)
             .map({ Mutation.fetchPlanList($0) })
             .asObservable()
-        
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart,
-                                  fetchPlanList,
-                                  loadingStop])
+
+        return requestWithLoading(task: fetchPlanList)
     }
     
     private func requestParticipationPlan(planId: Int,
                                           isJoining: Bool) -> Observable<Mutation> {
-        
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
-        
-        let requestParticipation = Observable.just(isJoining)
-            .flatMap { [weak self] isJoining -> Single<Void> in
-                guard let self = self else { return .never() }
-                return self.participationPlanUseCase.execute(planId: planId,
-                                                             isJoining: isJoining)
+                
+        let requestParticipation = participationPlanUseCase.execute(planId: planId,
+                                                                    isJoining: isJoining)
+            .asObservable()
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return handleParticipants(planId: planId)
             }
-            .map { Mutation.updatePlanParticipant(planId: planId) }
         
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart,
-                                  requestParticipation,
-                                  loadingStop])
+        return requestWithLoading(task: requestParticipation)
     }
+    
+    private func handleParticipants(planId: Int) -> Observable<Mutation> {
+        var currentPlans = currentState.plans
+        guard let index = currentPlans.firstIndex(where: { $0.id == planId }) else { return .empty() }
+        let changePlan = currentPlans[index].updateParticipants()
+        postParticipants(with: changePlan)
+        return .just(.fetchPlanList(currentPlans))
+    }
+    
+    private func postParticipants(with plan: Plan) {
+        if plan.isParticipating {
+            EventService.shared.postItem(.created(plan), from: self)
+        } else {
+            guard let id = plan.id else { return }
+            EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
+        }
+    }
+}
+
+// MARK: - 일정 선택
+extension MeetPlanListViewReactor {
     
     private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedPlan = currentState.plans[safe: index],
-              let planId = selectedPlan.id else { return .empty() }
-        self.coordinator?.pushPlanDetailView(postId: planId, type: .plan)
+              let planId = selectedPlan.id,
+              let planDate = selectedPlan.date else { return .empty() }
+        let type = checkPlanType(date: planDate)
+        self.coordinator?.pushPlanDetailView(postId: planId,
+                                             type: type,
+                                             completion: { [weak self] in
+            self?.notifyNewDayIfReviewType(with: type)
+        })
         return .empty()
+    }
+    
+    private func checkPlanType(date: Date) -> PlanDetailType {
+        if DateManager.isPastDay(on: date) == false {
+            return .plan
+        } else {
+            return .review(isReviewed: nil)
+        }
+    }
+    
+    private func notifyNewDayIfReviewType(with type: PlanDetailType) {
+        switch type {
+        case .review:
+            EventService.shared.post(name: .newDay)
+        default:
+            break
+        }
+    }
+}
+
+extension MeetPlanListViewReactor: MeetPlanListCommands {
+    func reset() {
+        action.onNext(.requestPlanList)
     }
 }
 
@@ -164,4 +197,9 @@ extension MeetPlanListViewReactor {
     private func deletePlan(_ planList: inout [Plan], planId: Int) {
         planList.removeAll { $0.id == planId }
     }
+}
+
+extension MeetPlanListViewReactor: ChildLoadingReactor {
+    var parent: ChildLoadingDelegate? { delegate }
+    var index: Int { 0 }
 }

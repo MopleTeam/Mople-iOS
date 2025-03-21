@@ -139,12 +139,12 @@ extension ReviewEditViewReactor {
                 return .empty()
             }
         
-        return requestWithLoading(task: requestUpdate) { [weak self] in
-            guard let self else { return }
-            print(#function, #line)
-            notificationUpdateImage()
-            coordiantor?.endFlow()
-        }
+        return requestWithLoading(task: requestUpdate)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.notificationUpdateImage()
+                self?.coordiantor?.endFlow()
+            })
     }
     
     private func requestAppImage(id: Int) -> Observable<Void> {
@@ -224,7 +224,7 @@ extension ReviewEditViewReactor {
 // MARK: - Notification
 extension ReviewEditViewReactor {
     private func notificationUpdateImage() {
-//        EventService.shared.postItem(., from: <#T##Any#>)
+        EventService.shared.post(name: .writeReview)
     }
 }
 

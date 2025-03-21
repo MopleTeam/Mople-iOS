@@ -13,7 +13,7 @@ struct Review: Equatable {
     var postId: Int?
     var name: String?
     var date: Date?
-    var participantsCount: Int?
+    var participantsCount: Int = 0
     var address: String?
     var addressTitle: String?
     var images: [ReviewImage]

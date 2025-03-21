@@ -120,9 +120,7 @@ final class ScheduleListReactor: Reactor {
         case let .scrollToDate(date):
             delegate?.scrollToDate(date: date)
         case let .selectedPlan(plan):
-            guard let id = plan.id else { return .empty() }
-            let type: PlanDetailType = plan.type == .plan ? .plan : .review(isReviewed: nil)
-            delegate?.selectedPlan(id: id, type: type)
+            handleSelectedPlan(with: plan)
         }
         
         return .empty()
@@ -188,6 +186,130 @@ extension ScheduleListReactor: ScheduleListCommands {
         monthDateList = initalDateList
         loadedDateList.removeAll()
         action.onNext(.parentCommand(.resetPlan))
+    }
+}
+
+// MARK: - 데이터 요청
+extension ScheduleListReactor {
+    
+    /// 서버에게 일정을 요청
+    /// 받아온 일정의 수가 5개보다 적을 경우 재귀호출
+    /// - Parameters:
+    ///   - month: 요청할 달
+    ///   - accumulated: 중첩 일정 리스트
+    ///   - type: 일정을 추가로 받아올 날짜의 방향(과거 or 미래)
+    private func recursionFetchMonthlyPlan(month: Date,
+                                           accumulated: [MonthlyPlan] = [],
+                                           type: ScheduleFetchType) -> Observable<[MonthlyPlan]> {
+        
+        guard let monthString = DateManager.toString(date: month, format: .month) else {
+            return .just([])
+        }
+        
+        return fetchMonthlyPlanUseCase.execute(month: monthString)
+            .asObservable()
+            .do(onNext: { [weak self] planList in
+                self?.updateRemainingMonth(month: month,
+                                           planList: planList)
+            })
+            .map({ $0 + accumulated })
+            .flatMap { [weak self] plans -> Observable<[MonthlyPlan]> in
+                guard let self else { return .just(plans)}
+                return handleRecursionFetch(type: type,
+                                            loadedList: plans)
+            }
+    }
+    
+    /// 요청 타입에 따라서 추가 일정 요청
+    private func moreFetchMonthlyPlan(type: ScheduleFetchType) -> Observable<Mutation> {
+        guard isLoading == false,
+              let fetchDate = findFetchDate(type: type) else { return .empty() }
+        isLoading = true
+        
+        let fetchPlanObserver = recursionFetchMonthlyPlan(month: fetchDate,
+                                                          type: type)
+            .flatMap { planList -> Observable<Mutation> in
+                switch type {
+                case .next:
+                    return .just(.updateMonthlyPlan(planList))
+                case .previous:
+                    return .just(.updateAddPlanList(planList))
+                }
+            }
+
+        return requestWithLoading(task: fetchPlanObserver)
+            .do(afterCompleted: { [weak self] in
+                self?.isLoading = false
+            })
+    }
+
+    /// 여러 달의 일정을 요청
+    private func recursionFetchMonthlyListPlan(month: [Date]) -> Observable<Mutation> {
+        guard isLoading == false,
+              month.isEmpty == false,
+              let currentMonth else { return .empty() }
+        
+        isLoading = true
+        
+        let fetchPlanObserver = month.map {
+            let fetchType: ScheduleFetchType = currentMonth > $0 ? .previous : .next
+            return recursionFetchMonthlyPlan(month: $0,
+                                             type: fetchType)
+        }
+        
+        let fetchPlanZipObserver = Observable.zip(fetchPlanObserver)
+            .map { $0.flatMap { $0 } }
+            .map { Mutation.updateMonthlyPlan($0) }
+        
+        return requestWithLoading(task: fetchPlanZipObserver)
+            .do(afterCompleted: { [weak self] in
+                self?.isLoading = false
+            })
+    }
+    
+    /// 일정의 갯수가 5개 이상이라면 그대로 return
+    /// 이하라면 재귀호출
+    private func handleRecursionFetch(type: ScheduleFetchType,
+                                      loadedList:[MonthlyPlan]) -> Observable<[MonthlyPlan]> {
+        if loadedList.count < 5,
+           let fetchDate = findFetchDate(type: type) {
+            return recursionFetchMonthlyPlan(month: fetchDate,
+                                                 accumulated: loadedList,
+                                                 type: type)
+        } else {
+            return .just(loadedList)
+        }
+    }
+}
+
+// MARK: - 일정 선택
+extension ScheduleListReactor {
+    
+    /// 일정 선택 시 타입과 날짜를 확인 후 맞는 타입으로 delegate에게 전달
+    private func handleSelectedPlan(with plan: MonthlyPlan) {
+        guard let id = plan.id,
+              let date = plan.date else { return }
+        let type = checkPlanType(type: plan.type, date: date)
+        delegate?.selectedPlan(id: id, type: type)
+    }
+    
+    private func checkPlanType(type: MonthlyPlanType, date: Date) -> PlanDetailType {
+        if type == .plan,
+           checkPreviousDate(on: date) == false {
+            return .plan
+        } else {
+            return .review(isReviewed: nil)
+        }
+    }
+    
+    /// 일정의 타입은 plan이지만 과거인 경우 새로고침 알림 발송
+    private func checkPreviousDate(on date: Date) -> Bool {
+        if DateManager.isPastDay(on: date) {
+            EventService.shared.post(name: .newDay)
+            return true
+        } else {
+            return false
+        }
     }
 }
 
@@ -271,42 +393,34 @@ extension ScheduleListReactor {
     
     /// 불러온 날짜에 속해있다면 추가
     private func isLoadedDate(on newDate: Date) -> Bool {
-        let test = loadedDateList.contains(where: { DateManager.isSameMonth($0, newDate) })
-        print(#function, #line, "#0319 \(test)" )
-        return test
+        return loadedDateList.contains(where: { DateManager.isSameMonth($0, newDate) })
     }
     
     /// 불러온 날짜 중 가장 작은 것, 가장 큰 것 사이에 있다면 추가
     private func isBetweenLoadedDate(on newDate: Date) -> Bool {
         guard let minLoadedDate = loadedDateList.min(),
               let maxLoadedDate = loadedDateList.max() else { return true }
-        let test = DateManager.isBetween(targetDate: newDate,
-                                         startDate: minLoadedDate,
-                                         endDate: maxLoadedDate)
-        print(#function, #line, "#0319 \(test)" )
-        return test
+        return DateManager.isBetween(targetDate: newDate,
+                                     startDate: minLoadedDate,
+                                     endDate: maxLoadedDate)
     }
     
     /// 불러온 날짜 중 가장 작은 것과 그 이전 날짜 사이라면 추가 (그 이전 날짜가 없어도 추가)
     private func isBetweenPreviousDate(on newDate: Date) -> Bool {
         guard let loadedDate = loadedDateList.min(),
               let activeMonth = findLargestPreviousMonth(from: loadedDate) else { return true }
-        let test = DateManager.isBetween(targetDate: newDate,
-                                         startDate: loadedDate,
-                                         endDate: activeMonth)
-        print(#function, #line, "#0319 \(test)" )
-        return test
+        return DateManager.isBetween(targetDate: newDate,
+                                     startDate: loadedDate,
+                                     endDate: activeMonth)
     }
     
     /// 불러온 날짜 중 가장 큰 것과 그 이후 날짜 사이라면 추가 (그 이후 날짜가 없어도 추가)
     private func isBetweenNextDate(on newDate: Date) -> Bool {
         guard let loadedDate = loadedDateList.max(),
               let activeMonth = findSmallestNextMonth(from: loadedDate) else { return true }
-        let test = DateManager.isBetween(targetDate: newDate,
-                                         startDate: loadedDate,
-                                         endDate: activeMonth)
-        print(#function, #line, "#0319 \(test)" )
-        return test
+        return DateManager.isBetween(targetDate: newDate,
+                                     startDate: loadedDate,
+                                     endDate: activeMonth)
     }
     
     /// 불러온 달 리스트에 추가
@@ -324,7 +438,6 @@ extension ScheduleListReactor {
     }
     
     // MARK: - 삭제
-    
     /// 일정 삭제
     private func deletePlan(_ planList: inout [MonthlyPlan], planId: Int?) {
         guard let deleteIndex = findPlanIndex(id: planId),
@@ -333,7 +446,7 @@ extension ScheduleListReactor {
         
         // 삭제된 날짜의 달에 잔여 데이터가 없다면 loadedDateList에서 삭제
         guard planList.contains(where: { guard let date = $0.date else { return false }
-            return DateManager.isSameMonth(date, deleteDate) }) == false else { return }
+            return DateManager.isSameDay(date, deleteDate) }) == false else { return }
         
         loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
         delegate?.updateDateList(type: .delete(DateManager.startOfDay(deleteDate)))
@@ -342,100 +455,6 @@ extension ScheduleListReactor {
     /// 현재 일정 리스트에서 삭제할 리뷰의 인덱스 얻기
     private func findPlanIndex(id: Int?) -> Int? {
         return currentState.planList.firstIndex { $0.id == id }
-    }
-}
-
-extension ScheduleListReactor {
-    
-    private func moreFetchMonthlyPlan(type: ScheduleFetchType) -> Observable<Mutation> {
-        guard isLoading == false,
-              let fetchDate = findFetchDate(type: type) else { return .empty() }
-        isLoading = true
-        
-        let fetchPlanObserver = recursionFetchMonthlyPlan(month: fetchDate,
-                                                          type: type)
-            .flatMap { planList -> Observable<Mutation> in
-                switch type {
-                case .next:
-                    return .just(.updateMonthlyPlan(planList))
-                case .previous:
-                    return .just(.updateAddPlanList(planList))
-                }
-            }
-
-        return requestWithLoading(task: fetchPlanObserver)
-            .do(afterCompleted: { [weak self] in
-                self?.isLoading = false
-            })
-    }
-    
-    // MARK: - 초기 표시 값 불러오기
-    
-    /// 일정을 보유한 달을 받아서 API 요청
-    /// - Parameter month: 요청할 달
-    private func recursionFetchMonthlyListPlan(month: [Date]) -> Observable<Mutation> {
-        guard isLoading == false,
-              month.isEmpty == false,
-              let currentMonth else { return .empty() }
-        
-        isLoading = true
-        
-        let fetchPlanObserver = month.map {
-            let fetchType: ScheduleFetchType = currentMonth > $0 ? .previous : .next
-            return recursionFetchMonthlyPlan(month: $0,
-                                             type: fetchType)
-        }
-        
-        let fetchPlanZipObserver = Observable.zip(fetchPlanObserver)
-            .map { $0.flatMap { $0 } }
-            .map { Mutation.updateMonthlyPlan($0) }
-        
-        return requestWithLoading(task: fetchPlanZipObserver)
-            .do(afterCompleted: { [weak self] in
-                self?.isLoading = false
-            })
-    }
-    
-    /// 서버에게 일정을 요청
-    /// 받아온 일정의 수가 5개보다 적을 경우 재귀호출
-    /// - Parameters:
-    ///   - month: 요청할 달
-    ///   - accumulated: 중첩 일정 리스트
-    ///   - type: 일정을 추가로 받아올 날짜의 방향(과거 or 미래)
-    private func recursionFetchMonthlyPlan(month: Date,
-                                           accumulated: [MonthlyPlan] = [],
-                                           type: ScheduleFetchType) -> Observable<[MonthlyPlan]> {
-        
-        guard let monthString = DateManager.toString(date: month, format: .month) else {
-            return .just([])
-        }
-        
-        return fetchMonthlyPlanUseCase.execute(month: monthString)
-            .asObservable()
-            .do(onNext: { [weak self] planList in
-                self?.updateRemainingMonth(month: month,
-                                           planList: planList)
-            })
-            .map({ $0 + accumulated })
-            .flatMap { [weak self] plans -> Observable<[MonthlyPlan]> in
-                guard let self else { return .just(plans)}
-                return handleRecursionFetch(type: type,
-                                            loadedList: plans)
-            }
-    }
-    
-    /// 일정의 갯수가 5개 이상이라면 그대로 return
-    /// 이하라면 재귀호출
-    private func handleRecursionFetch(type: ScheduleFetchType,
-                                      loadedList:[MonthlyPlan]) -> Observable<[MonthlyPlan]> {
-        if loadedList.count < 5,
-           let fetchDate = findFetchDate(type: type) {
-            return recursionFetchMonthlyPlan(month: fetchDate,
-                                                 accumulated: loadedList,
-                                                 type: type)
-        } else {
-            return .just(loadedList)
-        }
     }
 }
 
@@ -493,6 +512,7 @@ extension ScheduleListReactor {
         }
     }
     
+    /// 요청 가능한 상태 업데이트
     private func updateLoadState() {
         guard let currentDate = currentMonth else { return }
         let isNext = monthDateList.contains { $0 > currentDate }

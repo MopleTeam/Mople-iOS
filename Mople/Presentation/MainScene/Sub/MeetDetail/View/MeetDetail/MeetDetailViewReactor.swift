@@ -8,23 +8,30 @@
 import Foundation
 import ReactorKit
 
+protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate { }
+
+enum MeetDetailError: Error { }
+
 final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case updateMeetInfo(id: Int)
         case switchPage(isFuture: Bool)
         case pushMeetSetupView
-        case editMeet(Meet)
-        case planLoading(_ isLoading: Bool)
-        case reviewLoading(_ isLoading: Bool)
+        case editMeet(MeetPayload)
+        case planLoading(Bool)
+        case reviewLoading(Bool)
+        case resetList
         case endFlow
+        case catchChildError(MeetDetailError)
     }
     
     enum Mutation {
         case setMeetInfo(meet: Meet)
-        case notifyMeetInfoLoading(_ isLoading: Bool)
-        case notifyPlanLoading(_ isLoading: Bool)
-        case notifyReviewLoading(_ isLoading: Bool)
+        case updateMeetInfoLoading(Bool)
+        case updatePlanListLoading(Bool)
+        case updateReviewListLoading(Bool)
+        case catchError(MeetDetailError)
     }
     
     struct State {
@@ -39,6 +46,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     private let fetchMeetUseCase: FetchMeetDetail
     private weak var coordinator: MeetDetailCoordination?
+    public weak var planListCommands: MeetPlanListCommands?
+    public weak var reviewListCommands: MeetReviewListCommands?
     
     init(fetchMeetUseCase: FetchMeetDetail,
          coordinator: MeetDetailCoordination,
@@ -61,16 +70,20 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             coordinator?.swicthPlanListPage(isFuture: isFuture)
             return .empty()
         case let .planLoading(isLoading):
-            return .just(.notifyPlanLoading(isLoading))
-        case let .editMeet(meet):
-            return .just(.setMeetInfo(meet: meet))
+            return .just(.updatePlanListLoading(isLoading))
+        case let .editMeet(payload):
+            return handleMeetPayload(with: payload)
         case let .reviewLoading(isLoading):
-            return .just(.notifyReviewLoading(isLoading))
+            return .just(.updateReviewListLoading(isLoading))
         case .pushMeetSetupView:
             return pushMeetSetupView()
+        case .resetList:
+            return resetList()
         case .endFlow:
             coordinator?.endFlow()
             return .empty()
+        case let .catchChildError(err):
+            return .just(.catchError(err))
         }
     }
     
@@ -81,29 +94,36 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .setMeetInfo(meet):
             newState.meet = meet
-        case let .notifyMeetInfoLoading(isLoading):
+        case let .updateMeetInfoLoading(isLoading):
             newState.meetInfoLoaded = isLoading
-        case let .notifyPlanLoading(isLoading):
+        case let .updatePlanListLoading(isLoading):
             newState.futurePlanLoaded = isLoading
-        case let .notifyReviewLoading(isLoading):
-            print(#function, #line, "#33 pastPlan : \(isLoading)" )
+        case let .updateReviewListLoading(isLoading):
             newState.pastPlanLoaded = isLoading
+        case let .catchError(err):
+            handleError(state: &newState, err: err)
         }
         
         return newState
+    }
+    
+    private func handleError(state: inout State,
+                             err: MeetDetailError) {
+
+        // 에러처리
     }
 }
 
 extension MeetDetailViewReactor {
     private func fetchMeetInfo(id: Int) -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.notifyMeetInfoLoading(true))
+        let loadingStart = Observable.just(Mutation.updateMeetInfoLoading(true))
         
         #warning("에러 처리")
         let updateMeet = fetchMeetUseCase.execute(meetId: id)
             .asObservable()
             .map { Mutation.setMeetInfo(meet: $0) }
         
-        let loadingStop = Observable.just(Mutation.notifyMeetInfoLoading(false))
+        let loadingStop = Observable.just(Mutation.updateMeetInfoLoading(false))
         
         return Observable.concat([loadingStart,
                                   updateMeet,
@@ -116,5 +136,40 @@ extension MeetDetailViewReactor {
         guard let meet = currentState.meet else { return .empty() }
         coordinator?.pushMeetSetupView(meet: meet)
         return .empty()
+    }
+}
+
+// MARK: - 알림 수신
+extension MeetDetailViewReactor {
+    
+    /// 미팅 수정 알림 수신
+    private func handleMeetPayload(with payload: MeetPayload) -> Observable<Mutation> {
+        guard case .updated(let meet) = payload else { return .empty() }
+        return .just(.setMeetInfo(meet: meet))
+    }
+    
+    /// 날짜가 업데이트 된 경우
+    private func resetList() -> Observable<Mutation> {
+        planListCommands?.reset()
+        reviewListCommands?.reset()
+        return .empty()
+    }
+}
+
+extension MeetDetailViewReactor: MeetDetailDelegate {
+    func updateLoadingState(_ isLoading: Bool, index: Int) {
+        switch index {
+        case 0:
+            action.onNext(.planLoading(isLoading))
+        case 1:
+            action.onNext(.reviewLoading(isLoading))
+        default:
+            break
+        }
+    }
+    
+    func catchError(_ error: any Error, index: Int) {
+        guard let meetDetailErr = error as? MeetDetailError else { return }
+        action.onNext(.catchChildError(meetDetailErr))
     }
 }

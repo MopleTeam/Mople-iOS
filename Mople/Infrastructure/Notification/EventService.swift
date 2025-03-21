@@ -35,6 +35,18 @@ final class EventService {
     private let payloadKey = "payload"
     private let senderKey = "sender"
     
+    
+    // MARK: - Void
+    func post(name: Notification.Name) {
+        NotificationCenter.default.post(name: name, object: nil)
+    }
+    
+    func receiveObservable(name: Notification.Name) -> Observable<Void> {
+        return NotificationCenter.default.rx.notification(name)
+            .map { _ in }
+    }
+    
+    
     // MARK: - With Item
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
         NotificationCenter.default.post(name: payload.notiName,
@@ -77,4 +89,6 @@ extension Notification.Name {
     static let meet = Notification.Name(String(describing: Meet.self))
     static let plan = Notification.Name(String(describing: Plan.self))
     static let review = Notification.Name(String(describing: Review.self))
+    static let writeReview = Notification.Name("writeReview")
+    static let newDay = Notification.Name("newDay")
 }

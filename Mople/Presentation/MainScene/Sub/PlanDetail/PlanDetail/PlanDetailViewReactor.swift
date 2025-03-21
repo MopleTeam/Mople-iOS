@@ -264,7 +264,7 @@ extension PlanDetailViewReactor {
         return requestWithLoading(task: fetchPlan)
     }
     
-    private func fetchReviewDetail() -> Observable<Mutation> {
+    private func fetchReviewDetail(completion: (() -> Void)? = nil) -> Observable<Mutation> {
 
         let fetchReview = fetchReviewDetailUseCase.execute(reviewId: id)
             .asObservable()
@@ -279,6 +279,10 @@ extension PlanDetailViewReactor {
             }
         
         return requestWithLoading(task: fetchReview)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: {
+                completion?()
+            })
     }
     
     private func fetchReviewImages(_ reviewImages: [ReviewImage]) -> Observable<Mutation> {
@@ -316,11 +320,12 @@ extension PlanDetailViewReactor {
             .asObservable()
             .flatMap { Observable<Mutation>.empty() }
         
-        return requestWithLoading(task: deletePost,
-                                  completion: { [weak self] in
-            self?.sendNotifycation()
-            self?.coordinator?.endFlow()
-        })
+        return requestWithLoading(task: deletePost)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.sendNotifycation()
+                self?.coordinator?.endFlow()
+            })
     }
     
     private func reportPost() -> Observable<Mutation> {
@@ -341,8 +346,6 @@ extension PlanDetailViewReactor {
         
         return requestWithLoading(task: reportPost)
     }
-    
- 
 }
 
 // MARK: - 자식 -> 부모
@@ -386,14 +389,8 @@ extension PlanDetailViewReactor {
     }
     
     private func writeComment(_ comment: String) -> Observable<Mutation> {
-        Observable.just(comment)
-            .delay(.milliseconds(100), scheduler: MainScheduler.instance)
-            .do(onNext: { [weak self] comment in
-                self?.commentListCommands?.writeComment(comment: comment)
-            })
-            .flatMap { _ -> Observable<Mutation> in
-                return .empty()
-            }
+        self.commentListCommands?.writeComment(comment: comment)
+        return .empty()
     }
     
     private func cancleEditComment() -> Observable<Mutation> {
@@ -409,10 +406,22 @@ extension PlanDetailViewReactor {
     private func receiveNotifycation() -> Observable<Mutation> {
         switch type {
         case .plan:
-            return fetchPlanDetail()
+            return updatePlan()
         case .review:
-            return fetchReviewDetail()
+            return updateReview()
         }
+    }
+    
+    private func updatePlan() -> Observable<Mutation> {
+        return fetchPlanDetail()
+    }
+    
+    private func updateReview() -> Observable<Mutation> {
+        return fetchReviewDetail(completion: { [weak self] in
+            guard let self,
+                  let review = self.review else { return }
+            EventService.shared.postItem(.updated(review), from: self)
+        })
     }
     
     // 발신

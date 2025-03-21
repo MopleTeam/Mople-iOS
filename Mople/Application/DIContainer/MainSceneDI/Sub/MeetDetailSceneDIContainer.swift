@@ -29,7 +29,6 @@ final class MeetDetailSceneDIContainer: MeetDetailSceneDependencies {
 
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
-    
     private var mainReactor: MeetDetailViewReactor?
     
     init(appNetworkService: AppNetworkService,
@@ -72,15 +71,17 @@ extension MeetDetailSceneDIContainer {
     // MARK: - 예정된 일정리스트 뷰
     func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController {
         return MeetPlanListViewController(
-            reactor: makeMeetPlanListViewReactor(coordinator: coordinator),
-            parentReactor: mainReactor)
+            reactor: makeMeetPlanListViewReactor(coordinator: coordinator))
     }
     
     private func makeMeetPlanListViewReactor(coordinator: MeetDetailCoordination) -> MeetPlanListViewReactor {
-        return .init(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
-                     participationPlanUseCase: makeParticipationPlanUseCase(),
-                     coordinator: coordinator,
-                     meetID: meetId)
+        let reactor = MeetPlanListViewReactor(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
+                                            participationPlanUseCase: makeParticipationPlanUseCase(),
+                                            coordinator: coordinator,
+                                            delegate: mainReactor!,
+                                            meetID: meetId)
+        mainReactor?.planListCommands = reactor
+        return reactor
     }
     
     private func makeFetchMeetPlanUsecase() -> FetchMeetPlanList {
@@ -102,15 +103,16 @@ extension MeetDetailSceneDIContainer {
     // MARK: - 리뷰리스트 뷰
     func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController {
         return MeetReviewListViewController(
-            reactor: makeMeetReviewListViewReactor(coordinator: coordinator),
-            parentReactor: mainReactor
-        )
+            reactor: makeMeetReviewListViewReactor(coordinator: coordinator))
     }
     
     private func makeMeetReviewListViewReactor(coordinator: MeetDetailCoordination) -> MeetReviewListViewReactor {
-        return .init(fetchReviewUseCase: makeFetchReviewListUsecase(),
-                     coordinator: coordinator,
-                     meetID: meetId)
+        let reactor = MeetReviewListViewReactor(fetchReviewUseCase: makeFetchReviewListUsecase(),
+                                                coordinator: coordinator,
+                                                delegate: mainReactor!,
+                                                meetID: meetId)
+        mainReactor?.reviewListCommands = reactor
+        return reactor
     }
     
     private func makeFetchReviewListUsecase() -> FetchReviewList {

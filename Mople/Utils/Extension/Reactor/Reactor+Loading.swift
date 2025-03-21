@@ -17,13 +17,12 @@ extension LoadingReactor {
 
     func requestWithLoading(task: Observable<Mutation>,
                             minimumExecutionTime: RxTimeInterval = .seconds(0),
-                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300),
-                            completionScheduler: ImmediateSchedulerType = MainScheduler.instance,
-                            completionDealy: RxTimeInterval = .seconds(0),
-                            completeMutation: Mutation? = nil,
-                            completion: (() -> Void)? = nil) -> Observable<Mutation> {
+                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300)
+    ) -> Observable<Mutation> {
         
         let executionTimer = Observable<Int>.timer(minimumExecutionTime, scheduler: MainScheduler.instance)
+        
+        let loadingStop = Observable.just(updateLoadingMutation(false))
         
         let newTask = Observable.zip(task, executionTimer)
             .map { $0.0 }
@@ -31,10 +30,7 @@ extension LoadingReactor {
                 guard let self else { return .empty() }
                 return self.catchError(error)
             }
-            .concat(loadingStop(scheduler: completionScheduler,
-                                delay: completionDealy,
-                                completeMutation: completeMutation,
-                                completion: completion))
+            .concat(loadingStop)
             .share(replay: 1)
 
         let loadingStart = Observable.just(updateLoadingMutation(true))
@@ -48,23 +44,6 @@ extension LoadingReactor {
         let loadingStop = updateLoadingMutation(false)
         let catchError = catchErrorMutation(error)
         return .of(loadingStop, catchError)
-    }
-    
-    private func loadingStop(scheduler: ImmediateSchedulerType = MainScheduler.instance,
-                             delay: RxTimeInterval = .seconds(0),
-                             completeMutation: Mutation? = nil,
-                             completion: (() -> Void)? = nil) -> Observable<Mutation> {
-        return Observable.just(updateLoadingMutation(false))
-            .delay(delay, scheduler: MainScheduler.instance)
-            .observe(on: scheduler)
-            .flatMap({ mutation -> Observable<Mutation> in
-                completion?()
-                if let completeMutation {
-                    return .of(mutation, completeMutation)
-                } else {
-                    return .just(mutation)
-                }
-            })
     }
 }
 

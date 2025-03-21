@@ -233,9 +233,11 @@ extension ProfileEditViewReactor {
                 return Observable<Mutation>.empty()
             })
                     
-        return requestWithLoading(task: editProfile) { [weak self] in
-            self?.coordinator?.complete()
-        }
+        return requestWithLoading(task: editProfile)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.coordinator?.complete()
+            })
     }
     
     private func handleEditProfileTrigger(isEdit: Bool) -> Single<String?> {

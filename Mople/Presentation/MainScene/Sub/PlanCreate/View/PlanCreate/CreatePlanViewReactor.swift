@@ -202,9 +202,11 @@ extension CreatePlanViewReactor {
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
             .flatMap({ _ in Observable<Mutation>.empty() })
         
-        return requestWithLoading(task: uploadPlan) { [weak self] in
-            self?.coordinator?.endFlow()
-        }
+        return requestWithLoading(task: uploadPlan)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.coordinator?.endFlow()
+            })
     }
     
     private func editPlan(request: PlanRequest) -> Observable<Mutation> {
@@ -214,9 +216,11 @@ extension CreatePlanViewReactor {
             .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
             .flatMap({ _ in Observable<Mutation>.empty() })
         
-        return requestWithLoading(task: editPlan) { [weak self] in
-            self?.coordinator?.endFlow()
-        }
+        return requestWithLoading(task: editPlan)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.coordinator?.endFlow()
+            })
     }
     
     private func requestWithLoading(task: Observable<Mutation>,

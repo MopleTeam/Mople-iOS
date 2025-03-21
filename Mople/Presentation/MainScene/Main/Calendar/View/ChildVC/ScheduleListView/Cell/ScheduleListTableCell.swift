@@ -101,7 +101,7 @@ final class ScheduleListTableCell: UITableViewCell {
         }
     }
 
-    public func configure(viewModel: ScheduleListTableCellModel) {
+    public func configure(viewModel: ScheduleListViewModel) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))

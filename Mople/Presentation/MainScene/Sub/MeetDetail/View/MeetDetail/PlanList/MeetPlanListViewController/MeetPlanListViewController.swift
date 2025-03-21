@@ -16,9 +16,7 @@ final class MeetPlanListViewController: BaseViewController, View {
     typealias Reactor = MeetPlanListViewReactor
     
     var disposeBag = DisposeBag()
-        
-    private var parentReactor: MeetDetailViewReactor?
-    
+            
     private let countView: CountView = {
         let view = CountView(title: "예정된 약속")
         view.setFont(font: FontStyle.Body1.medium,
@@ -45,11 +43,9 @@ final class MeetPlanListViewController: BaseViewController, View {
         return view
     }()
     
-    init(reactor: Reactor,
-         parentReactor: MeetDetailViewReactor?) {
+    init(reactor: Reactor) {
         super.init()
         self.reactor = reactor
-        self.parentReactor = parentReactor
     }
     
     required init?(coder: NSCoder) {
@@ -121,24 +117,15 @@ final class MeetPlanListViewController: BaseViewController, View {
                 cellIdentifier: MeetPlanTableCell.reuseIdentifier,
                 cellType: MeetPlanTableCell.self)
             ) { [weak self] index, item, cell in
-                print(#function, #line, "Path : # 일정 셀 관리 ")
                 cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
                 cell.completeTapped = {
-                    print(#function, #line, "Path : # 참여버튼 클릭 ")
                     guard let planId = item.id else { return }
                     let action = Reactor.Action.updateParticipants(id: planId,
                                                                    isJoining: item.isParticipating)
                     self?.reactor?.action.onNext(action)
                 }
             }
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, isLoading in
-                vc.parentReactor?.action.onNext(.planLoading(isLoading))
-            })
             .disposed(by: disposeBag)
     }
     

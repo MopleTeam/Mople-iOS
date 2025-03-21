@@ -207,11 +207,13 @@ extension CreateMeetViewReactor {
                 self?.notificationNewMeet(meet)
                 return .empty()
             })
-            
+        
         return requestWithLoading(task: createMeet,
-                                  minimumExecutionTime: .seconds(1)) { [weak self] in
+                                  minimumExecutionTime: .seconds(1))
+        .observe(on: MainScheduler.instance)
+        .do(afterCompleted: { [weak self] in
             self?.handleCompletedTask()
-        }
+        })
     }
     
     private func requestCreateMeet() -> Observable<Mutation> {
@@ -233,9 +235,11 @@ extension CreateMeetViewReactor {
             })
             
         return requestWithLoading(task: createMeet,
-                                  minimumExecutionTime: .seconds(1)) { [weak self] in
+                                  minimumExecutionTime: .seconds(1))
+        .observe(on: MainScheduler.instance)
+        .do(afterCompleted: { [weak self] in
             self?.handleCompletedTask()
-        }
+        })
     }
     
     private func handleCompletedTask() {

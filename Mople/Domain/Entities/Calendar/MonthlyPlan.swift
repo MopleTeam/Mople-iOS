@@ -16,7 +16,7 @@ struct MonthlyPlan: Equatable  {
     let id: Int?
     var title: String?
     var date: Date?
-    var memberCount: Int?
+    var memberCount: Int
     var meet: MeetSummary?
     var weather: Weather?
     let type: MonthlyPlanType

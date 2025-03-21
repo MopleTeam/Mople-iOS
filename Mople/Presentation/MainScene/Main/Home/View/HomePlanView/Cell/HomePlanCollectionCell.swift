@@ -117,7 +117,7 @@ final class HomePlanCollectionCell: UICollectionViewCell {
         }
     }
 
-    public func configure(with viewModel: HomePlanCollectionCellViewModel) {
+    public func configure(with viewModel: HomePlanModel) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.dateInfoLabel.text = viewModel.dateString

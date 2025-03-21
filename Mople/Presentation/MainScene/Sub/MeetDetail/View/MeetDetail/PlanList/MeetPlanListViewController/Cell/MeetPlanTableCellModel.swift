@@ -11,7 +11,7 @@ struct MeetPlanTableCellModel {
     let id: Int?
     let title: String?
     let date: Date?
-    let participantCount: Int?
+    let participantCount: Int
     let weather: Weather?
     let postUserID: Int?
     let isParticipant: Bool?
@@ -21,9 +21,7 @@ struct MeetPlanTableCellModel {
         return DateManager.toString(date: date, format: .dot)
     }
     
-    var participantCountString: String? {
-        guard let participantCount = participantCount else { return nil }
-        
+    var participantCountString: String {
         return "\(participantCount)명 참여"
     }
 }

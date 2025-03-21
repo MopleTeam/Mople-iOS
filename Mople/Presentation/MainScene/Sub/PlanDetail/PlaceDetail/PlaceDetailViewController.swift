@@ -11,7 +11,7 @@ import ReactorKit
 
 final class PlaceDetailViewController: TitleNaviViewController, View {
     
-    typealias Reactor = PlaceDetailReactor
+    typealias Reactor = PlaceDetailViewReactor
     
     // MARK: - Variables
     var disposeBag = DisposeBag()
@@ -21,7 +21,7 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
 
     // MARK: - LifeCycle
     init(title: String,
-         reactor: PlaceDetailReactor) {
+         reactor: PlaceDetailViewReactor) {
         super.init(title: title)
         self.reactor = reactor
     }
@@ -55,7 +55,7 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
     }
     
     // MARK: - bind
-    func bind(reactor: PlaceDetailReactor) {
+    func bind(reactor: PlaceDetailViewReactor) {
         naviBar.rightItemEvent
             .map({ Reactor.Action.endProcess })
             .bind(to: reactor.action)

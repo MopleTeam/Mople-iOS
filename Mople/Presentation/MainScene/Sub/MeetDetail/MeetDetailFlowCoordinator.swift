@@ -11,11 +11,12 @@ protocol MeetDetailCoordination: AnyObject {
     func swicthPlanListPage(isFuture: Bool)
     func pushMeetSetupView(meet: Meet)
     func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType)
+                            type: PlanDetailType, completion: (() -> Void)?)
     func endFlow()
 }
 
 final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination {
+    
     private let dependencies: MeetDetailSceneDependencies
     private var detailMeetVC: MeetDetailViewController?
     private var planListVC: MeetPlanListViewController?
@@ -81,14 +82,17 @@ extension MeetDetailSceneCoordinator: MemberListViewCoordination {
     }
 }
 
-// MARK: - Flow
+// MARK: - 일정 상세 플로우
 extension MeetDetailSceneCoordinator {
     func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType) {
+                            type: PlanDetailType,
+                            completion: (() -> Void)?) {
         let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
                                                                                    type: type)
         start(coordinator: planDetailFlowCoordinator)
-        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
+        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController, completion: {
+            completion?()
+        })
     }
 }
 

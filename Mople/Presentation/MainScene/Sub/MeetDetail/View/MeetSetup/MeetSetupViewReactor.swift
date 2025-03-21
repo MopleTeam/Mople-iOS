@@ -139,10 +139,12 @@ extension MeetSetupViewReactor {
                 return .empty()
             }
         
-        return requestWithLoading(task: deleteMeet, completion: { [weak self] in
-            self?.notificationDeleteMeet()
-            self?.coordinator?.endFlow()
-        })
+        return requestWithLoading(task: deleteMeet)
+            .observe(on: MainScheduler.instance)
+            .do(afterCompleted: { [weak self] in
+                self?.notificationDeleteMeet()
+                self?.coordinator?.endFlow()
+            })
     }
 }
 

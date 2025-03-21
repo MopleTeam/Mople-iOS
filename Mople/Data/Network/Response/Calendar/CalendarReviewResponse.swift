@@ -27,7 +27,7 @@ extension CalendarReviewResponse {
             id: self.reviewId,
             title: self.reviewName,
             date: DateManager.parseServerFullDate(string: self.reviewTime),
-            memberCount: self.reviewParticipants,
+            memberCount: self.reviewParticipants ?? 0,
             meet: .init(id: meetId,
                         name: meetName,
                         imagePath: meetImage),
