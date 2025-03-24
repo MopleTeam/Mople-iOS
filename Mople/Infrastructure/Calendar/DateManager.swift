@@ -133,6 +133,14 @@ extension DateManager {
         return calendar.isDateInToday(date)
     }
     
+    static func test(on date: Date) -> Date? {
+        return calendar.date(byAdding: .day, value: -1, to: date)
+    }
+    
+    static func isFutureOrToday(on date: Date) -> Bool {
+        return isToday(on: date) || Date() < date
+    }
+    
     static func isPastDay(on date: Date) -> Bool {
         return date < Date() && isToday(on: date) == false
     }

@@ -15,44 +15,50 @@ enum HomeError: Error {
 final class HomeViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
+        enum Flow {
+            case planDetail(index: Int)
+            case createGroup
+            case createPlan
+            case calendar
+        }
+        
+        case flow(Flow)
         case checkNotificationPermission
-        case createGroup
-        case createPlan
-        case presentCalendaer
-        case requestRecentPlan
+        case fetchHomeData
         case updatePlan(_ planPayload: PlanPayload)
         case updateMeet(_ meetPayload: MeetPayload)
+        case reloadDay(Date)
     }
     
     enum Mutation {
         case updatePlanList(_ updatedPlanList: [Plan])
         case updateMeetList(_ updatedMeetList: [MeetSummary])
-        case responseRecentPlan(schedules: RecentPlan)
+        case updateHomeData(HomeData)
         case notifyLoadingState(_ isLoading: Bool)
-        case handleHomeError(error: HomeError?)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
         @Pulse var meetList: [MeetSummary] = []
-        @Pulse var error: HomeError?
+        @Pulse var error: Error?
         @Pulse var isLoading: Bool = false
     }
     
-    private let fetchRecentScheduleUseCase: FetchRecentPlan
+    private let fetchRecentScheduleUseCase: FetchHomeData
     private let notificationService: NotificationService
     private weak var coordinator: HomeFlowCoordinator?
     
     var initialState: State = State()
     
-    init(fetchRecentScheduleUseCase: FetchRecentPlan,
+    init(fetchRecentScheduleUseCase: FetchHomeData,
          notificationService: NotificationService,
          coordinator: HomeFlowCoordinator) {
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
         self.notificationService = notificationService
         self.coordinator = coordinator
         logLifeCycle()
-        action.onNext(.requestRecentPlan)
+        action.onNext(.fetchHomeData)
     }
     
     deinit {
@@ -61,20 +67,19 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .requestRecentPlan:
-            fetchRecentSchedules()
-        case .createGroup:
-            presentMeetCreateView()
-        case .createPlan:
-            presentPlanCreateView()
-        case .presentCalendaer:
-            presentNextEvent()
+        case .fetchHomeData:
+            return fetchHomeData()
+        case let .flow(action):
+            return handleFlowAction(with: action)
+
         case .checkNotificationPermission:
-            requestNotificationPermission()
+            return requestNotificationPermission()
         case let .updatePlan(payload):
-            handlePlanPayload(payload)
+            return handlePlanPayload(payload)
         case let .updateMeet(payload):
-            handleMeetPayload(payload)
+            return handleMeetPayload(payload)
+        case let .reloadDay(day):
+            return reloadDay(on: day)
         }
     }
     
@@ -83,45 +88,43 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case .responseRecentPlan(let homeModel):
-            let recentSchedules = homeModel.plans.sorted(by: <)
-            newState.meetList = homeModel.meets
-            newState.plans = recentSchedules
-        case let .handleHomeError(err):
-            newState.error = err
+        case .updateHomeData(let homeData):
+            newState.meetList = homeData.meets
+            newState.plans = homeData.plans.sorted(by: <)
         case let .notifyLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .updatePlanList(planList):
             newState.plans = planList
         case let .updateMeetList(meetList):
             newState.meetList = meetList
+        case let .catchError(err):
+            handleError(state: &newState, err: err)
         }
         return newState
     }
     
-    func handleError(state: State, err: Error) -> State {
-        let newState = state
-        
-        // 에러 처리
-        
-        return newState
+    func handleError(state: inout State, err: Error) {
+        switch err {
+        default:
+            state.error = err
+        }
     }
 }
     
 
 extension HomeViewReactor {
-    private func fetchRecentSchedules() -> Observable<Mutation> {
+    private func fetchHomeData() -> Observable<Mutation> {
         
         let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
         
-        let fetchSchedules = Observable.just(())//
+        let fetchSchedules = Observable.just(())
             .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .flatMap({ [weak self] _ -> Single<RecentPlan> in
+            .flatMap({ [weak self] _ -> Single<HomeData> in
                 guard let self else { return .never() }
                 return fetchRecentScheduleUseCase.execute()
             })
             .asObservable()
-            .map { Mutation.responseRecentPlan(schedules: $0) }
+            .map { Mutation.updateHomeData($0) }
         
         let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
         
@@ -133,7 +136,20 @@ extension HomeViewReactor {
 
 // MARK: - Flow
 extension HomeViewReactor {
-    #warning("정확한 날짜로 수정하기")
+    
+    private func handleFlowAction(with action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case .calendar:
+            return presentNextEvent()
+        case .createGroup:
+            return presentMeetCreateView()
+        case .createPlan:
+            return presentPlanCreateView()
+        case let .planDetail(index):
+            return presentPlanDetail(index: index)
+        }
+    }
+    
     private func presentNextEvent() -> Observable<Mutation> {
         guard !currentState.plans.isEmpty,
               let lastDate = currentState.plans.last?.date else { return .empty() }
@@ -149,9 +165,22 @@ extension HomeViewReactor {
     
     private func presentPlanCreateView() -> Observable<Mutation> {
         let meetList = currentState.meetList
-        guard meetList.isEmpty == false else { return .just(.handleHomeError(error: .emptyMeet)) }
+        guard meetList.isEmpty == false else { return .just(.catchError(HomeError.emptyMeet)) }
         coordinator?.presentPlanCreateView(meetList: meetList)
         return .empty()
+    }
+    
+    private func presentPlanDetail(index: Int) -> Observable<Mutation> {
+        guard let plan = currentState.plans[safe: index],
+              let id = plan.id,
+              let date = plan.date else { return .empty() }
+        
+        if DateManager.isPastDay(on: date) == false {
+            coordinator?.presentPlanDetailView(planId: id)
+            return .empty()
+        } else {
+            return .just(.catchError(PlanDetailError.expiredPlan(date)))
+        }
     }
 }
 
@@ -175,115 +204,104 @@ extension HomeViewReactor {
         
         switch payload {
         case let .created(plan):
-            self.addPlan(&planList, plan: plan)
+            return addPlan(&planList, plan: plan)
         case let .updated(plan):
-            self.updatePlan(&planList, plan: plan)
+            return updatePlan(&planList, plan: plan)
         case let .deleted(id):
-            self.deletePlan(&planList, planId: id)
+            return deletePlan(planList, planId: id)
         }
-        return .just(.updatePlanList(planList))
     }
     
-    private func addPlan(_ planList: inout [Plan], plan: Plan) {
+    private func addPlan(_ planList: inout [Plan], plan: Plan) -> Observable<Mutation> {
         planList.append(plan)
         planList.sort(by: <)
         
         if planList.count > 5 {
             planList.removeLast()
         }
+        
+        return .just(.updatePlanList(planList))
     }
     
-    private func updatePlan(_ planList: inout [Plan], plan: Plan) {
+    private func updatePlan(_ planList: inout [Plan], plan: Plan) -> Observable<Mutation> {
         guard let updatedIndex = planList.firstIndex(where: {
             $0.id == plan.id
-        }) else { return }
+        }) else { return .empty() }
         
         planList[updatedIndex] = plan
         planList.sort(by: <)
+        
+        return .just(.updatePlanList(planList))
     }
     
-    private func deletePlan(_ planList: inout [Plan], planId: Int) {
-        planList.removeAll { $0.id == planId }
+    private func deletePlan(_ planList: [Plan], planId: Int) -> Observable<Mutation> {
+        guard planList.contains(where: { $0.id == planId }) else { return .empty() }
+        action.onNext(.fetchHomeData)
+        return .empty()
     }
 }
 
 // MARK: - 모임 생성 알림 수신
 extension HomeViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
-        var meetList = currentState.meetList
-        var planList = currentState.plans
-        
-        appleMeetChanged(payload: payload,
-                         meetList: &meetList,
-                         planList: &planList)
-        
-        switch payload {
-        case .created:
-            return .just(.updateMeetList(meetList))
-        case .updated, .deleted:
-            let planUpdated = Mutation.updatePlanList(planList)
-            let meetUpdated = Mutation.updateMeetList(meetList)
-            return .of(planUpdated, meetUpdated)
-        }
-    }
-    
-    private func appleMeetChanged(payload: MeetPayload,
-                                  meetList: inout [MeetSummary],
-                                  planList: inout [Plan]) {
         switch payload {
         case let .created(meet):
-            addMeet(&meetList,
-                    meet: meet)
+            return addMeet(meet: meet)
         case let .updated(meet):
-            editMeet(&meetList,
-                     &planList,
-                     editMeet: meet)
+            let planUpdated = updatePlanMeetInfo(editMeet: meet)
+            let meetUpdated = updateMeetList(editMeet: meet)
+            return .merge(planUpdated, meetUpdated)
         case let .deleted(id):
-            deleteMeet(&meetList,
-                       &planList,
-                       meetId: id)
+            return deleteMeet(meetId: id)
         }
     }
     
-    private func addMeet(_ meetList: inout [MeetSummary], meet: Meet) {
-        guard let meetSummary = meet.meetSummary else { return }
-        meetList.insert(meetSummary, at: 0)
+    private func addMeet(meet: Meet) -> Observable<Mutation> {
+        guard let meetSummary = meet.meetSummary else { return .empty() }
+        var currentMeetList = currentState.meetList
+        currentMeetList.insert(meetSummary, at: 0)
+        return .just(.updateMeetList(currentMeetList))
     }
     
-    private func editMeet(_ meetList: inout [MeetSummary],
-                          _ planList: inout [Plan],
-                          editMeet: Meet) {
-        planList = changePlanMeetInfo(planList: planList,
-                                      editMeet: editMeet)
-        
-        meetList = replaceMeet(meetList: meetList,
-                               editMeet: editMeet)
-    }
-    
-    private func changePlanMeetInfo(planList: [Plan],
-                                    editMeet: Meet) -> [Plan] {
-        return planList.map({
+    private func updatePlanMeetInfo(editMeet: Meet) -> Observable<Mutation> {
+        let updatePlan = currentState.plans.map({
             var plan = $0
             guard plan.meet?.id == editMeet.meetSummary?.id else { return $0 }
             plan.meet?.name = editMeet.meetSummary?.name
             plan.meet?.imagePath = editMeet.meetSummary?.imagePath
             return plan
         })
+        return .just(.updatePlanList(updatePlan))
     }
     
-    private func replaceMeet(meetList: [MeetSummary],
-                             editMeet: Meet) -> [MeetSummary] {
-        meetList.map({
+    private func updateMeetList(editMeet: Meet) -> Observable<Mutation> {
+        let updateMeet = currentState.meetList.map {
             guard $0.id == editMeet.meetSummary?.id,
                   let meetSummary = editMeet.meetSummary else { return $0 }
             return meetSummary
-        })
+        }
+        return .just(.updateMeetList(updateMeet))
     }
     
-    private func deleteMeet(_ meetList: inout [MeetSummary],
-                            _ planList: inout [Plan],
-                            meetId: Int) {
-        planList.removeAll { $0.meet?.id == meetId }
-        meetList.removeAll { $0.id == meetId }
+    private func deleteMeet(meetId: Int) -> Observable<Mutation> {
+        if currentState.plans.contains(where: { $0.meet?.id == meetId }) {
+            action.onNext(.fetchHomeData)
+        }
+        
+        return .empty()
+    }
+}
+
+// MARK: - 새로고침
+extension HomeViewReactor {
+    private func reloadDay(on date: Date) -> Observable<Mutation> {
+        if currentState.plans.contains(where: {
+            guard let planDate = $0.date else { return false }
+            return DateManager.isSameDay(planDate, date) || planDate < date
+        }) {
+            action.onNext(.fetchHomeData)
+        }
+                
+        return .empty()
     }
 }

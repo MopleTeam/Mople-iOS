@@ -165,12 +165,12 @@ final class HomeViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
         
         self.makeMeetButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.createGroup }
+            .map { _ in Reactor.Action.flow(.createGroup) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.makeScheduleButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.createPlan }
+            .map { _ in Reactor.Action.flow(.createPlan) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -188,12 +188,37 @@ final class HomeViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
     }
     
-    private func handleError(_ err: HomeError) {
+    private func handleError(_ err: Error) {
+        switch err {
+        case let err as HomeError:
+            handleHomeError(err: err)
+        case let err as PlanDetailError:
+            showExpriedError(err: err)
+        default:
+            break
+        }
+    }
+    
+    private func handleHomeError(err: HomeError) {
         switch err {
         case .emptyMeet:
             self.showEmptyMeetAlert()
         }
     }
+    
+    private func showExpriedError(err: PlanDetailError) {
+        guard case .expiredPlan(let date) = err else { return }
+
+        let defaultAction: DefaultAction = .init(text: "확인",
+                                                 completion: {
+            EventService.shared.postReloadDay(on: date)
+        })
+        
+        alertManager.showAlert(title: err.message,
+                               defaultAction: defaultAction)
+    }
+    
+    
     
     private func setNotification(reactor: Reactor) {
         EventService.shared.addPlanObservable()
@@ -205,24 +230,30 @@ final class HomeViewController: DefaultViewController, View {
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        EventService.shared.addReloadObservable()
+            .map { Reactor.Action.reloadDay($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
 
 extension HomeViewController {
     private func showEmptyMeetAlert() {
-        let action: DefaultAction = .init(text: "모임 생성하기",
-                                          tintColor: ColorStyle.Default.white,
-                                          bgColor: ColorStyle.App.primary,
-                                          completion: makeMeet)
+        let createAction: DefaultAction = .init(text: "모임 생성하기",
+                                          completion: { [weak self] in
+            self?.makeMeet()
+        })
     
         alertManager.showAlert(title: "아직 소속된 모임이 없어요",
                                subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
-                               defaultAction: .init(text: "취소"),
-                               addAction: [action])
+                               defaultAction: .init(text: "취소",
+                                                    tintColor: ColorStyle.Gray._01, bgColor: ColorStyle.App.tertiary),
+                               addAction: [createAction])
     }
     
     private func makeMeet() {
-        reactor?.action.onNext(.createGroup)
+        reactor?.action.onNext(.flow(.createGroup))
     }
 }
 

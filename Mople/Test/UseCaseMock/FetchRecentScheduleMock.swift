@@ -8,10 +8,10 @@
 import Foundation
 import RxSwift
 
-final class FetchRecentScheduleMock: FetchRecentPlan {
+final class FetchRecentScheduleMock: FetchHomeData {
     
-    func execute() -> Single<RecentPlan> {
-        return  Observable.just(RecentPlan.mock())
+    func execute() -> Single<HomeData> {
+        return  Observable.just(HomeData.mock())
             .delay(.milliseconds(300), scheduler: MainScheduler.instance)
             .asSingle()
     }

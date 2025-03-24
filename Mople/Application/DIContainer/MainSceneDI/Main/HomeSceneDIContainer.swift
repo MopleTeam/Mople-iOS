@@ -52,8 +52,8 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
                                coordinator: coordinator)
     }
     
-    private func makeRecentPlanUseCase() -> FetchRecentPlan {
-        return FetchRecentPlanUseCase(recentPlanRepo: makeRecentPlanRepo())
+    private func makeRecentPlanUseCase() -> FetchHomeData {
+        return FetchHomeDataUseCase(homeDataRepo: makeRecentPlanRepo())
     }
     
     private func makeRecentPlanRepo() -> PlanQueryRepo {

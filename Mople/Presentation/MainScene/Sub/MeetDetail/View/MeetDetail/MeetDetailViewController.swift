@@ -14,6 +14,9 @@ import ReactorKit
 final class MeetDetailViewController: TitleNaviViewController, View {
     typealias Reactor = MeetDetailViewReactor
     
+    // MARK: - Alert
+    private let alertManager = TestAlertManager.shared
+    
     var disposeBag: DisposeBag = DisposeBag()
     
     private let contentView: UIView = {
@@ -82,7 +85,6 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private func initalizeSetup() {
         setLayout()
         setupNavi()
-        setPageVC()
     }
     
     private func setLayout() {
@@ -121,10 +123,6 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private func setupNavi() {
         self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .list)
-    }
-    
-    private func setPageVC() {
-        self.pageController.delegate = self
     }
     
     func bind(reactor: MeetDetailViewReactor) {
@@ -189,6 +187,14 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         .asDriver(onErrorJustReturn: false)
         .drive(self.rx.isLoading)
         .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(with: err)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setNotification(reactor: Reactor) {
@@ -197,15 +203,32 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.receiveObservable(name: .newDay)
-            .map { Reactor.Action.resetList }
+        EventService.shared.addReloadObservable()
+            .map { _ in Reactor.Action.resetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
-}
-extension MeetDetailViewController: UIPageViewControllerDelegate {
-    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        print(#function, #line, "#3" )
+    
+    // MARK: - 에러처리
+    private func handleError(with err: Error) {
+        switch err {
+        case let err as PlanDetailError:
+            showExpriedError(err: err)
+        default:
+            break
+        }
+    }
+    
+    private func showExpriedError(err: PlanDetailError) {
+        guard case .expiredPlan(let date) = err else { return }
+        
+        let defaultAction: DefaultAction = .init(text: "확인",
+                                                 completion: {
+            EventService.shared.postReloadDay(on: date)
+        })
+        
+        alertManager.showAlert(title: err.message,
+                               defaultAction: defaultAction)
     }
 }
 

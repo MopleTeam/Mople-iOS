@@ -14,6 +14,9 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     
     typealias Reactor = CalendarScheduleViewReactor
     
+    // MARK: - Alert
+    private let alertManager = TestAlertManager.shared
+    
     // MARK: - Variables
     var disposeBag = DisposeBag()
         
@@ -169,6 +172,14 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(with: err)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func outputBind(_ reactor: Reactor) {
@@ -206,6 +217,12 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .map { Reactor.Action.updateReview($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        EventService.shared.addReloadObservable()
+            .do(onNext: { print(#function, #line, "#0324 : \($0)" ) })
+            .map { Reactor.Action.reloadDay($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
@@ -226,6 +243,28 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     private func setGesture() {
         scopeGesture.delegate = self
         self.view.addGestureRecognizer(scopeGesture)
+    }
+    
+    // MARK: - 에러처리
+    private func handleError(with err: Error) {
+        switch err {
+        case let err as PlanDetailError:
+            showExpriedError(err: err)
+        default:
+            break
+        }
+    }
+    
+    private func showExpriedError(err: PlanDetailError) {
+        guard case .expiredPlan(let date) = err else { return }
+        
+        let defaultAction: DefaultAction = .init(text: "확인",
+                                                 completion: {
+            EventService.shared.postReloadDay(on: date)
+        })
+        
+        alertManager.showAlert(title: err.message,
+                               defaultAction: defaultAction)
     }
 }
 

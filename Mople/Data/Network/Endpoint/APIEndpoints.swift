@@ -240,7 +240,7 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
     
-    static func fetchRecentPlan() throws -> Endpoint<RecentPlanResponse> {
+    static func fetchRecentPlan() throws -> Endpoint<HomeDataResponse> {
         return try Endpoint(path: "plan/view",
                             authenticationType: .accessToken,
                             method: .get,

@@ -230,7 +230,7 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.receiveObservable(name: .writeReview)
+        EventService.shared.receiveObservable(name: .postReview)
             .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -301,8 +301,8 @@ extension PlanDetailViewController {
         case .plan:
             alertActions = [editPlan(),
                             deletePlan()]
-        case let .review(isReviewed):
-            alertActions = [editReview(isReviewed ?? false),
+        case .review:
+            alertActions = [editReview(),
                             deleteReview()]
         }
 
@@ -327,8 +327,9 @@ extension PlanDetailViewController {
     }
     
     // MARK: - 후기 편집
-    private func editReview(_ isReviewed: Bool) -> UIAlertAction {
-        let title = isReviewed ? "후기 수정" : "후기 작성"
+    private func editReview() -> UIAlertAction {
+        let hasImage = commonPlanModel?.hasImage ?? false
+        let title = hasImage ? "후기 수정" : "후기 작성"
         
         return alertManager.makeAction(title: title,
                                        completion: { [weak self] in

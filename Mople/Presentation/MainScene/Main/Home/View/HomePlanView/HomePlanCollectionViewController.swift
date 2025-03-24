@@ -78,7 +78,7 @@ final class HomePlanCollectionViewController: BaseViewController, View {
     }
     
     private func setCollectionView() {
-        self.collectionView.delegate = self
+        collectionView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         collectionView.register(HomePlanCollectionCell.self, forCellWithReuseIdentifier: HomePlanCollectionCell.reuseIdentifier)
         collectionView.register(RecentPlanFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
@@ -111,7 +111,12 @@ final class HomePlanCollectionViewController: BaseViewController, View {
     // MARK: - Binding
     func bind(reactor: HomeViewReactor) {
         footerTapObserver
-            .map({ _ in Reactor.Action.presentCalendaer })
+            .map({ _ in Reactor.Action.flow(.calendar) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .map { Reactor.Action.flow(.planDetail(index: $0.item)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

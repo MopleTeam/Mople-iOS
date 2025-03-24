@@ -10,19 +10,13 @@ import ReactorKit
 
 protocol ScheduleListCommands: AnyObject {
     func resetPlanList()
+    func reloadDay(on date: Date)
     func updatePlanMonthList(with list: [Date])
     func loadMonthlyPlan(on month: DateComponents)
     func selectedDate(on date: Date)
     func editMeet(payload: MeetPayload)
     func editPlan(payload: PlanPayload)
     func editReview(payload: ReviewPayload)
-}
-
-// 요청 가능한 타입 (없음, 이전, 이후, 모두) 필터링해서 state로 넣어놓기
-// 뷰에선 받으면 scollendobserver에 nil 보내고 타입에 따라서 요청 필터링
-
-enum ScheduleFetchError: Error {
-    case dateParsingError
 }
 
 enum ScheduleFetchType {
@@ -46,6 +40,7 @@ final class ScheduleListReactor: Reactor {
             case loadMonthlyPlan(Date)
             case loadInitalPlan([Date])
             case editPlanList([MonthlyPlan])
+            case reloadMonth(Date)
         }
         
         enum ChildEvent {
@@ -63,7 +58,6 @@ final class ScheduleListReactor: Reactor {
         case updateSelectedDate(Date)
         case updateAddPlanList([MonthlyPlan])
         case editPlanList([MonthlyPlan])
-        case catchError(ScheduleFetchError)
         case resetPlan
     }
     
@@ -106,6 +100,8 @@ final class ScheduleListReactor: Reactor {
                 return recursionFetchMonthlyListPlan(month: dateList)
             case let .editPlanList(planList):
                 return .just(.editPlanList(planList))
+            case let .reloadMonth(month):
+                return reloadMonthlyPlan(month: month)
             }
             
         case let .childEvent(event):
@@ -143,22 +139,9 @@ final class ScheduleListReactor: Reactor {
         case .resetPlan:
             newState.planList = []
             newState.reset = ()
-        case let .catchError(err):
-            handleError(state: &newState,
-                        err: err)
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State,
-                             err: ScheduleFetchError) {
-        isLoading = false
-        
-        switch err {
-        case .dateParsingError:
-            return
-        }
     }
 }
 
@@ -178,6 +161,12 @@ extension ScheduleListReactor: ScheduleListCommands {
     
     func selectedDate(on date: Date) {
         action.onNext(.parentCommand(.selectedDate(date)))
+    }
+    
+    func reloadDay(on date: Date) {
+        let planDate = currentState.planList.compactMap { $0.date }
+        guard planDate.contains(where: { DateManager.isSameDay($0, date) }) else { return }
+        action.onNext(.parentCommand(.reloadMonth(date)))
     }
     
     func resetPlanList() {
@@ -220,6 +209,57 @@ extension ScheduleListReactor {
             }
     }
     
+    /// 일정의 갯수가 5개 이상이라면 그대로 return
+    /// 이하라면 재귀호출
+    private func handleRecursionFetch(type: ScheduleFetchType,
+                                      loadedList:[MonthlyPlan]) -> Observable<[MonthlyPlan]> {
+        if loadedList.count < 5,
+           let fetchDate = findFetchDate(type: type) {
+            return recursionFetchMonthlyPlan(month: fetchDate,
+                                                 accumulated: loadedList,
+                                                 type: type)
+        } else {
+            return .just(loadedList)
+        }
+    }
+    
+    /// 새로고침이 필요한 달의 일정 다시 받아오기
+    private func reloadMonthlyPlan(month: Date) -> Observable<Mutation> {
+        guard isLoading == false,
+              let monthString = DateManager.toString(date: month, format: .month) else {
+            return .empty()
+        }
+        isLoading = true
+        
+        let reloadMonth = fetchMonthlyPlanUseCase.execute(month: monthString)
+            .asObservable()
+            .flatMap { [weak self] monthPlan -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                let newPlanList = removeMonthlyPlan(month: month,
+                                                    newPlan: monthPlan)
+                
+                return .just(.editPlanList(newPlanList))
+            }
+        
+        return requestWithLoading(task: reloadMonth,
+                                  completionHandler: { [weak self] in
+            self?.isLoading = false
+        }, errorHandler: { [weak self] in
+            self?.isLoading = false
+        })
+    }
+    
+    private func removeMonthlyPlan(month: Date, newPlan: [MonthlyPlan]) -> [MonthlyPlan] {
+        var planList = currentState.planList
+        planList.removeAll {
+            guard let date = $0.date else { return false }
+            return DateManager.isSameMonth(date, month)
+        }
+        
+        planList.append(contentsOf: newPlan)
+        return planList
+    }
+    
     /// 요청 타입에 따라서 추가 일정 요청
     private func moreFetchMonthlyPlan(type: ScheduleFetchType) -> Observable<Mutation> {
         guard isLoading == false,
@@ -237,10 +277,12 @@ extension ScheduleListReactor {
                 }
             }
 
-        return requestWithLoading(task: fetchPlanObserver)
-            .do(afterCompleted: { [weak self] in
-                self?.isLoading = false
-            })
+        return requestWithLoading(task: fetchPlanObserver,
+                                  completionHandler: { [weak self] in
+            self?.isLoading = false
+        }, errorHandler: { [weak self] in
+            self?.isLoading = false
+        })
     }
 
     /// 여러 달의 일정을 요청
@@ -261,24 +303,12 @@ extension ScheduleListReactor {
             .map { $0.flatMap { $0 } }
             .map { Mutation.updateMonthlyPlan($0) }
         
-        return requestWithLoading(task: fetchPlanZipObserver)
-            .do(afterCompleted: { [weak self] in
-                self?.isLoading = false
-            })
-    }
-    
-    /// 일정의 갯수가 5개 이상이라면 그대로 return
-    /// 이하라면 재귀호출
-    private func handleRecursionFetch(type: ScheduleFetchType,
-                                      loadedList:[MonthlyPlan]) -> Observable<[MonthlyPlan]> {
-        if loadedList.count < 5,
-           let fetchDate = findFetchDate(type: type) {
-            return recursionFetchMonthlyPlan(month: fetchDate,
-                                                 accumulated: loadedList,
-                                                 type: type)
-        } else {
-            return .just(loadedList)
-        }
+        return requestWithLoading(task: fetchPlanZipObserver,
+                                  completionHandler: { [weak self] in
+            self?.isLoading = false
+        }, errorHandler: { [weak self] in
+            self?.isLoading = false
+        })
     }
 }
 
@@ -287,28 +317,25 @@ extension ScheduleListReactor {
     
     /// 일정 선택 시 타입과 날짜를 확인 후 맞는 타입으로 delegate에게 전달
     private func handleSelectedPlan(with plan: MonthlyPlan) {
-        guard let id = plan.id,
-              let date = plan.date else { return }
-        let type = checkPlanType(type: plan.type, date: date)
-        delegate?.selectedPlan(id: id, type: type)
-    }
-    
-    private func checkPlanType(type: MonthlyPlanType, date: Date) -> PlanDetailType {
-        if type == .plan,
-           checkPreviousDate(on: date) == false {
-            return .plan
+        guard let id = plan.id else { return }
+        if plan.type == .plan {
+            handlePlanDate(id: id,
+                          with: plan)
         } else {
-            return .review(isReviewed: nil)
+            delegate?.selectedPlan(id: id,
+                                   type: .review)
         }
     }
     
-    /// 일정의 타입은 plan이지만 과거인 경우 새로고침 알림 발송
-    private func checkPreviousDate(on date: Date) -> Bool {
-        if DateManager.isPastDay(on: date) {
-            EventService.shared.post(name: .newDay)
-            return true
+    private func handlePlanDate(id: Int,
+                               with plan: MonthlyPlan) {
+        guard let date = plan.date else { return }
+        
+        if DateManager.isPastDay(on: date) == false {
+            delegate?.selectedPlan(id: id,
+                                   type: .plan)
         } else {
-            return false
+            parent?.catchError(PlanDetailError.expiredPlan(date), index: 1)
         }
     }
 }
@@ -372,7 +399,7 @@ extension ScheduleListReactor {
     private func updatePlan(_ planList: inout [MonthlyPlan], plan: Plan) {
         guard let newDate = plan.date else { return }
         handleUpdate(&planList, plan: plan)
-        delegate?.updateDateList(type: .update(DateManager.startOfDay(newDate)))
+        delegate?.updateDateList(type: .add(DateManager.startOfDay(newDate)))
     }
     
     private func handleUpdate(_ planList: inout [MonthlyPlan], plan: Plan) {
@@ -506,6 +533,8 @@ extension ScheduleListReactor {
         if planList.isEmpty == false {
             loadedDateList.append(month)
             lastLoadMonth = month
+            delegate?.updateDateList(type: .update(at: month,
+                                                   with: planList.compactMap({ $0.date })))
         } else {
             initalDateList.removeAll { $0 == month }
             delegate?.deleteMonth(month: month)

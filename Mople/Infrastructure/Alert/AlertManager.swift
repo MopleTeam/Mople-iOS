@@ -59,13 +59,13 @@ extension AlertManager {
 struct DefaultAction {
     
     var text: String
-    var tintColor: UIColor = ColorStyle.Gray._01
-    var bgColor: UIColor = ColorStyle.App.tertiary
+    var tintColor: UIColor
+    var bgColor: UIColor
     var completion: (() -> Void)?
     
-    init(text: String = "아니오",
-         tintColor: UIColor = ColorStyle.Gray._01,
-         bgColor: UIColor = ColorStyle.App.tertiary,
+    init(text: String = "확인",
+         tintColor: UIColor = ColorStyle.Default.white,
+         bgColor: UIColor = ColorStyle.App.primary,
          completion: (() -> Void)? = nil) {
         
         self.text = text

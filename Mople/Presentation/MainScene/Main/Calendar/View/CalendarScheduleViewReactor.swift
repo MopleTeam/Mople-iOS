@@ -42,7 +42,8 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case updatePlan(PlanPayload)
         case updateMeet(MeetPayload)
         case updateReview(ReviewPayload)
-//        case catchError(
+        case reloadDay(Date)
+        case catchError(Error)
     }
     
     enum Mutation {
@@ -54,6 +55,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         
         case calendarEvent(CalendarEvents)
         case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
@@ -61,6 +63,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var scope: ScopeType = .month
         @Pulse var changeMonth: DateComponents?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     // MARK: - Variables
@@ -100,6 +103,10 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
             return handlePlanPayload(payload)
         case let .updateReview(payload):
             return handleReviewPayload(payload)
+        case let .reloadDay(day):
+            return reloadMonth(on: day)
+        case let .catchError(err):
+            return .just(.catchError(err))
         }
     }
     
@@ -125,8 +132,20 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
                                 event: event)
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
+        case let .catchError(err):
+            handleError(state: &newState,
+                        err: err)
         }
         return newState
+    }
+    
+    private func handleError(state: inout State, err: Error) {
+        switch err {
+        case let planError as PlanDetailError:
+            state.error = planError
+        default:
+            break
+        }
     }
     
     private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
@@ -210,7 +229,7 @@ extension CalendarScheduleViewReactor: ChildLoadingDelegate {
     }
     
     func catchError(_ error: any Error, index: Int) {
-        
+        action.onNext(.catchError(error))
     }
 }
 
@@ -239,4 +258,11 @@ extension CalendarScheduleViewReactor {
     }
 }
 
+// MARK: - 새로고침
+extension CalendarScheduleViewReactor {
+    private func reloadMonth(on month: Date) -> Observable<Mutation> {
+        scheduleListCommands?.reloadDay(on: month)
+        return .empty()
+    }
+}
 

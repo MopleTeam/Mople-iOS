@@ -9,8 +9,9 @@ import Foundation
 import ReactorKit
 
 enum EventUpdateType {
-    case update(Date)
+    case add(Date)
     case delete(Date)
+    case update(at: Date, with :[Date])
 }
 
 protocol CalendarCommands: AnyObject {
@@ -47,6 +48,7 @@ final class CalendarViewReactor: Reactor {
     
     enum Mutation {
         case changeScope
+        case changeMonthScope
         case updatePage(Date)
         case updateScrollDate(Date)
         case updateDates([Date])
@@ -57,6 +59,7 @@ final class CalendarViewReactor: Reactor {
         @Pulse var scrollDate: Date?
         @Pulse var page: Date?
         @Pulse var changeScope: Void?
+        @Pulse var changeMonthScope: Void?
     }
     
     var initialState: State = State()
@@ -97,13 +100,15 @@ final class CalendarViewReactor: Reactor {
         
         switch mutation {
         case let .updateDates(dates):
-            newState.dates = dates
+            newState.dates = dates.map({ DateManager.startOfDay($0) })
         case let .updateScrollDate(date):
             newState.scrollDate = date
         case let .updatePage(month):
             newState.page = month
         case .changeScope:
             newState.changeScope = ()
+        case .changeMonthScope:
+            newState.changeMonthScope = ()
         }
         
         return newState
@@ -133,16 +138,17 @@ final class CalendarViewReactor: Reactor {
 extension CalendarViewReactor {
     private func fetchDates() -> Observable<Mutation> {
         let fetchDates = fetchCalendarDatesUseCase.execute()
-            .debug("#0320")
             .asObservable()
             .catchAndReturn([])
             .map { [weak self] in
                 self?.updatePlanMonthList(from: $0)
-                $0.forEach { print(#function, #line, "#0320 스케줄 일정 : \($0)" ) }
                 return Mutation.updateDates($0)
             }
         
         return requestWithLoading(task: fetchDates)
+            .flatMap { fetchMutation -> Observable<Mutation> in
+                return .of(fetchMutation, .changeMonthScope)
+            }
     }
     
     private func updatePlanMonthList(from dateList: [Date]) {
@@ -177,22 +183,33 @@ extension CalendarViewReactor: CalendarCommands {
         var dateList = currentState.dates
         
         switch type {
-        case let .update(newDate):
-            updatePlan(&dateList, newDate: newDate)
+        case let .add(newDate):
+            addPlan(with: &dateList, newDate: newDate)
         case let .delete(deleteDate):
-            deletePlan(&dateList, deleteDate: deleteDate)
+            deletePlan(with: &dateList, deleteDate: deleteDate)
+        case let .update(month, monthDateList):
+            updatePlan(with: &dateList,
+                       at: month,
+                       monthDate: monthDateList)
         }
         
         action.onNext(.parentCommand(.editDateList(dateList)))
     }
     
-    private func updatePlan(_ dateList: inout [Date], newDate: Date) {
+    private func addPlan(with dateList: inout [Date], newDate: Date) {
         guard dateList.contains(where: { $0 == newDate }) == false else { return }
         dateList.append(newDate)
     }
     
-    private func deletePlan(_ dateList: inout [Date], deleteDate: Date) {
+    private func deletePlan(with dateList: inout [Date], deleteDate: Date) {
         dateList.removeAll { $0 == deleteDate }
+    }
+    
+    private func updatePlan(with dateList: inout [Date],
+                            at month: Date,
+                            monthDate: [Date]) {
+        dateList.removeAll { DateManager.isSameMonth($0, month) }
+        dateList.append(contentsOf: monthDate)
     }
     
     func resetDate() {

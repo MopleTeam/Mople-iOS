@@ -138,7 +138,6 @@ final class CalendarViewController: BaseViewController, View {
         reactor.pulse(\.$dates)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, events in
-                vc.startMode()
                 vc.updateEvents(with: events)
                 vc.setDefaulsePreDate()
             })
@@ -162,10 +161,20 @@ final class CalendarViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$changeScope)
+            .observe(on: MainScheduler.instance)
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, _ in
                 vc.switchScope(type: .buttonTap)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$changeMonthScope)
+            .observe(on: MainScheduler.instance)
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, _ in
+                vc.changeMonthScope()
             })
             .disposed(by: disposeBag)
     }
@@ -362,10 +371,16 @@ extension CalendarViewController {
         calendar.setScope(scope, animated: true)
     }
 
-    /// Month인 경우에만 Week으로 전환
+    /// Month일 때 Week 스코프로 전환
     private func changeWeekScope(animated: Bool) {
         guard calendar.scope == .month else { return }
         calendar.setScope(.week, animated: animated)
+    }
+    
+    /// Week일 때 Week 스코프로 전환
+    private func changeMonthScope() {
+        guard calendar.scope == .week else { return }
+        calendar.setScope(.month, animated: false)
     }
 
     /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
@@ -377,10 +392,6 @@ extension CalendarViewController {
             self.selectedPresnetDate(on: date)
             self.dateSelectionObserver.accept(date)
         })
-    }
-    
-    private func startMode() {
-        calendar.setScope(.month, animated: false)
     }
 }
 
@@ -597,7 +608,7 @@ extension CalendarViewController {
     /// 이번달의 선택된 날짜또는 첫번째 이벤트 PreSelected로 설정
     private func setPreSelectedDateWhenMonth() {
         guard calendar.scope == .month else { return }
-        preSelectedDate = hasSelectedDateInCurrentMonth()
+        preSelectedDate = selectedDateInCurrentMonth()
         ?? findSameMonthDate(on: calendar.currentPage)
         ?? findSmallestNextMonth(on: calendar.currentPage)
         ?? findLargestPreviousDate(on: calendar.currentPage)
@@ -615,7 +626,7 @@ extension CalendarViewController {
 
     /// 이번달에 존재하는 날짜인지 체크
     /// - Parameter date: 체크할 날짜
-    private func hasSelectedDateInCurrentMonth() -> Date? {
+    private func selectedDateInCurrentMonth() -> Date? {
         guard let date = calendar.selectedDate,
               DateManager.isSameMonth(calendar.currentPage, date) else { return nil }
 
@@ -626,23 +637,28 @@ extension CalendarViewController {
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
         guard calendar.scope == .month,
-              calendar.selectedDate != preSelectedDate,
-              let preSelectedDate else { return }
+              calendar.selectedDate != preSelectedDate else { return }
         calendar.select(preSelectedDate, scrollToDate: false)
     }
 
     /// 기본값으로 첫 이벤트 preSelectedDate에 할당
     private func setDefaulsePreDate() {
         let currentDate = calendar.currentPage
-        preSelectedDate = findSameMonthDate(on: currentDate)
+        preSelectedDate = findFirstEvent(on: currentDate)
         ?? findSmallestNextMonth(on: currentDate)
         ?? findLargestPreviousDate(on: currentDate)
-        if let preSelectedDate {
-            calendar.select(preSelectedDate, scrollToDate: false)
-        } else {
-            guard let selectedDate = calendar.selectedDate else { return }
-            calendar.deselect(selectedDate)
-        }
+        deSelectedDate()
+    }
+    
+    private func deSelectedDate() {
+        guard let selectedDate = calendar.selectedDate else { return }
+        calendar.deselect(selectedDate)
+    }
+    
+    private func findFirstEvent(on date: Date) -> Date? {
+        let currentMonthDate = events.filter({ DateManager.isSameMonth($0, date) })
+        let activeEvent = currentMonthDate.filter { DateManager.isFutureOrToday(on: $0) }
+        return activeEvent.first ?? currentMonthDate.first
     }
     
     /// date와 같은 달의 이벤트 중 가장 첫번째

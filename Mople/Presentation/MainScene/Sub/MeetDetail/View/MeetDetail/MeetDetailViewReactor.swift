@@ -8,7 +8,9 @@
 import Foundation
 import ReactorKit
 
-protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate { }
+protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate {
+    func selectedPlan(id: Int, type: PlanDetailType)
+}
 
 enum MeetDetailError: Error { }
 
@@ -23,7 +25,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case reviewLoading(Bool)
         case resetList
         case endFlow
-        case catchChildError(MeetDetailError)
+        case catchError(Error)
     }
     
     enum Mutation {
@@ -31,7 +33,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetInfoLoading(Bool)
         case updatePlanListLoading(Bool)
         case updateReviewListLoading(Bool)
-        case catchError(MeetDetailError)
+        case catchError(Error)
     }
     
     struct State {
@@ -40,6 +42,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var meetInfoLoaded: Bool = false
         @Pulse var futurePlanLoaded: Bool = false
         @Pulse var pastPlanLoaded: Bool = false
+        @Pulse var error: Error?
     }
     
     var initialState: State = State()
@@ -82,7 +85,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case .endFlow:
             coordinator?.endFlow()
             return .empty()
-        case let .catchChildError(err):
+        case let .catchError(err):
             return .just(.catchError(err))
         }
     }
@@ -108,9 +111,13 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     }
     
     private func handleError(state: inout State,
-                             err: MeetDetailError) {
-
-        // 에러처리
+                             err: Error) {
+        switch err {
+        case let planError as PlanDetailError:
+            state.error = planError
+        default:
+            break
+        }
     }
 }
 
@@ -168,8 +175,11 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
         }
     }
     
-    func catchError(_ error: any Error, index: Int) {
-        guard let meetDetailErr = error as? MeetDetailError else { return }
-        action.onNext(.catchChildError(meetDetailErr))
+    func selectedPlan(id: Int, type: PlanDetailType) {
+        coordinator?.pushPlanDetailView(postId: id, type: type)
+    }
+    
+    func catchError(_ error: Error, index: Int) {
+        action.onNext(.catchError(error))
     }
 }

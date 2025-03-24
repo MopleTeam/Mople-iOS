@@ -17,8 +17,8 @@
 		5208C1762CBE2F3D006272E8 /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */; };
 		5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */; };
 		5208C17A2CBE72A8006272E8 /* UIApplication+RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */; };
-		521091E02D0FAC3800DD0407 /* RecentPlanResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */; };
-		521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091E22D0FACB500DD0407 /* RecentPlan.swift */; };
+		521091E02D0FAC3800DD0407 /* HomeDataResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091DF2D0FAC3800DD0407 /* HomeDataResponse.swift */; };
+		521091E32D0FACB500DD0407 /* HomeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091E22D0FACB500DD0407 /* HomeData.swift */; };
 		521091EF2D1021B700DD0407 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091EE2D1021B700DD0407 /* WeatherViewModel.swift */; };
 		521091F12D10559600DD0407 /* Meet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521091F02D10559600DD0407 /* Meet.swift */; };
 		5211F8F62C84234800403980 /* DefaultTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F8F52C84234800403980 /* DefaultTabBarController.swift */; };
@@ -164,7 +164,7 @@
 		52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECB2D11A57E00C249A6 /* UploadPlace.swift */; };
 		52741ECF2D14E00D00C249A6 /* PlanTimePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECE2D14E00D00C249A6 /* PlanTimePickerViewController.swift */; };
 		527A3E6C2C82CA8F007FE63B /* SignUpUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* SignUpUseCaseMock.swift */; };
-		527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */; };
+		527A3E722C8302AA007FE63B /* FetchHomeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchHomeData.swift */; };
 		527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */; };
 		527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E7E2C834BEE007FE63B /* ProfileFlowCoordinator.swift */; };
 		527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E8E2C836192007FE63B /* HomeViewController.swift */; };
@@ -412,8 +412,8 @@
 		5208C1752CBE2F3D006272E8 /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		5208C1772CBE6E13006272E8 /* ProfileEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewController.swift; sourceTree = "<group>"; };
 		5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+RootView.swift"; sourceTree = "<group>"; };
-		521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanResponse.swift; sourceTree = "<group>"; };
-		521091E22D0FACB500DD0407 /* RecentPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlan.swift; sourceTree = "<group>"; };
+		521091DF2D0FAC3800DD0407 /* HomeDataResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDataResponse.swift; sourceTree = "<group>"; };
+		521091E22D0FACB500DD0407 /* HomeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeData.swift; sourceTree = "<group>"; };
 		521091EE2D1021B700DD0407 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		521091F02D10559600DD0407 /* Meet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meet.swift; sourceTree = "<group>"; };
 		5211F8F52C84234800403980 /* DefaultTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTabBarController.swift; sourceTree = "<group>"; };
@@ -554,7 +554,7 @@
 		52741ECB2D11A57E00C249A6 /* UploadPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPlace.swift; sourceTree = "<group>"; };
 		52741ECE2D14E00D00C249A6 /* PlanTimePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTimePickerViewController.swift; sourceTree = "<group>"; };
 		527A3E6B2C82CA8F007FE63B /* SignUpUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpUseCaseMock.swift; sourceTree = "<group>"; };
-		527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRecentPlan.swift; sourceTree = "<group>"; };
+		527A3E712C8302AA007FE63B /* FetchHomeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchHomeData.swift; sourceTree = "<group>"; };
 		527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneCoordinator.swift; sourceTree = "<group>"; };
 		527A3E7E2C834BEE007FE63B /* ProfileFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlowCoordinator.swift; sourceTree = "<group>"; };
 		527A3E8E2C836192007FE63B /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -1926,6 +1926,14 @@
 			path = PlanDatePickerView;
 			sourceTree = "<group>";
 		};
+		52AAAF8B2D8DA66000CA9CE1 /* HomeData */ = {
+			isa = PBXGroup;
+			children = (
+				521091E22D0FACB500DD0407 /* HomeData.swift */,
+			);
+			path = HomeData;
+			sourceTree = "<group>";
+		};
 		52AD4B6D2D5B1BF400FCA929 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -2114,7 +2122,6 @@
 			isa = PBXGroup;
 			children = (
 				52C857BA2D0865A100765FB3 /* Plan.swift */,
-				521091E22D0FACB500DD0407 /* RecentPlan.swift */,
 				5285E6E12CDC342D00B855CB /* Components */,
 			);
 			path = Plan;
@@ -2163,7 +2170,7 @@
 			isa = PBXGroup;
 			children = (
 				52C857B52D082AFB00765FB3 /* PlanResponse.swift */,
-				521091DF2D0FAC3800DD0407 /* RecentPlanResponse.swift */,
+				521091DF2D0FAC3800DD0407 /* HomeDataResponse.swift */,
 			);
 			path = Plan;
 			sourceTree = "<group>";
@@ -2426,6 +2433,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				52AAAF8B2D8DA66000CA9CE1 /* HomeData */,
 				522958332D52004600AE4EC3 /* Member */,
 				529CCD442D3231430041CBB7 /* Review */,
 				529CCD432D32312A0041CBB7 /* Account */,
@@ -2625,7 +2633,7 @@
 			isa = PBXGroup;
 			children = (
 				5214F88B2D2BB11A00E8CE9C /* FetchMeetPlanList.swift */,
-				527A3E712C8302AA007FE63B /* FetchRecentPlan.swift */,
+				527A3E712C8302AA007FE63B /* FetchHomeData.swift */,
 				5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */,
 				529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */,
 			);
@@ -3124,7 +3132,7 @@
 				52818C902D1C469F0001E30B /* SearchPlaceTableCell.swift in Sources */,
 				52A1164B2D4BB23B00AC0C91 /* PlanDetailModel.swift in Sources */,
 				5221B1392D548011004859C9 /* PhotoCollectionHeaderView.swift in Sources */,
-				521091E02D0FAC3800DD0407 /* RecentPlanResponse.swift in Sources */,
+				521091E02D0FAC3800DD0407 /* HomeDataResponse.swift in Sources */,
 				5214F88C2D2BB11A00E8CE9C /* FetchMeetPlanList.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
 				527A3EA12C836435007FE63B /* ProfileSceneDIContainer.swift in Sources */,
@@ -3143,7 +3151,7 @@
 				5231DF772D2FCC4A00D52529 /* ParticipationPlan.swift in Sources */,
 				52EBAF6D2D4D1FC80085727B /* FetchUserInfoMock.swift in Sources */,
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
-				521091E32D0FACB500DD0407 /* RecentPlan.swift in Sources */,
+				521091E32D0FACB500DD0407 /* HomeData.swift in Sources */,
 				5214F8822D2BA98C00E8CE9C /* MeetPlanViewModel.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
@@ -3221,7 +3229,7 @@
 				52CE87C92CEC3FED00EBD85D /* ImageUploadRepo.swift in Sources */,
 				5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */,
 				52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */,
-				527A3E722C8302AA007FE63B /* FetchRecentPlan.swift in Sources */,
+				527A3E722C8302AA007FE63B /* FetchHomeData.swift in Sources */,
 				52B8E1232D5392EA00F7FF59 /* PhotoCollectionView.swift in Sources */,
 				52EA6DFB2CF78F9D00EFD753 /* SocialInfo.swift in Sources */,
 				522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */,

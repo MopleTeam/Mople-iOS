@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol PlanQueryRepo {
-    func fetchRecentPlanList() -> Single<RecentPlanResponse>
+    func fetchHomeData() -> Single<HomeDataResponse>
     func fetchPlanDetail(planId: Int) -> Single<PlanResponse>
     func fetchMeetPlanList(_ meetId: Int) -> Single<[PlanResponse]>
 }

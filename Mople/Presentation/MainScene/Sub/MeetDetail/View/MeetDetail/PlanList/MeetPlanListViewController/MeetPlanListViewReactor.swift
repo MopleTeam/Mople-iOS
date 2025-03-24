@@ -36,18 +36,15 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     private let fetchPlanUseCase: FetchMeetPlanList
     private let participationPlanUseCase: ParticipationPlan
-    private weak var coordinator: MeetDetailCoordination?
     private weak var delegate: MeetDetailDelegate?
     private let meedId: Int
     
     init(fetchPlanUseCase: FetchMeetPlanList,
          participationPlanUseCase: ParticipationPlan,
-         coordinator: MeetDetailCoordination,
          delegate: MeetDetailDelegate,
          meetID: Int) {
         self.fetchPlanUseCase = fetchPlanUseCase
         self.participationPlanUseCase = participationPlanUseCase
-        self.coordinator = coordinator
         self.delegate = delegate
         self.meedId = meetID
         action.onNext(.requestPlanList)
@@ -150,31 +147,23 @@ extension MeetPlanListViewReactor {
     
     private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedPlan = currentState.plans[safe: index],
-              let planId = selectedPlan.id,
-              let planDate = selectedPlan.date else { return .empty() }
-        let type = checkPlanType(date: planDate)
-        self.coordinator?.pushPlanDetailView(postId: planId,
-                                             type: type,
-                                             completion: { [weak self] in
-            self?.notifyNewDayIfReviewType(with: type)
-        })
+              let planId = selectedPlan.id else { return .empty() }
+        
+        handlePlanDate(id: planId,
+                       with: selectedPlan)
+        
         return .empty()
     }
     
-    private func checkPlanType(date: Date) -> PlanDetailType {
+    private func handlePlanDate(id: Int,
+                               with plan: Plan) {
+        guard let date = plan.date else { return }
+        
         if DateManager.isPastDay(on: date) == false {
-            return .plan
+            delegate?.selectedPlan(id: id,
+                                   type: .plan)
         } else {
-            return .review(isReviewed: nil)
-        }
-    }
-    
-    private func notifyNewDayIfReviewType(with type: PlanDetailType) {
-        switch type {
-        case .review:
-            EventService.shared.post(name: .newDay)
-        default:
-            break
+            parent?.catchError(PlanDetailError.expiredPlan(date), index: 1)
         }
     }
 }

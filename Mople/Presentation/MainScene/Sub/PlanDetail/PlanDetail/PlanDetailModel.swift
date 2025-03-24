@@ -9,12 +9,13 @@ import Foundation
 
 enum PlanDetailType {
     case plan
-    case review(isReviewed: Bool?)
+    case review
 }
 
 struct PlanDetailModel {
     let isCreator: Bool
     let type: PlanDetailType
+    var hasImage: Bool = false
 }
 
 extension PlanDetailModel {
@@ -25,6 +26,7 @@ extension PlanDetailModel {
     
     init(review: Review) {
         self.isCreator = review.isCreator
-        self.type = .review(isReviewed: review.isReviewd)
+        self.type = .review
+        self.hasImage = review.isReviewd
     }
 }

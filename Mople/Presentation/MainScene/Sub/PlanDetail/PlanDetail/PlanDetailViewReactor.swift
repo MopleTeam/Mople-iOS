@@ -15,6 +15,16 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
     func reportComment()
 }
 
+enum PlanDetailError: Error {
+    case expiredPlan(Date)
+    
+    var message: String {
+        switch self {
+        case .expiredPlan: "마감된 약속입니다."
+        }
+    }
+}
+
 final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {

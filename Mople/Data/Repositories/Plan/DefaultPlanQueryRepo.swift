@@ -9,7 +9,7 @@ import RxSwift
 
 final class DefaultPlanQueryRepo: BaseRepositories, PlanQueryRepo {
     
-    func fetchRecentPlanList() -> Single<RecentPlanResponse> {
+    func fetchHomeData() -> Single<HomeDataResponse> {
         return self.networkService.authenticatedRequest(endpointClosure: APIEndpoints.fetchRecentPlan)
     }
     

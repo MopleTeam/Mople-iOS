@@ -24,7 +24,9 @@ extension ChildLoadingReactor {
 
     func requestWithLoading(task: Observable<Mutation>,
                             minimumExecutionTime: RxTimeInterval = .seconds(0),
-                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300)
+                            defferredLoadingDelay: RxTimeInterval = .milliseconds(300),
+                            completionHandler: (() -> Void)? = nil,
+                            errorHandler: (() -> Void)? = nil
     ) -> Observable<Mutation> {
         
         let executionTimer = Observable<Int>.timer(minimumExecutionTime, scheduler: MainScheduler.instance)
@@ -32,6 +34,7 @@ extension ChildLoadingReactor {
         let loadingStop = Observable.just(())
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self else { return .empty() }
+                completionHandler?()
                 parent?.updateLoadingState(false, index: index)
                 return .empty()
             }
@@ -40,6 +43,7 @@ extension ChildLoadingReactor {
             .map { $0.0 }
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
+                errorHandler?()
                 return self.catchError(error)
             }
             .concat(loadingStop)

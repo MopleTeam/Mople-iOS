@@ -10,7 +10,7 @@ import UIKit
 protocol MeetDetailSceneDependencies {
     // MARK: - View
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController
-    func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController
+    func makeMeetPlanListViewController() -> MeetPlanListViewController
     func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetSetupCoordination) -> MeetSetupViewController
@@ -69,15 +69,15 @@ extension MeetDetailSceneDIContainer {
     
     
     // MARK: - 예정된 일정리스트 뷰
-    func makeMeetPlanListViewController(coordinator: MeetDetailCoordination) -> MeetPlanListViewController {
+    func makeMeetPlanListViewController() -> MeetPlanListViewController {
         return MeetPlanListViewController(
-            reactor: makeMeetPlanListViewReactor(coordinator: coordinator))
+            reactor: makeMeetPlanListViewReactor()
+        )
     }
     
-    private func makeMeetPlanListViewReactor(coordinator: MeetDetailCoordination) -> MeetPlanListViewReactor {
+    private func makeMeetPlanListViewReactor() -> MeetPlanListViewReactor {
         let reactor = MeetPlanListViewReactor(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
                                             participationPlanUseCase: makeParticipationPlanUseCase(),
-                                            coordinator: coordinator,
                                             delegate: mainReactor!,
                                             meetID: meetId)
         mainReactor?.planListCommands = reactor

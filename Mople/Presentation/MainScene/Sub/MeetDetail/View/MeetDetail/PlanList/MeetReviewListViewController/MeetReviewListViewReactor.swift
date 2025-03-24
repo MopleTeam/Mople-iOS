@@ -89,8 +89,7 @@ extension MeetReviewListViewReactor {
         guard let selectedReview = currentState.reviews[safe: index],
               let reviewId = selectedReview.id else { return .empty() }
         self.coordinator?.pushPlanDetailView(postId: reviewId,
-                                             type: .review(isReviewed: nil),
-                                             completion: nil)
+                                             type: .review)
         return .empty()
     }
 }
