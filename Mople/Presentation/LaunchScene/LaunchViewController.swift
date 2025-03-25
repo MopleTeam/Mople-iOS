@@ -30,10 +30,6 @@ final class LaunchViewController: DefaultViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
         viewModel.checkEntry()
     }
     

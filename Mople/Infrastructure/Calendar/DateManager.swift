@@ -171,7 +171,8 @@ extension DateManager {
     
     static func numberOfDaysBetween(_ date: Date) -> Int {
         let scheduleDate = startOfDay(date)
-        let result = calendar.dateComponents([.day], from: Date(), to: scheduleDate)
+        let today = startOfDay(Date())
+        let result = calendar.dateComponents([.day], from: today, to: scheduleDate)
         return result.day ?? 0
     }
     

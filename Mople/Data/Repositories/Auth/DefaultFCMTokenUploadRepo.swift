@@ -19,6 +19,7 @@ final class DefaultFCMTokenRepo: BaseRepositories, FCMTokenUploadRepo {
     }
     
     private func requsetUploadToken(_ token: String?) {
+        guard let token else { return }
         networkService.authenticatedRequest {
             try APIEndpoints.uploadFCMToken(token)
         }

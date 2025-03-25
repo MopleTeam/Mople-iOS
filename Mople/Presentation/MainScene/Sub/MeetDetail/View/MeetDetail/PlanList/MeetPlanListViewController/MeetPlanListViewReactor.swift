@@ -92,6 +92,7 @@ extension MeetPlanListViewReactor {
     private func fetchPlanList() -> Observable<Mutation> {
         
         let fetchPlanList = fetchPlanUseCase.execute(meetId: meedId)
+            .catchAndReturn([])
             .map({ Mutation.fetchPlanList($0) })
             .asObservable()
 
@@ -114,12 +115,16 @@ extension MeetPlanListViewReactor {
                     return handleParticipants(planIndex: planIndex)
                 }
             
-            return requestWithLoading(task: requestParticipation)
+            return requestWithLoading(task: requestParticipation,
+                                      errorHandler: { [weak self] err in
+                self?.handleParticipantionError(err: err,
+                                                id: planId)
+            })
         } else {
             return .just(.closePlan(id: planId))
         }
     }
-    
+
     private func checkPlanTime(planIndex: Int) -> Bool {
         guard let planDate = currentState.plans[planIndex].date else { return false }
         return planDate > Date()
@@ -139,6 +144,12 @@ extension MeetPlanListViewReactor {
             guard let id = plan.id else { return }
             EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
         }
+    }
+    
+    private func handleParticipantionError(err: Error, id: Int) {
+        guard let dataTransferError = err as? DataTransferError,
+              case .noResponse = dataTransferError else { return }
+        EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
     }
 }
 

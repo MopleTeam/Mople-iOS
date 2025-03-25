@@ -6,15 +6,18 @@
 //
 
 import UIKit
+import RxSwift
 
 final class AppFlowCoordinator: BaseCoordinator {
     
     private let appDIContainer: AppDIContainer
+    private var disposeBag = DisposeBag()
  
     init(navigationController: AppNaviViewController,
          appDIContainer: AppDIContainer) {
         self.appDIContainer = appDIContainer
         super.init(navigationController: navigationController)
+        bindSessionExpiration()
     }
     
     override func start() {
@@ -38,7 +41,6 @@ extension AppFlowCoordinator: LaunchCoordination {
     }
     
     func loginFlowStart() {
-        print(#function, #line)
         self.navigationController.viewControllers.removeAll()
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
         let flow = loginSceneDIContainer.makeAuthFlowCoordinator(navigationController: navigationController)
@@ -64,9 +66,22 @@ protocol SignOutListener {
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
+        KeyChainService.shared.deleteToken()
+        UserInfoStorage.shared.deleteEnitity()
         loginFlowStart()
     }
 }
-    
+
+// MARK: - 로그인 세션 만료
+extension AppFlowCoordinator {
+    private func bindSessionExpiration() {
+        EventService.shared.receiveObservable(name: .sessionExpired)
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                vc.loginFlowStart()
+            })
+            .disposed(by: disposeBag)
+    }
+}
     
 

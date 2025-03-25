@@ -11,7 +11,8 @@ import RxSwift
 enum DataTransferError: Error {
     case parsing(Error)
     case networkFailure(NetworkError)
-    case tokenExpired
+    case expiredToken
+    case expiredRefreshToken
     case noResponse
     case unknownError(Error)
 }
@@ -133,7 +134,8 @@ class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     
     private func handleErrorStatus(code: Int, err: Error) -> DataTransferError {
         switch code {
-        case 400: .tokenExpired
+        case 400: .expiredRefreshToken
+        case 401: .expiredToken
         case 404: .noResponse
         default : .unknownError(err)
         }

@@ -244,7 +244,7 @@ extension ScheduleListReactor {
         return requestWithLoading(task: reloadMonth,
                                   completionHandler: { [weak self] in
             self?.isLoading = false
-        }, errorHandler: { [weak self] in
+        }, errorHandler: { [weak self] _ in
             self?.isLoading = false
         })
     }
@@ -268,6 +268,7 @@ extension ScheduleListReactor {
         
         let fetchPlanObserver = recursionFetchMonthlyPlan(month: fetchDate,
                                                           type: type)
+        
             .flatMap { planList -> Observable<Mutation> in
                 switch type {
                 case .next:
@@ -280,7 +281,7 @@ extension ScheduleListReactor {
         return requestWithLoading(task: fetchPlanObserver,
                                   completionHandler: { [weak self] in
             self?.isLoading = false
-        }, errorHandler: { [weak self] in
+        }, errorHandler: { [weak self] _ in
             self?.isLoading = false
         })
     }
@@ -300,13 +301,20 @@ extension ScheduleListReactor {
         }
         
         let fetchPlanZipObserver = Observable.zip(fetchPlanObserver)
+            .do(afterCompleted: {
+                print(#function, #line, "Path : #0325 afterCompletd ")
+            }, onDispose: {
+                print(#function, #line, "Path : #0325 onDispose ")
+            })
             .map { $0.flatMap { $0 } }
             .map { Mutation.updateMonthlyPlan($0) }
         
         return requestWithLoading(task: fetchPlanZipObserver,
                                   completionHandler: { [weak self] in
+            print(#function, #line, "Path : #0325 completion ")
             self?.isLoading = false
-        }, errorHandler: { [weak self] in
+        }, errorHandler: { [weak self] _ in
+            print(#function, #line, "Path : #0325 error ")
             self?.isLoading = false
         })
     }
@@ -493,6 +501,7 @@ extension ScheduleListReactor {
     /// - Returns: 불러올 달 리스트
     private func findFetchDateList(from date: Date) -> [Date] {
         return [findLargestPreviousMonth(from: date),
+                findSameMonth(from: date),
                 findSmallestNextMonth(from: date)].compactMap { $0 }
     }
     
@@ -519,7 +528,7 @@ extension ScheduleListReactor {
     
     /// monthList에서 date로부터 앞으로 가까운 날짜
     private func findSmallestNextMonth(from date: Date) -> Date? {
-        return monthDateList.filter { $0 >= date }.min()
+        return monthDateList.filter { $0 > date }.min()
     }
     
     /// monthList에서 불러온 날짜 제거 및 저장

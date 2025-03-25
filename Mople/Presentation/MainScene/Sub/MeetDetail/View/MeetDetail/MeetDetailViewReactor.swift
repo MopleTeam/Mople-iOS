@@ -21,10 +21,10 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case switchPage(isFuture: Bool)
         case pushMeetSetupView
         case editMeet(MeetPayload)
-        case planLoading(Bool)
-        case reviewLoading(Bool)
         case resetList
         case endFlow
+        case planLoading(Bool)
+        case reviewLoading(Bool)
         case catchError(Error)
     }
     
@@ -123,18 +123,18 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
 
 extension MeetDetailViewReactor {
     private func fetchMeetInfo(id: Int) -> Observable<Mutation> {
-        let loadingStart = Observable.just(Mutation.updateMeetInfoLoading(true))
         
-        #warning("에러 처리")
         let updateMeet = fetchMeetUseCase.execute(meetId: id)
             .asObservable()
             .map { Mutation.setMeetInfo(meet: $0) }
         
-        let loadingStop = Observable.just(Mutation.updateMeetInfoLoading(false))
-        
-        return Observable.concat([loadingStart,
-                                  updateMeet,
-                                  loadingStop])
+        return requestWithLoading(task: updateMeet)
+    }
+    
+    private func handleMeetFetchError(err: Error, id: Int) {
+        guard let dataTransferError = err as? DataTransferError,
+              case .noResponse = dataTransferError else { return }
+        EventService.shared.postItem(MeetPayload.deleted(id: id), from: self)
     }
 }
 
@@ -181,5 +181,15 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
     
     func catchError(_ error: Error, index: Int) {
         action.onNext(.catchError(error))
+    }
+}
+
+extension MeetDetailViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateMeetInfoLoading(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

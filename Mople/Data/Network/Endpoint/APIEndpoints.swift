@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum TokenError: Error {
-    case noJWTToken
-    case noFCMToken
-}
-
 enum HTTPHeader {
     private static let acceptAll = ["Accept": "*/*"]
     private static let acceptJson = ["Accept": "application/json"]
@@ -42,20 +37,19 @@ enum HTTPHeader {
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.accessToken else { throw TokenError.noJWTToken }
+        guard let token = KeyChainService.cachedToken?.accessToken else { throw AppError.expiredToken }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.refreshToken else { throw TokenError.noJWTToken }
+        guard let token = KeyChainService.cachedToken?.refreshToken else { throw AppError.expiredToken }
         return ["refreshToken": token]
     }
 }
 
 // MARK: - FCM Token
 extension APIEndpoints {
-    static func uploadFCMToken(_ fcmToken: String?) throws -> Endpoint<Void> {
-        guard let fcmToken else { throw TokenError.noFCMToken }
+    static func uploadFCMToken(_ fcmToken: String) throws -> Endpoint<Void> {
         return try Endpoint(path: "token/save",
                             authenticationType: .accessToken,
                             method: .post,

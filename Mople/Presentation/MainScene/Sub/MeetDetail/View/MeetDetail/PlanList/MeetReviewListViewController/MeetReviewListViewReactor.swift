@@ -79,6 +79,7 @@ extension MeetReviewListViewReactor {
     private func fetchReviewList() -> Observable<Mutation> {
         
         let fetchPlanList = fetchReviewUseCase.execute(meetId: meedId)
+            .catchAndReturn([])
             .map({ Mutation.fetchReviewList(reviews: $0) })
             .asObservable()
                 

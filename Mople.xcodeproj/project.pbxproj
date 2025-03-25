@@ -245,6 +245,7 @@
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
 		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
 		52A7E35F2D686A57004782AF /* NSMutableAttributedString+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A7E35E2D686A57004782AF /* NSMutableAttributedString+Ext.swift */; };
+		52AAAF8D2D92970300CA9CE1 /* ErrorHandlingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */; };
 		52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */; };
 		52AD4B6F2D5B1BFC00FCA929 /* ProfileEditRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */; };
 		52AD4B722D5B808D00FCA929 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B712D5B808D00FCA929 /* LaunchViewController.swift */; };
@@ -633,6 +634,7 @@
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
 		52A7E35E2D686A57004782AF /* NSMutableAttributedString+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Ext.swift"; sourceTree = "<group>"; };
+		52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandlingService.swift; sourceTree = "<group>"; };
 		52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditRequest.swift; sourceTree = "<group>"; };
 		52AD4B712D5B808D00FCA929 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
@@ -814,6 +816,7 @@
 		5208C1882CC0D618006272E8 /* Alert */ = {
 			isa = PBXGroup;
 			children = (
+				52A388632D68A341001439C7 /* ToastManager.swift */,
 				524E33D32C80508C004B15FC /* AlertManager.swift */,
 			);
 			path = Alert;
@@ -1128,7 +1131,6 @@
 			isa = PBXGroup;
 			children = (
 				5231DF332D2F2A1E00D52529 /* DefaultAlertControl.swift */,
-				52A388632D68A341001439C7 /* ToastManager.swift */,
 			);
 			path = Alert;
 			sourceTree = "<group>";
@@ -1684,6 +1686,7 @@
 				52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */,
 				52CB0B462C7308A8002B6D20 /* Endpoint.swift */,
 				52CB0B442C730816002B6D20 /* NetworkConfig.swift */,
+				52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -3324,6 +3327,7 @@
 				52EC04E02D3E2AB800000C99 /* FetchReviewDetail.swift in Sources */,
 				52F1535D2D0724D0001A7BF5 /* CreatePlanViewReactor.swift in Sources */,
 				52D864522D29FC7D000F8378 /* MeetDetailFlowCoordinator.swift in Sources */,
+				52AAAF8D2D92970300CA9CE1 /* ErrorHandlingService.swift in Sources */,
 				5211F9132C89CEF800403980 /* ProfileView.swift in Sources */,
 				5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */,
 				52AD4B6F2D5B1BFC00FCA929 /* ProfileEditRequest.swift in Sources */,

@@ -140,7 +140,6 @@ extension CommentListViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: PhotoViewTableCell.reuseIdentifier) as! PhotoViewTableCell
         cell.configure(images)
         cell.photoTapped = { [weak self] index in
-            print(#function, #line, "Path :  ")
             self?.reactor?.action.onNext(.childEvent(.selectedPhoto(index)))
         }
         return cell

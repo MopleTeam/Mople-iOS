@@ -288,7 +288,9 @@ extension CommentListViewReactor {
         let reportComment = reportUseCase
             .execute(type: .comment(id: id), reason: nil)
             .asObservable()
-            .flatMap { Observable<Mutation>.just(.requestParent(.reportComment)) }
+            .map({ _ -> Mutation in
+                .requestParent(.reportComment)
+            })
         
         return requestWithLoading(task: reportComment)
     }

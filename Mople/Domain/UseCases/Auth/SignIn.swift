@@ -67,7 +67,7 @@ final class SignInUseCase: SignIn {
         return loginObserver
             .do(onSuccess: { socialLoginResult = $0 })
             .flatMap({ [weak self] accountInfo in
-                guard let self else { throw AppError.unknownError }
+                guard let self else { throw AppError.unknown }
                 return self.authenticationRepo
                     .signIn(social: accountInfo)
             })
@@ -93,7 +93,7 @@ final class SignInUseCase: SignIn {
         case let transferError as DataTransferError:
             return handleTransferError(transferError, socialLoginResult: socialLoginResult)
         default:
-            return .appError(error: .unknownError)
+            return .appError(error: .unknown)
         }
     }
     
@@ -103,7 +103,7 @@ final class SignInUseCase: SignIn {
             guard let socialLoginResult else { return .completeError }
             return .notFoundInfo(result: socialLoginResult)
         default:
-            return .appError(error: .unknownError)
+            return .appError(error: .unknown)
         }
     }
 }

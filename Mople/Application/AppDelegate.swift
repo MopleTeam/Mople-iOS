@@ -25,7 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         reqeustRemoteNotifications()
         AppAppearance.setupAppearance()
         
-        
         window = UIWindow(frame: UIScreen.main.bounds)
 
         let navigationController = AppNaviViewController(type: .main)

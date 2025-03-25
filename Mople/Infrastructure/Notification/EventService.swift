@@ -109,4 +109,5 @@ extension Notification.Name {
     static let review = Notification.Name(String(describing: Review.self))
     static let postReview = Notification.Name("postReview")
     static let reloadDay = Notification.Name("reloadDay")
+    static let sessionExpired = Notification.Name("sessionExpired")
 }

@@ -347,13 +347,13 @@ extension CalendarViewController {
     }
 
     // 확인
-    /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 pageObserver에 값 보내기
+    /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 monthObserver에 값 보내기
     private func sendCurrentPageToHeader() {
         monthObserver.accept(calendar.currentPage.toDateComponents())
     }
     
     private func sendCurrrentPageToTable() {
-        pageObserver.accept(calendar.currentPage.toDateComponents())
+        pageObserver.accept(calendar.currentPage.toMonthComponents())
     }
 
     // 확인
