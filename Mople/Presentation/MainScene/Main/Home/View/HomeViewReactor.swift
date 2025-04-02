@@ -27,7 +27,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case fetchHomeData
         case updatePlan(_ planPayload: PlanPayload)
         case updateMeet(_ meetPayload: MeetPayload)
-        case reloadDay(Date)
+        case reloadDay
     }
     
     enum Mutation {
@@ -78,8 +78,8 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             return handlePlanPayload(payload)
         case let .updateMeet(payload):
             return handleMeetPayload(payload)
-        case let .reloadDay(day):
-            return reloadDay(on: day)
+        case .reloadDay:
+            return reloadDay()
         }
     }
     
@@ -175,7 +175,7 @@ extension HomeViewReactor {
             coordinator?.presentPlanDetailView(planId: id)
             return .empty()
         } else {
-            return .just(.catchError(PlanDetailError.expiredPlan(date)))
+            return .just(.catchError(DateTransitionError.midnightReset))
         }
     }
 }
@@ -196,6 +196,7 @@ extension HomeViewReactor {
 // MARK: - 일정 생성 알림 수신
 extension HomeViewReactor {
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
+        print(#function, #line, "Path : #0331 ")
         var planList = currentState.plans
         
         switch payload {
@@ -232,8 +233,7 @@ extension HomeViewReactor {
     
     private func deletePlan(_ planList: [Plan], planId: Int) -> Observable<Mutation> {
         guard planList.contains(where: { $0.id == planId }) else { return .empty() }
-        action.onNext(.fetchHomeData)
-        return .empty()
+        return fetchHomeData()
     }
 }
 
@@ -290,14 +290,11 @@ extension HomeViewReactor {
 
 // MARK: - 새로고침
 extension HomeViewReactor {
-    private func reloadDay(on date: Date) -> Observable<Mutation> {
-        if currentState.plans.contains(where: {
-            guard let planDate = $0.date else { return false }
-            return DateManager.isSameDay(planDate, date) || planDate < date
-        }) {
+    private func reloadDay() -> Observable<Mutation> {
+        let planDate = currentState.plans.compactMap { $0.date }
+        if planDate.contains(where: { DateManager.isPastDay(on: $0) }) {
             action.onNext(.fetchHomeData)
         }
-                
         return .empty()
     }
 }

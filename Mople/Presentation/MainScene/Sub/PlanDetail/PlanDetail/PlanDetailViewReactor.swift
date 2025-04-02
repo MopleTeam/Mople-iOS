@@ -15,16 +15,6 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
     func reportComment()
 }
 
-enum PlanDetailError: Error {
-    case expiredPlan(Date)
-    
-    var message: String {
-        switch self {
-        case .expiredPlan: "마감된 약속입니다."
-        }
-    }
-}
-
 final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -70,7 +60,6 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case updatePlan(_ Plan: Plan)
         case updateReview(_ review: Review)
         case completeReport
-        case notifyMessage(_ message: String)
         case catchError(Error)
     }
     
@@ -81,7 +70,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var editComment: String?
         @Pulse var startOffsetY: CGFloat?
         @Pulse var reported: Void?
-        @Pulse var message: String?
+        @Pulse var error: Error?
     }
     
     // MARK: - Variable
@@ -147,7 +136,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case .deletePost:
             return deletePost()
         case .reportPost:
-            return reportPost()
+            return reportPlan()
         }
     }
     
@@ -162,8 +151,6 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case let .updateReview(review):
             newState.planInfo = .init(review: review)
             newState.commonPlanModel = .init(review: review)
-        case let .notifyMessage(message):
-            newState.message = message
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .updateChildEvent(event):
@@ -171,14 +158,10 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case .completeReport:
             newState.reported = ()
         case let .catchError(err):
-            handleError(state: &newState, error: err)
+            newState.error = err
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State, error: Error) {
-        
     }
 }
 
@@ -274,10 +257,13 @@ extension PlanDetailViewReactor {
         return requestWithLoading(task: fetchPlan)
     }
     
+    
+    
     private func fetchReviewDetail(completion: (() -> Void)? = nil) -> Observable<Mutation> {
 
         let fetchReview = fetchReviewDetailUseCase.execute(reviewId: id)
             .asObservable()
+            .observe(on: MainScheduler.instance)
             .flatMap { [weak self] review -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 self.review = review
@@ -285,14 +271,11 @@ extension PlanDetailViewReactor {
                 self.fetchCommentList(review.postId)
                 let fetchReview = Observable<Mutation>.just(.updateReview(review))
                 let fetchPhoto = fetchReviewImages(review.images)
+                completion?()
                 return Observable.concat([fetchPhoto, fetchReview])
             }
         
         return requestWithLoading(task: fetchReview)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: {
-                completion?()
-            })
     }
     
     private func fetchReviewImages(_ reviewImages: [ReviewImage]) -> Observable<Mutation> {
@@ -328,17 +311,17 @@ extension PlanDetailViewReactor {
                 }
             }
             .asObservable()
-            .flatMap { Observable<Mutation>.empty() }
+            .observe(on: MainScheduler.instance)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.postDeletePlan()
+                self?.coordinator?.endFlow()
+                return .empty()
+            }
         
         return requestWithLoading(task: deletePost)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.sendNotifycation()
-                self?.coordinator?.endFlow()
-            })
     }
     
-    private func reportPost() -> Observable<Mutation> {
+    private func reportPlan() -> Observable<Mutation> {
         
         let reportPost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
@@ -435,7 +418,7 @@ extension PlanDetailViewReactor {
     }
     
     // 발신
-    private func sendNotifycation() {
+    private func postDeletePlan() {
         switch type {
         case .plan:
             EventService.shared.postItem(PlanPayload.deleted(id: id),

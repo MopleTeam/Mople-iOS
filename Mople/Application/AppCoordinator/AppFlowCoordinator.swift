@@ -75,7 +75,7 @@ extension AppFlowCoordinator: SignOutListener {
 // MARK: - 로그인 세션 만료
 extension AppFlowCoordinator {
     private func bindSessionExpiration() {
-        EventService.shared.receiveObservable(name: .sessionExpired)
+        EventService.shared.addObservable(name: .sessionExpired)
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.loginFlowStart()
@@ -83,5 +83,7 @@ extension AppFlowCoordinator {
             .disposed(by: disposeBag)
     }
 }
+
+
     
 

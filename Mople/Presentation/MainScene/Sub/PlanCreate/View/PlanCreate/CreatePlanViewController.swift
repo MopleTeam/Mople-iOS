@@ -132,9 +132,10 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         }
         
         completeButton.snp.makeConstraints { make in
+            make.top.greaterThanOrEqualTo(mainStackView.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainStackView)
             make.height.equalTo(56)
-            make.bottom.equalToSuperview().inset(UIScreen.getBottomSafeAreaHeight())
+            make.bottom.equalToSuperview().inset(UIScreen.getDefaultBottomPadding())
         }
     }
     

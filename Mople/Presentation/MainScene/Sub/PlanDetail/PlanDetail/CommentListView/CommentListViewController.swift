@@ -87,6 +87,7 @@ final class CommentListViewController: BaseViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$createdCompletion)
+            .observe(on: MainScheduler.asyncInstance)
             .delay(.milliseconds(20), scheduler: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })

@@ -96,3 +96,57 @@ final class TestAlertManager {
         currentVC?.present(alert, animated: true)
     }
 }
+
+// MARK: - 에러 알림창 표시 및 포스팅
+extension TestAlertManager {
+    // MARK: - 에러처리
+    func showErrorAlert(err: Error,
+                        completion: (() -> Void)? = nil) {
+        switch err {
+        case let err as ResponseError:
+            showResposeErrorMessage(err: err,
+                                    completion: completion)
+        case let err as DateTransitionError:
+            showDateErrorMessage(err: err,
+                                 completion: completion)
+        default:
+            self.showAlert(title: "요청에 실패했습니다.")
+        }
+    }
+    
+    private func showDateErrorMessage(err: DateTransitionError,
+                                      completion: (() -> Void)?) {
+        let action = DefaultAction(completion: {
+            EventService.shared.post(name: .midnightUpdate)
+            completion?()
+        })
+        
+        self.showAlert(title: err.info,
+                               subTitle: err.subInfo,
+                               defaultAction: action)
+    }
+    
+    private func showResposeErrorMessage(err: ResponseError,
+                                         completion: (() -> Void)?) {
+        guard case .noResponse(let type) = err else { return }
+        
+        let action = DefaultAction(completion: { [weak self] in
+            self?.handleDeletePost(type: type)
+            completion?()
+        })
+        
+        self.showAlert(title: err.info,
+                               defaultAction: action)
+    }
+    
+    private func handleDeletePost(type: ResponseType) {
+        switch type {
+        case let .meet(id):
+            EventService.shared.postItem(MeetPayload.deleted(id: id), from: self)
+        case let .plan(id):
+            EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
+        case let .review(id):
+            EventService.shared.postItem(ReviewPayload.deleted(id: id), from: self)
+        }
+    }
+}

@@ -119,7 +119,7 @@ final class MeetPlanListViewController: BaseViewController, View {
             ) { [weak self] index, item, cell in
                 cell.configure(viewModel: .init(plan: item))
                 cell.selectionStyle = .none
-                cell.completeTapped = {
+                cell.completeTapped = { [weak self] in
                     guard let planId = item.id else { return }
                     let action = Reactor.Action.updateParticipants(id: planId,
                                                                    isJoining: item.isParticipating)

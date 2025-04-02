@@ -28,11 +28,12 @@ final class CalendarViewController: BaseViewController, View {
     private var preSelectedDate: Date?
     private let currentCalendar = DateManager.calendar
     private var events: [Date] = []
+    private var isSystemDragging: Bool = false
 
     // MARK: - Observable
     private let heightObserver: PublishRelay<CGFloat> = .init()
     private let scopeObserver: PublishRelay<ScopeType> = .init()
-    private let pageObserver: PublishRelay<DateComponents> = .init()
+    private let pageObserver: PublishRelay<Date> = .init()
     private let monthObserver: PublishRelay<DateComponents> = .init()
     private let dateSelectionObserver: PublishRelay<Date> = .init()
 
@@ -202,6 +203,7 @@ final class CalendarViewController: BaseViewController, View {
             .filter({ [weak self] _ in
                 return self?.calendar.scope == .month
             })
+            .do(onNext: { print(#function, #line, "#0319 선택된 날짜 : \($0)" ) })
             .map { Reactor.Action.childEvent(.changedPage($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -251,12 +253,11 @@ extension CalendarViewController: FSCalendarDelegate {
     func maximumDate(for calendar: FSCalendar) -> Date {
         return DateManager.getMaximumDate()
     }
-
+    
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
         print(#function, #line)
         setPreSelectedDateWhenMonth()
-        sendCurrentPageToHeader()
-        sendCurrrentPageToTable()
+        syncCurrentPage()
     }
 
     func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
@@ -346,6 +347,12 @@ extension CalendarViewController {
         }
     }
 
+    private func syncCurrentPage() {
+        guard isSystemDragging == false else { return }
+        sendCurrentPageToHeader()
+        sendCurrrentPageToTable()
+    }
+    
     // 확인
     /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 monthObserver에 값 보내기
     private func sendCurrentPageToHeader() {
@@ -353,7 +360,7 @@ extension CalendarViewController {
     }
     
     private func sendCurrrentPageToTable() {
-        pageObserver.accept(calendar.currentPage.toMonthComponents())
+        pageObserver.accept(calendar.currentPage)
     }
 
     // 확인
@@ -401,7 +408,6 @@ extension CalendarViewController {
     /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
     private func updateEvents(with events: [Date]) {
         self.events = events
-        events.forEach { print(#function, #line, "#0320 스케줄 리스트 : \($0)" ) }
         calendar.reloadData()
     }
 
@@ -431,8 +437,10 @@ extension CalendarViewController {
 
     /// 페이지 이동하기
     private func moveToPage(on date: Date, animated: Bool = false) {
+        isSystemDragging = true
         calendar.setScope(.month, animated: false)
         self.calendar.setCurrentPage(date, animated: animated)
+        isSystemDragging = false
     }
 
     /// 선택할 날짜가 현재 캘린더의 날짜에 포함되어 있다면 reloadData

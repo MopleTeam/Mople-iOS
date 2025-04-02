@@ -23,7 +23,7 @@ final class ImageUploadUseCase: ImageUpload {
     func execute(_ image: UIImage?) -> Single<String?> {
         print(#function, #line)
         return Single.deferred { [weak self] in
-            guard let self else { return .error(AppError.unknown) }
+            guard let self else { return .error(DataRequestError.unknown) }
             
             do {
                 guard let imageData = try Data.imageDataCompressed(uiImage: image) else {

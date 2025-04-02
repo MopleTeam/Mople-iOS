@@ -14,8 +14,10 @@ typealias ReviewPayload = EventService.Payload<Review>
 
 final class EventService {
     
-    static let shared = EventService()
-    private init() {}
+    enum ParticipationPayload {
+        case participating(Plan)
+        case notParticipation(id: Int)
+    }
     
     enum Payload<T> {
         case created(T)
@@ -32,38 +34,40 @@ final class EventService {
         }
     }
     
-    private let reloadDayKey = "reloadDay"
+    static let shared = EventService()
+    private init() {}
     private let payloadKey = "payload"
     private let senderKey = "sender"
     
+    // MARK: - Participating
+    func participatingPost(_ payload: ParticipationPayload, from sender: Any) {
+        NotificationCenter.default.post(name: .participating,
+                                        object: nil,
+                                        userInfo: [payloadKey: payload,
+                                                    senderKey: String(describing: sender)])
+    }
+    
+    func addParticipatingObservable() -> Observable<PlanPayload> {
+        let participatingObservable: Observable<ParticipationPayload> = makeObservable(name: .participating)
+        return participatingObservable.map {
+            switch $0 {
+            case let .participating(plan):
+                return .created(plan)
+            case let .notParticipation(id):
+                return .deleted(id: id)
+            }
+        }
+    }
     
     // MARK: - Void
     func post(name: Notification.Name) {
         NotificationCenter.default.post(name: name, object: nil)
     }
     
-    func receiveObservable(name: Notification.Name) -> Observable<Void> {
+    func addObservable(name: Notification.Name) -> Observable<Void> {
         return NotificationCenter.default.rx.notification(name)
             .map { _ in }
     }
-    
-    // MARK: - New Day Post
-    func postReloadDay(on reloadDay: Date) {
-        NotificationCenter.default.post(name: .reloadDay,
-                                        object: nil,
-                                        userInfo: [reloadDayKey: reloadDay])
-    }
-    
-    func addReloadObservable() -> Observable<Date> {
-        return NotificationCenter.default.rx.notification(.reloadDay, object: nil)
-            .share(replay: 1)
-            .compactMap { [weak self] in
-                guard let self,
-                      let reloadDay = $0.userInfo?[self.reloadDayKey] as? Date else { return nil }
-                return reloadDay
-            }
-    }
-    
     
     // MARK: - With Item
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
@@ -107,7 +111,8 @@ extension Notification.Name {
     static let meet = Notification.Name(String(describing: Meet.self))
     static let plan = Notification.Name(String(describing: Plan.self))
     static let review = Notification.Name(String(describing: Review.self))
+    static let participating = Notification.Name("participating")
     static let postReview = Notification.Name("postReview")
-    static let reloadDay = Notification.Name("reloadDay")
+    static let midnightUpdate = Notification.Name("midnightUpdate")
     static let sessionExpired = Notification.Name("sessionExpired")
 }

@@ -9,7 +9,7 @@ import UIKit
 import ReactorKit
 
 protocol CalendarReactorDelegate: AnyObject, ChildLoadingDelegate {
-    func updatePage(_ page: DateComponents)
+    func updatePage(_ page: Date)
     func updateMonth(_ month: DateComponents)
     func updatePlanMonthList(_ list: [Date])
     func updateCalendarHeight(_ height: CGFloat)
@@ -37,12 +37,12 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         
         case calendarAction(CalendarActions)
         case changeScope
-        case changeMonth(DateComponents)
+        case changeMonth(Date)
         case changeLoadingState(Bool)
         case updatePlan(PlanPayload)
         case updateMeet(MeetPayload)
         case updateReview(ReviewPayload)
-        case reloadDay(Date)
+        case midnightUpdate
         case catchError(Error)
     }
     
@@ -103,8 +103,8 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
             return handlePlanPayload(payload)
         case let .updateReview(payload):
             return handleReviewPayload(payload)
-        case let .reloadDay(day):
-            return reloadMonth(on: day)
+        case .midnightUpdate:
+            return midnightUpdate()
         case let .catchError(err):
             return .just(.catchError(err))
         }
@@ -133,19 +133,9 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
-            handleError(state: &newState,
-                        err: err)
+            newState.error = err
         }
         return newState
-    }
-    
-    private func handleError(state: inout State, err: Error) {
-        switch err {
-        case let planError as PlanDetailError:
-            state.error = planError
-        default:
-            break
-        }
     }
     
     private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
@@ -162,10 +152,9 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - 부모 -> 자식
 extension CalendarScheduleViewReactor {
-    private func monthChange(_ month: DateComponents) -> Observable<Mutation> {
-        guard let date = month.toDate() else { return .empty() }
-        scheduleListCommands?.resetPlanList()
-        calendarCommands?.changePage(on: date)
+    private func monthChange(_ month: Date) -> Observable<Mutation> {
+        scheduleListCommands?.fetchMonthPlan(on: month)
+        calendarCommands?.changePage(on: month)
         return .empty()
     }
     
@@ -191,10 +180,10 @@ extension CalendarScheduleViewReactor: CalendarReactorDelegate {
     }
     
     func updatePlanMonthList(_ list: [Date]) {
-        scheduleListCommands?.updatePlanMonthList(with: list)
+        scheduleListCommands?.setInitalList(with: list)
     }
     
-    func updatePage(_ page: DateComponents) {
+    func updatePage(_ page: Date) {
         scheduleListCommands?.loadMonthlyPlan(on: page)
     }
     
@@ -260,8 +249,8 @@ extension CalendarScheduleViewReactor {
 
 // MARK: - 새로고침
 extension CalendarScheduleViewReactor {
-    private func reloadMonth(on month: Date) -> Observable<Mutation> {
-        scheduleListCommands?.reloadDay(on: month)
+    private func midnightUpdate() -> Observable<Mutation> {
+        scheduleListCommands?.planUpdateWhenMidnight()
         return .empty()
     }
 }

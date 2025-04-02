@@ -150,7 +150,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(56)
             floatingViewBottom = make.bottom.equalToSuperview()
-                .inset(UIScreen.getBottomSafeAreaHeight()).constraint
+                .inset(UIScreen.getDefaultBottomPadding()).constraint
         }
     }
     
@@ -166,7 +166,7 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     // MARK: - Binding
     func bind(reactor: CreateMeetViewReactor) {
         naviBar.leftItemEvent
-            .map { Reactor.Action.endTask }
+            .map { Reactor.Action.endView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

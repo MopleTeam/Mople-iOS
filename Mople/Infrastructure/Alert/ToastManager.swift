@@ -21,7 +21,7 @@ final class ToastManager {
     }
     
     private lazy var messageLabel: IconLabel = {
-        let frameY = UIScreen.getBottomSafeAreaHeight() + 56
+        let frameY = UIScreen.getDefaultBottomPadding() + 56
         
         let label = IconLabel(icon: .check,
                               iconSize: .init(width: 24, height: 24),

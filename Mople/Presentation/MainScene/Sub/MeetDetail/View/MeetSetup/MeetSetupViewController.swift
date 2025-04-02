@@ -19,8 +19,12 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     var disposeBag = DisposeBag()
     private var isHost: Bool = false
     
+    // MARK: - Observer
+    private let meetingNotFound: PublishSubject<Void> = .init()
+    private let deleteMeet: PublishSubject<Void> = .init()
+    
     // MARK: - Alert
-    private let alertService = TestAlertManager.shared
+    private let alertManager = TestAlertManager.shared
     
     // MARK: - UI Components
     private let thumbnailImage: UIImageView = {
@@ -37,8 +41,8 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Gray._01)
-        btn.setImage(image: .editPan)
         btn.setLayoutMargins(inset: .zero)
+        btn.isEnabled = false
         return btn
     }()
     
@@ -196,6 +200,16 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        meetingNotFound
+            .map { Reactor.Action.flow(.endFlow) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        deleteMeet
+            .map { Reactor.Action.deleteMeet }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         memberListButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.memberList) }
             .bind(to: reactor.action)
@@ -220,7 +234,8 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(with: self, onNext: { vc, isHost in
                 vc.isHost = isHost
-                vc.setLeaveButtonText(isHost: isHost)
+                vc.setNameButtonImage()
+                vc.setLeaveButtonText()
             })
             .disposed(by: disposeBag)
         
@@ -231,21 +246,19 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$message)
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
-            .drive(with: self, onNext: { vc, message in
-                vc.alertService.showAlert(title: message)
+            .drive(with: self, onNext: { vc, err in
+                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
+                    self?.handleMeetingNotFoundAndDismiss(err: err)
+                })
             })
             .disposed(by: disposeBag)
     }
     
     private func setNotification(reactor: Reactor) {
         EventService.shared.addMeetObservable()
-            .compactMap({ payload -> Meet? in
-                guard case .updated(let meet) = payload else { return nil }
-                return meet
-            })
             .map { Reactor.Action.editMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -254,9 +267,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     // MARK: - Action
     private func setDeleteButtonAction() {
         deleteButton.rx.controlEvent(.touchUpInside)
-            .throttle(.seconds(1),
-                      latest: false,
-                      scheduler: MainScheduler.instance)
             .subscribe(with: self, onNext: { vc, _ in
                 vc.handleDeleteMeet()
             })
@@ -267,8 +277,14 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         if isHost {
             showDeleteAlert()
         } else {
-            reactor?.action.onNext(.deleteMeet)
+            deleteMeet.onNext(())
         }
+    }
+    
+    // MARK: - Error
+    private func handleMeetingNotFoundAndDismiss(err: Error) {
+        guard err is ResponseError else { return }
+        meetingNotFound.onNext(())
     }
     
     // MARK: - Alert
@@ -277,11 +293,12 @@ final class MeetSetupViewController: TitleNaviViewController, View {
                                           tintColor: ColorStyle.Default.white,
                                           bgColor: ColorStyle.App.secondary,
                                           completion: { [weak self] in
-            self?.reactor?.action.onNext(.deleteMeet)
+            self?.deleteMeet.onNext(())
         })
         
-        alertService.showAlert(title: "모임을 삭제할까요?",
+        alertManager.showAlert(title: "모임을 삭제할까요?",
                                subTitle: "해당 모임에 대한 모든 기록을 복구할 수 없어요",
+                               defaultAction: .init(text: "취소"),
                                addAction: [action])
     }
 }
@@ -296,10 +313,16 @@ extension MeetSetupViewController {
         setSinceLabel(meet.sinceDays)
     }
     
-    private func setLeaveButtonText(isHost: Bool) {
+    private func setLeaveButtonText() {
         deleteButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
                              font: FontStyle.Title3.medium,
                              normalColor: isHost ? ColorStyle.Default.red : ColorStyle.Gray._01)
+    }
+    
+    private func setNameButtonImage() {
+        guard isHost else { return }
+        meetNameButton.setImage(image: .editPan)
+        meetNameButton.isEnabled = true
     }
     
     private func setMemberCountLabel(_ memberCount: Int?) {

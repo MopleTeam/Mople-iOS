@@ -12,5 +12,4 @@ protocol MeetCommandRepo {
     func editMeet(id: Int,
                   reqeust: CreateMeetRequest) -> Single<MeetResponse>
     func deleteMeet(id: Int) -> Single<Void>
-    func leaveMeet(id: Int) -> Single<Void>
 }

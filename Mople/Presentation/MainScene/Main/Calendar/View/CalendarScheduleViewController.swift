@@ -21,7 +21,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     var disposeBag = DisposeBag()
         
     // MARK: - Observer
-    private let monthSelectedObserver: PublishSubject<DateComponents> = .init()
+    private let monthSelectedObserver: PublishSubject<Date> = .init()
     public let panGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
     
     // MARK: - Gesture
@@ -169,15 +169,17 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
+            .debug("로딩 들어와")
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
+            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(with: err)
+                vc.alertManager.showErrorAlert(err: err)
             })
             .disposed(by: disposeBag)
     }
@@ -208,6 +210,11 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        EventService.shared.addParticipatingObservable()
+            .map { Reactor.Action.updatePlan($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         EventService.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
@@ -218,9 +225,8 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addReloadObservable()
-            .do(onNext: { print(#function, #line, "#0324 : \($0)" ) })
-            .map { Reactor.Action.reloadDay($0) }
+        EventService.shared.addObservable(name: .midnightUpdate)
+            .map { Reactor.Action.midnightUpdate }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -243,28 +249,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     private func setGesture() {
         scopeGesture.delegate = self
         self.view.addGestureRecognizer(scopeGesture)
-    }
-    
-    // MARK: - 에러처리
-    private func handleError(with err: Error) {
-        switch err {
-        case let err as PlanDetailError:
-            showExpriedError(err: err)
-        default:
-            break
-        }
-    }
-    
-    private func showExpriedError(err: PlanDetailError) {
-        guard case .expiredPlan(let date) = err else { return }
-        
-        let defaultAction: DefaultAction = .init(text: "확인",
-                                                 completion: {
-            EventService.shared.postReloadDay(on: date)
-        })
-        
-        alertManager.showAlert(title: err.message,
-                               defaultAction: defaultAction)
     }
 }
 
@@ -301,7 +285,9 @@ extension CalendarScheduleViewController {
         let defaultDate = reactor?.currentState.changeMonth ?? Date().toDateComponents()
         let datePickView = YearMonthPickerViewController(defaultDate: defaultDate)
         datePickView.completed = { [weak self] selectedMonth in
-            self?.monthSelectedObserver.onNext(selectedMonth)
+            guard let monthDate = selectedMonth.toDate() else { return }
+            self?.setHeaderLabel(selectedMonth)
+            self?.monthSelectedObserver.onNext(monthDate)
         }
         datePickView.modalPresentationStyle = .pageSheet
         if let sheet = datePickView.sheetPresentationController {
@@ -374,7 +360,7 @@ extension CalendarScheduleViewController {
 extension CalendarScheduleViewController {
     public func presentEvent(on lastRecentDate: Date) {
         DispatchQueue.main.async { [weak self] in
-            self?.monthSelectedObserver.onNext(lastRecentDate.toDateComponents())
+            self?.monthSelectedObserver.onNext(lastRecentDate)
         }
     }
 }

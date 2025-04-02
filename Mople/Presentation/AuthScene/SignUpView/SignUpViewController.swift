@@ -72,7 +72,7 @@ class SignUpViewController: DefaultViewController, View {
             make.top.equalTo(mainTitle.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainTitle.snp.horizontalEdges)
             make.bottom.equalToSuperview()
-                .inset(UIScreen.getBottomSafeAreaHeight())
+                .inset(UIScreen.getDefaultBottomPadding())
         }
     }
     

@@ -4,10 +4,12 @@
 //
 //  Created by CatSlave on 2/4/25.
 //
-
+import UIKit
 import ReactorKit
 
-protocol MemberListViewCoordination: NavigationCloseable { }
+protocol MemberListViewCoordination: NavigationCloseable {
+    func endFlow()
+}
 
 enum MemberListType {
     case meet(id: Int?)
@@ -15,25 +17,24 @@ enum MemberListType {
     case review(id: Int?)
 }
 
-enum MemberListError: Error {
-    case nonId
-}
-
 final class MemberListViewReactor: Reactor {
     
     enum Action {
         case fetchPlanMemeber
         case endFlow
+        case endView
     }
     
     enum Mutation {
         case updateMember([MemberInfo])
-        case updateLoadingState(_ isLoading: Bool)
+        case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var members: [MemberInfo] = []
         @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     var initialState: State = State()
@@ -55,8 +56,11 @@ final class MemberListViewReactor: Reactor {
         switch action {
         case .fetchPlanMemeber:
             return fetchPlanMember()
-        case .endFlow:
+        case .endView:
             coordinator?.pop()
+            return .empty()
+        case .endFlow:
+            coordinator?.endFlow()
             return .empty()
         }
     }
@@ -70,6 +74,8 @@ final class MemberListViewReactor: Reactor {
             newState.members = sortMembersByPosition(members)
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
+        case let .catchError(err):
+            newState.error = err
         }
         
         return newState
@@ -98,21 +104,39 @@ extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
         let fetchMember = fetchMemberUseCase.execute(type: type)
             .asObservable()
+            .catch({ [weak self] in
+                guard let self else { return .error($0)}
+                let err = resolveNoResponseError($0)
+                return .error(err)
+            })
             .map { Mutation.updateMember($0.membsers) }
         
-        return fetchWithLoading(fetchMember)
+        return requestWithLoading(task: fetchMember)
+    }
+    
+    private func resolveNoResponseError(_ err: Error) -> Error {
+        guard let responseType = makeResponseType() else { return err }
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: responseType)
+    }
+    
+    private func makeResponseType() -> ResponseType? {
+        switch type {
+        case let .meet(id): return id.map { .meet(id: $0) }
+        case let .plan(id): return id.map { .plan(id: $0) }
+        case let .review(id): return id.map { .review(id: $0) }
+        }
     }
 }
 
-extension MemberListViewReactor {
-    private func fetchWithLoading(_ task: Observable<Mutation>) -> Observable<Mutation> {
-        let startLoad = Observable.just(Mutation.updateLoadingState(true))
-        
-        let endLoad = Observable.just(Mutation.updateLoadingState(false))
-        
-        return Observable.concat([startLoad,
-                                  task,
-                                  endLoad])
+extension MemberListViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }
+
 

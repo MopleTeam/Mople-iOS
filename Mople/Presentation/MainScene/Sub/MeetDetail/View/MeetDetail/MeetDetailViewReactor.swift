@@ -104,37 +104,26 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case let .updateReviewListLoading(isLoading):
             newState.pastPlanLoaded = isLoading
         case let .catchError(err):
-            handleError(state: &newState, err: err)
+            newState.error = err
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State,
-                             err: Error) {
-        switch err {
-        case let planError as PlanDetailError:
-            state.error = planError
-        default:
-            break
-        }
     }
 }
 
 extension MeetDetailViewReactor {
     private func fetchMeetInfo(id: Int) -> Observable<Mutation> {
         
-        let updateMeet = fetchMeetUseCase.execute(meetId: id)
+        let fetchMeet = fetchMeetUseCase.execute(meetId: id)
             .asObservable()
+            .catch({ 
+                let err = DataRequestError.resolveNoResponseError(err: $0,
+                                                                  responseType: .meet(id: id))
+                return .error(err)
+            })
             .map { Mutation.setMeetInfo(meet: $0) }
         
-        return requestWithLoading(task: updateMeet)
-    }
-    
-    private func handleMeetFetchError(err: Error, id: Int) {
-        guard let dataTransferError = err as? DataTransferError,
-              case .noResponse = dataTransferError else { return }
-        EventService.shared.postItem(MeetPayload.deleted(id: id), from: self)
+        return requestWithLoading(task: fetchMeet)
     }
 }
 

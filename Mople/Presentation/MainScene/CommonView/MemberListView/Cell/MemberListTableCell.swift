@@ -58,7 +58,7 @@ final class MemberListTableCell: UITableViewCell {
         }
     }
 
-    public func configure(with viewModel: MembserListTableCellModel) {
+    public func configure(with viewModel: MemberListTableCellModel) {
         nameLabel.text = viewModel.nickName
         memberInfoView.setConfigure(imagePath: viewModel.imagePath,
                                     position: viewModel.position)

@@ -29,10 +29,4 @@ final class DefaultMeetCommandRepo: BaseRepositories, MeetCommandRepo {
             try APIEndpoints.deleteMeet(id: id)
         }
     }
-    
-    func leaveMeet(id: Int) -> Single<Void> {
-        return networkService.authenticatedRequest {
-            try APIEndpoints.leaveMeet(id: id)
-        }
-    }
 }

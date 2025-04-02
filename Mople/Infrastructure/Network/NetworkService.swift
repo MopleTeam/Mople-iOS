@@ -10,7 +10,8 @@ import RxSwift
 import RxRelay
 
 enum NetworkError: Error {
-    case notConnected
+    case notConnectedInternet
+    case notConnectedServer
     case unknownError(Error?)
     case urlGeneration
     case error(statusCode: Int, data: Data)
@@ -76,8 +77,10 @@ final class DefaultNetworkService {
             return .error(statusCode: statusCode, data: data)
         case let urlError as URLError:
             switch urlError.code {
+            case .cannotConnectToHost:
+                return .notConnectedServer
             case .notConnectedToInternet:
-                return .notConnected
+                return .notConnectedInternet
             default:
                 return .unknownError(error)
             }

@@ -94,7 +94,7 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
             make.top.equalTo(commentContainer.snp.bottom)
             make.horizontalEdges.equalToSuperview()
             floatingViewBottom = make.bottom.equalToSuperview()
-                .inset(UIScreen.getBottomSafeAreaHeight()).constraint
+                .inset(UIScreen.getDefaultBottomPadding()).constraint
         }
     }
     
@@ -230,7 +230,7 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.receiveObservable(name: .postReview)
+        EventService.shared.addObservable(name: .postReview)
             .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -256,7 +256,7 @@ extension PlanDetailViewController {
     
     private func setStartOffsetY(_ offsetY: CGFloat) {
         guard let keyboardHeight else { return }
-        self.startOffsetY = offsetY - keyboardHeight + UIScreen.getBottomSafeAreaHeight()
+        self.startOffsetY = offsetY - keyboardHeight + UIScreen.getDefaultBottomPadding()
     }
 }
 

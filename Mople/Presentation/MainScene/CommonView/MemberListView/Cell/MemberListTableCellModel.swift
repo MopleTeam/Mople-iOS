@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct MembserListTableCellModel {
+struct MemberListTableCellModel {
     let nickName: String?
     let imagePath: String?
     let position: MemberPositionType?
 }
 
-extension MembserListTableCellModel {
+extension MemberListTableCellModel {
     init(memberInfo: MemberInfo) {
         self.nickName = memberInfo.nickname
         self.imagePath = memberInfo.imagePath

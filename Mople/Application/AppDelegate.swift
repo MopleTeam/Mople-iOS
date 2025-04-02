@@ -88,7 +88,43 @@ extension AppDelegate {
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate { }
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let url = response.notification.request.content.userInfo
+        url.forEach {
+            print(#function, #line, "#0327 : payload \($0)" )
+        }
+        if let apsArray = url["aps"] as? [String:Any] {
+            
+            apsArray.forEach {
+                print(#function, #line, "#0327 : \($0)" )
+            }
+            
+            if let alert = apsArray["alert"] as? [String:String] {
+                alert.forEach {
+                    print(#function, #line, "#0327 : \($0)" )
+                }
+            }
+//            print(#function, #line, "Path : #0327 \(apsArray)")
+        }
+        
+        
+        
+        let urlString = url.reduce("Push Url") { partialResult, apsValue in
+            partialResult + "\n" + "Key : \(apsValue.key)" + "\n" + "Value : \(apsValue.value)"
+        }
+    }
+}
+
+//,
+//   let badge = apsArray["badge"],
+//   let sound = apsArray["sound"],
+//   let alert = apsArray["alert"] as? [String:String],
+//   let body = alert["body"],
+//   let title = alert["title"]
 
 //class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //    

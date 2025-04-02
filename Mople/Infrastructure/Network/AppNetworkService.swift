@@ -9,36 +9,6 @@ import Foundation
 import RxSwift
 import RxRelay
 
-enum AppError: Error {
-    case networkUnavailable
-    case unknown
-    case expiredToken
-    case noResponse
-    case handled
-    
-    var info: String? {
-        switch self {
-        case .networkUnavailable:
-            "네트워크 연결을 확인해주세요."
-        case .unknown:
-            "알 수 없는 오류가 발생했습니다.\n잠시 후 다시 시도해주세요."
-        case .expiredToken:
-            "로그인이 만료되었어요"
-        default:
-            nil
-        }
-    }
-    
-    var subInfo: String? {
-        switch self {
-        case .expiredToken:
-            "서비스 이용을 위해 다시 로그인해주세요"
-        default:
-            nil
-        }
-    }
-}
-
 protocol AppNetworkService {
     func basicRequest<T: Decodable, E: ResponseRequestable>(endpoint: E) -> Single<T> where E.Response == T
     
@@ -121,7 +91,7 @@ extension DefaultAppNetWorkService {
             err.flatMap { [weak self] err -> Single<Void> in
                 print(#function, #line, "#0325 error : \(err)" )
                 guard let self,
-                      let dataTransferErr = err as? DataTransferError else { return .error(AppError.unknown) }
+                      let dataTransferErr = err as? DataTransferError else { return .error(DataRequestError.unknown) }
 
                 return handleDataTransferError(err: dataTransferErr)
             }.take(1)
@@ -130,16 +100,22 @@ extension DefaultAppNetWorkService {
     
     private func handleDataTransferError(err: DataTransferError) -> Single<Void> {
         switch err {
-        case .networkFailure:
-            errorHandlingService.handleError(err: .networkUnavailable)
-            return .error(AppError.handled)
+        case let .networkFailure(err):
+            print(#function, #line, "인터넷 에러 : \(err)" )
+            switch err {
+            case .notConnectedInternet:
+                errorHandlingService.handleError(err: .networkUnavailable)
+            default:
+                errorHandlingService.handleError(err: .serverUnavailable)
+            }
+            return .error(DataRequestError.handled)
         case .expiredToken:
             return reissueTokenIfNeeded().asSingle()
         case .noResponse:
-            return .error(AppError.noResponse)
+            return .error(DataRequestError.noResponse)
         default:
             errorHandlingService.handleError(err: .unknown)
-            return .error(AppError.handled)
+            return .error(DataRequestError.handled)
         }
     }
     
@@ -156,7 +132,7 @@ extension DefaultAppNetWorkService {
             .catch({ [weak self] err in
                 guard let self else { return .error(err)}
                 errorHandlingService.handleError(err: .expiredToken)
-                return .error(AppError.handled)
+                return .error(DataRequestError.handled)
             })
             .share(replay: 1)
             
@@ -171,7 +147,7 @@ extension DefaultAppNetWorkService {
             
             guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
                 errorHandlingService.handleError(err: .expiredToken)
-                return .error(AppError.handled)
+                return .error(DataRequestError.handled)
             }
             
             return self.dataTransferService

@@ -14,6 +14,9 @@ import ReactorKit
 final class MeetDetailViewController: TitleNaviViewController, View {
     typealias Reactor = MeetDetailViewReactor
     
+    // MARK: - Observer
+    private let meetingNotFound: PublishSubject<Void> = .init()
+    
     // MARK: - Alert
     private let alertManager = TestAlertManager.shared
     
@@ -137,6 +140,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        self.meetingNotFound
+            .map { Reactor.Action.endFlow }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         self.naviBar.rightItemEvent
             .map { Reactor.Action.pushMeetSetupView }
             .bind(to: reactor.action)
@@ -192,9 +200,16 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(with: err)
+                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
+                    self?.handleMeetingNotFoundAndDismiss(err: err)
+                })
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func handleMeetingNotFoundAndDismiss(err: Error) {
+        guard err is ResponseError else { return }
+        meetingNotFound.onNext(())
     }
     
     private func setNotification(reactor: Reactor) {
@@ -203,32 +218,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addReloadObservable()
+        EventService.shared.addObservable(name: .midnightUpdate)
             .map { _ in Reactor.Action.resetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: - 에러처리
-    private func handleError(with err: Error) {
-        switch err {
-        case let err as PlanDetailError:
-            showExpriedError(err: err)
-        default:
-            break
-        }
-    }
-    
-    private func showExpriedError(err: PlanDetailError) {
-        guard case .expiredPlan(let date) = err else { return }
-        
-        let defaultAction: DefaultAction = .init(text: "확인",
-                                                 completion: {
-            EventService.shared.postReloadDay(on: date)
-        })
-        
-        alertManager.showAlert(title: err.message,
-                               defaultAction: defaultAction)
     }
 }
 

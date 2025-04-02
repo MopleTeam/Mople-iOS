@@ -46,7 +46,7 @@ extension TransformKeyboardResponsive where Self: UIViewController {
         keyboardHeight = nil
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
-            self?.floatingViewBottom?.update(inset: UIScreen.getBottomSafeAreaHeight())
+            self?.floatingViewBottom?.update(inset: UIScreen.getDefaultBottomPadding())
             self?.resetScrollViewTransform()
         }
     }

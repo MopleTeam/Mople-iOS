@@ -6,8 +6,12 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class PhotoBookViewController: TitleNaviViewController {
+    
+    private var disposeBag = DisposeBag()
     
     // MARK: - Coordinator
     private weak var coordinator: NavigationCloseable?
@@ -74,6 +78,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         setCollectionView()
         setLayout()
         setNavi()
+        bind()
     }
     
     // MARK: - UI Setup
@@ -105,6 +110,15 @@ final class PhotoBookViewController: TitleNaviViewController {
             make.centerY.equalTo(naviBar)
             make.trailing.equalTo(naviBar).inset(20)
         }
+    }
+    
+    private func bind() {
+        self.naviBar.leftItemEvent
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.coordinator?.pop()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

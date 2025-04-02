@@ -153,14 +153,15 @@ final class ScheduleListViewController: BaseViewController, View {
     private func inputBind(_ reactor: Reactor) {
         reactor.pulse(\.$planList)
             .asDriver(onErrorJustReturn: [])
-            .do(onNext: { [weak self] _ in
+            .do(onNext: { [weak self] test in
+                print(#function, #line, "#0402 삭제된 뒤 카운트 : \(test.count)" )
                 self?.saveOffsetY = self?.tableView.contentOffset.y ?? 0
             })
             .map { [ScheduleListSectionModel].makeSectionModels(list: $0) }
             .drive(tableView.rx.items(dataSource: makeDataSource())) // 강한참조 확인필요
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$addPlanList)
+        reactor.pulse(\.$previousPlanList)
             .filter({ $0.isEmpty == false })
             .observe(on: MainScheduler.asyncInstance)
             .asDriver(onErrorJustReturn: [])
@@ -313,9 +314,11 @@ extension ScheduleListViewController {
     /// 캘린더에서 선택된 날짜에 맞추어 테이블뷰의 IndexPath 조정
     /// - Parameter selectDate: 캘린더에서 넘어온 날짜 및 IndexPath로 Scroll시 Animate 유무
     private func scrollSelectedDate(_ selectDate: Date) {
-        print(#function, #line, "#0318 들어온 날짜 : \(selectDate)" )
         guard let models = dataSource?.sectionModels else { return }
-        guard let headerIndex = models.firstIndex(where: { $0.date == selectDate }) else { return }
+        guard let headerIndex = models.firstIndex(where: {
+            guard let planDate = $0.date else { return false }
+            return DateManager.isSameDay(planDate, selectDate)
+        }) else { return }
         tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
     }
     

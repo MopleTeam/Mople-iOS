@@ -63,6 +63,10 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
     func pop() {
         self.navigationController.popViewController(animated: true)
     }
+    
+    func resetToRootView() {
+        
+    }
 }
 
 // MARK: - Gesture

@@ -16,7 +16,7 @@ final class DefaultPlanCommandRepo: BaseRepositories, PlanCommandRepo {
     }
     
     func participationPlan(planId: Int,
-                                  isJoining: Bool) -> Single<Void> {
+                           isJoining: Bool) -> Single<Void> {
         return networkService.authenticatedRequest {
             try isJoining ? APIEndpoints.leavePlan(id: planId) : APIEndpoints.joinPlan(id: planId)
         }

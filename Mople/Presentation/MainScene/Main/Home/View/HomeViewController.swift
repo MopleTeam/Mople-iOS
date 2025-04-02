@@ -192,10 +192,8 @@ final class HomeViewController: DefaultViewController, View {
         switch err {
         case let err as HomeError:
             handleHomeError(err: err)
-        case let err as PlanDetailError:
-            showExpriedError(err: err)
         default:
-            break
+            alertManager.showErrorAlert(err: err)
         }
     }
     
@@ -206,22 +204,13 @@ final class HomeViewController: DefaultViewController, View {
         }
     }
     
-    private func showExpriedError(err: PlanDetailError) {
-        guard case .expiredPlan(let date) = err else { return }
-
-        let defaultAction: DefaultAction = .init(text: "확인",
-                                                 completion: {
-            EventService.shared.postReloadDay(on: date)
-        })
-        
-        alertManager.showAlert(title: err.message,
-                               defaultAction: defaultAction)
-    }
-    
-    
-    
     private func setNotification(reactor: Reactor) {
         EventService.shared.addPlanObservable()
+            .map { Reactor.Action.updatePlan($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        EventService.shared.addParticipatingObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -230,11 +219,22 @@ final class HomeViewController: DefaultViewController, View {
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        EventService.shared.addReloadObservable()
-            .map { Reactor.Action.reloadDay($0) }
+
+        EventService.shared.addObservable(name: .midnightUpdate)
+            .map { Reactor.Action.reloadDay }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    private func resolveParticipating(
+        with payload: EventService.ParticipationPayload
+    ) -> EventService.Payload<Plan> {
+        switch payload {
+        case let .participating(plan):
+            return .created(plan)
+        case let .notParticipation(id):
+            return .deleted(id: id)
+        }
     }
 }
 
@@ -242,18 +242,15 @@ extension HomeViewController {
     private func showEmptyMeetAlert() {
         let createAction: DefaultAction = .init(text: "모임 생성하기",
                                           completion: { [weak self] in
-            self?.makeMeet()
+            self?.reactor?.action.onNext(.flow(.createGroup))
         })
     
         alertManager.showAlert(title: "아직 소속된 모임이 없어요",
                                subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
                                defaultAction: .init(text: "취소",
-                                                    tintColor: ColorStyle.Gray._01, bgColor: ColorStyle.App.tertiary),
+                                                    tintColor: ColorStyle.Gray._01,
+                                                    bgColor: ColorStyle.App.tertiary),
                                addAction: [createAction])
-    }
-    
-    private func makeMeet() {
-        reactor?.action.onNext(.flow(.createGroup))
     }
 }
 

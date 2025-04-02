@@ -14,8 +14,16 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     typealias Reactor = MemberListViewReactor
     
+    // MARK: - Observer
+    private let memberListNotFound: PublishSubject<Void> = .init()
+    
+    // MARK: - Alert
+    private let alertManager = TestAlertManager.shared
+    
+    // MARK: - Varibables
     var disposeBag = DisposeBag()
     
+    // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: "참여자 목록")
         view.frame.size.height = 64
@@ -34,6 +42,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         return table
     }()
     
+    // MARK: - Life Cycle
     init(title: String,
          reactor: MemberListViewReactor) {
         super.init(title: title)
@@ -49,6 +58,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         initalSetup()
     }
     
+    // MARK: - UI Setup
     private func initalSetup() {
         setNaviItem()
         setupTableView()
@@ -77,6 +87,11 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     func bind(reactor: MemberListViewReactor) {
         naviBar.leftItemEvent
+            .map { Reactor.Action.endView }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        memberListNotFound
             .map { Reactor.Action.endFlow }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -102,5 +117,20 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
                 vc.countView.countText = "\(count)명"
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
+                    self?.handleMeetingNotFoundAndDismiss(err: err)
+                })
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleMeetingNotFoundAndDismiss(err: Error) {
+        guard err is ResponseError else { return }
+        memberListNotFound.onNext(())
     }
 }

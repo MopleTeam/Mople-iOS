@@ -41,14 +41,8 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        enum ParentRequest {
-            case createdComment
-            case editedComment
-            case reportComment
-        }
-        
         case fetchedSectionModel([CommentTableSectionModel])
-        case requestParent(ParentRequest)
+        case createdComment
     }
     
     struct State {
@@ -106,27 +100,10 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchedSectionModel(models):
             newState.sectionModels = models
-        case let .requestParent(request):
-            handleDelegate(state: &newState,
-                           request: request)
+        case .createdComment:
+            newState.createdCompletion = ()
         }
         return newState
-    }
-    
-    private func handleDelegate(state: inout State,
-                                request: Mutation.ParentRequest) {
-        switch request {
-        case .createdComment:
-            
-            state.createdCompletion = ()
-            delegate?.editComment(nil)
-        case .editedComment:
-            selectedComment = nil
-            delegate?.editComment(nil)
-        case .reportComment:
-            selectedComment = nil
-            delegate?.reportComment()
-        }
     }
 }
 
@@ -229,13 +206,15 @@ extension CommentListViewReactor {
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
+                self.selectedComment = nil
+                delegate?.editComment(nil)
                 return .just(addCommentSectionModel(comments))
             })
 
         return requestWithLoading(task: createComment,
                                   minimumExecutionTime: .milliseconds(300))
             .flatMap { addSection -> Observable<Mutation> in
-                return .of(addSection, Mutation.requestParent(.createdComment))
+                return .of(addSection, .createdComment)
             }
     }
     
@@ -249,20 +228,17 @@ extension CommentListViewReactor {
                      commentId: commentId,
                      comment: comment)
             .asObservable()
-            .do(onNext: { [weak self] _ in
-                self?.selectedComment = nil
-            })
             .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                let addSection = addCommentSectionModel(comments)
-                let requestParent = Mutation.requestParent(.editedComment)
-                return .of(addSection, requestParent)
+                self.selectedComment = nil
+                delegate?.editComment(nil)
+                return .just(addCommentSectionModel(comments))
             })
         
         return requestWithLoading(task: editComment)
     }
-    
+
     private func deleteComment() -> Observable<Mutation> {
         
         guard let selectedCommentId = self.selectedComment?.id else { return .empty() }
@@ -270,12 +246,10 @@ extension CommentListViewReactor {
         let deleteComment = deleteCommentUseCase
             .execute(commentId: selectedCommentId)
             .asObservable()
-            .do(onNext: { [weak self] _ in
-                self?.selectedComment = nil
-            })
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self,
                       let postId else { return .empty() }
+                selectedComment = nil
                 return fetchCommentList(postId: postId)
             }
         
@@ -288,8 +262,10 @@ extension CommentListViewReactor {
         let reportComment = reportUseCase
             .execute(type: .comment(id: id), reason: nil)
             .asObservable()
-            .map({ _ -> Mutation in
-                .requestParent(.reportComment)
+            .flatMap({ [weak self] _ -> Observable<Mutation> in
+                self?.selectedComment = nil
+                self?.delegate?.reportComment()
+                return .empty()
             })
         
         return requestWithLoading(task: reportComment)

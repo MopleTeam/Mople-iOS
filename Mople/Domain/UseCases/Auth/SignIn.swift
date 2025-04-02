@@ -16,7 +16,7 @@ enum LoginError: Error {
     case appleAccountError
     case kakaoAccountError
     case completeError
-    case appError(error: AppError)
+    case appError(error: DataRequestError)
     
     var info: String? {
         switch self {
@@ -67,7 +67,7 @@ final class SignInUseCase: SignIn {
         return loginObserver
             .do(onSuccess: { socialLoginResult = $0 })
             .flatMap({ [weak self] accountInfo in
-                guard let self else { throw AppError.unknown }
+                guard let self else { throw DataRequestError.unknown }
                 return self.authenticationRepo
                     .signIn(social: accountInfo)
             })

@@ -110,7 +110,10 @@ final class MapInfoView: UIView {
         sv.alignment = .fill
         sv.distribution = .fill
         sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 20, left: 20, bottom: 0, right: 20)
+        sv.layoutMargins = .init(top: 20,
+                                 left: 20,
+                                 bottom: UIScreen.getSafeBottomHeight(),
+                                 right: 20)
         sv.backgroundColor = ColorStyle.Default.white
         sv.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         sv.layer.makeShadow(opactity: 0.1,
@@ -160,7 +163,8 @@ final class MapInfoView: UIView {
         }
         
         mainStackView.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
     

@@ -126,7 +126,7 @@ final class SignInViewController: DefaultViewController, View {
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview()
-                .inset(UIScreen.getBottomSafeAreaHeight())
+                .inset(UIScreen.getDefaultBottomPadding())
         }
         
         titleStackView.snp.makeConstraints { make in

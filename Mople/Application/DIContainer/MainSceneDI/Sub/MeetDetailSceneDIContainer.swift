@@ -135,18 +135,11 @@ extension MeetDetailSceneDIContainer {
                                           coordinator: MeetSetupCoordination) -> MeetSetupViewReactor {
         return .init(meet: meet,
                      deleteMeetUseCase: makeDeleteMeetUseCase(),
-                     leaveMeetUseCase: makeLeaveMeetUseCase(),
                      coordinator: coordinator)
     }
     
     private func makeDeleteMeetUseCase() -> DeleteMeet {
         return DeleteMeetUseCase(
-            repo: DefaultMeetCommandRepo(networkService: appNetworkService)
-        )
-    }
-    
-    private func makeLeaveMeetUseCase() -> LeaveMeet {
-        return LeaveMeetUseCase(
             repo: DefaultMeetCommandRepo(networkService: appNetworkService)
         )
     }

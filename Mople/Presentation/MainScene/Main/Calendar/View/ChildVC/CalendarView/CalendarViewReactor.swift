@@ -37,7 +37,7 @@ final class CalendarViewReactor: Reactor {
             case changedCalendarHeight(CGFloat)
             case changedScope(ScopeType)
             case changeMonth(DateComponents)
-            case changedPage(DateComponents)
+            case changedPage(Date)
             case selectedDate(Date)
         }
         
@@ -152,9 +152,7 @@ extension CalendarViewReactor {
     }
     
     private func updatePlanMonthList(from dateList: [Date]) {
-        let monthList = dateList.compactMap { $0.toMonthComponents().toDate() }
-        let deduplicatedMonthList = Set(monthList)
-        delegate?.updatePlanMonthList(Array(deduplicatedMonthList))
+        delegate?.updatePlanMonthList(dateList)
     }
 }
 
@@ -209,6 +207,9 @@ extension CalendarViewReactor: CalendarCommands {
                             at month: Date,
                             monthDate: [Date]) {
         dateList.removeAll { DateManager.isSameMonth($0, month) }
+        monthDate.forEach {
+            print(#function, #line, "#0329 불러온 날짜 : \($0)" )
+        }
         dateList.append(contentsOf: monthDate)
     }
     

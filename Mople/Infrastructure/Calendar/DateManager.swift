@@ -133,10 +133,6 @@ extension DateManager {
         return calendar.isDateInToday(date)
     }
     
-    static func test(on date: Date) -> Date? {
-        return calendar.date(byAdding: .day, value: -1, to: date)
-    }
-    
     static func isFutureOrToday(on date: Date) -> Bool {
         return isToday(on: date) || Date() < date
     }
@@ -191,6 +187,10 @@ extension DateManager {
 extension DateManager {
     static func startOfDay(_ date: Date) -> Date {
         return calendar.startOfDay(for: date)
+    }
+    
+    static func startOfMonth(_ date: Date) -> Date? {
+        return date.toMonthComponents().toDate()
     }
 
     static func getNextMonth(_ date: Date) -> Date {

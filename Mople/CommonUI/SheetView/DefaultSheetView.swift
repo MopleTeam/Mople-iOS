@@ -54,7 +54,10 @@ final class DefaultSheetView: UIView {
         sv.alignment = .fill
         sv.distribution = .fill
         sv.layer.makeCornes(radius: 13, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
-        sv.layoutMargins = .init(top: 0, left: 20, bottom: 0, right: 20)
+        sv.layoutMargins = .init(top: 0,
+                                 left: 20,
+                                 bottom: UIScreen.getSafeBottomHeight(),
+                                 right: 20)
         sv.isLayoutMarginsRelativeArrangement = true
         return sv
     }()

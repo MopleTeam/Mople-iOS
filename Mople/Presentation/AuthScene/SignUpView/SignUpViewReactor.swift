@@ -219,13 +219,13 @@ extension SignUpViewReactor {
                 return self.fetchUserInfo.execute()
             })
             .asObservable()
-            .flatMap({ _ in Observable<Mutation>.empty() })
+            .observe(on: MainScheduler.instance)
+            .flatMap({ [weak self] _ -> Observable<Mutation> in
+                self?.coordinator?.presentMainFlow()
+                return .empty()
+            })
         
         return requestWithLoading(task: signUp)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.coordinator?.presentMainFlow()
-            })
     }
     
     private func signUp(_ imagePath: String?) -> Single<Void> {

@@ -60,7 +60,7 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
             make.top.equalTo(titleViewBottom)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview()
-                .inset(UIScreen.getBottomSafeAreaHeight())
+                .inset(UIScreen.getDefaultBottomPadding())
         }
     }
     

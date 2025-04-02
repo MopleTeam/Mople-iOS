@@ -16,7 +16,7 @@ class DefaultViewController: BaseViewController {
     private(set) var indicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
-        indicator.layer.zPosition = 1
+        indicator.layer.zPosition = 10
         return indicator
     }()
     

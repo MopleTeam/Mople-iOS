@@ -84,6 +84,11 @@ extension MainSceneCoordinator: MainCoordination {
         self.parentCoordinator?.didFinish(coordinator: self)
         (self.parentCoordinator as? SignOutListener)?.signOut()
     }
+    
+    // MARK: - 루트뷰로 돌아오기
+    func returnToRootView() {
+        self.navigationController.dismiss(animated: true)
+    }
 }
 
 // MARK: - 탭바 컨트롤

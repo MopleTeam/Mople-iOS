@@ -135,16 +135,14 @@ extension ReviewEditViewReactor {
         let deleteImage = requsetDeleteImage(id: id)
         let requestUpdate = Observable.zip(addImage, deleteImage)
             .asObservable()
-            .flatMap { _ -> Observable<Mutation> in
+            .observe(on: MainScheduler.instance)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.notificationUpdateImage()
+                self?.coordiantor?.endFlow()
                 return .empty()
             }
         
         return requestWithLoading(task: requestUpdate)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.notificationUpdateImage()
-                self?.coordiantor?.endFlow()
-            })
     }
     
     private func requestAppImage(id: Int) -> Observable<Void> {

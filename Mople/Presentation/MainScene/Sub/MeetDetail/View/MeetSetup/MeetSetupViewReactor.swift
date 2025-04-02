@@ -8,15 +8,10 @@
 import Foundation
 import ReactorKit
 
-protocol MeetSetupCoordination: AnyObject {
+protocol MeetSetupCoordination: NavigationCloseable {
     func pushEditMeetView(previousMeet: Meet)
     func pushMemberListView()
-    func pop()
     func endFlow()
-}
-
-enum MeetSetupError: Error {
-    
 }
 
 final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
@@ -26,10 +21,11 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
             case editMeet
             case memberList
             case pop
+            case endFlow
         }
         
         case setMeet(_ meet: Meet)
-        case editMeet(Meet)
+        case editMeet(MeetPayload)
         case flow(Flow)
         case deleteMeet
     }
@@ -44,22 +40,20 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     struct State {
         @Pulse var meet: Meet?
         @Pulse var isHost: Bool = false
-        @Pulse var message: String?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     var initialState: State = State()
     
+    private var isLoading = false
     private let deleteMeetUseCase: DeleteMeet
-    private let leaveMeetUseCase: LeaveMeet
     private weak var coordinator: MeetSetupCoordination?
     
     init(meet: Meet,
          deleteMeetUseCase: DeleteMeet,
-         leaveMeetUseCase: LeaveMeet,
          coordinator: MeetSetupCoordination) {
         self.deleteMeetUseCase = deleteMeetUseCase
-        self.leaveMeetUseCase = leaveMeetUseCase
         self.coordinator = coordinator
         initalSetup(meet: meet)
         logLifeCycle()
@@ -74,13 +68,14 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
+        guard isLoading == false else { return .empty() }
         switch action {
         case let .setMeet(Meet):
             return self.setMeetInfo(Meet)
         case let .flow(action):
             return handleFlowAction(action)
-        case let .editMeet(Meet):
-            return .just(.updateMeet(Meet))
+        case let .editMeet(payload):
+            return handleMeetPayload(with: payload)
         case .deleteMeet:
             return handleDeleteMeet()
         }
@@ -98,14 +93,10 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .catchError(err):
-            handleError(state: &newState, error: err)
+            newState.error = err
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State, error: Error) {
-        
     }
 }
 
@@ -124,26 +115,24 @@ extension MeetSetupViewReactor {
     /// 호스트 여부에 따라서 모임 삭제 및 모임 탈퇴
     private func handleDeleteMeet() -> Observable<Mutation> {
         guard let meetId = currentState.meet?.meetSummary?.id else { return .empty() }
-        let isHost = currentState.isHost
-        let deleteMeet = Observable.just(isHost)
-            .flatMap { [weak self] isHost -> Single<Void> in
-                guard let self else { return .never() }
-                if isHost {
-                    return deleteMeetUseCase.execute(id: meetId)
-                } else {
-                    return leaveMeetUseCase.execute(id: meetId)
-                }
-            }
+        isLoading = true
+        let deleteMeet = deleteMeetUseCase.execute(id: meetId)
             .asObservable()
-            .flatMap { _ -> Observable<Mutation> in
+            .catch({
+                let err = DataRequestError.resolveNoResponseError(err: $0,
+                                                                  responseType: .meet(id: meetId))
+                return .error(err)
+            })
+            .observe(on: MainScheduler.instance)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.notificationDeleteMeet()
+                self?.coordinator?.endFlow()
                 return .empty()
             }
         
         return requestWithLoading(task: deleteMeet)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.notificationDeleteMeet()
-                self?.coordinator?.endFlow()
+            .do(onDispose: { [weak self] in
+                self?.isLoading = false
             })
     }
 }
@@ -159,13 +148,24 @@ extension MeetSetupViewReactor {
             coordinator?.pushMemberListView()
         case .pop:
             coordinator?.pop()
+        case .endFlow:
+            coordinator?.endFlow()
         }
         return .empty()
     }
 }
 
-// MARK: - Notification
+// MARK: - 알림 수신 및 발신
 extension MeetSetupViewReactor {
+    private func handleMeetPayload(with payload: MeetPayload) -> Observable<Mutation> {
+        switch payload {
+        case let .updated(meet):
+            return .just(.updateMeet(meet))
+        default:
+            return .empty()
+        }
+    }
+    
     private func notificationDeleteMeet() {
         guard let id = currentState.meet?.meetSummary?.id else { return }
         EventService.shared.postItem(MeetPayload.deleted(id: id),

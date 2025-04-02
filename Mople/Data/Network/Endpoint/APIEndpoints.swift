@@ -37,12 +37,12 @@ enum HTTPHeader {
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.accessToken else { throw AppError.expiredToken }
+        guard let token = KeyChainService.cachedToken?.accessToken else { throw DataRequestError.expiredToken }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.refreshToken else { throw AppError.expiredToken }
+        guard let token = KeyChainService.cachedToken?.refreshToken else { throw DataRequestError.expiredToken }
         return ["refreshToken": token]
     }
 }
@@ -209,13 +209,6 @@ extension APIEndpoints {
     }
     
     static func deleteMeet(id: Int) throws -> Endpoint<Void> {
-        return try Endpoint(path: "meet/\(id)",
-                            authenticationType: .accessToken,
-                            method: .delete,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
-    }
-    
-    static func leaveMeet(id: Int) throws -> Endpoint<Void> {
         return try Endpoint(path: "meet/\(id)",
                             authenticationType: .accessToken,
                             method: .delete,

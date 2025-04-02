@@ -229,15 +229,13 @@ extension ProfileEditViewReactor {
                 return self.editProfile(imagePath: imagePath)
             }
             .asObservable()
-            .flatMap({ _ in
-                return Observable<Mutation>.empty()
+            .observe(on: MainScheduler.instance)
+            .flatMap({ [weak self] _ -> Observable<Mutation> in
+                self?.coordinator?.complete()
+                return .empty()
             })
                     
         return requestWithLoading(task: editProfile)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.coordinator?.complete()
-            })
     }
     
     private func handleEditProfileTrigger(isEdit: Bool) -> Single<String?> {

@@ -141,7 +141,7 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
         completeButton.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(mainStackView).inset(20)
             make.height.equalTo(56)
-            make.bottom.equalToSuperview().inset(UIScreen.getBottomSafeAreaHeight())
+            make.bottom.equalToSuperview().inset(UIScreen.getDefaultBottomPadding())
         }
     }
     

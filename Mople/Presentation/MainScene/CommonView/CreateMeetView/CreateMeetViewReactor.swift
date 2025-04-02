@@ -23,7 +23,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case resetImage
         case createMeet
         case setPreviousMeet(Meet)
-        case endTask
+        case endView
     }
     
     enum Mutation {
@@ -90,7 +90,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
             }
         case let .setPreviousMeet(meet):
             return .just(.updatePreviousMeet(meet))
-        case .endTask:
+        case .endView:
             return endTask()
         }
     }
@@ -205,15 +205,12 @@ extension CreateMeetViewReactor {
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
                 self?.notificationNewMeet(meet)
+                self?.handleCompletedTask()
                 return .empty()
             })
         
         return requestWithLoading(task: createMeet,
                                   minimumExecutionTime: .seconds(1))
-        .observe(on: MainScheduler.instance)
-        .do(afterCompleted: { [weak self] in
-            self?.handleCompletedTask()
-        })
     }
     
     private func requestCreateMeet() -> Observable<Mutation> {
@@ -231,18 +228,16 @@ extension CreateMeetViewReactor {
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
                 self?.notificationNewMeet(meet)
+                self?.handleCompletedTask()
                 return .empty()
             })
             
         return requestWithLoading(task: createMeet,
                                   minimumExecutionTime: .seconds(1))
-        .observe(on: MainScheduler.instance)
-        .do(afterCompleted: { [weak self] in
-            self?.handleCompletedTask()
-        })
     }
     
     private func handleCompletedTask() {
+        print(#function, #line, "이게 왜 호출돼" )
         switch type {
         case .create:
             coordinator?.dismiss()

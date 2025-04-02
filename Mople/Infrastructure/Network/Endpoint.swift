@@ -72,13 +72,13 @@ extension Endpoint {
             return headers
         case .accessToken:
             guard let token = KeyChainService.cachedToken?.accessToken else {
-                throw AppError.expiredToken
+                throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Authorization":"Bearer \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }
         case .refreshToken:
             guard let token = KeyChainService.cachedToken?.refreshToken else {
-                throw AppError.expiredToken
+                throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Refresh":" \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }

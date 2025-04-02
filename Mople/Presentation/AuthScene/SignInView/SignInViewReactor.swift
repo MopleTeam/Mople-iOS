@@ -86,13 +86,13 @@ extension SignInViewReactor {
                 
         let loginTask = signIn.execute(platform: platform)
             .flatMap({ [weak self] in
-                guard let self else { throw AppError.unknown }
+                guard let self else { throw DataRequestError.unknown }
                 return self.fetchUserInfo.execute()
             })
             .asObservable()
             .map { Mutation.moveToMain }
             .catch { [weak self] err in
-                guard let self else { throw AppError.unknown }
+                guard let self else { throw DataRequestError.unknown }
                 return self.handleError(err: err)
             }
         
@@ -115,10 +115,10 @@ extension SignInViewReactor {
                 .map { _ in .moveToProfileSetup(socialInfo) }
         case let err as LoginError:
             return .just(.notifyMessage(message: err.info))
-        case let err as AppError:
+        case let err as DataRequestError:
             return .just(.notifyMessage(message: err.info))
         default:
-            return .just(.notifyMessage(message: AppError.unknown.info))
+            return .just(.notifyMessage(message: DataRequestError.unknown.info))
         }
     }
 }

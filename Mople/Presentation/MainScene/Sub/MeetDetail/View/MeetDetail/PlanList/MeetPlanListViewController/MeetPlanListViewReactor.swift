@@ -60,7 +60,7 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         case .requestPlanList:
             return fetchPlanList()
         case let .updateParticipants(id, isJoining):
-            return requestParticipationPlan(planId: id, isJoining: isJoining)
+            return handleParticipation(planId: id, isJoining: isJoining)
         case let .selectedPlan(index):
             return presentPlanDetailView(index: index)
         case let .updatePlan(payload):
@@ -98,39 +98,48 @@ extension MeetPlanListViewReactor {
 
         return requestWithLoading(task: fetchPlanList)
     }
-    
-    private func requestParticipationPlan(planId: Int,
-                                          isJoining: Bool) -> Observable<Mutation> {
-        
-        guard let planIndex = currentState.plans.firstIndex(where: { $0.id == planId }) else {
-            return .empty()
-        }
-        
-        if checkPlanTime(planIndex: planIndex) {
-            let requestParticipation = participationPlanUseCase.execute(planId: planId,
-                                                                        isJoining: isJoining)
-                .asObservable()
-                .flatMap { [weak self] _ -> Observable<Mutation> in
-                    guard let self else { return .empty() }
-                    return handleParticipants(planIndex: planIndex)
-                }
-            
-            return requestWithLoading(task: requestParticipation,
-                                      errorHandler: { [weak self] err in
-                self?.handleParticipantionError(err: err,
-                                                id: planId)
-            })
-        } else {
-            return .just(.closePlan(id: planId))
-        }
-    }
 
-    private func checkPlanTime(planIndex: Int) -> Bool {
-        guard let planDate = currentState.plans[planIndex].date else { return false }
-        return planDate > Date()
+    // 일정 시간이 마감된 경우 : UI 업데이트
+    // 일정이 과거인 경우 : reload post
+    // 일정이 사라진 경우 : delete post
+    private func handleParticipation(planId: Int,
+                                     isJoining: Bool) -> Observable<Mutation> {
+        
+        guard let planIndex = currentState.plans.firstIndex(where: { $0.id == planId }),
+              let planDate = currentState.plans[safe: planIndex]?.date else { return .empty() }
+        print(#function, #line, "#0331 참여 일정 : \(planDate)" )
+        switch planDate {
+        case _ where DateManager.isPastDay(on: planDate):
+            parent?.catchError(DateTransitionError.midnightReset, index: 1)
+            return .empty()
+        case _ where planDate < Date():
+            return .just(.closePlan(id: planId))
+        default:
+            return requestParticipation(id: planId,
+                                        planIndex: planIndex,
+                                        isJoining: isJoining)
+        }
     }
     
-    private func handleParticipants(planIndex: Int) -> Observable<Mutation> {
+    private func requestParticipation(id: Int,
+                                      planIndex: Int,
+                                      isJoining: Bool) -> Observable<Mutation> {
+        let requestParticipation = participationPlanUseCase.execute(planId: id,
+                                                                    isJoining: isJoining)
+            .asObservable()
+            .catch({ 
+                let err = DataRequestError.resolveNoResponseError(err: $0,
+                                                                  responseType: .plan(id: id))
+                return .error(err)
+            })
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return updateParticipation(planIndex: planIndex)
+            }
+        return requestWithLoading(task: requestParticipation)
+    }
+    
+    private func updateParticipation(planIndex: Int) -> Observable<Mutation> {
         var currentPlans = currentState.plans
         let changePlan = currentPlans[planIndex].updateParticipants()
         postParticipants(with: changePlan)
@@ -139,17 +148,13 @@ extension MeetPlanListViewReactor {
     
     private func postParticipants(with plan: Plan) {
         if plan.isParticipating {
-            EventService.shared.postItem(.created(plan), from: self)
+            EventService.shared.participatingPost(.participating(plan),
+                                                  from: self)
         } else {
             guard let id = plan.id else { return }
-            EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
+            EventService.shared.participatingPost(.notParticipation(id: id),
+                                                  from: self)
         }
-    }
-    
-    private func handleParticipantionError(err: Error, id: Int) {
-        guard let dataTransferError = err as? DataTransferError,
-              case .noResponse = dataTransferError else { return }
-        EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
     }
 }
 
@@ -174,7 +179,7 @@ extension MeetPlanListViewReactor {
             delegate?.selectedPlan(id: id,
                                    type: .plan)
         } else {
-            parent?.catchError(PlanDetailError.expiredPlan(date), index: 1)
+            parent?.catchError(DateTransitionError.midnightReset, index: 1)
         }
     }
 }

@@ -199,28 +199,26 @@ extension CreatePlanViewReactor {
         let uploadPlan = createPlanUseCase.execute(request: request)
             .asObservable()
             .observe(on: MainScheduler.instance)
-            .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
-            .flatMap({ _ in Observable<Mutation>.empty() })
+            .flatMap({ [weak self] plan -> Observable<Mutation> in
+                self?.notificationNewPlan(plan)
+                self?.coordinator?.endFlow()
+                return .empty()
+            })
         
         return requestWithLoading(task: uploadPlan)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.coordinator?.endFlow()
-            })
     }
     
     private func editPlan(request: PlanRequest) -> Observable<Mutation> {
         let editPlan = editPlanUseCase.execute(request: request)
             .asObservable()
             .observe(on: MainScheduler.instance)
-            .do(onNext: { [weak self] in self?.notificationNewPlan($0) })
-            .flatMap({ _ in Observable<Mutation>.empty() })
+            .flatMap({ [weak self] plan -> Observable<Mutation> in
+                self?.notificationNewPlan(plan)
+                self?.coordinator?.endFlow()
+                return .empty()
+            })
         
         return requestWithLoading(task: editPlan)
-            .observe(on: MainScheduler.instance)
-            .do(afterCompleted: { [weak self] in
-                self?.coordinator?.endFlow()
-            })
     }
     
     private func requestWithLoading(task: Observable<Mutation>,
