@@ -8,18 +8,8 @@
 import Foundation
 import ReactorKit
 
-enum SearchError: Error {
-    case emptyQuery
-    case unkonwnError
-    
-    var info: String {
-        switch self {
-        case .emptyQuery:
-            return "검색어를 입력해주세요."
-        case .unkonwnError:
-            return "잠시 후 다시 시도해주세요."
-        }
-    }
+protocol SearchPlaceDelegate: AnyObject {
+    func selectedPlace(with place: PlaceInfo)
 }
 
 final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
@@ -32,27 +22,25 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         case updateUserLocation
         case fetchCahcedPlace
-        case searchPlace(query: String?)
+        case searchPlace(query: String)
         case selectedPlace(index: Int)
         case deletePlace(index: Int)
         case endProcess
-        case completed
+        case completed(place: PlaceInfo)
     }
     
     enum Mutation {
         case setUserLocation(_ location: Location?)
         case setPlace(_ result: PlaceSearchResult)
-        case notifyLoadingState(_ isLoading: Bool)
-        case handleSearchError(error: SearchError?)
-        case updateSelectedPlace(PlaceInfo?)
+        case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var searchResult: PlaceSearchResult?
-        @Pulse var selectedPlace: PlaceInfo?
         @Pulse var userLocation: Location?
-        @Pulse var error: SearchError?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     var initialState: State = State()
@@ -61,18 +49,20 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
     private let locationService: LocationService
     private let queryStorage: SearchedPlaceStorage
     private weak var coordinator: SearchPlaceCoordination?
+    private weak var delegate: SearchPlaceDelegate?
     
     init(searchLocationUseCase: SearchPlace,
          locationService: LocationService,
          queryStorage: SearchedPlaceStorage,
-         coordinator: SearchPlaceCoordination) {
+         coordinator: SearchPlaceCoordination,
+         delegate: SearchPlaceDelegate) {
         self.searchUseCase = searchLocationUseCase
         self.locationService = locationService
         self.queryStorage = queryStorage
         self.coordinator = coordinator
+        self.delegate = delegate
         logLifeCycle()
-        action.onNext(.updateUserLocation)
-        action.onNext(.fetchCahcedPlace)
+        initalAction()
     }
     
     deinit {
@@ -94,12 +84,9 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         case .endProcess:
             self.coordinator?.endProcess()
             return .empty()
-        case .completed:
-            if let selectedPlace = currentState.selectedPlace {
-                self.coordinator?.completedProcess(selectedPlace: selectedPlace)
-            } else {
-                // 에러 출력
-            }
+        case let .completed(place):
+            delegate?.selectedPlace(with: place)
+            coordinator?.completed()
             return .empty()
         }
     }
@@ -111,20 +98,21 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .setPlace(result):
             newState.searchResult = result
-        case let .handleSearchError(err):
+        case let .catchError(err):
             newState.error = err
-        case let .notifyLoadingState(isLoading):
+        case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .setUserLocation(location):
             newState.userLocation = location
-        case let .updateSelectedPlace(placeInfo):
-            newState.selectedPlace = placeInfo
-            coordinator?.showDetailPlaceView()
         }
         
         return newState
     }
     
+    private func initalAction() {
+        action.onNext(.updateUserLocation)
+        action.onNext(.fetchCahcedPlace)
+    }
 }
 
 extension SearchPlaceViewReactor {
@@ -135,31 +123,17 @@ extension SearchPlaceViewReactor {
     }
     
     private func updateUserLocation() -> Observable<Mutation> {
-        let loadingEnd = Observable.just(Mutation.notifyLoadingState(false))
-            .filter { [weak self] _ in self?.currentState.isLoading == true }
-        
         let location = locationService.updateLocation()
             .map { Mutation.setUserLocation($0) }
-            .concat(loadingEnd)
-            .share(replay: 1)
-        
-        let loading = Observable.just(Mutation.notifyLoadingState(true))
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .take(until: location)
 
-        return .merge([location, loading])
+        return requestWithLoading(task: location,
+                                  defferredLoadingDelay: .seconds(0))
     }
     
-    private func searchPlace(query: String?) -> Observable<Mutation> {
-        
-        guard let query, !query.isEmpty else {
-            return .just(.handleSearchError(error: SearchError.emptyQuery))
-        }
-        
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
+    private func searchPlace(query: String) -> Observable<Mutation> {
         
         let userLocation = currentState.userLocation
-        #warning("에러 처리")
+
         let requestSearch = searchUseCase.execute(query: query,
                                                   x: userLocation?.longitude,
                                                   y: userLocation?.latitude)
@@ -172,40 +146,33 @@ extension SearchPlaceViewReactor {
             })
             .map { Mutation.setPlace(.init(places: $0.result, isCached: false)) }
         
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
-        
-        return Observable.concat([loadingStart,
-                                  requestSearch,
-                                  loadingStop])
+        return requestWithLoading(task: requestSearch)
     }
         
     private func updateSelectedPlace(index: Int) -> Observable<Mutation> {
         
-        let selectedPlace = self.selectedPlace(index: index)
+        guard let selectedPlace = self.selectedPlace(index: index) else {
+            return .empty()
+        }
+        coordinator?.showDetailPlaceView(with: selectedPlace)
+        queryStorage.addPlace(selectedPlace)
         
-        let updateSelectedPlace = Observable.just(selectedPlace)
-            .map { Mutation.updateSelectedPlace($0) }
-        
-        let updatedCachedPlace = Observable.just(selectedPlace)
-            .compactMap { $0 }
-            .do { [weak self] in
-                self?.queryStorage.addPlace($0)
-            }
-            .filter({ [weak self] _ in self?.currentState.searchResult?.isCached == true })
-            .delay(.milliseconds(300), scheduler: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return self.fetchCahcedPlace()
-            }
-            
-        return Observable.concat([updateSelectedPlace, updatedCachedPlace])
+        if currentState.searchResult?.isCached == true {
+            return Observable.just(())
+                .delay(.milliseconds(300), scheduler: MainScheduler.instance)
+                .flatMap { [weak self] _ -> Observable<Mutation> in
+                    guard let self else { return .empty() }
+                    return self.fetchCahcedPlace()
+                }
+        } else {
+            return .empty()
+        }
     }
     
     private func selectedPlace(index: Int) -> PlaceInfo? {
         guard let result = currentState.searchResult,
-              result.places.count > index else { return nil }
-        var selectedPlace = result.places[safe: index]
-        selectedPlace?.updateDistance(userLocation: currentState.userLocation)
+              var selectedPlace = result.places[safe: index] else { return nil }
+        selectedPlace.updateDistance(userLocation: currentState.userLocation)
         return selectedPlace
     }
     
@@ -239,5 +206,16 @@ extension SearchPlaceViewReactor {
     private func updateSearchResultVisibility(result: [PlaceInfo]) {
         self.coordinator?.updateEmptyViewVisibility(shouldShow: result.isEmpty)
         self.coordinator?.updateSearchResultViewVisibility(shouldShow: !result.isEmpty)
+    }
+}
+
+// MARK: - 로딩
+extension SearchPlaceViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

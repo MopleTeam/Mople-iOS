@@ -32,7 +32,6 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         case updateCompleteAvaliable(Bool)
         case updateDuplicateState(Bool?)
         case updateLoadingState(Bool)
-        case notifyMessage(String?)
         case catchError(Error)
     }
     
@@ -43,7 +42,7 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var canComplete: Bool = false
         @Pulse var isDuplicate: Bool?
         @Pulse var isLoading: Bool = false
-        @Pulse var message: String?
+        @Pulse var error: Error?
     }
     
     private let editProfile: EditProfile
@@ -105,6 +104,7 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         case let .updateProfile(profile):
             newState.profile = profile
         case let .updateImage(image):
+            isEditImage = true
             newState.selectedImage = image
         case let .updateDuplicateAvaliable(isAvaliable):
             newState.canDuplicateCheck = isAvaliable
@@ -114,17 +114,11 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
             newState.isDuplicate = isDuplicate
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
-        case let .notifyMessage(message):
-            newState.message = message
-        case let .catchError(error):
-            handleError(state: &newState, error: error)
+        case let .catchError(err):
+            newState.error = err
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State, error: Error) {
-        
     }
     
     private func setPreviousUserInfo(_ userInfo: UserInfo) {
@@ -137,62 +131,28 @@ extension ProfileEditViewReactor {
     
     // MARK: - 닉네임 정규식 검사 및 업데이트
     private func updateNickname(_ name: String) -> Observable<Mutation> {
-        print(#function, #line)
-        let resetDuplication = Observable
-            .just(Mutation.updateDuplicateState(nil))
-        
-        let updateDuplicateAvailable = checkDuplicateAvaliable(name: name)
-        
-        return .concat([resetDuplication,
-                        updateDuplicateAvailable])
+        profile?.nickname = name
+
+        return .concat([.just(.updateDuplicateState(nil)),
+                        checkDuplicateAvaliable(name: name)])
     }
     
     private func checkDuplicateAvaliable(name: String) -> Observable<Mutation> {
-        print(#function, #line)
-        let isAvailableName = checkAvailableName(name)
-        
-        setNickname(isAvailable: isAvailableName, name: name)
-        
-        let isDuplicateAvailable = Observable<Mutation>.just(.updateDuplicateAvaliable(isAvailableName))
-        let isCompleteAvailable = checkCompleteAvaliableByName(name)
-        return .concat([isDuplicateAvailable, isCompleteAvailable])
-    }
-    
-    private func checkAvailableName(_ name: String) -> Bool {
         let isValid = Validator.checkNickname(name)
-        let isEqualsName = isEqualsToPreviousNickname(name)
-        return isValid && !isEqualsName
-    }
-    
-    private func isEqualsToPreviousNickname(_ name: String?) -> Bool {
-        let previousName = previousProfile.name
-        return previousName == name
-    }
-    
-    private func setNickname(isAvailable: Bool,
-                             name: String) {
-        guard isAvailable else { return }
-        profile?.nickname = name
-    }
-    
-    private func checkCompleteAvaliableByName(_ name: String) -> Observable<Mutation>  {
-        let isEqualsName = isEqualsToPreviousNickname(name)
-        return .just(.updateCompleteAvaliable(isEditImage && isEqualsName))
+        let isChangedName = isChangedNickname(name)
+        return .concat([.just(.updateDuplicateAvaliable(isValid && isChangedName)),
+                        .just(.updateCompleteAvaliable(isEditImage && !isChangedName))])
     }
     
     // MARK: - 이미지 업데이트
     private func updateImage() -> Observable<Mutation> {
         return photoService.presentImagePicker()
             .asObservable()
-            .do(onNext: { [weak self] _ in
-                self?.isEditImage = true
-            })
             .map { Mutation.updateImage($0.first) }
             .concat(checkCompleteAvaliableByPhoto())
     }
     
     private func resetImage() -> Observable<Mutation> {
-        print(#function, #line)
         self.isEditImage = true
         return Observable<Mutation>.just(.updateImage(nil))
             .concat(checkCompleteAvaliableByPhoto())
@@ -200,9 +160,15 @@ extension ProfileEditViewReactor {
     
     private func checkCompleteAvaliableByPhoto() -> Observable<Mutation> {
         let currentName = profile?.nickname
-        let isEqualsName = isEqualsToPreviousNickname(currentName)
+        let isChangedName = isChangedNickname(currentName)
         let isDuplicateName = currentState.isDuplicate ?? true
-        return .just(.updateCompleteAvaliable(isEqualsName || !isDuplicateName))
+        return .just(.updateCompleteAvaliable(!isChangedName || !isDuplicateName))
+    }
+    
+    // MARK: - 닉네임 변경여부
+    private func isChangedNickname(_ name: String?) -> Bool {
+        let previousName = previousProfile.name
+        return previousName != name
     }
     
     // MARK: - 닉네임 중복검사
@@ -217,7 +183,6 @@ extension ProfileEditViewReactor {
     }
     
     // MARK: - 프로필 편집
-    #warning("중복검사 이후 중복되는 경우 핸들링")
     private func requestEditProfile() -> Observable<Mutation> {
         let editProfile = Observable.just(isEditImage)
             .flatMap { [weak self] isEdit -> Single<String?> in

@@ -16,6 +16,9 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     
     var disposeBag = DisposeBag()
     
+    // MARK: - Observable
+    private let endFlow: PublishSubject<Void> = .init()
+    
     // MARK: - Alert
     private let alertManager = AlertManager.shared
     
@@ -161,6 +164,11 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        endFlow
+            .map { Reactor.Action.flow(.endFlow) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         planInfoView.rx.memberTapped
             .map { Reactor.Action.flow(.showMemberList) }
             .bind(to: reactor.action)
@@ -212,11 +220,11 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
             .drive(completeButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$message)
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
-            .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showAlert(message: message)
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err: err)
             })
             .disposed(by: disposeBag)
         
@@ -224,6 +232,17 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - 에러 핸들링
+    private func handleError(err: ReviewEditError) {
+        switch err {
+        case let .noResponse(err):
+            alertManager.showResponseErrorMessage(err: err,
+                                                 completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        }
     }
 }
 

@@ -16,7 +16,7 @@ final class HomeViewController: DefaultViewController, View {
     var disposeBag = DisposeBag()
     
     // MARK: - Manager
-    private let alertManager = TestAlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -192,8 +192,10 @@ final class HomeViewController: DefaultViewController, View {
         switch err {
         case let err as HomeError:
             handleHomeError(err: err)
+        case let err as DateTransitionError:
+            alertManager.showDateErrorMessage(err: err)
         default:
-            alertManager.showErrorAlert(err: err)
+            alertManager.showDefatulErrorMessage()
         }
     }
     
@@ -224,17 +226,6 @@ final class HomeViewController: DefaultViewController, View {
             .map { Reactor.Action.reloadDay }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    private func resolveParticipating(
-        with payload: EventService.ParticipationPayload
-    ) -> EventService.Payload<Plan> {
-        switch payload {
-        case let .participating(plan):
-            return .created(plan)
-        case let .notParticipation(id):
-            return .deleted(id: id)
-        }
     }
 }
 

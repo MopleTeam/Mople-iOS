@@ -150,6 +150,7 @@ final class ScheduleListReactor: Reactor {
             newState.planList.append(contentsOf: list)
             newState.previousPlanList = list
         case let .initalPlan(list):
+            print(#function, #line, "#0407 list count : \(list.count)" )
             newState.planList = list
         case let .updateSelectedDate(date):
             newState.selectedDate = date
@@ -217,11 +218,15 @@ extension ScheduleListReactor: ScheduleListCommands {
     
     // 만료된 일정이 있는 경우 업데이트
     func planUpdateWhenMidnight() {
+        var reloadMonth: Set<Date> = .init()
         let filterPlan = currentState.planList.filter { $0.type == .plan }
         let planDate = filterPlan.compactMap { $0.date }
         let expriedPlan = planDate.filter { DateManager.isPastDay(on: $0) }
-        let reloadMonth = expriedPlan.compactMap { DateManager.startOfMonth($0) }
-        action.onNext(.parentCommand(.reloadMonth(reloadMonth)))
+        expriedPlan.forEach {
+            guard let month = DateManager.startOfMonth($0) else { return }
+            reloadMonth.insert(month)
+        }
+        action.onNext(.parentCommand(.reloadMonth(Array(reloadMonth))))
     }
     
     // 초기셋업
@@ -248,6 +253,7 @@ extension ScheduleListReactor {
         
         return fetchMonthlyPlanUseCase.execute(month: monthString)
             .asObservable()
+            .catchAndReturn([])
             .do(onNext: { [weak self] planList in
                 self?.updateLoadedMonth(month: month,
                                         planList: planList)
@@ -408,7 +414,6 @@ extension ScheduleListReactor {
         case let .updated(meet):
             guard let meetSummary = meet.meetSummary else { return }
             updateMeet(&planList, meet: meetSummary)
-            break
         default: break
         }
         action.onNext(.parentCommand(.editPlanList(planList)))
@@ -442,8 +447,7 @@ extension ScheduleListReactor {
         action.onNext(.parentCommand(.editPlanList(planList)))
     }
     
-    // MARK: - 일정 변경
-    
+    // MARK: - 모임 변경
     /// 미팅의 이름, 사진이 변경된 경우 일치하는 일정의 미팅 정보를 변경
     private func updateMeet(_ planList: inout [MonthlyPlan], meet: MeetSummary) {
         planList.indices.forEach {
@@ -452,11 +456,12 @@ extension ScheduleListReactor {
         }
     }
     
+    // MARK: - 일정 변경
     /// 일정에 변경사항이 있을 경우 일치하는 일정의 값을 변경
     private func updatePlan(_ planList: inout [MonthlyPlan], plan: Plan) {
         guard let newDate = plan.date else { return }
         handleUpdate(&planList, plan: plan)
-        delegate?.updateDateList(type: .add(DateManager.startOfDay(newDate)))
+        delegate?.updateDateList(type: .add(newDate))
     }
     
     private func handleUpdate(_ planList: inout [MonthlyPlan], plan: Plan) {
@@ -521,28 +526,15 @@ extension ScheduleListReactor {
         updateLoadState()
     }
     
-    // MARK: - 삭제
+    // MARK: - 일정 삭제
     /// 일정 삭제
     private func deletePlan(_ planList: inout [MonthlyPlan], planId: Int?) {
-        print(#function, #line, "#0402 들어왔을 때 카운트 : \(planList.count)" )
         guard let deleteIndex = findPlanIndex(id: planId),
               let deleteDate = planList[deleteIndex].date else { return }
         planList.remove(at: deleteIndex)
-        print(#function, #line, "#0402 삭제된 뒤 카운트 : \(planList.count)" )
-        // 삭제된 날짜의 달에 잔여 데이터가 없다면 loadedDateList에서 삭제
-        guard planList.contains(where: {
-            guard let date = $0.date else { return false }
-            return DateManager.isSameDay(date, deleteDate)
-        }) == false
-        else { return }
-        
+        guard isContainsDate(with: planList, date: deleteDate) == false else { return }
         loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
-        delegate?.updateDateList(type: .delete(DateManager.startOfDay(deleteDate)))
-    }
-    
-    /// 현재 일정 리스트에서 삭제할 리뷰의 인덱스 얻기
-    private func findPlanIndex(id: Int?) -> Int? {
-        return currentState.planList.firstIndex { $0.id == id }
+        delegate?.updateDateList(type: .delete(deleteDate))
     }
 }
 
@@ -648,6 +640,19 @@ extension ScheduleListReactor {
         default:
             return nil
         }
+    }
+    
+    /// list에 date가 포함되어 있는지 확인
+    private func isContainsDate(with list: [MonthlyPlan], date: Date) -> Bool {
+        return list.contains {
+            guard let planDate = $0.date else { return false }
+            return DateManager.isSameDay(planDate, date)
+        }
+    }
+    
+    /// 현재 일정 리스트에서 id와 해당하는 일정 인덱스 찾기
+    private func findPlanIndex(id: Int?) -> Int? {
+        return currentState.planList.firstIndex { $0.id == id }
     }
 }
 

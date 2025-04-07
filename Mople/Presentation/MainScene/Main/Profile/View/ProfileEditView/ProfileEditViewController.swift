@@ -132,11 +132,12 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
             .drive(self.profileSetupView.rx.isDuplicate)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$message)
+        #warning("여기 고쳐야해")
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
-            .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showAlert(message: message)
+            .drive(with: self, onNext: { vc, _ in
+                vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
         

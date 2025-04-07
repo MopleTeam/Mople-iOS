@@ -130,11 +130,12 @@ class SignUpViewController: DefaultViewController, View {
             .drive(self.profileSetupView.rx.isDuplicate)
             .disposed(by: disposeBag)
         
+        #warning("여기 고쳐야해")
         reactor.pulse(\.$message)
             .compactMap { $0 }
             .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
             .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showAlert(message: message)
+//                vc.alertManager.showAlert(message: message)
             })
             .disposed(by: disposeBag)
         

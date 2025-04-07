@@ -316,8 +316,8 @@ extension ScheduleListViewController {
     private func scrollSelectedDate(_ selectDate: Date) {
         guard let models = dataSource?.sectionModels else { return }
         guard let headerIndex = models.firstIndex(where: {
-            guard let planDate = $0.date else { return false }
-            return DateManager.isSameDay(planDate, selectDate)
+            guard let sectionDate = $0.date else { return false }
+            return DateManager.isSameDay(sectionDate, selectDate)
         }) else { return }
         tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
     }

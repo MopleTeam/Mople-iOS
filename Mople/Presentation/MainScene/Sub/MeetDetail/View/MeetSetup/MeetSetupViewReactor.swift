@@ -14,6 +14,10 @@ protocol MeetSetupCoordination: NavigationCloseable {
     func endFlow()
 }
 
+enum MeetSetupError: Error {
+    case noResponse(ResponseError)
+}
+
 final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -34,14 +38,14 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         case updateMeet(_ meet: Meet)
         case checkHost(_ isHost: Bool)
         case updateLoadingState(Bool)
-        case catchError(Error)
+        case catchError(MeetSetupError?)
     }
     
     struct State {
         @Pulse var meet: Meet?
         @Pulse var isHost: Bool = false
         @Pulse var isLoading: Bool = false
-        @Pulse var error: Error?
+        @Pulse var error: MeetSetupError?
     }
     
     var initialState: State = State()
@@ -118,11 +122,6 @@ extension MeetSetupViewReactor {
         isLoading = true
         let deleteMeet = deleteMeetUseCase.execute(id: meetId)
             .asObservable()
-            .catch({
-                let err = DataRequestError.resolveNoResponseError(err: $0,
-                                                                  responseType: .meet(id: meetId))
-                return .error(err)
-            })
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 self?.notificationDeleteMeet()
@@ -180,6 +179,16 @@ extension MeetSetupViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let dataError = error as? DataRequestError,
+              let responseError = getDataRequestError(err: dataError) else {
+            return .catchError(nil)
+        }
+        return .catchError(.noResponse(responseError))
+    }
+    
+    private func getDataRequestError(err: DataRequestError) -> ResponseError? {
+        guard let meetId = currentState.meet?.meetSummary?.id else { return nil }
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: .meet(id: meetId))
     }
 }

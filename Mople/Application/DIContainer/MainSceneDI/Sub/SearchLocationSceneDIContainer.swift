@@ -10,7 +10,7 @@ import UIKit
 protocol SearchPlaceSceneDependencies {
     func makeSearchLocationViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController
     func makeSearchResultViewController() -> SearchResultViewController
-    func makeDetailLocationViewController() -> PlaceSelectViewController
+    func makePlaceSelectViewController(with place: PlaceInfo) -> PlaceSelectViewController
 }
 
 final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
@@ -18,11 +18,14 @@ final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
     private var commonReactor: SearchPlaceViewReactor?
+    private weak var delegate: SearchPlaceDelegate?
     
     init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
+         commonFactory: CommonSceneFactory,
+         delegate: SearchPlaceDelegate) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
+        self.delegate = delegate
     }
     
     func makeSearchLocationFlowCoordinator() -> BaseCoordinator {
@@ -33,7 +36,8 @@ final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
 
 // MARK: - View
 extension SearchLocationSceneDIContainer {
-    func makeSearchLocationViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController {
+    func makeSearchLocationViewController(coordinator: SearchPlaceCoordination
+    ) -> SearchPlaceViewController {
         makeCommonReactor(coordinator: coordinator)
         return SearchPlaceViewController(reactor: commonReactor)
     }
@@ -42,18 +46,21 @@ extension SearchLocationSceneDIContainer {
         return .init(reactor: commonReactor)
     }
     
-    func makeDetailLocationViewController() -> PlaceSelectViewController {
-        return PlaceSelectViewController(reactor: commonReactor)
+    func makePlaceSelectViewController(with place: PlaceInfo) -> PlaceSelectViewController {
+        return PlaceSelectViewController(reactor: commonReactor,
+                                         place: place)
     }
 }
 
 // MARK: - Common Reactor
 extension SearchLocationSceneDIContainer {
     private func makeCommonReactor(coordinator: SearchPlaceCoordination) {
+        guard let delegate else { return }
         commonReactor = .init(searchLocationUseCase: makeSearchLocationUseCase(),
                               locationService: DefaultLocationService(),
                               queryStorage: DefaultSearchedPlaceStorage(),
-                              coordinator: coordinator)
+                              coordinator: coordinator,
+                              delegate: delegate)
     }
     
     private func makeSearchLocationUseCase() -> SearchPlace {

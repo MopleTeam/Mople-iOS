@@ -872,15 +872,6 @@
 			path = ChildVC;
 			sourceTree = "<group>";
 		};
-		520C9E5D2CE54F6200778558 /* ProfileView */ = {
-			isa = PBXGroup;
-			children = (
-				52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */,
-				527A3E9A2C836290007FE63B /* ProfileViewController.swift */,
-			);
-			path = ProfileView;
-			sourceTree = "<group>";
-		};
 		520C9E632CE5DF3200778558 /* SignUpView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1591,19 +1582,11 @@
 			path = Place;
 			sourceTree = "<group>";
 		};
-		52818C772D1992CE0001E30B /* PlanCreate */ = {
+		52818C792D1992D80001E30B /* View */ = {
 			isa = PBXGroup;
 			children = (
 				52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */,
 				526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */,
-			);
-			path = PlanCreate;
-			sourceTree = "<group>";
-		};
-		52818C792D1992D80001E30B /* View */ = {
-			isa = PBXGroup;
-			children = (
-				52818C772D1992CE0001E30B /* PlanCreate */,
 				52A7876F2D02666C00A633B3 /* MeetSelectView */,
 				52A787742D03489800A633B3 /* PlanDatePickerView */,
 				52741ECD2D14DFD600C249A6 /* PlanTimePickerView */,
@@ -1624,7 +1607,8 @@
 		52818C802D1A97ED0001E30B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				52F83A672D354C71003DD790 /* SearchPlace */,
+				52818C892D1C40D60001E30B /* SearchPlaceViewReactor.swift */,
+				52818C5D2D1808140001E30B /* SearchPlaceViewController.swift */,
 				52818C8B2D1C45890001E30B /* SearchResult */,
 				52D8642A2D264157000F8378 /* DetailPlace */,
 			);
@@ -2809,10 +2793,11 @@
 		52F83A5F2D354379003DD790 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				520C9E5D2CE54F6200778558 /* ProfileView */,
+				52266BF72CBD471A007D03EB /* ProfileViewReactor.swift */,
+				527A3E9A2C836290007FE63B /* ProfileViewController.swift */,
 				520C9E642CE5DF3A00778558 /* ProfileEditView */,
-				525DFCFB2CCA135500835312 /* NotifyView */,
 				525DFCFC2CCA136400835312 /* PolicyView */,
+				525DFCFB2CCA135500835312 /* NotifyView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2852,15 +2837,6 @@
 				5235B7122D2E6722006BEAF3 /* PlanList */,
 			);
 			path = MeetDetail;
-			sourceTree = "<group>";
-		};
-		52F83A672D354C71003DD790 /* SearchPlace */ = {
-			isa = PBXGroup;
-			children = (
-				52818C892D1C40D60001E30B /* SearchPlaceViewReactor.swift */,
-				52818C5D2D1808140001E30B /* SearchPlaceViewController.swift */,
-			);
-			path = SearchPlace;
 			sourceTree = "<group>";
 		};
 		52F83A682D354CC0003DD790 /* Sub */ = {

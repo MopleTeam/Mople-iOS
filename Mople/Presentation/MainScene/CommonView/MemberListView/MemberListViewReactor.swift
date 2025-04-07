@@ -17,6 +17,10 @@ enum MemberListType {
     case review(id: Int?)
 }
 
+enum MemberListError: Error {
+    case noResponse(ResponseError)
+}
+
 final class MemberListViewReactor: Reactor {
     
     enum Action {
@@ -28,13 +32,13 @@ final class MemberListViewReactor: Reactor {
     enum Mutation {
         case updateMember([MemberInfo])
         case updateLoadingState(Bool)
-        case catchError(Error)
+        case catchError(MemberListError?)
     }
     
     struct State {
         @Pulse var members: [MemberInfo] = []
         @Pulse var isLoading: Bool = false
-        @Pulse var error: Error?
+        @Pulse var error: MemberListError?
     }
     
     var initialState: State = State()
@@ -104,20 +108,9 @@ extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
         let fetchMember = fetchMemberUseCase.execute(type: type)
             .asObservable()
-            .catch({ [weak self] in
-                guard let self else { return .error($0)}
-                let err = resolveNoResponseError($0)
-                return .error(err)
-            })
             .map { Mutation.updateMember($0.membsers) }
         
         return requestWithLoading(task: fetchMember)
-    }
-    
-    private func resolveNoResponseError(_ err: Error) -> Error {
-        guard let responseType = makeResponseType() else { return err }
-        return DataRequestError.resolveNoResponseError(err: err,
-                                                       responseType: responseType)
     }
     
     private func makeResponseType() -> ResponseType? {
@@ -135,7 +128,17 @@ extension MemberListViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let dataError = error as? DataRequestError,
+              let responseError = handleDataRequestError(err: dataError) else {
+            return .catchError(nil)
+        }
+        return .catchError(.noResponse(responseError))
+    }
+    
+    private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
+        guard let responseType = makeResponseType() else { return nil }
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: responseType)
     }
 }
 

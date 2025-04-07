@@ -20,7 +20,7 @@ enum DateTransitionError: Error {
     var subInfo: String? {
         switch self {
         case .midnightReset:
-            "해당 일정은 후기로 확인해보세요."
+            "일정이 마감됐어요.\n후기에서 확인해보세요."
         }
     }
 }

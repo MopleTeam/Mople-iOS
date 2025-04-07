@@ -190,17 +190,16 @@ final class MeetPlanTableCell: UITableViewCell {
     private func handleCompletdButton(isCreator: Bool,
                                       isParticipant: Bool?,
                                       planDate: Date?) {
-        guard isCreator == false,
-              let isParticipant,
-              let planDate else { return  removeCompletionButton() }
-                
-        guard isButtonEnabledForDate(planDate) else { return }
-        isAlreadyParticipated(isParticipant)
+        guard let isParticipant,
+              let planDate,
+              isButtonEnabledForDate(planDate) else { return }
+        updateButtonVisibility(isCreator: isCreator,
+                               isParticipation: isParticipant)
     }
 }
 
 extension MeetPlanTableCell {
-
+    
     private func isButtonEnabledForDate(_ date: Date) -> Bool {
         guard date < Date() else { return true }
         completdButton.isEnabled = false
@@ -209,6 +208,15 @@ extension MeetPlanTableCell {
                                 normalColor: ColorStyle.Gray._05)
         buttonSizeDown()
         return false
+    }
+    
+    private func updateButtonVisibility(isCreator: Bool,
+                                        isParticipation: Bool) {
+        if isCreator {
+            removeCompletionButton()
+        } else {
+            isAlreadyParticipated(isParticipation)
+        }
     }
     
     private func isAlreadyParticipated(_ isParticipant: Bool) {

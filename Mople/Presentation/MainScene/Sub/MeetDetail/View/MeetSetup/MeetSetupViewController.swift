@@ -20,11 +20,11 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     private var isHost: Bool = false
     
     // MARK: - Observer
-    private let meetingNotFound: PublishSubject<Void> = .init()
+    private let endFlow: PublishSubject<Void> = .init()
     private let deleteMeet: PublishSubject<Void> = .init()
     
     // MARK: - Alert
-    private let alertManager = TestAlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - UI Components
     private let thumbnailImage: UIImageView = {
@@ -200,7 +200,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        meetingNotFound
+        endFlow
             .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -250,9 +250,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
-                    self?.handleMeetingNotFoundAndDismiss(err: err)
-                })
+                vc.handleError(err: err)
             })
             .disposed(by: disposeBag)
     }
@@ -282,9 +280,14 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     }
     
     // MARK: - Error
-    private func handleMeetingNotFoundAndDismiss(err: Error) {
-        guard err is ResponseError else { return }
-        meetingNotFound.onNext(())
+    private func handleError(err: MeetSetupError) {
+        switch err {
+        case let .noResponse(err):
+            alertManager.showResponseErrorMessage(err: err,
+                                                  completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        }
     }
     
     // MARK: - Alert

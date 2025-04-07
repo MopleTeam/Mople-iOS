@@ -42,10 +42,9 @@ enum DataRequestError: Error {
         }
     }
     
-    static func resolveNoResponseError(err: Error,
-                                       responseType: ResponseType) -> Error {
-        guard let requestError = err as? DataRequestError,
-              requestError == .noResponse else { return err }
+    static func resolveNoResponseError(err: DataRequestError,
+                                       responseType: ResponseType) -> ResponseError? {
+        guard .noResponse == err else { return nil }
         
         switch responseType {
         case let .meet(id):

@@ -39,7 +39,8 @@ final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
 extension PlanCreateSceneDIContainer {
     func makeSearchLocationCoordinator() -> BaseCoordinator {
         let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
-                                                              commonFactory: commonFactory)
+                                                              commonFactory: commonFactory,
+                                                              delegate: commonReactor!)
         return searchLoactionDI.makeSearchLocationFlowCoordinator()
     }
 }

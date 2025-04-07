@@ -20,6 +20,10 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     // MARK: - Alert
     private let alertManager = AlertManager.shared
     
+    // MARK: - Observer
+    private let endFlow: PublishSubject<Void> = .init()
+    
+    // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
@@ -146,9 +150,10 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함
     // 추가로 받을 것 모든 데이터 입력됐을 시 completed버튼 활성화
     func bind(reactor: CreatePlanViewReactor) {
-        setFlowAction(reactor: reactor)
+        setFlowAction(reactor)
         inputBind(reactor)
         outputBind(reactor)
+        setNotification(reactor)
     }
     
     private func inputBind(_ reactor: CreatePlanViewReactor) {
@@ -200,11 +205,11 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .drive(placeSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$message)
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "요청에 실패했습니다.")
-            .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showAlert(message: message)
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err: err)
             })
             .disposed(by: disposeBag)
         
@@ -228,16 +233,18 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
         
         completeButton.rx.controlEvent(.touchUpInside)
-            .throttle(.seconds(1),
-                      latest: false,
-                      scheduler: MainScheduler.instance)
             .map({ Reactor.Action.requestPlanCreation })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func setFlowAction(reactor: CreatePlanViewReactor) {
+    private func setFlowAction(_ reactor: CreatePlanViewReactor) {
         naviBar.leftItemEvent
+            .map({ Reactor.Action.flowAction(.endProcess) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        endFlow
             .map({ Reactor.Action.flowAction(.endProcess) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -262,11 +269,28 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
-}
-
-extension CreatePlanViewController {
-    public func setupPlace(_ place: PlaceInfo) {
-        self.reactor?.action.onNext(.setValue(.place(place)))
+    
+    private func setNotification(_ reactor: Reactor) {
+        EventService.shared.addMeetObservable()
+            .map { Reactor.Action.updateMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - 에러 핸들링
+    private func handleError(err: CreatePlanError) {
+        switch err {
+        case let .midnight(err):
+            alertManager.showDateErrorMessage(err: err,
+                                              completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        case let .noResponse(responseError):
+            alertManager.showResponseErrorMessage(err: responseError)
+        case .invalid:
+            guard let message = err.info else { return }
+            alertManager.showAlert(title: message)
+        }
     }
 }
 

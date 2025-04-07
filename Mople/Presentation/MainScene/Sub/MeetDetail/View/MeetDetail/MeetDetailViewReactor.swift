@@ -12,12 +12,15 @@ protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate {
     func selectedPlan(id: Int, type: PlanDetailType)
 }
 
-enum MeetDetailError: Error { }
+enum MeetDetailError: Error {
+    case noResponse(ResponseError)
+    case midnight(DateTransitionError)
+}
 
 final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case updateMeetInfo(id: Int)
+        case fetchMeetInfo
         case switchPage(isFuture: Bool)
         case pushMeetSetupView
         case editMeet(MeetPayload)
@@ -25,7 +28,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case endFlow
         case planLoading(Bool)
         case reviewLoading(Bool)
-        case catchError(Error)
+        case catchError(MeetDetailError)
     }
     
     enum Mutation {
@@ -33,7 +36,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetInfoLoading(Bool)
         case updatePlanListLoading(Bool)
         case updateReviewListLoading(Bool)
-        case catchError(Error)
+        case catchError(MeetDetailError?)
     }
     
     struct State {
@@ -42,11 +45,11 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var meetInfoLoaded: Bool = false
         @Pulse var futurePlanLoaded: Bool = false
         @Pulse var pastPlanLoaded: Bool = false
-        @Pulse var error: Error?
+        @Pulse var error: MeetDetailError?
     }
     
     var initialState: State = State()
-    
+    private let meetId: Int
     private let fetchMeetUseCase: FetchMeetDetail
     private weak var coordinator: MeetDetailCoordination?
     public weak var planListCommands: MeetPlanListCommands?
@@ -57,7 +60,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
          meetID: Int) {
         self.fetchMeetUseCase = fetchMeetUseCase
         self.coordinator = coordinator
-        action.onNext(.updateMeetInfo(id: meetID))
+        self.meetId = meetID
+        action.onNext(.fetchMeetInfo)
         logLifeCycle()
     }
     
@@ -67,8 +71,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .updateMeetInfo(id):
-            return self.fetchMeetInfo(id: id)
+        case .fetchMeetInfo:
+            return self.fetchMeetInfo()
         case let .switchPage(isFuture):
             coordinator?.swicthPlanListPage(isFuture: isFuture)
             return .empty()
@@ -112,15 +116,10 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
 }
 
 extension MeetDetailViewReactor {
-    private func fetchMeetInfo(id: Int) -> Observable<Mutation> {
+    private func fetchMeetInfo() -> Observable<Mutation> {
         
-        let fetchMeet = fetchMeetUseCase.execute(meetId: id)
+        let fetchMeet = fetchMeetUseCase.execute(meetId: meetId)
             .asObservable()
-            .catch({ 
-                let err = DataRequestError.resolveNoResponseError(err: $0,
-                                                                  responseType: .meet(id: id))
-                return .error(err)
-            })
             .map { Mutation.setMeetInfo(meet: $0) }
         
         return requestWithLoading(task: fetchMeet)
@@ -169,7 +168,14 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
     }
     
     func catchError(_ error: Error, index: Int) {
-        action.onNext(.catchError(error))
+        switch error {
+        case let error as DateTransitionError:
+            action.onNext(.catchError(.midnight(error)))
+        case let error as ResponseError:
+            action.onNext(.catchError(.noResponse(error)))
+        default:
+            return
+        }
     }
 }
 
@@ -179,6 +185,15 @@ extension MeetDetailViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let dataError = error as? DataRequestError,
+              let responseError = handleDataRequestError(err: dataError) else {
+            return .catchError(nil)
+        }
+        return .catchError(.noResponse(responseError))
+    }
+    
+    private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: .meet(id: meetId))
     }
 }

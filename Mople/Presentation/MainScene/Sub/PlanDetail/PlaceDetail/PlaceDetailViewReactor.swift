@@ -14,37 +14,41 @@ protocol PlaceDetailCoordination: AnyObject {
 final class PlaceDetailViewReactor: Reactor {
     
     enum Action {
-        case setPlace(PlaceInfo)
+        case setPlace
         case endProcess
     }
     
     enum Mutation {
         case updatePlaceInfo(PlaceInfo?)
         case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var placeInfo: PlaceInfo?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     var initialState: State = State()
     
     private let locationService: LocationService
+    private var place: PlaceInfo
     private weak var coordinator: PlaceDetailCoordination?
     
     init(place: PlaceInfo,
          locationService: LocationService,
          coordinator: PlaceDetailCoordination) {
+        self.place = place
         self.locationService = locationService
         self.coordinator = coordinator
-        action.onNext(.setPlace(place))
+        initalAction()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .setPlace(placeInfo):
-            return updatePlaceInfo(placeInfo)
+        case .setPlace:
+            return updatePlaceInfo()
         case .endProcess:
             coordinator?.pop()
             return .empty()
@@ -60,32 +64,38 @@ final class PlaceDetailViewReactor: Reactor {
             newState.placeInfo = placeInfo
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
+        case .catchError:
+            break
         }
         
         return newState
     }
-}
-
-extension PlaceDetailViewReactor {
-    private func updatePlaceInfo(_ placeInfo: PlaceInfo) -> Observable<Mutation> {
-        let loadingEnd = Observable.just(Mutation.updateLoadingState(false))
-            .filter { [weak self] _ in self?.currentState.isLoading == true }
-        
-        let location = locationService.updateLocation()
-            .map({
-                var newPlaceInfo = placeInfo
-                newPlaceInfo.updateDistance(userLocation: $0)
-                return newPlaceInfo
-            })
-            .map { Mutation.updatePlaceInfo($0) }
-            .concat(loadingEnd)
-            .share(replay: 1)
-        
-        let loading = Observable.just(Mutation.updateLoadingState(true))
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .take(until: location)
-
-        return .merge([location, loading])
+    
+    private func initalAction() {
+        action.onNext(.setPlace)
     }
 }
 
+extension PlaceDetailViewReactor {
+    private func updatePlaceInfo() -> Observable<Mutation> {
+        let location = locationService.updateLocation()
+            .flatMap({ [weak self] location -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                place.updateDistance(userLocation: location)
+                return .just(.updatePlaceInfo(place))
+            })
+
+        return requestWithLoading(task: location)
+    }
+}
+
+// MARK: - 로딩
+extension PlaceDetailViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
+    }
+}

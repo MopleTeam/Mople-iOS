@@ -15,10 +15,10 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     typealias Reactor = MemberListViewReactor
     
     // MARK: - Observer
-    private let memberListNotFound: PublishSubject<Void> = .init()
+    private let endFlow: PublishSubject<Void> = .init()
     
     // MARK: - Alert
-    private let alertManager = TestAlertManager.shared
+    private let alertManager = AlertManager.shared
     
     // MARK: - Varibables
     var disposeBag = DisposeBag()
@@ -86,16 +86,23 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     }
     
     func bind(reactor: MemberListViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
             .map { Reactor.Action.endView }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        memberListNotFound
+        endFlow
             .map { Reactor.Action.endFlow }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
@@ -122,15 +129,19 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
-                    self?.handleMeetingNotFoundAndDismiss(err: err)
-                })
+                vc.handleError(err: err)
             })
             .disposed(by: disposeBag)
     }
     
-    private func handleMeetingNotFoundAndDismiss(err: Error) {
-        guard err is ResponseError else { return }
-        memberListNotFound.onNext(())
+    // MARK: - 에러 핸들링
+    private func handleError(err: MemberListError) {
+        switch err {
+        case let .noResponse(err):
+            alertManager.showResponseErrorMessage(err: err,
+                                                 completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        }
     }
 }

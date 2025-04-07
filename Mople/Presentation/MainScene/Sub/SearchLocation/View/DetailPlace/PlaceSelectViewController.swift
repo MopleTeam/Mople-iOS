@@ -15,15 +15,14 @@ final class PlaceSelectViewController: BaseViewController, View {
     typealias Reactor = SearchPlaceViewReactor
     
     var disposeBag = DisposeBag()
+    
+    private let placeInfo: PlaceInfo
         
     private let mapView = MapInfoView(type: .select)
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initalSetup()
-    }
-    
-    init(reactor: SearchPlaceViewReactor?) {
+    init(reactor: SearchPlaceViewReactor?,
+         place: PlaceInfo) {
+        self.placeInfo = place
         super.init()
         self.reactor = reactor
     }
@@ -32,8 +31,14 @@ final class PlaceSelectViewController: BaseViewController, View {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initalSetup()
+    }
+
     private func initalSetup() {
         setLayout()
+        setPlace()
     }
     
     private func setLayout() {
@@ -43,19 +48,18 @@ final class PlaceSelectViewController: BaseViewController, View {
             make.edges.equalToSuperview()
         }
     }
+    
+    private func setPlace() {
+        mapView.setConfigure(.init(place: placeInfo))
+    }
 
     func bind(reactor: SearchPlaceViewReactor) {
         self.mapView.selectedButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.completed }
+            .compactMap { [weak self] _ in
+                guard let self else { return nil }
+                return Reactor.Action.completed(place: placeInfo)
+            }
             .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$selectedPlace)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
-            .drive(with: self, onNext: { vc, place in
-                vc.mapView.setConfigure(.init(place: place))
-            })
             .disposed(by: disposeBag)
     }
 }

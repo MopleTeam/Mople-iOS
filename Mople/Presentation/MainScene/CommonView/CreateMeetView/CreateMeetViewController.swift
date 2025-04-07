@@ -165,6 +165,11 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
 
     // MARK: - Binding
     func bind(reactor: CreateMeetViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
             .map { Reactor.Action.endView }
             .bind(to: reactor.action)
@@ -180,13 +185,12 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             .do(onNext: { [weak self]_ in
                 self?.view.endEditing(true)
             })
-            .throttle(.seconds(1),
-                      latest: false,
-                      scheduler: MainScheduler.instance)
             .map { Reactor.Action.createMeet }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$image)
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, image in
@@ -215,11 +219,11 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$message)
+        reactor.pulse(\.$error)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
+            .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showAlert(message: message)
+                vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
     }

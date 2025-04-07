@@ -182,9 +182,11 @@ extension CalendarViewReactor: CalendarCommands {
         
         switch type {
         case let .add(newDate):
-            addPlan(with: &dateList, newDate: newDate)
+            addPlan(with: &dateList,
+                    newDate: newDate)
         case let .delete(deleteDate):
-            deletePlan(with: &dateList, deleteDate: deleteDate)
+            deletePlan(with: &dateList,
+                       deleteDate: deleteDate)
         case let .update(month, monthDateList):
             updatePlan(with: &dateList,
                        at: month,
@@ -195,22 +197,24 @@ extension CalendarViewReactor: CalendarCommands {
     }
     
     private func addPlan(with dateList: inout [Date], newDate: Date) {
-        guard dateList.contains(where: { $0 == newDate }) == false else { return }
-        dateList.append(newDate)
+        let startNewDate = DateManager.startOfDay(newDate)
+        guard dateList.contains(where: { $0 == startNewDate }) == false else { return }
+        dateList.append(startNewDate)
     }
     
-    private func deletePlan(with dateList: inout [Date], deleteDate: Date) {
-        dateList.removeAll { $0 == deleteDate }
+    private func deletePlan(with dateList: inout [Date],
+                            deleteDate: Date) {
+        dateList.removeAll { date in
+            return DateManager.isSameDay(date, deleteDate)
+        }
     }
     
     private func updatePlan(with dateList: inout [Date],
                             at month: Date,
                             monthDate: [Date]) {
+        let startUpdateDate = monthDate.compactMap { DateManager.startOfDay($0) }
         dateList.removeAll { DateManager.isSameMonth($0, month) }
-        monthDate.forEach {
-            print(#function, #line, "#0329 불러온 날짜 : \($0)" )
-        }
-        dateList.append(contentsOf: monthDate)
+        dateList.append(contentsOf: startUpdateDate)
     }
     
     func resetDate() {

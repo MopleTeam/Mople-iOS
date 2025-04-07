@@ -10,8 +10,8 @@ import UIKit
 protocol SearchPlaceCoordination: AnyObject {
     func updateSearchResultViewVisibility(shouldShow: Bool)
     func updateEmptyViewVisibility(shouldShow: Bool)
-    func showDetailPlaceView()
-    func completedProcess(selectedPlace: PlaceInfo)
+    func showDetailPlaceView(with place: PlaceInfo)
+    func completed()
     func endProcess()
 }
 
@@ -73,11 +73,11 @@ extension SearchPlaceFlowCoordinator {
 
 // MARK: - Detail Place View Visibility
 extension SearchPlaceFlowCoordinator {
-    func showDetailPlaceView() {
+    func showDetailPlaceView(with place: PlaceInfo) {
         guard let searchLoactionVC,
               detailPlaceVC == nil else { return }
         let container = searchLoactionVC.detailPlaceContainer
-        detailPlaceVC = dependencies.makeDetailLocationViewController()
+        detailPlaceVC = dependencies.makePlaceSelectViewController(with: place)
         searchLoactionVC.add(child: detailPlaceVC!, container: container)
         container.isHidden = false
         print(#function, #line, "#1 : 성공" )
@@ -102,8 +102,7 @@ extension SearchPlaceFlowCoordinator {
         }
     }
     
-    func completedProcess(selectedPlace: PlaceInfo) {
-        (self.parentCoordinator as? PlaceSelectionDelegate)?.didSelectPlace(selectedPlace)
+    func completed() {
         self.endFlow()
     }
     

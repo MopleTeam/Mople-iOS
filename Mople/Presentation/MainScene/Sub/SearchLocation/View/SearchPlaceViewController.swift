@@ -94,11 +94,10 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     }
     
     func bind(reactor: SearchPlaceViewReactor) {
-        [searchBar.rx.searchEvent, searchBar.rx.searchButtonEvent].forEach { $0.map { [weak self] _ in
-            return Reactor.Action.searchPlace(query: self?.searchQuery)
-        }
-        .bind(to: reactor.action)
-        .disposed(by: disposeBag) }
+        [searchBar.rx.searchEvent, searchBar.rx.searchButtonEvent].forEach {
+            $0.map { Reactor.Action.searchPlace(query: $0) }
+                .bind(to: reactor.action)
+            .disposed(by: disposeBag) }
         
         searchBar.rx.editEvent
             .filter({ [weak self] in
@@ -131,22 +130,11 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         
         reactor.pulse(\.$error)
             .compactMap { $0 }
-            .asDriver(onErrorJustReturn: .unkonwnError)
+            .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, err in
-                vc.alertManager.showAlert(message: err.info, completion: {
-                    vc.handleError(err)
-                })
+                vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func handleError(_ error: SearchError) {
-        switch error {
-        case .emptyQuery:
-            self.searchBar.searchTextField.inputTextField.becomeFirstResponder()
-        default:
-            break
-        }
     }
 }
 

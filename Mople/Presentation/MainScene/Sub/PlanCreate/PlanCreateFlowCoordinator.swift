@@ -15,10 +15,6 @@ protocol PlanCreateCoordination: AnyObject {
     func endFlow()
 }
 
-protocol PlaceSelectionDelegate {
-    func didSelectPlace(_ place: PlaceInfo)
-}
-
 final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
     private let dependencies: PlanCreateSceneDependencies
     private var planCreateVC: CreatePlanViewController?
@@ -61,13 +57,6 @@ extension PlanCreateFlowCoordinator {
         let flow = dependencies.makeSearchLocationCoordinator()
         self.start(coordinator: flow)
         self.navigationController.presentWithTransition(flow.navigationController)
-    }
-}
-
-// MARK: - SearchLoactionFlow로부터 주입받기
-extension PlanCreateFlowCoordinator: PlaceSelectionDelegate {
-    func didSelectPlace(_ place: PlaceInfo) {
-        planCreateVC?.setupPlace(place)
     }
 }
 

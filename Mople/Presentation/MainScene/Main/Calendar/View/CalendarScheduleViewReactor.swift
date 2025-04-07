@@ -24,6 +24,10 @@ protocol SchduleListReactorDelegate: AnyObject, ChildLoadingDelegate {
     func deleteMonth(month: Date)
 }
 
+enum CalendarError: Error {
+    case midnight(DateTransitionError)
+}
+
 final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
     
     typealias ScopeChangeType = CalendarViewController.ScopeChangeType
@@ -43,7 +47,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         case updateMeet(MeetPayload)
         case updateReview(ReviewPayload)
         case midnightUpdate
-        case catchError(Error)
+        case catchError(CalendarError)
     }
     
     enum Mutation {
@@ -55,7 +59,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         
         case calendarEvent(CalendarEvents)
         case updateLoadingState(Bool)
-        case catchError(Error)
+        case catchError(CalendarError)
     }
     
     struct State {
@@ -63,7 +67,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var scope: ScopeType = .month
         @Pulse var changeMonth: DateComponents?
         @Pulse var isLoading: Bool = false
-        @Pulse var error: Error?
+        @Pulse var error: CalendarError?
     }
     
     // MARK: - Variables
@@ -218,7 +222,12 @@ extension CalendarScheduleViewReactor: ChildLoadingDelegate {
     }
     
     func catchError(_ error: any Error, index: Int) {
-        action.onNext(.catchError(error))
+        switch error {
+        case let error as DateTransitionError:
+            action.onNext(.catchError(.midnight(error)))
+        default:
+            break
+        }
     }
 }
 

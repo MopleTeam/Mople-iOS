@@ -8,6 +8,10 @@ import UIKit
 import Kingfisher
 import ReactorKit
 
+enum ReviewEditError: Error {
+    case noResponse(ResponseError)
+}
+
 final class ReviewEditViewReactor: Reactor {
     
     enum Action {
@@ -29,14 +33,14 @@ final class ReviewEditViewReactor: Reactor {
         case updateLoadingState(Bool)
         case updateImage([ImageWrapper])
         case updateCompleteAvaliable(Bool)
-        case catchError(Error)
+        case catchError(ReviewEditError?)
     }
     
     struct State {
         @Pulse var images: [ImageWrapper] = []
         @Pulse var review: Review?
         @Pulse var canComplete: Bool = false
-        @Pulse var message: String?
+        @Pulse var error: ReviewEditError?
         @Pulse var isLoading: Bool = false
     }
     
@@ -59,7 +63,7 @@ final class ReviewEditViewReactor: Reactor {
         self.imageUpload = imageUpload
         self.photoService = photoService
         self.coordiantor = coordinator
-        initalSetup()
+        initalAction()
     }
     
     func mutate(action: Action) -> Observable<Mutation> {
@@ -93,18 +97,13 @@ final class ReviewEditViewReactor: Reactor {
         case let .updateCompleteAvaliable(isAvaliable):
             newState.canComplete = isAvaliable
         case let .catchError(error):
-            handleError(state: &newState,
-                        error: error)
+            newState.error = error
         }
         
         return newState
     }
     
-    private func handleError(state: inout State, error: Error) {
-        
-    }
-    
-    private func initalSetup() {
+    private func initalAction() {
         action.onNext(.fetchReview(review))
         action.onNext(.loadImage)
     }
@@ -131,7 +130,7 @@ extension ReviewEditViewReactor {
     // MARK: - 이미지 편집하기
     private func updateReview() -> Observable<Mutation> {
         guard let id = review.id else { return .empty() }
-        let addImage = requestAppImage(id: id)
+        let addImage = requestAddImage(id: id)
         let deleteImage = requsetDeleteImage(id: id)
         let requestUpdate = Observable.zip(addImage, deleteImage)
             .asObservable()
@@ -145,7 +144,7 @@ extension ReviewEditViewReactor {
         return requestWithLoading(task: requestUpdate)
     }
     
-    private func requestAppImage(id: Int) -> Observable<Void> {
+    private func requestAddImage(id: Int) -> Observable<Void> {
         let addImages = currentState.images
             .filter { $0.isNew }
             .map { $0.image }
@@ -245,7 +244,17 @@ extension ReviewEditViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let dataError = error as? DataRequestError,
+              let responseError = handleDataRequestError(err: dataError) else {
+            return .catchError(nil)
+        }
+        return .catchError(.noResponse(responseError))
+    }
+    
+    private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
+        guard let meetId = review.meet?.id else { return nil }
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: .meet(id: meetId))
     }
 }
 

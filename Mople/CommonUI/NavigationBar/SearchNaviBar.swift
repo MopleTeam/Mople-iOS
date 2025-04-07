@@ -17,6 +17,8 @@ final class SearchNaviBar: UIView {
         case right
     }
     
+    private var disposeBag = DisposeBag()
+    
     // MARK: - UI Components
     private(set) lazy var searchTextField: DefaultTextField = {
         let textField = DefaultTextField()
@@ -37,8 +39,10 @@ final class SearchNaviBar: UIView {
         btn.setTitle(text: "검색",
                      font: FontStyle.Body2.semiBold,
                      normalColor: ColorStyle.Default.white)
-        btn.setBgColor(normalColor: ColorStyle.App.primary)
+        btn.setBgColor(normalColor: ColorStyle.App.primary,
+                       disabledColor: ColorStyle.Primary.disable)
         btn.setRadius(4)
+        btn.isEnabled = false
         return btn
     }()
 
@@ -54,6 +58,7 @@ final class SearchNaviBar: UIView {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
+        bind()
     }
     
     required init?(coder: NSCoder) {
@@ -77,6 +82,14 @@ final class SearchNaviBar: UIView {
             make.width.equalTo(40)
         }
     }
+    
+    // MARK: - Bind
+    private func bind() {
+        searchTextField.rx.editText
+            .map({ $0?.count ?? 0 >= 1 })
+            .bind(to: searchButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+    }
 }
 
 extension Reactive where Base: SearchNaviBar {
@@ -85,12 +98,19 @@ extension Reactive where Base: SearchNaviBar {
         base.searchTextField.rx.editEvent
     }
     
-    var searchButtonEvent: ControlEvent<Void> {
+    var searchButtonEvent: Observable<String> {
         base.searchButton.rx.controlEvent(.touchUpInside)
+            .compactMap { _ in
+                base.searchTextField.text
+            }
     }
     
-    var searchEvent: ControlEvent<Void> {
+    var searchEvent: Observable<String> {
         base.searchTextField.rx.returnEvent
+            .compactMap { _ in
+                base.searchTextField.text
+            }
+            .filter { $0.count >= 1 }
     }
     
     var backEvent: ControlEvent<Void> {

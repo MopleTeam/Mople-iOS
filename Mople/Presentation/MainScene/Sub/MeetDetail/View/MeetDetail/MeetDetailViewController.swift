@@ -15,10 +15,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     typealias Reactor = MeetDetailViewReactor
     
     // MARK: - Observer
-    private let meetingNotFound: PublishSubject<Void> = .init()
+    private let endFlow: PublishSubject<Void> = .init()
     
     // MARK: - Alert
-    private let alertManager = TestAlertManager.shared
+    private let alertManager = AlertManager.shared
     
     var disposeBag: DisposeBag = DisposeBag()
     
@@ -140,7 +140,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.meetingNotFound
+        self.endFlow
             .map { Reactor.Action.endFlow }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -200,16 +200,9 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.alertManager.showErrorAlert(err: err, completion: { [weak self] in
-                    self?.handleMeetingNotFoundAndDismiss(err: err)
-                })
+                vc.handleError(err: err)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func handleMeetingNotFoundAndDismiss(err: Error) {
-        guard err is ResponseError else { return }
-        meetingNotFound.onNext(())
     }
     
     private func setNotification(reactor: Reactor) {
@@ -222,6 +215,21 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .map { _ in Reactor.Action.resetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - 에러 핸들링
+    private func handleError(err: MeetDetailError) {
+        switch err {
+        case let .noResponse(err):
+            alertManager.showResponseErrorMessage(err: err,
+                                                 completion: { [weak self] in
+                guard case .noResponse(let responseType) = err,
+                      case .meet(let id) = responseType else { return }
+                self?.endFlow.onNext(())
+            })
+        case let .midnight(err):
+            alertManager.showDateErrorMessage(err: err)
+        }
     }
 }
 

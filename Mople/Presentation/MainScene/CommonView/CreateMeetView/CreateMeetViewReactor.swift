@@ -31,7 +31,6 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case updateCompleteAvaliable(Bool)
         case updateLoadingState(Bool)
         case updatePreviousMeet(Meet)
-        case notifyMessage(message: String?)
         case catchError(Error)
     }
     
@@ -39,12 +38,13 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var image: UIImage?
         @Pulse var canComplete: Bool = false
         @Pulse var previousMeet: Meet?
-        @Pulse var message: String?
+        @Pulse var error: Error?
         @Pulse var isLoading: Bool = false
     }
     
     var initialState: State = State()
-    
+
+    private var isLoading: Bool = false
     private var type: MeetCreationType
     private let createMeetUseCase: CreateMeet
     private let editMeetUseCase: EditMeet
@@ -82,12 +82,7 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case .resetImage:
             return resetImage()
         case .createMeet:
-            switch type {
-            case .create:
-                return requestCreateMeet()
-            case let .edit(meet):
-                return requestEditMeet(meet)
-            }
+            return handleCreate()
         case let .setPreviousMeet(meet):
             return .just(.updatePreviousMeet(meet))
         case .endView:
@@ -104,15 +99,12 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
             newState.image = image
         case let .updateCompleteAvaliable(isAvaliable):
             newState.canComplete = isAvaliable
-        case let .notifyMessage(message):
-            newState.message = message
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .updatePreviousMeet(meet):
             newState.previousMeet = meet
         case let .catchError(error):
-            handleError(state: &newState,
-                        error: error)
+            newState.error = error
         }
 
         return newState
@@ -127,10 +119,6 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
             createRequest = .init(name: meet.meetSummary?.name,
                                 image: meet.meetSummary?.imagePath)
         }
-    }
-    
-    private func handleError(state: inout State, error: Error) {
-        
     }
 }
 
@@ -189,6 +177,22 @@ extension CreateMeetViewReactor {
     }
     
     // MARK: - 미팅 생성 및 편집
+    private func handleCreate() -> Observable<Mutation> {
+        guard isLoading == false else { return .empty() }
+        let mutation: Observable<Mutation>
+        switch type {
+        case .create:
+            mutation = requestCreateMeet()
+        case let .edit(meet):
+            mutation = requestEditMeet(meet)
+        }
+        
+        return mutation
+            .do(onDispose: { [weak self] in
+                self?.isLoading = false
+            })
+    }
+    
     private func requestEditMeet(_ meet: Meet) -> Observable<Mutation> {
         let selectedImage = currentState.image
         
@@ -237,7 +241,6 @@ extension CreateMeetViewReactor {
     }
     
     private func handleCompletedTask() {
-        print(#function, #line, "이게 왜 호출돼" )
         switch type {
         case .create:
             coordinator?.dismiss()

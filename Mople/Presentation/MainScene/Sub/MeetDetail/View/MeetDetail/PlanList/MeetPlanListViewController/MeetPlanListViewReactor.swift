@@ -107,7 +107,6 @@ extension MeetPlanListViewReactor {
         
         guard let planIndex = currentState.plans.firstIndex(where: { $0.id == planId }),
               let planDate = currentState.plans[safe: planIndex]?.date else { return .empty() }
-        print(#function, #line, "#0331 참여 일정 : \(planDate)" )
         switch planDate {
         case _ where DateManager.isPastDay(on: planDate):
             parent?.catchError(DateTransitionError.midnightReset, index: 1)
@@ -127,10 +126,11 @@ extension MeetPlanListViewReactor {
         let requestParticipation = participationPlanUseCase.execute(planId: id,
                                                                     isJoining: isJoining)
             .asObservable()
-            .catch({ 
-                let err = DataRequestError.resolveNoResponseError(err: $0,
-                                                                  responseType: .plan(id: id))
-                return .error(err)
+            .catch({ [weak self] in
+                let err = self?.resolveParticipationError(err: $0,
+                                                          planId: id)
+                return .error(err ?? $0)
+                
             })
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self else { return .empty() }
@@ -155,6 +155,13 @@ extension MeetPlanListViewReactor {
             EventService.shared.participatingPost(.notParticipation(id: id),
                                                   from: self)
         }
+    }
+    
+    private func resolveParticipationError(err: Error,
+                                           planId: Int) -> ResponseError? {
+        guard let dataError = err as? DataRequestError else { return nil }
+        return DataRequestError.resolveNoResponseError(err: dataError,
+                                                       responseType: .plan(id: planId))
     }
 }
 

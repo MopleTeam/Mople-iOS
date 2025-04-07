@@ -9,7 +9,7 @@ import Foundation
 
 final class DefaultErrorHandlingService {
     
-    private let alertManager = TestAlertManager.shared
+    private let alertManager = AlertManager.shared
     private var isShowAlert: Bool = false
     
     func handleError(err: DataRequestError) {
