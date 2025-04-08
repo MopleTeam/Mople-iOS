@@ -6,9 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 final class LaunchViewController: DefaultViewController {
     
+    private var disposeBag = DisposeBag()
+    
+    // MARK: - ViewModel
     private let viewModel: LaunchViewModel
     
     private let logoImage: UIImageView = {
@@ -30,6 +34,7 @@ final class LaunchViewController: DefaultViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
+        bind()
         viewModel.checkEntry()
     }
     
@@ -40,5 +45,25 @@ final class LaunchViewController: DefaultViewController {
         logoImage.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func bind() {
+        viewModel.error
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleError(_ err: Error) {
+        guard DataRequestError.isHandledError(err: err) == false else {
+            return
+        }
+        
+        alertManager.showDefatulErrorMessage(completion: { [weak self] in
+            self?.viewModel.showSignInFlow()
+        })
     }
 }

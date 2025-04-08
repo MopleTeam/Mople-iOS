@@ -31,10 +31,6 @@ class SignUpViewController: DefaultViewController, View {
     }()
     
     private let profileSetupView = ProfileSetupView(type: .create)
-    
-    
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
 
     // MARK: - LifeCycle
     init(signUpReactor: SignUpViewReactor) {

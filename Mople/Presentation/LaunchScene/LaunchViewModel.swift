@@ -8,15 +8,28 @@ import UIKit
 import RxSwift
 
 protocol LaunchViewModel: AnyObject {
+    var error: Observable<Error?> { get }
     func checkEntry()
+    func showSignInFlow()
 }
 
 final class DefaultLaunchViewModel: LaunchViewModel {
     
     private var disposeBag = DisposeBag()
-    private let fetchUserInfo: FetchUserInfo
+    
+    // MARK: - Observable
+    private let errorSubject: PublishSubject<Error?> = .init()
+    var error: Observable<Error?> {
+        return errorSubject.asObservable()
+    }
+    
+    // MARK: - Coordinator
     private weak var coordinator: LaunchCoordination?
     
+    // MARK: - Usecase
+    private let fetchUserInfo: FetchUserInfo
+    
+    // MARK: - LifeCycle
     init(fetchUserInfo: FetchUserInfo,
          coordinator: LaunchCoordination) {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Created" )
@@ -28,7 +41,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     deinit {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Deinit" )
     }
-        
+    
     func checkEntry() {
         if KeyChainService.shared.hasToken() {
             showMainFlow()
@@ -37,13 +50,8 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         }
     }
     
-    private func showSignInFlow() {
-        Observable.just(())
-            .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vm, _ in
-                vm.coordinator?.loginFlowStart()
-            })
-            .disposed(by: disposeBag)
+    func showSignInFlow() {
+        coordinator?.loginFlowStart()
     }
     
     private func showMainFlow() {
@@ -58,8 +66,11 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         fetchUserInfo.execute()
             .asObservable()
             .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vm, _ in
+            .subscribe(with: self,
+                       onNext: { vm, _ in
                 vm.coordinator?.mainFlowStart(isFirstStart: false)
+            }, onError: { vm, err in
+                vm.errorSubject.onNext(err)
             })
             .disposed(by: disposeBag)
     }

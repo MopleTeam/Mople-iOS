@@ -12,6 +12,9 @@ import SnapKit
 
 class DefaultViewController: BaseViewController {
     
+    // MARK: - Alert
+    public let alertManager = AlertManager.shared
+    
     // MARK: - Indicator
     private(set) var indicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)

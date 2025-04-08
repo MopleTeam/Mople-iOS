@@ -26,11 +26,10 @@ final class PlanDetailViewController: TitleNaviViewController, View, ScrollKeybo
     var startOffsetY: CGFloat = .zero
     
     // MARK: - Manager
-    private let alertManager = AlertManager.shared
-    private let toastMessageManager = ToastManager.shared
+    private let toastManager = ToastManager.shared
     
     // MARK: - Observable
-    private var loadingObserver: PublishSubject<Bool> = .init()
+    private var endFlow: PublishSubject<Void> = .init()
     
     // MARK: - Variables
     private var commonPlanModel: PlanDetailModel?
@@ -135,7 +134,7 @@ extension PlanDetailViewController {
 // MARK: - Handle Reactor
 extension PlanDetailViewController {
     private func inputBind(reactor: Reactor) {
-        self.planInfoView.rx.memberTapped
+        planInfoView.rx.memberTapped
             .do(onNext: { [weak self] in
                 self?.view.endEditing(true)
             })
@@ -143,7 +142,7 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.planInfoView.rx.mapTapped
+        planInfoView.rx.mapTapped
             .do(onNext: { [weak self] in
                 self?.view.endEditing(true)
             })
@@ -151,7 +150,12 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.naviBar.leftItemEvent
+        naviBar.leftItemEvent
+            .map { Reactor.Action.flow(.endFlow) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        endFlow
             .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -189,7 +193,7 @@ extension PlanDetailViewController {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, _ in
-                vc.toastMessageManager.presentToast(text: "신고 접수가 완료되었습니다")
+                vc.toastManager.presentToast(text: "신고 접수가 완료되었습니다")
             })
             .disposed(by: disposeBag)
         
@@ -197,6 +201,14 @@ extension PlanDetailViewController {
             .compactMap({ $0 })
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -240,6 +252,24 @@ extension PlanDetailViewController {
         switch payload {
         case .updated: return true
         default: return false
+        }
+    }
+    
+    // MARK: - 에러 핸들링
+    private func handleError(_ err: PlanDetailError) {
+        switch err {
+        case let .noResponse(err):
+            alertManager.showResponseErrorMessage(err: err,
+                                                 completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        case let .midnight(err):
+            alertManager.showDateErrorMessage(err: err,
+                                              completion: { [weak self] in
+                self?.endFlow.onNext(())
+            })
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         }
     }
 }

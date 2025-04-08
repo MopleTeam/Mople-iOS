@@ -17,9 +17,6 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     var disposeBag: DisposeBag = DisposeBag()
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
     
@@ -209,7 +206,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
         
@@ -278,7 +275,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     }
     
     // MARK: - 에러 핸들링
-    private func handleError(err: CreatePlanError) {
+    private func handleError(_ err: CreatePlanError) {
         switch err {
         case let .midnight(err):
             alertManager.showDateErrorMessage(err: err,
@@ -287,6 +284,8 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             })
         case let .noResponse(responseError):
             alertManager.showResponseErrorMessage(err: responseError)
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         case .invalid:
             guard let message = err.info else { return }
             alertManager.showAlert(title: message)

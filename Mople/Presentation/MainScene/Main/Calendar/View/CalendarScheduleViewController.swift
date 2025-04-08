@@ -14,9 +14,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     
     typealias Reactor = CalendarScheduleViewReactor
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
     // MARK: - Variables
     var disposeBag = DisposeBag()
         
@@ -179,7 +176,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
     }
@@ -252,10 +249,12 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     // MARK: - 에러 핸들링
-    private func handleError(err: CalendarError) {
+    private func handleError(_ err: CalendarError) {
         switch err {
         case let .midnight(err):
             alertManager.showDateErrorMessage(err: err)
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         }
     }
 }

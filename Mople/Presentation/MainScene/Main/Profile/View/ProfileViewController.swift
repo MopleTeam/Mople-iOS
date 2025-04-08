@@ -33,7 +33,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         return imageView
     }()
     
-    private let profileNameButton: BaseButton = {
+    private let profileEditButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Gray._01)
@@ -101,7 +101,7 @@ final class ProfileViewController: TitleNaviViewController, View {
     }()
     
     private lazy var profileStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [imageContainer, profileNameButton])
+        let sv = UIStackView(arrangedSubviews: [imageContainer, profileEditButton])
         sv.axis = .vertical
         sv.spacing = 12
         sv.alignment = .center
@@ -212,23 +212,23 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     // MARK: - Binding
     func bind(reactor: Reactor) {
+        profileEditButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.editProfile) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         notifyButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.presentNotifyView }
+            .map { Reactor.Action.flow(.setNotify) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         policyButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.presentPolicyView }
+            .map { Reactor.Action.flow(.policy) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         logoutButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.logout }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        profileNameButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.editProfile }
+            .map { Reactor.Action.flow(.logout) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -249,7 +249,7 @@ final class ProfileViewController: TitleNaviViewController, View {
 // MARK: - 프로필 적용
 extension ProfileViewController {
     private func setProfile(_ profile: UserInfo) {
-        profileNameButton.title = profile.name
+        profileEditButton.title = profile.name
         profileImageView.kfSetimage(profile.imagePath, defaultImageType: .user)
     }
 }

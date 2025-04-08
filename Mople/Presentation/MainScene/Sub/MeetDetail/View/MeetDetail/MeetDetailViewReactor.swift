@@ -15,6 +15,7 @@ protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate {
 enum MeetDetailError: Error {
     case noResponse(ResponseError)
     case midnight(DateTransitionError)
+    case unknown(Error)
 }
 
 final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
@@ -36,7 +37,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetInfoLoading(Bool)
         case updatePlanListLoading(Bool)
         case updateReviewListLoading(Bool)
-        case catchError(MeetDetailError?)
+        case catchError(MeetDetailError)
     }
     
     struct State {
@@ -152,6 +153,11 @@ extension MeetDetailViewReactor {
 }
 
 extension MeetDetailViewReactor: MeetDetailDelegate {
+    
+    func selectedPlan(id: Int, type: PlanDetailType) {
+        coordinator?.pushPlanDetailView(postId: id, type: type)
+    }
+    
     func updateLoadingState(_ isLoading: Bool, index: Int) {
         switch index {
         case 0:
@@ -162,11 +168,7 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
             break
         }
     }
-    
-    func selectedPlan(id: Int, type: PlanDetailType) {
-        coordinator?.pushPlanDetailView(postId: id, type: type)
-    }
-    
+
     func catchError(_ error: Error, index: Int) {
         switch error {
         case let error as DateTransitionError:
@@ -187,7 +189,7 @@ extension MeetDetailViewReactor: LoadingReactor {
     func catchErrorMutation(_ error: Error) -> Mutation {
         guard let dataError = error as? DataRequestError,
               let responseError = handleDataRequestError(err: dataError) else {
-            return .catchError(nil)
+            return .catchError(.unknown(error))
         }
         return .catchError(.noResponse(responseError))
     }

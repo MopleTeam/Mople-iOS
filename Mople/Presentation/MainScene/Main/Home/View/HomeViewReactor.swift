@@ -10,6 +10,8 @@ import ReactorKit
 
 enum HomeError: Error {
     case emptyMeet
+    case midnight(DateTransitionError)
+    case unknown(Error)
 }
 
 final class HomeViewReactor: Reactor, LifeCycleLoggable {
@@ -34,15 +36,15 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case updatePlanList(_ updatedPlanList: [Plan])
         case updateMeetList(_ updatedMeetList: [MeetSummary])
         case updateHomeData(HomeData)
-        case notifyLoadingState(_ isLoading: Bool)
-        case catchError(Error)
+        case updateLoadingState(Bool)
+        case catchError(HomeError)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
         @Pulse var meetList: [MeetSummary] = []
-        @Pulse var error: Error?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: HomeError?
     }
     
     private let fetchRecentScheduleUseCase: FetchHomeData
@@ -71,7 +73,6 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             return fetchHomeData()
         case let .flow(action):
             return handleFlowAction(with: action)
-
         case .checkNotificationPermission:
             return requestNotificationPermission()
         case let .updatePlan(payload):
@@ -91,42 +92,29 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case .updateHomeData(let homeData):
             newState.meetList = homeData.meets
             newState.plans = homeData.plans.sorted(by: <)
-        case let .notifyLoadingState(isLoading):
+        case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .updatePlanList(planList):
             newState.plans = planList
         case let .updateMeetList(meetList):
             newState.meetList = meetList
         case let .catchError(err):
-            handleError(state: &newState, err: err)
+            newState.error = err
         }
         return newState
-    }
-    
-    func handleError(state: inout State, err: Error) {
-        switch err {
-        default:
-            state.error = err
-        }
     }
 }
     
 
 extension HomeViewReactor {
     private func fetchHomeData() -> Observable<Mutation> {
-        
-        let loadingStart = Observable.just(Mutation.notifyLoadingState(true))
-        
+                
         let fetchSchedules = fetchRecentScheduleUseCase.execute()
             .asObservable()
             .catchAndReturn(.init(plans: [], meets: []))
             .map { Mutation.updateHomeData($0) }
-
-        let loadingStop = Observable.just(Mutation.notifyLoadingState(false))
         
-        return Observable.concat([loadingStart,
-                                  fetchSchedules,
-                                  loadingStop])
+        return requestWithLoading(task: fetchSchedules)
     }
 }
 
@@ -175,7 +163,7 @@ extension HomeViewReactor {
             coordinator?.presentPlanDetailView(planId: id)
             return .empty()
         } else {
-            return .just(.catchError(DateTransitionError.midnightReset))
+            return .just(.catchError(.midnight(.midnightReset)))
         }
     }
 }
@@ -296,5 +284,15 @@ extension HomeViewReactor {
             action.onNext(.fetchHomeData)
         }
         return .empty()
+    }
+}
+
+extension HomeViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(.unknown(error))
     }
 }

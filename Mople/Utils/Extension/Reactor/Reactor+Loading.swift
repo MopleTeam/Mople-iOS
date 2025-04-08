@@ -42,8 +42,13 @@ extension LoadingReactor {
     
     private func catchError(_ error: Error) -> Observable<Mutation> {
         let loadingStop = updateLoadingMutation(false)
-        let catchError = catchErrorMutation(error)
-        return .of(loadingStop, catchError)
+        
+        if DataRequestError.isHandledError(err: error) {
+            return .just(loadingStop)
+        } else {
+            let catchError = catchErrorMutation(error)
+            return .of(loadingStop, catchError)
+        }
     }
 }
 

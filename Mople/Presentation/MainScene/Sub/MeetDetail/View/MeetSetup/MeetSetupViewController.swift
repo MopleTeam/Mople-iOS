@@ -23,9 +23,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     private let endFlow: PublishSubject<Void> = .init()
     private let deleteMeet: PublishSubject<Void> = .init()
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
     // MARK: - UI Components
     private let thumbnailImage: UIImageView = {
         let view = UIImageView()
@@ -250,7 +247,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
     }
@@ -280,7 +277,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     }
     
     // MARK: - Error
-    private func handleError(err: MeetSetupError) {
+    private func handleError(_ err: MeetSetupError) {
         switch err {
         case let .noResponse(err):
             alertManager.showResponseErrorMessage(err: err,

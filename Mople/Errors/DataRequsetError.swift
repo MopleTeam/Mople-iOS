@@ -55,4 +55,9 @@ enum DataRequestError: Error {
             return ResponseError.noResponse(.review(id: id))
         }
     }
+    
+    static func isHandledError(err: Error) -> Bool {
+        guard let requestErr = err as? Self else { return false }
+        return requestErr == .handled
+    }
 }

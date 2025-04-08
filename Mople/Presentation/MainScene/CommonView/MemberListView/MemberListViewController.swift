@@ -17,9 +17,6 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
     // MARK: - Varibables
     var disposeBag = DisposeBag()
     
@@ -129,19 +126,21 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
     }
     
     // MARK: - 에러 핸들링
-    private func handleError(err: MemberListError) {
+    private func handleError(_ err: MemberListError) {
         switch err {
         case let .noResponse(err):
             alertManager.showResponseErrorMessage(err: err,
                                                  completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         }
     }
 }

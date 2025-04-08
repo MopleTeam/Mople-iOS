@@ -226,6 +226,7 @@ extension ScheduleListReactor: ScheduleListCommands {
             guard let month = DateManager.startOfMonth($0) else { return }
             reloadMonth.insert(month)
         }
+        guard reloadMonth.isEmpty == false else { return }
         action.onNext(.parentCommand(.reloadMonth(Array(reloadMonth))))
     }
     
@@ -260,6 +261,16 @@ extension ScheduleListReactor {
             })
     }
     
+    /// fetch monthlist zip
+    private func fetchMonthlyPlans(with monthList: [Date]) -> Observable<[MonthlyPlan]> {
+        guard monthList.isEmpty == false else { return .just([])}
+        let observables = monthList.compactMap { [weak self] in
+            self?.fetchMonthDate(month: $0)
+        }
+        return Observable.zip(observables)
+            .map { $0.flatMap { $0 } }
+    }
+    
     // MARK: - 기본 표시할 일정데이터 불러오기
     
     /// 요청리스트에서 현재 달, 이전 달, 다음 달 데이터를 요청
@@ -274,26 +285,20 @@ extension ScheduleListReactor {
                                     accumulated: [MonthlyPlan] = []) -> Observable<Mutation> {
         
         let fetchList = findTimelineList(from: month)
-        if fetchList.isEmpty {
-            return .just(.initalPlan(accumulated))
-        } else {
-            let fetchMonths = mergeOrWrapMonthlyPlans(with: fetchList,
-                                                         accumulated: accumulated)
-                .flatMap({ [weak self] planList -> Observable<Mutation> in
-                    guard let self,
-                          planList.count < 5 else { return .just(.initalPlan(planList)) }
+        guard fetchList.isEmpty == false else { return .just(.initalPlan(accumulated))}
+        
+        return fetchMonthlyPlans(with: fetchList)
+            .map { $0 + accumulated }
+            .flatMap({ [weak self] planList -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                
+                if planList.count >= 5 {
+                    return .just(.initalPlan(planList))
+                } else {
                     return fetchTimelinePlans(with: month,
                                               accumulated: planList)
-                })
-            
-            return fetchMonths
-        }
-    }
-    
-    private func mergeOrWrapMonthlyPlans(with loadList: [Date],
-                                            accumulated: [MonthlyPlan] = []) -> Observable<[MonthlyPlan]> {
-        guard let zippedPlans = zipMonthlyPlansIfNeeded(with: loadList) else { return .just(accumulated) }
-        return zippedPlans.map { $0 + accumulated }
+                }
+            })
     }
     
     // MARK: - 스크롤시 데이터 불러오기
@@ -345,12 +350,9 @@ extension ScheduleListReactor {
     // MARK: - 만료된 일정이 있는 경우 새로고침
     /// 새로고침이 필요한 달의 일정 다시 받아오기
     private func reloadMonthlyPlan(months: [Date]) -> Observable<Mutation> {
+        guard months.isEmpty == false else { return .empty() }
         
-        guard let zippedPlans = zipMonthlyPlansIfNeeded(with: months) else {
-            return .empty()
-        }
-        
-        return zippedPlans
+        return fetchMonthlyPlans(with: months)
             .flatMap { [weak self] reloadPlans -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 let updatePlanList = replaceMonthlyPlan(month: months,
@@ -624,22 +626,6 @@ extension ScheduleListReactor {
     /// monthList에서 date로부터 앞으로 가까운 날짜
     private func findSmallestNextMonth(from date: Date) -> Date? {
         return monthDateList.filter { $0 > date }.min()
-    }
-    
-    /// 불러올 monthList의 갯수에 따라서 적절한 Observable 형태로 조정
-    private func zipMonthlyPlansIfNeeded(with monthList: [Date]) -> Observable<[MonthlyPlan]>? {
-        let observables = monthList.compactMap { [weak self] in
-            self?.fetchMonthDate(month: $0)
-        }
-        switch observables.count {
-        case 1:
-            return observables.first
-        case 2...:
-            return Observable.zip(observables)
-                .map { $0.flatMap { $0 } }
-        default:
-            return nil
-        }
     }
     
     /// list에 date가 포함되어 있는지 확인

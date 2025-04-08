@@ -14,14 +14,12 @@ import ReactorKit
 final class MeetDetailViewController: TitleNaviViewController, View {
     typealias Reactor = MeetDetailViewReactor
     
+    var disposeBag: DisposeBag = DisposeBag()
+
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
-    var disposeBag: DisposeBag = DisposeBag()
-    
+    // MARK: - UI Components
     private let contentView: UIView = {
         let view = UIView()
         view.backgroundColor = ColorStyle.BG.primary
@@ -200,7 +198,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
     }
@@ -218,17 +216,19 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     }
     
     // MARK: - 에러 핸들링
-    private func handleError(err: MeetDetailError) {
+    private func handleError(_ err: MeetDetailError) {
         switch err {
         case let .noResponse(err):
             alertManager.showResponseErrorMessage(err: err,
                                                  completion: { [weak self] in
                 guard case .noResponse(let responseType) = err,
-                      case .meet(let id) = responseType else { return }
+                      case .meet = responseType else { return }
                 self?.endFlow.onNext(())
             })
         case let .midnight(err):
             alertManager.showDateErrorMessage(err: err)
+        case let .unknown(err):
+            alertManager.showDefatulErrorMessage()
         }
     }
 }

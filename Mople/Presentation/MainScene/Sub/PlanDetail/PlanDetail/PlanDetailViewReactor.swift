@@ -15,6 +15,12 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
     func reportComment()
 }
 
+enum PlanDetailError: Error {
+    case noResponse(ResponseError)
+    case midnight(DateTransitionError)
+    case unknown(Error)
+}
+
 final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -41,8 +47,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case parentCommand(ParentCommand)
         case childEvent(ChildEvent)
-        case updatePost
         case flow(Flow)
+        case updatePost
         case deletePost
         case reportPost
         case loadPlanInfo(type: PlanDetailType)
@@ -56,11 +62,11 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case updateChildEvent(ChildEvent)
         
-        case updateLoadingState(_ isLoading: Bool)
         case updatePlan(_ Plan: Plan)
         case updateReview(_ review: Review)
         case completeReport
-        case catchError(Error)
+        case updateLoadingState(Bool)
+        case catchError(PlanDetailError)
     }
     
     struct State {
@@ -70,7 +76,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var editComment: String?
         @Pulse var startOffsetY: CGFloat?
         @Pulse var reported: Void?
-        @Pulse var error: Error?
+        @Pulse var error: PlanDetailError?
     }
     
     // MARK: - Variable
@@ -136,7 +142,7 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
         case .deletePost:
             return deletePost()
         case .reportPost:
-            return reportPlan()
+            return reportPost()
         }
     }
     
@@ -167,6 +173,8 @@ final class PlanDetailViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - 액션 핸들링
 extension PlanDetailViewReactor {
+    
+    // MARK: - Fetch 관리
     private func handleLoad(type: PlanDetailType) -> Observable<Mutation> {
         switch type {
         case .plan:
@@ -176,33 +184,45 @@ extension PlanDetailViewReactor {
         }
     }
     
+    // MARK: - Flow 관리
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        guard isFlowPastSchedule(with: action) == false else {
+            return .just(.catchError(.midnight(.midnightReset)))
+        }
         switch action {
         case .memberList:
             handlePushMemberList()
-        case .placeDetailView:
-            coordinator?.pushPlaceDetailView(place: placeInfo!)
         case .editPlan:
             coordinator?.presentPlanEditFlow(plan: plan!)
         case .editReview:
             coordinator?.presentReviewEditFlow(review: review!)
+        case .placeDetailView:
+            coordinator?.pushPlaceDetailView(place: placeInfo!)
         case .endFlow:
             coordinator?.endFlow()
         }
         return .empty()
     }
     
+    /// 타입이 일정인 경우, 일정을 수정 또는 멤버리스트로 접근 시 과거의 일정인지 체크
+    ///  - 과거 일정이라면 수정이 불가, 멤버리스트는 전환된 리뷰 Id로 진입해야하기 때문에 새로고침 필요
+    private func isFlowPastSchedule(with flow: Action.Flow) -> Bool {
+        guard flow == .editPlan || flow == .memberList else { return false }
+        return isPastSchedule()
+    }
+    
     private func handlePushMemberList() {
         switch type {
         case .plan:
-            guard let planId = plan?.id else { break }
+            guard let planId = plan?.id else { return }
             coordinator?.pushMemberListView(postId: planId)
         case .review:
-            guard let reviewPostId = review?.postId else { break }
+            guard let reviewPostId = review?.postId else { return }
             coordinator?.pushMemberListView(postId: reviewPostId)
         }
     }
     
+    // MARK: - 자식 리액터 액션 관리
     private func handleChildAction(_ event: Action.ChildEvent) -> Observable<Mutation> {
         switch event {
         case let .commentLoading(isLoad):
@@ -213,11 +233,14 @@ extension PlanDetailViewReactor {
             return .just(.updateChildEvent(.changedOffsetY(offsetY)))
         case .reportComment:
             return .just(.completeReport)
+            
+        #warning("댓글리스트 에러 처리 해야함, 일정삭제 버그 고쳐진 다음")
         case let .catchError(err):
-            return .just(.catchError(err))
+            return .empty()
         }
     }
     
+    // MARK: - 자식 리액터로 전달할 액션 관리
     private func handleParentCommand(_ command: Action.ParentCommand) -> Observable<Mutation> {
         switch command {
         case let .writeComment(comment):
@@ -240,9 +263,9 @@ extension PlanDetailViewReactor {
     }
 }
 
-// MARK: - 데이터 로드
+// MARK: - 데이터 요청
 extension PlanDetailViewReactor {
-    #warning("데이터 못찾으면 뒤로가기")
+  
     private func fetchPlanDetail() -> Observable<Mutation> {
         
         let fetchPlan = fetchPlanDetailUsecase.execute(planId: id)
@@ -256,8 +279,6 @@ extension PlanDetailViewReactor {
 
         return requestWithLoading(task: fetchPlan)
     }
-    
-    
     
     private func fetchReviewDetail(completion: (() -> Void)? = nil) -> Observable<Mutation> {
 
@@ -300,6 +321,9 @@ extension PlanDetailViewReactor {
     }
     
     private func deletePost() -> Observable<Mutation> {
+        guard isPastSchedule() == false else {
+            return .just(.catchError(.midnight(.midnightReset)))
+        }
         let deletePost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
                 guard let self else { return .never() }
@@ -321,23 +345,31 @@ extension PlanDetailViewReactor {
         return requestWithLoading(task: deletePost)
     }
     
-    private func reportPlan() -> Observable<Mutation> {
-        
+    private func reportPost() -> Observable<Mutation> {
+        guard isPastSchedule() == false else {
+            return .just(.catchError(.midnight(.midnightReset)))
+        }
         let reportPost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
                 guard let self else { return .never() }
-                switch type {
-                case .plan:
-                    return reportUseCase.execute(type: .plan(id: id),
-                                                 reason: nil)
-                case .review:
-                    return reportUseCase.execute(type: .review(id: id),
-                                                 reason: nil)
-                }
+                let reportType = getReportType()
+                return reportUseCase.execute(type: reportType,
+                                             reason: nil)
             }
             .flatMap { Observable<Mutation>.just(.completeReport) }
         
         return requestWithLoading(task: reportPost)
+    }
+    
+    private func getReportType() -> ReportType {
+        return type == .plan ? .plan(id: id) : .review(id: id)
+    }
+    
+    /// 일정인 경우 삭제, 수정 요청하기 전 리뷰로 전환되지는 않았는지 체크
+    private func isPastSchedule() -> Bool {
+        guard type == .plan,
+              let planDate = plan?.date else { return false }
+        return DateManager.isPastDay(on: planDate)
     }
 }
 
@@ -363,14 +395,6 @@ extension PlanDetailViewReactor: CommentListDelegate  {
     
     func reportComment() {
         action.onNext(.childEvent(.reportComment))
-    }
-    
-    func updateLoadingState(_ isLoading: Bool, index: Int) {
-        action.onNext(.childEvent(.commentLoading(isLoading)))
-    }
-    
-    func catchError(_ error: Error, index: Int) {
-        action.onNext(.childEvent(.catchError(error)))
     }
 }
 
@@ -437,7 +461,30 @@ extension PlanDetailViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let dataError = error as? DataRequestError,
+              let responseError = handleDataRequestError(err: dataError) else {
+            return .catchError(.unknown(error))
+        }
+        return .catchError(.noResponse(responseError))
+    }
+    
+    private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
+        let responseType = getResponseType()
+        return DataRequestError.resolveNoResponseError(err: err,
+                                                       responseType: responseType)
+    }
+    
+    private func getResponseType() -> ResponseType {
+        return type == .plan ? .plan(id: id) : .review(id: id)
     }
 }
 
+extension PlanDetailViewReactor: ChildLoadingDelegate {
+    func updateLoadingState(_ isLoading: Bool, index: Int) {
+        action.onNext(.childEvent(.commentLoading(isLoading)))
+    }
+    
+    func catchError(_ error: Error, index: Int) {
+        action.onNext(.childEvent(.catchError(error)))
+    }
+}

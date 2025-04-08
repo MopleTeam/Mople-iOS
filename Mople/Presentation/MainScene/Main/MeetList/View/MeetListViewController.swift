@@ -17,6 +17,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
     
     var disposeBag = DisposeBag()
     
+    // MARK: - UI Components
     private let borderView: UIView = {
         let view = UIView()
         view.layer.makeLine(width: 1)
@@ -126,6 +127,14 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
                 cell.configure(with: .init(meet: item))
                 cell.selectionStyle = .none
             }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.alertManager.showDefatulErrorMessage()
+            })
             .disposed(by: disposeBag)
     }
     

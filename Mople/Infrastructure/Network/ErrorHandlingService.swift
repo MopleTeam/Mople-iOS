@@ -12,7 +12,7 @@ final class DefaultErrorHandlingService {
     private let alertManager = AlertManager.shared
     private var isShowAlert: Bool = false
     
-    func handleError(err: DataRequestError) {
+    func handleError(_ err: DataRequestError) {
         guard isShowAlert == false else { return }
         isShowAlert = true
         

@@ -73,25 +73,14 @@ final class DefaultAppNetWorkService: AppNetworkService {
 
 extension DefaultAppNetWorkService {
     
-    // 해당 화면에서 처리할 것
-    // 네트워크 문제 (알림 표시)
-    // 알 수 없는 에러
-    // 토큰 재발급 및 만료 처리
-    // 위 세가지들은 아래로 내릴 때 AppError에서 이미 처리된 에러로 내려보냄
-    // 처리가 안된 것들은 AppError로 묶어서 보냄 네트워크단 하위에서 받는 에러는 AppError로 통일됨
-    // 처리가 안된 것 noResponse(로그인 -> 회원가입 및 화면 뒤로가기)
-
-    // 토큰 만료 에러
-    // 네트워크 에러
-    // 언노운 에러
-    
-    // 404 에러
     private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
         return source.retry { err in
             err.flatMap { [weak self] err -> Single<Void> in
                 print(#function, #line, "#0325 error : \(err)" )
                 guard let self,
-                      let dataTransferErr = err as? DataTransferError else { return .error(DataRequestError.unknown) }
+                      let dataTransferErr = err as? DataTransferError else {
+                    return .error(DataRequestError.unknown)
+                }
 
                 return handleDataTransferError(err: dataTransferErr)
             }.take(1)
@@ -104,9 +93,9 @@ extension DefaultAppNetWorkService {
             print(#function, #line, "인터넷 에러 : \(err)" )
             switch err {
             case .notConnectedInternet:
-                errorHandlingService.handleError(err: .networkUnavailable)
+                errorHandlingService.handleError(.networkUnavailable)
             default:
-                errorHandlingService.handleError(err: .serverUnavailable)
+                errorHandlingService.handleError(.serverUnavailable)
             }
             return .error(DataRequestError.handled)
         case .expiredToken:
@@ -114,7 +103,7 @@ extension DefaultAppNetWorkService {
         case .noResponse:
             return .error(DataRequestError.noResponse)
         default:
-            errorHandlingService.handleError(err: .unknown)
+            errorHandlingService.handleError(.unknown)
             return .error(DataRequestError.handled)
         }
     }
@@ -131,7 +120,7 @@ extension DefaultAppNetWorkService {
             })
             .catch({ [weak self] err in
                 guard let self else { return .error(err)}
-                errorHandlingService.handleError(err: .expiredToken)
+                errorHandlingService.handleError(.expiredToken)
                 return .error(DataRequestError.handled)
             })
             .share(replay: 1)
@@ -146,7 +135,7 @@ extension DefaultAppNetWorkService {
             guard let self else { return .never() }
             
             guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
-                errorHandlingService.handleError(err: .expiredToken)
+                errorHandlingService.handleError(.expiredToken)
                 return .error(DataRequestError.handled)
             }
             

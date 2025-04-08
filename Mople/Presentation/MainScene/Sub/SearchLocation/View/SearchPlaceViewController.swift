@@ -17,9 +17,6 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Manager
-    private let alertManager = AlertManager.shared
-    
     // MARK: - UI Components
     
     private(set) var startView: DefaultEmptyView = {

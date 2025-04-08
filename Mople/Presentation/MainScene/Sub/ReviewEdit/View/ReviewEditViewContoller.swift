@@ -19,9 +19,6 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     // MARK: - Observable
     private let endFlow: PublishSubject<Void> = .init()
     
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-    
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
@@ -224,7 +221,7 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
-                vc.handleError(err: err)
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
         
@@ -235,13 +232,15 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     }
     
     // MARK: - 에러 핸들링
-    private func handleError(err: ReviewEditError) {
+    private func handleError(_ err: ReviewEditError) {
         switch err {
         case let .noResponse(err):
             alertManager.showResponseErrorMessage(err: err,
                                                  completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         }
     }
 }

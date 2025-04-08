@@ -14,10 +14,6 @@ protocol CommentListCommands: AnyObject {
     func addPhotoList(_ photoPaths: [UIImage])
 }
 
-enum CommentViewError: Error {
-    
-}
-
 final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {

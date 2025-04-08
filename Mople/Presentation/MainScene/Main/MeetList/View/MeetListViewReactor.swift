@@ -8,6 +8,7 @@
 import ReactorKit
 
 final class MeetListViewReactor: Reactor, LifeCycleLoggable {
+    
     enum Action {
         case fetchMeetList
         case selectMeet(index: Int)
@@ -15,11 +16,15 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        case fetchMeetList(groupList: [Meet])
+        case fetchMeetList([Meet])
+        case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var meetList: [Meet] = []
+        @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     private let fetchUseCase: FetchMeetList
@@ -53,8 +58,12 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case .fetchMeetList(let groupList):
+        case let .fetchMeetList(groupList):
             newState.meetList = groupList
+        case let .updateLoadingState(isLoad):
+            newState.isLoading = isLoad
+        case let .catchError(err):
+            newState.error = err
         }
         
         return newState
@@ -67,9 +76,9 @@ extension MeetListViewReactor {
         
         let fetchData = fetchUseCase.execute()
             .asObservable()
-            .map { Mutation.fetchMeetList(groupList: $0) }
+            .map { Mutation.fetchMeetList($0) }
         
-        return fetchData
+        return requestWithLoading(task: fetchData)
     }
     
     private func presentMeetDetailView(index: Int) -> Observable<Mutation> {
@@ -93,7 +102,7 @@ extension MeetListViewReactor {
         case let .deleted(id):
             self.deleteMeet(&meetList, meetId: id)
         }
-        return .just(.fetchMeetList(groupList: meetList))
+        return .just(.fetchMeetList(meetList))
     }
     
     private func addMeet(_ meetList: inout [Meet], meet: Meet) {
@@ -110,5 +119,15 @@ extension MeetListViewReactor {
     
     private func deleteMeet(_ meetList: inout [Meet], meetId: Int) {
         meetList.removeAll { $0.meetSummary?.id == meetId }
+    }
+}
+
+extension MeetListViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

@@ -59,8 +59,12 @@ extension ChildLoadingReactor {
     }
     
     private func catchError(_ error: Error) -> Observable<Mutation> {
+        
         parent?.updateLoadingState(false, index: index)
-        parent?.catchError(error, index: index)
+        
+        if DataRequestError.isHandledError(err: error) == false {
+            parent?.catchError(error, index: index)
+        }
         return .empty()
     }
 }

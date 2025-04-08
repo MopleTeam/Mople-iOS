@@ -10,6 +10,7 @@ import ReactorKit
 
 enum ReviewEditError: Error {
     case noResponse(ResponseError)
+    case unknown(Error)
 }
 
 final class ReviewEditViewReactor: Reactor {
@@ -33,15 +34,15 @@ final class ReviewEditViewReactor: Reactor {
         case updateLoadingState(Bool)
         case updateImage([ImageWrapper])
         case updateCompleteAvaliable(Bool)
-        case catchError(ReviewEditError?)
+        case catchError(ReviewEditError)
     }
     
     struct State {
         @Pulse var images: [ImageWrapper] = []
         @Pulse var review: Review?
         @Pulse var canComplete: Bool = false
-        @Pulse var error: ReviewEditError?
         @Pulse var isLoading: Bool = false
+        @Pulse var error: ReviewEditError?
     }
     
     var initialState: State = State()
@@ -246,7 +247,7 @@ extension ReviewEditViewReactor: LoadingReactor {
     func catchErrorMutation(_ error: Error) -> Mutation {
         guard let dataError = error as? DataRequestError,
               let responseError = handleDataRequestError(err: dataError) else {
-            return .catchError(nil)
+            return .catchError(.unknown(error))
         }
         return .catchError(.noResponse(responseError))
     }

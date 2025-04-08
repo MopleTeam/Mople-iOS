@@ -11,11 +11,15 @@ import ReactorKit
 final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        enum Flow {
+            case editProfile
+            case setNotify
+            case policy
+            case logout
+        }
+        
+        case flow(Flow)
         case fetchUserInfo
-        case editProfile
-        case presentNotifyView
-        case presentPolicyView
-        case logout
         case deleteAccount
     }
     
@@ -44,15 +48,9 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchUserInfo:
-            return self.fetchProfile()
-        case .editProfile:
-            return presentEditView()
-        case .presentNotifyView:
-            return presentNotifyView()
-        case .presentPolicyView:
-            return presentPolicyView()
-        case .logout:
-            return self.logout()
+            return fetchProfile()
+        case let .flow(action):
+            return handleFlowAction(action)
         case .deleteAccount:
             return Observable.empty()
         }
@@ -73,33 +71,26 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
 
 extension ProfileViewReactor {
     
-    #warning("프로필 없는 경우(?) 처리")
     private func fetchProfile() -> Observable<Mutation> {
         guard let userInfo = UserInfoStorage.shared.userInfo else { return .empty() }
         return .just(.fetchUserInfo(userInfo))
     }
-    
-    private func presentEditView() -> Observable<Mutation> {
-        guard let previousProfile = currentState.userProfile else { return .empty() }
-        coordinator?.presentEditView(previousProfile: previousProfile)
-        return Observable.empty()
-    }
-    
-    /// 코디네이터에게 알림관리 뷰로 이동요청
-    private func presentNotifyView() -> Observable<Mutation> {
-        coordinator?.pushNotifyView()
-        return Observable.empty()
-    }
-    
-    /// 코디네이터에게 개인정보 처리방침 뷰로 이동요청
-    private func presentPolicyView() -> Observable<Mutation> {
-        coordinator?.pushPolicyView()
-        return Observable.empty()
-    }
-    
-    /// 로그아웃시 키체인에 저장된 토큰정보 삭제 후 로그인 화면으로 이동
-    private func logout() -> Observable<Mutation> {
-        self.coordinator?.logout()
+
+}
+
+extension ProfileViewReactor {
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case .editProfile:
+            guard let previousProfile = currentState.userProfile else { return .empty() }
+            coordinator?.presentEditView(previousProfile: previousProfile)
+        case .setNotify:
+            coordinator?.pushNotifyView()
+        case .policy:
+            coordinator?.pushPolicyView()
+        case .logout:
+            coordinator?.logout()
+        }
         return .empty()
     }
 }

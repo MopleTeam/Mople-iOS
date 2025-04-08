@@ -15,9 +15,6 @@ final class HomeViewController: DefaultViewController, View {
     
     var disposeBag = DisposeBag()
     
-    // MARK: - Manager
-    private let alertManager = AlertManager.shared
-    
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
@@ -188,21 +185,14 @@ final class HomeViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
     }
     
-    private func handleError(_ err: Error) {
-        switch err {
-        case let err as HomeError:
-            handleHomeError(err: err)
-        case let err as DateTransitionError:
-            alertManager.showDateErrorMessage(err: err)
-        default:
-            alertManager.showDefatulErrorMessage()
-        }
-    }
-    
-    private func handleHomeError(err: HomeError) {
+    private func handleError(_ err: HomeError) {
         switch err {
         case .emptyMeet:
             self.showEmptyMeetAlert()
+        case let .midnight(err):
+            alertManager.showDateErrorMessage(err: err)
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
         }
     }
     

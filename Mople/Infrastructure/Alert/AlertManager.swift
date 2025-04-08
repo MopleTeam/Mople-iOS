@@ -127,8 +127,9 @@ extension AlertManager {
 // MARK: - 에러 알림창 표시 및 포스팅
 extension AlertManager {
     // MARK: - 에러처리
-    func showDefatulErrorMessage() {
-        self.showAlert(title: "요청에 실패했습니다.\n잠시 후 다시 시도해주세요.")
+    func showDefatulErrorMessage(completion: (() -> Void)? = nil) {
+        self.showAlert(title: "요청에 실패했습니다.\n잠시 후 다시 시도해주세요.",
+                       defaultAction: .init(completion: completion))
     }
     
     // MARK: - Midnight Handling

@@ -65,7 +65,6 @@ extension BaseButton {
         configuration?.image = image
         configuration?.imagePlacement = imagePlacement
         configuration?.imagePadding = contentPadding
-        
     }
     
     public func setBgColor(normalColor: UIColor?,

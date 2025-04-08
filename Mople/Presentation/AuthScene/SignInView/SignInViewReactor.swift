@@ -93,7 +93,7 @@ extension SignInViewReactor {
             .map { Mutation.moveToMain }
             .catch { [weak self] err in
                 guard let self else { throw DataRequestError.unknown }
-                return self.handleError(err: err)
+                return self.handleError(err)
             }
         
         let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
@@ -107,7 +107,7 @@ extension SignInViewReactor {
 
 // MARK: - 로그인 에러 핸들링
 extension SignInViewReactor {
-    private func handleError(err: Error) -> Observable<Mutation> {
+    private func handleError(_ err: Error) -> Observable<Mutation> {
         switch err {
         case LoginError.notFoundInfo(let socialInfo):
             return Observable.just(())

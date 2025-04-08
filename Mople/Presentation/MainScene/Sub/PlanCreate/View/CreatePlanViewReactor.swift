@@ -16,6 +16,7 @@ enum PlanCreationType {
 enum CreatePlanError: Error {
     case midnight(DateTransitionError)
     case noResponse(ResponseError)
+    case unknown(Error)
     case invalid
     
     var info: String? {
@@ -72,7 +73,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         case updatePreviousPlan(Plan)
         case updateMeetList(_ meets: [MeetSummary])
         case updateLoadingState(Bool)
-        case catchError(CreatePlanError?)
+        case catchError(CreatePlanError)
     }
     
     struct State {
@@ -402,7 +403,7 @@ extension CreatePlanViewReactor: LoadingReactor {
     func catchErrorMutation(_ error: Error) -> Mutation {
         guard let dataError = error as? DataRequestError,
               let responseError = getDataRequestError(err: dataError) else {
-            return .catchError(nil)
+            return .catchError(.unknown(error))
         }
         
         return .catchError(.noResponse(responseError))

@@ -112,7 +112,7 @@
 		523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645422C901CF7009E0784 /* MeetListViewReactor.swift */; };
 		523645492C90B711009E0784 /* UIView+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523645482C90B711009E0784 /* UIView+PreView.swift */; };
 		5236454B2C90B734009E0784 /* UIViewController+PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5236454A2C90B734009E0784 /* UIViewController+PreView.swift */; };
-		523E760B2D5B84E100BD22CB /* LaunchViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E760A2D5B84E100BD22CB /* LaunchViewReactor.swift */; };
+		523E760B2D5B84E100BD22CB /* LaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E760A2D5B84E100BD22CB /* LaunchViewModel.swift */; };
 		523E76112D5CEEA900BD22CB /* URL+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76102D5CEEA900BD22CB /* URL+Kingfisher.swift */; };
 		523E76132D5CF32600BD22CB /* Observable+ImageList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76122D5CF32600BD22CB /* Observable+ImageList.swift */; };
 		523E76152D5D2E0D00BD22CB /* ImageWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76142D5D2E0D00BD22CB /* ImageWrapper.swift */; };
@@ -509,7 +509,7 @@
 		523645422C901CF7009E0784 /* MeetListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetListViewReactor.swift; sourceTree = "<group>"; };
 		523645482C90B711009E0784 /* UIView+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+PreView.swift"; sourceTree = "<group>"; };
 		5236454A2C90B734009E0784 /* UIViewController+PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+PreView.swift"; sourceTree = "<group>"; };
-		523E760A2D5B84E100BD22CB /* LaunchViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewReactor.swift; sourceTree = "<group>"; };
+		523E760A2D5B84E100BD22CB /* LaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewModel.swift; sourceTree = "<group>"; };
 		523E76102D5CEEA900BD22CB /* URL+Kingfisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Kingfisher.swift"; sourceTree = "<group>"; };
 		523E76122D5CF32600BD22CB /* Observable+ImageList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Observable+ImageList.swift"; sourceTree = "<group>"; };
 		523E76142D5D2E0D00BD22CB /* ImageWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageWrapper.swift; sourceTree = "<group>"; };
@@ -1946,7 +1946,7 @@
 		52AD4B702D5B807000FCA929 /* LaunchScene */ = {
 			isa = PBXGroup;
 			children = (
-				523E760A2D5B84E100BD22CB /* LaunchViewReactor.swift */,
+				523E760A2D5B84E100BD22CB /* LaunchViewModel.swift */,
 				52AD4B712D5B808D00FCA929 /* LaunchViewController.swift */,
 			);
 			path = LaunchScene;
@@ -3023,7 +3023,7 @@
 				52E99EE92CA1B3EA007E552C /* ScheduleListTableHeaderView.swift in Sources */,
 				528E09E62D6B921E00832BA7 /* AllPlanDate.swift in Sources */,
 				5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */,
-				523E760B2D5B84E100BD22CB /* LaunchViewReactor.swift in Sources */,
+				523E760B2D5B84E100BD22CB /* LaunchViewModel.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
 				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
 				5211F9082C86F2DB00403980 /* HomePlanCollectionCell.swift in Sources */,

@@ -19,6 +19,7 @@ enum MemberListType {
 
 enum MemberListError: Error {
     case noResponse(ResponseError)
+    case unknown(Error)
 }
 
 final class MemberListViewReactor: Reactor {
@@ -32,7 +33,7 @@ final class MemberListViewReactor: Reactor {
     enum Mutation {
         case updateMember([MemberInfo])
         case updateLoadingState(Bool)
-        case catchError(MemberListError?)
+        case catchError(MemberListError)
     }
     
     struct State {
@@ -130,7 +131,7 @@ extension MemberListViewReactor: LoadingReactor {
     func catchErrorMutation(_ error: Error) -> Mutation {
         guard let dataError = error as? DataRequestError,
               let responseError = handleDataRequestError(err: dataError) else {
-            return .catchError(nil)
+            return .catchError(.unknown(error))
         }
         return .catchError(.noResponse(responseError))
     }

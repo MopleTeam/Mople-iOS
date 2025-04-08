@@ -25,9 +25,6 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
 
     // MARK: - UI Components
     private let profileSetupView = ProfileSetupView(type: .update)
-    
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
 
     // MARK: - LifeCycle
     init(editProfileReactor: ProfileEditViewReactor) {
@@ -132,18 +129,17 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
             .drive(self.profileSetupView.rx.isDuplicate)
             .disposed(by: disposeBag)
         
-        #warning("여기 고쳐야해")
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$error)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, _ in
                 vc.alertManager.showDefatulErrorMessage()
             })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
     

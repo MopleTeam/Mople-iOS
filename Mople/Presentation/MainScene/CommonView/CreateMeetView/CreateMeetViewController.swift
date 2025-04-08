@@ -30,9 +30,6 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     var adjustableView: UIView { self.mainStackView }
     var floatingView: UIView { self.completionButton }
     var floatingViewBottom: Constraint?
-    
-    // MARK: - Manager
-    private let alertManager = AlertManager.shared
    
     // MARK: - Gesture
     private let imageTapGesture = UITapGestureRecognizer()

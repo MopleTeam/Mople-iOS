@@ -73,5 +73,13 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+//                vc.aler
+            })
+            .disposed(by: disposeBag)
     }
 }

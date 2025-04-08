@@ -26,6 +26,7 @@ protocol SchduleListReactorDelegate: AnyObject, ChildLoadingDelegate {
 
 enum CalendarError: Error {
     case midnight(DateTransitionError)
+    case unknown(Error)
 }
 
 final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
@@ -216,21 +217,6 @@ extension CalendarScheduleViewReactor: SchduleListReactorDelegate {
     }
 }
 
-extension CalendarScheduleViewReactor: ChildLoadingDelegate {
-    func updateLoadingState(_ isLoading: Bool, index: Int) {
-        action.onNext(.changeLoadingState(isLoading))
-    }
-    
-    func catchError(_ error: any Error, index: Int) {
-        switch error {
-        case let error as DateTransitionError:
-            action.onNext(.catchError(.midnight(error)))
-        default:
-            break
-        }
-    }
-}
-
 // MARK: - 모임, 일정, 리뷰 변경사항 적용
 extension CalendarScheduleViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
@@ -264,3 +250,18 @@ extension CalendarScheduleViewReactor {
     }
 }
 
+// MARK: - 자식뷰 로딩 및 에러
+extension CalendarScheduleViewReactor: ChildLoadingDelegate {
+    func updateLoadingState(_ isLoading: Bool, index: Int) {
+        action.onNext(.changeLoadingState(isLoading))
+    }
+    
+    func catchError(_ error: Error, index: Int) {
+        switch error {
+        case let error as DateTransitionError:
+            action.onNext(.catchError(.midnight(error)))
+        default:
+            action.onNext(.catchError(.unknown(error)))
+        }
+    }
+}
