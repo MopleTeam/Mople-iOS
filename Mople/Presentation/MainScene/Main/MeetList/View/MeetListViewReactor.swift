@@ -58,8 +58,8 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .fetchMeetList(groupList):
-            newState.meetList = groupList
+        case let .fetchMeetList(meetList):
+            newState.meetList = meetList
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):

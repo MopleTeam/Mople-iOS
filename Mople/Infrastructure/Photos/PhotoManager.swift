@@ -75,6 +75,8 @@ protocol PhotoService {
 
 final class DefaultPhotoService: PhotoService {
 
+    private var pickerView: PHPickerViewController?
+    
     private var imageObserver: ((SingleEvent<[UIImage]>) -> Void)?
     
     private var limit: Int
@@ -119,16 +121,17 @@ final class DefaultPhotoService: PhotoService {
         configuration.selection = .ordered
         configuration.selectionLimit = limit
         configuration.filter = .images
-        let pickerViewController = PHPickerViewController(configuration: configuration)
-        pickerViewController.delegate = self
-        topView.present(pickerViewController, animated: true)
+        pickerView = PHPickerViewController(configuration: configuration)
+        guard let pickerView else { return }
+        pickerView.delegate = self
+        topView.present(pickerView, animated: true)
     }
 }
 
 extension DefaultPhotoService: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         print(#function, #line)
-        
+                
         let group = DispatchGroup()
         var imageList: [UIImage] = []
         var order: [Int] = []

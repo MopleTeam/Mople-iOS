@@ -10,7 +10,7 @@ import RxSwift
 
 protocol EditMeet {
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Single<Meet>
+                 request: CreateMeetRequest) -> Single<Meet?>
 }
 
 final class EditMeetUseCase: EditMeet {
@@ -22,7 +22,7 @@ final class EditMeetUseCase: EditMeet {
     }
     
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Single<Meet> {
+                 request: CreateMeetRequest) -> Single<Meet?> {
         return repo.editMeet(
             id: id,
             reqeust: request)

@@ -137,8 +137,8 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
         reactor.pulse(\.$error)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .drive(with: self, onNext: { vc, _ in
-                vc.alertManager.showDefatulErrorMessage()
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
     }
@@ -151,6 +151,17 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
                 vc.showPhotos()
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Error Handling
+    private func handleError(_ err: ProfileEditError) {
+        switch err {
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
+        case .failSelectPhoto(let compressionPhotoError):
+            alertManager.showAlert(title: compressionPhotoError.info,
+                                   subTitle: compressionPhotoError.subInfo)
+        }
     }
 }
 

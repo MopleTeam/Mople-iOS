@@ -132,7 +132,7 @@ extension DefaultAppNetWorkService {
     // 로그인 세션 만료 용 에러 보내기
     private func reissueToken() -> Single<Void> {
         return Single.deferred { [weak self] in
-            guard let self else { return .never() }
+            guard let self else { return .just(()) }
             
             guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
                 errorHandlingService.handleError(.expiredToken)

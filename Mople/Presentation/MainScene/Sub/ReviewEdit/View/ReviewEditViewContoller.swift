@@ -239,6 +239,9 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
                                                  completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
+        case let .failSelectPhoto(err):
+            alertManager.showAlert(title: err.info,
+                                   subTitle: err.subInfo)
         case .unknown:
             alertManager.showDefatulErrorMessage()
         }

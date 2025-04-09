@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 final class CreateGroupMock: CreateMeet {
-    func execute(requset: CreateMeetRequest) -> Single<Meet> {
+    func execute(requset: CreateMeetRequest) -> Single<Meet?> {
         return Observable.just(.mock(id: 999, creatorId: 999))
             .delay(.seconds(2), scheduler: MainScheduler.instance)
             .asSingle()

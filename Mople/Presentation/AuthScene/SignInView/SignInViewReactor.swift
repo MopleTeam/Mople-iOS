@@ -17,15 +17,11 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        case moveToProfileSetup(_ socialInfo: SocialInfo)
-        case moveToMain
-        case notifyMessage(message: String?)
-        case setLoading(isLoad: Bool)
+        case catchError(LoginError?)
     }
     
     struct State {
-        @Pulse var message: String? = nil
-        @Pulse var isLoading: Bool = false
+        @Pulse var error: LoginError?
     }
     
     private let signIn: SignIn
@@ -52,14 +48,8 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .notifyMessage(message):
-            newState.message = message
-        case let .setLoading(isLoad):
-            newState.isLoading = isLoad
-        case let .moveToProfileSetup(socialInfo):
-            coordinator?.pushSignUpView(socialInfo)
-        case .moveToMain:
-            coordinator?.presentMainFlow()
+        case let .catchError(err):
+            newState.error = err
         }
   
         return newState
@@ -76,49 +66,41 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
-
-
-
 // MARK: - Execute
 extension SignInViewReactor {
     private func executeSignIn(platform: LoginPlatform) -> Observable<Mutation> {
-        let loadingOn = Observable.just(Mutation.setLoading(isLoad: true))
-                
-        let loginTask = signIn.execute(platform: platform)
-            .flatMap({ [weak self] in
-                guard let self else { throw DataRequestError.unknown }
+                  
+        return signIn.execute(platform: platform)
+            .flatMap({ [weak self] _ -> Single<Void> in
+                guard let self else { return .just(()) }
                 return self.fetchUserInfo.execute()
             })
+            .observe(on: MainScheduler.instance)
             .asObservable()
-            .map { Mutation.moveToMain }
-            .catch { [weak self] err in
-                guard let self else { throw DataRequestError.unknown }
-                return self.handleError(err)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.coordinator?.presentMainFlow()
+                return .empty()
             }
-        
-        let loadingOff = Observable.just(Mutation.setLoading(isLoad: false))
-      
-        
-        return Observable.concat([loadingOn,
-                                  loginTask,
-                                  loadingOff])
+            .catch({ [weak self] err -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                let err = handleError(err)
+                return .just(.catchError(err))
+            })
     }
-}
-
-// MARK: - 로그인 에러 핸들링
-extension SignInViewReactor {
-    private func handleError(_ err: Error) -> Observable<Mutation> {
-        switch err {
-        case LoginError.notFoundInfo(let socialInfo):
-            return Observable.just(())
-                .observe(on: MainScheduler.instance)
-                .map { _ in .moveToProfileSetup(socialInfo) }
-        case let err as LoginError:
-            return .just(.notifyMessage(message: err.info))
-        case let err as DataRequestError:
-            return .just(.notifyMessage(message: err.info))
+    
+    private func handleError(_ err: Error) -> LoginError? {
+        guard let loginErr = err as? LoginError else {
+            return .unknown(err)
+        }
+        
+        switch loginErr {
+        case let .notFoundInfo(socialInfo):
+            coordinator?.pushSignUpView(socialInfo)
+            return nil
+        case .cancle, .handled:
+            return nil
         default:
-            return .just(.notifyMessage(message: DataRequestError.unknown.info))
+            return loginErr
         }
     }
 }

@@ -132,25 +132,16 @@ final class MeetPlanListViewController: BaseViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, index in
-                vc.closePlan(at: index)
+                vc.reloadCell(at: index)
             })
             .disposed(by: disposeBag)
     }
-    
-    private func closePlan(at index: Int) {
-        tableView.reloadRows(at: [.init(row: index, section: 0)], with: .none)
-    }
-    
+
     private func setNotification(reactor: Reactor) {
         EventService.shared.addPlanObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    private func setPlanCountLabel(planList: [Plan]) {
-        guard planList.isEmpty == false else { return }
-        countView.countText = "\(planList.count)개"
     }
 }
 
@@ -161,5 +152,16 @@ extension MeetPlanListViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - UI Update
+extension MeetPlanListViewController {
+    private func setPlanCountLabel(planList: [Plan]) {
+        guard planList.isEmpty == false else { return }
+        countView.countText = "\(planList.count)개"
+    }
+    
+    private func reloadCell(at index: Int) {
+        tableView.reloadRows(at: [.init(row: index, section: 0)], with: .none)
+    }
+}
 
 

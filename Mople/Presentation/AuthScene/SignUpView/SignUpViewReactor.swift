@@ -12,6 +12,11 @@ protocol SignUpCoordination: AnyObject {
     func presentMainFlow()
 }
 
+enum SignUpError: Error {
+    case failSelectPhoto(CompressionPhotoError)
+    case unknown(Error)
+}
+
 class SignUpViewReactor: Reactor, LifeCycleLoggable {
 
     enum Action {
@@ -29,8 +34,7 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         case updateDuplicateAvaliable(Bool)
         case updateValidState(Bool?)
         case updateLoadingState(Bool)
-        case notifyMessage(String?)
-        case catchError(Error)
+        case catchError(SignUpError)
     }
     
     struct State {
@@ -39,16 +43,26 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var canDuplicateCheck: Bool = false
         @Pulse var isValidNickname: Bool?
         @Pulse var isLoading: Bool = false
-        @Pulse var message: String?
+        @Pulse var error: SignUpError?
     }
     
+    // MARK: - Variables
+    private var isLoading: Bool = false
+    
+    // MARK: - 유즈케이스
     private let signUpUseCase: SignUp
     private let imageUploadUseCase: ImageUpload
     private let validationNickname: CheckDuplicateNickname
     private let creationNickname: CreationNickname
     private let fetchUserInfo: FetchUserInfo
+    
+    // MARK: - 앨범 접근
     private let photoService: PhotoService
+    
+    // MARK: - 코디네이터
     private weak var coordinator: SignUpCoordination?
+    
+    // MARK: - 회원가입 모델
     private var signUpModel: SignUpRequest?
     
     var initialState: State = State()
@@ -108,17 +122,11 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
             newState.isValidNickname = isValid
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
-        case let .notifyMessage(message):
-            newState.message = message
         case let .catchError(error):
-            handleError(state: &newState, error: error)
+            newState.error = error
         }
         
         return newState
-    }
-    
-    private func handleError(state: inout State, error: Error) {
-        
     }
     
     // MARK: - Intial
@@ -206,16 +214,17 @@ extension SignUpViewReactor {
 
     // MARK: - 회원가입
     private func requsetSignUp() -> Observable<Mutation> {
-        print(#function, #line)
+        guard isLoading == false else { return .empty() }
+        isLoading = true
         let image = currentState.profileImage
 
         let signUp = imageUploadUseCase.execute(image)
             .flatMap { [weak self] imagePath -> Single<Void> in
-                guard let self else { return .never() }
+                guard let self else { return .just(()) }
                 return self.signUp(imagePath)
             }
             .flatMap({ [weak self] _ -> Single<Void> in
-                guard let self else { return .never() }
+                guard let self else { return .just(()) }
                 return self.fetchUserInfo.execute()
             })
             .asObservable()
@@ -226,10 +235,13 @@ extension SignUpViewReactor {
             })
         
         return requestWithLoading(task: signUp)
+            .do(onDispose: { [weak self] in
+                self?.isLoading = false
+            })
     }
     
     private func signUp(_ imagePath: String?) -> Single<Void> {
-        guard var signUpModel else { return .never() }
+        guard var signUpModel else { return .just(()) }
         signUpModel.image = imagePath
         return self.signUpUseCase.execute(request: signUpModel)
     }
@@ -242,6 +254,9 @@ extension SignUpViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let photoErr = error as? CompressionPhotoError else {
+            return .catchError(.unknown(error))
+        }
+        return .catchError(.failSelectPhoto(photoErr))
     }
 }

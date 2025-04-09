@@ -12,7 +12,7 @@ import SnapKit
 import ReactorKit
 import AuthenticationServices
 
-final class SignInViewController: DefaultViewController, View {
+final class SignInViewController: BaseViewController, View {
     
     typealias Reactor = SignInViewReactor
     
@@ -154,18 +154,13 @@ final class SignInViewController: DefaultViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        #warning("여기 고쳐야해")
-        reactor.pulse(\.$message)
+        reactor.pulse(\.$error)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
-            .drive(with: self, onNext: { vc, message in
-//                vc.alertManager.showAlert(title: "로그인 에러", message: message)
+            .drive(with: self, onNext: { vc, err in
+                guard let title = err.info else { return }
+                vc.alertManager.showAlert(title: title)
             })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
     }
 }

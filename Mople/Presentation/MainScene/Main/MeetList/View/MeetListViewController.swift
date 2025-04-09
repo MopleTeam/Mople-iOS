@@ -143,6 +143,11 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        EventService.shared.addPlanObservable()
+            .map { _ in Reactor.Action.fetchMeetList }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
 

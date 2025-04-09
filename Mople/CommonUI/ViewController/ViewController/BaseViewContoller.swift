@@ -8,6 +8,10 @@
 import UIKit
 
 class BaseViewController: UIViewController, LifeCycleLoggable {
+    
+    // MARK: - Alert
+    public let alertManager = AlertManager.shared
+    
     // MARK: - Properties
     private let className: String
     

@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol CreateMeet {
-    func execute(requset: CreateMeetRequest) -> Single<Meet>
+    func execute(requset: CreateMeetRequest) -> Single<Meet?>
 }
 
 final class CreateMeetUseCase: CreateMeet {
@@ -20,7 +20,7 @@ final class CreateMeetUseCase: CreateMeet {
         self.createMeetRepo = createMeetRepo
     }
     
-    func execute(requset: CreateMeetRequest) -> Single<Meet> {
+    func execute(requset: CreateMeetRequest) -> Single<Meet?> {
         return self.createMeetRepo
             .createMeet(reqeust: requset)
             .map { $0.toDomain() }

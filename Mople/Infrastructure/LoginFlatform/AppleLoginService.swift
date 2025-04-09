@@ -59,8 +59,6 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
            let identityToken = appleIDCredential.identityToken {
             let identityCode = String(decoding: identityToken, as: UTF8.self)
             
-            print(#function, #line, "# 29 : \(appleIDCredential.email)" )
-            
             guard let email = fetchAppleEmail(appleIDCredential.email) else {
                 loginObserver?(.failure(LoginError.appleAccountError))
                 return
@@ -75,7 +73,12 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        loginObserver?(.failure(LoginError.completeError))
+        if let authError = error as? ASAuthorizationError,
+           authError.code == .canceled {
+            loginObserver?(.failure(LoginError.cancle))
+        } else {
+            loginObserver?(.failure(LoginError.completeError))
+        }
     }
     
     private func fetchAppleEmail(_ email: String?) -> String? {

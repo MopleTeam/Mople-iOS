@@ -18,9 +18,6 @@ final class CommentListViewController: BaseViewController, View {
     
     var disposeBag = DisposeBag()
 
-    // MARK: - Alert
-    private let alertManager = AlertManager.shared
-
     private var dataSource: RxTableViewSectionedReloadDataSource<CommentTableSectionModel>?
     
     private(set) var tableView: UITableView = {

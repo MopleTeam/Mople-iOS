@@ -17,6 +17,10 @@ class SignUpViewController: DefaultViewController, View {
     
     var disposeBag = DisposeBag()
     
+    // MARK: - Observable
+    private let resetImage: PublishSubject<Void> = .init()
+    private let showAlbum: PublishSubject<Void> = .init()
+    
     // MARK: - Variables
     private var hasImage: Bool = false
  
@@ -91,10 +95,17 @@ class SignUpViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
         
         profileSetupView.rx.completeTapped
-            .throttle(.seconds(1),
-                      latest: false,
-                      scheduler: MainScheduler.instance)
             .map { Reactor.Action.complete }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        resetImage
+            .map { Reactor.Action.resetImage }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        showAlbum
+            .map { Reactor.Action.showImagePicker }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -126,18 +137,17 @@ class SignUpViewController: DefaultViewController, View {
             .drive(self.profileSetupView.rx.isDuplicate)
             .disposed(by: disposeBag)
         
-        #warning("여기 고쳐야해")
-        reactor.pulse(\.$message)
-            .compactMap { $0 }
-            .asDriver(onErrorJustReturn: "오류가 발생했습니다.")
-            .drive(with: self, onNext: { vc, message in
-//                vc.alertManager.showAlert(message: message)
-            })
-            .disposed(by: disposeBag)
-        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -148,6 +158,17 @@ class SignUpViewController: DefaultViewController, View {
                 vc.showPhotos()
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Error Handling
+    private func handleError(_ err: SignUpError) {
+        switch err {
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
+        case .failSelectPhoto(let compressionPhotoError):
+            alertManager.showAlert(title: compressionPhotoError.info,
+                                   subTitle: compressionPhotoError.subInfo)
+        }
     }
 }
 
@@ -160,8 +181,15 @@ extension SignUpViewController: KeyboardDismissable {
 // MARK: - 이미지 선택
 extension SignUpViewController {
     private func showPhotos() {
-        let defaultPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
-        let selectPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
+        let defaultPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경",
+                                                         completion: { [weak self] in
+            self?.resetImage.onNext(())
+        })
+        
+        let selectPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택",
+                                                        completion: { [weak self] in
+            self?.showAlbum.onNext(())
+        })
         
         if hasImage {
             alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
@@ -170,15 +198,7 @@ extension SignUpViewController {
         }
     }
     
-    private func presentPhotos() {
-        self.reactor?.action.onNext(.showImagePicker)
-    }
-    
-    private func setDefaultImage() {
-        self.reactor?.action.onNext(.resetImage)
-    }
-    
-    private func setHasImageState(_ image: Any?) {
+    private func setHasImageState(_ image: UIImage?) {
         hasImage = image != nil
     }
 }

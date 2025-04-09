@@ -153,8 +153,8 @@ extension DateManager {
         return calendar.isDate(date1, equalTo: date2, toGranularity: .month)
     }
     
-    static func isBetween(targetDate: Date, startDate: Date, endDate: Date) -> Bool {
-        return startDate <= targetDate && endDate >= targetDate
+    static func isWithinRange(target: Date, from: Date, to: Date) -> Bool {
+        return from <= target && to >= target
     }
 }
 

@@ -326,7 +326,7 @@ extension PlanDetailViewReactor {
         }
         let deletePost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
-                guard let self else { return .never() }
+                guard let self else { return .just(())}
                 switch type {
                 case .plan:
                     return deletePlanUseCase.execute(id: id)
@@ -351,7 +351,7 @@ extension PlanDetailViewReactor {
         }
         let reportPost = Observable.just(type)
             .flatMap { [weak self] type -> Single<Void> in
-                guard let self else { return .never() }
+                guard let self else { return .just(()) }
                 let reportType = getReportType()
                 return reportUseCase.execute(type: reportType,
                                              reason: nil)

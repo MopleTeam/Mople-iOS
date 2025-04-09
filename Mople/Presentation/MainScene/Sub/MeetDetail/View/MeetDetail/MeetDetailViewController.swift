@@ -227,7 +227,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             })
         case let .midnight(err):
             alertManager.showDateErrorMessage(err: err)
-        case let .unknown(err):
+        case .unknown:
             alertManager.showDefatulErrorMessage()
         }
     }

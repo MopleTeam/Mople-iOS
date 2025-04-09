@@ -201,15 +201,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .compactMap({ $0?.title })
             .drive(placeSelectView.rx.selectedText)
             .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$error)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
-            .drive(with: self, onNext: { vc, err in
-                vc.handleError(err)
-            })
-            .disposed(by: disposeBag)
-        
+
         reactor.state
             .map { $0.canComplete }
             .bind(to: completeButton.rx.isEnabled)
@@ -218,6 +210,14 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
             .disposed(by: disposeBag)
     }
 

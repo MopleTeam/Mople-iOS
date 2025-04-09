@@ -14,11 +14,6 @@ typealias ReviewPayload = EventService.Payload<Review>
 
 final class EventService {
     
-    enum ParticipationPayload {
-        case participating(Plan)
-        case notParticipation(id: Int)
-    }
-    
     enum Payload<T> {
         case created(T)
         case updated(T)
@@ -34,30 +29,15 @@ final class EventService {
         }
     }
     
+    enum ParticipationPayload {
+        case participating(Plan)
+        case notParticipation(id: Int)
+    }
+    
     static let shared = EventService()
     private init() {}
     private let payloadKey = "payload"
     private let senderKey = "sender"
-    
-    // MARK: - Participating
-    func participatingPost(_ payload: ParticipationPayload, from sender: Any) {
-        NotificationCenter.default.post(name: .participating,
-                                        object: nil,
-                                        userInfo: [payloadKey: payload,
-                                                    senderKey: String(describing: sender)])
-    }
-    
-    func addParticipatingObservable() -> Observable<PlanPayload> {
-        let participatingObservable: Observable<ParticipationPayload> = makeObservable(name: .participating)
-        return participatingObservable.map {
-            switch $0 {
-            case let .participating(plan):
-                return .created(plan)
-            case let .notParticipation(id):
-                return .deleted(id: id)
-            }
-        }
-    }
     
     // MARK: - Void
     func post(name: Notification.Name) {
@@ -69,7 +49,7 @@ final class EventService {
             .map { _ in }
     }
     
-    // MARK: - With Item
+    // MARK: - Payload
     func postItem<T>(_ payload: Payload<T>, from sender: Any) {
         NotificationCenter.default.post(name: payload.notiName,
                                         object: nil,
@@ -89,6 +69,27 @@ final class EventService {
         return makeObservable(name: .review)
     }
     
+    // MARK: - Participating
+    func postParticipating(_ payload: ParticipationPayload, from sender: Any) {
+        NotificationCenter.default.post(name: .participating,
+                                        object: nil,
+                                        userInfo: [payloadKey: payload,
+                                                    senderKey: String(describing: sender)])
+    }
+    
+    func addParticipatingObservable() -> Observable<PlanPayload> {
+        let participatingObservable: Observable<ParticipationPayload> = makeObservable(name: .participating)
+        return participatingObservable.map {
+            switch $0 {
+            case let .participating(plan):
+                return .created(plan)
+            case let .notParticipation(id):
+                return .deleted(id: id)
+            }
+        }
+    }
+    
+    // MARK: - Payload Observable
     private func makeObservable<T>(name: Notification.Name) -> Observable<T> {
         return NotificationCenter.default.rx.notification(name, object: nil)
             .share(replay: 1)

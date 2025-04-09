@@ -468,13 +468,10 @@ extension ScheduleListReactor {
     
     private func handleUpdate(_ planList: inout [MonthlyPlan], plan: Plan) {
         guard let newDate = plan.date,
-              let monthDate = DateManager.startOfMonth(newDate) else { return }
+              let monthDate = DateManager.startOfMonth(newDate),
+              isActiveDate(on: monthDate) == false else { return }
         
-        if planList.isEmpty ||
-            isLoadedDate(on: monthDate) ||
-            isBetweenLoadedDate(on: monthDate) ||
-            isBetweenPreviousDate(on: monthDate) ||
-            isBetweenNextDate(on: monthDate) {
+        if planList.isEmpty || canAddPlan(planDate: newDate) {
             planList.append(.init(plan: plan))
             updateLoadedList(newDate: monthDate)
         } else {
@@ -482,36 +479,64 @@ extension ScheduleListReactor {
         }
     }
     
-    /// 불러온 날짜에 속해있다면 추가
+    /// 불러올 날짜에 속해있는지 체크
+    private func isActiveDate(on newDate: Date) -> Bool {
+        return monthDateList.contains { DateManager.isSameMonth($0, newDate) }
+    }
+    
+    private func canAddPlan(planDate: Date) -> Bool {
+        guard let firstLoadedDate = loadedDateList.min(),
+              let lastLoadedDate = loadedDateList.max() else { return false }
+        
+        return isLoadedDate(on: planDate) ||
+        isBetweenLoadedDate(newDate: planDate,
+                            firstLoaded: firstLoadedDate,
+                            lastLoaded: lastLoadedDate) ||
+        isBetweenPreviousDate(newDate: planDate,
+                              firstLoaded: firstLoadedDate) ||
+        isBetweenNextDate(newDate: planDate,
+                          lastLoaded: lastLoadedDate)
+    }
+    
+    /// 불러온 날짜에 속해있는지 체크
     private func isLoadedDate(on newDate: Date) -> Bool {
         return loadedDateList.contains(where: { DateManager.isSameMonth($0, newDate) })
     }
     
     /// 불러온 날짜 중 가장 작은 것, 가장 큰 것 사이에 있다면 추가
-    private func isBetweenLoadedDate(on newDate: Date) -> Bool {
-        guard let minLoadedDate = loadedDateList.min(),
-              let maxLoadedDate = loadedDateList.max() else { return true }
-        return DateManager.isBetween(targetDate: newDate,
-                                     startDate: minLoadedDate,
-                                     endDate: maxLoadedDate)
+    private func isBetweenLoadedDate(newDate: Date,
+                                     firstLoaded: Date,
+                                     lastLoaded: Date) -> Bool {
+        return DateManager.isWithinRange(target: newDate,
+                                         from: firstLoaded,
+                                         to: lastLoaded)
     }
     
     /// 불러온 날짜 중 가장 작은 것과 그 이전 날짜 사이라면 추가 (그 이전 날짜가 없어도 추가)
-    private func isBetweenPreviousDate(on newDate: Date) -> Bool {
-        guard let loadedDate = loadedDateList.min(),
-              let activeMonth = findLargestPreviousMonth(from: loadedDate) else { return true }
-        return DateManager.isBetween(targetDate: newDate,
-                                     startDate: loadedDate,
-                                     endDate: activeMonth)
+    /// -
+    private func isBetweenPreviousDate(newDate: Date,
+                                       firstLoaded: Date) -> Bool {
+        print(#function, #line, "#0409 date 비교 : \(newDate), firstLoaded: \(firstLoaded)" )
+        guard newDate < firstLoaded else { return false }
+        guard let inactiveMonth = findPreviousActiveMonth(from: firstLoaded) else { return true }
+        return DateManager.isWithinRange(target: newDate,
+                                         from: inactiveMonth,
+                                         to: firstLoaded)
     }
     
     /// 불러온 날짜 중 가장 큰 것과 그 이후 날짜 사이라면 추가 (그 이후 날짜가 없어도 추가)
-    private func isBetweenNextDate(on newDate: Date) -> Bool {
-        guard let loadedDate = loadedDateList.max(),
-              let activeMonth = findSmallestNextMonth(from: loadedDate) else { return true }
-        return DateManager.isBetween(targetDate: newDate,
-                                     startDate: loadedDate,
-                                     endDate: activeMonth)
+    private func isBetweenNextDate(newDate: Date,
+                                   lastLoaded: Date) -> Bool {
+        print(#function, #line, "#0409 date 비교 : \(newDate), lastLoaded: \(lastLoaded)" )
+        guard newDate > lastLoaded else { return false }
+        guard let activeMonth = findNextActiveMonth(from: lastLoaded) else {
+            print(#function, #line, "#0409 없어" )
+            return true
+        }
+        print(#function, #line, "다음 불러올 날짜 : \(activeMonth)" )
+        return DateManager.isWithinRange(target: newDate,
+                                         from: lastLoaded,
+                                         to: activeMonth)
     }
     
     /// 불러온 달 리스트에 추가
@@ -599,9 +624,9 @@ extension ScheduleListReactor {
                                    type: ScheduleFetchType) -> Date? {
         switch type {
         case .next:
-            return findSmallestNextMonth(from: date)
+            return findNextActiveMonth(from: date)
         case .previous:
-            return findLargestPreviousMonth(from: date)
+            return findPreviousActiveMonth(from: date)
         }
     }
     
@@ -609,22 +634,22 @@ extension ScheduleListReactor {
     /// - Parameter date: 타켓 날짜
     /// - Returns: 불러올 달 리스트
     private func findTimelineList(from date: Date) -> [Date] {
-        return [findLargestPreviousMonth(from: date),
-                findSameMonth(from: date),
-                findSmallestNextMonth(from: date)].compactMap { $0 }
+        return [findPreviousActiveMonth(from: date),
+                findSameActiveMonth(from: date),
+                findNextActiveMonth(from: date)].compactMap { $0 }
     }
-
-    private func findSameMonth(from date: Date) -> Date? {
-        return monthDateList.filter { $0 == date }.first
+    
+    private func findSameActiveMonth(from date: Date) -> Date? {
+        return monthDateList.filter { DateManager.isSameMonth($0, date) }.first
     }
     
     /// monthList에서 date로부터 뒤로 가까운 날짜
-    private func findLargestPreviousMonth(from date: Date) -> Date? {
+    private func findPreviousActiveMonth(from date: Date) -> Date? {
         return monthDateList.filter { $0 < date }.max()
     }
     
     /// monthList에서 date로부터 앞으로 가까운 날짜
-    private func findSmallestNextMonth(from date: Date) -> Date? {
+    private func findNextActiveMonth(from date: Date) -> Date? {
         return monthDateList.filter { $0 > date }.min()
     }
     

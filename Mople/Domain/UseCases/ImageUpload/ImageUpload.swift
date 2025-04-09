@@ -22,13 +22,13 @@ final class ImageUploadUseCase: ImageUpload {
     
     func execute(_ image: UIImage?) -> Single<String?> {
         print(#function, #line)
+        guard let image else { return .just(nil) }
+        
         return Single.deferred { [weak self] in
-            guard let self else { return .never() }
+            guard let self else { return .just(nil) }
             
             do {
-                guard let imageData = try Data.imageDataCompressed(uiImage: image) else {
-                    return .just(nil)
-                }
+                let imageData = try Data.imageDataCompressed(uiImage: image) 
                 return self.imageUploadRepo.uploadImage(data: imageData, path: .profile)
             } catch {
                 return .error(error)

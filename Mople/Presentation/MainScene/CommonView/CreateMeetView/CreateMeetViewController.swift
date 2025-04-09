@@ -217,12 +217,23 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
-            .compactMap { $0 }
             .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, message in
-                vc.alertManager.showDefatulErrorMessage()
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Error Handling
+    private func handleError(_ err: CreateMeetError) {
+        switch err {
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
+        case .failSelectPhoto(let compressionPhotoError):
+            alertManager.showAlert(title: compressionPhotoError.info,
+                                   subTitle: compressionPhotoError.subInfo)
+        }
     }
     
     // MARK: - Gesture Setup

@@ -7,19 +7,26 @@
 
 import UIKit
 
+enum CompressionPhotoError: Error {
+    case maxQualityReached
+    case compressionFailed
+    
+    var info: String {
+        return "사진을 업로드할 수 없어요."
+    }
+    var subInfo: String {
+        return "선택된 사진의 용량이 너무 커요."
+    }
+}
+
 extension Data {
     
-    enum CompressionError: Error {
-        case maxQualityReached
-        case compressionFailed
-    }
-    
-    static func imageDataCompressed(uiImage: UIImage?, quality: CGFloat = 0.5) throws -> Self? {
+    static func imageDataCompressed(uiImage: UIImage,
+                                    quality: CGFloat = 0.5) throws -> Self {
         let maxSize = 1_000_000
-        
-        guard let uiImage else { return nil }
-        guard quality >= 0 else { throw CompressionError.maxQualityReached }
-        guard let data = uiImage.jpegData(compressionQuality: quality) else { throw CompressionError.compressionFailed }
+
+        guard quality >= 0 else { throw CompressionPhotoError.maxQualityReached }
+        guard let data = uiImage.jpegData(compressionQuality: quality) else { throw CompressionPhotoError.compressionFailed }
         guard data.count >= maxSize else { return data }
         
         return try imageDataCompressed(uiImage: uiImage,

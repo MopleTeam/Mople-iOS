@@ -78,7 +78,7 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, err in
-//                vc.aler
+                vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
     }

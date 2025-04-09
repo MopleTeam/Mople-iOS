@@ -133,7 +133,6 @@ final class CalendarViewController: BaseViewController, View {
         outputBind(reactor)
     }
     
-#warning("데이터 받을 때 layoutsubviews 신경쓰기")
     private func inputBind(_ reactor: Reactor) {
         
         reactor.pulse(\.$dates)
@@ -666,12 +665,12 @@ extension CalendarViewController {
     private func findFirstEvent(on date: Date) -> Date? {
         let currentMonthDate = events.filter({ DateManager.isSameMonth($0, date) })
         let activeEvent = currentMonthDate.filter { DateManager.isFutureOrToday(on: $0) }
-        return activeEvent.first ?? currentMonthDate.first
+        return activeEvent.min() ?? currentMonthDate.min()
     }
     
     /// date와 같은 달의 이벤트 중 가장 첫번째
     private func findSameMonthDate(on date: Date) -> Date? {
-        return events.filter({ DateManager.isSameMonth($0, date) }).first
+        return events.filter({ DateManager.isSameMonth($0, date) }).min()
     }
     
     /// date보다 과거 이벤트 중 가장 큰 것

@@ -10,6 +10,7 @@ import ReactorKit
 
 enum ReviewEditError: Error {
     case noResponse(ResponseError)
+    case failSelectPhoto(CompressionPhotosError)
     case unknown(Error)
 }
 
@@ -133,7 +134,11 @@ extension ReviewEditViewReactor {
         guard let id = review.id else { return .empty() }
         let addImage = requestAddImage(id: id)
         let deleteImage = requsetDeleteImage(id: id)
-        let requestUpdate = Observable.zip(addImage, deleteImage)
+        let requestUpdate = addImage
+            .flatMap({ [weak self] _ -> Observable<Void> in
+                guard let self else { return .empty() }
+                return deleteImage
+            })
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
@@ -245,11 +250,22 @@ extension ReviewEditViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        guard let dataError = error as? DataRequestError,
-              let responseError = handleDataRequestError(err: dataError) else {
-            return .catchError(.unknown(error))
+        let err = handleError(error)
+        return .catchError(err)
+    }
+    
+    private func handleError(_ err: Error) -> ReviewEditError {
+        switch err {
+        case let requestError as DataRequestError:
+            guard let responseError = handleDataRequestError(err: requestError) else {
+                return .unknown(err)
+            }
+            return .noResponse(responseError)
+        case let photoError as CompressionPhotosError:
+            return .failSelectPhoto(photoError)
+        default:
+            return .unknown(err)
         }
-        return .catchError(.noResponse(responseError))
     }
     
     private func handleDataRequestError(err: DataRequestError) -> ResponseError? {

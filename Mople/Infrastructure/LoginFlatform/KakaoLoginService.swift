@@ -63,7 +63,7 @@ final class DefaultKakaoLoginService: KakaoLoginService {
             return Disposables.create()
         }
         .debug("kakao login debug")
-        .retryWithDelayAndCondition(retryCount: 5)
+        .retryWithDelayAndCondition(retryCount: 10)
     }
     
 }

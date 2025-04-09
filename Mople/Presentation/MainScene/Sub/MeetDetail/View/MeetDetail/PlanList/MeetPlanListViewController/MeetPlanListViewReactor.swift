@@ -148,11 +148,11 @@ extension MeetPlanListViewReactor {
     
     private func postParticipants(with plan: Plan) {
         if plan.isParticipating {
-            EventService.shared.participatingPost(.participating(plan),
+            EventService.shared.postParticipating(.participating(plan),
                                                   from: self)
         } else {
             guard let id = plan.id else { return }
-            EventService.shared.participatingPost(.notParticipation(id: id),
+            EventService.shared.postParticipating(.notParticipation(id: id),
                                                   from: self)
         }
     }

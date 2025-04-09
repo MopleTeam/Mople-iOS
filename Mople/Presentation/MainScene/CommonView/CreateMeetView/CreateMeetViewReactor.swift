@@ -8,12 +8,17 @@
 import UIKit
 import ReactorKit
 
+protocol MeetCreateViewCoordination: NavigationCloseable { }
+
 enum MeetCreationType {
     case create
     case edit(Meet)
 }
 
-protocol MeetCreateViewCoordination: NavigationCloseable { }
+enum CreateMeetError: Error {
+    case unknown(Error)
+    case failSelectPhoto(CompressionPhotoError)
+}
 
 final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
     
@@ -31,14 +36,14 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         case updateCompleteAvaliable(Bool)
         case updateLoadingState(Bool)
         case updatePreviousMeet(Meet)
-        case catchError(Error)
+        case catchError(CreateMeetError)
     }
     
     struct State {
         @Pulse var image: UIImage?
         @Pulse var canComplete: Bool = false
         @Pulse var previousMeet: Meet?
-        @Pulse var error: Error?
+        @Pulse var error: CreateMeetError?
         @Pulse var isLoading: Bool = false
     }
     
@@ -196,11 +201,11 @@ extension CreateMeetViewReactor {
     private func requestEditMeet(_ meet: Meet) -> Observable<Mutation> {
         let selectedImage = currentState.image
         
-        let createMeet = imageUploadUseCase.execute(selectedImage)
-            .flatMap { [weak self] imagePath -> Single<Meet> in
+        let editMeet = imageUploadUseCase.execute(selectedImage)
+            .flatMap { [weak self] imagePath -> Single<Meet?> in
                 guard let self,
                       let id = meet.meetSummary?.id,
-                      var request = createRequest else { return .never() }
+                      var request = createRequest else { return .just(nil)}
                 request.image = imagePath ?? createRequest?.image
                 return editMeetUseCase.execute(id: id,
                                                request: request)
@@ -208,12 +213,13 @@ extension CreateMeetViewReactor {
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
-                self?.notificationNewMeet(meet)
-                self?.handleCompletedTask()
+                guard let self else { return .empty() }
+                notificationNewMeet(meet)
+                handleCompletedTask()
                 return .empty()
             })
         
-        return requestWithLoading(task: createMeet,
+        return requestWithLoading(task: editMeet,
                                   minimumExecutionTime: .seconds(1))
     }
     
@@ -222,17 +228,18 @@ extension CreateMeetViewReactor {
         let selectedImage = currentState.image
 
         let createMeet = imageUploadUseCase.execute(selectedImage)
-            .flatMap { [weak self] imagePath -> Single<Meet> in
+            .flatMap { [weak self] imagePath -> Single<Meet?> in
                 guard let self,
-                      var request = createRequest else { return .never() }
+                      var request = createRequest else { return .just(nil) }
                 request.image = imagePath
                 return createMeetUseCase.execute(requset: request)
             }
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
-                self?.notificationNewMeet(meet)
-                self?.handleCompletedTask()
+                guard let self else { return .empty() }
+                notificationNewMeet(meet)
+                handleCompletedTask()
                 return .empty()
             })
             
@@ -260,7 +267,8 @@ extension CreateMeetViewReactor {
 
 // MARK: - Notification
 extension CreateMeetViewReactor {
-    private func notificationNewMeet(_ meet: Meet) {
+    private func notificationNewMeet(_ meet: Meet?) {
+        guard let meet else { return }
         switch type {
         case .create:
             EventService.shared.postItem(.created(meet),
@@ -278,6 +286,9 @@ extension CreateMeetViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let photoErr = error as? CompressionPhotoError else {
+            return .catchError(.unknown(error))
+        }
+        return .catchError(.failSelectPhoto(photoErr))
     }
 }

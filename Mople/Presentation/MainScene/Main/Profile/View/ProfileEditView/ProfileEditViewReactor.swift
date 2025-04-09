@@ -13,6 +13,11 @@ protocol ProfileEditViewCoordinator: AnyObject {
     func complete()
 }
 
+enum ProfileEditError: Error {
+    case failSelectPhoto(CompressionPhotoError)
+    case unknown(Error)
+}
+
 class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
@@ -32,7 +37,7 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         case updateCompleteAvaliable(Bool)
         case updateDuplicateState(Bool?)
         case updateLoadingState(Bool)
-        case catchError(Error)
+        case catchError(ProfileEditError)
     }
     
     struct State {
@@ -42,7 +47,7 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var canComplete: Bool = false
         @Pulse var isDuplicate: Bool?
         @Pulse var isLoading: Bool = false
-        @Pulse var error: Error?
+        @Pulse var error: ProfileEditError?
     }
     
     private let editProfile: EditProfile
@@ -186,11 +191,11 @@ extension ProfileEditViewReactor {
     private func requestEditProfile() -> Observable<Mutation> {
         let editProfile = Observable.just(isEditImage)
             .flatMap { [weak self] isEdit -> Single<String?> in
-                guard let self else { return .never() }
+                guard let self else { return .just(nil) }
                 return handleEditProfileTrigger(isEdit: isEdit)
             }
             .flatMap { [weak self] imagePath -> Single<Void> in
-                guard let self else { return .never() }
+                guard let self else { return .just(()) }
                 return self.editProfile(imagePath: imagePath)
             }
             .asObservable()
@@ -214,7 +219,7 @@ extension ProfileEditViewReactor {
     }
     
     private func editProfile(imagePath: String?) -> Single<Void> {
-        guard var profile else { return .never() }
+        guard var profile else { return .just(()) }
         profile.image = imagePath
         return self.editProfile.execute(request: profile)
     }
@@ -235,7 +240,10 @@ extension ProfileEditViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        return .catchError(error)
+        guard let photoErr = error as? CompressionPhotoError else {
+            return .catchError(.unknown(error))
+        }
+        return .catchError(.failSelectPhoto(photoErr))
     }
 }
 
