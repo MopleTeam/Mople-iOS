@@ -34,7 +34,7 @@ final class SearchPlaceFlowCoordinator: BaseCoordinator, SearchPlaceCoordination
     }
 }
 
-// MARK: - Empty View Visiblility
+// MARK: - Empty View
 extension SearchPlaceFlowCoordinator {
     func updateEmptyViewVisibility(shouldShow: Bool) {
         searchLoactionVC?.startView.isHidden = shouldShow
@@ -42,7 +42,7 @@ extension SearchPlaceFlowCoordinator {
     }
 }
 
-// MARK: - SearchResult View Visibility
+// MARK: - SearchResult View
 extension SearchPlaceFlowCoordinator {
     func updateSearchResultViewVisibility(shouldShow: Bool) {
         if shouldShow {
@@ -60,7 +60,6 @@ extension SearchPlaceFlowCoordinator {
         searchResultVC = vc
         searchLoactionVC.add(child: vc, container: container)
         container.isHidden = false
-        print(#function, #line, "#1 : 성공" )
     }
     
     private func closeSearchResult() {
@@ -71,7 +70,7 @@ extension SearchPlaceFlowCoordinator {
     }
 }
 
-// MARK: - Detail Place View Visibility
+// MARK: - Detail Place View
 extension SearchPlaceFlowCoordinator {
     func showDetailPlaceView(with place: PlaceInfo) {
         guard let searchLoactionVC,
@@ -80,7 +79,6 @@ extension SearchPlaceFlowCoordinator {
         detailPlaceVC = dependencies.makePlaceSelectViewController(with: place)
         searchLoactionVC.add(child: detailPlaceVC!, container: container)
         container.isHidden = false
-        print(#function, #line, "#1 : 성공" )
     }
     
     private func closeDetailPlace() {
@@ -90,7 +88,6 @@ extension SearchPlaceFlowCoordinator {
         searchLoactionVC?.detailPlaceContainer.isHidden = true
     }
 }
-
 
 // MARK: - End Flow
 extension SearchPlaceFlowCoordinator {

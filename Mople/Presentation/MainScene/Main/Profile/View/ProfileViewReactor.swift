@@ -31,10 +31,13 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var userProfile: UserInfo?
     }
     
+    // MARK: - Variables
     var initialState = State()
     
+    // MARK: - Coordinator
     private weak var coordinator: ProfileCoordination?
     
+    // MARK: - LifeCycle
     init(coordinator: ProfileCoordination) {
         self.coordinator = coordinator
         action.onNext(.fetchUserInfo)
@@ -45,6 +48,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchUserInfo:
@@ -69,6 +73,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
 }
 
+// MARK: - Data Request
 extension ProfileViewReactor {
     
     private func fetchProfile() -> Observable<Mutation> {
@@ -78,6 +83,7 @@ extension ProfileViewReactor {
 
 }
 
+// MARK: - Coordination
 extension ProfileViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {

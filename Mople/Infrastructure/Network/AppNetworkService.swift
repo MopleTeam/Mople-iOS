@@ -62,8 +62,6 @@ final class DefaultAppNetWorkService: AppNetworkService {
                     let endpoint = try endpointClosure()
                     return self.dataTransferService.request(with: endpoint)
                 } catch {
-                    // 400 에러
-                    // 나머지 에러 여기서
                     return .error(error)
                 }
             }
@@ -88,9 +86,9 @@ extension DefaultAppNetWorkService {
     }
     
     private func handleDataTransferError(err: DataTransferError) -> Single<Void> {
+        print(#function, #line, "Path : # Error \(err) ")
         switch err {
         case let .networkFailure(err):
-            print(#function, #line, "인터넷 에러 : \(err)" )
             switch err {
             case .notConnectedInternet:
                 errorHandlingService.handleError(.networkUnavailable)
@@ -109,6 +107,7 @@ extension DefaultAppNetWorkService {
     }
     
     private func reissueTokenIfNeeded() -> Observable<Void> {
+        print(#function, #line)
         if let ongoingRefresh = tokenRefreshSubject.value {
             return ongoingRefresh
         }

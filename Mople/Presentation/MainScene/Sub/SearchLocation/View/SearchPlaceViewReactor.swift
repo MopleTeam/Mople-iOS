@@ -14,19 +14,18 @@ protocol SearchPlaceDelegate: AnyObject {
 
 final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
     
-    struct PlaceSearchResult {
-        let places: [PlaceInfo]
-        let isCached: Bool
-    }
-    
     enum Action {
+        enum Flow {
+            case endProcess
+            case completed(place: PlaceInfo)
+        }
+        
         case updateUserLocation
         case fetchCahcedPlace
         case searchPlace(query: String)
         case selectedPlace(index: Int)
         case deletePlace(index: Int)
-        case endProcess
-        case completed(place: PlaceInfo)
+        case flow(Flow)
     }
     
     enum Mutation {
@@ -43,14 +42,30 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: Error?
     }
     
+    struct PlaceSearchResult {
+        let places: [PlaceInfo]
+        let isCached: Bool
+    }
+    
+    // MARK: - Variables
     var initialState: State = State()
     
+    // MARK: - UseCase
     private let searchUseCase: SearchPlace
+    
+    // MARK: - Location
     private let locationService: LocationService
+    
+    // MARK: - Storage
     private let queryStorage: SearchedPlaceStorage
+    
+    // MARK: - Coordinator
     private weak var coordinator: SearchPlaceCoordination?
+    
+    // MARK: - Delegate
     private weak var delegate: SearchPlaceDelegate?
     
+    // MARK: - LifeCycle
     init(searchLocationUseCase: SearchPlace,
          locationService: LocationService,
          queryStorage: SearchedPlaceStorage,
@@ -61,33 +76,35 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         self.queryStorage = queryStorage
         self.coordinator = coordinator
         self.delegate = delegate
+        initialAction()
         logLifeCycle()
-        initalAction()
     }
     
     deinit {
         logLifeCycle()
     }
     
+    // MARK: - Initial Setup
+    private func initialAction() {
+        action.onNext(.updateUserLocation)
+        action.onNext(.fetchCahcedPlace)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .updateUserLocation:
             return updateUserLocation()
         case .fetchCahcedPlace:
-            return self.fetchCahcedPlace()
+            return fetchCahcedPlace()
         case let .searchPlace(query):
-            return self.searchPlace(query: query)
+            return searchPlace(query: query)
         case let .selectedPlace(index):
-            return self.updateSelectedPlace(index: index)
+            return updateSelectedPlace(index: index)
         case let .deletePlace(index):
-            return self.deleteHistory(index: index)
-        case .endProcess:
-            self.coordinator?.endProcess()
-            return .empty()
-        case let .completed(place):
-            delegate?.selectedPlace(with: place)
-            coordinator?.completed()
-            return .empty()
+            return deleteHistory(index: index)
+        case let .flow(action):
+            return handleFlowAction(action)
         }
     }
     
@@ -108,26 +125,25 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
         
         return newState
     }
-    
-    private func initalAction() {
-        action.onNext(.updateUserLocation)
-        action.onNext(.fetchCahcedPlace)
-    }
 }
 
+// MARK: - Location Update
 extension SearchPlaceViewReactor {
-    private func fetchCahcedPlace() -> Observable<Mutation> {
-        let places = queryStorage.readPlaces()
-        self.updateHistoryVisibility(result: places)
-        return .just(Mutation.setPlace(.init(places: places, isCached: true)))
-    }
-    
     private func updateUserLocation() -> Observable<Mutation> {
         let location = locationService.updateLocation()
             .map { Mutation.setUserLocation($0) }
 
         return requestWithLoading(task: location,
                                   defferredLoadingDelay: .seconds(0))
+    }
+}
+
+// MARK: - Data Request
+extension SearchPlaceViewReactor {
+    private func fetchCahcedPlace() -> Observable<Mutation> {
+        let places = queryStorage.readPlaces()
+        self.updateHistoryVisibility(result: places)
+        return .just(Mutation.setPlace(.init(places: places, isCached: true)))
     }
     
     private func searchPlace(query: String) -> Observable<Mutation> {
@@ -148,7 +164,10 @@ extension SearchPlaceViewReactor {
         
         return requestWithLoading(task: requestSearch)
     }
-        
+}
+
+// MARK: - History Update
+extension SearchPlaceViewReactor {
     private func updateSelectedPlace(index: Int) -> Observable<Mutation> {
         
         guard let selectedPlace = self.selectedPlace(index: index) else {
@@ -187,7 +206,7 @@ extension SearchPlaceViewReactor {
     }
 }
 
-// MARK: - Flow Update
+// MARK: - View Update
 extension SearchPlaceViewReactor {
     
     /// 캐시데이터가 있으면 검색결과 창 표시, 없다면 기본 화면 표시 (기본화면 startView)
@@ -209,7 +228,21 @@ extension SearchPlaceViewReactor {
     }
 }
 
-// MARK: - 로딩
+// MARK: - Coordination
+extension SearchPlaceViewReactor {
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case .endProcess:
+            coordinator?.endProcess()
+        case let .completed(place):
+            delegate?.selectedPlace(with: place)
+            coordinator?.completed()
+        }
+        return .empty()
+    }
+}
+
+// MARK: - Loading & Error
 extension SearchPlaceViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

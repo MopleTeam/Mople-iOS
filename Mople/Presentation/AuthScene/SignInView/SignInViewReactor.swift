@@ -24,12 +24,17 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: LoginError?
     }
     
-    private let signIn: SignIn
-    private let fetchUserInfo: FetchUserInfo
-    private weak var coordinator: AuthFlowCoordination?
-    
+    // MARK: - Variables
     var initialState: State = State()
     
+    // MARK: - UseCase
+    private let signIn: SignIn
+    private let fetchUserInfo: FetchUserInfo
+    
+    // MARK: - Coordinator
+    private weak var coordinator: AuthFlowCoordination?
+    
+    // MARK: - LifeCycle
     init(signInUseCase: SignIn,
          fetchUserInfoUseCase: FetchUserInfo,
          coordinator: AuthFlowCoordination) {
@@ -43,6 +48,7 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - State Mutation
     func reduce(state: State, mutation: Mutation) -> State {
         
         var newState = state
@@ -66,7 +72,7 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
-// MARK: - Execute
+// MARK: - Data Request
 extension SignInViewReactor {
     private func executeSignIn(platform: LoginPlatform) -> Observable<Mutation> {
                   

@@ -10,11 +10,13 @@ import RxSwift
 
 final class LaunchViewController: DefaultViewController {
     
+    // MARK: - Variables
     private var disposeBag = DisposeBag()
     
     // MARK: - ViewModel
     private let viewModel: LaunchViewModel
     
+    // MARK: - UI Components
     private let logoImage: UIImageView = {
         let view = UIImageView()
         view.image = .launchScreenIcon
@@ -22,6 +24,7 @@ final class LaunchViewController: DefaultViewController {
         return view
     }()
     
+    // MARK: - LifeCycle
     init(viewModel: LaunchViewModel) {
         self.viewModel = viewModel
         super.init()
@@ -33,12 +36,13 @@ final class LaunchViewController: DefaultViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setLayout()
+        setupUI()
         bind()
-        viewModel.checkEntry()
+        checkAccount()
     }
     
-    private func setLayout() {
+    // MARK: - UI Setup
+    private func setupUI() {
         self.view.backgroundColor = ColorStyle.Default.white
         self.view.addSubview(logoImage)
         
@@ -47,6 +51,7 @@ final class LaunchViewController: DefaultViewController {
         }
     }
     
+    // MARK: - Bind
     private func bind() {
         viewModel.error
             .asDriver(onErrorJustReturn: nil)
@@ -65,5 +70,9 @@ final class LaunchViewController: DefaultViewController {
         alertManager.showDefatulErrorMessage(completion: { [weak self] in
             self?.viewModel.showSignInFlow()
         })
+    }
+    
+    private func checkAccount() {
+        viewModel.checkEntry()
     }
 }

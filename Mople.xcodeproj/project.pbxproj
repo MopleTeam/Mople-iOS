@@ -8,6 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200C36D2CFF66D000C0CEFC /* Single+retry.swift */; };
+		520185192DA79C9D00C2B4FC /* NotifyListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185182DA79C9D00C2B4FC /* NotifyListViewReactor.swift */; };
+		5201851B2DA79CA800C2B4FC /* NotifyListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201851A2DA79CA800C2B4FC /* NotifyListViewController.swift */; };
+		5201851E2DA79D3600C2B4FC /* NotifyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201851D2DA79D3600C2B4FC /* NotifyResponse.swift */; };
+		520185222DA7A09F00C2B4FC /* NotifyPayloadResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185212DA7A09F00C2B4FC /* NotifyPayloadResponse.swift */; };
+		520185242DA7A0C800C2B4FC /* Notify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185232DA7A0C800C2B4FC /* Notify.swift */; };
+		520185292DA7A0D800C2B4FC /* NotifyPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185282DA7A0D800C2B4FC /* NotifyPayload.swift */; };
+		5201852D2DA7A1B400C2B4FC /* NotifyRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201852C2DA7A1B400C2B4FC /* NotifyRepo.swift */; };
+		5201852F2DA7BF2800C2B4FC /* FetchNotifyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201852E2DA7BF2800C2B4FC /* FetchNotifyList.swift */; };
+		520185322DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185312DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift */; };
+		520185352DA7CEEE00C2B4FC /* NotifyTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185342DA7CEEE00C2B4FC /* NotifyTableCell.swift */; };
+		520185372DA8082800C2B4FC /* NotifyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185362DA8082800C2B4FC /* NotifyViewModel.swift */; };
+		5201853A2DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185392DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift */; };
+		5201853E2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201853D2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift */; };
+		520185422DA904D900C2B4FC /* NotifySubscribeViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185412DA904D900C2B4FC /* NotifySubscribeViewReactor.swift */; };
+		520185452DA907BB00C2B4FC /* NotifySubscribeRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185442DA907BB00C2B4FC /* NotifySubscribeRepo.swift */; };
+		520185472DA9080700C2B4FC /* FetchNotifyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520185462DA9080700C2B4FC /* FetchNotifyState.swift */; };
+		5201854B2DA9096D00C2B4FC /* SubscribeNotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201854A2DA9096D00C2B4FC /* SubscribeNotify.swift */; };
 		5207C9132CB3C16800BB27A6 /* FetchScheduleMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */; };
 		5207C9152CB3C21800BB27A6 /* FetchPlanList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */; };
 		520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520805162C69E0770015F6E0 /* SignInViewController.swift */; };
@@ -123,7 +140,7 @@
 		523E76212D5D462100BD22CB /* DeleteReviewImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76202D5D462100BD22CB /* DeleteReviewImage.swift */; };
 		523E76232D5D598700BD22CB /* ReviewImageUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76222D5D598700BD22CB /* ReviewImageUpload.swift */; };
 		523E76272D5EA4B800BD22CB /* PhotoBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523E76262D5EA4B800BD22CB /* PhotoBookViewController.swift */; };
-		52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */; };
+		52473D6C2CEF5D60009D045A /* CustomPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52473D6B2CEF5D60009D045A /* CustomPickerView.swift */; };
 		524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */; };
 		524B2F6E2D34048100D80B12 /* AppTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524B2F6D2D34048100D80B12 /* AppTransition.swift */; };
 		524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */; };
@@ -143,7 +160,7 @@
 		525DFCED2CC8E95500835312 /* DefaultNicknameManagerRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCEC2CC8E95500835312 /* DefaultNicknameManagerRepo.swift */; };
 		525DFCF42CC8F54E00835312 /* NicknameManagerRepoMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCF32CC8F54E00835312 /* NicknameManagerRepoMock.swift */; };
 		525DFCFE2CCA13A900835312 /* PolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCFD2CCA13A900835312 /* PolicyViewController.swift */; };
-		525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCFF2CCA13B000835312 /* NotifyViewController.swift */; };
+		525DFD002CCA13B000835312 /* NotifySubcribeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525DFCFF2CCA13B000835312 /* NotifySubcribeViewController.swift */; };
 		525DFD032CCB640000835312 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD022CCB640000835312 /* KakaoSDKAuth */; };
 		525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD042CCB640000835312 /* KakaoSDKCommon */; };
 		525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 525DFD062CCB640000835312 /* KakaoSDKUser */; };
@@ -159,10 +176,10 @@
 		526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */; };
-		52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC22D11565B00C249A6 /* DefaultSheetView.swift */; };
+		52741EC32D11565B00C249A6 /* CustomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC22D11565B00C249A6 /* CustomSheetView.swift */; };
 		52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */; };
 		52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECB2D11A57E00C249A6 /* UploadPlace.swift */; };
-		52741ECF2D14E00D00C249A6 /* PlanTimePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECE2D14E00D00C249A6 /* PlanTimePickerViewController.swift */; };
+		52741ECF2D14E00D00C249A6 /* TimePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECE2D14E00D00C249A6 /* TimePickerViewController.swift */; };
 		527A3E6C2C82CA8F007FE63B /* SignUpUseCaseMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E6B2C82CA8F007FE63B /* SignUpUseCaseMock.swift */; };
 		527A3E722C8302AA007FE63B /* FetchHomeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E712C8302AA007FE63B /* FetchHomeData.swift */; };
 		527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */; };
@@ -200,7 +217,7 @@
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
 		5285E6CE2CDB3C9300B855CB /* String+ConvertDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */; };
 		5286C4D92C536BE50083F432 /* KeyChainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* KeyChainService.swift */; };
-		528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoManager.swift */; };
+		528D27C72C79F6B800178F14 /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoService.swift */; };
 		528E09E02D6B8FEB00832BA7 /* CalendarViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */; };
 		528E09E32D6B918E00832BA7 /* AllPlanDateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */; };
 		528E09E62D6B921E00832BA7 /* AllPlanDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09E52D6B921E00832BA7 /* AllPlanDate.swift */; };
@@ -245,7 +262,7 @@
 		52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */; };
 		52A6A04F2D42CC520041CDE9 /* PhotoViewTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */; };
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
-		52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */; };
+		52A787762D0348B400A633B3 /* DateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* DateSelectViewController.swift */; };
 		52A7E35F2D686A57004782AF /* NSMutableAttributedString+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A7E35E2D686A57004782AF /* NSMutableAttributedString+Ext.swift */; };
 		52AAAF8D2D92970300CA9CE1 /* ErrorHandlingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */; };
 		52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */; };
@@ -328,6 +345,12 @@
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
+		52DF6DF72DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */; };
+		52DF6DF92DAE3EDD00204297 /* CheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF82DAE3EDD00204297 /* CheckView.swift */; };
+		52DF6DFC2DAE44BB00204297 /* AppSettingOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */; };
+		52DF6DFF2DAE4FB700204297 /* MapSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DFE2DAE4FB700204297 /* MapSelectView.swift */; };
+		52DF6E012DAE9B2C00204297 /* CustomModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6E002DAE9B2C00204297 /* CustomModalView.swift */; };
+		52DF6E042DAE9B6800204297 /* CustomModalButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6E032DAE9B6800204297 /* CustomModalButton.swift */; };
 		52E0E8062D30B957002213FF /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E8052D30B957002213FF /* LocationService.swift */; };
 		52E0E8082D30B95D002213FF /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E8072D30B95D002213FF /* NotificationService.swift */; };
 		52E0E80B2D30ED73002213FF /* DefaultReviewQueryRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E0E80A2D30ED73002213FF /* DefaultReviewQueryRepo.swift */; };
@@ -406,6 +429,23 @@
 
 /* Begin PBXFileReference section */
 		5200C36D2CFF66D000C0CEFC /* Single+retry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Single+retry.swift"; sourceTree = "<group>"; };
+		520185182DA79C9D00C2B4FC /* NotifyListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyListViewReactor.swift; sourceTree = "<group>"; };
+		5201851A2DA79CA800C2B4FC /* NotifyListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyListViewController.swift; sourceTree = "<group>"; };
+		5201851D2DA79D3600C2B4FC /* NotifyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyResponse.swift; sourceTree = "<group>"; };
+		520185212DA7A09F00C2B4FC /* NotifyPayloadResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyPayloadResponse.swift; sourceTree = "<group>"; };
+		520185232DA7A0C800C2B4FC /* Notify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notify.swift; sourceTree = "<group>"; };
+		520185282DA7A0D800C2B4FC /* NotifyPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyPayload.swift; sourceTree = "<group>"; };
+		5201852C2DA7A1B400C2B4FC /* NotifyRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyRepo.swift; sourceTree = "<group>"; };
+		5201852E2DA7BF2800C2B4FC /* FetchNotifyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNotifyList.swift; sourceTree = "<group>"; };
+		520185312DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNotifyRepo.swift; sourceTree = "<group>"; };
+		520185342DA7CEEE00C2B4FC /* NotifyTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyTableCell.swift; sourceTree = "<group>"; };
+		520185362DA8082800C2B4FC /* NotifyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyViewModel.swift; sourceTree = "<group>"; };
+		520185392DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyListFlowCoordinator.swift; sourceTree = "<group>"; };
+		5201853D2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyListSceneDIContainer.swift; sourceTree = "<group>"; };
+		520185412DA904D900C2B4FC /* NotifySubscribeViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifySubscribeViewReactor.swift; sourceTree = "<group>"; };
+		520185442DA907BB00C2B4FC /* NotifySubscribeRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifySubscribeRepo.swift; sourceTree = "<group>"; };
+		520185462DA9080700C2B4FC /* FetchNotifyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNotifyState.swift; sourceTree = "<group>"; };
+		5201854A2DA9096D00C2B4FC /* SubscribeNotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeNotify.swift; sourceTree = "<group>"; };
 		5207C9122CB3C16800BB27A6 /* FetchScheduleMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchScheduleMock.swift; sourceTree = "<group>"; };
 		5207C9142CB3C21800BB27A6 /* FetchPlanList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanList.swift; sourceTree = "<group>"; };
 		520805162C69E0770015F6E0 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
@@ -520,7 +560,7 @@
 		523E76202D5D462100BD22CB /* DeleteReviewImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteReviewImage.swift; sourceTree = "<group>"; };
 		523E76222D5D598700BD22CB /* ReviewImageUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewImageUpload.swift; sourceTree = "<group>"; };
 		523E76262D5EA4B800BD22CB /* PhotoBookViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoBookViewController.swift; sourceTree = "<group>"; };
-		52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultPickerView.swift; sourceTree = "<group>"; };
+		52473D6B2CEF5D60009D045A /* CustomPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPickerView.swift; sourceTree = "<group>"; };
 		524B2F6B2D34046E00D80B12 /* AppNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
 		524B2F6D2D34048100D80B12 /* AppTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTransition.swift; sourceTree = "<group>"; };
 		524E33CE2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactive+ViewLifeCycle.swift"; sourceTree = "<group>"; };
@@ -539,7 +579,7 @@
 		525DFCEC2CC8E95500835312 /* DefaultNicknameManagerRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNicknameManagerRepo.swift; sourceTree = "<group>"; };
 		525DFCF32CC8F54E00835312 /* NicknameManagerRepoMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NicknameManagerRepoMock.swift; sourceTree = "<group>"; };
 		525DFCFD2CCA13A900835312 /* PolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyViewController.swift; sourceTree = "<group>"; };
-		525DFCFF2CCA13B000835312 /* NotifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyViewController.swift; sourceTree = "<group>"; };
+		525DFCFF2CCA13B000835312 /* NotifySubcribeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifySubcribeViewController.swift; sourceTree = "<group>"; };
 		5268BA2A2D3EF892000C5F3A /* ChatingTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatingTextFieldView.swift; sourceTree = "<group>"; };
 		5268BA302D3F0BAA000C5F3A /* PhotoCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionCell.swift; sourceTree = "<group>"; };
 		5268BA372D3F71D0000C5F3A /* CommentCommandRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCommandRepo.swift; sourceTree = "<group>"; };
@@ -552,10 +592,10 @@
 		526B98652CEE0DC1002488C5 /* LabeledButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledButtonView.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponsive.swift; sourceTree = "<group>"; };
-		52741EC22D11565B00C249A6 /* DefaultSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSheetView.swift; sourceTree = "<group>"; };
+		52741EC22D11565B00C249A6 /* CustomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSheetView.swift; sourceTree = "<group>"; };
 		52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewModel.swift; sourceTree = "<group>"; };
 		52741ECB2D11A57E00C249A6 /* UploadPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPlace.swift; sourceTree = "<group>"; };
-		52741ECE2D14E00D00C249A6 /* PlanTimePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTimePickerViewController.swift; sourceTree = "<group>"; };
+		52741ECE2D14E00D00C249A6 /* TimePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimePickerViewController.swift; sourceTree = "<group>"; };
 		527A3E6B2C82CA8F007FE63B /* SignUpUseCaseMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpUseCaseMock.swift; sourceTree = "<group>"; };
 		527A3E712C8302AA007FE63B /* FetchHomeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchHomeData.swift; sourceTree = "<group>"; };
 		527A3E782C834A12007FE63B /* MainSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSceneCoordinator.swift; sourceTree = "<group>"; };
@@ -593,7 +633,7 @@
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5285E6CD2CDB3C9300B855CB /* String+ConvertDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ConvertDate.swift"; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* KeyChainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainService.swift; sourceTree = "<group>"; };
-		528D27C62C79F6B800178F14 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
+		528D27C62C79F6B800178F14 /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
 		528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewReactor.swift; sourceTree = "<group>"; };
 		528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPlanDateResponse.swift; sourceTree = "<group>"; };
 		528E09E52D6B921E00832BA7 /* AllPlanDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPlanDate.swift; sourceTree = "<group>"; };
@@ -636,7 +676,7 @@
 		52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableHeader.swift; sourceTree = "<group>"; };
 		52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewTableCell.swift; sourceTree = "<group>"; };
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
-		52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDateSelectViewController.swift; sourceTree = "<group>"; };
+		52A787752D0348B400A633B3 /* DateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSelectViewController.swift; sourceTree = "<group>"; };
 		52A7E35E2D686A57004782AF /* NSMutableAttributedString+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Ext.swift"; sourceTree = "<group>"; };
 		52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandlingService.swift; sourceTree = "<group>"; };
 		52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
@@ -714,6 +754,12 @@
 		52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewController.swift; sourceTree = "<group>"; };
 		52D864912D2BA2DF000F8378 /* ScheduleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleListViewModel.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
+		52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNotifySubscribeRepo.swift; sourceTree = "<group>"; };
+		52DF6DF82DAE3EDD00204297 /* CheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckView.swift; sourceTree = "<group>"; };
+		52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingOpener.swift; sourceTree = "<group>"; };
+		52DF6DFE2DAE4FB700204297 /* MapSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSelectView.swift; sourceTree = "<group>"; };
+		52DF6E002DAE9B2C00204297 /* CustomModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomModalView.swift; sourceTree = "<group>"; };
+		52DF6E032DAE9B6800204297 /* CustomModalButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomModalButton.swift; sourceTree = "<group>"; };
 		52E0E8052D30B957002213FF /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		52E0E8072D30B95D002213FF /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		52E0E80A2D30ED73002213FF /* DefaultReviewQueryRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultReviewQueryRepo.swift; sourceTree = "<group>"; };
@@ -800,6 +846,109 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		520185162DA79C2900C2B4FC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
+				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
+				52A1164A2D4BB23B00AC0C91 /* PlanDetailModel.swift */,
+				529CCD542D323FD10041CBB7 /* PlanDetail */,
+				52FE68602D508596009EC8EC /* PlaceDetail */,
+				523E76252D5EA41B00BD22CB /* PhotoView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		5201851C2DA79D2800C2B4FC /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				5201851D2DA79D3600C2B4FC /* NotifyResponse.swift */,
+				520185212DA7A09F00C2B4FC /* NotifyPayloadResponse.swift */,
+			);
+			path = Notify;
+			sourceTree = "<group>";
+		};
+		520185252DA7A0CB00C2B4FC /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				520185232DA7A0C800C2B4FC /* Notify.swift */,
+				520185282DA7A0D800C2B4FC /* NotifyPayload.swift */,
+			);
+			path = Notify;
+			sourceTree = "<group>";
+		};
+		5201852A2DA7A1A000C2B4FC /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				520185492DA9095500C2B4FC /* Write */,
+				520185482DA9094E00C2B4FC /* Read */,
+			);
+			path = Notify;
+			sourceTree = "<group>";
+		};
+		5201852B2DA7A1AC00C2B4FC /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				5201852C2DA7A1B400C2B4FC /* NotifyRepo.swift */,
+				520185442DA907BB00C2B4FC /* NotifySubscribeRepo.swift */,
+			);
+			path = Notify;
+			sourceTree = "<group>";
+		};
+		520185302DA7BF8700C2B4FC /* Notify */ = {
+			isa = PBXGroup;
+			children = (
+				520185312DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift */,
+				52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */,
+			);
+			path = Notify;
+			sourceTree = "<group>";
+		};
+		520185332DA7CEA600C2B4FC /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				520185342DA7CEEE00C2B4FC /* NotifyTableCell.swift */,
+				520185362DA8082800C2B4FC /* NotifyViewModel.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		520185382DA8E5A400C2B4FC /* NotifyList */ = {
+			isa = PBXGroup;
+			children = (
+				520185392DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift */,
+				5201853F2DA8EE3300C2B4FC /* View */,
+			);
+			path = NotifyList;
+			sourceTree = "<group>";
+		};
+		5201853F2DA8EE3300C2B4FC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				520185182DA79C9D00C2B4FC /* NotifyListViewReactor.swift */,
+				5201851A2DA79CA800C2B4FC /* NotifyListViewController.swift */,
+				520185332DA7CEA600C2B4FC /* Cell */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		520185482DA9094E00C2B4FC /* Read */ = {
+			isa = PBXGroup;
+			children = (
+				5201852E2DA7BF2800C2B4FC /* FetchNotifyList.swift */,
+				520185462DA9080700C2B4FC /* FetchNotifyState.swift */,
+			);
+			path = Read;
+			sourceTree = "<group>";
+		};
+		520185492DA9095500C2B4FC /* Write */ = {
+			isa = PBXGroup;
+			children = (
+				5201854A2DA9096D00C2B4FC /* SubscribeNotify.swift */,
+			);
+			path = Write;
+			sourceTree = "<group>";
+		};
 		5207C9112CB1E10400BB27A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -867,7 +1016,6 @@
 			children = (
 				52C0F8BD2C9489CC0080CA65 /* CalendarView */,
 				5259B0112C9FD35D006B2711 /* ScheduleListView */,
-				52E99EE12CA15556007E552C /* DatePickerView */,
 			);
 			path = ChildVC;
 			sourceTree = "<group>";
@@ -1290,6 +1438,7 @@
 		523645402C901190009E0784 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				52A6A0472D426B440041CDE9 /* PlanInfo */,
 				5221B13A2D548022004859C9 /* PhotoListView */,
 				52EC04BE2D38CCBB00000C99 /* Count */,
 				52741EC42D116A5600C249A6 /* Thumbnail */,
@@ -1298,6 +1447,7 @@
 				5211F9122C89CEF800403980 /* ProfileView.swift */,
 				5229583F2D52077800AE4EC3 /* MemberInfoView.swift */,
 				52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */,
+				52DF6DF82DAE3EDD00204297 /* CheckView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1325,17 +1475,9 @@
 			isa = PBXGroup;
 			children = (
 				523E76262D5EA4B800BD22CB /* PhotoBookViewController.swift */,
-				529629162D5EC66500003F66 /* PhotoBookCollectionCell.swift */,
+				52DF6DF32DAB361A00204297 /* Cell */,
 			);
 			path = PhotoView;
-			sourceTree = "<group>";
-		};
-		52473D6A2CEF5D4A009D045A /* Picker */ = {
-			isa = PBXGroup;
-			children = (
-				52473D6B2CEF5D60009D045A /* DefaultPickerView.swift */,
-			);
-			path = Picker;
 			sourceTree = "<group>";
 		};
 		524B2F6A2D34045400D80B12 /* AppNavigation */ = {
@@ -1400,7 +1542,8 @@
 		525DFCFB2CCA135500835312 /* NotifyView */ = {
 			isa = PBXGroup;
 			children = (
-				525DFCFF2CCA13B000835312 /* NotifyViewController.swift */,
+				520185412DA904D900C2B4FC /* NotifySubscribeViewReactor.swift */,
+				525DFCFF2CCA13B000835312 /* NotifySubcribeViewController.swift */,
 			);
 			path = NotifyView;
 			sourceTree = "<group>";
@@ -1495,14 +1638,6 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		52741ECD2D14DFD600C249A6 /* PlanTimePickerView */ = {
-			isa = PBXGroup;
-			children = (
-				52741ECE2D14E00D00C249A6 /* PlanTimePickerViewController.swift */,
-			);
-			path = PlanTimePickerView;
-			sourceTree = "<group>";
-		};
 		527A3E662C82C8E5007FE63B /* UseCaseMock */ = {
 			isa = PBXGroup;
 			children = (
@@ -1587,9 +1722,7 @@
 			children = (
 				52F1535C2D0724D0001A7BF5 /* CreatePlanViewReactor.swift */,
 				526B985D2CEDBC03002488C5 /* CreatePlanViewController.swift */,
-				52A7876F2D02666C00A633B3 /* MeetSelectView */,
-				52A787742D03489800A633B3 /* PlanDatePickerView */,
-				52741ECD2D14DFD600C249A6 /* PlanTimePickerView */,
+				52DF6DF42DAC93D100204297 /* SelectView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1686,14 +1819,6 @@
 				5283DE5F2CCCC2D5006B7B45 /* KakaoLoginService.swift */,
 			);
 			path = LoginFlatform;
-			sourceTree = "<group>";
-		};
-		528D27C52C79F68B00178F14 /* Photos */ = {
-			isa = PBXGroup;
-			children = (
-				528D27C62C79F6B800178F14 /* PhotoManager.swift */,
-			);
-			path = Photos;
 			sourceTree = "<group>";
 		};
 		528D27C82C7A3ABE00178F14 /* Extension */ = {
@@ -1849,9 +1974,7 @@
 			isa = PBXGroup;
 			children = (
 				529CCD572D3240930041CBB7 /* PlanDetailFlowCoordinator.swift */,
-				529CCD542D323FD10041CBB7 /* PlanDetail */,
-				52FE68602D508596009EC8EC /* PlaceDetail */,
-				523E76252D5EA41B00BD22CB /* PhotoView */,
+				520185162DA79C2900C2B4FC /* View */,
 			);
 			path = PlanDetail;
 			sourceTree = "<group>";
@@ -1859,10 +1982,6 @@
 		529CCD542D323FD10041CBB7 /* PlanDetail */ = {
 			isa = PBXGroup;
 			children = (
-				529CCD592D3267710041CBB7 /* PlanDetailViewReactor.swift */,
-				529CCD552D323FDF0041CBB7 /* PlanDetailViewController.swift */,
-				52A1164A2D4BB23B00AC0C91 /* PlanDetailModel.swift */,
-				52A6A0472D426B440041CDE9 /* PlanInfo */,
 				52EC04B82D38C0D700000C99 /* CommentListView */,
 			);
 			path = PlanDetail;
@@ -1919,14 +2038,6 @@
 			path = MeetSelectView;
 			sourceTree = "<group>";
 		};
-		52A787742D03489800A633B3 /* PlanDatePickerView */ = {
-			isa = PBXGroup;
-			children = (
-				52A787752D0348B400A633B3 /* PlanDateSelectViewController.swift */,
-			);
-			path = PlanDatePickerView;
-			sourceTree = "<group>";
-		};
 		52AAAF8B2D8DA66000CA9CE1 /* HomeData */ = {
 			isa = PBXGroup;
 			children = (
@@ -1963,6 +2074,7 @@
 		52B6F63C2C77655C00DA2D75 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				5201852B2DA7A1AC00C2B4FC /* Notify */,
 				52EC04DD2D3E1E5900000C99 /* Auth */,
 				5231DF3F2D2F96B000D52529 /* Profile */,
 				5231DF412D2F96CF00D52529 /* Meet */,
@@ -2068,12 +2180,14 @@
 			path = CalendarView;
 			sourceTree = "<group>";
 		};
-		52C5200D2D0D6DBC0085F5F7 /* SheetView */ = {
+		52C5200D2D0D6DBC0085F5F7 /* Modal */ = {
 			isa = PBXGroup;
 			children = (
-				52741EC22D11565B00C249A6 /* DefaultSheetView.swift */,
+				52DF6E022DAE9B4F00204297 /* CustomModal */,
+				52741EC22D11565B00C249A6 /* CustomSheetView.swift */,
+				52473D6B2CEF5D60009D045A /* CustomPickerView.swift */,
 			);
-			path = SheetView;
+			path = Modal;
 			sourceTree = "<group>";
 		};
 		52C520102D0D99C00085F5F7 /* Cell */ = {
@@ -2141,6 +2255,7 @@
 		52C857B72D0862CB00765FB3 /* Response */ = {
 			isa = PBXGroup;
 			children = (
+				5201851C2DA79D2800C2B4FC /* Notify */,
 				52B8E11D2D53449000F7FF59 /* Member */,
 				52EC04ED2D3E5B6A00000C99 /* Comment */,
 				5214F8AD2D2C9B1300E8CE9C /* Review */,
@@ -2217,8 +2332,7 @@
 				5231DF322D2F29FF00D52529 /* Alert */,
 				52D864832D2A8E66000F8378 /* SegmentControl */,
 				52D864302D27E5E3000F8378 /* MapView */,
-				52C5200D2D0D6DBC0085F5F7 /* SheetView */,
-				52473D6A2CEF5D4A009D045A /* Picker */,
+				52C5200D2D0D6DBC0085F5F7 /* Modal */,
 				526B98602CEDBDE9002488C5 /* TextField */,
 				526B985F2CEDBDD6002488C5 /* NavigationBar */,
 				523645402C901190009E0784 /* View */,
@@ -2263,7 +2377,6 @@
 				52EA6E192CF8C4AE00EFD753 /* FCMToken */,
 				5208C1882CC0D618006272E8 /* Alert */,
 				52CB41E02CA2F2800071679D /* Calendar */,
-				528D27C52C79F68B00178F14 /* Photos */,
 				528D27C42C79F68500178F14 /* LoginFlatform */,
 				528D27C32C79F67400178F14 /* Network */,
 			);
@@ -2347,6 +2460,7 @@
 				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
 				529CCD492D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift */,
 				5221B1362D543749004859C9 /* ReviewEditSceneDIContainer.swift */,
+				5201853D2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift */,
 			);
 			path = Sub;
 			sourceTree = "<group>";
@@ -2404,11 +2518,48 @@
 			path = Keyboard;
 			sourceTree = "<group>";
 		};
+		52DF6DF32DAB361A00204297 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				529629162D5EC66500003F66 /* PhotoBookCollectionCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		52DF6DF42DAC93D100204297 /* SelectView */ = {
+			isa = PBXGroup;
+			children = (
+				52741ECE2D14E00D00C249A6 /* TimePickerViewController.swift */,
+				52A787752D0348B400A633B3 /* DateSelectViewController.swift */,
+				52A7876F2D02666C00A633B3 /* MeetSelectView */,
+			);
+			path = SelectView;
+			sourceTree = "<group>";
+		};
+		52DF6DFD2DAE4F8500204297 /* MapSelectView */ = {
+			isa = PBXGroup;
+			children = (
+				52DF6DFE2DAE4FB700204297 /* MapSelectView.swift */,
+			);
+			path = MapSelectView;
+			sourceTree = "<group>";
+		};
+		52DF6E022DAE9B4F00204297 /* CustomModal */ = {
+			isa = PBXGroup;
+			children = (
+				52DF6E002DAE9B2C00204297 /* CustomModalView.swift */,
+				52DF6E032DAE9B6800204297 /* CustomModalButton.swift */,
+			);
+			path = CustomModal;
+			sourceTree = "<group>";
+		};
 		52E0E8042D30B94A002213FF /* Premission */ = {
 			isa = PBXGroup;
 			children = (
 				52E0E8052D30B957002213FF /* LocationService.swift */,
 				52E0E8072D30B95D002213FF /* NotificationService.swift */,
+				528D27C62C79F6B800178F14 /* PhotoService.swift */,
+				52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */,
 			);
 			path = Premission;
 			sourceTree = "<group>";
@@ -2435,6 +2586,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				520185252DA7A0CB00C2B4FC /* Notify */,
 				52AAAF8B2D8DA66000CA9CE1 /* HomeData */,
 				522958332D52004600AE4EC3 /* Member */,
 				529CCD442D3231430041CBB7 /* Review */,
@@ -2493,6 +2645,7 @@
 				52818C632D182AE00001E30B /* SearchPlace */,
 				529629222D5F501000003F66 /* Report */,
 				528E09FE2D6B9E1C00832BA7 /* Calendar */,
+				5201852A2DA7A1A000C2B4FC /* Notify */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -2531,16 +2684,9 @@
 				52EC04D12D3E159000000C99 /* SearchPlace */,
 				5296291C2D5F4D9000003F66 /* Report */,
 				528E09FB2D6B9D8E00832BA7 /* Calendar */,
+				520185302DA7BF8700C2B4FC /* Notify */,
 			);
 			path = Repositories;
-			sourceTree = "<group>";
-		};
-		52E99EE12CA15556007E552C /* DatePickerView */ = {
-			isa = PBXGroup;
-			children = (
-				5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */,
-			);
-			path = DatePickerView;
 			sourceTree = "<group>";
 		};
 		52E99EE72CA1B3C5007E552C /* HeaderView */ = {
@@ -2817,6 +2963,7 @@
 				52CC75CD2D1D4B4D000CC8B9 /* DefaultViewController.swift */,
 				5236452C2C8EDCEF009E0784 /* TitleNaviViewController.swift */,
 				52818C612D18217B0001E30B /* SearchNaviViewController.swift */,
+				5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -2847,6 +2994,7 @@
 				526B985C2CEDBBF6002488C5 /* PlanCreate */,
 				529CCD522D323FAF0041CBB7 /* PlanDetail */,
 				5221B12C2D54121D004859C9 /* ReviewEdit */,
+				520185382DA8E5A400C2B4FC /* NotifyList */,
 			);
 			path = Sub;
 			sourceTree = "<group>";
@@ -2895,6 +3043,7 @@
 			children = (
 				52FE68632D510B86009EC8EC /* PlaceDetailViewReactor.swift */,
 				52FE68612D5085C2009EC8EC /* PlaceDetailViewController.swift */,
+				52DF6DFD2DAE4F8500204297 /* MapSelectView */,
 			);
 			path = PlaceDetail;
 			sourceTree = "<group>";
@@ -3023,6 +3172,7 @@
 				52E99EE92CA1B3EA007E552C /* ScheduleListTableHeaderView.swift in Sources */,
 				528E09E62D6B921E00832BA7 /* AllPlanDate.swift in Sources */,
 				5214F8AC2D2C9ACC00E8CE9C /* FetchReviewList.swift in Sources */,
+				52DF6DFC2DAE44BB00204297 /* AppSettingOpener.swift in Sources */,
 				523E760B2D5B84E100BD22CB /* LaunchViewModel.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
 				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
@@ -3040,6 +3190,7 @@
 				52CB41E22CA2F2910071679D /* DateManager.swift in Sources */,
 				5214F88E2D2BB1A000E8CE9C /* FetchMeetFuturePlanMock.swift in Sources */,
 				5231B6832D4150C50028AF62 /* ScrollKeyboardResponsive.swift in Sources */,
+				520185472DA9080700C2B4FC /* FetchNotifyState.swift in Sources */,
 				529CCD482D3232370041CBB7 /* FetchPlanDetailMock.swift in Sources */,
 				52D864572D29FD89000F8378 /* MeetDetailViewController.swift in Sources */,
 				52CB0B452C730816002B6D20 /* NetworkConfig.swift in Sources */,
@@ -3057,6 +3208,7 @@
 				52818C6F2D1955E00001E30B /* SearchPlaceResultResponse.swift in Sources */,
 				527A3E992C836287007FE63B /* CalendarScheduleViewController.swift in Sources */,
 				52E2382D2C745E960066C9A3 /* AuthSceneDIContainer.swift in Sources */,
+				520185422DA904D900C2B4FC /* NotifySubscribeViewReactor.swift in Sources */,
 				52CC75CE2D1D4B4D000CC8B9 /* DefaultViewController.swift in Sources */,
 				5231DF7F2D2FE78700D52529 /* DefaultSearchPlaceRepo.swift in Sources */,
 				52EA6E062CF7F22900EFD753 /* SignUpViewReactor.swift in Sources */,
@@ -3081,14 +3233,17 @@
 				5236452D2C8EDCEF009E0784 /* TitleNaviViewController.swift in Sources */,
 				52EC04C22D391B4700000C99 /* CommentListViewReactor.swift in Sources */,
 				5211F90B2C87039F00403980 /* UIViewController+AddChild.swift in Sources */,
+				52DF6DF72DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift in Sources */,
 				529629242D5F501D00003F66 /* ReportPost.swift in Sources */,
 				527A3E6C2C82CA8F007FE63B /* SignUpUseCaseMock.swift in Sources */,
+				520185292DA7A0D800C2B4FC /* NotifyPayload.swift in Sources */,
 				5214F8BE2D2CA24B00E8CE9C /* FetchReviewMock.swift in Sources */,
 				52A388602D688F2B001439C7 /* DeletePlan.swift in Sources */,
 				52EC04C02D38CCC800000C99 /* CountView.swift in Sources */,
 				5268BA3A2D3F7321000C5F3A /* DefaultCommentCommandRepo.swift in Sources */,
 				523645372C8FFE9F009E0784 /* FetchRecentScheduleMock.swift in Sources */,
 				52E238372C76530D0066C9A3 /* SignInViewReactor.swift in Sources */,
+				520185352DA7CEEE00C2B4FC /* NotifyTableCell.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */,
 				52818C8A2D1C40D60001E30B /* SearchPlaceViewReactor.swift in Sources */,
 				522958372D52005C00AE4EC3 /* MemberList.swift in Sources */,
@@ -3102,6 +3257,7 @@
 				529CCD582D3240930041CBB7 /* PlanDetailFlowCoordinator.swift in Sources */,
 				528E09F72D6B9C4000832BA7 /* MonthlyPlan.swift in Sources */,
 				52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */,
+				5201854B2DA9096D00C2B4FC /* SubscribeNotify.swift in Sources */,
 				523E76272D5EA4B800BD22CB /* PhotoBookViewController.swift in Sources */,
 				5231DF442D2F972B00D52529 /* PlanCommandRepo.swift in Sources */,
 				526B98622CEDBDFD002488C5 /* LabeledTextFieldView.swift in Sources */,
@@ -3110,10 +3266,12 @@
 				52E2382F2C74601D0066C9A3 /* AppleLoginService.swift in Sources */,
 				5208C17A2CBE72A8006272E8 /* UIApplication+RootView.swift in Sources */,
 				52D864592D29FDBC000F8378 /* MeetDetailViewReactor.swift in Sources */,
+				5201851B2DA79CA800C2B4FC /* NotifyListViewController.swift in Sources */,
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
 				5229583C2D52022100AE4EC3 /* MemberInfoMock.swift in Sources */,
 				52D864922D2BA2DF000F8378 /* ScheduleListViewModel.swift in Sources */,
+				5201852F2DA7BF2800C2B4FC /* FetchNotifyList.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
@@ -3126,6 +3284,7 @@
 				52818C902D1C469F0001E30B /* SearchPlaceTableCell.swift in Sources */,
 				52A1164B2D4BB23B00AC0C91 /* PlanDetailModel.swift in Sources */,
 				5221B1392D548011004859C9 /* PhotoCollectionHeaderView.swift in Sources */,
+				52DF6DF92DAE3EDD00204297 /* CheckView.swift in Sources */,
 				521091E02D0FAC3800DD0407 /* HomeDataResponse.swift in Sources */,
 				5214F88C2D2BB11A00E8CE9C /* FetchMeetPlanList.swift in Sources */,
 				52CB0B492C732186002B6D20 /* DataTransferService.swift in Sources */,
@@ -3147,6 +3306,7 @@
 				526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */,
 				521091E32D0FACB500DD0407 /* HomeData.swift in Sources */,
 				5214F8822D2BA98C00E8CE9C /* MeetPlanViewModel.swift in Sources */,
+				5201853E2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift in Sources */,
 				526B98662CEE0DC1002488C5 /* LabeledButtonView.swift in Sources */,
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
@@ -3165,7 +3325,9 @@
 				52A388642D68A341001439C7 /* ToastManager.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
 				5214F8CC2D2CEB3B00E8CE9C /* RequestParticipationPlanMock.swift in Sources */,
-				52741EC32D11565B00C249A6 /* DefaultSheetView.swift in Sources */,
+				520185322DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift in Sources */,
+				520185192DA79C9D00C2B4FC /* NotifyListViewReactor.swift in Sources */,
+				52741EC32D11565B00C249A6 /* CustomSheetView.swift in Sources */,
 				52CE87CC2CEC40D000EBD85D /* CreateMeet.swift in Sources */,
 				5221B1332D5432E3004859C9 /* Reactor+Loading.swift in Sources */,
 				5229583A2D52014C00AE4EC3 /* MemberListRepo.swift in Sources */,
@@ -3192,7 +3354,7 @@
 				523E76172D5D438900BD22CB /* ReviewImageResponse.swift in Sources */,
 				522958352D52005200AE4EC3 /* MemberInfo.swift in Sources */,
 				52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */,
-				525DFD002CCA13B000835312 /* NotifyViewController.swift in Sources */,
+				525DFD002CCA13B000835312 /* NotifySubcribeViewController.swift in Sources */,
 				52CE87D22CEC5BC800EBD85D /* CreateGroupMock.swift in Sources */,
 				52818C622D18217B0001E30B /* SearchNaviViewController.swift in Sources */,
 				5226496C2D379BA600E38029 /* PlanQueryRepo.swift in Sources */,
@@ -3209,6 +3371,7 @@
 				529CCD5A2D3267710041CBB7 /* PlanDetailViewReactor.swift in Sources */,
 				5296291F2D5F4F6700003F66 /* ReportRepo.swift in Sources */,
 				52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */,
+				52DF6E012DAE9B2C00204297 /* CustomModalView.swift in Sources */,
 				52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */,
 				528E09E02D6B8FEB00832BA7 /* CalendarViewReactor.swift in Sources */,
 				52FE68622D5085C2009EC8EC /* PlaceDetailViewController.swift in Sources */,
@@ -3216,7 +3379,9 @@
 				5214F8B92D2C9FCB00E8CE9C /* Review.swift in Sources */,
 				522958402D52077800AE4EC3 /* MemberInfoView.swift in Sources */,
 				528E09F12D6B9A3900832BA7 /* MonthlyPlanResponse.swift in Sources */,
-				52741ECF2D14E00D00C249A6 /* PlanTimePickerViewController.swift in Sources */,
+				520185372DA8082800C2B4FC /* NotifyViewModel.swift in Sources */,
+				5201851E2DA79D3600C2B4FC /* NotifyResponse.swift in Sources */,
+				52741ECF2D14E00D00C249A6 /* TimePickerViewController.swift in Sources */,
 				5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				5268BA3E2D3F7585000C5F3A /* DeleteComment.swift in Sources */,
@@ -3225,10 +3390,12 @@
 				5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */,
 				52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchHomeData.swift in Sources */,
+				5201853A2DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift in Sources */,
 				52B8E1232D5392EA00F7FF59 /* PhotoCollectionView.swift in Sources */,
 				52EA6DFB2CF78F9D00EFD753 /* SocialInfo.swift in Sources */,
 				522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */,
 				5221B1352D5436C6004859C9 /* ReviewEditFlowCoordinator.swift in Sources */,
+				520185242DA7A0C800C2B4FC /* Notify.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */,
 				5231DF4C2D2FA23000D52529 /* BaseRepositories.swift in Sources */,
@@ -3248,7 +3415,7 @@
 				528E0A022D6B9E4200832BA7 /* FetchMonthlyPlan.swift in Sources */,
 				5268BA422D3FA5F1000C5F3A /* UIScrollView+Position.swift in Sources */,
 				5235B7172D2E7303006BEAF3 /* MeetSetupViewReactor.swift in Sources */,
-				528D27C72C79F6B800178F14 /* PhotoManager.swift in Sources */,
+				528D27C72C79F6B800178F14 /* PhotoService.swift in Sources */,
 				52CC75D42D1E7DA1000CC8B9 /* SearchedPlaceStorage.swift in Sources */,
 				5214F89A2D2C060400E8CE9C /* UserInfoRepo.swift in Sources */,
 				52CB0B422C72AD23002B6D20 /* AppConfiguration.swift in Sources */,
@@ -3267,7 +3434,7 @@
 				5214F8AF2D2C9B2900E8CE9C /* ReviewResponse.swift in Sources */,
 				52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */,
 				52EC04E92D3E5AEF00000C99 /* CreateComment.swift in Sources */,
-				52A787762D0348B400A633B3 /* PlanDateSelectViewController.swift in Sources */,
+				52A787762D0348B400A633B3 /* DateSelectViewController.swift in Sources */,
 				5231DF7D2D2FE77800D52529 /* SearchPlaceRepo.swift in Sources */,
 				5221B12E2D541244004859C9 /* ReviewEditViewContoller.swift in Sources */,
 				52FE68642D510B86009EC8EC /* PlaceDetailViewReactor.swift in Sources */,
@@ -3278,12 +3445,13 @@
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				52818C602D181CBB0001E30B /* SearchNaviBar.swift in Sources */,
 				52D8646E2D2A364A000F8378 /* FetchGroupUseCaseMock.swift in Sources */,
-				52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */,
+				52473D6C2CEF5D60009D045A /* CustomPickerView.swift in Sources */,
 				52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */,
 				5231DF502D2FA91F00D52529 /* MeetQueryRepo.swift in Sources */,
 				5211F90D2C87339300403980 /* UICollectionView+Snaping.swift in Sources */,
 				52EC04BD2D38C13900000C99 /* CommentListViewController.swift in Sources */,
 				5296291B2D5F4B5100003F66 /* ReportRequest.swift in Sources */,
+				520185222DA7A09F00C2B4FC /* NotifyPayloadResponse.swift in Sources */,
 				52C857B22D081DE800765FB3 /* PlanRequest.swift in Sources */,
 				523E76212D5D462100BD22CB /* DeleteReviewImage.swift in Sources */,
 				52EC04F22D3E601500000C99 /* DefaultCommentQueryRepo.swift in Sources */,
@@ -3325,9 +3493,11 @@
 				52AD4B6F2D5B1BFC00FCA929 /* ProfileEditRequest.swift in Sources */,
 				52F83A572D34F6EA003DD790 /* MeetListFlowCoordinator.swift in Sources */,
 				52F83A532D34F1CD003DD790 /* HomeFlowCoordinator.swift in Sources */,
+				52DF6E042DAE9B6800204297 /* CustomModalButton.swift in Sources */,
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5250C2C22D649A2000D89548 /* Reactor+Child.swift in Sources */,
 				52B8E11F2D53449E00F7FF59 /* MemberListResponse.swift in Sources */,
+				52DF6DFF2DAE4FB700204297 /* MapSelectView.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
 				529CCD4A2D3232C70041CBB7 /* PlanDetailSceneDIContainer.swift in Sources */,
@@ -3357,9 +3527,11 @@
 				527A3EA52C837034007FE63B /* MainSceneDIContainer.swift in Sources */,
 				521917582CEB088B00696292 /* CreateMeetViewReactor.swift in Sources */,
 				52CE87C72CEC3F9200EBD85D /* MeetCommandRepo.swift in Sources */,
+				5201852D2DA7A1B400C2B4FC /* NotifyRepo.swift in Sources */,
 				520805172C69E0770015F6E0 /* SignInViewController.swift in Sources */,
 				52E2383F2C76E8C00066C9A3 /* AuthSceneCoordinator.swift in Sources */,
 				522958492D52080900AE4EC3 /* MemberListTableCell.swift in Sources */,
+				520185452DA907BB00C2B4FC /* NotifySubscribeRepo.swift in Sources */,
 				52B8E1212D5344B100F7FF59 /* MemberInfoResponse.swift in Sources */,
 				52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,

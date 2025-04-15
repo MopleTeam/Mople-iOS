@@ -22,6 +22,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             case createGroup
             case createPlan
             case calendar
+            case notify
         }
         
         case flow(Flow)
@@ -47,26 +48,39 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: HomeError?
     }
     
-    private let fetchRecentScheduleUseCase: FetchHomeData
-    private let notificationService: NotificationService
-    private weak var coordinator: HomeFlowCoordinator?
-    
+    // MARK: - Variables
     var initialState: State = State()
     
+    // MARK: - UseCcase
+    private let fetchRecentScheduleUseCase: FetchHomeData
+    
+    // MARK: - Notification
+    private let notificationService: NotificationService
+    
+    // MARK: - Coordinator
+    private weak var coordinator: HomeFlowCoordinator?
+    
+    // MARK: - LifeCycle
     init(fetchRecentScheduleUseCase: FetchHomeData,
          notificationService: NotificationService,
          coordinator: HomeFlowCoordinator) {
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
         self.notificationService = notificationService
         self.coordinator = coordinator
+        initialAction()
         logLifeCycle()
-        action.onNext(.fetchHomeData)
     }
     
     deinit {
         logLifeCycle()
     }
     
+    // MARK: - Initital Setup
+    private func initialAction() {
+        action.onNext(.fetchHomeData)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchHomeData:
@@ -105,7 +119,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     }
 }
     
-
+// MARK: - Data Request
 extension HomeViewReactor {
     private func fetchHomeData() -> Observable<Mutation> {
                 
@@ -118,7 +132,7 @@ extension HomeViewReactor {
     }
 }
 
-// MARK: - Flow
+// MARK: - Coordination
 extension HomeViewReactor {
     
     private func handleFlowAction(with action: Action.Flow) -> Observable<Mutation> {
@@ -131,6 +145,8 @@ extension HomeViewReactor {
             return presentPlanCreateView()
         case let .planDetail(index):
             return presentPlanDetail(index: index)
+        case .notify:
+            return presentNotifyView()
         }
     }
     
@@ -160,11 +176,16 @@ extension HomeViewReactor {
               let date = plan.date else { return .empty() }
         
         if DateManager.isPastDay(on: date) == false {
-            coordinator?.presentPlanDetailView(planId: id)
+            coordinator?.presentPlanDetailView(planId: id, type: .plan)
             return .empty()
         } else {
             return .just(.catchError(.midnight(.midnightReset)))
         }
+    }
+    
+    private func presentNotifyView() -> Observable<Mutation> {
+        coordinator?.presentNotifyView()
+        return .empty()
     }
 }
 
@@ -172,7 +193,7 @@ extension HomeViewReactor {
 extension HomeViewReactor {
     private func requestNotificationPermission() -> Observable<Mutation> {
         return Observable<Mutation>.create { observer in
-            self.notificationService.requestPremission {
+            self.notificationService.requestPermissions {
                 observer.onCompleted()
             }
             
@@ -181,8 +202,10 @@ extension HomeViewReactor {
     }
 }
 
-// MARK: - 일정 생성 알림 수신
+// MARK: - Notify
 extension HomeViewReactor {
+    
+    // MARK: - Plan
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         print(#function, #line, "Path : #0331 ")
         var planList = currentState.plans
@@ -223,10 +246,8 @@ extension HomeViewReactor {
         guard planList.contains(where: { $0.id == planId }) else { return .empty() }
         return fetchHomeData()
     }
-}
-
-// MARK: - 모임 생성 알림 수신
-extension HomeViewReactor {
+    
+    // MARK: - Meet
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
         switch payload {
         case let .created(meet):
@@ -274,10 +295,8 @@ extension HomeViewReactor {
         
         return .empty()
     }
-}
-
-// MARK: - 새로고침
-extension HomeViewReactor {
+    
+    // MARK: - MidNight
     private func reloadDay() -> Observable<Mutation> {
         let planDate = currentState.plans.compactMap { $0.date }
         if planDate.contains(where: { DateManager.isPastDay(on: $0) }) {
@@ -287,6 +306,7 @@ extension HomeViewReactor {
     }
 }
 
+// MARK: - Loading & Error
 extension HomeViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

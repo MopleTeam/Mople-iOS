@@ -14,16 +14,15 @@ import RxDataSources
 
 final class ScheduleListViewController: BaseViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = ScheduleListReactor
-    
+    private var scheduleListReactor: ScheduleListReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Variables
     private var dataSource: RxTableViewSectionedReloadDataSource<ScheduleListSectionModel>?
     private var visibleHeaders: [UIView] = []
     private var saveOffsetY: CGFloat = 0
-    private let nextLoadState: [LoadState] = [.all, .next]
-    private let previousLoadStaet: [LoadState] = [.all, .previous]
 
     // MARK: - Observable
     private let dateSyncObserver: PublishRelay<Date> = .init()
@@ -53,7 +52,7 @@ final class ScheduleListViewController: BaseViewController, View {
     // MARK: - LifeCycle
     init(reactor: Reactor) {
         super.init()
-        self.reactor = reactor
+        self.scheduleListReactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -62,16 +61,13 @@ final class ScheduleListViewController: BaseViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopTableviewScroll()
-    }
-    
-    private func initalSetup() {
-        setupUI()
     }
 
     // MARK: - UI Setup
@@ -108,14 +104,20 @@ final class ScheduleListViewController: BaseViewController, View {
         
         return dataSource!
     }
+}
+
+// MARK: - Reactor Setup
+extension ScheduleListViewController {
+    private func setReactor() {
+        reactor = scheduleListReactor
+    }
     
-    // MARK: - Bind
     func bind(reactor: ScheduleListReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func inputBind(_ reactor: Reactor) {
         self.dateSyncObserver
             .filter({ [weak self] _ in
                 self?.userInteratingObserver.value == true
@@ -144,17 +146,10 @@ final class ScheduleListViewController: BaseViewController, View {
             .disposed(by: disposeBag)
     }
     
-    private func findSelctedPlan(at indexPath: IndexPath) -> MonthlyPlan? {
-        guard let section = dataSource?.sectionModels[indexPath.section],
-              let item = section.items[safe: indexPath.row] else { return nil }
-        return item
-    }
-    
-    private func inputBind(_ reactor: Reactor) {
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$planList)
             .asDriver(onErrorJustReturn: [])
             .do(onNext: { [weak self] test in
-                print(#function, #line, "#0402 삭제된 뒤 카운트 : \(test.count)" )
                 self?.saveOffsetY = self?.tableView.contentOffset.y ?? 0
             })
             .map { [ScheduleListSectionModel].makeSectionModels(list: $0) }
@@ -372,7 +367,6 @@ extension ScheduleListViewController {
 
 // MARK: - Gesture
 extension ScheduleListViewController {
-    #warning("다시 한번 알아두기")
     public func panGestureRequire(_ gesture: UIPanGestureRecognizer) {
         self.tableView.panGestureRecognizer.require(toFail: gesture)
     }
@@ -380,6 +374,12 @@ extension ScheduleListViewController {
 
 // MARK: - Helper
 extension ScheduleListViewController {
+    private func findSelctedPlan(at indexPath: IndexPath) -> MonthlyPlan? {
+        guard let section = dataSource?.sectionModels[indexPath.section],
+              let item = section.items[safe: indexPath.row] else { return nil }
+        return item
+    }
+    
     public func checkTop() -> Bool {
         return self.tableView.contentOffset.y <= self.tableView.contentInset.top
     }

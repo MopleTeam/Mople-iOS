@@ -9,7 +9,7 @@ import Foundation
 import ReactorKit
 
 protocol MeetPlanListCommands: AnyObject {
-    func reset()
+    func fetchPlan()
 }
 
 final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
@@ -32,22 +32,26 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var closingPlanIndex: Int?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
+    private let meetId: Int
     
+    // MARK: - UseCase
     private let fetchPlanUseCase: FetchMeetPlanList
     private let participationPlanUseCase: ParticipationPlan
-    private weak var delegate: MeetDetailDelegate?
-    private let meedId: Int
     
+    // MARK: - Delegate
+    private weak var delegate: MeetDetailDelegate?
+    
+    // MARK: - LifeCycle
     init(fetchPlanUseCase: FetchMeetPlanList,
          participationPlanUseCase: ParticipationPlan,
          delegate: MeetDetailDelegate,
-         meetID: Int) {
+         meetId: Int) {
         self.fetchPlanUseCase = fetchPlanUseCase
         self.participationPlanUseCase = participationPlanUseCase
         self.delegate = delegate
-        self.meedId = meetID
-        action.onNext(.requestPlanList)
+        self.meetId = meetId
         logLifeCycle()
     }
     
@@ -55,6 +59,7 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .requestPlanList:
@@ -82,16 +87,20 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         return newState
     }
         
-    private func closePlan(state: inout State, id: Int) {
+    private func closePlan(state: inout State,
+                           id: Int) {
         guard let closePlanIndex = state.plans.firstIndex(where: { $0.id == id }) else { return }
         state.closingPlanIndex = closePlanIndex
     }
 }
 
+// MARK: - Data Request
 extension MeetPlanListViewReactor {
+    
+    // MARK: - 일정 리스트 받아오기
     private func fetchPlanList() -> Observable<Mutation> {
         
-        let fetchPlanList = fetchPlanUseCase.execute(meetId: meedId)
+        let fetchPlanList = fetchPlanUseCase.execute(meetId: meetId)
             .catchAndReturn([])
             .map({ Mutation.fetchPlanList($0) })
             .asObservable()
@@ -99,6 +108,7 @@ extension MeetPlanListViewReactor {
         return requestWithLoading(task: fetchPlanList)
     }
 
+    // MARK: - 참여 핸들링
     // 일정 시간이 마감된 경우 : UI 업데이트
     // 일정이 과거인 경우 : reload post
     // 일정이 사라진 경우 : delete post
@@ -165,7 +175,7 @@ extension MeetPlanListViewReactor {
     }
 }
 
-// MARK: - 일정 선택
+// MARK: - Selected Plan
 extension MeetPlanListViewReactor {
     
     private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
@@ -191,13 +201,7 @@ extension MeetPlanListViewReactor {
     }
 }
 
-extension MeetPlanListViewReactor: MeetPlanListCommands {
-    func reset() {
-        action.onNext(.requestPlanList)
-    }
-}
-
-// MARK: - 일정 알림 수신
+// MARK: - Notify
 extension MeetPlanListViewReactor {
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         var planList = currentState.plans
@@ -232,6 +236,14 @@ extension MeetPlanListViewReactor {
     }
 }
 
+// MARK: - Commands
+extension MeetPlanListViewReactor: MeetPlanListCommands {
+    func fetchPlan() {
+        action.onNext(.requestPlanList)
+    }
+}
+
+// MARK: - Loading & Error
 extension MeetPlanListViewReactor: ChildLoadingReactor {
     var parent: ChildLoadingDelegate? { delegate }
     var index: Int { 0 }

@@ -34,6 +34,7 @@ final class PlanDetailFlowCoordinator: BaseCoordinator, PlanDetailCoordination {
     }
 }
 
+// MARK: - Default View
 extension PlanDetailFlowCoordinator {
     private func makePlanDetailViewController() -> PlanDetailViewController {
         let planDetailVC = dependencies.makePlanDetailViewController(coordinator: self)
@@ -43,14 +44,13 @@ extension PlanDetailFlowCoordinator {
     }
     
     private func addCommentListView(parentVC: PlanDetailViewController, container: UIView) {
-        
         let commentListVC = dependencies.makeCommentListViewController()
         parentVC.commentListView = commentListVC
         parentVC.add(child: commentListVC, container: container)
     }
 }
 
-// MARK: - 멤버 리스트
+// MARK: - Member List View
 extension PlanDetailFlowCoordinator: MemberListViewCoordination {
     func pushMemberListView(postId: Int) {
         let view = dependencies.makeMemberListViewController(coordinator: self)
@@ -58,7 +58,7 @@ extension PlanDetailFlowCoordinator: MemberListViewCoordination {
     }
 }
 
-// MARK: - 포토북
+// MARK: - Photo View
 extension PlanDetailFlowCoordinator {
     func pushPhotoView(index: Int,
                        imagePaths: [String]) {
@@ -70,7 +70,7 @@ extension PlanDetailFlowCoordinator {
     }
 }
 
-// MARK: - 상세 지도
+// MARK: - Detail Place View
 extension PlanDetailFlowCoordinator: PlaceDetailCoordination {
     func pushPlaceDetailView(place: PlaceInfo) {
         let view = dependencies.makePlaceDetailViewController(place: place,
@@ -79,14 +79,17 @@ extension PlanDetailFlowCoordinator: PlaceDetailCoordination {
     }
 }
 
-// MARK: - Present(플로우 전환)
+// MARK: - Flow
 extension PlanDetailFlowCoordinator {
+    
+    // 일정 수정 플로우
     func presentPlanEditFlow(plan: Plan) {
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
         self.start(coordinator: flow)
         self.navigationController.presentWithTransition(flow.navigationController)
     }
     
+    // 리뷰 수정 플로우
     func presentReviewEditFlow(review: Review) {
         let flow = dependencies.makeReviewEditFlowCoordinator(review: review)
         self.start(coordinator: flow)
@@ -94,7 +97,7 @@ extension PlanDetailFlowCoordinator {
     }
 }
 
-// MARK: - 플로우 종료
+// MARK: - End Flow
 extension PlanDetailFlowCoordinator {
     func endFlow() {
         self.navigationController.dismiss(animated: true) { [weak self] in

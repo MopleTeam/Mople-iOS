@@ -8,10 +8,7 @@
 import UIKit
 import ReactorKit
 
-protocol ProfileEditViewCoordinator: AnyObject {
-    func dismiss()
-    func complete()
-}
+protocol ProfileEditViewCoordination: NavigationCloseable { }
 
 enum ProfileEditError: Error {
     case failSelectPhoto(CompressionPhotoError)
@@ -50,24 +47,30 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: ProfileEditError?
     }
     
+    // MARK: - Variables
+    var initialState: State = State()
     private let editProfile: EditProfile
-    private let imageUpload: ImageUpload
-    private let duplicateCheck: CheckDuplicateNickname
-    private let photoService: PhotoService
-    private weak var coordinator: ProfileEditViewCoordinator?
-    
     private let previousProfile: UserInfo
     private var profile: ProfileEditRequest?
     private var isEditImage: Bool = false
     
-    var initialState: State = State()
+    // MARK: - UseCase
+    private let imageUpload: ImageUpload
+    private let duplicateCheck: CheckDuplicateNickname
     
+    // MARK: - Photo
+    private let photoService: PhotoService
+    
+    // MARK: - Coordinator
+    private weak var coordinator: ProfileEditViewCoordination?
+    
+    // MARK: - LifeCycle
     init(previousProfile: UserInfo,
          editProfile: EditProfile,
          imageUpload: ImageUpload,
          validationNickname: CheckDuplicateNickname,
          photoService: PhotoService,
-         coordinator: ProfileEditViewCoordinator) {
+         coordinator: ProfileEditViewCoordination) {
         self.previousProfile = previousProfile
         self.editProfile = editProfile
         self.duplicateCheck = validationNickname
@@ -82,6 +85,13 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - Initial Setup
+    private func setPreviousUserInfo(_ userInfo: UserInfo) {
+        action.onNext(.setPreviousProfile(userInfo))
+        profile = .init(profile: userInfo)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .setPreviousProfile(profile):
@@ -125,13 +135,9 @@ class ProfileEditViewReactor: Reactor, LifeCycleLoggable {
         
         return newState
     }
-    
-    private func setPreviousUserInfo(_ userInfo: UserInfo) {
-        action.onNext(.setPreviousProfile(userInfo))
-        profile = .init(profile: userInfo)
-    }
 }
 
+// MARK: - Data Request
 extension ProfileEditViewReactor {
     
     // MARK: - 닉네임 정규식 검사 및 업데이트
@@ -201,7 +207,8 @@ extension ProfileEditViewReactor {
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] _ -> Observable<Mutation> in
-                self?.coordinator?.complete()
+                self?.postEditProfile()
+                self?.coordinator?.dismiss(completion: nil)
                 return .empty()
             })
                     
@@ -225,15 +232,22 @@ extension ProfileEditViewReactor {
     }
 }
 
-// MARK: - Navigator
+// MARK: - Notifi {
+extension ProfileEditViewReactor {
+    private func postEditProfile() {
+        EventService.shared.post(name: .editProfile)
+    }
+}
+
+// MARK: - Coordination
 extension ProfileEditViewReactor {
     private func endView() -> Observable<Mutation> {
-        self.coordinator?.dismiss()
+        self.coordinator?.dismiss(completion: nil)
         return .empty()
     }
 }
 
-// MARK: - Loading
+// MARK: - Loading & Error
 extension ProfileEditViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
@@ -246,6 +260,4 @@ extension ProfileEditViewReactor: LoadingReactor {
         return .catchError(.failSelectPhoto(photoErr))
     }
 }
-
-
 

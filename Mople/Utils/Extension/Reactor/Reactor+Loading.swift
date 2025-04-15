@@ -26,12 +26,12 @@ extension LoadingReactor {
         
         let newTask = Observable.zip(task, executionTimer)
             .map { $0.0 }
+            .concat(loadingStop)
             .observe(on: MainScheduler.instance)
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
             }
-            .concat(loadingStop)
             .share(replay: 1)
 
         let loadingStart = Observable.just(updateLoadingMutation(true))

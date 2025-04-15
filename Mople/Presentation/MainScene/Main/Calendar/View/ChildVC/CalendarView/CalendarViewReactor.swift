@@ -62,31 +62,33 @@ final class CalendarViewReactor: Reactor {
         @Pulse var changeMonthScope: Void?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
     
+    // MARK: - UseCase
     private let fetchCalendarDatesUseCase: FetchAllPlanDate
+    
+    // MARK: - Delegate
     private weak var delegate: CalendarReactorDelegate?
     
+    // MARK: - LifeCycle
     init(fetchCalendraDatesUseCase: FetchAllPlanDate,
          delegate: CalendarReactorDelegate) {
         self.fetchCalendarDatesUseCase = fetchCalendraDatesUseCase
         self.delegate = delegate
-        initalSetup()
+        initialSetup()
     }
     
+    // MARK: - Initial Setup
+    private func initialSetup() {
+        action.onNext(.fetchDates)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .parentCommand(action):
-            switch action {
-            case let .scrollToDate(date):
-                return .just(.updateScrollDate(date))
-            case .changeScope:
-                return .just(.changeScope)
-            case let .editDateList(dateList):
-                return .just(.updateDates(dateList))
-            case let .changePage(month):
-                return .just(.updatePage(month))
-            }
+        case let .parentCommand(commmand):
+            return handleCommands(commmand)
         case .fetchDates:
             return fetchDates()
         case let .childEvent(action):
@@ -113,7 +115,10 @@ final class CalendarViewReactor: Reactor {
         
         return newState
     }
-    
+}
+
+// MARK: - Action Handling
+extension CalendarViewReactor {
     private func handleDelegateFromAction(action: Action.ChildEvent) -> Observable<Mutation> {
         switch action {
         case let .changedCalendarHeight(height):
@@ -130,11 +135,21 @@ final class CalendarViewReactor: Reactor {
         return .empty()
     }
     
-    private func initalSetup() {
-        action.onNext(.fetchDates)
+    private func handleCommands(_ command: Action.ParentCommand) -> Observable<Mutation> {
+        switch command {
+        case let .scrollToDate(date):
+            return .just(.updateScrollDate(date))
+        case .changeScope:
+            return .just(.changeScope)
+        case let .editDateList(dateList):
+            return .just(.updateDates(dateList))
+        case let .changePage(month):
+            return .just(.updatePage(month))
+        }
     }
 }
 
+// MARK: - Data Request
 extension CalendarViewReactor {
     private func fetchDates() -> Observable<Mutation> {
         let fetchDates = fetchCalendarDatesUseCase.execute()
@@ -156,6 +171,7 @@ extension CalendarViewReactor {
     }
 }
 
+// MARK: - Commands
 extension CalendarViewReactor: CalendarCommands {
     func scrollToDate(on date: Date) {
         action.onNext(.parentCommand(.scrollToDate(date)))
@@ -218,10 +234,11 @@ extension CalendarViewReactor: CalendarCommands {
     }
     
     func resetDate() {
-        initalSetup()
+        initialSetup()
     }
 }
 
+// MARK: - Loading & Error
 extension CalendarViewReactor: ChildLoadingReactor {
     var parent: ChildLoadingDelegate? { delegate }
 }

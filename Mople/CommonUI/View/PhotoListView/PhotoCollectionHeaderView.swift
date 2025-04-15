@@ -26,14 +26,14 @@ final class PhotoCollectionHeaderView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initalSetup()
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initalSetup() {
+    private func initialSetup() {
         setupUI()
         bind()
     }

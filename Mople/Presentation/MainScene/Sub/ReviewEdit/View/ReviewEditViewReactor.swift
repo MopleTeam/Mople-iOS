@@ -14,7 +14,7 @@ enum ReviewEditError: Error {
     case unknown(Error)
 }
 
-final class ReviewEditViewReactor: Reactor {
+final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         enum Flow {
@@ -46,15 +46,22 @@ final class ReviewEditViewReactor: Reactor {
         @Pulse var error: ReviewEditError?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
-    
     private var review: Review
-    private let deleteReviewImage: DeleteReviewImage
-    private let imageUpload: ReviewImageUpload
-    private let photoService: PhotoService
-    private weak var coordiantor: ReviewEditViewCoordination?
     private var existingImageIds: [String] = []
     
+    // MARK: - UseCase
+    private let deleteReviewImage: DeleteReviewImage
+    private let imageUpload: ReviewImageUpload
+    
+    // MARK: - Photo
+    private let photoService: PhotoService
+    
+    // MARK: - Coordinator
+    private weak var coordiantor: ReviewEditViewCoordination?
+    
+    // MARK: - LifeCycle
     init(review: Review,
          deleteReviewImage: DeleteReviewImage,
          imageUpload: ReviewImageUpload,
@@ -65,9 +72,21 @@ final class ReviewEditViewReactor: Reactor {
         self.imageUpload = imageUpload
         self.photoService = photoService
         self.coordiantor = coordinator
-        initalAction()
+        initialAction()
+        logLifeCycle()
     }
     
+    deinit {
+        logLifeCycle()
+    }
+    
+    // MARK: - Intial Setup
+    private func initialAction() {
+        action.onNext(.fetchReview(review))
+        action.onNext(.loadImage)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .fetchReview(review):
@@ -104,13 +123,9 @@ final class ReviewEditViewReactor: Reactor {
         
         return newState
     }
-    
-    private func initalAction() {
-        action.onNext(.fetchReview(review))
-        action.onNext(.loadImage)
-    }
 }
 
+// MARK: - Data Request
 extension ReviewEditViewReactor {
     
     // MARK: - 이미지 불러오기
@@ -132,17 +147,15 @@ extension ReviewEditViewReactor {
     // MARK: - 이미지 편집하기
     private func updateReview() -> Observable<Mutation> {
         guard let id = review.id else { return .empty() }
-        let addImage = requestAddImage(id: id)
-        let deleteImage = requsetDeleteImage(id: id)
-        let requestUpdate = addImage
+        let requestUpdate = requestAddImage(id: id)
             .flatMap({ [weak self] _ -> Observable<Void> in
                 guard let self else { return .empty() }
-                return deleteImage
+                return requsetDeleteImage(id: id)
             })
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.notificationUpdateImage()
+                self?.postUpdateImage()
                 self?.coordiantor?.endFlow()
                 return .empty()
             }
@@ -224,13 +237,14 @@ extension ReviewEditViewReactor {
     }
 }
 
-// MARK: - Notification
+// MARK: - Notify
 extension ReviewEditViewReactor {
-    private func notificationUpdateImage() {
+    private func postUpdateImage() {
         EventService.shared.post(name: .postReview)
     }
 }
 
+// MARK: - Coordination
 extension ReviewEditViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
@@ -244,6 +258,7 @@ extension ReviewEditViewReactor {
     }
 }
 
+// MARK: - Loading & Error
 extension ReviewEditViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

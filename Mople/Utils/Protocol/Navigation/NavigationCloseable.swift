@@ -8,6 +8,6 @@
 import Foundation
 
 protocol NavigationCloseable: AnyObject {
-    func dismiss()
+    func dismiss(completion: (() -> Void)?)
     func pop()
 }

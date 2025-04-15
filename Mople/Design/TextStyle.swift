@@ -84,9 +84,14 @@ struct TextStyle {
     }
     
     enum CreatePlan {
+        enum Picker {
+            static let meet = "모임선택"
+            static let date = "날짜선택"
+            static let time = "시간선택"
+        }
         static let title = "일정 생성하기"
-        static let group = "모임 이름"
-        static let groupInfo = "모임을 선택해주세요"
+        static let meet = "모임 이름"
+        static let meetInfo = "모임을 선택해주세요"
         static let plan = "약속 이름"
         static let planInfo = "일정을 입력해주세요"
         static let date = "날짜 선택"
@@ -95,6 +100,7 @@ struct TextStyle {
         static let timeInfo = "시간을 선택해주세요"
         static let place = "장소 선택"
         static let placeInfo = "장소를 선택해주세요"
+        static let selecteTitle = "완료"
         static let completedTitle = "일정 생성"
     }
 }

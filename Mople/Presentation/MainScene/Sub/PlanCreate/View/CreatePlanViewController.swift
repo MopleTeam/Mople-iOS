@@ -13,11 +13,12 @@ import ReactorKit
 
 final class CreatePlanViewController: TitleNaviViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = CreatePlanViewReactor
-    
+    private var createPlanReactor: CreatePlanViewReactor?
     var disposeBag: DisposeBag = DisposeBag()
     
-    // MARK: - Observer
+    // MARK: - Observables
     private let endFlow: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
@@ -27,12 +28,11 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         return view
     }()
     
-    
     private let contentView = UIView()
     
     private let meetSelectView: LabeledButtonView = {
-        let btn = LabeledButtonView(title: TextStyle.CreatePlan.group,
-                                    inputText: TextStyle.CreatePlan.groupInfo)
+        let btn = LabeledButtonView(title: TextStyle.CreatePlan.meet,
+                                    inputText: TextStyle.CreatePlan.meetInfo)
         return btn
     }()
     
@@ -91,7 +91,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     init(title: String?,
          reactor: CreatePlanViewReactor?) {
         super.init(title: title)
-        self.reactor = reactor
+        self.createPlanReactor = reactor
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -100,16 +100,18 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
+        setupTapKeyboardDismiss()
     }
     
-    private func initalSetup() {
-        setupLayout()
+    // MARK: - UI Setup
+    private func setupUI() {
         setNaviItem()
-        setupKeyboardDismissGestrue()
+        setLayout()
     }
     
-    private func setupLayout() {
+    private func setLayout() {
         self.view.backgroundColor = ColorStyle.Default.white
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
@@ -143,9 +145,14 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     private func setNaviItem() {
         self.setBarItem(type: .left)
     }
+}
+
+// MARK: - Reactor Setup
+extension CreatePlanViewController {
+    private func setReactor() {
+        reactor = createPlanReactor
+    }
     
-    // 날짜 이름만 리액터에 연결, 모임 id, 날짜, 시간, 장소는 각 뷰에서 넘겨줘야 함
-    // 추가로 받을 것 모든 데이터 입력됐을 시 completed버튼 활성화
     func bind(reactor: CreatePlanViewReactor) {
         setFlowAction(reactor)
         inputBind(reactor)
@@ -235,38 +242,40 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
     }
     
+    // MARK: - Flow Action
     private func setFlowAction(_ reactor: CreatePlanViewReactor) {
         naviBar.leftItemEvent
-            .map({ Reactor.Action.flowAction(.endProcess) })
+            .map({ Reactor.Action.flow(.endProcess) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         endFlow
-            .map({ Reactor.Action.flowAction(.endProcess) })
+            .map({ Reactor.Action.flow(.endProcess) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.meetSelectView.button.rx.controlEvent(.touchUpInside)
-            .map({ Reactor.Action.flowAction(.groupSelectView) })
+            .map({ Reactor.Action.flow(.groupSelectView) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.dateSelectView.button.rx.controlEvent(.touchUpInside)
-            .map({ Reactor.Action.flowAction(.dateSelectView) })
+            .map({ Reactor.Action.flow(.dateSelectView) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.timeSelectView.button.rx.controlEvent(.touchUpInside)
-            .map({ Reactor.Action.flowAction(.timeSelectView) })
+            .map({ Reactor.Action.flow(.timeSelectView) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.placeSelectView.button.rx.controlEvent(.touchUpInside)
-            .map({ Reactor.Action.flowAction(.placeSelectView) })
+            .map({ Reactor.Action.flow(.placeSelectView) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
+    // MARK: - Notify
     private func setNotification(_ reactor: Reactor) {
         EventService.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
@@ -299,10 +308,6 @@ extension CreatePlanViewController: KeyboardDismissable, UIGestureRecognizerDele
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
-    
-    private func setupKeyboardDismissGestrue() {
-        setupTapKeyboardDismiss()
     }
 }
 

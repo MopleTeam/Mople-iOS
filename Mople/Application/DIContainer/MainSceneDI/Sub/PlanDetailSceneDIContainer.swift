@@ -55,7 +55,6 @@ extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 상세
     func makePlanDetailViewController(coordinator: PlanDetailCoordination) -> PlanDetailViewController {
-        print(#function, #line, "Path : # 테스트 55 ")
         return .init(title: getPlanViewTitle(),
                      reactor: makePlanDetailViewReactor(type: type,
                                                         coordinator: coordinator))
@@ -188,12 +187,17 @@ extension PlanDetailSceneDIContainer {
     
     // MARK: - 일정 편집
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
-        return commonFactory.makePlanCreateCoordinator(type: .edit(plan))
+        return commonFactory.makePlanCreateCoordinator(type: .edit(plan),
+                                                       completionHandler: nil)
     }
     
     // MARK: - 리뷰 편집
     func makeReviewEditFlowCoordinator(review: Review) -> BaseCoordinator {
-        return commonFactory.makeReviewEditCoordinator(review: review)
+        let reviewEditDI = ReviewEditSceneDIContainer(
+            appNetworkService: appNetworkService,
+            commonFactory: commonFactory,
+            review: review)
+        return reviewEditDI.makeReviewEditCoordinator()
     }
 }
 

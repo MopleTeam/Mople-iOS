@@ -49,7 +49,6 @@ class TitleNaviViewController: DefaultViewController {
         self.view.addSubview(superTopView)
         self.view.addSubview(naviBar)
         
-
         superTopView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.bottom.equalTo(self.naviBar.snp.top)

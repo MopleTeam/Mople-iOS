@@ -22,7 +22,7 @@ enum MemberListError: Error {
     case unknown(Error)
 }
 
-final class MemberListViewReactor: Reactor {
+final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case fetchPlanMemeber
@@ -42,21 +42,37 @@ final class MemberListViewReactor: Reactor {
         @Pulse var error: MemberListError?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
-    
-    private let fetchMemberUseCase: FetchMemberList
     private let type: MemberListType
+    
+    // MARK: - UseCase
+    private let fetchMemberUseCase: FetchMemberList
+    
+    // MARK: - Coordinator
     private weak var coordinator: MemberListViewCoordination?
     
+    // MARK: - LifeCycle
     init(type: MemberListType,
          fetchMemberUseCase: FetchMemberList,
          coordinator: MemberListViewCoordination) {
         self.fetchMemberUseCase = fetchMemberUseCase
         self.coordinator = coordinator
         self.type = type
-        initalSetup()
+        initialAction()
+        logLifeCycle()
     }
     
+    deinit {
+        logLifeCycle()
+    }
+    
+    // MARK: - Initial Setup
+    private func initialAction() {
+        action.onNext(.fetchPlanMemeber)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchPlanMemeber:
@@ -85,26 +101,9 @@ final class MemberListViewReactor: Reactor {
         
         return newState
     }
-    
-    private func initalSetup() {
-        action.onNext(.fetchPlanMemeber)
-    }
 }
 
-extension MemberListViewReactor {
-    private func sortMembersByPosition(_ members: [MemberInfo]) -> [MemberInfo] {
-        let hostMember = members.filter {
-            $0.position == .host || $0.position == .owner
-        }
-        
-        let otherMembers = members.filter {
-            $0.position == .member
-        }.sorted(by: <)
-        
-        return hostMember + otherMembers
-    }
-}
-
+// MARK: - Data Request
 extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
         let fetchMember = fetchMemberUseCase.execute(type: type)
@@ -123,6 +122,22 @@ extension MemberListViewReactor {
     }
 }
 
+// MARK: - Helper
+extension MemberListViewReactor {
+    private func sortMembersByPosition(_ members: [MemberInfo]) -> [MemberInfo] {
+        let hostMember = members.filter {
+            $0.position == .host || $0.position == .owner
+        }
+        
+        let otherMembers = members.filter {
+            $0.position == .member
+        }.sorted(by: <)
+        
+        return hostMember + otherMembers
+    }
+}
+
+// MARK: - Loading & Error
 extension MemberListViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
@@ -142,5 +157,3 @@ extension MemberListViewReactor: LoadingReactor {
                                                        responseType: responseType)
     }
 }
-
-

@@ -13,10 +13,16 @@ import ReactorKit
 
 final class CreateMeetViewController: TitleNaviViewController, View, TransformKeyboardResponsive, DismissTansitionControllabel {
     
+    // MARK: - Reactor
     typealias Reactor = CreateMeetViewReactor
-    
+    private var createMeetReactor: CreateMeetViewReactor?
     var disposeBag = DisposeBag()
     
+    // MARK: - Observable
+    private let resetImage: PublishSubject<Void> = .init()
+    private let showImagePicker: PublishSubject<Void> = .init()
+    
+    // MARK: - Transition
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
     // MARK: - Variables
@@ -79,19 +85,15 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         return sv
     }()
     
+    // MARK: - LifeCycle
     init(isFlow: Bool,
          isEdit: Bool,
          title: String?,
          reactor: CreateMeetViewReactor) {
         self.isEditMode = isEdit
         super.init(title: title)
-        self.reactor = reactor
+        self.createMeetReactor = reactor
         configureTransition(isNeed: !isFlow)
-    }
-    
-    private func configureTransition(isNeed: Bool) {
-        guard isNeed else { return }
-        setupTransition()
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -100,13 +102,17 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
         setupKeyboardEvent()
+        setImageGestrue()
+        setupTapKeyboardDismiss()
     }
     
-    private func initalSetup() {
-        setupUI()
-        setGesture()
+    // MARK: - Transition
+    private func configureTransition(isNeed: Bool) {
+        guard isNeed else { return }
+        setupTransition()
     }
     
     // MARK: - UI Setup
@@ -159,8 +165,28 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         let title = isEditMode ? "저장" : TextStyle.CreateGroup.completedTitle
         completionButton.title = title
     }
+}
 
-    // MARK: - Binding
+// MARK: - Gesture Setup
+extension CreateMeetViewController {
+    private func setImageGestrue() {
+        self.thumnailView.addGestureRecognizer(imageTapGesture)
+        
+        imageTapGesture.rx.event
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.showPhotos()
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Reactor Setup
+extension CreateMeetViewController {
+    private func setReactor() {
+        reactor = createMeetReactor
+    }
+    
     func bind(reactor: CreateMeetViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
@@ -183,6 +209,16 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
                 self?.view.endEditing(true)
             })
             .map { Reactor.Action.createMeet }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        showImagePicker
+            .map { Reactor.Action.showImagePicker}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        resetImage
+            .map { Reactor.Action.resetImage}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -235,23 +271,6 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
                                    subTitle: compressionPhotoError.subInfo)
         }
     }
-    
-    // MARK: - Gesture Setup
-    private func setGesture() {
-        setImageGestrue()
-        setupKeyboardDismissGestrue()
-    }
-    
-    private func setImageGestrue() {
-        self.thumnailView.addGestureRecognizer(imageTapGesture)
-        
-        imageTapGesture.rx.event
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.showPhotos()
-            })
-            .disposed(by: disposeBag)
-    }
 }
 
 // MARK: - 이미지 선택
@@ -268,11 +287,11 @@ extension CreateMeetViewController {
     }
     
     private func presentPhotos() {
-        reactor?.action.onNext(.showImagePicker)
+        showImagePicker.onNext(())
     }
     
     private func setDefaultImage() {
-        reactor?.action.onNext(.resetImage)
+        resetImage.onNext(())
     }
     
     private func setImage(_ image: UIImage?) {
@@ -298,9 +317,5 @@ extension CreateMeetViewController: KeyboardDismissable, UIGestureRecognizerDele
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
-    }
-    
-    private func setupKeyboardDismissGestrue() {
-        setupTapKeyboardDismiss()
     }
 }

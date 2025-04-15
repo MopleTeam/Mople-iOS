@@ -9,7 +9,7 @@ import UIKit
 
 extension UIStackView {
 
-    func reverseSubviewsZIndex(setNeedsLayout: Bool = true) {
+    func reverseSubviewsZIndex() {
         let stackedViews = self.arrangedSubviews
 
         stackedViews.forEach {

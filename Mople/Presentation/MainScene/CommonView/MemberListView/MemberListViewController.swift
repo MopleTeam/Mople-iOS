@@ -12,13 +12,13 @@ import ReactorKit
 
 final class MemberListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
     
+    // MARK: - Reactor
     typealias Reactor = MemberListViewReactor
+    private var memberListReactor: MemberListViewReactor?
+    var disposeBag = DisposeBag()
     
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
-    
-    // MARK: - Varibables
-    var disposeBag = DisposeBag()
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -39,11 +39,11 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         return table
     }()
     
-    // MARK: - Life Cycle
+    // MARK: - LifeCycle
     init(title: String,
          reactor: MemberListViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.memberListReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -52,14 +52,15 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
     }
     
     // MARK: - UI Setup
-    private func initalSetup() {
+    private func setupUI() {
         setNaviItem()
         setupTableView()
-        setupUI()
+        setLayout()
     }
     
     private func setNaviItem() {
@@ -72,7 +73,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
                                 forCellReuseIdentifier: MemberListTableCell.reuseIdentifier)
     }
     
-    private func setupUI() {
+    private func setLayout() {
         self.view.backgroundColor = ColorStyle.Default.white
         view.addSubview(tableView)
         
@@ -80,6 +81,13 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
             make.top.equalTo(self.titleViewBottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
+    }
+}
+
+// MARK: - Reactor Setup
+extension MemberListViewController {
+    private func setReactor() {
+        reactor = memberListReactor
     }
     
     func bind(reactor: MemberListViewReactor) {

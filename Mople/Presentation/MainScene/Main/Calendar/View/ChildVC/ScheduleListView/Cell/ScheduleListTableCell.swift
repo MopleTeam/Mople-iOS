@@ -65,7 +65,7 @@ final class ScheduleListTableCell: UITableViewCell {
     // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
-        setLayout()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -74,7 +74,7 @@ final class ScheduleListTableCell: UITableViewCell {
     
     
     // MARK: - UI Setup
-    private func setLayout() {
+    private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
 
@@ -101,6 +101,7 @@ final class ScheduleListTableCell: UITableViewCell {
         }
     }
 
+    // MARK: - Configure
     public func configure(viewModel: ScheduleListViewModel) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString

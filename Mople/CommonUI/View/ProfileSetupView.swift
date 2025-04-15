@@ -64,8 +64,7 @@ final class ProfileSetupView: UIView {
     
     fileprivate let completeButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.DatePicker.completedTitle,
-                     font: FontStyle.Title3.semiBold,
+        btn.setTitle(font: FontStyle.Title3.semiBold,
                      normalColor: ColorStyle.Default.white)
         btn.setBgColor(normalColor: ColorStyle.App.primary,
                        disabledColor: ColorStyle.Primary.disable)
@@ -98,14 +97,14 @@ final class ProfileSetupView: UIView {
     init(type: ProfileViewType) {
         super.init(frame: .zero)
         handleViewType(type)
-        initalSetup()
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initalSetup() {
+    private func initialSetup() {
         setupLayout()
         setProfileViewGestrue()
         setupTextField()

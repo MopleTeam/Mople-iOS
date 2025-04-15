@@ -12,10 +12,13 @@ import SnapKit
 
 final class MeetPlanTableCell: UITableViewCell {
     
+    // MARK: - Variables
     private var disposeBag = DisposeBag()
     
+    // MARK: - Closure
     var completeTapped: (() -> Void)?
         
+    // MARK: - UI Components
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.semiBold
@@ -91,26 +94,23 @@ final class MeetPlanTableCell: UITableViewCell {
         return sv
     }()
 
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initalSetup()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    #warning("재사용 시 init이 호출되지 않고 prepareForReuse만 호출된다")
     override func prepareForReuse() {
         super.prepareForReuse()
         addCompletionButton()
         disposeBag = DisposeBag()
     }
     
-    private func initalSetup() {
-        setupUI()
-    }
-    
+    // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
@@ -156,7 +156,6 @@ final class MeetPlanTableCell: UITableViewCell {
     
     // MARK: - Action
     private func setAction() {
-        print(#function, #line, "Path : # 버튼 설정하기 ")
         completdButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { tableCell, _ in
                 tableCell.completeTapped?()
@@ -164,6 +163,7 @@ final class MeetPlanTableCell: UITableViewCell {
             .disposed(by: disposeBag)
     }
 
+    // MARK: - Configure
     public func configure(viewModel: MeetPlanViewModel) {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
@@ -186,7 +186,10 @@ final class MeetPlanTableCell: UITableViewCell {
     private func handleTitlePostIcon(isCreator: Bool) {
         self.titleLabel.hideIcon(isHide: !isCreator)
     }
-    
+}
+
+// MARK: - Participation Button Setup
+extension MeetPlanTableCell {
     private func handleCompletdButton(isCreator: Bool,
                                       isParticipant: Bool?,
                                       planDate: Date?) {
@@ -196,9 +199,6 @@ final class MeetPlanTableCell: UITableViewCell {
         updateButtonVisibility(isCreator: isCreator,
                                isParticipation: isParticipant)
     }
-}
-
-extension MeetPlanTableCell {
     
     private func isButtonEnabledForDate(_ date: Date) -> Bool {
         guard date < Date() else { return true }

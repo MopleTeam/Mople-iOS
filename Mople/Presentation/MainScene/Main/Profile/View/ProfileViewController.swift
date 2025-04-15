@@ -10,9 +10,14 @@ import RxSwift
 import ReactorKit
 
 final class ProfileViewController: TitleNaviViewController, View {
-    typealias Reactor = ProfileViewReactor
     
+    // MARK: - Reactor
+    typealias Reactor = ProfileViewReactor
+    private var profileReactor: ProfileViewReactor?
     var disposeBag = DisposeBag()
+    
+    // MARK: - Observable
+    private let reloadProfile: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -150,7 +155,7 @@ final class ProfileViewController: TitleNaviViewController, View {
     init(title: String,
          reactor: ProfileViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.profileReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -159,12 +164,13 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupLayout()
+        setupUI()
+        setReactor()
     }
 
     // MARK: - UI Setup
     
-    private func setupLayout() {
+    private func setupUI() {
         print(#function, #line)
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
@@ -210,8 +216,30 @@ final class ProfileViewController: TitleNaviViewController, View {
         }
     }
     
-    // MARK: - Binding
+    private func setProfile(_ profile: UserInfo) {
+        profileEditButton.title = profile.name
+        profileImageView.kfSetimage(profile.imagePath, defaultImageType: .user)
+    }
+}
+
+// MARK: - Reactor Setup
+extension ProfileViewController {
+    private func setReactor() {
+        reactor = profileReactor
+    }
+     
     func bind(reactor: Reactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+        setNotification(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
+        reloadProfile
+            .map { Reactor.Action.fetchUserInfo }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         profileEditButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.editProfile) }
             .bind(to: reactor.action)
@@ -231,12 +259,10 @@ final class ProfileViewController: TitleNaviViewController, View {
             .map { Reactor.Action.flow(.logout) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$userProfile))
-            .map { $0.1 }
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$userProfile)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, profile in
@@ -244,19 +270,18 @@ final class ProfileViewController: TitleNaviViewController, View {
             })
             .disposed(by: disposeBag)
     }
-}
-
-// MARK: - 프로필 적용
-extension ProfileViewController {
-    private func setProfile(_ profile: UserInfo) {
-        profileEditButton.title = profile.name
-        profileImageView.kfSetimage(profile.imagePath, defaultImageType: .user)
+    
+    private func setNotification(_ reactor: Reactor) {
+        EventService.shared.addObservable(name: .editProfile)
+            .map { Reactor.Action.fetchUserInfo }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
 
 extension ProfileViewController {
     public func fetchProfile() {
-        reactor?.action.onNext(.fetchUserInfo)
+        reloadProfile.onNext(())
     }
 }
 

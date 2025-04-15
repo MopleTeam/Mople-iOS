@@ -61,12 +61,10 @@ extension MeetListSceneDIConatiner: MeetListSceneDependencies {
     
     // MARK: - 모임 상세
     func makeMeetDetailFlowCoordiantor(meetId: Int) -> BaseCoordinator {
-        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
-                                                      meetId: meetId)
-        return meetDetailDI.makeMeetDetailCoordinator()
+        return commonFactory.makeMeetDetailCoordiantor(meetId: meetId)
     }
     
+    // MARK: - 모임 생성 뷰컨트롤러
     func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
         return commonFactory.makeCreateMeetViewController(isFlow: false,
                                                           isEdit: false,

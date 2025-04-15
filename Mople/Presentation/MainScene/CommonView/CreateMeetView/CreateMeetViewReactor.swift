@@ -8,7 +8,9 @@
 import UIKit
 import ReactorKit
 
-protocol MeetCreateViewCoordination: NavigationCloseable { }
+protocol MeetCreateViewCoordination: NavigationCloseable {
+    func completed(with meet: Meet)
+}
 
 enum MeetCreationType {
     case create
@@ -47,17 +49,24 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isLoading: Bool = false
     }
     
+    // MARK: - Variables
     var initialState: State = State()
-
+    private var createRequest: CreateMeetRequest?
     private var isLoading: Bool = false
     private var type: MeetCreationType
+    
+    // MARK: - UseCase
     private let createMeetUseCase: CreateMeet
     private let editMeetUseCase: EditMeet
     private let imageUploadUseCase: ImageUpload
-    private let photoService: PhotoService
-    private weak var coordinator: MeetCreateViewCoordination?
-    private var createRequest: CreateMeetRequest?
     
+    // MARK: - Photo
+    private let photoService: PhotoService
+    
+    // MARK: - Coordinator
+    private weak var coordinator: MeetCreateViewCoordination?
+    
+    // MARK: - LifeCycle
     init(type: MeetCreationType,
          createMeetUseCase: CreateMeet,
          editMeetUseCase: EditMeet,
@@ -78,6 +87,19 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - Initial Setup
+    private func handleCreationType() {
+        switch type {
+        case .create:
+            createRequest = CreateMeetRequest()
+        case let .edit(meet):
+            action.onNext(.setPreviousMeet(meet))
+            createRequest = .init(name: meet.meetSummary?.name,
+                                image: meet.meetSummary?.imagePath)
+        }
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .setNickname(name):
@@ -114,19 +136,9 @@ final class CreateMeetViewReactor: Reactor, LifeCycleLoggable {
 
         return newState
     }
-    
-    private func handleCreationType() {
-        switch type {
-        case .create:
-            createRequest = CreateMeetRequest()
-        case let .edit(meet):
-            action.onNext(.setPreviousMeet(meet))
-            createRequest = .init(name: meet.meetSummary?.name,
-                                image: meet.meetSummary?.imagePath)
-        }
-    }
 }
 
+// MARK: - Data Request
 extension CreateMeetViewReactor {
     
     // MARK: - 미팅 이름 업데이트
@@ -213,9 +225,10 @@ extension CreateMeetViewReactor {
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                notificationNewMeet(meet)
-                handleCompletedTask()
+                guard let self,
+                      let meet else { return .empty() }
+                postNewMeet(meet)
+                handleCompletedTask(with: meet)
                 return .empty()
             })
         
@@ -237,9 +250,10 @@ extension CreateMeetViewReactor {
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                notificationNewMeet(meet)
-                handleCompletedTask()
+                guard let self,
+                      let meet else { return .empty() }
+                postNewMeet(meet)
+                handleCompletedTask(with: meet)
                 return .empty()
             })
             
@@ -247,28 +261,19 @@ extension CreateMeetViewReactor {
                                   minimumExecutionTime: .seconds(1))
     }
     
-    private func handleCompletedTask() {
+    private func handleCompletedTask(with meet: Meet) {
         switch type {
         case .create:
-            coordinator?.dismiss()
+            coordinator?.completed(with: meet)
         case .edit:
             coordinator?.pop()
         }
     }
 }
 
-// MARK: - Flow
+// MARK: - Notify
 extension CreateMeetViewReactor {
-    private func endTask() -> Observable<Mutation> {
-        coordinator?.dismiss()
-        return .empty()
-    }
-}
-
-// MARK: - Notification
-extension CreateMeetViewReactor {
-    private func notificationNewMeet(_ meet: Meet?) {
-        guard let meet else { return }
+    private func postNewMeet(_ meet: Meet) {
         switch type {
         case .create:
             EventService.shared.postItem(.created(meet),
@@ -280,6 +285,16 @@ extension CreateMeetViewReactor {
     }
 }
 
+
+// MARK: - Coordination
+extension CreateMeetViewReactor {
+    private func endTask() -> Observable<Mutation> {
+        coordinator?.dismiss(completion: nil)
+        return .empty()
+    }
+}
+
+// MARK: - Loading & Error
 extension CreateMeetViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

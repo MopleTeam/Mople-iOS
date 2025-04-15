@@ -44,7 +44,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             case place(_ placeInfo: PlaceInfo)
         }
 
-        enum FlowAction {
+        enum Flow {
             case groupSelectView
             case dateSelectView
             case timeSelectView
@@ -53,7 +53,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         }
         
         case setValue(SetValue)
-        case flowAction(FlowAction)
+        case flow(Flow)
         case fetchPreviousPlan(Plan)
         case fetchMeetList([MeetSummary])
         case updateMeet(MeetPayload)
@@ -96,17 +96,42 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
                 return isFilled()
             }
         }
+        
+        private func isFilled() -> Bool {
+            return seletedMeet != nil &&
+            planTitle != nil &&
+            selectedDay != nil &&
+            selectedTime != nil &&
+            selectedPlace != nil
+        }
+        
+        private func isChanged(previousPlan: Plan) -> Bool {
+            guard let selectedDay,
+                  let selectedTime,
+                  let selectedDate = DateManager.combineDayAndTime(day: selectedDay,
+                                                                   time: selectedTime) else {
+                return false
+            }
+            
+            return planTitle != previousPlan.title ||
+            selectedDate != previousPlan.date ||
+            selectedPlace != UploadPlace(plan: previousPlan)
+        }
     }
     
-    // MARK: - Variable
+    // MARK: - Variables
+    var initialState: State = State()
     private let type: PlanCreationType
     private var isLoading: Bool = false
+    
+    // MARK: - UseCase
     private let createPlanUseCase: CreatePlan
     private let editPlanUseCase: EditPlan
+    
+    // MARK: - Coordinator
     private weak var coordinator: PlanCreateCoordination?
     
-    var initialState: State = State()
-    
+    // MARK: - LifeCycle
     init(createPlanUseCase: CreatePlan,
          editPlanUseCase: EditPlan,
          type: PlanCreationType,
@@ -122,7 +147,18 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     deinit {
         logLifeCycle()
     }
-        
+    
+    // MARK: - Initial Setup
+    private func handleViewType() {
+        switch type {
+        case let .create(meets):
+            action.onNext(.fetchMeetList(meets))
+        case let .edit(plan):
+            action.onNext(.fetchPreviousPlan(plan))
+        }
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .setValue(value):
@@ -131,7 +167,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             return self.handleCreation()
         case let .fetchMeetList(meets):
             return .just(.updateMeetList(meets))
-        case .flowAction(let action):
+        case .flow(let action):
             return self.handleFlowAction(action)
         case let .fetchPreviousPlan(plan):
             return .just(.updatePreviousPlan(plan))
@@ -176,17 +212,57 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         state.selectedPlace = place
         state.previousPlan = plan
     }
+}
+
+// MARK: - Action Handling
+extension CreatePlanViewReactor {
+    private func handleSetValueAction(_ action: Action.SetValue)  -> Observable<Mutation> {
+        switch action {
+        case let .meet(index):
+            return self.parseMeetId(selectedIndex: index)
+        case let .name(name):
+            return .just(.updateValue(.name(name)))
+        case let .date(date, type):
+            return self.updateDate(date: date, type: type)
+        case let .place(placeInfo):
+            return .just(.updateValue(.place(placeInfo)))
+        }
+    }
     
-    private func handleViewType() {
+    private func parseMeetId(selectedIndex: Int) -> Observable<Mutation> {
+        let meet = currentState.meets[safe: selectedIndex]
+        return .just(.updateValue(.meet(meet)))
+    }
+    
+    private func updateDate(date: DateComponents, type: UpdatePlanType) -> Observable<Mutation> {
         switch type {
-        case let .create(meets):
-            action.onNext(.fetchMeetList(meets))
-        case let .edit(plan):
-            action.onNext(.fetchPreviousPlan(plan))
+        case .day:
+            return .just(.updateValue(.date(date)))
+        case .time:
+            return .just(.updateValue(.time(date)))
         }
     }
 }
 
+// MARK: - Mutation Handling
+extension CreatePlanViewReactor {
+    private func handleValueMutation(_ state: inout State, value: Mutation.UpdateValue) {
+        switch value {
+        case .meet(let meet):
+            state.seletedMeet = meet
+        case .name(let name):
+            state.planTitle = name
+        case .date(let date):
+            state.selectedDay = date
+        case .time(let time):
+            state.selectedTime = time
+        case .place(let place):
+            state.selectedPlace = .init(place: place)
+        }
+    }
+}
+
+// MARK: - Data Request
 extension CreatePlanViewReactor {
     
     private func handleCreation() -> Observable<Mutation> {
@@ -202,17 +278,14 @@ extension CreatePlanViewReactor {
             return editPlan(request: request)
         }
     }
-}
-
-// MARK: - 일정 생성 및 일정 유효성 체크
-extension CreatePlanViewReactor {
+    
     private func createPlan(request: PlanRequest) -> Observable<Mutation> {
         let uploadPlan = createPlanUseCase.execute(request: request)
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] plan -> Observable<Mutation> in
                 self?.postNewPlan(plan)
-                self?.coordinator?.endFlow()
+                self?.coordinator?.completed(with: plan)
                 return .empty()
             })
         
@@ -277,7 +350,10 @@ extension CreatePlanViewReactor {
         guard date > DateManager.addFiveMinutes(Date()) else { throw CreatePlanError.invalid }
         return date
     }
-    
+}
+
+// MARK: - Notify
+extension CreatePlanViewReactor {
     private func postNewPlan(_ plan: Plan) {
         switch type {
         case .create:
@@ -288,62 +364,19 @@ extension CreatePlanViewReactor {
                                          from: self)
         }
     }
+    
+    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
+        guard case .deleted(let id) = payload else { return .empty() }
+        var currentMeetList = currentState.meets
+        currentMeetList.removeAll { $0.id == id }
+        return .of(.updateMeetList(currentMeetList),
+                   .updateValue(.meet(nil)))
+    }
 }
 
-// MARK: - Set Value
+// MARK: - Coordination
 extension CreatePlanViewReactor {
-    private func handleValueMutation(_ state: inout State, value: Mutation.UpdateValue) {
-        switch value {
-        case .meet(let meet):
-            state.seletedMeet = meet
-        case .name(let name):
-            state.planTitle = name
-        case .date(let date):
-            state.selectedDay = date
-        case .time(let time):
-            state.selectedTime = time
-        case .place(let place):
-            state.selectedPlace = .init(place: place)
-        }
-    }
-    
-    private func handleSetValueAction(_ action: Action.SetValue)  -> Observable<Mutation> {
-        switch action {
-        case let .meet(index):
-            return self.parseMeetId(selectedIndex: index)
-        case let .name(name):
-            return .just(.updateValue(.name(name)))
-        case let .date(date, type):
-            return self.updateDate(date: date, type: type)
-        case let .place(placeInfo):
-            return .just(.updateValue(.place(placeInfo)))
-        }
-    }
-    
-    private func parseMeetId(selectedIndex: Int) -> Observable<Mutation> {
-        let meet = currentState.meets[safe: selectedIndex]
-        return .just(.updateValue(.meet(meet)))
-    }
-    
-    private func updateDate(date: DateComponents, type: UpdatePlanType) -> Observable<Mutation> {
-        switch type {
-        case .day:
-            return .just(.updateValue(.date(date)))
-        case .time:
-            return .just(.updateValue(.time(date)))
-        }
-    }
-}
-
-extension CreatePlanViewReactor: SearchPlaceDelegate {
-    func selectedPlace(with place: PlaceInfo) {
-        action.onNext(.setValue(.place(place)))
-    }
-}
-
-// MARK: - Flow Action
-extension CreatePlanViewReactor {
-    private func handleFlowAction(_ action: Action.FlowAction) -> Observable<Mutation> {
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
         case .groupSelectView:
             coordinator?.presentGroupSelectView()
@@ -360,41 +393,14 @@ extension CreatePlanViewReactor {
     }
 }
 
-extension CreatePlanViewReactor.State {
-    private func isFilled() -> Bool {
-        return seletedMeet != nil &&
-        planTitle != nil &&
-        selectedDay != nil &&
-        selectedTime != nil &&
-        selectedPlace != nil
-    }
-    
-    private func isChanged(previousPlan: Plan) -> Bool {
-        guard let selectedDay,
-              let selectedTime,
-              let selectedDate = DateManager.combineDayAndTime(day: selectedDay,
-                                                               time: selectedTime) else {
-            return false
-        }
-        
-        return planTitle != previousPlan.title ||
-        selectedDate != previousPlan.date ||
-        selectedPlace != UploadPlace(plan: previousPlan)
+// MARK: - Delegate
+extension CreatePlanViewReactor: SearchPlaceDelegate {
+    func selectedPlace(with place: PlaceInfo) {
+        action.onNext(.setValue(.place(place)))
     }
 }
 
-// MARK: - 페이로드
-extension CreatePlanViewReactor {
-    private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
-        guard case .deleted(let id) = payload else { return .empty() }
-        var currentMeetList = currentState.meets
-        currentMeetList.removeAll { $0.id == id }
-        return .of(.updateMeetList(currentMeetList),
-                   .updateValue(.meet(nil)))
-    }
-}
-
-// MARK: - 로딩
+// MARK: - Loading & Error
 extension CreatePlanViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

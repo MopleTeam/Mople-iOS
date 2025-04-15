@@ -47,26 +47,24 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
     }
     
     // MARK: - Variables
+    var initialState: State = State()
     private var isLoading: Bool = false
+    private var signUpModel: SignUpRequest?
     
-    // MARK: - 유즈케이스
+    // MARK: - UseCase
     private let signUpUseCase: SignUp
     private let imageUploadUseCase: ImageUpload
     private let validationNickname: CheckDuplicateNickname
     private let creationNickname: CreationNickname
     private let fetchUserInfo: FetchUserInfo
     
-    // MARK: - 앨범 접근
+    // MARK: - Photo
     private let photoService: PhotoService
     
-    // MARK: - 코디네이터
+    // MARK: - Coordinator
     private weak var coordinator: SignUpCoordination?
     
-    // MARK: - 회원가입 모델
-    private var signUpModel: SignUpRequest?
-    
-    var initialState: State = State()
-    
+    // MARK: - LifeCycle
     init(signUpUseCase: SignUp,
          imageUploadUseCase: ImageUpload,
          validationNickname: CheckDuplicateNickname,
@@ -82,7 +80,7 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         self.fetchUserInfo = fetchUserInfo
         self.photoService = photoService
         self.coordinator = coordinator
-        initalSetup(socialInfo)
+        initialSetup(socialInfo)
         logLifeCycle()
     }
     
@@ -90,6 +88,13 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - Initial Setup
+    private func initialSetup(_ socialInfo: SocialInfo) {
+        self.signUpModel = .init(provider: socialInfo)
+        self.action.onNext(.createNickname)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .setNickname(name):
@@ -128,23 +133,9 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
         
         return newState
     }
-    
-    // MARK: - Intial
-    private func initalSetup(_ socialInfo: SocialInfo) {
-        setSocialInfo(socialInfo)
-        requestCreationNickname()
-    }
-    
-    private func setSocialInfo(_ socialInfo: SocialInfo) {
-        self.signUpModel = .init(provider: socialInfo)
-    }
-    
-    private func requestCreationNickname() {
-        self.action.onNext(.createNickname)
-    }
 }
 
-// MARK: - Observable
+// MARK: - Data Request
 extension SignUpViewReactor {
     
     // MARK: - 랜덤 닉네임 생성
@@ -247,7 +238,7 @@ extension SignUpViewReactor {
     }
 }
 
-// MARK: - Loading
+// MARK: - Loading & Error
 extension SignUpViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

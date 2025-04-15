@@ -42,6 +42,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Deinit" )
     }
     
+    // MARK: - Account Check
     func checkEntry() {
         if KeyChainService.shared.hasToken() {
             showMainFlow()
@@ -62,6 +63,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         }
     }
     
+    // MARK: - Data Request
     private func fetchUser() {
         fetchUserInfo.execute()
             .asObservable()

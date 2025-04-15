@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import SnapKit
 
 struct MapInfoViewModel {
@@ -41,14 +43,11 @@ extension MapInfoViewModel {
 }
 
 final class MapInfoView: UIView {
-    
-    enum ViewType {
-        case basic
-        case select
-    }
-        
+ 
+    // MARK: - Variables
     private var location: Location?
     
+    // MARK: - UI Components
     private let mapView = MapView(isScroll: true,
                                   isZoom: true)
     
@@ -75,12 +74,8 @@ final class MapInfoView: UIView {
         return label
     }()
     
-    private(set) lazy var selectedButton: BaseButton = {
+    fileprivate lazy var selectedButton: BaseButton = {
         let button = BaseButton()
-        button.setTitle(text: "장소 선택",
-                        font: FontStyle.Title3.semiBold,
-                        normalColor: ColorStyle.Default.white)
-        button.setBgColor(normalColor: ColorStyle.App.primary)
         button.setRadius(8)
         return button
     }()
@@ -104,7 +99,7 @@ final class MapInfoView: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [placeInfoStackView])
+        let sv = UIStackView(arrangedSubviews: [placeInfoStackView, selectedButton])
         sv.axis = .vertical
         sv.spacing = 20
         sv.alignment = .fill
@@ -121,10 +116,10 @@ final class MapInfoView: UIView {
         return sv
     }()
     
-    init(type: ViewType = .basic) {
-        print(#function, #line, "LifeCycle Test DetailPlaceViewController Created" )
-        super.init(frame: .zero)
-        initalSetup(type)
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
     }
 
     deinit {
@@ -135,26 +130,13 @@ final class MapInfoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setMapView()
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        print(#function, #line)
+        self.setMapView()
     }
     
-    private func initalSetup(_ type: ViewType) {
-        setTypeConfigure(type)
-        setLayout()
-    }
-    
-    private func setTypeConfigure(_ type: ViewType) {
-        guard case .select = type else { return }
-        mainStackView.addArrangedSubview(selectedButton)
-        
-        selectedButton.snp.makeConstraints { make in
-            make.height.equalTo(56)
-        }
-    }
-    
-    private func setLayout() {
+    private func setupUI() {
         self.addSubview(mapView)
         self.addSubview(mainStackView)
         
@@ -166,11 +148,19 @@ final class MapInfoView: UIView {
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+        
+        selectedButton.snp.makeConstraints { make in
+            make.height.equalTo(56)
+        }
     }
     
     private func setMapView() {
-        mapView.initializeMap(location: location ?? .defaultLocation,
-                              offset: .init(x: 0, y: -(mainStackView.bounds.height / 2)))
+        print(#function, #line)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            mapView.initializeMap(location: location ?? .defaultLocation,
+                                  offset: .init(x: 0, y: -(mainStackView.bounds.height / 2)))
+        }
     }
     
     public func setConfigure(_ viewModel: MapInfoViewModel) {
@@ -187,4 +177,22 @@ final class MapInfoView: UIView {
             distanceLabel.isHidden = true
         }
     }
+    
+    public func setSelectButton(text: String?,
+                                textFont: UIFont?,
+                                textColor: UIColor?,
+                                backColor: UIColor?) {
+        selectedButton.setTitle(text: text,
+                                font: textFont,
+                                normalColor: textColor)
+        selectedButton.setBgColor(normalColor: backColor)
+    }
 }
+
+extension Reactive where Base: MapInfoView {
+    var selected: ControlEvent<Void> {
+        return base.selectedButton.rx.tap
+    }
+}
+
+

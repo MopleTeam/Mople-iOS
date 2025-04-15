@@ -12,9 +12,11 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class ProfileEditViewController: TitleNaviViewController, View, DismissTansitionControllabel {
-    typealias Reactor = ProfileEditViewReactor
+class ProfileEditViewController: TitleNaviViewController, View, DismissTansitionControllabel, KeyboardDismissable {
     
+    // MARK: - Reactor
+    typealias Reactor = ProfileEditViewReactor
+    private var profileEditReactor: ProfileEditViewReactor?
     var disposeBag = DisposeBag()
 
     // MARK: - Transition
@@ -29,7 +31,7 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
     // MARK: - LifeCycle
     init(editProfileReactor: ProfileEditViewReactor) {
         super.init(title: TextStyle.ProfileEdit.title)
-        self.reactor = editProfileReactor
+        self.profileEditReactor = editProfileReactor
         setupTransition()
     }
     
@@ -39,14 +41,16 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
+        setupAction()
+        setupTapKeyboardDismiss()
     }
     
-    private func initalSetup() {
+    // MARK: - UI Setup
+    private func setupUI() {
         setLayout()
         setNaviItem()
-        setupAction()
-        setupKeyboardDismissGestrue()
     }
     
     // MARK: - UI Setup
@@ -64,8 +68,25 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
     private func setNaviItem() {
         self.setBarItem(type: .left)
     }
+    
+    // MARK: - Action
+    private func setupAction() {
+        profileSetupView.rx.imageViewTapped
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                vc.view.endEditing(true)
+                vc.showPhotos()
+            })
+            .disposed(by: disposeBag)
+    }
+}
 
-    // MARK: - Binding
+// MARK: - Reactor Setup
+extension ProfileEditViewController {
+    private func setReactor() {
+        reactor = profileEditReactor
+    }
+    
     func bind(reactor: ProfileEditViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
@@ -143,16 +164,6 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
             .disposed(by: disposeBag)
     }
     
-    private func setupAction() {
-        profileSetupView.rx.imageViewTapped
-            .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.view.endEditing(true)
-                vc.showPhotos()
-            })
-            .disposed(by: disposeBag)
-    }
-    
     // MARK: - Error Handling
     private func handleError(_ err: ProfileEditError) {
         switch err {
@@ -162,13 +173,6 @@ class ProfileEditViewController: TitleNaviViewController, View, DismissTansition
             alertManager.showAlert(title: compressionPhotoError.info,
                                    subTitle: compressionPhotoError.subInfo)
         }
-    }
-}
-
-// MARK: - 키보드 
-extension ProfileEditViewController: KeyboardDismissable {
-    private func setupKeyboardDismissGestrue() {
-        setupTapKeyboardDismiss()
     }
 }
 

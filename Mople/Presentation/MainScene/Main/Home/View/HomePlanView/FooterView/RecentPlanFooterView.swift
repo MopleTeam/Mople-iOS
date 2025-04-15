@@ -12,8 +12,10 @@ import RxCocoa
 
 final class RecentPlanFooterView: UICollectionReusableView {
     
-    var disposeBag = DisposeBag()
+    // MARK: - Variables
+    private var disposeBag = DisposeBag()
         
+    // MARK: - UI Components
     private let moreButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Home.moreBtnTitle,
@@ -26,6 +28,7 @@ final class RecentPlanFooterView: UICollectionReusableView {
         return btn
     }()
     
+    // MARK: - LifeCycle
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
@@ -35,6 +38,7 @@ final class RecentPlanFooterView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.addSubview(moreButton)
         
@@ -45,6 +49,7 @@ final class RecentPlanFooterView: UICollectionReusableView {
         }
     }
     
+    // MARK: - Action
     public func setTapAction(on tapObserver: AnyObserver<Void>) {
         moreButton.rx.controlEvent(.touchUpInside)
             .map({ _ in })

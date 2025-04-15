@@ -17,13 +17,13 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
     private let type: NaviType
     
     // MARK: - Transition
-    var presentTransition: AppTransition = .init(type: .present)
-    var dismissTransition: AppTransition = .init(type: .dismiss)
+    lazy var presentTransition: AppTransition = .init(type: .present)
+    lazy var dismissTransition: AppTransition = .init(type: .dismiss)
 
     init(type: NaviType = .sub) {
         self.type = type
         super.init(nibName: nil, bundle: nil)
-        initalSetup()
+        initialSetup()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -34,7 +34,7 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
         print(#function, #line, "Path : # 네비 삭제 ")
     }
     
-    private func initalSetup() {
+    private func initialSetup() {
         self.navigationBar.isHidden = true
         guard type == .sub else { return }
         setupTransition()

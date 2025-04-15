@@ -10,8 +10,11 @@ import Kingfisher
 
 final class ProfileView: UIImageView {
     
+    // MARK: - Variables
+    private var isSetRadius: Bool = false
     private var task: DownloadTask?
     
+    // MARK: - LifeCycle
     init() {
         super.init(frame: .zero)
         self.setupUI()
@@ -21,13 +24,20 @@ final class ProfileView: UIImageView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        self.layer.cornerRadius = self.frame.height / 2
-    }
-    
     deinit {
         task?.cancel()
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        initialSetup()
+    }
+    
+    // MARK: - UI Setup
+    private func initialSetup() {
+        guard !isSetRadius else { return }
+        self.layer.cornerRadius = self.frame.height / 2
+        isSetRadius = true
     }
     
     private func setupUI() {

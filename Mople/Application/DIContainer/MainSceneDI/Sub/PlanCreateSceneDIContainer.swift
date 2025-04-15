@@ -10,8 +10,8 @@ import UIKit
 protocol PlanCreateSceneDependencies {
     func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController
     func makeGroupSelectViewController() -> MeetSelectViewController
-    func makeDateSelectViewController() -> PlanDateSelectViewController
-    func makeTimeSelectViewController() -> PlanTimePickerViewController
+    func makeDateSelectViewController() -> DateSelectViewController
+    func makeTimeSelectViewController() -> TimePickerViewController
     func makeSearchLocationCoordinator() -> BaseCoordinator
 }
 
@@ -30,9 +30,10 @@ final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
         self.type = type
     }
     
-    func makePlanCreateFlowCoordinator() -> BaseCoordinator {
+    func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)? = nil) -> BaseCoordinator {
         return PlanCreateFlowCoordinator(navigationController: AppNaviViewController(),
-                                         dependencies: self)
+                                         dependencies: self,
+                                         completionHandler: completionHandler)
     }
 }
 
@@ -56,12 +57,12 @@ extension PlanCreateSceneDIContainer {
         return MeetSelectViewController(reactor: commonReactor)
     }
     
-    func makeDateSelectViewController() -> PlanDateSelectViewController {
-        return PlanDateSelectViewController(reactor: commonReactor)
+    func makeDateSelectViewController() -> DateSelectViewController {
+        return DateSelectViewController(reactor: commonReactor)
     }
     
-    func makeTimeSelectViewController() -> PlanTimePickerViewController {
-        return PlanTimePickerViewController(reactor: commonReactor)
+    func makeTimeSelectViewController() -> TimePickerViewController {
+        return TimePickerViewController(reactor: commonReactor)
     }
 }
 

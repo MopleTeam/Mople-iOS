@@ -11,8 +11,8 @@ protocol ProfileSceneDependencies {
     // MARK: - View
     func makeProfileViewController(coordinator: ProfileCoordination) -> ProfileViewController
     func makeProfileEditViewController(previousProfile: UserInfo,
-                                       coordinator: ProfileEditViewCoordinator) -> ProfileEditViewController
-    func makeNotifyViewController() -> NotifyViewController
+                                       coordinator: ProfileEditViewCoordination) -> ProfileEditViewController
+    func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController
     func makePolicyViewController() -> PolicyViewController
 }
 
@@ -53,14 +53,14 @@ extension ProfileSceneDIContainer {
 // MARK: - 프로필 편집 View
 extension ProfileSceneDIContainer {
     func makeProfileEditViewController(previousProfile: UserInfo,
-                                       coordinator: ProfileEditViewCoordinator) -> ProfileEditViewController {
+                                       coordinator: ProfileEditViewCoordination) -> ProfileEditViewController {
         return ProfileEditViewController(
             editProfileReactor: makeProfileEditViewReactor(previousProfile: previousProfile,
                                                            coordinator: coordinator))
     }
     
     private func makeProfileEditViewReactor(previousProfile: UserInfo,
-                                            coordinator: ProfileEditViewCoordinator) -> ProfileEditViewReactor {
+                                            coordinator: ProfileEditViewCoordination) -> ProfileEditViewReactor {
         return .init(previousProfile: previousProfile,
                      editProfile: makeEditProfileUseCase(),
                      imageUpload: commonFacoty.makeImageUploadUseCase(),
@@ -78,8 +78,30 @@ extension ProfileSceneDIContainer {
 
 // MARK: - 알림관리 View
 extension ProfileSceneDIContainer {
-    func makeNotifyViewController() -> NotifyViewController {
-        return NotifyViewController()
+    func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController {
+        return NotifySubcribeViewController(
+            reactor: makeNotifySubscribeReactor(coordinator: coordinator)
+        )
+    }
+    
+    private func makeNotifySubscribeReactor(coordinator: NotifySubscribeCoordination) -> NotifySubscribeViewReactor {
+        let repo = DefaultNotifySubscribeRepo(networkService: appNetworkService)
+        return .init(fetchNotifyState: makeFetchNotifyState(repo: repo),
+                     subscribeNotify: makeSubscribeNotify(repo: repo),
+                     notificationService: makeNotifyService(),
+                     coordinator: coordinator)
+    }
+    
+    private func makeFetchNotifyState(repo: NotifySubscribeRepo) -> FetchNotifyState {
+        return FetchNotifyStateUseCase(repo: repo)
+    }
+    
+    private func makeSubscribeNotify(repo: NotifySubscribeRepo) -> SubscribeNotify {
+        return SubscribeNotifyUseCase(repo: repo)
+    }
+    
+    private func makeNotifyService() -> NotificationService {
+        return DefaultNotificationService()
     }
 }
 

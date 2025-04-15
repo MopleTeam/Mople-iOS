@@ -30,6 +30,10 @@ final class MeetListFlowCoordinator: BaseCoordinator, MeetListFlowCoordination {
 
 // MARK: - View
 extension MeetListFlowCoordinator: MeetCreateViewCoordination {
+    func completed(with meet: Meet) {
+        
+    }
+    
     func presentMeetCreateView() {
         let meetCreateVC = dependency.makeCreateMeetViewController(coordinator: self)
         self.navigationController.presentWithTransition(meetCreateVC)

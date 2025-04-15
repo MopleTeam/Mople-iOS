@@ -77,9 +77,9 @@ extension MeetDetailSceneDIContainer {
     
     private func makeMeetPlanListViewReactor() -> MeetPlanListViewReactor {
         let reactor = MeetPlanListViewReactor(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
-                                            participationPlanUseCase: makeParticipationPlanUseCase(),
-                                            delegate: mainReactor!,
-                                            meetID: meetId)
+                                              participationPlanUseCase: makeParticipationPlanUseCase(),
+                                              delegate: mainReactor!,
+                                              meetId: meetId)
         mainReactor?.planListCommands = reactor
         return reactor
     }
@@ -110,7 +110,7 @@ extension MeetDetailSceneDIContainer {
         let reactor = MeetReviewListViewReactor(fetchReviewUseCase: makeFetchReviewListUsecase(),
                                                 coordinator: coordinator,
                                                 delegate: mainReactor!,
-                                                meetID: meetId)
+                                                meetId: meetId)
         mainReactor?.reviewListCommands = reactor
         return reactor
     }

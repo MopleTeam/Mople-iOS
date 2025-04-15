@@ -31,34 +31,35 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
     }
 }
 
-// MARK: - Push
-extension ProfileFlowCoordinator {
+// MARK: - Notify View
+extension ProfileFlowCoordinator: NotifySubscribeCoordination {
     func pushNotifyView() {
-        let notifyView = dependencies.makeNotifyViewController()
-        self.navigationController.pushViewController(notifyView, animated: false)
-    }
-    
-    func pushPolicyView() {
-        let policyView = dependencies.makePolicyViewController()
-        self.navigationController.pushViewController(policyView, animated: false)
-    }
-    
-    func logout() {
-        (self.parentCoordinator as? MainCoordination)?.signOut()
+        let notifyView = dependencies.makeNotifyViewController(coordinator: self)
+        self.navigationController.pushViewController(notifyView, animated: true)
     }
 }
 
-// MARK: - Present
-extension ProfileFlowCoordinator: ProfileEditViewCoordinator {
+// MARK: - Policy View
+extension ProfileFlowCoordinator {
+    func pushPolicyView() {
+        let policyView = dependencies.makePolicyViewController()
+        self.navigationController.pushViewController(policyView, animated: true)
+    }
+}
+
+// MARK: - Prfile Edit Flow
+extension ProfileFlowCoordinator: ProfileEditViewCoordination {
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          coordinator: self)
         self.navigationController.presentWithTransition(profileEditView)
     }
-    
-    func complete() {
-        profileVC?.fetchProfile()
-        dismiss()
+}
+
+// MARK: - End Main Flow
+extension ProfileFlowCoordinator {
+    func logout() {
+        (self.parentCoordinator as? MainCoordination)?.signOut()
     }
 }
 

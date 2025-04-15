@@ -10,6 +10,7 @@ import SnapKit
 
 final class MeetReviewTableCell: UITableViewCell {
     
+    // MARK: - UI Components
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
@@ -104,10 +105,10 @@ final class MeetReviewTableCell: UITableViewCell {
         return sv
     }()
     
-    
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setLayout()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -121,7 +122,8 @@ final class MeetReviewTableCell: UITableViewCell {
         photoView.image = .defaultMeet
     }
     
-    private func setLayout() {
+    // MARK: - UI Setup
+    private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
         self.imageContainer.addSubview(photoView)
@@ -158,6 +160,7 @@ final class MeetReviewTableCell: UITableViewCell {
         photoCountLabel.layer.cornerRadius = 10
     }
     
+    // MARK: - Configure
     public func configure(viewModel: MeetReviewViewModel) {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title

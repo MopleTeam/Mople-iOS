@@ -33,14 +33,14 @@ final class PhotoCollectionView: UIView {
     init(isEditMode: Bool = false) {
         self.isEditMode = isEditMode
         super.init(frame: .zero)
-        initalSetup()
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initalSetup() {
+    private func initialSetup() {
         setCollectionView()
         setLayout()
     }

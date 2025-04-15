@@ -10,6 +10,7 @@ import SnapKit
 
 final class MeetListTableCell: UITableViewCell {
             
+    // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
         let view = ThumbnailView(thumbnailSize: 56,
                                       thumbnailRadius: 12)
@@ -45,6 +46,7 @@ final class MeetListTableCell: UITableViewCell {
         return sv
     }()
     
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -54,6 +56,7 @@ final class MeetListTableCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
@@ -69,6 +72,7 @@ final class MeetListTableCell: UITableViewCell {
         }
     }
 
+    // MARK: - Configure
     public func configure(with viewModel: ThumbnailViewModel) {
         thumbnailView.configure(with: viewModel)
         formatDateStatusLabel(date: viewModel.lastPlanDate)

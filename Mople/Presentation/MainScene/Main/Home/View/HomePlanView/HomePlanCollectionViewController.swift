@@ -13,13 +13,15 @@ import RxDataSources
 
 final class HomePlanCollectionViewController: BaseViewController, View {
     
-    typealias Reactor = HomeViewReactor
+    // MARK: - Section
     typealias Section = SectionModel<Void, Plan>
     
-    // MARK: - Variables
+    // MARK: - Reactor
+    typealias Reactor = HomeViewReactor
+    private var homeReactor: HomeViewReactor?
     var disposeBag = DisposeBag()
     
-    // MARK: - Observer
+    // MARK: - Observable
     private let footerTapObserver: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
@@ -42,9 +44,9 @@ final class HomePlanCollectionViewController: BaseViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: HomeViewReactor) {
+    init(reactor: HomeViewReactor?) {
         super.init()
-        self.reactor = reactor
+        self.homeReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +56,7 @@ final class HomePlanCollectionViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setCollectionView()
+        setReactor()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -64,6 +66,11 @@ final class HomePlanCollectionViewController: BaseViewController, View {
     
     // MARK: - UI Setup
     private func setupUI() {
+        setCollectionView()
+        setLayout()
+    }
+    
+    private func setLayout() {
         view.addSubview(collectionView)
         view.addSubview(emptyPlanView)
         
@@ -107,9 +114,21 @@ final class HomePlanCollectionViewController: BaseViewController, View {
          )
         return dataSource
     }
+}
 
-    // MARK: - Binding
+// MARK: - Reactor Setup
+extension HomePlanCollectionViewController {
+    
+    private func setReactor() {
+        reactor = homeReactor
+    }
+    
     func bind(reactor: HomeViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         footerTapObserver
             .map({ _ in Reactor.Action.flow(.calendar) })
             .bind(to: reactor.action)
@@ -120,20 +139,16 @@ final class HomePlanCollectionViewController: BaseViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        let responsePlans = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$plans))
-            .map { $0.1 }
-            .share()
-        
-        responsePlans
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$plans)
             .map { [Section(model: (), items: $0)] }
             .asDriver(onErrorJustReturn: [])
             .drive(self.collectionView.rx.items(dataSource: configureDataSource()))
             .disposed(by: disposeBag)
         
-        responsePlans
+        reactor.pulse(\.$plans)
                 .asDriver(onErrorJustReturn: [])
                 .drive(with: self, onNext: { vc, schedules in
                     vc.emptyPlanView.isHidden = !schedules.isEmpty

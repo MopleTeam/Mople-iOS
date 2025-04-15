@@ -35,7 +35,6 @@ protocol DismissTansitionControllabel: NSObject {
 }
 
 extension DismissTansitionControllabel where Self: UIViewController {
-    
     func setupTransition() {
         guard self.navigationController == nil else {
             print(#function, #line, "Path : # 네비 있음 ")

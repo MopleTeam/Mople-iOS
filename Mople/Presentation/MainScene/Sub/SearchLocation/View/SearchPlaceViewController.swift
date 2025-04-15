@@ -13,8 +13,10 @@ import ReactorKit
 
 // PlanCreate Reactor를 받아와서 데이터 공유하기
 class SearchPlaceViewController: SearchNaviViewController, View {
-    typealias Reactor = SearchPlaceViewReactor
     
+    // MARK: - Reactor
+    typealias Reactor = SearchPlaceViewReactor
+    private var searchPlaceReactor: SearchPlaceViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -48,23 +50,20 @@ class SearchPlaceViewController: SearchNaviViewController, View {
         return view
     }()
         
+    // MARK: - LifeCycle
     init(reactor: SearchPlaceViewReactor?) {
         super.init()
-        self.reactor = reactor
+        self.searchPlaceReactor = reactor
     }
     
-    @MainActor required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialSetup()
-        setupKeyboardDismissGestrue()
-    }
-    
-    private func initialSetup() {
         setupUI()
+        setReactor()
         setupKeyboardDismissGestrue()
     }
     
@@ -89,8 +88,20 @@ class SearchPlaceViewController: SearchNaviViewController, View {
             }
         }
     }
+}
+
+// MARK: - Reactor Setup
+extension SearchPlaceViewController {
+    private func setReactor() {
+        reactor = searchPlaceReactor
+    }
     
     func bind(reactor: SearchPlaceViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         [searchBar.rx.searchEvent, searchBar.rx.searchButtonEvent].forEach {
             $0.map { Reactor.Action.searchPlace(query: $0) }
                 .bind(to: reactor.action)
@@ -106,7 +117,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
             .disposed(by: disposeBag)
         
         searchBar.rx.backEvent
-            .map({ Reactor.Action.endProcess })
+            .map({ Reactor.Action.flow(.endProcess) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -116,10 +127,12 @@ class SearchPlaceViewController: SearchNaviViewController, View {
                 let isActiveDetailView = !self.detailPlaceContainer.isHidden
                 return isActiveDetailView && isEdit
             }
-            .map({ _ in Reactor.Action.endProcess })
+            .map({ _ in Reactor.Action.flow(.endProcess)})
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)

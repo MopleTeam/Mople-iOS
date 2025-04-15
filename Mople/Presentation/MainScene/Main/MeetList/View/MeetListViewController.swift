@@ -13,8 +13,9 @@ import ReactorKit
 
 class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
     
+    // MARK: - Reactor
     typealias Reactor = MeetListViewReactor
-    
+    private var meetListReactor: MeetListViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -44,10 +45,11 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         return view
     }()
     
+    // MARK: - LifeCycle
     init(title: String?,
          reactor: MeetListViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.meetListReactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -56,10 +58,12 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
     }
     
-    private func initalSetup() {
+    // MARK: - UI Setup
+    private func setupUI() {
         setLayout()
         setupTableView()
     }
@@ -91,7 +95,14 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(MeetListTableCell.self, forCellReuseIdentifier: MeetListTableCell.reuseIdentifier)
     }
+}
 
+// MARK: - Reactor Setup
+extension MeetListViewController {
+    private func setReactor() {
+        reactor = meetListReactor
+    }
+    
     func bind(reactor: MeetListViewReactor) {
         inputBind(reactor: reactor)
         outputBind(reactor: reactor)
@@ -106,14 +117,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
     }
     
     private func outputBind(reactor: Reactor) {
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        let responseMeets = Observable.combineLatest(viewDidLayout, reactor.pulse(\.$meetList))
-            .map { $0.1 }
-            .share()
-        
-        responseMeets
+        reactor.pulse(\.$meetList)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, groupList in
                 vc.emptyView.isHidden = !groupList.isEmpty
@@ -121,7 +125,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
             })
             .disposed(by: disposeBag)
 
-        responseMeets
+        reactor.pulse(\.$meetList)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: MeetListTableCell.reuseIdentifier, cellType: MeetListTableCell.self)) { index, item, cell in
                 cell.configure(with: .init(meet: item))

@@ -55,7 +55,7 @@ extension MeetDetailSceneCoordinator {
     }
 }
 
-// MARK: - 미팅 설정 뷰
+// MARK: - Meet Setup View
 extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     func pushMeetSetupView(meet: Meet) {
         let vc = dependencies.makeMeetSetupViewController(meet: meet,
@@ -64,8 +64,12 @@ extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     }
 }
 
-// MARK: - 미팅 수정 뷰
+// MARK: - Meet Edit View
 extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
+    func completed(with meet: Meet) {
+        self.dismiss(completion: nil)
+    }
+    
     func pushEditMeetView(previousMeet: Meet) {
         let vc = dependencies.makeEditMeetViewController(previousMeet: previousMeet,
                                                          coordinator: self)
@@ -74,7 +78,7 @@ extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
     }
 }
 
-// MARK: - 멤버 리스트 뷰
+// MARK: - MemberList View
 extension MeetDetailSceneCoordinator: MemberListViewCoordination {
     func pushMemberListView() {
         let vc = dependencies.makeMemberListViewController(coordinator: self)
@@ -82,7 +86,7 @@ extension MeetDetailSceneCoordinator: MemberListViewCoordination {
     }
 }
 
-// MARK: - 일정 상세 플로우
+// MARK: - Plan Detail Flow
 extension MeetDetailSceneCoordinator {
     func pushPlanDetailView(postId: Int,
                             type: PlanDetailType) {

@@ -12,11 +12,13 @@ import RxCocoa
 import ReactorKit
 
 final class MeetDetailViewController: TitleNaviViewController, View {
-    typealias Reactor = MeetDetailViewReactor
     
+    // MARK: - Reactor
+    typealias Reactor = MeetDetailViewReactor
+    private var meetDetailReactor: MeetDetailViewReactor?
     var disposeBag: DisposeBag = DisposeBag()
 
-    // MARK: - Observer
+    // MARK: - Observables
     private let endFlow: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
@@ -68,22 +70,25 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return pageVC
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initalizeSetup()
-    }
-    
+    // MARK: - LifeCycle
     init(title: String?,
          reactor: MeetDetailViewReactor?) {
         super.init(title: title)
-        self.reactor = reactor
+        self.meetDetailReactor = reactor
     }
     
-    @MainActor required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initalizeSetup() {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        setReactor()
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
         setLayout()
         setupNavi()
     }
@@ -125,6 +130,13 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .list)
     }
+}
+
+// MARK: - Reactor Setup
+extension MeetDetailViewController {
+    private func setReactor() {
+        reactor = meetDetailReactor
+    }
     
     func bind(reactor: MeetDetailViewReactor) {
         inputBind(reactor: reactor)
@@ -133,34 +145,34 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     }
     
     private func inputBind(reactor: Reactor) {
+        Observable.just(())
+            .map { Reactor.Action.fetchMeetInfo }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         self.naviBar.leftItemEvent
-            .map { Reactor.Action.endFlow }
+            .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.endFlow
-            .map { Reactor.Action.endFlow }
+            .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.naviBar.rightItemEvent
-            .map { Reactor.Action.pushMeetSetupView }
+            .map { Reactor.Action.flow(.pushMeetSetupView) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         [self.segment.rx.nextTap, self.segment.rx.previousTap].forEach({
-            $0.map({ Reactor.Action.switchPage(isFuture: $0)
-            })
+            $0.map({ Reactor.Action.flow(.switchPage(isFuture: $0)) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag) })
     }
     
     private func outputBind(reactor: Reactor) {
-        let viewDidLayout = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        Observable.combineLatest(viewDidLayout, reactor.pulse(\.$meet))
-            .map({ $0.1 })
+        reactor.pulse(\.$meet)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, meet in

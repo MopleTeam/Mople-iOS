@@ -10,6 +10,7 @@ import SnapKit
 
 final class MemberListTableCell: UITableViewCell {
         
+    // MARK: - UI Components
     private let memberInfoView: MemberInfoView = {
         let view = MemberInfoView()
         view.layer.cornerRadius = 20
@@ -34,6 +35,7 @@ final class MemberListTableCell: UITableViewCell {
         return sv
     }()
     
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -43,6 +45,7 @@ final class MemberListTableCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)

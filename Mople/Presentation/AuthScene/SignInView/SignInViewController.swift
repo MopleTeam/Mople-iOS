@@ -14,9 +14,9 @@ import AuthenticationServices
 
 final class SignInViewController: BaseViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = SignInViewReactor
-    
-    // MARK: - Variables
+    private var signInReactor: SignInViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -97,7 +97,7 @@ final class SignInViewController: BaseViewController, View {
     // MARK: - LifeCycle
     init(reactor: SignInViewReactor) {
         super.init()
-        self.reactor = reactor
+        self.signInReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -107,14 +107,11 @@ final class SignInViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setReactor()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        setupLayout()
-    }
-        
-    private func setupLayout() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainStackView)
         self.titleContainerView.addSubview(titleStackView)
@@ -141,9 +138,20 @@ final class SignInViewController: BaseViewController, View {
             make.height.equalTo(56)
         }
     }
+}
+
+// MARK: - Reactor Setup
+extension SignInViewController {
+    private func setReactor() {
+        reactor = signInReactor
+    }
     
-    // MARK: - Binding
     func bind(reactor: SignInViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         self.appleLoginButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
@@ -153,7 +161,9 @@ final class SignInViewController: BaseViewController, View {
             .map { _ in Reactor.Action.kakaoLogin }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$error)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
@@ -165,6 +175,7 @@ final class SignInViewController: BaseViewController, View {
     }
 }
 
+// MARK: - Auth
 extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return self.view.window!

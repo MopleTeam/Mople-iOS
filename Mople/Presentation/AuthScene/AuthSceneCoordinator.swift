@@ -41,14 +41,12 @@ extension AuthSceneCoordinator {
 extension AuthSceneCoordinator: SignUpCoordination {
     
     func presentMainFlow() {
-        print(#function, #line, "# 30 로그인 성공" )
         fadeOut { [weak self] in
             self?.clearScene()
         }
     }
     
     private func clearScene() {
-        print(#function, #line, "# 30 메인뷰로 이동" )
         self.navigationController.viewControllers = []
         self.parentCoordinator?.didFinish(coordinator: self)
         (self.parentCoordinator as? SignInListener)?.signIn()

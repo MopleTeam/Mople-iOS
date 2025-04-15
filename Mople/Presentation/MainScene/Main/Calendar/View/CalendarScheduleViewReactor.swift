@@ -91,7 +91,7 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
-    // MARK: - Mutate
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .calendarAction(action):
@@ -115,18 +115,6 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         }
     }
     
-    private func handleCalendarAction(_ action: Action.CalendarActions) -> Observable<Mutation> {
-        switch action {
-        case let .changedMonth(page):
-            return .just(.calendarEvent(.updateMonth(page)))
-        case let .changedHeight(height):
-            return .just(.calendarEvent(.updateHeight(height)))
-        case let .changedScope(scope):
-            return .just(.calendarEvent(.updateScope(scope)))
-        }
-    }
-    
-    // MARK: - Reduce
     func reduce(state: State, mutation: Mutation) -> State {
         
         var newState = state
@@ -142,7 +130,23 @@ final class CalendarScheduleViewReactor: Reactor, LifeCycleLoggable {
         }
         return newState
     }
-    
+}
+
+// MARK: - Action Handling
+extension CalendarScheduleViewReactor {
+    private func handleCalendarAction(_ action: Action.CalendarActions) -> Observable<Mutation> {
+        switch action {
+        case let .changedMonth(page):
+            return .just(.calendarEvent(.updateMonth(page)))
+        case let .changedHeight(height):
+            return .just(.calendarEvent(.updateHeight(height)))
+        case let .changedScope(scope):
+            return .just(.calendarEvent(.updateScope(scope)))
+        }
+    }
+}
+
+extension CalendarScheduleViewReactor {
     private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
         switch event {
         case let .updateMonth(month):
@@ -169,7 +173,7 @@ extension CalendarScheduleViewReactor {
     }
 }
 
-// MARK: - 캘린더 액션
+// MARK: - Calendar Deleagte
 extension CalendarScheduleViewReactor: CalendarReactorDelegate {
 
     func updateCalendarHeight(_ height: CGFloat) {
@@ -185,7 +189,7 @@ extension CalendarScheduleViewReactor: CalendarReactorDelegate {
     }
     
     func updatePlanMonthList(_ list: [Date]) {
-        scheduleListCommands?.setInitalList(with: list)
+        scheduleListCommands?.setInitialList(with: list)
     }
     
     func updatePage(_ page: Date) {
@@ -197,7 +201,7 @@ extension CalendarScheduleViewReactor: CalendarReactorDelegate {
     }
 }
 
-// MARK: - 스케줄 리스트 액션
+// MARK: - Schedule List Delegate
 extension CalendarScheduleViewReactor: SchduleListReactorDelegate {
     func scrollToDate(date: Date) {
         calendarCommands?.scrollToDate(on: date)
@@ -217,7 +221,7 @@ extension CalendarScheduleViewReactor: SchduleListReactorDelegate {
     }
 }
 
-// MARK: - 모임, 일정, 리뷰 변경사항 적용
+// MARK: - Notify
 extension CalendarScheduleViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
         switch payload {
@@ -240,17 +244,14 @@ extension CalendarScheduleViewReactor {
         scheduleListCommands?.editReview(payload: payload)
         return .empty()
     }
-}
-
-// MARK: - 새로고침
-extension CalendarScheduleViewReactor {
+    
     private func midnightUpdate() -> Observable<Mutation> {
         scheduleListCommands?.planUpdateWhenMidnight()
         return .empty()
     }
 }
 
-// MARK: - 자식뷰 로딩 및 에러
+// MARK: - Loading & Error
 extension CalendarScheduleViewReactor: ChildLoadingDelegate {
     func updateLoadingState(_ isLoading: Bool, index: Int) {
         action.onNext(.changeLoadingState(isLoading))

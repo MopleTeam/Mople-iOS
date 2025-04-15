@@ -12,8 +12,9 @@ import ReactorKit
 
 final class ReviewEditViewContoller: TitleNaviViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = ReviewEditViewReactor
-    
+    private var reviewEditReactor: ReviewEditViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Observable
@@ -85,7 +86,7 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     init(title: String,
          reactor: ReviewEditViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.reviewEditReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -94,16 +95,17 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
-    }
-    
-    private func initalSetup() {
-        setupLayout()
-        setNaviItem()
+        setupUI()
+        setReactor()
     }
     
     // MARK: - UI Setup
-    private func setupLayout() {
+    private func setupUI() {
+        setNaviItem()
+        setLayout()
+    }
+    
+    private func setLayout() {
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
@@ -148,8 +150,14 @@ final class ReviewEditViewContoller: TitleNaviViewController, View {
     private func setNaviItem() {
         self.setBarItem(type: .left)
     }
+}
 
-    // MARK: - Bind
+// MARK: - Reactor Setup
+extension ReviewEditViewContoller {
+    private func setReactor() {
+        reactor = reviewEditReactor
+    }
+    
     func bind(reactor: ReviewEditViewReactor) {
         inputBind(reactor)
         outputBind(reactor)

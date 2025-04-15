@@ -56,16 +56,13 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
         self.navigationController.viewControllers.removeAll()
     }
     
-    func dismiss() {
-        self.navigationController.dismiss(animated: true)
+    func dismiss(completion: (() -> Void)?) {
+        self.navigationController.dismiss(animated: true,
+                                          completion: completion)
     }
     
     func pop() {
         self.navigationController.popViewController(animated: true)
-    }
-    
-    func resetToRootView() {
-        
     }
 }
 

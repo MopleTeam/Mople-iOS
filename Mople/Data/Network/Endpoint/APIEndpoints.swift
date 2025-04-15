@@ -413,3 +413,34 @@ extension APIEndpoints {
                             queryParameters: ["date":"\(month)"])
     }
 }
+
+// MARK: - 알림
+extension APIEndpoints {
+    static func fetchNotify() throws -> Endpoint<[NotifyResponse]> {
+        return try Endpoint(path: "notification/list",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+}
+
+// MARK: - 알림 구독
+extension APIEndpoints {
+    static func fetchNotifyState() throws -> Endpoint<[String]> {
+        return try Endpoint(path: "notification/subscribe",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader())
+    }
+    
+    static func subscribeMeetNotify(type: SubscribeType,
+                                    isSubscribe: Bool) throws -> Endpoint<Void> {
+        
+        let path = isSubscribe ? "notification/subscribe" : "notification/unsubscribe"
+        return try Endpoint(path: path,
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            bodyParameters: ["topics": ["\(type.rawValue)"]])
+    }
+}

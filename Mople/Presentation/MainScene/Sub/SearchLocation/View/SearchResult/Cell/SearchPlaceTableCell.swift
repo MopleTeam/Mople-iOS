@@ -11,10 +11,13 @@ import SnapKit
 
 final class SearchPlaceTableCell: UITableViewCell {
     
+    // MARK: - Variables
     private var disposeBag = DisposeBag()
     
+    // MARK: - Closure
     public var deleteButtonTapped: (() -> Void)?
         
+    // MARK: - UI Components
     private let placeIcon: UIImageView = {
         let view = UIImageView()
         view.image = .location
@@ -75,22 +78,25 @@ final class SearchPlaceTableCell: UITableViewCell {
         sv.distribution = .fill
         return sv
     }()
-    
+     
+    // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
-        bind()
+        setAction()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
         self.contentView.backgroundColor = highlighted ? ColorStyle.BG.primary : ColorStyle.Default.white
     }
 
+    // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .clear
         self.contentView.addSubview(mainStackView)
@@ -100,15 +106,7 @@ final class SearchPlaceTableCell: UITableViewCell {
         }
     }
     
-    private func bind() {
-        self.deleteButton.rx.controlEvent(.touchUpInside)
-            .asDriver()
-            .drive(with: self, onNext: { cell, _ in
-                cell.deleteButtonTapped?()
-            })
-            .disposed(by: disposeBag)
-    }
-    
+    // MARK: - Configure
     public func configure(with viewModel: SearchPlaceViewModel) {
         self.titleLabel.text = viewModel.title
         self.addressLabel.text = viewModel.address
@@ -116,6 +114,16 @@ final class SearchPlaceTableCell: UITableViewCell {
     
     public func shouldShowButton(isEnabled: Bool) {
         self.deleteButton.isHidden = !isEnabled
+    }
+    
+    // MARK: - Action
+    private func setAction() {
+        self.deleteButton.rx.controlEvent(.touchUpInside)
+            .asDriver()
+            .drive(with: self, onNext: { cell, _ in
+                cell.deleteButtonTapped?()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

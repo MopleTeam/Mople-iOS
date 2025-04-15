@@ -9,7 +9,7 @@ import Foundation
 import ReactorKit
 
 protocol MeetReviewListCommands: AnyObject {
-    func reset()
+    func fetchReview()
 }
 
 final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
@@ -28,29 +28,36 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var reviews: [Review] = []
     }
     
+    // MARK: - Variables
     var initialState: State = State()
+    private let meetId: Int
     
+    // MARK: - UseCase
     private let fetchReviewUseCase: FetchReviewList
-    private weak var coordinator: MeetDetailCoordination?
-    private weak var delegate: MeetDetailDelegate?
-    private let meedId: Int
     
+    // MARK: - Coordinator
+    private weak var coordinator: MeetDetailCoordination?
+    
+    // MARK: - Delegate
+    private weak var delegate: MeetDetailDelegate?
+    
+    // MARK: - LifeCycle
     init(fetchReviewUseCase: FetchReviewList,
          coordinator: MeetDetailCoordination,
          delegate: MeetDetailDelegate,
-         meetID: Int) {
+         meetId: Int) {
         self.fetchReviewUseCase = fetchReviewUseCase
         self.coordinator = coordinator
         self.delegate = delegate
-        self.meedId = meetID
+        self.meetId = meetId
         logLifeCycle()
-        action.onNext(.requestReviewList)
     }
     
     deinit {
         logLifeCycle()
     }
     
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .requestReviewList:
@@ -75,33 +82,20 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
+// MARK: - Data Requset
 extension MeetReviewListViewReactor {
     private func fetchReviewList() -> Observable<Mutation> {
         
-        let fetchPlanList = fetchReviewUseCase.execute(meetId: meedId)
+        let fetchPlanList = fetchReviewUseCase.execute(meetId: meetId)
             .catchAndReturn([])
             .map({ Mutation.fetchReviewList(reviews: $0) })
             .asObservable()
                 
         return requestWithLoading(task: fetchPlanList)
     }
-    
-    private func presentReviewDetailView(index: Int) -> Observable<Mutation> {
-        guard let selectedReview = currentState.reviews[safe: index],
-              let reviewId = selectedReview.id else { return .empty() }
-        self.coordinator?.pushPlanDetailView(postId: reviewId,
-                                             type: .review)
-        return .empty()
-    }
 }
 
-extension MeetReviewListViewReactor: MeetReviewListCommands {
-    func reset() {
-        action.onNext(.requestReviewList)
-    }
-}
-
-// MARK: - 리뷰 알림 수신
+// MARK: - Notify
 extension MeetReviewListViewReactor {
     private func handleReviewPayload(_ payload: ReviewPayload) -> Observable<Mutation> {
         var reviewList = currentState.reviews
@@ -131,6 +125,25 @@ extension MeetReviewListViewReactor {
     }
 }
 
+// MARK: - Coordination
+extension MeetReviewListViewReactor {
+    private func presentReviewDetailView(index: Int) -> Observable<Mutation> {
+        guard let selectedReview = currentState.reviews[safe: index],
+              let reviewId = selectedReview.id else { return .empty() }
+        self.coordinator?.pushPlanDetailView(postId: reviewId,
+                                             type: .review)
+        return .empty()
+    }
+}
+
+// MARK: - Command
+extension MeetReviewListViewReactor: MeetReviewListCommands {
+    func fetchReview() {
+        action.onNext(.requestReviewList)
+    }
+}
+
+// MARK: - Loading & Error
 extension MeetReviewListViewReactor: ChildLoadingReactor {
     var parent: ChildLoadingDelegate? { delegate }
     var index: Int { 1 }

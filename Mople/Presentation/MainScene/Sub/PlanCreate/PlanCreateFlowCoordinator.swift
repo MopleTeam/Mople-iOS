@@ -13,15 +13,20 @@ protocol PlanCreateCoordination: AnyObject {
     func presentTimeSelectView()
     func presentSearchLocationView()
     func endFlow()
+    func completed(with plan: Plan)
 }
 
 final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
+    
     private let dependencies: PlanCreateSceneDependencies
     private var planCreateVC: CreatePlanViewController?
+    private let completion: ((Plan) -> Void)?
     
     init(navigationController: AppNaviViewController,
-         dependencies: PlanCreateSceneDependencies) {
+         dependencies: PlanCreateSceneDependencies,
+         completionHandler: ((Plan) -> Void)? = nil) {
         self.dependencies = dependencies
+        self.completion = completionHandler
         super.init(navigationController: navigationController)
         setDismissGestureCompletion()
     }
@@ -32,9 +37,8 @@ final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
     }
 }
 
-// MARK: - Presnet VC
+// MARK: - Picker View
 extension PlanCreateFlowCoordinator {
-    #warning("뷰이동이 있는 경우의 피커뷰만 코디네이터에서 생성")
     func presentGroupSelectView() {
         let vc = dependencies.makeGroupSelectViewController()
         navigationController.present(vc, animated: true)
@@ -51,7 +55,7 @@ extension PlanCreateFlowCoordinator {
     }
 }
 
-// MARK: - Present Flow
+// MARK: - Search Loaction Flow
 extension PlanCreateFlowCoordinator {
     func presentSearchLocationView() {
         let flow = dependencies.makeSearchLocationCoordinator()
@@ -63,7 +67,16 @@ extension PlanCreateFlowCoordinator {
 // MARK: - End Flow
 extension PlanCreateFlowCoordinator {
     
+    func completed(with plan: Plan) {
+        print(#function, #line, "성공했잖아?" )
+        self.navigationController.dismiss(animated: true) { [weak self] in
+            self?.completion?(plan)
+            self?.clear()
+        }
+    }
+    
     func endFlow() {
+        print(#function, #line, "성공했는데..?" )
         self.navigationController.dismiss(animated: true) { [weak self] in
             self?.clear()
         }

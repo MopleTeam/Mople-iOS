@@ -146,21 +146,4 @@ extension MainSceneCoordinator {
         
         return (index, destinationVC)
     }
-    
-    private func containsViewController(navigation: UINavigationController,
-                                        destination: UIViewController.Type) -> Bool {
-        return navigation.viewControllers.contains(where: { view in
-            view.isKind(of: destination) })
-    }
-    
-    private func prepareViewController(viewController: UIViewController,
-                      destination: Route) -> Bool {
-        
-        if case .calendar(let presentDate) = destination,
-           let calendarVC = viewController as? CalendarScheduleViewController {
-            calendarVC.presentEvent(on: presentDate)
-        }
-        
-        return viewController.isKind(of: destination.type)
-    }
 }

@@ -29,7 +29,7 @@ final class ReviewEditFlowCoordinator: BaseCoordinator, ReviewEditViewCoordinati
     }
 }
 
-// MARK: - 멤버 리스트 이동
+// MARK: - MemberList View
 extension ReviewEditFlowCoordinator: MemberListViewCoordination {
     func pushMemberListView() {
         let view = dependencies.makeMemberListViewController(coordinator: self)
@@ -37,7 +37,7 @@ extension ReviewEditFlowCoordinator: MemberListViewCoordination {
     }
 }
 
-// MARK: - 플로우 종료
+// MARK: - End Flow
 extension ReviewEditFlowCoordinator {
     func endFlow() {
         self.navigationController.dismiss(animated: true) { [weak self] in

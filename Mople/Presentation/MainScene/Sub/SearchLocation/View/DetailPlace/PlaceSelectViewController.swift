@@ -12,19 +12,30 @@ import RxSwift
 
 final class PlaceSelectViewController: BaseViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = SearchPlaceViewReactor
-    
+    private var searchPlaceReactor: SearchPlaceViewReactor?
     var disposeBag = DisposeBag()
     
+    // MARK: - Variables
     private let placeInfo: PlaceInfo
         
-    private let mapView = MapInfoView(type: .select)
+    // MARK: - UI Components
+    private let mapView: MapInfoView = {
+        let view = MapInfoView()
+        view.setSelectButton(text: "장소 선택",
+                             textFont: FontStyle.Title3.semiBold,
+                             textColor: ColorStyle.Default.white,
+                             backColor: ColorStyle.App.primary)
+        return view
+    }()
     
+    // MARK: - LifeCycle
     init(reactor: SearchPlaceViewReactor?,
          place: PlaceInfo) {
         self.placeInfo = place
         super.init()
-        self.reactor = reactor
+        searchPlaceReactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -33,10 +44,12 @@ final class PlaceSelectViewController: BaseViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
+        setupUI()
+        setReactor()
     }
 
-    private func initalSetup() {
+    // MARK: - UI Setup
+    private func setupUI() {
         setLayout()
         setPlace()
     }
@@ -52,12 +65,17 @@ final class PlaceSelectViewController: BaseViewController, View {
     private func setPlace() {
         mapView.setConfigure(.init(place: placeInfo))
     }
+    
+    // MARK: - Reactor Setup
+    private func setReactor() {
+        reactor = searchPlaceReactor
+    }
 
     func bind(reactor: SearchPlaceViewReactor) {
-        self.mapView.selectedButton.rx.controlEvent(.touchUpInside)
+        self.mapView.rx.selected
             .compactMap { [weak self] _ in
                 guard let self else { return nil }
-                return Reactor.Action.completed(place: placeInfo)
+                return Reactor.Action.flow(.completed(place: placeInfo))
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

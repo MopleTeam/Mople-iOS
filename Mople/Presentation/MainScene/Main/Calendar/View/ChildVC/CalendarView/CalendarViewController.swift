@@ -19,8 +19,9 @@ enum ScopeType {
 
 final class CalendarViewController: BaseViewController, View {
 
+    // MARK: - Reactor
     typealias Reactor = CalendarViewReactor
-
+    private var calendarReactor: CalendarViewReactor?
     var disposeBag = DisposeBag()
 
     // MARK: - Variables
@@ -39,15 +40,8 @@ final class CalendarViewController: BaseViewController, View {
 
     // MARK: - Gestrue
     private let gestureObserver: Observable<UIPanGestureRecognizer>
-    
-    /// 제스처 시작 시 캘린더 minX(Offset)
-    private var startCalendarOffset: CGPoint?
     private var gestureDirection: GestureDirection?
-    
-    /// 가로 스크롤 카운트
-    /// - 가로 스크롤 시 발생하는 0.33 애니메이션 사이에 추가로 들어오는 제스처를 제어용도
-    // 카운트는 began에서 올려줘야 함.
-    // 0.33 사이에 두번째 제스처가 들어오고 ended가 아닌 상태에서 첫번째 제스처가 끝이나면 수직 제스처가 허용되는 상황이 발생6
+    private var startCalendarOffset: CGPoint?
     private var horizonGestureCount: Int = 0
 
     // MARK: - UI Components
@@ -70,7 +64,7 @@ final class CalendarViewController: BaseViewController, View {
          verticalGestureObserver: Observable<UIPanGestureRecognizer>) {
         self.gestureObserver = verticalGestureObserver
         super.init()
-        self.reactor = reactor
+        self.calendarReactor = reactor
     }
 
     required init?(coder: NSCoder) {
@@ -80,13 +74,18 @@ final class CalendarViewController: BaseViewController, View {
     override func viewDidLoad() {
         print(#function, #line)
         super.viewDidLoad()
-        setCalendar()
         setupUI()
-        setGestrueAction()
+        setReactor()
+        setGestrue()
     }
 
     // MARK: - UI Setup
     private func setupUI() {
+        setCalendar()
+        setLayout()
+    }
+    
+    private func setLayout() {
         view.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
         view.backgroundColor = ColorStyle.Default.white
         view.addSubview(calendar)
@@ -127,7 +126,23 @@ final class CalendarViewController: BaseViewController, View {
         calendar.appearance.selectionColor = .clear
     }
 
-    // MARK: - Binding
+    // MARK: - Gesture Setup
+    private func setGestrue() {
+        self.gestureObserver
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { vc, gesture in
+                vc.handleGesture(gesture)
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Reactor Setup
+extension CalendarViewController {
+    private func setReactor() {
+        reactor = calendarReactor
+    }
+    
     func bind(reactor: CalendarViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
@@ -144,7 +159,7 @@ final class CalendarViewController: BaseViewController, View {
             .disposed(by: disposeBag)
      
         reactor.pulse(\.$page)
-            .observe(on: MainScheduler.asyncInstance)
+            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, date in
@@ -202,7 +217,6 @@ final class CalendarViewController: BaseViewController, View {
             .filter({ [weak self] _ in
                 return self?.calendar.scope == .month
             })
-            .do(onNext: { print(#function, #line, "#0319 선택된 날짜 : \($0)" ) })
             .map { Reactor.Action.childEvent(.changedPage($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -216,18 +230,6 @@ final class CalendarViewController: BaseViewController, View {
             .compactMap({ $0 })
             .map { Reactor.Action.childEvent(.selectedDate($0)) }
             .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-    }
-
-
-    // MARK: - Set Observer
-    /// 상위뷰에서 제스처 동작이 들어온 경우
-    private func setGestrueAction() {
-        self.gestureObserver
-            .observe(on: MainScheduler.instance)
-            .subscribe(with: self, onNext: { vc, gesture in
-                vc.handleGesture(gesture)
-            })
             .disposed(by: disposeBag)
     }
 }
@@ -477,7 +479,6 @@ extension CalendarViewController {
     }
 
     /// 제스처 핸들링
-    /// isPageAnimation : 가로 스크롤 애니메이션 중 제스처
     private func handleGestureWhenMonth(_ gesture: UIPanGestureRecognizer) {
         let calendarCollectionView = self.calendar.collectionView!
         let velocity = gesture.velocity(in: self.parent?.view)
@@ -616,7 +617,7 @@ extension CalendarViewController {
     private func setPreSelectedDateWhenMonth() {
         guard calendar.scope == .month else { return }
         preSelectedDate = selectedDateInCurrentMonth()
-        ?? findSameMonthDate(on: calendar.currentPage)
+        ?? findFirstEvent(on: calendar.currentPage)
         ?? findSmallestNextMonth(on: calendar.currentPage)
         ?? findLargestPreviousDate(on: calendar.currentPage)
     }
@@ -665,12 +666,7 @@ extension CalendarViewController {
     private func findFirstEvent(on date: Date) -> Date? {
         let currentMonthDate = events.filter({ DateManager.isSameMonth($0, date) })
         let activeEvent = currentMonthDate.filter { DateManager.isFutureOrToday(on: $0) }
-        return activeEvent.min() ?? currentMonthDate.min()
-    }
-    
-    /// date와 같은 달의 이벤트 중 가장 첫번째
-    private func findSameMonthDate(on date: Date) -> Date? {
-        return events.filter({ DateManager.isSameMonth($0, date) }).min()
+        return activeEvent.min() ?? currentMonthDate.max()
     }
     
     /// date보다 과거 이벤트 중 가장 큰 것

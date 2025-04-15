@@ -12,13 +12,13 @@ import ReactorKit
 
 final class CalendarScheduleViewController: TitleNaviViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = CalendarScheduleViewReactor
-    
-    // MARK: - Variables
+    private var calendarScheduleReactor: CalendarScheduleViewReactor?
     var disposeBag = DisposeBag()
         
-    // MARK: - Observer
-    private let monthSelectedObserver: PublishSubject<Date> = .init()
+    // MARK: - Observable
+    private let monthSelectedObserver: BehaviorSubject<Date?> = .init(value: nil)
     public let panGestureObserver: PublishSubject<UIPanGestureRecognizer> = .init()
     
     // MARK: - Gesture
@@ -68,7 +68,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     init(title: String,
          reactor: CalendarScheduleViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.calendarScheduleReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -79,6 +79,7 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         print(#function, #line)
         super.viewDidLoad()
         setupUI()
+        setReactor()
         setAction()
         setGesture()
     }
@@ -132,7 +133,34 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
         }
     }
     
-    // MARK: - Binding
+    // MARK: - Action
+    private func setAction() {
+        headerButton.rx.controlEvent(.touchUpInside)
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.presentDatePicker()
+            })
+            .disposed(by: disposeBag)
+        
+        scopeGesture.rx.event
+            .asDriver()
+            .drive(panGestureObserver)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Gestrue
+    private func setGesture() {
+        scopeGesture.delegate = self
+        self.view.addGestureRecognizer(scopeGesture)
+    }
+}
+
+// MARK: - Reactor Setup
+extension CalendarScheduleViewController {
+    private func setReactor() {
+        reactor = calendarScheduleReactor
+    }
+    
     func bind(reactor: CalendarScheduleViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
@@ -140,6 +168,35 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
     }
     
     private func inputBind(_ reactor: Reactor) {
+        naviBar.rightItemEvent
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.changeScope }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        naviBar.leftItemEvent
+            .observe(on: MainScheduler.instance)
+            .map { Reactor.Action.changeScope }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        let monthObserver = monthSelectedObserver
+            .compactMap({ $0 })
+            .observe(on: MainScheduler.asyncInstance)
+        
+        monthObserver
+            .map { Reactor.Action.changeMonth($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        monthObserver
+            .subscribe(with: self, onNext: { vc, month in
+                vc.setHeaderLabel(month.toDateComponents())
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$changeMonth)
             .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
@@ -166,38 +223,16 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)
-            .debug("로딩 들어와")
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
-            .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
                 vc.handleError(err)
             })
-            .disposed(by: disposeBag)
-    }
-    
-    private func outputBind(_ reactor: Reactor) {
-        naviBar.rightItemEvent
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.changeScope }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        naviBar.leftItemEvent
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.changeScope }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        monthSelectedObserver
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.changeMonth($0) }
-            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
@@ -226,26 +261,6 @@ final class CalendarScheduleViewController: TitleNaviViewController, View {
             .map { Reactor.Action.midnightUpdate }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: - Action
-    private func setAction() {
-        headerButton.rx.controlEvent(.touchUpInside)
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.presentDatePicker()
-            })
-            .disposed(by: disposeBag)
-        
-        scopeGesture.rx.event
-            .asDriver()
-            .drive(panGestureObserver)
-            .disposed(by: disposeBag)
-    }
-    
-    private func setGesture() {
-        scopeGesture.delegate = self
-        self.view.addGestureRecognizer(scopeGesture)
     }
     
     // MARK: - 에러 핸들링
@@ -293,7 +308,6 @@ extension CalendarScheduleViewController {
         let datePickView = YearMonthPickerViewController(defaultDate: defaultDate)
         datePickView.completed = { [weak self] selectedMonth in
             guard let monthDate = selectedMonth.toDate() else { return }
-            self?.setHeaderLabel(selectedMonth)
             self?.monthSelectedObserver.onNext(monthDate)
         }
         datePickView.modalPresentationStyle = .pageSheet
@@ -363,12 +377,10 @@ extension CalendarScheduleViewController {
     }
 }
 
-// MARK: - Home View에서 넘어왔을 때의 액션
+// MARK: - From HomeView
 extension CalendarScheduleViewController {
     public func presentEvent(on lastRecentDate: Date) {
-        DispatchQueue.main.async { [weak self] in
-            self?.monthSelectedObserver.onNext(lastRecentDate)
-        }
+        monthSelectedObserver.onNext(lastRecentDate)
     }
 }
 

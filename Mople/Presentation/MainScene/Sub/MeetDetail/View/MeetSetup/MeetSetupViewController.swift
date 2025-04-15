@@ -13,15 +13,17 @@ import ReactorKit
 
 final class MeetSetupViewController: TitleNaviViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = MeetSetupViewReactor
-    
-    // MARK: - Variables
+    private var meetSetupReactor: MeetSetupViewReactor?
     var disposeBag = DisposeBag()
-    private var isHost: Bool = false
     
-    // MARK: - Observer
+    // MARK: - Observable
     private let endFlow: PublishSubject<Void> = .init()
     private let deleteMeet: PublishSubject<Void> = .init()
+    
+    // MARK: - Variables
+    private var isHost: Bool = false
     
     // MARK: - UI Components
     private let thumbnailImage: UIImageView = {
@@ -126,26 +128,23 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     init(title: String?,
          reactor: MeetSetupViewReactor) {
         super.init(title: title)
-        self.reactor = reactor
+        self.meetSetupReactor = reactor
     }
     
-    @MainActor required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
-    }
-    
-    private func initalSetup() {
-        setLayout()
+        setupUI()
+        setReactor()
         setDeleteButtonAction()
     }
     
     // MARK: - UI Setup
-    private func setLayout() {
-        setupUI()
+    private func setupUI() {
+        setLayout()
         setupNavi()
     }
     
@@ -154,7 +153,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         self.setBarItem(type: .right, image: .invite)
     }
     
-    private func setupUI() {
+    private func setLayout() {
         self.view.addSubview(mainStackView)
         self.memberListButton.addSubview(memberCountLabel)
         
@@ -184,7 +183,63 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         }
     }
     
-    // MARK: - Bind
+    private func setMeetInfo(_ meet: Meet) {
+        thumbnailImage.kfSetimage(meet.meetSummary?.imagePath,
+                                  defaultImageType: .meet)
+        meetNameButton.title = meet.meetSummary?.name
+        setMemberCountLabel(meet.memberCount)
+        setSinceLabel(meet.sinceDays)
+    }
+    
+    private func setLeaveButtonText() {
+        deleteButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
+                             font: FontStyle.Title3.medium,
+                             normalColor: isHost ? ColorStyle.Default.red : ColorStyle.Gray._01)
+    }
+    
+    private func setNameButtonImage() {
+        guard isHost else { return }
+        meetNameButton.setImage(image: .editPan)
+        meetNameButton.isEnabled = true
+    }
+    
+    private func setMemberCountLabel(_ memberCount: Int?) {
+        guard let memberCount else { return }
+        memberCountLabel.text = "\(memberCount)명"
+    }
+    
+    private func setSinceLabel(_ sinceDayCount: Int?) {
+        let sinceCount = String(sinceDayCount ?? 0)
+        let text = "우리가 추억을 쌓은지 \(sinceCount) 일째"
+        sinceDayLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: text,
+                                                                                   highlightText: sinceCount,
+                                                                                   highlightFont: FontStyle.Body1.bold)
+    }
+    
+    // MARK: - Action
+    private func setDeleteButtonAction() {
+        deleteButton.rx.controlEvent(.touchUpInside)
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.handleDeleteMeet()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleDeleteMeet() {
+        if isHost {
+            showDeleteAlert()
+        } else {
+            deleteMeet.onNext(())
+        }
+    }
+}
+
+// MARK: - Reactor Setup
+extension MeetSetupViewController {
+    private func setReactor() {
+        reactor = meetSetupReactor
+    }
+    
     func bind(reactor: MeetSetupViewReactor) {
         inputBind(reactor: reactor)
         outputBind(reactor: reactor)
@@ -259,23 +314,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             .disposed(by: disposeBag)
     }
     
-    // MARK: - Action
-    private func setDeleteButtonAction() {
-        deleteButton.rx.controlEvent(.touchUpInside)
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.handleDeleteMeet()
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func handleDeleteMeet() {
-        if isHost {
-            showDeleteAlert()
-        } else {
-            deleteMeet.onNext(())
-        }
-    }
-    
     // MARK: - Error
     private func handleError(_ err: MeetSetupError) {
         switch err {
@@ -286,8 +324,10 @@ final class MeetSetupViewController: TitleNaviViewController, View {
             })
         }
     }
-    
-    // MARK: - Alert
+}
+
+// MARK: - Alert
+extension MeetSetupViewController {
     private func showDeleteAlert() {
         let action: DefaultAction = .init(text: "모임삭제",
                                           tintColor: ColorStyle.Default.white,
@@ -300,42 +340,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
                                subTitle: "해당 모임에 대한 모든 기록을 복구할 수 없어요",
                                defaultAction: .init(text: "취소"),
                                addAction: [action])
-    }
-}
-
-// MARK: - State 적용
-extension MeetSetupViewController {
-    private func setMeetInfo(_ meet: Meet) {
-        thumbnailImage.kfSetimage(meet.meetSummary?.imagePath,
-                                  defaultImageType: .meet)
-        meetNameButton.title = meet.meetSummary?.name
-        setMemberCountLabel(meet.memberCount)
-        setSinceLabel(meet.sinceDays)
-    }
-    
-    private func setLeaveButtonText() {
-        deleteButton.setTitle(text: isHost ? "모임 삭제" : "모임 나가기",
-                             font: FontStyle.Title3.medium,
-                             normalColor: isHost ? ColorStyle.Default.red : ColorStyle.Gray._01)
-    }
-    
-    private func setNameButtonImage() {
-        guard isHost else { return }
-        meetNameButton.setImage(image: .editPan)
-        meetNameButton.isEnabled = true
-    }
-    
-    private func setMemberCountLabel(_ memberCount: Int?) {
-        guard let memberCount else { return }
-        memberCountLabel.text = "\(memberCount)명"
-    }
-    
-    private func setSinceLabel(_ sinceDayCount: Int?) {
-        let sinceCount = String(sinceDayCount ?? 0)
-        let text = "우리가 추억을 쌓은지 \(sinceCount) 일째"
-        sinceDayLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: text,
-                                                                                   highlightText: sinceCount,
-                                                                                   highlightFont: FontStyle.Body1.bold)
     }
 }
 

@@ -21,10 +21,11 @@ protocol CommonSceneFactory {
                                       isEdit: Bool,
                                       type: MeetCreationType,
                                       coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
-    func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator
+    func makePlanCreateCoordinator(type: PlanCreationType,
+                                   completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makeMeetDetailCoordiantor(meetId: Int) -> BaseCoordinator
     func makePlanDetailCoordinator(postId: Int,
                                    type: PlanDetailType) -> BaseCoordinator
-    func makeReviewEditCoordinator(review: Review) -> BaseCoordinator
 }
 
 final class CommonDIContainer: CommonSceneFactory {
@@ -138,12 +139,13 @@ extension CommonDIContainer {
     }
     
     // MARK: - 일정 생성 플로우
-    func makePlanCreateCoordinator(type: PlanCreationType) -> BaseCoordinator {
+    func makePlanCreateCoordinator(type: PlanCreationType,
+                                   completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonFactory: self,
             type: type)
-        return planCreateDI.makePlanCreateFlowCoordinator()
+        return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completionHandler)
     }
     
     // MARK: - 일정 상세 뷰
@@ -156,12 +158,11 @@ extension CommonDIContainer {
         return planDetailDI.makePlanDetailCoordinator()
     }
     
-    // MARK: - 리뷰 편집 플로우
-    func makeReviewEditCoordinator(review: Review) -> BaseCoordinator {
-        let reviewEditDI = ReviewEditSceneDIContainer(
-            appNetworkService: appNetworkService,
-            commonFactory: self,
-            review: review)
-        return reviewEditDI.makeReviewEditCoordinator()
+    // MARK: - 모임 상세 뷰
+    func makeMeetDetailCoordiantor(meetId: Int) -> BaseCoordinator {
+        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: self,
+                                                      meetId: meetId)
+        return meetDetailDI.makeMeetDetailCoordinator()
     }
 }

@@ -28,7 +28,7 @@ final class CalendarFlowCoordinator: BaseCoordinator, CalendarCoordination {
     }
 }
 
-// MARK: - 기본 뷰
+// MARK: - Default View
 extension CalendarFlowCoordinator {
     private func makeMainViewController() -> CalendarScheduleViewController {
         let mainVC = dependencies.makeCalendarScheduleViewcontroller(coordinator: self)

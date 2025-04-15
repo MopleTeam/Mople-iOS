@@ -27,15 +27,21 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: Error?
     }
     
-    private let fetchUseCase: FetchMeetList
-    private weak var coordinator: MeetListFlowCoordination?
+    // MARK: - Variables
     var initialState: State = State()
     
+    // MARK: - UseCase
+    private let fetchUseCase: FetchMeetList
+    
+    // MARK: - Coordinator
+    private weak var coordinator: MeetListFlowCoordination?
+    
+    // MARK: - LifeCycle
     init(fetchUseCase: FetchMeetList,
          coordinator: MeetListFlowCoordination) {
         self.fetchUseCase = fetchUseCase
         self.coordinator = coordinator
-        action.onNext(.fetchMeetList)
+        initialAction()
         logLifeCycle()
     }
     
@@ -43,6 +49,12 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - InitialSetup
+    private func initialAction() {
+        action.onNext(.fetchMeetList)
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchMeetList:
@@ -70,7 +82,7 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
-
+// MARK: - Data Request
 extension MeetListViewReactor {
     private func fetchMeetList() -> Observable<Mutation> {
         
@@ -80,7 +92,10 @@ extension MeetListViewReactor {
         
         return requestWithLoading(task: fetchData)
     }
-    
+}
+
+// MARK: - Coordination
+extension MeetListViewReactor {
     private func presentMeetDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedGroup = currentState.meetList[safe: index],
               let id = selectedGroup.meetSummary?.id else { return .empty() }
@@ -89,7 +104,8 @@ extension MeetListViewReactor {
     }
 }
 
-// MARK: - 노티피케이션
+
+// MARK: - Notify
 extension MeetListViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
         var meetList = currentState.meetList
@@ -122,6 +138,7 @@ extension MeetListViewReactor {
     }
 }
 
+// MARK: - Loading & Error
 extension MeetListViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

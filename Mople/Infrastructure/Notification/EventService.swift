@@ -116,4 +116,5 @@ extension Notification.Name {
     static let postReview = Notification.Name("postReview")
     static let midnightUpdate = Notification.Name("midnightUpdate")
     static let sessionExpired = Notification.Name("sessionExpired")
+    static let editProfile = Notification.Name("editProfile")
 }

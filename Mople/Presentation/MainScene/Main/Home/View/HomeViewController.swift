@@ -11,8 +11,9 @@ import Kingfisher
 
 final class HomeViewController: DefaultViewController, View {
  
+    // MARK: - Reactor
     typealias Reactor = HomeViewReactor
-    
+    private(set) var homeReactor: HomeViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -50,10 +51,8 @@ final class HomeViewController: DefaultViewController, View {
         return sv
     }()
     
-    private let recentPlanContainerView = UIView()
-    
-    private var planListCollectionView: HomePlanCollectionViewController?
-        
+    private(set) var recentPlanContainerView = UIView()
+            
     private let makeMeetButton: CardButton = {
         let btn = CardButton()
         btn.setTitle(text: TextStyle.Home.createGroup)
@@ -96,36 +95,24 @@ final class HomeViewController: DefaultViewController, View {
         return sv
     }()
     
+    // MARK: - LifeCycle
     init(reactor: HomeViewReactor) {
         super.init()
-        self.reactor = reactor
-        addPlanListView(reactor: reactor)
-        setNotification(reactor: reactor)
+        self.homeReactor = reactor
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Child VC
-    private func addPlanListView(reactor: HomeViewReactor) {
-        let vc = HomePlanCollectionViewController(reactor: reactor)
-        planListCollectionView = vc
-        add(child: vc, container: recentPlanContainerView)
-    }
-    
-    // MARK: - Set UI
     override func viewDidLoad() {
         print(#function, #line)
         super.viewDidLoad()
         setupUI()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        print(#function, #line)
+        setReactor()
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = ColorStyle.BG.primary
         self.view.addSubview(scrollView)
@@ -154,23 +141,43 @@ final class HomeViewController: DefaultViewController, View {
             make.width.height.greaterThanOrEqualTo(40)
         }
     }
+}
+
+// MARK: - Reactor Setup
+extension HomeViewController {
+    private func setReactor() {
+        reactor = homeReactor
+    }
     
     func bind(reactor: HomeViewReactor) {
+        inputBind(reactor)
+        outputBind(reactor)
+        setNotification(reactor: reactor)
+    }
+    
+    private func inputBind(_ reactor: Reactor) {
         rx.viewDidLoad
-            .map { _ in Reactor.Action.checkNotificationPermission }
+            .map { Reactor.Action.checkNotificationPermission }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.makeMeetButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.flow(.createGroup) }
+        makeMeetButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.createGroup) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.makeScheduleButton.rx.controlEvent(.touchUpInside)
-            .map { _ in Reactor.Action.flow(.createPlan) }
+        makeScheduleButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.createPlan) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        notifyButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.notify) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
@@ -183,17 +190,6 @@ final class HomeViewController: DefaultViewController, View {
                 vc.handleError(err)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func handleError(_ err: HomeError) {
-        switch err {
-        case .emptyMeet:
-            self.showEmptyMeetAlert()
-        case let .midnight(err):
-            alertManager.showDateErrorMessage(err: err)
-        case .unknown:
-            alertManager.showDefatulErrorMessage()
-        }
     }
     
     private func setNotification(reactor: Reactor) {
@@ -216,6 +212,18 @@ final class HomeViewController: DefaultViewController, View {
             .map { Reactor.Action.reloadDay }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Error Handling
+    private func handleError(_ err: HomeError) {
+        switch err {
+        case .emptyMeet:
+            self.showEmptyMeetAlert()
+        case let .midnight(err):
+            alertManager.showDateErrorMessage(err: err)
+        case .unknown:
+            alertManager.showDefatulErrorMessage()
+        }
     }
 }
 

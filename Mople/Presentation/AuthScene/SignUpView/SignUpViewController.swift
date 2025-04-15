@@ -12,9 +12,11 @@ import ReactorKit
 import SnapKit
 import PhotosUI
 
-class SignUpViewController: DefaultViewController, View {
-    typealias Reactor = SignUpViewReactor
+class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     
+    // MARK: - Reactor
+    typealias Reactor = SignUpViewReactor
+    private var signReactor: SignUpViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Observable
@@ -39,7 +41,7 @@ class SignUpViewController: DefaultViewController, View {
     // MARK: - LifeCycle
     init(signUpReactor: SignUpViewReactor) {
         super.init()
-        self.reactor = signUpReactor
+        self.signReactor = signUpReactor
     }
     
     required init?(coder: NSCoder) {
@@ -48,17 +50,14 @@ class SignUpViewController: DefaultViewController, View {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initalSetup()
-    }
-    
-    private func initalSetup() {
-        setLayout()
+        setupUI()
+        setReactor()
         setAction()
-        setupKeyboardDismissGestrue()
+        setupTapKeyboardDismiss()
     }
     
     // MARK: - UI Setup
-    private func setLayout() {
+    private func setupUI() {
         self.view.backgroundColor = .white
         self.view.addSubview(mainTitle)
         self.view.addSubview(profileSetupView)
@@ -76,7 +75,23 @@ class SignUpViewController: DefaultViewController, View {
         }
     }
     
-    // MARK: - Binding
+    // MARK: - Action
+    private func setAction() {
+        profileSetupView.rx.imageViewTapped
+            .asDriver(onErrorJustReturn: ())
+            .drive(with: self, onNext: { vc, _ in
+                vc.showPhotos()
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Reactor Setup
+extension SignUpViewController {
+    private func setReactor() {
+        reactor = signReactor
+    }
+    
     func bind(reactor: SignUpViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
@@ -151,15 +166,6 @@ class SignUpViewController: DefaultViewController, View {
             .disposed(by: disposeBag)
     }
     
-    private func setAction() {
-        profileSetupView.rx.imageViewTapped
-            .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.showPhotos()
-            })
-            .disposed(by: disposeBag)
-    }
-    
     // MARK: - Error Handling
     private func handleError(_ err: SignUpError) {
         switch err {
@@ -169,12 +175,6 @@ class SignUpViewController: DefaultViewController, View {
             alertManager.showAlert(title: compressionPhotoError.info,
                                    subTitle: compressionPhotoError.subInfo)
         }
-    }
-}
-
-extension SignUpViewController: KeyboardDismissable {
-    private func setupKeyboardDismissGestrue() {
-        setupTapKeyboardDismiss()
     }
 }
 

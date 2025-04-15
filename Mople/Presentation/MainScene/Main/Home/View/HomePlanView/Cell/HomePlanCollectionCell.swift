@@ -10,6 +10,7 @@ import SnapKit
 
 final class HomePlanCollectionCell: UICollectionViewCell {
 
+    // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
         let view = ThumbnailView(thumbnailSize: 28,
                                       thumbnailRadius: 6)
@@ -69,7 +70,7 @@ final class HomePlanCollectionCell: UICollectionViewCell {
         return sv
     }()
     
-    
+    // MARK: - LifeCycle
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -79,6 +80,7 @@ final class HomePlanCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - UI Setup
     private func setupUI() {
         setLayout()
         setInfoLabel()
@@ -117,6 +119,7 @@ final class HomePlanCollectionCell: UICollectionViewCell {
         }
     }
 
+    // MARK: - Configure
     public func configure(with viewModel: HomePlanModel) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString

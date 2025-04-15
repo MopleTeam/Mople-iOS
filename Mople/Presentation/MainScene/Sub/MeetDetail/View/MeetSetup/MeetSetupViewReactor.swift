@@ -48,29 +48,36 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: MeetSetupError?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
-    
     private var isLoading = false
+    
+    // MARK: - UseCase
     private let deleteMeetUseCase: DeleteMeet
+    
+    // MARK: - Coordinator
     private weak var coordinator: MeetSetupCoordination?
     
+    // MARK: - LifeCycle
     init(meet: Meet,
          deleteMeetUseCase: DeleteMeet,
          coordinator: MeetSetupCoordination) {
         self.deleteMeetUseCase = deleteMeetUseCase
         self.coordinator = coordinator
-        initalSetup(meet: meet)
+        initialAction(meet: meet)
         logLifeCycle()
-    }
-    
-    private func initalSetup(meet: Meet) {
-        action.onNext(.setMeet(meet))
     }
     
     deinit {
         logLifeCycle()
     }
     
+    // MARK: - Intial Setup
+    private func initialAction(meet: Meet) {
+        action.onNext(.setMeet(meet))
+    }
+    
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         guard isLoading == false else { return .empty() }
         switch action {
@@ -104,8 +111,8 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
+// MARK: - Set Meet
 extension MeetSetupViewReactor {
-    
     /// 모임 정보 설정 및 호스트 여부 확인
     private func setMeetInfo(_ meet: Meet) -> Observable<Mutation> {
         let userID = UserInfoStorage.shared.userInfo?.id
@@ -115,7 +122,10 @@ extension MeetSetupViewReactor {
         
         return Observable.concat([checkHost, updateMeet])
     }
-    
+}
+
+// MARK: - Data Request
+extension MeetSetupViewReactor {
     /// 호스트 여부에 따라서 모임 삭제 및 모임 탈퇴
     private func handleDeleteMeet() -> Observable<Mutation> {
         guard let meetId = currentState.meet?.meetSummary?.id else { return .empty() }
@@ -124,7 +134,7 @@ extension MeetSetupViewReactor {
             .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.notificationDeleteMeet()
+                self?.postDeleteMeet()
                 self?.coordinator?.endFlow()
                 return .empty()
             }
@@ -136,7 +146,25 @@ extension MeetSetupViewReactor {
     }
 }
 
-// MARK: - 플로우
+// MARK: - Notify
+extension MeetSetupViewReactor {
+    private func postDeleteMeet() {
+        guard let id = currentState.meet?.meetSummary?.id else { return }
+        EventService.shared.postItem(MeetPayload.deleted(id: id),
+                                     from: self)
+    }
+    
+    private func handleMeetPayload(with payload: MeetPayload) -> Observable<Mutation> {
+        switch payload {
+        case let .updated(meet):
+            return .just(.updateMeet(meet))
+        default:
+            return .empty()
+        }
+    }
+}
+
+// MARK: - Coordination
 extension MeetSetupViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
@@ -154,25 +182,7 @@ extension MeetSetupViewReactor {
     }
 }
 
-// MARK: - 알림 수신 및 발신
-extension MeetSetupViewReactor {
-    private func handleMeetPayload(with payload: MeetPayload) -> Observable<Mutation> {
-        switch payload {
-        case let .updated(meet):
-            return .just(.updateMeet(meet))
-        default:
-            return .empty()
-        }
-    }
-    
-    private func notificationDeleteMeet() {
-        guard let id = currentState.meet?.meetSummary?.id else { return }
-        EventService.shared.postItem(MeetPayload.deleted(id: id),
-                                     from: self)
-    }
-}
-
-// MARK: - 로딩 관리
+// MARK: - Loading & Error
 extension MeetSetupViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)

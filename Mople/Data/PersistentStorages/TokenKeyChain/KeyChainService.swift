@@ -57,7 +57,7 @@ extension KeyChainService {
             return nil
         }
 
-        return email + "1"
+        return email
     }
     
     func deleteEmail() {

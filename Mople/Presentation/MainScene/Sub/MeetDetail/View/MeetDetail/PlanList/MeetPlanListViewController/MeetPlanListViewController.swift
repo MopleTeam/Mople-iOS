@@ -13,10 +13,18 @@ import ReactorKit
 
 final class MeetPlanListViewController: BaseViewController, View {
     
+    // MARK: - Reactor
     typealias Reactor = MeetPlanListViewReactor
-    
+    private var meetPlanReactor: MeetPlanListViewReactor?
     var disposeBag = DisposeBag()
+    
+    // MARK: - Observable
+    private let reset: PublishSubject<Void> = .init()
             
+    // MARK: - Variables
+    private var hasAppeared: Bool = false
+    
+    // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: "예정된 약속")
         view.setFont(font: FontStyle.Body1.medium,
@@ -43,9 +51,10 @@ final class MeetPlanListViewController: BaseViewController, View {
         return view
     }()
     
+    // MARK: - LifeCycle
     init(reactor: Reactor) {
         super.init()
-        self.reactor = reactor
+        self.meetPlanReactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -55,11 +64,12 @@ final class MeetPlanListViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setReactor()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.tableHeaderView = countView // 테이블뷰의 크기가 정해진 다음 할당해야 경고가 발생하지 않음
+        setHeaderView()
     }
     
     // MARK: - UI Setup
@@ -87,6 +97,34 @@ final class MeetPlanListViewController: BaseViewController, View {
         self.tableView.register(MeetPlanTableCell.self, forCellReuseIdentifier: MeetPlanTableCell.reuseIdentifier)
     }
     
+    private func setHeaderView() {
+        guard hasAppeared == false else { return }
+        hasAppeared = true
+        tableView.tableHeaderView = countView
+    }
+    
+    private func setPlanList(with planList: [Plan]) {
+        emptyPlanView.isHidden = !planList.isEmpty
+        tableView.isHidden = planList.isEmpty
+        setPlanCountLabel(planList: planList)
+    }
+    
+    private func setPlanCountLabel(planList: [Plan]) {
+        guard planList.isEmpty == false else { return }
+        countView.countText = "\(planList.count)개"
+    }
+    
+    private func reloadCell(at index: Int) {
+        tableView.reloadRows(at: [.init(row: index, section: 0)], with: .none)
+    }
+}
+
+// MARK: - Reactor Setup
+extension MeetPlanListViewController {
+    private func setReactor() {
+        reactor = meetPlanReactor
+    }
+    
     func bind(reactor: MeetPlanListViewReactor) {
         setInput(reactor: reactor)
         setOutput(reactor: reactor)
@@ -98,16 +136,18 @@ final class MeetPlanListViewController: BaseViewController, View {
             .map({ Reactor.Action.selectedPlan(index: $0.row) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        reset
+            .map { Reactor.Action.requestPlanList }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func setOutput(reactor: Reactor) {
         reactor.pulse(\.$plans)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, planList in
-                let isEmpty = planList.isEmpty
-                vc.emptyPlanView.isHidden = !isEmpty
-                vc.tableView.isHidden = isEmpty
-                vc.setPlanCountLabel(planList: planList)
+                vc.setPlanList(with: planList)
             })
             .disposed(by: disposeBag)
         
@@ -148,19 +188,7 @@ final class MeetPlanListViewController: BaseViewController, View {
 extension MeetPlanListViewController: UITableViewDelegate {
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         guard scrollView.isRefresh() else { return }
-        reactor?.action.onNext(.requestPlanList)
-    }
-}
-
-// MARK: - UI Update
-extension MeetPlanListViewController {
-    private func setPlanCountLabel(planList: [Plan]) {
-        guard planList.isEmpty == false else { return }
-        countView.countText = "\(planList.count)개"
-    }
-    
-    private func reloadCell(at index: Int) {
-        tableView.reloadRows(at: [.init(row: index, section: 0)], with: .none)
+        reset.onNext(())
     }
 }
 

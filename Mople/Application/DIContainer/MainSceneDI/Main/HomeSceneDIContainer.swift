@@ -13,8 +13,12 @@ protocol HomeSceneDependencies {
     func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     
     // MARK: - Flow
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary]) -> BaseCoordinator
-    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator
+    func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator
+    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
+                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PlanDetailType) -> BaseCoordinator
+    func makeNotifyListFlowCoordinator() -> BaseCoordinator
 }
 
 final class HomeSceneDIContainer {
@@ -40,12 +44,13 @@ final class HomeSceneDIContainer {
 
 extension HomeSceneDIContainer: HomeSceneDependencies {
     
-    // MARK: - 홈 화면
+    // MARK: - 기본 화면
     func makeHomeViewController(coordinator: HomeFlowCoordinator) -> HomeViewController {
-        return HomeViewController(reactor: makeHomeViewReactor(coordinator: coordinator))
+        let parentVC = HomeViewController(reactor: makeHomeViewReactor(coordinator: coordinator))
+        addChildVC(parentVC: parentVC)
+        return parentVC
     }
     
-    // 테스트 모드
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
         return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
                                notificationService: DefaultNotificationService(),
@@ -53,15 +58,17 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
     }
     
     private func makeRecentPlanUseCase() -> FetchHomeData {
-        return FetchHomeDataUseCase(homeDataRepo: makeRecentPlanRepo())
+        let repo = DefaultPlanQueryRepo(networkService: appNetworkService)
+        return FetchHomeDataUseCase(homeDataRepo: repo)
     }
     
-    private func makeRecentPlanRepo() -> PlanQueryRepo {
-        return DefaultPlanQueryRepo(networkService: appNetworkService)
+    private func addChildVC(parentVC: HomeViewController) {
+        let recentPlanVC = HomePlanCollectionViewController(reactor: parentVC.homeReactor)
+        parentVC.add(child: recentPlanVC,
+                     container: parentVC.recentPlanContainerView)
     }
-
-        
-    // MARK: - 그룹 생성 화면
+    
+    // MARK: - 뷰 이동
     func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
         return commonFactory.makeCreateMeetViewController(isFlow: false,
                                                           isEdit: false,
@@ -69,13 +76,28 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
                                                           coordinator: coordinator)
     }
     
-    // MARK: - 일정 생성 플로우
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary]) -> BaseCoordinator {
-        return commonFactory.makePlanCreateCoordinator(type: .create(meetList))
+    // MARK: - 플로우 이동
+    /// 모임생성 플로우 생성
+    func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
+        return commonFactory.makeMeetDetailCoordiantor(meetId: meetId)
+    }
+        
+    /// 일정생성 플로우 생성
+    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
+                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
+        return commonFactory.makePlanCreateCoordinator(type: .create(meetList),
+                                                       completionHandler: completionHandler)
     }
     
-    // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(postId: Int) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId, type: .plan)
+    /// 일정 상세 플로우 생성
+    func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PlanDetailType) -> BaseCoordinator {
+        return commonFactory.makePlanDetailCoordinator(postId: postId, type: type)
+    }
+    
+    func makeNotifyListFlowCoordinator() -> BaseCoordinator {
+        let notifyListSceneDI = NotifyListSceneDIContainer(appNetworkService: appNetworkService,
+                                                           commonFactory: commonFactory)
+        return notifyListSceneDI.makeNotifyListCoordinator()
     }
 }

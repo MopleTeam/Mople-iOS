@@ -293,6 +293,24 @@ extension Date {
     func getTime() -> DateComponents {
         return DateManager.calendar.dateComponents([.hour, .minute], from: self)
     }
+    
+    func timeAgoDescription() -> String? {
+        let betweenCount = DateManager.numberOfTimeBetween(self)
+        
+        let components = [
+            (betweenCount.year, "년"),
+            (betweenCount.month, "개월"),
+            (betweenCount.day, "일"),
+            (betweenCount.hour, "시간"),
+            (betweenCount.minute, "분"),
+            (betweenCount.second, "초")
+        ]
+        
+        guard let (value, unit) = components.first(where: { $0.0 != 0 }),
+              let value else { return "1초 전" }
+        
+        return "\(abs(value))\(unit) 전"
+    }
 }
 
 extension DateComponents {

@@ -21,14 +21,22 @@ enum MeetDetailError: Error {
 final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case fetchMeetInfo
-        case switchPage(isFuture: Bool)
-        case pushMeetSetupView
+        enum Flow {
+            case switchPage(isFuture: Bool)
+            case pushMeetSetupView
+            case endFlow
+        }
+
+        enum Loading {
+            case planLoading(Bool)
+            case reviewLoading(Bool)
+        }
+        
+        case loading(Loading)
         case editMeet(MeetPayload)
         case resetList
-        case endFlow
-        case planLoading(Bool)
-        case reviewLoading(Bool)
+        case fetchMeetInfo
+        case flow(Flow)
         case catchError(MeetDetailError)
     }
     
@@ -49,20 +57,27 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: MeetDetailError?
     }
     
+    // MARK: - Variables
     var initialState: State = State()
     private let meetId: Int
+    
+    // MARK: - UseCase
     private let fetchMeetUseCase: FetchMeetDetail
+    
+    // MARK: - Coordinator
     private weak var coordinator: MeetDetailCoordination?
+    
+    // MARK: - Commands
     public weak var planListCommands: MeetPlanListCommands?
     public weak var reviewListCommands: MeetReviewListCommands?
     
+    // MARK: - LifeCycle
     init(fetchMeetUseCase: FetchMeetDetail,
          coordinator: MeetDetailCoordination,
          meetID: Int) {
         self.fetchMeetUseCase = fetchMeetUseCase
         self.coordinator = coordinator
         self.meetId = meetID
-        action.onNext(.fetchMeetInfo)
         logLifeCycle()
     }
     
@@ -70,26 +85,19 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchMeetInfo:
             return self.fetchMeetInfo()
-        case let .switchPage(isFuture):
-            coordinator?.swicthPlanListPage(isFuture: isFuture)
-            return .empty()
-        case let .planLoading(isLoading):
-            return .just(.updatePlanListLoading(isLoading))
         case let .editMeet(payload):
             return handleMeetPayload(with: payload)
-        case let .reviewLoading(isLoading):
-            return .just(.updateReviewListLoading(isLoading))
-        case .pushMeetSetupView:
-            return pushMeetSetupView()
         case .resetList:
-            return resetList()
-        case .endFlow:
-            coordinator?.endFlow()
-            return .empty()
+            return resetPost()
+        case let .loading(action):
+            return handleChildLoading(action)
+        case let .flow(action):
+            return handleFlowAction(action)
         case let .catchError(err):
             return .just(.catchError(err))
         }
@@ -116,42 +124,61 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     }
 }
 
+// MARK: - Data Request
 extension MeetDetailViewReactor {
     private func fetchMeetInfo() -> Observable<Mutation> {
         
         let fetchMeet = fetchMeetUseCase.execute(meetId: meetId)
             .asObservable()
-            .map { Mutation.setMeetInfo(meet: $0) }
+            .map { [weak self] in
+                self?.fetchPost()
+                return Mutation.setMeetInfo(meet: $0)
+            }
         
         return requestWithLoading(task: fetchMeet)
     }
 }
 
+// MARK: - Coordinator
 extension MeetDetailViewReactor {
-    private func pushMeetSetupView() -> Observable<Mutation> {
-        guard let meet = currentState.meet else { return .empty() }
-        coordinator?.pushMeetSetupView(meet: meet)
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case let .switchPage(isFuture):
+            coordinator?.swicthPlanListPage(isFuture: isFuture)
+        case .pushMeetSetupView:
+            guard let meet = currentState.meet else { return .empty() }
+            coordinator?.pushMeetSetupView(meet: meet)
+        case .endFlow:
+            coordinator?.endFlow()
+        }
+        
         return .empty()
     }
 }
 
-// MARK: - 알림 수신
+// MARK: - Notify
 extension MeetDetailViewReactor {
-    
     /// 미팅 수정 알림 수신
     private func handleMeetPayload(with payload: MeetPayload) -> Observable<Mutation> {
         guard case .updated(let meet) = payload else { return .empty() }
         return .just(.setMeetInfo(meet: meet))
     }
     
-    /// 날짜가 업데이트 된 경우
-    private func resetList() -> Observable<Mutation> {
-        planListCommands?.reset()
-        reviewListCommands?.reset()
+    private func resetPost() -> Observable<Mutation> {
+        fetchPost()
         return .empty()
     }
 }
 
+// MARK: - Commands
+extension MeetDetailViewReactor {
+    private func fetchPost() {
+        planListCommands?.fetchPlan()
+        reviewListCommands?.fetchReview()
+    }
+}
+
+// MARK: - Delegate
 extension MeetDetailViewReactor: MeetDetailDelegate {
     
     func selectedPlan(id: Int, type: PlanDetailType) {
@@ -161,9 +188,9 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
     func updateLoadingState(_ isLoading: Bool, index: Int) {
         switch index {
         case 0:
-            action.onNext(.planLoading(isLoading))
+            action.onNext(.loading(.planLoading(isLoading)))
         case 1:
-            action.onNext(.reviewLoading(isLoading))
+            action.onNext(.loading(.reviewLoading(isLoading)))
         default:
             break
         }
@@ -181,6 +208,19 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
     }
 }
 
+// MARK: - Child Loading
+extension MeetDetailViewReactor {
+    private func handleChildLoading(_ action: Action.Loading) -> Observable<Mutation> {
+        switch action {
+        case let .planLoading(isLoad):
+            return .just(.updatePlanListLoading(isLoad))
+        case let .reviewLoading(isLoad):
+            return .just(.updateReviewListLoading(isLoad))
+        }
+    }
+}
+
+// MARK: - Loading & Error
 extension MeetDetailViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateMeetInfoLoading(isLoading)
