@@ -1,5 +1,5 @@
 //
-//  CustomModalView.swift
+//  MapSelectView.swift
 //  Mople
 //
 //  Created by CatSlave on 4/15/25.
@@ -7,28 +7,25 @@
 
 import UIKit
 import RxSwift
-import SnapKit
+import RxCocoa
 
-final class CustomModalView: UIView {
+final class DefaultSheetViewController: UIViewController {
     
     // MARK: - Variables
     private var disposeBag = DisposeBag()
     private let modalHeight: CGFloat = 195
     private let opacity: CGFloat = 0.5
     
-    // MARK: - Observable
-    private let dismiss: PublishSubject<Void> = .init()
-    public var dismissObservable: Observable<Void> {
-        return dismiss.asObserver()
-    }
-    
     // MARK: - Gesture
-    private let panGesture = UIPanGestureRecognizer()
+    private let panGesture: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer()
+        gesture.cancelsTouchesInView = false
+        return gesture
+    }()
     
     // MARK: - UI Components
-    private let contentView: UIView
     
-    private let mainView: UIView = {
+    private let sheetView: UIView = {
         let view = UIView()
         view.backgroundColor = ColorStyle.Default.white
         view.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
@@ -48,37 +45,43 @@ final class CustomModalView: UIView {
         return view
     }()
     
-    init(contentView: UIView) {
-        self.contentView = contentView
-        super.init(frame: .zero)
-        setupUI()
-        setGesture()
+    private lazy var buttonStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
+    }()
+        
+    // MARK: - LifeCycle
+    init(actions: [DefaultSheetAction]) {
+        super.init(nibName: nil, bundle: nil)
+        addButtons(actions: actions)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-        initialSetup()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        setGesture()
     }
     
-    private func initialSetup() {
-        DispatchQueue.main.async { [weak self] in
-            self?.resetModal()
-        }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        resetModal()
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
-        self.backgroundColor = ColorStyle.Default.black.withAlphaComponent(0)
-
-        self.addSubview(mainView)
-        mainView.addSubview(grabberView)
-        mainView.addSubview(scrollView)
-        scrollView.addSubview(contentView)
+        self.view.addSubview(sheetView)
+        sheetView.addSubview(grabberView)
+        sheetView.addSubview(scrollView)
+        scrollView.addSubview(buttonStackView)
         
-        mainView.snp.makeConstraints { make in
+        sheetView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview().offset(modalHeight)
             make.height.equalTo(modalHeight)
@@ -97,29 +100,29 @@ final class CustomModalView: UIView {
             make.bottom.equalToSuperview()
         }
         
-        contentView.snp.makeConstraints { make in
+        sheetView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView.contentLayoutGuide)
             make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
         }
     }
     
     private func setGesture() {
-        self.addGestureRecognizer(panGesture)
+        self.view.addGestureRecognizer(panGesture)
         
         panGesture.rx.event
             .filter({ [weak self] in
                 guard let self else { return false }
-                return $0.translation(in: self).y >= 0
+                return $0.translation(in: self.view).y >= 0
             })
             .bind(with: self, onNext: { view, gesture in
                 view.handlePanGesture(gesture: gesture)
             })
             .disposed(by: disposeBag)
     }
-    
+
     private func handlePanGesture(gesture: UIPanGestureRecognizer) {
-        let velocity = gesture.velocity(in: self).y
-        let translationY = gesture.translation(in: self).y
+        let velocity = gesture.velocity(in: self.view).y
+        let translationY = gesture.translation(in: self.view).y
         let adjustOpacity = opacity - opacity * translationY / modalHeight
 
         switch gesture.state {
@@ -160,9 +163,9 @@ final class CustomModalView: UIView {
             guard let self else { return }
             changeBottomOffset(offset: modalHeight)
             changeOpacity(opacity: 0)
-            layoutIfNeeded()
+            self.view.layoutIfNeeded()
         }, completion: { [weak self] _ in
-            self?.dismiss.onNext(())
+            self?.dismiss(animated: true)
         })
     }
     
@@ -173,38 +176,54 @@ final class CustomModalView: UIView {
             guard let self else { return }
             changeBottomOffset(offset: 0)
             changeOpacity(opacity: opacity)
-            layoutIfNeeded()
+            self.view.layoutIfNeeded()
         })
     }
     
     // 모달 내림 정도 조정
     private func changeBottomOffset(offset: CGFloat) {
-        mainView.snp.updateConstraints { make in
+        sheetView.snp.updateConstraints { make in
             make.bottom.equalToSuperview().offset(offset)
         }
     }
     
     // 배경 투명도 조정
     private func changeOpacity(opacity: CGFloat) {
-        backgroundColor = backgroundColor?.withAlphaComponent(opacity)
+        let backColor = ColorStyle.Default.black
+        self.view.backgroundColor = backColor.withAlphaComponent(opacity)
     }
 }
 
-extension CustomModalView {
-    static func makeModalButton(title: String?,
-                                image: UIImage?) -> BaseButton {
+extension DefaultSheetViewController {
+    private func addButtons(actions: [DefaultSheetAction]) {
+        actions.forEach {
+            let button = actionButtonBulider(action: $0)
+            buttonStackView.addArrangedSubview(button)
+        }
+    }
+    
+    private func actionButtonBulider(action: DefaultSheetAction) -> BaseButton {
         let btn = BaseButton()
         btn.setButtonAlignment(.leading)
-        btn.setTitle(text: title,
+        btn.setTitle(text: action.text,
                      font: FontStyle.Body1.medium,
                      normalColor: ColorStyle.Gray._02)
         btn.setLayoutMargins(inset: .init(top: 16, leading: 20, bottom: 16, trailing: 20))
-        btn.setImage(image: image,
+        btn.setImage(image: action.image,
                      imagePlacement: .leading,
                      contentPadding: 8)
         btn.setBgColor(normalColor: ColorStyle.Default.white,
-                       selectedColor: ColorStyle.BG.primary)
+                       highlightColor: ColorStyle.BG.primary)
+        btn.addAction(makeAction(action.completion),
+                      for: .touchUpInside)
         return btn
+    }
+    
+    private func makeAction(_ action: (() -> Void)?) -> UIAction {
+        return .init { [weak self] _ in
+            self?.dismiss(animated: true,
+                          completion: action)
+        }
     }
 }
 

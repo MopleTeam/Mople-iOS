@@ -1,0 +1,46 @@
+# Xcode 관련
+.DS_Store
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# 빌드 아티팩트
+build/
+DerivedData/
+
+# CocoaPods
+Pods/
+# Carthage
+Carthage/Build/
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+
+# 개인 설정
+*.xcworkspace
+!default.xcworkspace
+
+# 인증서, 키
+*.p12
+*.mobileprovision
+
+# 기타
+*.moved-aside
+*.swp
+
+# Firebase 설정 파일 (개인별로 다름)
+GoogleService-Info.plist
+
+# 시크릿 키 관리용 xcconfig
+Secrets.xcconfig

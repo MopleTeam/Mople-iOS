@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class DefaultAlertControl: UIViewController {
+final class DefaultAlertViewController: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -61,8 +61,8 @@ final class DefaultAlertControl: UIViewController {
     
     init(title: String?,
          subTitle: String?,
-         defaultAction: DefaultAction,
-         addAction: [DefaultAction] = []) {
+         defaultAction: DefaultAlertAction,
+         addAction: [DefaultAlertAction] = []) {
         super.init(nibName: nil, bundle: nil)
         setModalStyle()
         setTitle(title: title, subTitle: subTitle)
@@ -100,7 +100,7 @@ final class DefaultAlertControl: UIViewController {
 }
 
 // MARK: - 텍스트 셋팅
-extension DefaultAlertControl {
+extension DefaultAlertViewController {
     private func setTitle(title: String?,
                           subTitle: String?) {
         titleLabel.text = title
@@ -115,9 +115,9 @@ extension DefaultAlertControl {
 }
 
 // MARK: - 버튼 셋팅
-extension DefaultAlertControl {
-    private func addButtons(defaultAction: DefaultAction,
-                            addActions: [DefaultAction]) {
+extension DefaultAlertViewController {
+    private func addButtons(defaultAction: DefaultAlertAction,
+                            addActions: [DefaultAlertAction]) {
         let defaultButton = actionButtonBulider(action: defaultAction,
                                                 dismissAnimated: true)
         buttonStackView.addArrangedSubview(defaultButton)
@@ -128,7 +128,7 @@ extension DefaultAlertControl {
         }
     }
     
-    private func actionButtonBulider(action: DefaultAction,
+    private func actionButtonBulider(action: DefaultAlertAction,
                                      dismissAnimated: Bool = true) -> BaseButton {
         let btn = BaseButton()
         btn.setTitle(text: action.text,

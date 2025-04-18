@@ -8,9 +8,9 @@
 import Foundation
 import Security
 
-final class KeyChainService {
+final class JWTTokenStorage {
     
-    static let shared = KeyChainService()
+    static let shared = JWTTokenStorage()
     
     private init() {}
     
@@ -24,7 +24,7 @@ final class KeyChainService {
 }
 
 // MARK: - Apple Email 관리
-extension KeyChainService {
+extension JWTTokenStorage {
     func saveEmail(_ email: String) {
         guard let emailData = email.data(using: .utf8) else { return }
         
@@ -71,7 +71,7 @@ extension KeyChainService {
 }
 
 // MARK: - JWT 토큰 관리
-extension KeyChainService {
+extension JWTTokenStorage {
     func saveToken(_ tokens: Data) {
         
         let query: [String: Any] = [
