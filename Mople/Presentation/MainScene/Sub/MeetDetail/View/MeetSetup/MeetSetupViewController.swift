@@ -329,8 +329,8 @@ extension MeetSetupViewController {
 // MARK: - Alert
 extension MeetSetupViewController {
     private func showDeleteAlert() {
-        let action: DefaultAction = .init(text: "모임삭제",
-                                          tintColor: ColorStyle.Default.white,
+        let action: DefaultAlertAction = .init(text: "모임삭제",
+                                          textColor: ColorStyle.Default.white,
                                           bgColor: ColorStyle.App.secondary,
                                           completion: { [weak self] in
             self?.deleteMeet.onNext(())

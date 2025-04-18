@@ -18,23 +18,45 @@ final class DefaultNotificationService: NotificationService {
     
     func requestPermissions(completion: (() -> Void)? = nil) {
         
-        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, err in
+        notificationCenter.getNotificationSettings { [weak self] settings in
+            guard let self else { return }
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                requestAuthorization(completion: completion)
+            case .authorized, .provisional:
+                registerNotifications()
+            default:
+                break
+            }
+        }
+    }
+    
+    private func requestAuthorization(completion: (() -> Void)? = nil) {
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, err in
+            print(#function, #line, "알림 허용여부 : \(granted)" )
             if granted == true, err == nil {
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
+                self?.registerNotifications()
+            } else {
+                print(#function, #line, "알림 허용여부\(granted), \(err)" )
             }
             completion?()
         }
     }
     
+    private func registerNotifications() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
+    }
+    
     func checkPrePermissions() -> Observable<Bool> {
-        return Observable.create { [weak self] emiiter in
+        return Observable.create { [weak self] emitter in
             guard let self else { return Disposables.create() }
             notificationCenter.getNotificationSettings {
-                let isAllow = $0.authorizationStatus == .authorized
-                emiiter.onNext(isAllow)
-                emiiter.onCompleted()
+                let status = $0.authorizationStatus
+                let isAllow = status == .authorized || status == .provisional
+                emitter.onNext(isAllow)
+                emitter.onCompleted()
             }
             
             return Disposables.create()

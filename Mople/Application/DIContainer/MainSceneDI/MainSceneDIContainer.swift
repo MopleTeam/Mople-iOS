@@ -16,7 +16,7 @@ protocol MainTapDependencies {
     func makeProfileCoordinator() -> BaseCoordinator
 }
 
-final class MainSceneDIContainer: MainSceneDependencies {
+final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
     private var FCMTokenManager: FCMTokenManager?
 
     private let appNetworkService: AppNetworkService
@@ -24,10 +24,15 @@ final class MainSceneDIContainer: MainSceneDependencies {
 
     init(appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory,
-         isFirstStart: Bool) {
+         isLogin: Bool) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
-        makeFCMTokenManager(isFirstStart: isFirstStart)
+        makeFCMTokenManager(isLogin: isLogin)
+        logLifeCycle()
+    }
+    
+    deinit {
+        logLifeCycle()
     }
     
     func makeMainFlowCoordinator(navigationController: AppNaviViewController) -> MainSceneCoordinator {
@@ -39,9 +44,9 @@ final class MainSceneDIContainer: MainSceneDependencies {
 
 // MARK: - FCMToken Manager
 extension MainSceneDIContainer {
-    private func makeFCMTokenManager(isFirstStart: Bool)  {
+    private func makeFCMTokenManager(isLogin: Bool)  {
         FCMTokenManager = .init(repo: makeFCMTokenRepo(),
-                                isRefresh: isFirstStart)
+                                isLogin: isLogin)
     }
     
     private func makeFCMTokenRepo() -> FCMTokenUploadRepo {

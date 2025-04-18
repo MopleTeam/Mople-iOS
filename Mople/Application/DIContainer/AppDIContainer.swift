@@ -10,11 +10,12 @@ import Foundation
 final class AppDIContainer {
     
     // MARK: - 앱 서비스
-    lazy var appConfiguration = AppConfiguration()
     
     lazy var appNetworkService: AppNetworkService = {
         
-        let config = ApiDataNetworkConfig(baseURL: URL(string: appConfiguration.apiBaseURL))
+        let baseUrl = AppConfiguration.apiBaseURL
+        
+        let config = ApiDataNetworkConfig(baseURL: URL(string: baseUrl))
         
         let apiDataNetwork = DefaultNetworkService(config: config)
         
@@ -50,7 +51,7 @@ extension AppDIContainer {
     func makeMainSceneDIContainer(isFirstStart: Bool) -> MainSceneDIContainer {
         return MainSceneDIContainer(appNetworkService: appNetworkService,
                                     commonFactory: commonDIContainer,
-                                    isFirstStart: isFirstStart)
+                                    isLogin: isFirstStart)
     }
 }
 

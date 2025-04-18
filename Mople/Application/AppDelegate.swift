@@ -61,8 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
                 
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-        print("디바이스 토큰 확인")
-        print("deviceToken:\(deviceTokenString)")
+        print("디바이스 토큰 확인 \(deviceTokenString)")
     }
 }
 
@@ -74,8 +73,8 @@ extension AppDelegate {
     }
     
     private func registerKakaoKey() {
-        guard let appKey = Bundle.main.object(forInfoDictionaryKey: "KakaoKey") as? String else { return }
-        KakaoSDK.initSDK(appKey: appKey)
+        let kakaoKey = AppConfiguration.kakaoKey
+        KakaoSDK.initSDK(appKey: kakaoKey)
     }
     
     private func registerFirebase() {
@@ -83,8 +82,8 @@ extension AppDelegate {
     }
     
     private func registerNaverMap() {
-        guard let appKey = Bundle.main.object(forInfoDictionaryKey: "NaverClientId") as? String else { return }
-        NMFAuthManager.shared().clientId = appKey
+        let naverId = AppConfiguration.naverID
+        NMFAuthManager.shared().clientId = naverId
     }
 }
 

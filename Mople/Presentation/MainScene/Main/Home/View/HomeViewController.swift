@@ -110,6 +110,13 @@ final class HomeViewController: DefaultViewController, View {
         super.viewDidLoad()
         setupUI()
         setReactor()
+        checkBadgeCount()
+    }
+    
+    private func checkBadgeCount() {
+        let badgeCount = UIApplication.shared.applicationIconBadgeNumber
+        print(#function, #line, "badgeCount : \(badgeCount)" )
+        UIApplication.shared.applicationIconBadgeNumber = 40
     }
     
     // MARK: - UI Setup
@@ -156,7 +163,7 @@ extension HomeViewController {
     }
     
     private func inputBind(_ reactor: Reactor) {
-        rx.viewDidLoad
+        rx.viewDidAppear
             .map { Reactor.Action.checkNotificationPermission }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -229,7 +236,7 @@ extension HomeViewController {
 
 extension HomeViewController {
     private func showEmptyMeetAlert() {
-        let createAction: DefaultAction = .init(text: "모임 생성하기",
+        let createAction: DefaultAlertAction = .init(text: "모임 생성하기",
                                           completion: { [weak self] in
             self?.reactor?.action.onNext(.flow(.createGroup))
         })
@@ -237,7 +244,7 @@ extension HomeViewController {
         alertManager.showAlert(title: "아직 소속된 모임이 없어요",
                                subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
                                defaultAction: .init(text: "취소",
-                                                    tintColor: ColorStyle.Gray._01,
+                                                    textColor: ColorStyle.Gray._01,
                                                     bgColor: ColorStyle.App.tertiary),
                                addAction: [createAction])
     }

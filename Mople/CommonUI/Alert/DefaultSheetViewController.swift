@@ -57,6 +57,7 @@ final class DefaultSheetViewController: UIViewController {
     init(actions: [DefaultSheetAction]) {
         super.init(nibName: nil, bundle: nil)
         addButtons(actions: actions)
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
@@ -72,6 +73,11 @@ final class DefaultSheetViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         resetModal()
+    }
+    
+    // MARK: - Initial Setup
+    private func initialSetup() {
+        self.modalPresentationStyle = .overFullScreen
     }
     
     // MARK: - UI Setup
@@ -100,7 +106,7 @@ final class DefaultSheetViewController: UIViewController {
             make.bottom.equalToSuperview()
         }
         
-        sheetView.snp.makeConstraints { make in
+        buttonStackView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView.contentLayoutGuide)
             make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
         }
@@ -221,7 +227,7 @@ extension DefaultSheetViewController {
     
     private func makeAction(_ action: (() -> Void)?) -> UIAction {
         return .init { [weak self] _ in
-            self?.dismiss(animated: true,
+            self?.dismiss(animated: false,
                           completion: action)
         }
     }

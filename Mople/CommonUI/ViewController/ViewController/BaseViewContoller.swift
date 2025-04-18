@@ -11,6 +11,7 @@ class BaseViewController: UIViewController, LifeCycleLoggable {
     
     // MARK: - Alert
     public let alertManager = AlertManager.shared
+    public let sheetManager = SheetManager.shared
     
     // MARK: - Properties
     private let className: String

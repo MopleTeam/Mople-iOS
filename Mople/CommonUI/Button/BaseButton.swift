@@ -18,7 +18,13 @@ class BaseButton: UIButton {
     
     override var isEnabled: Bool {
         didSet {
-            self.setEnabled(isEnabled)
+            setEnabledColor(isEnabled)
+        }
+    }
+    
+    override var isHighlighted: Bool {
+        didSet {
+            setHighlightedColor(isHighlighted)
         }
     }
     
@@ -29,11 +35,13 @@ class BaseButton: UIButton {
     private var normalTextColor: UIColor?
     private var selectedTextColor: UIColor?
     
-    // MARK: - BackColor Save
+    // MARK: - BackColor
     private var normalBackColor: UIColor?
     private var selectedBackColor: UIColor?
     private var disabledBackColor: UIColor?
+    private var highlightBackColor: UIColor?
     
+    // MARK: - LifeCycle
     init() {
         super.init(frame: .zero)
         initialSetup()
@@ -46,6 +54,32 @@ class BaseButton: UIButton {
     private func initialSetup() {
         configuration = .filled()
         setBgColor(normalColor: .clear)
+    }
+    
+    private func setBackgoundColor(_ color: UIColor?) {
+        configuration?.background.backgroundColor = color
+    }
+    
+    private func setFont(_ font: UIFont?,_ color: UIColor?) {
+        let transformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.foregroundColor = color
+            outgoing.font = font
+            return outgoing
+        }
+        configuration?.titleTextAttributesTransformer = transformer
+    }
+    
+    private func setEnabledColor(_ isEnabled: Bool) {
+        guard let normalBackColor, let disabledBackColor else { return }
+        let color = isEnabled ? normalBackColor : disabledBackColor
+        setBackgoundColor(color)
+    }
+    
+    private func setHighlightedColor(_ isHighlighted: Bool) {
+        guard let highlightBackColor else { return }
+        let color = isHighlighted ? highlightBackColor : normalBackColor
+        setBackgoundColor(color)
     }
 }
 
@@ -69,11 +103,13 @@ extension BaseButton {
     
     public func setBgColor(normalColor: UIColor?,
                            selectedColor: UIColor? = nil,
-                           disabledColor: UIColor? = nil) {
-        configuration?.background.backgroundColor = normalColor
+                           disabledColor: UIColor? = nil,
+                           highlightColor: UIColor? = nil) {
+        setBackgoundColor(normalColor)
         normalBackColor = normalColor
         selectedBackColor = selectedColor
         disabledBackColor = disabledColor
+        highlightBackColor = highlightColor
     }
     
     public func setTitle(text: String? = nil,
@@ -90,21 +126,6 @@ extension BaseButton {
     public func setRadius(_ radius: CGFloat) {
         configuration?.background.cornerRadius = radius
     }
-    
-    private func setFont(_ font: UIFont?,_ color: UIColor?) {
-        let transformer = UIConfigurationTextAttributesTransformer { incoming in
-            var outgoing = incoming
-            outgoing.foregroundColor = color
-            outgoing.font = font
-            return outgoing
-        }
-        configuration?.titleTextAttributesTransformer = transformer
-    }
-    
-    private func setEnabled(_ isEnabled: Bool) {
-        guard let normalBackColor, let disabledBackColor else { return }
-        configuration?.background.backgroundColor = isEnabled ? normalBackColor : disabledBackColor
-    }
 }
 
 extension BaseButton {
@@ -115,7 +136,7 @@ extension BaseButton {
     
     public func updateSelectedBackColor(isSelected: Bool) {
         let changeColor = isSelected ? selectedBackColor : normalBackColor
-        configuration?.background.backgroundColor = changeColor
+        setBackgoundColor(changeColor)
     }
 }
 

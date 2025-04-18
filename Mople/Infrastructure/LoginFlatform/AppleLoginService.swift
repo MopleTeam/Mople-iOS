@@ -94,11 +94,11 @@ extension DefaultAppleLoginService: ASAuthorizationControllerDelegate {
         guard let email,
               !email.isEmpty else { return  }
         
-        KeyChainService.shared.saveEmail(email)
+        JWTTokenStorage.shared.saveEmail(email)
     }
     
     private func getEmail() -> String? {
-        KeyChainService.shared.getEmail()
+        JWTTokenStorage.shared.getEmail()
     }
 }
 

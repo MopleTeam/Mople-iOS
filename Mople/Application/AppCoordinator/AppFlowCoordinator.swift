@@ -66,8 +66,9 @@ protocol SignOutListener {
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
-        KeyChainService.shared.deleteToken()
+        JWTTokenStorage.shared.deleteToken()
         UserInfoStorage.shared.deleteEnitity()
+        UserDefaults.deleteFCMToken()
         loginFlowStart()
     }
 }
@@ -78,7 +79,7 @@ extension AppFlowCoordinator {
         EventService.shared.addObservable(name: .sessionExpired)
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
-                vc.loginFlowStart()
+                vc.signOut()
             })
             .disposed(by: disposeBag)
     }

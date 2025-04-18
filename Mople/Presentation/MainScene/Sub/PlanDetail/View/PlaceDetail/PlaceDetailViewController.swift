@@ -16,6 +16,9 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
     private var placeDetailReactor: PlaceDetailViewReactor?
     var disposeBag = DisposeBag()
     
+    // MARK: - Variables
+    private var placeInfo: PlaceInfo?
+    
     // MARK: - UI Components
     private let mapView: MapInfoView = {
         let view = MapInfoView()
@@ -83,9 +86,7 @@ extension PlaceDetailViewController {
         mapView.rx.selected
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                let modalVC = MapSelectViewController()
-                modalVC.modalPresentationStyle = .overFullScreen
-                vc.present(modalVC, animated: false)
+                vc.presentSelectMapView()
             })
             .disposed(by: disposeBag)
     }
@@ -96,6 +97,7 @@ extension PlaceDetailViewController {
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, placeInfo in
                 vc.mapView.setConfigure(.init(place: placeInfo))
+                vc.placeInfo = placeInfo
             })
             .disposed(by: disposeBag)
         
@@ -113,3 +115,49 @@ extension PlaceDetailViewController {
             .disposed(by: disposeBag)
     }
 }
+
+// MARK: - Select Map Service
+extension PlaceDetailViewController {
+    private func presentSelectMapView() {
+        let naverMapAction: DefaultSheetAction = .init(text: "네이버 지도",
+                                                       image: .naverMap,
+                                                       completion: { [weak self] in
+            guard let self,
+                  let title = placeInfo?.title,
+                  let placeLat =  placeInfo?.location?.latitude,
+                  let placeLon = placeInfo?.location?.longitude,
+                  let urlTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
+                                                       
+            guard let bundleId = Bundle.main.bundleIdentifier else { return }
+            guard let url = URL(string: "nmap://route?dlat=\(placeLat)&dlng=\(placeLon)&dname=\(urlTitle)&appname=\(bundleId)"),
+                  let appStoreURL = URL(string: "http://itunes.apple.com/app/id311867728?mt=8") else { return }
+            
+            if UIApplication.shared.canOpenURL(url) {
+              UIApplication.shared.open(url)
+            } else {
+              UIApplication.shared.open(appStoreURL)
+            }
+        })
+        
+        let kakaoMapAction: DefaultSheetAction = .init(text: "카카오맵",
+                                                       image: .kakaoMap,
+                                                       completion: { [weak self] in
+            guard let self,
+                  let title = placeInfo?.title,
+                  let placeLat =  placeInfo?.location?.latitude,
+                  let placeLon = placeInfo?.location?.longitude else { return }
+            
+            guard let url = URL(string: "kakaomap://look?p=\(placeLat),\(placeLon)"),
+                  let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id304608425") else { return }
+            if UIApplication.shared.canOpenURL(url) {
+              UIApplication.shared.open(url)
+            } else {
+                UIApplication.shared.open(appStoreURL)
+            }
+        })
+        
+        sheetManager.showSheet(actions: [naverMapAction, kakaoMapAction])
+    }
+}
+
+

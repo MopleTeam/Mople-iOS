@@ -71,13 +71,13 @@ extension Endpoint {
         case .none:
             return headers
         case .accessToken:
-            guard let token = KeyChainService.cachedToken?.accessToken else {
+            guard let token = JWTTokenStorage.cachedToken?.accessToken else {
                 throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Authorization":"Bearer \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }
         case .refreshToken:
-            guard let token = KeyChainService.cachedToken?.refreshToken else {
+            guard let token = JWTTokenStorage.cachedToken?.refreshToken else {
                 throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Refresh":" \(token)"]

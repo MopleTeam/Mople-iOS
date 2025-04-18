@@ -44,7 +44,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     
     // MARK: - Account Check
     func checkEntry() {
-        if KeyChainService.shared.hasToken() {
+        if JWTTokenStorage.shared.hasToken() {
             showMainFlow()
         } else {
             showSignInFlow()

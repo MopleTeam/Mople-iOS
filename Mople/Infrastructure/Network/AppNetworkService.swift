@@ -142,7 +142,7 @@ extension DefaultAppNetWorkService {
                 .request(with: refreshEndpoint)
                 .do {
                     print(#function, #line, "Path : #0325 토근 재발급 \($0) ")
-                    KeyChainService.shared.saveToken($0)
+                    JWTTokenStorage.shared.saveToken($0)
                 }
                 .map { _ in }
         }

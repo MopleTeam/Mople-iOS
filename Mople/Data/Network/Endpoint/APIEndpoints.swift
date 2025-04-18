@@ -37,12 +37,12 @@ enum HTTPHeader {
 struct APIEndpoints {
     
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.accessToken else { throw DataRequestError.expiredToken }
+        guard let token = JWTTokenStorage.cachedToken?.accessToken else { throw DataRequestError.expiredToken }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = KeyChainService.cachedToken?.refreshToken else { throw DataRequestError.expiredToken }
+        guard let token = JWTTokenStorage.cachedToken?.refreshToken else { throw DataRequestError.expiredToken }
         return ["refreshToken": token]
     }
 }
