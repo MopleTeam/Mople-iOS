@@ -46,7 +46,21 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeProfileViewReactor(coordinator: ProfileCoordination) -> ProfileViewReactor {
-        return ProfileViewReactor(coordinator: coordinator)
+        return ProfileViewReactor(signOutUseCase: makeSignoutUseCase(),
+                                  deleteAccountUseCase: makeDeleteAccountUseCase(),
+                                  coordinator: coordinator)
+    }
+    
+    private func makeSignoutUseCase() -> SignOut {
+        return SignOutUseCase(repo: makeAuthRepo())
+    }
+    
+    private func makeDeleteAccountUseCase() -> DeleteAccount {
+        return DeleteAccountUseCase(repo: makeAuthRepo())
+    }
+    
+    private func makeAuthRepo() -> AuthenticationRepo {
+        return DefaultAuthenticationRepo(networkService: appNetworkService)
     }
 }
 

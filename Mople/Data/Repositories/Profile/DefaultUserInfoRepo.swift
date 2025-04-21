@@ -7,7 +7,7 @@
 import RxSwift
 
 final class DefaultUserInfoRepo: BaseRepositories, UserInfoRepo {
-    func getUserInfo() -> Single<Void> {
+    func updateUserInfo() -> Single<Void> {
         let getUserInfo = networkService.authenticatedRequest {
             try APIEndpoints.getUserInfo()
         }

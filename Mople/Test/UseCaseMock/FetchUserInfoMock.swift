@@ -14,7 +14,10 @@ final class FetchUserInfoMock: FetchUserInfo {
                                         imagePath: "https://picsum.photos/id/\(Int.random(in: 1...100))/200/300"))
         .delay(.seconds(2), scheduler: MainScheduler.instance)
         .observe(on: MainScheduler.instance)
-        .map({ UserInfoStorage.shared.addEntity($0) })
+        .flatMap({ userInfo -> Single<Void> in
+            UserInfoStorage.shared.addEntity(userInfo)
+            return .just(())
+        })
         .asSingle()
     }
 }

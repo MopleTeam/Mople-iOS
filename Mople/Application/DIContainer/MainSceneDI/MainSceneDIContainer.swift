@@ -10,10 +10,14 @@ import UIKit
 typealias MainSceneDependencies = MainTapDependencies
 
 protocol MainTapDependencies {
+    // MARK: - Tabbar Configure
     func makeHomeFlowCoordinator() -> BaseCoordinator
     func makeMeetListFlowCoordinator() -> BaseCoordinator
     func makeCalendarFlowCoordinator() -> BaseCoordinator
     func makeProfileCoordinator() -> BaseCoordinator
+    
+    // MARK: - NotificationDestination
+    func makeNotificationDestination(type: NotificationDestination) -> BaseCoordinator
 }
 
 final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
@@ -81,5 +85,19 @@ extension MainSceneDIContainer {
         let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService,
                                                 commonFacoty: commonFactory)
         return profileDI.makeSetupFlowCoordinator()
+    }
+}
+
+// MARK: - handle NotificationDestination
+extension MainSceneDIContainer {
+    func makeNotificationDestination(type: NotificationDestination) -> BaseCoordinator {
+        switch type {
+        case let .meet(id):
+            return commonFactory.makeMeetDetailCoordiantor(meetId: id)
+        case let .plan(id):
+            return commonFactory.makePlanDetailCoordinator(postId: id, type: .plan)
+        case let .review(id):
+            return commonFactory.makePlanDetailCoordinator(postId: id, type: .review)
+        }
     }
 }

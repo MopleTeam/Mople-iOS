@@ -26,6 +26,7 @@ final class SearchPlaceFlowCoordinator: BaseCoordinator, SearchPlaceCoordination
          dependencies: SearchPlaceSceneDependencies) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+        setDismissGestureCompletion()
     }
     
     override func start() {

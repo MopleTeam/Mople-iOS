@@ -68,7 +68,6 @@ extension PlanCreateFlowCoordinator {
 extension PlanCreateFlowCoordinator {
     
     func completed(with plan: Plan) {
-        print(#function, #line, "성공했잖아?" )
         self.navigationController.dismiss(animated: true) { [weak self] in
             self?.completion?(plan)
             self?.clear()
@@ -76,7 +75,6 @@ extension PlanCreateFlowCoordinator {
     }
     
     func endFlow() {
-        print(#function, #line, "성공했는데..?" )
         self.navigationController.dismiss(animated: true) { [weak self] in
             self?.clear()
         }

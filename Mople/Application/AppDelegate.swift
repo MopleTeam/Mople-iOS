@@ -10,18 +10,19 @@ import KakaoSDKCommon
 import FirebaseCore
 import KakaoSDKAuth
 import NMapsMap
+import RealmSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    
     let appDIContainer = AppDIContainer()
     var appFlowCoordinator: AppFlowCoordinator?
     
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        configureRealmMigration()
         registerServices()
-        
         reqeustRemoteNotifications()
         AppAppearance.setupAppearance()
         
@@ -86,6 +87,33 @@ extension AppDelegate {
         NMFAuthManager.shared().clientId = naverId
     }
 }
+//7d78e02635931ea890ac5f8c205d7fe9eb04f57749cf1a380ade9d3f7aa5ff57
+// MARK: - Realm Migration
+extension AppDelegate {
+    
+    /// Realm 마이그레이션
+    func configureRealmMigration() {
+        
+        let newSchemaVersion: UInt64 = 2
+        
+        let config = Realm.Configuration(
+            schemaVersion: newSchemaVersion,
+            migrationBlock: { migration, oldSchemaVersion in
+                self.migrateToV2(migration: migration, from: oldSchemaVersion)
+            })
+        Realm.Configuration.defaultConfiguration = config
+        
+        _ = try! Realm()
+    }
+    
+    /// Realm 마이그레이션 버전 2
+    private func migrateToV2(migration: Migration, from oldSchemaVersion: UInt64) {
+        guard oldSchemaVersion < 2 else { return }
+        migration.enumerateObjects(ofType: UserInfoEntity.className()) { oldObject, newObject in
+            newObject?["notifyCount"] = 0
+        }
+    }
+}
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
@@ -93,28 +121,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let url = response.notification.request.content.userInfo
-        url.forEach {
-            print(#function, #line, "#0327 : payload \($0)" )
-        }
-        if let apsArray = url["aps"] as? [String:Any] {
-            
-            apsArray.forEach {
-                print(#function, #line, "#0327 : \($0)" )
-            }
-            
-            if let alert = apsArray["alert"] as? [String:String] {
-                alert.forEach {
-                    print(#function, #line, "#0327 : \($0)" )
-                }
-            }
-//            print(#function, #line, "Path : #0327 \(apsArray)")
-        }
-        
-        
-        
-        let urlString = url.reduce("Push Url") { partialResult, apsValue in
-            partialResult + "\n" + "Key : \(apsValue.key)" + "\n" + "Value : \(apsValue.value)"
-        }
+        guard let destination: NotificationDestination = .init(userInfo: url) else { return }
+        appFlowCoordinator?.handleNotificationTap(destination: destination)
     }
 }
 

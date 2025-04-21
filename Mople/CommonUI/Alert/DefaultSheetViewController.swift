@@ -29,6 +29,8 @@ final class DefaultSheetViewController: UIViewController {
         let view = UIView()
         view.backgroundColor = ColorStyle.Default.white
         view.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
+        view.layer.makeShadow(opactity: 0.1,
+                            radius: 16)
         return view
     }()
     

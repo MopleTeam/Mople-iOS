@@ -8,9 +8,11 @@
 import UIKit
 
 protocol MainCoordination: AnyObject {
-    func changeCalendarTap(date: Date)
+    func showCalendar(startingFrom date: Date)
     func signOut()
 }
+
+
 
 final class MainSceneCoordinator: BaseCoordinator {
     
@@ -65,10 +67,6 @@ extension MainSceneCoordinator {
 
 extension MainSceneCoordinator: MainCoordination {
     
-    func changeCalendarTap(date: Date) {
-        switchTap(route: .calendar(presentDate: date))
-    }
-    
     // MARK: - 로그아웃
     /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
     func signOut() {
@@ -93,57 +91,24 @@ extension MainSceneCoordinator: MainCoordination {
 
 // MARK: - 탭바 컨트롤
 extension MainSceneCoordinator {
-    enum Route {
-        case home, group, profile
-        case calendar(presentDate: Date)
-        
-        var type: UIViewController.Type {
-            switch self {
-            case .home:
-                return HomeViewController.self
-            case .group:
-                return MeetListViewController.self
-            case .calendar:
-                return CalendarScheduleViewController.self
-            case .profile:
-                return ProfileViewController.self
-            }
-        }
-    }
-
-    /// 새로운 일정 및 그룹 생성 후 그룹 리스트 탭으로 이동
-    public func switchTap(route: Route) {
-        
-        let destination = getIndexFromTabBar(destination: route)
-        guard let index = destination.index,
-              let vc = destination.destinationVC,
-              self.tabBarController.selectedIndex != index else { return }
-        
-        tabBarController.selectedIndex = index
-        
-        switch route {
-        case let .calendar(presentDate):
-            guard let calendarVC = vc as? CalendarScheduleViewController else { return }
-            calendarVC.presentEvent(on: presentDate)
-        default:
-            break
-        }
+    enum Route: Int {
+        case home, meetList, calendar, profile
     }
     
-    /// 변경하고자 하는 VC가 해당하는 탭 Index 찾기
-    private func getIndexFromTabBar(destination: Route) -> (index: Int?, destinationVC: UIViewController?) {
-        var destinationVC: UIViewController?
-        
-        let index = tabBarController.viewControllers?.firstIndex(where: { vc in
-            guard let navi = vc as? UINavigationController else { return false }
-            return navi.viewControllers.contains {
-                if $0.isKind(of: destination.type) {
-                    destinationVC = $0
-                    return true
-                } else { return false }
-            }
-        })
-        
-        return (index, destinationVC)
+    /// 캘린더 탭으로 전환하기
+    /// - Parameter date: 캘린더 탭에서 보여줄 날짜
+    func showCalendar(startingFrom date: Date) {
+        tabBarController.selectedIndex = Route.calendar.rawValue
+        guard let calendarVC = tabBarController.viewcController(ofType: CalendarScheduleViewController.self) else { return }
+        calendarVC.presentEvent(on: date)
+    }
+}
+
+// MARK: - Handle Notification Tap
+extension MainSceneCoordinator {
+    func handleNitification(destination: NotificationDestination) {
+        let destination = dependencies.makeNotificationDestination(type: destination)
+        self.start(coordinator: destination)
+        self.navigationController.presentWithTransition(destination.navigationController)
     }
 }

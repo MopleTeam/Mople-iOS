@@ -87,7 +87,8 @@ extension HomeFlowCoordinator {
 extension HomeFlowCoordinator {
     func pushCalendarView(lastRecentDate: Date) {
         guard let mainCoordination = self.parentCoordinator as? MainCoordination else { return }
-        mainCoordination.changeCalendarTap(date: lastRecentDate)
+        mainCoordination.showCalendar(startingFrom: lastRecentDate)
     }
 }
+
 

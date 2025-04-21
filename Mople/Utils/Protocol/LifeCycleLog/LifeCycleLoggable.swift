@@ -14,7 +14,8 @@ protocol LifeCycleLoggable {
 extension LifeCycleLoggable {
     func logLifeCycle(function: String = #function, line: Int = #line) {
         #if DEBUG
-        print("[\(String(describing: self))] \(function):\(line)")
+        let className = String(describing: type(of: self))
+        print("[\(className)] \(function):\(line)")
         #endif
     }
 }

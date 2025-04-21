@@ -4,7 +4,7 @@
 //
 //  Created by CatSlave on 1/20/25.
 //
-
+import UIKit
 import RxSwift
 
 protocol FetchUserInfo {
@@ -25,6 +25,6 @@ final class FetchUserInfoUseCase: FetchUserInfo {
     }
     
     func execute() -> Single<Void> {
-        return self.userInfoRepo.getUserInfo()
+        return self.userInfoRepo.updateUserInfo()
     }
 }

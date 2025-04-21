@@ -18,6 +18,7 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
 enum PlanDetailError: Error {
     case noResponse(ResponseError)
     case midnight(DateTransitionError)
+    case failComment
     case unknown(Error)
 }
 
@@ -232,10 +233,8 @@ extension PlanDetailViewReactor {
             return .just(.updateChildEvent(.changedOffsetY(offsetY)))
         case .reportComment:
             return .just(.completeReport)
-            
-        #warning("댓글리스트 에러 처리 해야함, 일정삭제 버그 고쳐진 다음")
-        case let .catchError(err):
-            return .empty()
+        case .catchError:
+            return .just(.catchError(.failComment))
         }
     }
     

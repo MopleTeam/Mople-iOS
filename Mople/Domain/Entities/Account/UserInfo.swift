@@ -9,6 +9,7 @@ import Foundation
 
 struct UserInfo: Hashable, Equatable {
     let id: Int?
+    var notifyCount: Int = 0
     var name: String?
     var imagePath: String?
     var location: Location?

@@ -72,7 +72,7 @@ extension APIEndpoints {
 
 // MARK: - Login
 extension APIEndpoints {
-    static func executeSignUp(request: SignUpRequest) -> Endpoint<Data> {
+    static func signUp(request: SignUpRequest) -> Endpoint<Data> {
         return try! Endpoint(path: "auth/sign-up",
                              method: .post,
                              headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -80,7 +80,7 @@ extension APIEndpoints {
                              responseDecoder: RawDataResponseDecoder())
     }
     
-    static func executeSignIn(platform: String,
+    static func signIn(platform: String,
                               identityToken: String,
                               email: String) -> Endpoint<Data> {
         return try! Endpoint(path: "auth/sign-in",
@@ -92,18 +92,32 @@ extension APIEndpoints {
                              responseDecoder: RawDataResponseDecoder())
     }
     
-    static func getUserInfo() throws -> Endpoint<UserInfoDTO> {
-        return try Endpoint(path: "user/info",
+    static func signOut(userId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "auth/sign-out",
                             authenticationType: .accessToken,
-                            method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader())
+    }
+    
+    static func deleteAccount() throws -> Endpoint<Void> {
+        return try Endpoint(path: "user/remove",
+                            authenticationType: .accessToken,
+                            method: .delete,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader())
     }
 }
 
 // MARK: - Profile
 extension APIEndpoints {
     
-    static func setupProfile(request: ProfileEditRequest) throws -> Endpoint<UserInfoDTO> {
+    static func getUserInfo() throws -> Endpoint<UserInfoResponse> {
+        return try Endpoint(path: "user/info",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
+    static func setupProfile(request: ProfileEditRequest) throws -> Endpoint<UserInfoResponse> {
         return try Endpoint(path: "user/info",
                             authenticationType: .accessToken,
                             method: .patch,

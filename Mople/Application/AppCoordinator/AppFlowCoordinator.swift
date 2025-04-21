@@ -7,8 +7,12 @@
 
 import UIKit
 import RxSwift
+import RxRelay
 
 final class AppFlowCoordinator: BaseCoordinator {
+    
+    // MARK: - Observable
+    private let mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
     
     private let appDIContainer: AppDIContainer
     private var disposeBag = DisposeBag()
@@ -28,16 +32,18 @@ final class AppFlowCoordinator: BaseCoordinator {
 
 // MARK: - 런치 스크린
 protocol LaunchCoordination: AnyObject {
-    func mainFlowStart(isFirstStart: Bool)
+    func mainFlowStart(fcmTokenRefresh: Bool)
     func loginFlowStart()
 }
 
 extension AppFlowCoordinator: LaunchCoordination {
-    func mainFlowStart(isFirstStart: Bool = false) {
+    func mainFlowStart(fcmTokenRefresh: Bool = false) {
         self.navigationController.viewControllers.removeAll()
-        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isFirstStart: isFirstStart)
+        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isFirstStart: fcmTokenRefresh)
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
+        setBadgeCount()
+        mainReadySubject.onNext(())
     }
     
     func loginFlowStart() {
@@ -45,6 +51,7 @@ extension AppFlowCoordinator: LaunchCoordination {
         let loginSceneDIContainer = appDIContainer.makeLoginSceneDIContainer()
         let flow = loginSceneDIContainer.makeAuthFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
+        resetBadgeCount()
     }
 }
 
@@ -55,7 +62,7 @@ protocol SignInListener {
 
 extension AppFlowCoordinator: SignInListener {
     func signIn() {
-        mainFlowStart(isFirstStart: true)
+        mainFlowStart(fcmTokenRefresh: true)
     }
 }
 
@@ -85,6 +92,34 @@ extension AppFlowCoordinator {
     }
 }
 
-
+// MARK: - BadgeCount
+extension AppFlowCoordinator {
+    private func resetBadgeCount() {
+        UIApplication.shared.applicationIconBadgeNumber = 0
+    }
     
+    private func setBadgeCount() {
+        guard let userInfo = UserInfoStorage.shared.userInfo else { return }
+        print(#function, #line, "뱃지 카운트 : \(userInfo.notifyCount)" )
+        UIApplication.shared.applicationIconBadgeNumber = userInfo.notifyCount
+    }
+}
 
+// MARK: - Notify Handle
+extension AppFlowCoordinator { 
+    func handleNotificationTap(destination: NotificationDestination) {
+        mainReadySubject
+            .observe(on: MainScheduler.instance)
+            .take(1)
+            .subscribe(onNext: { [weak self] in
+                self?.routeNotification(to: destination)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func routeNotification(to destination: NotificationDestination) {
+        guard let mainFlow = findChildCoordinator(ofType: MainSceneCoordinator.self) else { return }
+        mainFlow.childCoordinators.forEach { $0.resetChildCoordinators() }
+        mainFlow.handleNitification(destination: destination)
+    }
+}

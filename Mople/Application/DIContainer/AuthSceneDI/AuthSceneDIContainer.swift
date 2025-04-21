@@ -82,7 +82,7 @@ extension AuthSceneDIContainer {
     }
     
     private func makeSignUpUseCase() -> SignUp {
-        return SignUpUseCase(authenticationRepo: makeAuthenticationRepo())
+        return SignUpUseCase(repo: makeAuthenticationRepo())
     }
     
     private func makeCreationNicknameUseCase() -> CreationNickname {

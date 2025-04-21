@@ -11,7 +11,7 @@ protocol ProfileCoordination: AnyObject {
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
     func pushPolicyView()
-    func logout()
+    func signOut()
 }
 
 final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
@@ -58,7 +58,7 @@ extension ProfileFlowCoordinator: ProfileEditViewCoordination {
 
 // MARK: - End Main Flow
 extension ProfileFlowCoordinator {
-    func logout() {
+    func signOut() {
         (self.parentCoordinator as? MainCoordination)?.signOut()
     }
 }

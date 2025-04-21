@@ -18,6 +18,8 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     // MARK: - Observable
     private let reloadProfile: PublishSubject<Void> = .init()
+    private let signOut: PublishSubject<Void> = .init()
+    private let deleteAccount: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -85,7 +87,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         return label
     }()
     
-    private let logoutButton: BaseButton = {
+    private let signOutButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(text: TextStyle.Profile.logoutTitle,
                      font: FontStyle.Title3.medium,
@@ -129,7 +131,7 @@ final class ProfileViewController: TitleNaviViewController, View {
     }()
     
     private lazy var accountManageStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [logoutButton, resignButton])
+        let sv = UIStackView(arrangedSubviews: [signOutButton, resignButton])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fillEqually
@@ -166,6 +168,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         super.viewDidLoad()
         setupUI()
         setReactor()
+        setAction()
     }
 
     // MARK: - UI Setup
@@ -209,7 +212,7 @@ final class ProfileViewController: TitleNaviViewController, View {
             make.trailing.equalToSuperview()
         }
         
-        [notifyButton, policyButton, versionLabel, logoutButton, resignButton].forEach {
+        [notifyButton, policyButton, versionLabel, signOutButton, resignButton].forEach {
             $0.snp.makeConstraints { make in
                 make.height.equalTo(56)
             }
@@ -219,6 +222,23 @@ final class ProfileViewController: TitleNaviViewController, View {
     private func setProfile(_ profile: UserInfo) {
         profileEditButton.title = profile.name
         profileImageView.kfSetimage(profile.imagePath, defaultImageType: .user)
+    }
+    
+    // MARK: - Action
+    private func setAction() {
+        signOutButton.rx.tap
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.showSignOutAlert()
+            })
+            .disposed(by: disposeBag)
+            
+        resignButton.rx.tap
+            .asDriver()
+            .drive(with: self, onNext: { vc, _ in
+                vc.showDeleteAccountAlert()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -255,8 +275,13 @@ extension ProfileViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        logoutButton.rx.controlEvent(.touchUpInside)
-            .map { Reactor.Action.flow(.logout) }
+        signOut
+            .map { Reactor.Action.signOut }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        deleteAccount
+            .map { Reactor.Action.deleteAccount }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -276,6 +301,41 @@ extension ProfileViewController {
             .map { Reactor.Action.fetchUserInfo }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+}
+
+extension ProfileViewController {
+
+    private func showSignOutAlert() {
+        let signOutAction: DefaultAlertAction = .init(text: "네",
+                                               textColor: ColorStyle.Default.white,
+                                                      bgColor: ColorStyle.App.primary,
+                                               completion: { [weak self] in
+            self?.signOut.onNext(())
+        })
+        
+        alertManager.showAlert(title: "로그아웃 하시겠어요?",
+                               defaultAction: makeCancleAlertAction(),
+                               addAction: [signOutAction])
+    }
+    
+    private func showDeleteAccountAlert() {
+        let deleteAccountAction: DefaultAlertAction = .init(text: "회원탈퇴",
+                                                            textColor: ColorStyle.Default.white,
+                                                            bgColor: ColorStyle.App.secondary,
+                                                            completion: { [weak self] in
+            self?.deleteAccount.onNext(())
+        })
+        
+        alertManager.showAlert(title: "로그아웃 하시겠어요?",
+                               defaultAction: makeCancleAlertAction(),
+                               addAction: [deleteAccountAction])
+    }
+    
+    private func makeCancleAlertAction() -> DefaultAlertAction {
+        return .init(text: "아니오",
+                     textColor: ColorStyle.Gray._01,
+                     bgColor: ColorStyle.App.tertiary)
     }
 }
 

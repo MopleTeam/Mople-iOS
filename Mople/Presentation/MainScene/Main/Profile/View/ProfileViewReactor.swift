@@ -15,30 +15,44 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             case editProfile
             case setNotify
             case policy
-            case logout
         }
         
         case flow(Flow)
         case fetchUserInfo
+        case signOut
         case deleteAccount
     }
     
     enum Mutation {
         case fetchUserInfo(_ userInfo: UserInfo)
+        case updateLoadingState(Bool)
+        case catchError(Error)
     }
     
     struct State {
         @Pulse var userProfile: UserInfo?
+        @Pulse var isLoading: Bool = false
+        @Pulse var error: Error?
     }
     
     // MARK: - Variables
     var initialState = State()
+    private var userId: Int?
+    private var isRequesting: Bool = false
+    
+    // MARK: - UseCase
+    private let signOutUseCase: SignOut
+    private let deleteAccountUseCase: DeleteAccount
     
     // MARK: - Coordinator
     private weak var coordinator: ProfileCoordination?
     
     // MARK: - LifeCycle
-    init(coordinator: ProfileCoordination) {
+    init(signOutUseCase: SignOut,
+         deleteAccountUseCase: DeleteAccount,
+         coordinator: ProfileCoordination) {
+        self.signOutUseCase = signOutUseCase
+        self.deleteAccountUseCase = deleteAccountUseCase
         self.coordinator = coordinator
         action.onNext(.fetchUserInfo)
         logLifeCycle()
@@ -55,8 +69,10 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             return fetchProfile()
         case let .flow(action):
             return handleFlowAction(action)
+        case .signOut:
+            return signOut()
         case .deleteAccount:
-            return Observable.empty()
+            return deleteAccount()
         }
     }
     
@@ -66,6 +82,10 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case .fetchUserInfo(let profile):
             newState.userProfile = profile
+        case let .updateLoadingState(isLoad):
+            newState.isLoading = isLoad
+        case let .catchError(err):
+            newState.error = err
         }
         
         return newState
@@ -78,9 +98,46 @@ extension ProfileViewReactor {
     
     private func fetchProfile() -> Observable<Mutation> {
         guard let userInfo = UserInfoStorage.shared.userInfo else { return .empty() }
+        userId = userInfo.id
         return .just(.fetchUserInfo(userInfo))
     }
 
+    private func signOut() -> Observable<Mutation> {
+        guard let userId,
+              !isRequesting else { return .empty() }
+        
+        isRequesting = true
+        
+        let signOut = signOutUseCase.execute(userId: userId)
+            .asObservable()
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.coordinator?.signOut()
+                return .empty()
+            }
+        
+        return requestWithLoading(task: signOut)
+            .do(onDispose: { [weak self] in
+                self?.isRequesting = false
+            })
+    }
+    
+    private func deleteAccount() -> Observable<Mutation> {
+        guard !isRequesting else { return .empty() }
+        
+        isRequesting = true
+        
+        let deleteAccount = deleteAccountUseCase.execute()
+            .asObservable()
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.coordinator?.signOut()
+                return .empty()
+            }
+        
+        return requestWithLoading(task: deleteAccount)
+            .do(onDispose: { [weak self] in
+                self?.isRequesting = false
+            })
+    }
 }
 
 // MARK: - Coordination
@@ -94,9 +151,17 @@ extension ProfileViewReactor {
             coordinator?.pushNotifyView()
         case .policy:
             coordinator?.pushPolicyView()
-        case .logout:
-            coordinator?.logout()
         }
         return .empty()
+    }
+}
+
+extension ProfileViewReactor: LoadingReactor {
+    func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
+        return .updateLoadingState(isLoading)
+    }
+    
+    func catchErrorMutation(_ error: Error) -> Mutation {
+        return .catchError(error)
     }
 }

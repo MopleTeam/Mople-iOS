@@ -36,11 +36,7 @@ protocol DismissTansitionControllabel: NSObject {
 
 extension DismissTansitionControllabel where Self: UIViewController {
     func setupTransition() {
-        guard self.navigationController == nil else {
-            print(#function, #line, "Path : # 네비 있음 ")
-            return
-        }
-        print(#function, #line, "네비 없음" )
+        guard self.navigationController == nil else { return }
         modalPresentationStyle = .fullScreen
         dismissTransition.setupDismissGesture(for: self)
     }

@@ -119,44 +119,52 @@ extension PlaceDetailViewController {
 // MARK: - Select Map Service
 extension PlaceDetailViewController {
     private func presentSelectMapView() {
+        guard let placeLat =  placeInfo?.location?.latitude,
+              let placeLon = placeInfo?.location?.longitude else { return }
+        
         let naverMapAction: DefaultSheetAction = .init(text: "네이버 지도",
                                                        image: .naverMap,
                                                        completion: { [weak self] in
-            guard let self,
-                  let title = placeInfo?.title,
-                  let placeLat =  placeInfo?.location?.latitude,
-                  let placeLon = placeInfo?.location?.longitude,
-                  let urlTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
-                                                       
-            guard let bundleId = Bundle.main.bundleIdentifier else { return }
-            guard let url = URL(string: "nmap://route?dlat=\(placeLat)&dlng=\(placeLon)&dname=\(urlTitle)&appname=\(bundleId)"),
-                  let appStoreURL = URL(string: "http://itunes.apple.com/app/id311867728?mt=8") else { return }
-            
-            if UIApplication.shared.canOpenURL(url) {
-              UIApplication.shared.open(url)
-            } else {
-              UIApplication.shared.open(appStoreURL)
-            }
+            self?.openNaverMap(lat: placeLat,
+                               lon: placeLon,
+                               placeTitle: self?.placeInfo?.title)
         })
         
         let kakaoMapAction: DefaultSheetAction = .init(text: "카카오맵",
                                                        image: .kakaoMap,
                                                        completion: { [weak self] in
-            guard let self,
-                  let title = placeInfo?.title,
-                  let placeLat =  placeInfo?.location?.latitude,
-                  let placeLon = placeInfo?.location?.longitude else { return }
-            
-            guard let url = URL(string: "kakaomap://look?p=\(placeLat),\(placeLon)"),
-                  let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id304608425") else { return }
-            if UIApplication.shared.canOpenURL(url) {
-              UIApplication.shared.open(url)
-            } else {
-                UIApplication.shared.open(appStoreURL)
-            }
+            self?.openKakaoMap(lat: placeLat,
+                               lon: placeLon)
         })
         
         sheetManager.showSheet(actions: [naverMapAction, kakaoMapAction])
+    }
+    
+    private func openNaverMap(lat: Double, lon: Double, placeTitle: String?) {
+        let bundleId = AppConfiguration.bundleID
+        guard let placeTitle,
+              let endcodeTitle = placeTitle.urlEncoded(),
+              let mapURL = URL(string: "nmap://route?dlat=\(lat)&dlng=\(lon)&dname=\(endcodeTitle)&appname=\(bundleId)"),
+              let appStoreURL = URL(string: "http://itunes.apple.com/app/id311867728?mt=8") else { return }
+        
+        openMap(mapURL: mapURL,
+                appStoreURL: appStoreURL)
+    }
+    
+    private func openKakaoMap(lat: Double, lon: Double) {
+        guard let mapURL = URL(string: "kakaomap://look?p=\(lat),\(lon)"),
+              let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id304608425") else { return }
+        
+        openMap(mapURL: mapURL,
+                appStoreURL: appStoreURL)
+    }
+    
+    private func openMap(mapURL: URL, appStoreURL: URL) {
+        if UIApplication.shared.canOpenURL(mapURL) {
+            UIApplication.shared.open(mapURL)
+        } else {
+            UIApplication.shared.open(appStoreURL)
+        }
     }
 }
 

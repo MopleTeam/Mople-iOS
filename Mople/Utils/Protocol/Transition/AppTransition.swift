@@ -22,24 +22,19 @@ final class AppTransition: NSObject {
     // MARK: - 제스처 활용 용도
     private var initialFrame: CGRect?
     private weak var currentView: UIView?
-    private weak var viewController: UIViewController? {
-        didSet {
-            guard let viewController else { return }
-            print(#function, #line, "#0412 : \(viewController.description)" )
-        }
-    }
+    private weak var viewController: UIViewController?
     private weak var previousViewController: UIViewController?
     private var completion: (() -> Void)?
     
     // MARK: - LifeCycle
     init(type: TransitionType) {
-        print(#function, #line, "Path : #0412 트랜지션 생성 \(type) ")
+        print(#function, #line, "Path : #0412 \(type) 트랜지션 생성 ")
         self.type = type
         super.init()
     }
     
     deinit {
-        print(#function, #line, "Path : #0412 트랜지션 해제 ")
+        print(#function, #line, "Path : #0412 \(type) 트랜지션 해제 ")
     }
     
     public func setGestureCompletion(completion: (() -> Void)?) {

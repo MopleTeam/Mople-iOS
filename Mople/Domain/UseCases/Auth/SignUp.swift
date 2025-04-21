@@ -5,28 +5,27 @@
 //  Created by CatSlave on 8/20/24.
 //
 
-import UIKit
 import RxSwift
 
 protocol SignUp {
     func execute(request: SignUpRequest) -> Single<Void>
 }
 
-final class SignUpUseCase: SignUp {
+final class SignUpUseCase: SignUp, LifeCycleLoggable {
 
-    private let authenticationRepo: AuthenticationRepo
+    private let repo: AuthenticationRepo
     
-    init(authenticationRepo: AuthenticationRepo) {
-        print(#function, #line, "LifeCycle Test SignInUseCase Created" )
-        self.authenticationRepo = authenticationRepo
+    init(repo: AuthenticationRepo) {
+        self.repo = repo
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test SignInUseCase Deinit" )
+        logLifeCycle()
     }
     
     // MARK: - SignUp
     func execute(request: SignUpRequest) -> Single<Void> {
-        return self.authenticationRepo.signUp(requestModel: request)
+        return repo.signUp(requestModel: request)
     }
 }

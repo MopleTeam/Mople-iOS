@@ -78,4 +78,16 @@ final class DefaultTabBarController: UITabBarController {
     }
 }
 
+extension DefaultTabBarController {
+    func viewcController<T: UIViewController>(ofType type: T.Type) -> T? {
+        let navs = viewControllers as? [UINavigationController] ?? []
 
+        for nav in navs {
+            if let matched = nav.viewControllers.first(where: { $0 is T }) as? T {
+                return matched
+            }
+        }
+        
+        return nil
+    }
+}

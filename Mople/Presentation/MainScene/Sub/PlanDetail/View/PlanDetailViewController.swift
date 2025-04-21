@@ -295,7 +295,7 @@ extension PlanDetailViewController {
                                               completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
-        case .unknown:
+        case .unknown, .failComment:
             alertManager.showDefatulErrorMessage()
         }
     }

@@ -19,7 +19,7 @@ protocol AppNetworkService {
 
 final class DefaultAppNetWorkService: AppNetworkService {
    
-    private let tokenRefreshSubject = BehaviorRelay<Observable<Void>?>(value: nil)
+    private var ongoingRefresh: Observable<Void>? = nil
     private let errorHandlingService = DefaultErrorHandlingService()
     private let dataTransferService: DataTransferService
     
@@ -108,14 +108,14 @@ extension DefaultAppNetWorkService {
     
     private func reissueTokenIfNeeded() -> Observable<Void> {
         print(#function, #line)
-        if let ongoingRefresh = tokenRefreshSubject.value {
+        if let ongoingRefresh {
             return ongoingRefresh
         }
         
         let refreshObservable = reissueToken()
             .asObservable()
             .do(onDispose: { [weak self] in
-                self?.tokenRefreshSubject.accept(nil)
+                self?.ongoingRefresh = nil
             })
             .catch({ [weak self] err in
                 guard let self else { return .error(err)}
@@ -124,7 +124,7 @@ extension DefaultAppNetWorkService {
             })
             .share(replay: 1)
             
-        tokenRefreshSubject.accept(refreshObservable)
+        ongoingRefresh = refreshObservable
         return refreshObservable
     }
     

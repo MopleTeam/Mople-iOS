@@ -19,9 +19,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     
     // MARK: - Observable
     private let errorSubject: PublishSubject<Error?> = .init()
-    var error: Observable<Error?> {
-        return errorSubject.asObservable()
-    }
+    var error: Observable<Error?> { return errorSubject.asObservable() }
     
     // MARK: - Coordinator
     private weak var coordinator: LaunchCoordination?
@@ -45,7 +43,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     // MARK: - Account Check
     func checkEntry() {
         if JWTTokenStorage.shared.hasToken() {
-            showMainFlow()
+            fetchUser()
         } else {
             showSignInFlow()
         }
@@ -55,22 +53,13 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         coordinator?.loginFlowStart()
     }
     
-    private func showMainFlow() {
-        if UserInfoStorage.shared.hasUserInfo {
-            coordinator?.mainFlowStart(isFirstStart: false)
-        } else {
-            fetchUser()
-        }
-    }
-    
-    // MARK: - Data Request
     private func fetchUser() {
         fetchUserInfo.execute()
             .asObservable()
             .observe(on: MainScheduler.instance)
             .subscribe(with: self,
-                       onNext: { vm, _ in
-                vm.coordinator?.mainFlowStart(isFirstStart: false)
+                       onNext: { vm, test in
+                vm.coordinator?.mainFlowStart(fcmTokenRefresh: false)
             }, onError: { vm, err in
                 vm.errorSubject.onNext(err)
             })

@@ -25,27 +25,31 @@ final class HomeViewController: DefaultViewController, View {
     
     private let contentView = UIView()
     
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = TextStyle.App.title
-        label.font = FontStyle.Title.black
-        label.textColor = ColorStyle.App.primary
-        label.setContentHuggingPriority(.init(1), for: .horizontal)
-        label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
-        return label
+    private let logoView: UIImageView = {
+        let view = UIImageView()
+        view.image = .logo
+        view.contentMode = .scaleAspectFit
+        return view
+    }()
+    
+    private let topEmptyView: UIView = {
+        let view = UIView()
+        view.setContentHuggingPriority(.init(1), for: .horizontal)
+        return view
     }()
     
     private let notifyButton: UIButton = {
         let btn = UIButton()
         btn.setImage(.bell, for: .normal)
+        btn.contentMode = .scaleAspectFit
         return btn
     }()
     
     private lazy var topStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleLabel, notifyButton])
+        let sv = UIStackView(arrangedSubviews: [logoView, topEmptyView, notifyButton])
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.alignment = .fill
+        sv.alignment = .center
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = UIEdgeInsets(top: 8, left: 20, bottom: 8, right: 20)
         return sv
@@ -110,13 +114,6 @@ final class HomeViewController: DefaultViewController, View {
         super.viewDidLoad()
         setupUI()
         setReactor()
-        checkBadgeCount()
-    }
-    
-    private func checkBadgeCount() {
-        let badgeCount = UIApplication.shared.applicationIconBadgeNumber
-        print(#function, #line, "badgeCount : \(badgeCount)" )
-        UIApplication.shared.applicationIconBadgeNumber = 40
     }
     
     // MARK: - UI Setup
@@ -140,12 +137,16 @@ final class HomeViewController: DefaultViewController, View {
             make.bottom.equalToSuperview()
         }
         
-        recentPlanContainerView.snp.makeConstraints { make in
-            make.height.equalTo(270)
+        logoView.snp.makeConstraints { make in
+            make.height.greaterThanOrEqualTo(40)
         }
         
         notifyButton.snp.makeConstraints { make in
-            make.width.height.greaterThanOrEqualTo(40)
+            make.height.greaterThanOrEqualTo(40)
+        }
+        
+        recentPlanContainerView.snp.makeConstraints { make in
+            make.height.equalTo(270)
         }
     }
 }

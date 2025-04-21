@@ -13,6 +13,7 @@ protocol Coordinator: AnyObject {
     func start()
     func start(coordinator: Coordinator)
     func didFinish(coordinator: Coordinator)
+    func resetChildCoordinators()
 }
 
 class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
@@ -56,6 +57,21 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
         self.navigationController.viewControllers.removeAll()
     }
     
+    func resetChildCoordinators() {
+        self.navigationController.dismiss(animated: true,
+                                          completion: { [weak self] in
+            guard let self,
+                  !self.childCoordinators.isEmpty else { return }
+            
+            childCoordinators.forEach {
+                $0.navigationController.viewControllers.removeAll()
+                self.didFinish(coordinator: $0)
+            }
+            
+            childCoordinators.removeAll()
+        })
+    }
+    
     func dismiss(completion: (() -> Void)?) {
         self.navigationController.dismiss(animated: true,
                                           completion: completion)
@@ -90,6 +106,15 @@ extension BaseCoordinator {
                 }
             }
         }
+    }
+}
+
+// MARK: - Hleper
+extension BaseCoordinator {
+    func findChildCoordinator<C: Coordinator>(ofType type: C.Type) -> C? {
+        return childCoordinators
+            .filter { $0 is C }
+            .first as? C
     }
 }
 

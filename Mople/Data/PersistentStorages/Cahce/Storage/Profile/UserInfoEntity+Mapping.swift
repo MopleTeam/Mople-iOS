@@ -11,6 +11,7 @@ import RealmSwift
 class UserInfoEntity: Object {
     @Persisted(primaryKey: true) var _id: ObjectId
     @Persisted var userId: Int?
+    @Persisted var notifyCount: Int = 0
     @Persisted var name: String?
     @Persisted var imagePath: String?
     @Persisted var longitude: Double?
@@ -27,12 +28,14 @@ extension UserInfoEntity {
         self.userId = userInfo.id
         self.name = userInfo.name
         self.imagePath = userInfo.imagePath
+        self.notifyCount = userInfo.notifyCount
     }
 }
 
 extension UserInfoEntity {
     func toDomain() -> UserInfo {
         return .init(id: userId,
+                     notifyCount: notifyCount,
                      name: name,
                      imagePath: imagePath)
     }
