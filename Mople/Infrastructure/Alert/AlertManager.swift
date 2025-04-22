@@ -87,7 +87,7 @@ extension AlertManager {
     func showDateErrorMessage(err: DateTransitionError,
                               completion: (() -> Void)? = nil) {
         let action = DefaultAlertAction(completion: {
-            EventService.shared.post(name: .midnightUpdate)
+            NotificationManager.shared.post(name: .midnightUpdate)
             completion?()
         })
         
@@ -113,11 +113,11 @@ extension AlertManager {
     private func handleDeletePost(type: ResponseType) {
         switch type {
         case let .meet(id):
-            EventService.shared.postItem(MeetPayload.deleted(id: id), from: self)
+            NotificationManager.shared.postItem(MeetPayload.deleted(id: id), from: self)
         case let .plan(id):
-            EventService.shared.postItem(PlanPayload.deleted(id: id), from: self)
+            NotificationManager.shared.postItem(PlanPayload.deleted(id: id), from: self)
         case let .review(id):
-            EventService.shared.postItem(ReviewPayload.deleted(id: id), from: self)
+            NotificationManager.shared.postItem(ReviewPayload.deleted(id: id), from: self)
         }
     }
 }

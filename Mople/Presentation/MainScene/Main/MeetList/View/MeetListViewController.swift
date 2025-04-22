@@ -143,12 +143,12 @@ extension MeetListViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addPlanObservable()
+        NotificationManager.shared.addPlanObservable()
             .map { _ in Reactor.Action.fetchMeetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

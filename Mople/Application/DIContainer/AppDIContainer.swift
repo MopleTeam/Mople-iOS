@@ -48,10 +48,10 @@ extension AppDIContainer {
     }
     
     // MARK: - 메인 플로우
-    func makeMainSceneDIContainer(isFirstStart: Bool) -> MainSceneDIContainer {
-        return MainSceneDIContainer(appNetworkService: appNetworkService,
-                                    commonFactory: commonDIContainer,
-                                    isLogin: isFirstStart)
+    func makeMainSceneDIContainer(isLoign: Bool) -> MainSceneDIContainer {
+        return MainSceneDIContainer(isLogin: isLoign,
+                                    appNetworkService: appNetworkService,
+                                    commonFactory: commonDIContainer)
     }
 }
 

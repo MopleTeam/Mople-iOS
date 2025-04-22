@@ -43,12 +43,18 @@ extension NotifyListSceneDIContainer {
     
     private func makeNotifyListViewReactor(coordinator: NotifyListFlowCoordination) -> NotifyListViewReactor {
         return .init(fetchNotifyList: makeFetchNotifyListUseCase(),
+                     resetNotifyCount: makeResetNotifyCountUseCase(),
                      coordinator: coordinator)
     }
     
     private func makeFetchNotifyListUseCase() -> FetchNotifyList {
         let repo = DefaultNotifyRepo(networkService: appNetworkService)
         return FetchNotifyListUseCase(repo: repo)
+    }
+    
+    private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
+        let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        return ResetNotifyCountUseCase(repo: repo)
     }
     
     // MARK: - 플로우 이동

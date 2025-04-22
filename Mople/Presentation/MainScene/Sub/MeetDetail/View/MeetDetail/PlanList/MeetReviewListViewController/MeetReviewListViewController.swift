@@ -157,7 +157,7 @@ extension MeetReviewListViewController {
     }
     
     private func setNotification(_ reactor: Reactor) {
-        EventService.shared.addReviewObservable()
+        NotificationManager.shared.addReviewObservable()
             .map { Reactor.Action.updateReview($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

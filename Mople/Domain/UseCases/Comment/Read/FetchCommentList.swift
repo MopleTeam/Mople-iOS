@@ -13,15 +13,15 @@ protocol FetchCommentList {
 
 final class FetchCommentListUseCase: FetchCommentList {
     
-    private let fetchCommentListRepo: CommentQueryRepo
+    private let repo: CommentRepo
     private let userId = UserInfoStorage.shared.userInfo?.id
     
-    init(fetchCommentListRepo: CommentQueryRepo) {
-        self.fetchCommentListRepo = fetchCommentListRepo
+    init(repo: CommentRepo) {
+        self.repo = repo
     }
     
     func execute(postId: Int) -> Single<[Comment]> {
-        fetchCommentListRepo.fetchCommentList(postId: postId)
+        repo.fetchCommentList(postId: postId)
             .map { $0.map { response in
                 response.toDomain() }
             }

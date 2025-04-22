@@ -23,3 +23,6 @@ final class DefaultNotifySubscribeRepo: BaseRepositories, NotifySubscribeRepo {
 }
     
     
+final class DefaultNotifyStatusQueryRepo: BaseRepositories {
+    
+}

@@ -82,20 +82,19 @@ extension PlanDetailSceneDIContainer {
     }
     
     private func makeFetchPlanDetailUsecase() -> FetchPlanDetail {
-        return FetchPlanDetailUseCase(
-            planRepo: DefaultPlanQueryRepo(networkService: appNetworkService)
-        )
+        let repo = DefaultPlanRepo(networkService: appNetworkService)
+        return FetchPlanDetailUseCase(repo: repo)
     }
     
     private func makeDeletePlanUseCase() -> DeletePlan {
         return DeletePlanUseCase(
-            repo: DefaultPlanCommandRepo(networkService: appNetworkService)
+            repo: DefaultPlanRepo(networkService: appNetworkService)
         )
     }
     
     private func makeDeleteReviewUseCase() -> DeleteReview {
         return DeleteReviewUseCase(
-            repo: DefaultReviewCommnadRepo(networkService: appNetworkService)
+            repo: DefaultReviewRepo(networkService: appNetworkService)
         )
     }
 
@@ -116,27 +115,23 @@ extension PlanDetailSceneDIContainer {
     }
     
     private func makeFetchCommentListUseCase() -> FetchCommentList {
-        return FetchCommentListUseCase(fetchCommentListRepo: makeFetchCommentListRepo())
-    }
-    
-    private func makeFetchCommentListRepo() -> CommentQueryRepo {
-        return DefaultCommentQueryRepo(networkService: appNetworkService)
+        return FetchCommentListUseCase(repo: makeCommentRepo())
     }
     
     private func makeCreateCommentUseCase() -> CreateComment {
-        return CreateCommentUseCase(createCommentRepo: makeCommentCommandRepo())
+        return CreateCommentUseCase(repo: makeCommentRepo())
     }
     
     private func makeDeleteCommentUseCase() -> DeleteComment {
-        return DeleteCommentUseCase(deleteCommentRepo: makeCommentCommandRepo())
+        return DeleteCommentUseCase(repo: makeCommentRepo())
     }
     
     private func makeEditCommentUseCase() -> EditComment {
-        return EditCommentUseCase(editCommentRepo: makeCommentCommandRepo())
+        return EditCommentUseCase(repo: makeCommentRepo())
     }
     
-    private func makeCommentCommandRepo() -> CommentCommandRepo {
-        return DefaultCommentCommandRepo(networkService: appNetworkService)
+    private func makeCommentRepo() -> CommentRepo {
+        return DefaultCommentRepo(networkService: appNetworkService)
     }
 }
 

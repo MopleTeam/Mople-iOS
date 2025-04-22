@@ -12,10 +12,10 @@ protocol FetchHomeData {
 }
 
 final class FetchHomeDataUseCase: FetchHomeData {
-    let repo: PlanQueryRepo
+    private let repo: PlanRepo
     
-    init(homeDataRepo: PlanQueryRepo) {
-        self.repo = homeDataRepo
+    init(repo: PlanRepo) {
+        self.repo = repo
     }
     
     func execute() -> Single<HomeData> {

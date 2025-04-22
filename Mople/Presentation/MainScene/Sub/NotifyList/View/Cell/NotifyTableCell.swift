@@ -91,5 +91,9 @@ final class NotifyTableCell: UITableViewCell {
         titleLabel.text = viewModel.title
         subTitleLabel.text = viewModel.subTitle
     }
+    
+    public func setReadStatus(isNew: Bool) {
+        contentView.backgroundColor = isNew ? ColorStyle.BG.primary : .clear
+    }
 }
 

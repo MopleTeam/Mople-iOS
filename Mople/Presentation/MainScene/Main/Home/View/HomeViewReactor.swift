@@ -28,6 +28,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case flow(Flow)
         case checkNotificationPermission
         case fetchHomeData
+        case fetchNotifyStatus
         case updatePlan(_ planPayload: PlanPayload)
         case updateMeet(_ meetPayload: MeetPayload)
         case reloadDay
@@ -37,6 +38,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case updatePlanList(_ updatedPlanList: [Plan])
         case updateMeetList(_ updatedMeetList: [MeetSummary])
         case updateHomeData(HomeData)
+        case updateNotifyStatus(Bool)
         case updateLoadingState(Bool)
         case catchError(HomeError)
     }
@@ -44,14 +46,17 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     struct State {
         @Pulse var plans: [Plan] = []
         @Pulse var meetList: [MeetSummary] = []
+        @Pulse var hasNotify: Bool = false
         @Pulse var isLoading: Bool = false
         @Pulse var error: HomeError?
     }
     
     // MARK: - Variables
     var initialState: State = State()
+    private let isLogin: Bool
     
     // MARK: - UseCcase
+    private let uploadFCMTokenUseCase: UploadFCMToken
     private let fetchRecentScheduleUseCase: FetchHomeData
     
     // MARK: - Notification
@@ -61,9 +66,13 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     private weak var coordinator: HomeFlowCoordinator?
     
     // MARK: - LifeCycle
-    init(fetchRecentScheduleUseCase: FetchHomeData,
+    init(isLogin: Bool,
+         uploadFCMTokcnUseCase: UploadFCMToken,
+         fetchRecentScheduleUseCase: FetchHomeData,
          notificationService: NotificationService,
          coordinator: HomeFlowCoordinator) {
+        self.isLogin = isLogin
+        self.uploadFCMTokenUseCase = uploadFCMTokcnUseCase
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
         self.notificationService = notificationService
         self.coordinator = coordinator
@@ -77,6 +86,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initital Setup
     private func initialAction() {
+        uploadFCMToken()
         action.onNext(.fetchHomeData)
     }
     
@@ -85,6 +95,8 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchHomeData:
             return fetchHomeData()
+        case .fetchNotifyStatus:
+            return fetchNoticationStatus()
         case let .flow(action):
             return handleFlowAction(with: action)
         case .checkNotificationPermission:
@@ -103,9 +115,11 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case .updateHomeData(let homeData):
+        case let .updateHomeData(homeData):
             newState.meetList = homeData.meets
             newState.plans = homeData.plans.sorted(by: <)
+        case let .updateNotifyStatus(hasNotify):
+            newState.hasNotify = hasNotify
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .updatePlanList(planList):
@@ -129,6 +143,20 @@ extension HomeViewReactor {
             .map { Mutation.updateHomeData($0) }
         
         return requestWithLoading(task: fetchSchedules)
+    }
+    
+    private func fetchNoticationStatus() -> Observable<Mutation> {
+        guard let notifyCount = UserInfoStorage.shared.userInfo?.notifyCount else {
+            return .empty()
+        }
+        let hasNotify = notifyCount > 0
+        return .just(.updateNotifyStatus(hasNotify))
+    }
+    
+    private func uploadFCMToken() {
+        guard isLogin else { return }
+        uploadFCMTokenUseCase
+            .executeWhenLogin()
     }
 }
 

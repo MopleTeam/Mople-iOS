@@ -14,9 +14,9 @@ protocol DeletePlan {
 
 final class DeletePlanUseCase: DeletePlan {
     
-    let repo: PlanCommandRepo
+    let repo: PlanRepo
     
-    init(repo: PlanCommandRepo) {
+    init(repo: PlanRepo) {
         self.repo = repo
     }
     

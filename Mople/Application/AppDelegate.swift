@@ -17,6 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let appDIContainer = AppDIContainer()
     var appFlowCoordinator: AppFlowCoordinator?
+    var wasInBackground: Bool = false {
+        didSet {
+            print(#function, #line, "application wasIn : \(wasInBackground)" )
+        }
+    }
     
     var window: UIWindow?
     
@@ -63,6 +68,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
         print("디바이스 토큰 확인 \(deviceTokenString)")
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        print(#function, #line, "Path : # 메서드 실행 순서 확인 ")
+        wasInBackground = true
+    }
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        print(#function, #line, "Path : # 메서드 실행 순서 확인 ")
+        guard wasInBackground else { return }
+        checkNotifyPermission()
+        updateNotifyCount()
+        // 화면진입 노티 발송하기 (홈화면인 상태에서 화면이 백그라운드에 있는 경우에 다시 앱으로 진입했을 때를 인지하기 위해)
+    }
+    
+    private func updateNotifyCount() {
+        let badgeCount = UIApplication.shared.applicationIconBadgeNumber
+        UserInfoStorage.shared.updateNotifyCount(badgeCount)
+    }
+    
+    private func checkNotifyPermission() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.getNotificationSettings { setting in
+            guard setting.authorizationStatus == .authorized else { return }
+            self.registerForPushNotifications()
+        }
+    }
+    
+    func registerForPushNotifications() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
     }
 }
 
@@ -120,6 +158,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+        print(#function, #line, "Path : # 메서드 실행 순서 확인 ")
         let url = response.notification.request.content.userInfo
         guard let destination: NotificationDestination = .init(userInfo: url) else { return }
         appFlowCoordinator?.handleNotificationTap(destination: destination)
@@ -274,3 +313,4 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 ////        }
 //    }
 //}
+

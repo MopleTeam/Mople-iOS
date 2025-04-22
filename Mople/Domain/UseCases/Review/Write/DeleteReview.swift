@@ -14,9 +14,9 @@ protocol DeleteReview {
 
 final class DeleteReviewUseCase: DeleteReview {
     
-    let repo: ReviewCommandRepo
+    let repo: ReviewRepo
     
-    init(repo: ReviewCommandRepo) {
+    init(repo: ReviewRepo) {
         self.repo = repo
     }
     

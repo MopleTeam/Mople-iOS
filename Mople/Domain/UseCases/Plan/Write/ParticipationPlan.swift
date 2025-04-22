@@ -13,9 +13,9 @@ protocol ParticipationPlan {
 }
 
 final class ParticipationPlanUseCase: ParticipationPlan {
-    let participationRepo: PlanCommandRepo
+    let participationRepo: PlanRepo
     
-    init(participationRepo: PlanCommandRepo) {
+    init(participationRepo: PlanRepo) {
         self.participationRepo = participationRepo
     }
     

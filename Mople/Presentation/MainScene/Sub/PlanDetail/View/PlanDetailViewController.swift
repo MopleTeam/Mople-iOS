@@ -261,7 +261,7 @@ extension PlanDetailViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addPlanObservable()
+        NotificationManager.shared.addPlanObservable()
             .filter({ [weak self] payload in
                 self?.filterEdit(payload: payload) ?? false
             })
@@ -269,13 +269,13 @@ extension PlanDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addObservable(name: .postReview)
+        NotificationManager.shared.addObservable(name: .postReview)
             .map { _ in Reactor.Action.updatePost }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func filterEdit<T>(payload: EventService.Payload<T>) -> Bool {
+    private func filterEdit<T>(payload: NotificationManager.Payload<T>) -> Bool {
         switch payload {
         case .updated: return true
         default: return false

@@ -240,7 +240,7 @@ extension ReviewEditViewReactor {
 // MARK: - Notify
 extension ReviewEditViewReactor {
     private func postUpdateImage() {
-        EventService.shared.post(name: .postReview)
+        NotificationManager.shared.post(name: .postReview)
     }
 }
 

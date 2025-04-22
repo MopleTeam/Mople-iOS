@@ -15,11 +15,11 @@ protocol EditComment {
 
 final class EditCommentUseCase: EditComment {
     
-    private let editCommentRepo: CommentCommandRepo
+    private let editCommentRepo: CommentRepo
     private let userId = UserInfoStorage.shared.userInfo?.id
     
-    init(editCommentRepo: CommentCommandRepo) {
-        self.editCommentRepo = editCommentRepo
+    init(repo: CommentRepo) {
+        self.editCommentRepo = repo
     }
     
     func execute(postId: Int,

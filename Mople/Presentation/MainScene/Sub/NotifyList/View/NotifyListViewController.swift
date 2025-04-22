@@ -98,6 +98,10 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(NotifyTableCell.self, forCellReuseIdentifier: NotifyTableCell.reuseIdentifier)
     }
+    
+    private func setCount(_ count: Int) {
+        countView.countText = "\(count)개"
+    }
 }
 
 // MARK: - Reactor Setup
@@ -131,7 +135,30 @@ extension NotifyListViewController {
                 cellType: NotifyTableCell.self)
             ) { index, item, cell in
                 cell.configure(viewModel: .init(notify: item))
+                cell.setReadStatus(isNew: item.isNew)
             }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$notifyList)
+            .asDriver(onErrorJustReturn: [])
+            .map { $0
+                .filter { $0.isNew }
+                .count
+            }
+            .drive(with: self, onNext: { vc, newCount in
+                vc.setCount(newCount)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$resetedCount)
+            .compactMap({ $0 })
+            .do(onNext: { _ in
+                print(#function, #line, "Path : # 값이 들어옴 ")
+            })
+            .asDriver(onErrorJustReturn: nil)
+            .drive(onNext: { _ in
+                UIApplication.shared.applicationIconBadgeNumber = 0
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)

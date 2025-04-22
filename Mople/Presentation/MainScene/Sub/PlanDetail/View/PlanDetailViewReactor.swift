@@ -387,10 +387,10 @@ extension PlanDetailViewReactor {
     private func postDeletePlan() {
         switch type {
         case .plan:
-            EventService.shared.postItem(PlanPayload.deleted(id: id),
+            NotificationManager.shared.postItem(PlanPayload.deleted(id: id),
                                          from: self)
         case .review:
-            EventService.shared.postItem(ReviewPayload.deleted(id: id),
+            NotificationManager.shared.postItem(ReviewPayload.deleted(id: id),
                                          from: self)
         }
     }
@@ -412,7 +412,7 @@ extension PlanDetailViewReactor {
         return fetchReviewDetail(completion: { [weak self] in
             guard let self,
                   let review = self.review else { return }
-            EventService.shared.postItem(.updated(review), from: self)
+            NotificationManager.shared.postItem(.updated(review), from: self)
         })
     }
 }

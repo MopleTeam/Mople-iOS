@@ -237,27 +237,27 @@ extension CalendarScheduleViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addPlanObservable()
+        NotificationManager.shared.addPlanObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addParticipatingObservable()
+        NotificationManager.shared.addParticipatingObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addReviewObservable()
+        NotificationManager.shared.addReviewObservable()
             .map { Reactor.Action.updateReview($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addObservable(name: .midnightUpdate)
+        NotificationManager.shared.addObservable(name: .midnightUpdate)
             .map { Reactor.Action.midnightUpdate }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

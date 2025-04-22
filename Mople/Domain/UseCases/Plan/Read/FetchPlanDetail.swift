@@ -13,15 +13,15 @@ protocol FetchPlanDetail {
 
 final class FetchPlanDetailUseCase: FetchPlanDetail {
     
-    private let planRepo: PlanQueryRepo
+    private let repo: PlanRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
     
-    init(planRepo: PlanQueryRepo) {
-        self.planRepo = planRepo
+    init(repo: PlanRepo) {
+        self.repo = repo
     }
     
     func execute(planId: Int) -> Single<Plan> {
-        return planRepo.fetchPlanDetail(planId: planId)
+        return repo.fetchPlanDetail(planId: planId)
             .map { $0.toDomain() }
             .map { [weak self] plan in
                 var verifyPlan = plan

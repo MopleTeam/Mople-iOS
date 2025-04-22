@@ -12,9 +12,9 @@ protocol CreatePlan {
 }
 
 final class CreatePlanUseCase: CreatePlan {
-    let createPlanRepo: PlanCommandRepo
+    let createPlanRepo: PlanRepo
     
-    init(createPlanRepo: PlanCommandRepo) {
+    init(createPlanRepo: PlanRepo) {
         self.createPlanRepo = createPlanRepo
     }
     

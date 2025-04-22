@@ -235,7 +235,7 @@ extension ProfileEditViewReactor {
 // MARK: - Notifi {
 extension ProfileEditViewReactor {
     private func postEditProfile() {
-        EventService.shared.post(name: .editProfile)
+        NotificationManager.shared.post(name: .editProfile)
     }
 }
 

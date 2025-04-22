@@ -12,9 +12,9 @@ protocol EditPlan {
 }
 
 final class EditPlanUseCase: EditPlan {
-    let editPlanRepo: PlanCommandRepo
+    let editPlanRepo: PlanRepo
     
-    init(editPlanRepo: PlanCommandRepo) {
+    init(editPlanRepo: PlanRepo) {
         self.editPlanRepo = editPlanRepo
     }
     

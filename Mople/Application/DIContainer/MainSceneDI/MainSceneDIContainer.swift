@@ -21,17 +21,17 @@ protocol MainTapDependencies {
 }
 
 final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
-    private var FCMTokenManager: FCMTokenManager?
 
+    private let isLogin: Bool
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
 
-    init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory,
-         isLogin: Bool) {
+    init(isLogin: Bool,
+         appNetworkService: AppNetworkService,
+         commonFactory: CommonSceneFactory) {
+        self.isLogin = isLogin
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
-        makeFCMTokenManager(isLogin: isLogin)
         logLifeCycle()
     }
     
@@ -46,22 +46,11 @@ final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
     }
 }
 
-// MARK: - FCMToken Manager
-extension MainSceneDIContainer {
-    private func makeFCMTokenManager(isLogin: Bool)  {
-        FCMTokenManager = .init(repo: makeFCMTokenRepo(),
-                                isLogin: isLogin)
-    }
-    
-    private func makeFCMTokenRepo() -> FCMTokenUploadRepo {
-        return DefaultFCMTokenRepo(networkService: appNetworkService)
-    }
-}
-
 // MARK: - Tabbar
 extension MainSceneDIContainer {
     func makeHomeFlowCoordinator() -> BaseCoordinator {
-        let homeSceneDI = HomeSceneDIContainer(appNetworkService: appNetworkService,
+        let homeSceneDI = HomeSceneDIContainer(isLogin: isLogin,
+                                               appNetworkService: appNetworkService,
                                                commonFactory: commonFactory)
         return homeSceneDI.makeHomeFlowCoordinator()
     }

@@ -276,10 +276,10 @@ extension CreateMeetViewReactor {
     private func postNewMeet(_ meet: Meet) {
         switch type {
         case .create:
-            EventService.shared.postItem(.created(meet),
+            NotificationManager.shared.postItem(.created(meet),
                                          from: self)
         case .edit:
-            EventService.shared.postItem(.updated(meet),
+            NotificationManager.shared.postItem(.updated(meet),
                                          from: self)
         }
     }

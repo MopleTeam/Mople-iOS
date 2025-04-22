@@ -73,23 +73,31 @@ final class UserInfoStorage {
         self.userInfo?.updateProfile(profile)
     }
     
-    func changeNotifyCount(isIncreasing: Bool) {
-        let adjustCount = isIncreasing ? 1 : -1
-    
+    func updateNotifyCount(_ count: Int) {
         guard let userInfo = userInfoData.first else { return }
     
         try! realmDB.write({
-    //            userInfo.notifyCount += adjustCount
+            userInfo.notifyCount = count
         })
     
-        self.userInfo?.notifyCount += adjustCount
+        self.userInfo?.notifyCount = count
     }
+    
+//    let adjustCount = isIncreasing ? 1 : -1
+//
+//    guard let userInfo = userInfoData.first else { return }
+//
+//    try! realmDB.write({
+////            userInfo.notifyCount += adjustCount
+//    })
+//
+//    self.userInfo?.notifyCount += adjustCount
     
     func resetNotifyCount() {
         guard let userInfo = userInfoData.first else { return }
     
         try! realmDB.write({
-    //            userInfo.notifyCount = 0
+            userInfo.notifyCount = 0
         })
     
         self.userInfo?.notifyCount = 0

@@ -23,11 +23,14 @@ protocol HomeSceneDependencies {
 
 final class HomeSceneDIContainer {
         
+    private let isLogin: Bool
     private let appNetworkService: AppNetworkService
     private let commonFactory: CommonSceneFactory
 
-    init(appNetworkService: AppNetworkService,
+    init(isLogin: Bool,
+         appNetworkService: AppNetworkService,
          commonFactory: CommonSceneFactory) {
+        self.isLogin = isLogin
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
     }
@@ -52,14 +55,21 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
     }
     
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
-        return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
+        return HomeViewReactor(isLogin: isLogin,
+                               uploadFCMTokcnUseCase: makeUploadFCMTokenUseCase(),
+                               fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
                                notificationService: DefaultNotificationService(),
                                coordinator: coordinator)
     }
     
+    private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
+        let repo = DefaultFCMTokenRepo(networkService: appNetworkService)
+        return UploadFCMTokenUseCase(repo: repo)
+    }
+    
     private func makeRecentPlanUseCase() -> FetchHomeData {
-        let repo = DefaultPlanQueryRepo(networkService: appNetworkService)
-        return FetchHomeDataUseCase(homeDataRepo: repo)
+        let repo = DefaultPlanRepo(networkService: appNetworkService)
+        return FetchHomeDataUseCase(repo: repo)
     }
     
     private func addChildVC(parentVC: HomeViewController) {

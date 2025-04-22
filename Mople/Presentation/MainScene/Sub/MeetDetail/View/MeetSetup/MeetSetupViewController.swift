@@ -308,7 +308,7 @@ extension MeetSetupViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.editMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

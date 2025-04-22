@@ -8,6 +8,8 @@
 import UIKit
 import ReactorKit
 import Kingfisher
+import RxSwift
+import RxCocoa
 
 final class HomeViewController: DefaultViewController, View {
  
@@ -38,12 +40,7 @@ final class HomeViewController: DefaultViewController, View {
         return view
     }()
     
-    private let notifyButton: UIButton = {
-        let btn = UIButton()
-        btn.setImage(.bell, for: .normal)
-        btn.contentMode = .scaleAspectFit
-        return btn
-    }()
+    private let notifyButton = UIButton()
     
     private lazy var topStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [logoView, topEmptyView, notifyButton])
@@ -149,6 +146,11 @@ final class HomeViewController: DefaultViewController, View {
             make.height.equalTo(270)
         }
     }
+    
+    private func setNotifyButton(hasNotify: Bool) {
+        let image: UIImage = hasNotify ? .bellOn : .bellOn
+        notifyButton.setImage(image, for: .normal)
+    }
 }
 
 // MARK: - Reactor Setup
@@ -165,7 +167,13 @@ extension HomeViewController {
     
     private func inputBind(_ reactor: Reactor) {
         rx.viewDidAppear
+            .take(1)
             .map { Reactor.Action.checkNotificationPermission }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+            
+        rx.viewWillAppear
+            .map { Reactor.Action.fetchNotifyStatus }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -186,6 +194,13 @@ extension HomeViewController {
     }
     
     private func outputBind(_ reactor: Reactor) {
+        reactor.pulse(\.$hasNotify)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, hasNotify in
+                vc.setNotifyButton(hasNotify: hasNotify)
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
@@ -201,22 +216,22 @@ extension HomeViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addPlanObservable()
+        NotificationManager.shared.addPlanObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addParticipatingObservable()
+        NotificationManager.shared.addParticipatingObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        EventService.shared.addObservable(name: .midnightUpdate)
+        NotificationManager.shared.addObservable(name: .midnightUpdate)
             .map { Reactor.Action.reloadDay }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -250,5 +265,4 @@ extension HomeViewController {
                                addAction: [createAction])
     }
 }
-
 

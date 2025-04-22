@@ -216,12 +216,12 @@ extension MeetDetailViewController {
     }
     
     private func setNotification(reactor: Reactor) {
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.editMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        EventService.shared.addObservable(name: .midnightUpdate)
+        NotificationManager.shared.addObservable(name: .midnightUpdate)
             .map { _ in Reactor.Action.resetList }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

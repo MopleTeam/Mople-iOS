@@ -9,4 +9,5 @@ import RxSwift
 
 protocol NotifyRepo {
     func fetchNotifyList() -> Single<[NotifyResponse]>
+    func resetNotifyCount() -> Single<Void>
 }

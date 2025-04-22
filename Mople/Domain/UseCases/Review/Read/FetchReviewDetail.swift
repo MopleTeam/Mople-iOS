@@ -13,10 +13,10 @@ protocol FetchReviewDetail {
 
 final class FetchReviewDetailUseCase: FetchReviewDetail {
     
-    private let repo: ReviewQueryRepo
+    private let repo: ReviewRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
     
-    init(repo: ReviewQueryRepo) {
+    init(repo: ReviewRepo) {
         self.repo = repo
     }
     

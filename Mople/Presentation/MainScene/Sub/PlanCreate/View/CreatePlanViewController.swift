@@ -277,7 +277,7 @@ extension CreatePlanViewController {
     
     // MARK: - Notify
     private func setNotification(_ reactor: Reactor) {
-        EventService.shared.addMeetObservable()
+        NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

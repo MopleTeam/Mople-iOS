@@ -83,8 +83,8 @@ extension PlanCreateSceneDIContainer {
         return EditPlanUseCase(editPlanRepo: makeCreatePlanRepo())
     }
     
-    private func makeCreatePlanRepo() -> PlanCommandRepo {
-        return DefaultPlanCommandRepo(networkService: appNetworkService)
+    private func makeCreatePlanRepo() -> PlanRepo {
+        return DefaultPlanRepo(networkService: appNetworkService)
     }
 }
 

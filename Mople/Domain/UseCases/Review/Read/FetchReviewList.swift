@@ -12,14 +12,14 @@ protocol FetchReviewList {
 }
 
 final class FetchReviewListUseCase: FetchReviewList {
-    let reviewListRepo: ReviewQueryRepo
+    private let repo: ReviewRepo
     
-    init(reviewListRepo: ReviewQueryRepo) {
-        self.reviewListRepo = reviewListRepo
+    init(repo: ReviewRepo) {
+        self.repo = repo
     }
     
     func execute(meetId: Int) -> Single<[Review]> {
-        return reviewListRepo.fetchReviewList(meetId)
+        return repo.fetchReviewList(meetId)
             .map { $0.map { response in
                 response.toDomain() }
             }

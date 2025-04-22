@@ -13,7 +13,6 @@ final class AppFlowCoordinator: BaseCoordinator {
     
     // MARK: - Observable
     private let mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
-    
     private let appDIContainer: AppDIContainer
     private var disposeBag = DisposeBag()
  
@@ -32,14 +31,14 @@ final class AppFlowCoordinator: BaseCoordinator {
 
 // MARK: - 런치 스크린
 protocol LaunchCoordination: AnyObject {
-    func mainFlowStart(fcmTokenRefresh: Bool)
+    func mainFlowStart(isLogin: Bool)
     func loginFlowStart()
 }
 
 extension AppFlowCoordinator: LaunchCoordination {
-    func mainFlowStart(fcmTokenRefresh: Bool = false) {
+    func mainFlowStart(isLogin: Bool = false) {
         self.navigationController.viewControllers.removeAll()
-        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isFirstStart: fcmTokenRefresh)
+        let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isLoign: isLogin)
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
         setBadgeCount()
@@ -62,7 +61,7 @@ protocol SignInListener {
 
 extension AppFlowCoordinator: SignInListener {
     func signIn() {
-        mainFlowStart(fcmTokenRefresh: true)
+        mainFlowStart(isLogin: true)
     }
 }
 
@@ -83,7 +82,7 @@ extension AppFlowCoordinator: SignOutListener {
 // MARK: - 로그인 세션 만료
 extension AppFlowCoordinator {
     private func bindSessionExpiration() {
-        EventService.shared.addObservable(name: .sessionExpired)
+        NotificationManager.shared.addObservable(name: .sessionExpired)
             .asDriver(onErrorJustReturn: ())
             .drive(with: self, onNext: { vc, _ in
                 vc.signOut()
@@ -100,7 +99,6 @@ extension AppFlowCoordinator {
     
     private func setBadgeCount() {
         guard let userInfo = UserInfoStorage.shared.userInfo else { return }
-        print(#function, #line, "뱃지 카운트 : \(userInfo.notifyCount)" )
         UIApplication.shared.applicationIconBadgeNumber = userInfo.notifyCount
     }
 }
@@ -123,3 +121,4 @@ extension AppFlowCoordinator {
         mainFlow.handleNitification(destination: destination)
     }
 }
+

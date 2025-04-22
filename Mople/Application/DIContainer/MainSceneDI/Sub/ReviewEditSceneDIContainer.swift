@@ -58,8 +58,8 @@ extension ReviewEditSceneDIContainer {
         return DeleteReviewImageUseCase(repo: makeReviewCommandRepo())
     }
     
-    private func makeReviewCommandRepo() -> ReviewCommandRepo {
-        return DefaultReviewCommnadRepo(networkService: appNetworkService)
+    private func makeReviewCommandRepo() -> ReviewRepo {
+        return DefaultReviewRepo(networkService: appNetworkService)
     }
     
     private func makeReviewImageUploadUseCase() -> ReviewImageUpload {

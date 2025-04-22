@@ -17,12 +17,9 @@ final class DefaultSheetViewController: UIViewController {
     private let opacity: CGFloat = 0.5
     
     // MARK: - Gesture
-    private let panGesture: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer()
-        gesture.cancelsTouchesInView = false
-        return gesture
-    }()
-    
+    private let panGesture = UIPanGestureRecognizer()
+    private let tapGesture = UITapGestureRecognizer()
+        
     // MARK: - UI Components
     
     private let sheetView: UIView = {
@@ -116,6 +113,17 @@ final class DefaultSheetViewController: UIViewController {
     
     private func setGesture() {
         self.view.addGestureRecognizer(panGesture)
+        self.view.addGestureRecognizer(tapGesture)
+        
+        tapGesture.rx.event
+            .asDriver()
+            .do(onNext: { _ in
+                print(#function, #line, "Path : # 탭 제스처 ")
+            })
+            .drive(with: self, onNext: { vc, _ in
+                vc.downModal()
+            })
+            .disposed(by: disposeBag)
         
         panGesture.rx.event
             .filter({ [weak self] in
@@ -165,7 +173,7 @@ final class DefaultSheetViewController: UIViewController {
     }
     
     // 모달 dismiss
-    private func downModal() {
+    private func downModal(completion: (() -> Void)? = nil) {
         UIView.animate(withDuration: 0.33,
                        animations: { [weak self] in
             guard let self else { return }
@@ -173,7 +181,8 @@ final class DefaultSheetViewController: UIViewController {
             changeOpacity(opacity: 0)
             self.view.layoutIfNeeded()
         }, completion: { [weak self] _ in
-            self?.dismiss(animated: true)
+            self?.dismiss(animated: true,
+                          completion: completion)
         })
     }
     
@@ -229,8 +238,7 @@ extension DefaultSheetViewController {
     
     private func makeAction(_ action: (() -> Void)?) -> UIAction {
         return .init { [weak self] _ in
-            self?.dismiss(animated: false,
-                          completion: action)
+            self?.downModal(completion: action)
         }
     }
 }

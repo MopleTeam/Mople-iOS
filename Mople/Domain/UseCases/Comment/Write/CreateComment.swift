@@ -13,11 +13,11 @@ protocol CreateComment {
 
 final class CreateCommentUseCase: CreateComment {
     
-    private let createCommentRepo: CommentCommandRepo
+    private let createCommentRepo: CommentRepo
     private let userId = UserInfoStorage.shared.userInfo?.id
     
-    init(createCommentRepo: CommentCommandRepo) {
-        self.createCommentRepo = createCommentRepo
+    init(repo: CommentRepo) {
+        self.createCommentRepo = repo
     }
     
     func execute(postId: Int,

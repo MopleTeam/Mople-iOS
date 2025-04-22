@@ -14,14 +14,14 @@ protocol FetchMeetList {
 
 final class FetchMeetListUseCase: FetchMeetList {
   
-    let meetListRepo: MeetQueryRepo
+    private let repo: MeetRepo
     
-    init(meetListRepo: MeetQueryRepo) {
-        self.meetListRepo = meetListRepo
+    init(repo: MeetRepo) {
+        self.repo = repo
     }
     
     func execute() -> Single<[Meet]> {
-        return meetListRepo.fetchMeetList()
+        return repo.fetchMeetList()
             .map { $0.map { response in
                 response.toDomain() }
             }

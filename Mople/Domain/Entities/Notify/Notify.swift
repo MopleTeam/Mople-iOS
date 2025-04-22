@@ -20,4 +20,5 @@ struct Notify {
     let postDate: Date = DateManager.getPreviousMonth(Date())
     let type: NotifyType?
     let payload: NotifyPayload?
+    var isNew: Bool = false
 }

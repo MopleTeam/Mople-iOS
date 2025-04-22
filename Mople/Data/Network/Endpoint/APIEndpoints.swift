@@ -436,6 +436,13 @@ extension APIEndpoints {
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
+    
+    static func resetNotifyCount() throws -> Endpoint<Void> {
+        return try Endpoint(path: "notification/clear",
+                            authenticationType: .accessToken,
+                            method: .put,
+                            headerParameters: HTTPHeader.getReceiveAllHeader())
+    }
 }
 
 // MARK: - 알림 구독

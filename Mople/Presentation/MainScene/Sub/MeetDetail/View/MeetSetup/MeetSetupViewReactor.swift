@@ -150,7 +150,7 @@ extension MeetSetupViewReactor {
 extension MeetSetupViewReactor {
     private func postDeleteMeet() {
         guard let id = currentState.meet?.meetSummary?.id else { return }
-        EventService.shared.postItem(MeetPayload.deleted(id: id),
+        NotificationManager.shared.postItem(MeetPayload.deleted(id: id),
                                      from: self)
     }
     

@@ -14,9 +14,9 @@ protocol CreateMeet {
 
 final class CreateMeetUseCase: CreateMeet {
     
-    let createMeetRepo: MeetCommandRepo
+    let createMeetRepo: MeetRepo
     
-    init(createMeetRepo: MeetCommandRepo) {
+    init(createMeetRepo: MeetRepo) {
         self.createMeetRepo = createMeetRepo
     }
     

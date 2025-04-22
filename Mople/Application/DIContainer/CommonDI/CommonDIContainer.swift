@@ -55,9 +55,8 @@ extension CommonDIContainer {
 
     // MARK: - 리뷰 정보 유즈케이스
     func makeFetchReviewDetailUseCase() -> FetchReviewDetail {
-        return FetchReviewDetailUseCase(
-            repo: DefaultReviewQueryRepo(networkService: appNetworkService)
-        )
+        let repo = DefaultReviewRepo(networkService: appNetworkService)
+        return FetchReviewDetailUseCase(repo: repo)
     }
     
     // MARK: - 닉네임 중복검사
@@ -113,8 +112,8 @@ extension CommonDIContainer {
         return EditMeetUseCase(repo: makeMeetCommandRepo())
     }
     
-    private func makeMeetCommandRepo() -> MeetCommandRepo {
-        return DefaultMeetCommandRepo(networkService: appNetworkService)
+    private func makeMeetCommandRepo() -> MeetRepo {
+        return DefaultMeetRepo(networkService: appNetworkService)
     }
     
     // MARK: - 멤버 리스트 화면

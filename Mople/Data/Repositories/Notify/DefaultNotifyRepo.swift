@@ -13,4 +13,17 @@ final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
             try APIEndpoints.fetchNotify()
         }
     }
+    
+    func resetNotifyCount() -> Single<Void> {
+        let resetCount = networkService.authenticatedRequest {
+            try APIEndpoints.resetNotifyCount()
+        }
+        
+        return resetCount
+            .observe(on: MainScheduler.instance)
+            .flatMap({
+                UserInfoStorage.shared.resetNotifyCount()
+                return .just(())
+            })
+    }
 }

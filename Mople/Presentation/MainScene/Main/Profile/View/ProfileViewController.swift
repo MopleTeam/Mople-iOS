@@ -297,7 +297,7 @@ extension ProfileViewController {
     }
     
     private func setNotification(_ reactor: Reactor) {
-        EventService.shared.addObservable(name: .editProfile)
+        NotificationManager.shared.addObservable(name: .editProfile)
             .map { Reactor.Action.fetchUserInfo }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

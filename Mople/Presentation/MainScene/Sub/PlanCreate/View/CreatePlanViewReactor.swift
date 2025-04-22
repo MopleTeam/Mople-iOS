@@ -357,10 +357,10 @@ extension CreatePlanViewReactor {
     private func postNewPlan(_ plan: Plan) {
         switch type {
         case .create:
-            EventService.shared.postItem(.created(plan),
+            NotificationManager.shared.postItem(.created(plan),
                                          from: self)
         case .edit:
-            EventService.shared.postItem(.updated(plan),
+            NotificationManager.shared.postItem(.updated(plan),
                                          from: self)
         }
     }

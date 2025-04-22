@@ -12,15 +12,15 @@ protocol FetchMeetPlanList {
 }
 
 final class FetchMeetPlanListUsecase: FetchMeetPlanList {
-    private let meetPlanRepo: PlanQueryRepo
+    private let repo: PlanRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
     
-    init(meetPlanRepo: PlanQueryRepo) {
-        self.meetPlanRepo = meetPlanRepo
+    init(repo: PlanRepo) {
+        self.repo = repo
     }
     
     func execute(meetId: Int) -> Single<[Plan]> {
-        return meetPlanRepo.fetchMeetPlanList(meetId)
+        return repo.fetchMeetPlanList(meetId)
             .map { $0.map { response in
                 response.toDomain() }
             }

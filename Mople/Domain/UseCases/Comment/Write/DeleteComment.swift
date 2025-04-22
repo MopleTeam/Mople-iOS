@@ -13,10 +13,10 @@ protocol DeleteComment {
 
 final class DeleteCommentUseCase: DeleteComment {
     
-    private let deleteCommentRepo: CommentCommandRepo
+    private let deleteCommentRepo: CommentRepo
     
-    init(deleteCommentRepo: CommentCommandRepo) {
-        self.deleteCommentRepo = deleteCommentRepo
+    init(repo: CommentRepo) {
+        self.deleteCommentRepo = repo
     }
     
     func execute(commentId: Int) -> Single<Void> {

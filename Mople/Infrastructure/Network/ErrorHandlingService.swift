@@ -45,7 +45,7 @@ final class DefaultErrorHandlingService {
                                subTitle: subTitle,
                                defaultAction: .init(completion: {
             self.isShowAlert = false
-            EventService.shared.post(name: .sessionExpired)
+            NotificationManager.shared.post(name: .sessionExpired)
         }))
     
     }

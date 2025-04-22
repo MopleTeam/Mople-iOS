@@ -13,14 +13,14 @@ protocol FetchMeetDetail {
 
 final class FetchMeetDetailUseCase: FetchMeetDetail {
    
-    let meetDetailRepo: MeetQueryRepo
+    private let repo: MeetRepo
     
-    init(meetDetailRepo: MeetQueryRepo) {
-        self.meetDetailRepo = meetDetailRepo
+    init(repo: MeetRepo) {
+        self.repo = repo
     }
     
     func execute(meetId: Int) -> Single<Meet> {
-        return meetDetailRepo.fetchMeetDetail(meetId: meetId)
+        return repo.fetchMeetDetail(meetId: meetId)
             .map { $0.toDomain()  }
     }
 }

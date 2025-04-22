@@ -60,11 +60,8 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchMeetDetailUseCase() -> FetchMeetDetail {
-        return FetchMeetDetailUseCase(meetDetailRepo: makeMeetDetailRepo())
-    }
-    
-    private func makeMeetDetailRepo() -> MeetQueryRepo {
-        return DefaultMeetQueryRepo(networkService: appNetworkService)
+        let repo = DefaultMeetRepo(networkService: appNetworkService)
+        return FetchMeetDetailUseCase(repo: repo)
     }
     
     
@@ -85,19 +82,16 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchMeetPlanUsecase() -> FetchMeetPlanList {
-        return FetchMeetPlanListUsecase(meetPlanRepo: makeMeetPlanListRepo())
-    }
-    
-    private func makeMeetPlanListRepo() -> PlanQueryRepo {
-        return DefaultPlanQueryRepo(networkService: appNetworkService)
+        let repo = DefaultPlanRepo(networkService: appNetworkService)
+        return FetchMeetPlanListUsecase(repo: repo)
     }
     
     private func makeParticipationPlanUseCase() -> ParticipationPlan {
         return ParticipationPlanUseCase(participationRepo: makeParticipationPlanRepo())
     }
     
-    private func makeParticipationPlanRepo() -> PlanCommandRepo {
-        return DefaultPlanCommandRepo(networkService: appNetworkService)
+    private func makeParticipationPlanRepo() -> PlanRepo {
+        return DefaultPlanRepo(networkService: appNetworkService)
     }
     
     // MARK: - 리뷰리스트 뷰
@@ -116,11 +110,8 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchReviewListUsecase() -> FetchReviewList {
-        return FetchReviewListUseCase(reviewListRepo: makeReviewRepo())
-    }
-    
-    private func makeReviewRepo() -> ReviewQueryRepo {
-        return DefaultReviewQueryRepo(networkService: appNetworkService)
+        let repo = DefaultReviewRepo(networkService: appNetworkService)
+        return FetchReviewListUseCase(repo: repo)
     }
     
     // MARK: - 모임 설정 뷰
@@ -140,7 +131,7 @@ extension MeetDetailSceneDIContainer {
     
     private func makeDeleteMeetUseCase() -> DeleteMeet {
         return DeleteMeetUseCase(
-            repo: DefaultMeetCommandRepo(networkService: appNetworkService)
+            repo: DefaultMeetRepo(networkService: appNetworkService)
         )
     }
     

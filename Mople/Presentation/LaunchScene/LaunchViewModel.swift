@@ -59,7 +59,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
             .observe(on: MainScheduler.instance)
             .subscribe(with: self,
                        onNext: { vm, test in
-                vm.coordinator?.mainFlowStart(fcmTokenRefresh: false)
+                vm.coordinator?.mainFlowStart(isLogin: false)
             }, onError: { vm, err in
                 vm.errorSubject.onNext(err)
             })

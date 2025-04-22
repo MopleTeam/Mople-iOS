@@ -14,9 +14,9 @@ protocol DeleteMeet {
 
 final class DeleteMeetUseCase: DeleteMeet {
     
-    let repo: MeetCommandRepo
+    let repo: MeetRepo
     
-    init(repo: MeetCommandRepo) {
+    init(repo: MeetRepo) {
         self.repo = repo
     }
     

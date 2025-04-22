@@ -17,28 +17,34 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case updateNotifyList([Notify])
+        case resetNotifyCount
         case updateLoadingState(Bool)
         case catchError(Error)
     }
     
     struct State {
         @Pulse var notifyList: [Notify] = []
+        @Pulse var resetedCount: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
+        
     }
     
     var initialState: State = State()
     
     // MARK: - UseCase
     private let fetchNotifyListUseCase: FetchNotifyList
+    private let resetNotifyCountUseCase : ResetNotifyCount
     
     // MARK: - Coordinator
     private weak var coordinator: NotifyListFlowCoordination?
     
     // MARK: - LifeCycle
     init(fetchNotifyList: FetchNotifyList,
+         resetNotifyCount: ResetNotifyCount,
          coordinator: NotifyListFlowCoordination) {
         self.fetchNotifyListUseCase = fetchNotifyList
+        self.resetNotifyCountUseCase = resetNotifyCount
         self.coordinator = coordinator
         initialAction()
         logLifeCycle()
@@ -57,7 +63,7 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchNotifyList:
-            return fetchNotifyList()
+            return fetchNotifyAndResetCount()
         case let .selectNotify(index):
             return handleNotifyTap(index: index)
         case .endFlow:
@@ -72,7 +78,11 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .updateNotifyList(notifyList):
+            print(#function, #line, "Path : # 알림 리스트 조정 ")
             newState.notifyList = notifyList
+        case .resetNotifyCount:
+            print(#function, #line, "Path : # 알림 리셋 조정 ")
+            newState.resetedCount = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -85,14 +95,20 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Requset
 extension NotifyListViewReactor {
-    private func fetchNotifyList() -> Observable<Mutation> {
-        
-        #warning("정렬 처리필요 (서버에서 날짜포함시켜서 보낸 뒤)")
+    private func fetchNotifyAndResetCount() -> Observable<Mutation> {
+
         let fetchNotify = fetchNotifyListUseCase.execute()
             .asObservable()
-            .map { Mutation.updateNotifyList($0) }
+            .flatMap({ [weak self] notifyList -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                
+                return resetNotifyCountUseCase.execute()
+                    .asObservable()
+                    .map { _ in Mutation.updateNotifyList(notifyList) }
+            })
         
         return requestWithLoading(task: fetchNotify)
+            .concat(Observable<Mutation>.just(.resetNotifyCount))
     }
 }
 
