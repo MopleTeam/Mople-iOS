@@ -19,7 +19,7 @@ class DefaultEmptyView: UIView {
     private let label: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
-        label.textColor = ColorStyle.Gray._06
+        label.textColor = .gray06
         label.textAlignment = .center
         label.numberOfLines = 2
         return label
@@ -64,9 +64,5 @@ extension DefaultEmptyView {
     
     public func setImage(image: UIImage?) {
         imageView.image = image
-    }
-    
-    public func hideContent(_ isHidden: Bool) {
-        mainStackView.isHidden = isHidden
     }
 }

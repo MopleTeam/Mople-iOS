@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol FetchHomeData {
-    func execute() -> Single<HomeData>
+    func execute() -> Observable<HomeData>
 }
 
 final class FetchHomeDataUseCase: FetchHomeData {
@@ -18,9 +18,10 @@ final class FetchHomeDataUseCase: FetchHomeData {
         self.repo = repo
     }
     
-    func execute() -> Single<HomeData> {
+    func execute() -> Observable<HomeData> {
         return repo.fetchHomeData()
             .map { $0.toDomain() }
+            .asObservable()
     }
 }
 

@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchMeetPlanList {
-    func execute(meetId: Int) -> Single<[Plan]>
+    func execute(meetId: Int) -> Observable<[Plan]>
 }
 
 final class FetchMeetPlanListUsecase: FetchMeetPlanList {
@@ -19,7 +19,7 @@ final class FetchMeetPlanListUsecase: FetchMeetPlanList {
         self.repo = repo
     }
     
-    func execute(meetId: Int) -> Single<[Plan]> {
+    func execute(meetId: Int) -> Observable<[Plan]> {
         return repo.fetchMeetPlanList(meetId)
             .map { $0.map { response in
                 response.toDomain() }
@@ -29,5 +29,6 @@ final class FetchMeetPlanListUsecase: FetchMeetPlanList {
                 verifyPlan.verifyCreator(self?.userID)
                 return verifyPlan }
             }
+            .asObservable()
     }
 }

@@ -14,7 +14,6 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     // MARK: - Reactor
     typealias Reactor = MemberListViewReactor
-    private var memberListReactor: MemberListViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Observer
@@ -22,11 +21,11 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     // MARK: - UI Components
     private let countView: CountView = {
-        let view = CountView(title: "참여자 목록")
+        let view = CountView(title: L10n.memberList)
         view.frame.size.height = 64
         view.setBottomInset(16)
         view.setFont(font: FontStyle.Body1.medium,
-                     textColor: ColorStyle.Gray._04)
+                     textColor: .gray04)
         return view
     }()
 
@@ -40,10 +39,12 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     }()
     
     // MARK: - LifeCycle
-    init(title: String,
+    init(screenName: ScreenName,
+         title: String?,
          reactor: MemberListViewReactor) {
-        super.init(title: title)
-        self.memberListReactor = reactor
+        super.init(screenName: screenName,
+                   title: title)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -53,7 +54,6 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
     }
     
     // MARK: - UI Setup
@@ -74,7 +74,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     }
     
     private func setLayout() {
-        self.view.backgroundColor = ColorStyle.Default.white
+        self.view.backgroundColor = .defaultWhite
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { make in
@@ -86,16 +86,25 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
 
 // MARK: - Reactor Setup
 extension MemberListViewController {
-    private func setReactor() {
-        reactor = memberListReactor
-    }
-    
+ 
     func bind(reactor: MemberListViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
             .map { Reactor.Action.endView }
             .bind(to: reactor.action)
@@ -107,7 +116,7 @@ extension MemberListViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
@@ -126,7 +135,7 @@ extension MemberListViewController {
             .asDriver(onErrorJustReturn: [])
             .map({ $0.count })
             .drive(with: self, onNext: { vc, count in
-                vc.countView.countText = "\(count)명"
+                vc.countView.countText = L10n.peopleCount(count)
             })
             .disposed(by: disposeBag)
         
@@ -138,6 +147,7 @@ extension MemberListViewController {
             })
             .disposed(by: disposeBag)
     }
+
     
     // MARK: - 에러 핸들링
     private func handleError(_ err: MemberListError) {

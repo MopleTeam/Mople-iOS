@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol CreationNickname {
-    func executue() -> Single<String?>
+    func executue() -> Observable<String>
 }
 
 final class CreationNicknameUseCase: CreationNickname {
@@ -19,8 +19,14 @@ final class CreationNicknameUseCase: CreationNickname {
         self.nickNameRepo = nickNameRepo
     }
     
-    func executue() -> Single<String?> {
+    func executue() -> Observable<String> {
         self.nickNameRepo.creationNickname()
-            .map { String(data: $0, encoding: .utf8)  }
+            .asObservable()
+            .flatMap({ data -> Observable<String> in
+                guard let nickname = String(data: data, encoding: .utf8) else {
+                    return .empty()
+                }
+                return .just(nickname)
+            })
     }
 }

@@ -12,7 +12,7 @@ import RxRelay
 final class AppFlowCoordinator: BaseCoordinator {
     
     // MARK: - Observable
-    private let mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
+    private var mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
     private let appDIContainer: AppDIContainer
     private var disposeBag = DisposeBag()
  
@@ -20,12 +20,11 @@ final class AppFlowCoordinator: BaseCoordinator {
          appDIContainer: AppDIContainer) {
         self.appDIContainer = appDIContainer
         super.init(navigationController: navigationController)
-        bindSessionExpiration()
     }
     
     override func start() {
         let launchView = appDIContainer.makeLaunchViewController(coordinator: self)
-        self.navigationController.pushViewController(launchView, animated: false)
+        self.pushWithTracking(launchView, animated: false)
     }
 }
 
@@ -72,22 +71,12 @@ protocol SignOutListener {
 
 extension AppFlowCoordinator: SignOutListener {
     func signOut() {
-        JWTTokenStorage.shared.deleteToken()
-        UserInfoStorage.shared.deleteEnitity()
-        UserDefaults.deleteFCMToken()
+        resetMainReadySubject()
         loginFlowStart()
     }
-}
-
-// MARK: - 로그인 세션 만료
-extension AppFlowCoordinator {
-    private func bindSessionExpiration() {
-        NotificationManager.shared.addObservable(name: .sessionExpired)
-            .asDriver(onErrorJustReturn: ())
-            .drive(with: self, onNext: { vc, _ in
-                vc.signOut()
-            })
-            .disposed(by: disposeBag)
+    
+    private func resetMainReadySubject() {
+        mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
     }
 }
 
@@ -116,9 +105,50 @@ extension AppFlowCoordinator {
     }
     
     private func routeNotification(to destination: NotificationDestination) {
+        resetMainFlow(completion: { mainFlow in
+            mainFlow.handleNotification(destination: destination)
+        })
+    }
+}
+
+// MARK: - Invite Handle
+extension AppFlowCoordinator {
+    func handleInvite(with url: URL) {
+        guard let scheme = url.scheme,
+              scheme == "mople",
+              let inviteCode = url.queryParameters["code"] else { return }
+        
+        mainReadySubject
+            .take(1)
+            .subscribe(onNext: { [weak self] in
+                self?.routeJoinMeet(with: inviteCode)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func routeJoinMeet(with code: String) {
+        resetMainFlow(completion: { mainFlow in
+            mainFlow.handleInviteMeet(code: code)
+        })
+    }
+}
+
+extension AppFlowCoordinator {
+    private func resetMainFlow(completion: ((MainSceneCoordinator) -> Void)? = nil) {
         guard let mainFlow = findChildCoordinator(ofType: MainSceneCoordinator.self) else { return }
-        mainFlow.childCoordinators.forEach { $0.resetChildCoordinators() }
-        mainFlow.handleNitification(destination: destination)
+        
+        let group = DispatchGroup()
+        
+        mainFlow.childCoordinators.forEach {
+            group.enter()
+            $0.resetChildCoordinators(completion: {
+                group.leave()
+            })
+        }
+        
+        group.notify(queue: .main) {
+            completion?(mainFlow)
+        }
     }
 }
 

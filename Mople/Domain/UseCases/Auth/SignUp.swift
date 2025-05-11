@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol SignUp {
-    func execute(request: SignUpRequest) -> Single<Void>
+    func execute(request: SignUpRequest) -> Observable<Void>
 }
 
 final class SignUpUseCase: SignUp, LifeCycleLoggable {
@@ -25,7 +25,8 @@ final class SignUpUseCase: SignUp, LifeCycleLoggable {
     }
     
     // MARK: - SignUp
-    func execute(request: SignUpRequest) -> Single<Void> {
+    func execute(request: SignUpRequest) -> Observable<Void> {
         return repo.signUp(requestModel: request)
+            .asObservable()
     }
 }

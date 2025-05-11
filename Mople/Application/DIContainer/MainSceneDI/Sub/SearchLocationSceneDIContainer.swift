@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SearchPlaceSceneDependencies {
-    func makeSearchLocationViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController
+    func makeSearchPlaceViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController
     func makeSearchResultViewController() -> SearchResultViewController
     func makePlaceSelectViewController(with place: PlaceInfo) -> PlaceSelectViewController
 }
@@ -16,15 +16,12 @@ protocol SearchPlaceSceneDependencies {
 final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
 
     private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
     private var commonReactor: SearchPlaceViewReactor?
     private weak var delegate: SearchPlaceDelegate?
     
     init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory,
-         delegate: SearchPlaceDelegate) {
+         delegate: SearchPlaceDelegate?) {
         self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
         self.delegate = delegate
     }
     
@@ -36,10 +33,11 @@ final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
 
 // MARK: - View
 extension SearchLocationSceneDIContainer {
-    func makeSearchLocationViewController(coordinator: SearchPlaceCoordination
+    func makeSearchPlaceViewController(coordinator: SearchPlaceCoordination
     ) -> SearchPlaceViewController {
         makeCommonReactor(coordinator: coordinator)
-        return SearchPlaceViewController(reactor: commonReactor)
+        return SearchPlaceViewController(screenName: .plan_write_map_search,
+                                         reactor: commonReactor)
     }
     
     func makeSearchResultViewController() -> SearchResultViewController {
@@ -47,7 +45,8 @@ extension SearchLocationSceneDIContainer {
     }
     
     func makePlaceSelectViewController(with place: PlaceInfo) -> PlaceSelectViewController {
-        return PlaceSelectViewController(reactor: commonReactor,
+        return PlaceSelectViewController(screenName: .plan_write_map,
+                                         reactor: commonReactor,
                                          place: place)
     }
 }

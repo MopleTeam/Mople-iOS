@@ -77,12 +77,11 @@ extension SignInViewReactor {
     private func executeSignIn(platform: LoginPlatform) -> Observable<Mutation> {
                   
         return signIn.execute(platform: platform)
-            .flatMap({ [weak self] _ -> Single<Void> in
-                guard let self else { return .just(()) }
+            .flatMap({ [weak self] _ -> Observable<Void> in
+                guard let self else { return .empty() }
                 return self.fetchUserInfo.execute()
             })
             .observe(on: MainScheduler.instance)
-            .asObservable()
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 self?.coordinator?.presentMainFlow()
                 return .empty()

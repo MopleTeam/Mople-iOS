@@ -17,7 +17,7 @@ final class MeetListTableCell: UITableViewCell {
         view.addArrowImageView()
         view.addMemberCountLabel()
         view.setTitleLabel(font: FontStyle.Title3.semiBold,
-                           color: ColorStyle.Gray._01)
+                           color: .gray01)
         view.setSpacing(12)
         return view
     }()
@@ -25,8 +25,8 @@ final class MeetListTableCell: UITableViewCell {
     private let scheduleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
-        label.textColor = ColorStyle.Gray._04
-        label.backgroundColor = ColorStyle.BG.input
+        label.textColor = .gray04
+        label.backgroundColor = .bgInput
         label.clipsToBounds = true
         label.layer.cornerRadius = 10
         label.textAlignment = .center
@@ -39,7 +39,7 @@ final class MeetListTableCell: UITableViewCell {
         sv.spacing = 12
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.backgroundColor = ColorStyle.Default.white
+        sv.backgroundColor = .defaultWhite
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
@@ -83,10 +83,11 @@ final class MeetListTableCell: UITableViewCell {
         switch status {
         case .present:
             scheduleLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: status.message,
-                                                                                       highlightText: "오늘")
+                                                                                       highlightText: L10n.Date.today)
         case let .future(day):
+            let dDayTitle = L10n.Date.dday(day)
             scheduleLabel.attributedText = NSMutableAttributedString.makeHighlightText(fullText: status.message,
-                                                                                       highlightText: "D-\(day)")
+                                                                                       highlightText: dDayTitle)
         case .past, .none:
             scheduleLabel.text = status.message
         }
@@ -104,13 +105,13 @@ extension MeetListTableCell {
         var message: String {
             switch self {
             case let .past(day):
-                return "마지막 약속으로부터 \(abs(day))일 지났어요."
+                return L10n.Meetlist.lastDay(abs(day))
             case .present:
-                return "오늘 약속된 일정이 있어요"
+                return L10n.Date.today + " " + L10n.Meetlist.hasPlan
             case let .future(day):
-                return "D-\(day) 약속된 일정이 있어요."
+                return L10n.Date.dday(day) + " " + L10n.Meetlist.hasPlan
             case .none:
-                return "새로운 일정을 추가해보세요."
+                return L10n.Meetlist.newPlan
             }
         }
     }

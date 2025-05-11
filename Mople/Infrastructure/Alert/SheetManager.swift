@@ -32,8 +32,10 @@ final class SheetManager {
         UIApplication.shared.topVC
     }
     
-    func showSheet(actions: [DefaultSheetAction]) {
-        let alert = DefaultSheetViewController(actions: actions)
+    func showSheet(actions: [DefaultSheetAction],
+                   cancleAction: (() -> Void)? = nil) {
+        let alert = DefaultSheetViewController(actions: actions,
+                                               cancleAction: cancleAction)
         currentVC?.present(alert, animated: false)
     }
 }

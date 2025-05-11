@@ -107,7 +107,6 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
 extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
         let fetchMember = fetchMemberUseCase.execute(type: type)
-            .asObservable()
             .map { Mutation.updateMember($0.membsers) }
         
         return requestWithLoading(task: fetchMember)

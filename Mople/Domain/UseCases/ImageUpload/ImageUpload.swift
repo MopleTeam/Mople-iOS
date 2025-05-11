@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 
 protocol ImageUpload {
-    func execute(_ image: UIImage?) -> Single<String?>
+    func execute(_ image: UIImage) -> Observable<String>
 }
 
 final class ImageUploadUseCase: ImageUpload {
@@ -20,16 +20,14 @@ final class ImageUploadUseCase: ImageUpload {
         self.imageUploadRepo = imageUploadRepo
     }
     
-    func execute(_ image: UIImage?) -> Single<String?> {
-        print(#function, #line)
-        guard let image else { return .just(nil) }
-        
-        return Single.deferred { [weak self] in
-            guard let self else { return .just(nil) }
+    func execute(_ image: UIImage) -> Observable<String> {
+        return Observable.deferred { [weak self] in
+            guard let self else { return .empty() }
             
             do {
-                let imageData = try Data.imageDataCompressed(uiImage: image) 
+                let imageData = try Data.imageDataCompressed(uiImage: image)
                 return self.imageUploadRepo.uploadImage(data: imageData, path: .profile)
+                    .asObservable()
             } catch {
                 return .error(error)
             }

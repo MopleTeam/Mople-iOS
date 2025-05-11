@@ -8,7 +8,6 @@ import UIKit
 import RxSwift
 
 protocol LaunchViewModel: AnyObject {
-    var error: Observable<Error?> { get }
     func checkEntry()
     func showSignInFlow()
 }
@@ -17,22 +16,17 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     
     private var disposeBag = DisposeBag()
     
-    // MARK: - Observable
-    private let errorSubject: PublishSubject<Error?> = .init()
-    var error: Observable<Error?> { return errorSubject.asObservable() }
-    
     // MARK: - Coordinator
     private weak var coordinator: LaunchCoordination?
     
     // MARK: - Usecase
-    private let fetchUserInfo: FetchUserInfo
+    private let fetchUserInfoUseCase: FetchUserInfo
     
     // MARK: - LifeCycle
-    init(fetchUserInfo: FetchUserInfo,
+    init(fetchUserInfoUseCase: FetchUserInfo,
          coordinator: LaunchCoordination) {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Created" )
-
-        self.fetchUserInfo = fetchUserInfo
+        self.fetchUserInfoUseCase = fetchUserInfoUseCase
         self.coordinator = coordinator
     }
     
@@ -42,7 +36,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     
     // MARK: - Account Check
     func checkEntry() {
-        if JWTTokenStorage.shared.hasToken() {
+        if KeychainStorage.shared.hasToken() {
             fetchUser()
         } else {
             showSignInFlow()
@@ -54,16 +48,21 @@ final class DefaultLaunchViewModel: LaunchViewModel {
     }
     
     private func fetchUser() {
-        fetchUserInfo.execute()
-            .asObservable()
+        fetchUserInfoUseCase.execute()
             .observe(on: MainScheduler.instance)
             .subscribe(with: self,
                        onNext: { vm, test in
                 vm.coordinator?.mainFlowStart(isLogin: false)
             }, onError: { vm, err in
-                vm.errorSubject.onNext(err)
+                vm.resetUserData()
+                vm.showSignInFlow()
             })
             .disposed(by: disposeBag)
     }
+    
+    private func resetUserData() {
+        KeychainStorage.shared.deleteToken()
+        UserInfoStorage.shared.deleteEnitity()
+        UserDefaults.deleteFCMToken()
+    }
 }
-

@@ -13,7 +13,7 @@ protocol Coordinator: AnyObject {
     func start()
     func start(coordinator: Coordinator)
     func didFinish(coordinator: Coordinator)
-    func resetChildCoordinators()
+    func resetChildCoordinators(completion: (() -> Void)?)
 }
 
 class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
@@ -57,11 +57,14 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
         self.navigationController.viewControllers.removeAll()
     }
     
-    func resetChildCoordinators() {
+    func resetChildCoordinators(completion: (() -> Void)?) {
         self.navigationController.dismiss(animated: true,
                                           completion: { [weak self] in
             guard let self,
-                  !self.childCoordinators.isEmpty else { return }
+                  !self.childCoordinators.isEmpty else {
+                completion?()
+                return
+            }
             
             childCoordinators.forEach {
                 $0.navigationController.viewControllers.removeAll()
@@ -69,9 +72,41 @@ class BaseCoordinator: Coordinator, LifeCycleLoggable, NavigationCloseable {
             }
             
             childCoordinators.removeAll()
+            completion?()
         })
     }
+}
+
+// MARK: - Navigation
+extension BaseCoordinator {
     
+    // MARK: - Start
+    func present(_ viewController: UIViewController,
+                 completion: (() -> Void)? = nil) {
+        self.navigationController.presentWithTransition(viewController,
+                                                        completion: completion)
+    }
+    
+    func push(_ viewController: UIViewController,
+              animated: Bool = true) {
+        self.navigationController.pushViewController(viewController,
+                                                     animated: animated)
+    }
+    
+    // MARK: - Start With Tracking
+    func pushWithTracking(_ viewController: UIViewController,
+                          animated: Bool = true) {
+        self.push(viewController, animated: animated)
+        ScreenTracking.track(with: viewController)
+    }
+    
+    func presentWithTracking(_ viewController: UIViewController,
+                             completion: (() -> Void)? = nil) {
+        self.present(viewController, completion: completion)
+        ScreenTracking.track(with: viewController)
+    }
+    
+    // MARK: - End
     func dismiss(completion: (() -> Void)?) {
         self.navigationController.dismiss(animated: true,
                                           completion: completion)

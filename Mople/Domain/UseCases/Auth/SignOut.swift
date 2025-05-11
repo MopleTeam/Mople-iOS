@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol SignOut {
-    func execute(userId: Int) -> Single<Void>
+    func execute(userId: Int) -> Observable<Void>
 }
 
 final class SignOutUseCase: SignOut, LifeCycleLoggable {
@@ -24,7 +24,8 @@ final class SignOutUseCase: SignOut, LifeCycleLoggable {
         logLifeCycle()
     }
     
-    func execute(userId: Int) -> Single<Void> {
+    func execute(userId: Int) -> Observable<Void> {
         return repo.signOut(userId: userId)
+            .asObservable()
     }
 }

@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol DeleteAccount {
-    func execute() -> Single<Void>
+    func execute() -> Observable<Void>
 }
 
 final class DeleteAccountUseCase: DeleteAccount, LifeCycleLoggable {
@@ -24,7 +24,8 @@ final class DeleteAccountUseCase: DeleteAccount, LifeCycleLoggable {
         logLifeCycle()
     }
     
-    func execute() -> Single<Void> {
+    func execute() -> Observable<Void> {
         return repo.deleteAccount()
+            .asObservable()
     }
 }

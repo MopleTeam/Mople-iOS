@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol ResetNotifyCount {
-    func execute() -> Single<Void>
+    func execute() -> Observable<Void>
 }
 
 final class ResetNotifyCountUseCase: ResetNotifyCount {
@@ -18,7 +18,8 @@ final class ResetNotifyCountUseCase: ResetNotifyCount {
         self.repo = repo
     }
     
-    func execute() -> Single<Void> {
+    func execute() -> Observable<Void> {
         repo.resetNotifyCount()
+            .asObservable()
     }
 }

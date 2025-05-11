@@ -20,7 +20,7 @@ final class MemberListTableCell: UITableViewCell {
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.medium
-        label.textColor = ColorStyle.Gray._02
+        label.textColor = .gray02
         return label
     }()
     

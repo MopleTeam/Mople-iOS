@@ -14,7 +14,7 @@ final class DefaultCalendarRepo: BaseRepositories, CalendarRepo {
         }
     }
     
-    func fetchMonthlyPlan(month: String) -> Single<MonthlyPlanResponse> {
+    func fetchMonthlyPost(month: String) -> Single<MonthlyPostResponse> {
         return networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarPagingData(month: month)
         }

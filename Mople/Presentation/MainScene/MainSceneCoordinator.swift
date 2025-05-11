@@ -6,19 +6,24 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol MainCoordination: AnyObject {
     func showCalendar(startingFrom date: Date)
-    func signOut()
+    func showJoinedMeet(with meet: Meet)
+    func startLoginFlow()
 }
-
-
 
 final class MainSceneCoordinator: BaseCoordinator {
     
-    private(set) var dependencies: MainSceneDependencies
-    private(set) var tabBarController = DefaultTabBarController()
- 
+    private var disposeBag = DisposeBag()
+    
+    // MARK: - Observable
+    private let mainReadySubject = ReplaySubject<Void>.create(bufferSize: 1)
+    
+    private let dependencies: MainSceneDependencies
+    private var tabBarController: MainTabBarController?
+    
     init(navigationController: AppNaviViewController,
          dependencies: MainSceneDependencies) {
         self.dependencies = dependencies
@@ -26,8 +31,10 @@ final class MainSceneCoordinator: BaseCoordinator {
     }
     
     override func start() {
-        tabBarController.setViewControllers(getTabs(), animated: false)
-        navigationController.pushViewController(tabBarController, animated: false)
+        tabBarController = dependencies.makeMainTabBarController(coordinator: self)
+        tabBarController?.setViewControllers(getTabs(), animated: false)
+        self.push(tabBarController!, animated: false)
+        mainReadySubject.onNext(())
     }
     
     private func getTabs() -> [UIViewController] {
@@ -65,31 +72,22 @@ extension MainSceneCoordinator {
     }
 }
 
+// MARK: - Navigation
 extension MainSceneCoordinator: MainCoordination {
-    
-    // MARK: - 로그아웃
-    /// 로그아웃 및 회원탈퇴 후 로그인 화면으로 넘어가기
-    func signOut() {
-        fadeOut { [weak self] in
-            self?.clearScene()
-        }
-    }
-    
+        
     /// 로그아웃, 회원탈퇴 시 자식 뷰 지우기
-    private func clearScene() {
-        self.clearUp()
-        self.tabBarController.viewControllers?.removeAll()
-        self.parentCoordinator?.didFinish(coordinator: self)
-        (self.parentCoordinator as? SignOutListener)?.signOut()
-    }
-    
-    // MARK: - 루트뷰로 돌아오기
-    func returnToRootView() {
-        self.navigationController.dismiss(animated: true)
+    func startLoginFlow() {
+        fadeOut { [weak self] in
+            guard let self else { return }
+            self.clearUp()
+            self.tabBarController?.viewControllers?.removeAll()
+            self.parentCoordinator?.didFinish(coordinator: self)
+            (self.parentCoordinator as? SignOutListener)?.signOut()
+        }
     }
 }
 
-// MARK: - 탭바 컨트롤
+// MARK: - Handle TabBar
 extension MainSceneCoordinator {
     enum Route: Int {
         case home, meetList, calendar, profile
@@ -98,17 +96,39 @@ extension MainSceneCoordinator {
     /// 캘린더 탭으로 전환하기
     /// - Parameter date: 캘린더 탭에서 보여줄 날짜
     func showCalendar(startingFrom date: Date) {
-        tabBarController.selectedIndex = Route.calendar.rawValue
-        guard let calendarVC = tabBarController.viewcController(ofType: CalendarScheduleViewController.self) else { return }
+        guard let calendarVC = tabBarController?.viewController(ofType: CalendarPostViewController.self) else {
+            return
+        }
+        tabBarController?.selectedIndex = Route.calendar.rawValue
         calendarVC.presentEvent(on: date)
+    }
+    
+    func showJoinedMeet(with meet: Meet) {
+        guard let meetListVC = tabBarController?.viewController(ofType: MeetListViewController.self) else {
+            return
+        }
+        tabBarController?.selectedIndex = Route.meetList.rawValue
+        meetListVC.presentJoinMeet(with: meet)
     }
 }
 
 // MARK: - Handle Notification Tap
 extension MainSceneCoordinator {
-    func handleNitification(destination: NotificationDestination) {
+    func handleNotification(destination: NotificationDestination) {
+        tabBarController?.resetNotify()
         let destination = dependencies.makeNotificationDestination(type: destination)
         self.start(coordinator: destination)
-        self.navigationController.presentWithTransition(destination.navigationController)
+        self.present(destination.navigationController)
+    }
+}
+
+// MARK: - Handle Invite
+extension MainSceneCoordinator {
+    func handleInviteMeet(code: String) {
+        mainReadySubject
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.tabBarController?.joinMeet(code: code)
+            })
+            .disposed(by: disposeBag)
     }
 }

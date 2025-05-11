@@ -22,6 +22,7 @@ final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
         return resetCount
             .observe(on: MainScheduler.instance)
             .flatMap({
+                print(#function, #line, "Path : # 리셋 요청 ")
                 UserInfoStorage.shared.resetNotifyCount()
                 return .just(())
             })

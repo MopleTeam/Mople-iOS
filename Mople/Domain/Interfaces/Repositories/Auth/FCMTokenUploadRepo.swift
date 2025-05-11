@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol FCMTokenUploadRepo {
-    func uploadFCMToken(_ token: String) 
+    func uploadFCMToken(_ token: String) -> Single<Void>
 }

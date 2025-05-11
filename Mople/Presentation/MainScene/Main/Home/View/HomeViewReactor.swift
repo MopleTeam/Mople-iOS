@@ -26,12 +26,12 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         }
         
         case flow(Flow)
-        case checkNotificationPermission
         case fetchHomeData
         case fetchNotifyStatus
         case updatePlan(_ planPayload: PlanPayload)
         case updateMeet(_ meetPayload: MeetPayload)
         case reloadDay
+        case refresh
     }
     
     enum Mutation {
@@ -39,6 +39,7 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetList(_ updatedMeetList: [MeetSummary])
         case updateHomeData(HomeData)
         case updateNotifyStatus(Bool)
+        case completedRefresh
         case updateLoadingState(Bool)
         case catchError(HomeError)
     }
@@ -47,34 +48,24 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var plans: [Plan] = []
         @Pulse var meetList: [MeetSummary] = []
         @Pulse var hasNotify: Bool = false
+        @Pulse var isRefreshed: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: HomeError?
     }
     
     // MARK: - Variables
     var initialState: State = State()
-    private let isLogin: Bool
     
     // MARK: - UseCcase
-    private let uploadFCMTokenUseCase: UploadFCMToken
     private let fetchRecentScheduleUseCase: FetchHomeData
-    
-    // MARK: - Notification
-    private let notificationService: NotificationService
     
     // MARK: - Coordinator
     private weak var coordinator: HomeFlowCoordinator?
     
     // MARK: - LifeCycle
-    init(isLogin: Bool,
-         uploadFCMTokcnUseCase: UploadFCMToken,
-         fetchRecentScheduleUseCase: FetchHomeData,
-         notificationService: NotificationService,
+    init(fetchRecentScheduleUseCase: FetchHomeData,
          coordinator: HomeFlowCoordinator) {
-        self.isLogin = isLogin
-        self.uploadFCMTokenUseCase = uploadFCMTokcnUseCase
         self.fetchRecentScheduleUseCase = fetchRecentScheduleUseCase
-        self.notificationService = notificationService
         self.coordinator = coordinator
         initialAction()
         logLifeCycle()
@@ -86,7 +77,6 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initital Setup
     private func initialAction() {
-        uploadFCMToken()
         action.onNext(.fetchHomeData)
     }
     
@@ -94,19 +84,20 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchHomeData:
-            return fetchHomeData()
+            return .concat([fetchPlanDataWithLoading(),
+                            fetchNoticationStatus()])
         case .fetchNotifyStatus:
             return fetchNoticationStatus()
         case let .flow(action):
             return handleFlowAction(with: action)
-        case .checkNotificationPermission:
-            return requestNotificationPermission()
         case let .updatePlan(payload):
             return handlePlanPayload(payload)
         case let .updateMeet(payload):
             return handleMeetPayload(payload)
         case .reloadDay:
             return reloadDay()
+        case .refresh:
+            return refreshHomeData()
         }
     }
     
@@ -120,12 +111,14 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
             newState.plans = homeData.plans.sorted(by: <)
         case let .updateNotifyStatus(hasNotify):
             newState.hasNotify = hasNotify
-        case let .updateLoadingState(isLoading):
-            newState.isLoading = isLoading
         case let .updatePlanList(planList):
             newState.plans = planList
         case let .updateMeetList(meetList):
             newState.meetList = meetList
+        case .completedRefresh:
+            newState.isRefreshed = ()
+        case let .updateLoadingState(isLoading):
+            newState.isLoading = isLoading
         case let .catchError(err):
             newState.error = err
         }
@@ -135,16 +128,21 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
     
 // MARK: - Data Request
 extension HomeViewReactor {
-    private func fetchHomeData() -> Observable<Mutation> {
-                
-        let fetchSchedules = fetchRecentScheduleUseCase.execute()
-            .asObservable()
+    
+    /// 최근 일정 불러오기
+    private func fetchPlanData() -> Observable<Mutation> {
+        return fetchRecentScheduleUseCase.execute()
             .catchAndReturn(.init(plans: [], meets: []))
             .map { Mutation.updateHomeData($0) }
-        
+    }
+    
+    /// 최근 일정 로딩과 함께 불러오기
+    private func fetchPlanDataWithLoading() -> Observable<Mutation> {
+        let fetchSchedules = fetchPlanData()
         return requestWithLoading(task: fetchSchedules)
     }
     
+    /// 알림 카운트 불러오기
     private func fetchNoticationStatus() -> Observable<Mutation> {
         guard let notifyCount = UserInfoStorage.shared.userInfo?.notifyCount else {
             return .empty()
@@ -153,10 +151,11 @@ extension HomeViewReactor {
         return .just(.updateNotifyStatus(hasNotify))
     }
     
-    private func uploadFCMToken() {
-        guard isLogin else { return }
-        uploadFCMTokenUseCase
-            .executeWhenLogin()
+    /// 최근 일정 리프레쉬
+    private func refreshHomeData() -> Observable<Mutation> {
+        let refreshed = Observable.just(Mutation.completedRefresh)
+        return .concat([fetchPlanData(),
+                        refreshed])
     }
 }
 
@@ -217,25 +216,11 @@ extension HomeViewReactor {
     }
 }
 
-// MARK: - Premission
-extension HomeViewReactor {
-    private func requestNotificationPermission() -> Observable<Mutation> {
-        return Observable<Mutation>.create { observer in
-            self.notificationService.requestPermissions {
-                observer.onCompleted()
-            }
-            
-            return Disposables.create()
-        }
-    }
-}
-
 // MARK: - Notify
 extension HomeViewReactor {
     
     // MARK: - Plan
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
-        print(#function, #line, "Path : #0331 ")
         var planList = currentState.plans
         
         switch payload {
@@ -272,7 +257,7 @@ extension HomeViewReactor {
     
     private func deletePlan(_ planList: [Plan], planId: Int) -> Observable<Mutation> {
         guard planList.contains(where: { $0.id == planId }) else { return .empty() }
-        return fetchHomeData()
+        return fetchPlanDataWithLoading()
     }
     
     // MARK: - Meet
@@ -317,11 +302,7 @@ extension HomeViewReactor {
     }
     
     private func deleteMeet(meetId: Int) -> Observable<Mutation> {
-        if currentState.plans.contains(where: { $0.meet?.id == meetId }) {
-            action.onNext(.fetchHomeData)
-        }
-        
-        return .empty()
+        return fetchPlanDataWithLoading()
     }
     
     // MARK: - MidNight

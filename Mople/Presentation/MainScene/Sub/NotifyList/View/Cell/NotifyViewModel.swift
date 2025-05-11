@@ -22,7 +22,7 @@ extension NotifyViewModel {
     
     private mutating func setSubTitle(with notify: Notify) {
         guard let meetTitle = notify.meetTitle,
-              let timeDescription = notify.postDate.timeAgoDescription() else { return }
+              let timeDescription = notify.postDate?.timeAgoDescription() else { return }
         subTitle = meetTitle + " · " + timeDescription
     }
 }

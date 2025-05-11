@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol DeleteReview {
-    func exectue(id: Int) -> Single<Void>
+    func exectue(id: Int) -> Observable<Void>
 }
 
 final class DeleteReviewUseCase: DeleteReview {
@@ -20,7 +20,8 @@ final class DeleteReviewUseCase: DeleteReview {
         self.repo = repo
     }
     
-    func exectue(id: Int) -> Single<Void> {
+    func exectue(id: Int) -> Observable<Void> {
         return repo.deleteReview(id: id)
+            .asObservable()
     }
 }

@@ -1,0 +1,243 @@
+/* 
+  Localizable.strings
+  Mople
+
+  Created by CatSlave on 5/6/25.
+  
+*/
+
+// MARK: - 로그인 화면
+"app_subTitle"      = "모임부터 약속까지 간편한 관리";
+"login.kakao"    = "카카오로 시작하기";
+"login.apple"    = "Apple로 시작하기";
+
+// MARK: - Create & Edit Profile
+"edit_profile" = "프로필 수정";
+"create_profile.header" = "자신을 나타낼\n프로필을 설정해주세요";
+"create_profile.input" = "닉네임";
+"create_profile.input_placeholder" = "닉네임을 입력해주세요";
+"create_profile.name_check" = "중복확인";
+"create_profile.name_duplicate" = "이미 사용중인 닉네임 입니다.";
+"create_profile.name_available" = "사용 가능한 닉네임 입니다.";
+"create_profile.complete" = "모플 시작하기";
+
+// MARK: - Home
+"home" = "홈";
+"home.more_plan" = "더보기";
+"home.create_meet" = "새로운\n모임 만들기";
+"home.create_plan" = "새로운\n일정 만들기";
+"home.empty_plan" = "새로운 일정을 추가하고\n관리해보세요";
+"home.empty_meet_info" = "아직 소속된 모임이 없어요";
+"home.empty_meet_subinfo" = "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!";
+
+// MARK: - MeetList
+"meetlist" = "모임";
+"meetlist.empty" = "새로운 모임을 추가해주세요";
+
+// MARK: - Calendar
+"calendar" = "일정관리";
+"calendar.empty" = "새로운 일정을 추가해주세요";
+"calendar.header" = "%@년 %@월";
+
+// MARK: - PostList
+"postlist.non_date" = "날짜 정보 없음";
+
+// MARK: - Profile
+"profile" = "프로필";
+"profile.title" = "마이페이지";
+"profile.notify" = "알림 관리";
+"profile.policy" = "개인정보 처리방침";
+"profile.version" = "버전정보";
+"profile.signout" = "로그아웃";
+"profile.resign" = "회원탈퇴";
+"profile.signout_info" = "로그아웃 하시겠어요?";
+"profile.resign_info" = "정말 탈퇴하시겠어요?";
+"profile.resign_subInfo" = "회원 탈퇴하면 모임과 일정을 복구할 수 없어요";
+
+// MARK: - Create & Edit Meet
+"create_meet" = "모임 생성하기";
+"edit_meet" = "모임 정보 수정";
+"createmeet.input" = "모임 이름";
+"createmeet.input_placeholder" = "모임 이름을 입력해주세요";
+
+// MARK: - Create & Edit Plan
+"create_plan" = "일정 생성";
+"edit_plan" = "일정 수정";
+"createplan.meet_input" = "모임 이름";
+"createplan.meet_placeholder" = "모임을 선택해주세요";
+"createplan.name_input" = "약속 이름";
+"createplan.name_placeholder" = "일정을 입력해주세요";
+"createplan.date_input" = "날짜 선택";
+"createplan.date_placeholder" = "날짜를 선택해주세요";
+"createplan.time_input" = "시간 선택";
+"createplan.time_placeholder" = "시간을 선택해주세요";
+"createplan.place_input" = "장소 선택";
+"createplan.place_placeholder" = "장소를 선택해주세요";
+"createplan.invaild_date" = "선택된 시간이 너무 이릅니다.";
+
+// MARK: - Create & Edit Plan.Picker
+"picker.meet" = "모임선택";
+"picker.date" = "날짜선택";
+"picker.time" = "시간선택";
+
+// MARK: - Meet Detail
+"meetdetail.empty_post" = "새로운 일정을 추가해주세요";
+"meetdetail.planlist" = "예정된 약속";
+"meetdetail.reviwelist" = "지난 약속";
+"meetdetail.plan_end" = "해당 약속은 마감되었어요";
+"meetdetail.Plan_join" = "약속 참여하기";
+"meetdetail.plan_leave" = "약속 불참";
+
+// MARK: - Meet Detail Setup
+"meetdetail.setup" = "모임 설정";
+"meetdetail.since_count" = "우리가 추억을 쌓은지 %d 일째";
+"meetdetail.delete" = "모임 삭제";
+"meetdetail.delete_info" = "모임을 삭제하시겠어요?";
+"meetdetail.delete_subinfo" = "해당 모임에 대한 모든 기록을 복구할 수 없어요";
+"meetdetail.leave" = "모임 나가기";
+"meetdetail.leave_info" = "모임을 나가시겠어요?";
+"meetdetail.invite" = "모플에서 초대된 모임을 확인해보세요!";
+
+// MARK: - Post Detail
+"postdetail.plan" = "일정 상세";
+"postdetail.review" = "후기 상세";
+"postdetail.delete_plan" = "일정 삭제";
+"postdetail.delete_review" = "후기 상세";
+
+// MARK: - Comment
+"comment" = "댓글";
+"comment.input" = "댓글을 입력해주세요.";
+"comment.edit" = "댓글 수정";
+"comment.delete" = "댓글 삭제";
+
+// MARK: - Review Detail
+"review.create" = "후기 작성";
+"review.edit" = "후기 수정";
+"review.photo_header" = "함께한 순간";
+"review.suggestion_info" = "아직 후기를 남기지 않았어요";
+"review.suggestion_subinfo" = "멤버들과 그날의 추억에 대한 기록을 남기고 공유해 보세요.";
+
+
+// MARK: - Create Review
+"createreview.header" = "만족스러운 약속이셨나요?\n사진을 남겨 추억을 나눠보세요";
+"createreview.complete" = "후기 작성하기";
+
+// MARK: - Plcae Detail
+"placedetail" = "상세 지도";
+"placedetail.find_load" = "약속장소 길찾기";
+"placedetail.map_naver" = "네이버 지도";
+"placedetail.map_kakao" = "카카오 지도";
+
+// MARK: - Notify List
+"notifylist" = "알림";
+"notifylist.new" = "새로운 알림";
+"notifylist.empty" = "새로운 알림이 없어요";
+
+// MARK: - PhotoBook
+"photo.permission_info" = "사진 접근 권한을 허용해주세요";
+"photo.permission_subinfo" = "더 쉽고 편하게 사진을 등록할 수 있어요";
+"photo.default_image" = "기본 이미지로 변경";
+"photo.select_image" = "앨범에서 사진 선택";
+
+// MARK: - Meet Plan Info
+"meetlist.has_plan" = "약속된 일정이 있어요.";
+"meetlist.last_day" = "마지막 약속으로부터 %d일 지났어요.";
+"meetlist.new_plan" = "새로운 일정을 추가해보세요.";
+
+// MARK: - Notify Subcribe
+"notify.active" = "알람을 활성화하고  일정관리에 도움을 받아보세요";
+"notify.meet" = "모임 알림";
+"notify.meet_info" = "모임에 관련된 알림";
+"notify.plan" = "일정 알림";
+"notify.plan_info" = "다가오는 일정이나 변동사항에 대한 알림";
+
+// MARK: - Search Place
+"searchplace.title" = "약속 장소를 검색해주세요";
+"searchplace.input" = "장소를 검색해주세요";
+"searchplace.empty" = "검색결과가 없어요";
+"searchplace.recent" = "최근 검색";
+"searchplace.non_name" = "장소 이름 없음";
+"searchplace.selected" = "장소 선택";
+
+// MARK: - Member List
+"member_list" = "참여자 목록";
+
+// MARK: - Member List
+"report.plan" = "일정 신고";
+"report.review" = "후기 신고";
+"report.comment" = "댓글 신고";
+"report.completed" = "신고 접수가 완료되었습니다.";
+
+// MARK: - Common
+"create" = "생성하기";
+"search" = "검색";
+"setup" = "설정";
+"complete" = "완료";
+"check" = "확인";
+"save" = "저장";
+"cancle" = "취소";
+"yes" = "예";
+"no" = "아니오";
+"participant_count" = "%d명 참여";
+"people_count" = "%d명";
+"item_count" = "%d개";
+"non_name" = "이름 없음";
+
+// MARK: - Date
+"date.today" = "오늘";
+"date.Dday" = "D-%d";
+
+/// format
+"date.format.full" = "yyyy.MM.dd E HH시 mm분";
+"date.format.basic" = "yyyy년 MM월 dd일";
+"date.format.dot" = "yyyy. MM. dd E";
+"date.format.time" = "HH시 mm분";
+"date.format.month" = "yyyyMM";
+"date.format.serverFull" = "yyyy-MM-dd HH:mm:ss";
+"date.format.serverSimple" = "yyyy-MM-dd";
+
+/// period
+"date.period.am" = "오전";
+"date.period.pm" = "오후";
+
+/// label
+"date.label.year" = "년";
+"date.label.month" = "개월";
+"date.label.month_short" = "월";
+"date.label.day" = "일";
+"date.label.hour" = "시간";
+"date.label.hour_short" = "시";
+"date.label.minute" = "분";
+"date.label.second" = "초";
+
+/// duration
+"date.duration.ago" = "전";
+"date.duration.ago_defaul" = "1초 전";
+
+
+// MARK: - Error
+"error.login.default" = "로그인에 실패했어요.\n다시 시도해 주세요.";
+"error.login.apple" = "설정에서 Apple 로그인 연동 해제 후\n다시 시도해 주세요.";
+"error.login.kakao" = "카카오 계정과 연동을 실패했습니다.\n다시 시도해 주세요.";
+
+"error.default" = "요청에 실패했습니다.\n잠시 후 다시 시도해주세요.";
+
+"error.photo.upload" = "사진을 업로드할 수 없어요.";
+"error.photo.single_compression" = "선택된 사진의 용량이 너무 커요.";
+"error.photo.mutiple_compression" = "추가된 사진 중 %@번째 사진의 용량이 너무 커요.";
+
+"error.noResponse.meet" = "모임을 찾을 수 없어요.";
+"error.noResponse.plan" = "일정을 찾을 수 없어요.";
+"error.noResponse.review" = "후기를 찾을 수 없어요.";
+
+"error.midnight.info" = "자정을 지나 데이터가 업데이트됐어요!";
+"error.midnight.subinfo" = "일정이 마감됐어요.\n후기에서 확인해보세요.";
+
+"error.server.info" = "서버와 소통이 원활하지 않습니다.";
+"error.server.subinfo" = "현재 서버와의 연결이 원활하지 않습니다.\n잠시 후 다시 시도해 주세요.";
+
+"error.network" = "네트워크 연결을 확인해주세요.";
+
+"error.expried_token.info" = "로그인이 만료되었어요";
+"error.expried_token.subinfo" = "서비스 이용을 위해 다시 로그인해주세요";
+

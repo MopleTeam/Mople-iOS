@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol CheckDuplicateNickname {
-    func execute(_ nickname: String) -> Single<Bool>
+    func execute(_ nickname: String) -> Observable<Bool>
 }
 
 final class CheckDuplicateNicknameUseCase: CheckDuplicateNickname {
@@ -19,10 +19,11 @@ final class CheckDuplicateNicknameUseCase: CheckDuplicateNickname {
         self.duplicateCheckRepo = duplicateCheckRepo
     }
         
-    func execute(_ nickname: String) -> Single<Bool> {
+    func execute(_ nickname: String) -> Observable<Bool> {
         return duplicateCheckRepo.isNicknameExists(nickname)
             .map { String(data: $0, encoding: .utf8) }
             .map { self.handleRequestValue($0) }
+            .asObservable()
     }
     
     private func handleRequestValue(_ value: String?) -> Bool {

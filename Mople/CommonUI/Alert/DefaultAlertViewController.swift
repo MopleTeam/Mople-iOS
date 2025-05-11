@@ -9,17 +9,26 @@ import UIKit
 
 final class DefaultAlertViewController: UIViewController {
     
+    private lazy var warningView = UIView()
+    
+    private lazy var warningImageView: UIImageView = {
+        let view = UIImageView()
+        view.contentMode = .scaleAspectFit
+        view.image = .warning
+        return view
+    }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ColorStyle.Gray._01
+        label.textColor = .gray01
         label.font = FontStyle.Title2.semiBold
         label.textAlignment = .center
         return label
     }()
     
-    private let subTitleLabel: UILabel = {
+    private lazy var subTitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = ColorStyle.Gray._02
+        label.textColor = .gray02
         label.font = FontStyle.Body1.regular
         label.textAlignment = .center
         label.numberOfLines = 3
@@ -32,8 +41,6 @@ final class DefaultAlertViewController: UIViewController {
         sv.spacing = 8
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         return sv
     }()
     
@@ -55,7 +62,7 @@ final class DefaultAlertViewController: UIViewController {
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 24, left: 16, bottom: 16, right: 16)
         sv.layer.cornerRadius = 10
-        sv.backgroundColor = ColorStyle.Default.white
+        sv.backgroundColor = .defaultWhite
         return sv
     }()
     
@@ -85,7 +92,7 @@ final class DefaultAlertViewController: UIViewController {
     }
         
     private func setLayout() {
-        self.view.backgroundColor = ColorStyle.Default.black.withAlphaComponent(0.6)
+        self.view.backgroundColor = .defaultBlack.withAlphaComponent(0.6)
         self.view.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
@@ -148,6 +155,18 @@ extension DefaultAlertViewController {
         return .init { [weak self] _ in
             self?.dismiss(animated: dismissAnimated,
                           completion: action)
+        }
+    }
+}
+
+extension DefaultAlertViewController {
+    public func setWarningImage() {
+        mainStackView.insertArrangedSubview(warningView, at: 0)
+        warningView.addSubview(warningImageView)
+        warningImageView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.verticalEdges.equalToSuperview()
+            make.size.equalTo(40)
         }
     }
 }

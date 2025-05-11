@@ -8,10 +8,17 @@
 import UIKit
 
 protocol MeetDetailCoordination: AnyObject {
+    
+    // MARK: - Default View
     func swicthPlanListPage(isFuture: Bool)
+    
+    // MARK: - Move To View
     func pushMeetSetupView(meet: Meet)
-    func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType)
+    
+    // MARK: - Move To Flow
+    func presentPlanCreateView(meet: MeetSummary)
+    func presentPlanDetailView(postId: Int,
+                               type: PostType)
     func endFlow()
 }
 
@@ -31,7 +38,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     
     override func start() {
         detailMeetVC = dependencies.makeMeetDetailViewController(coordinator: self)
-        navigationController.pushViewController(detailMeetVC!, animated: false)
+        self.pushWithTracking(detailMeetVC!, animated: false)
         setPageViews()
     }
     
@@ -60,7 +67,7 @@ extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     func pushMeetSetupView(meet: Meet) {
         let vc = dependencies.makeMeetSetupViewController(meet: meet,
                                                           coordinator: self)
-        navigationController.pushViewController(vc, animated: true)
+        self.pushWithTracking(vc, animated: true)
     }
 }
 
@@ -73,8 +80,7 @@ extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
     func pushEditMeetView(previousMeet: Meet) {
         let vc = dependencies.makeEditMeetViewController(previousMeet: previousMeet,
                                                          coordinator: self)
-        
-        navigationController.pushViewController(vc, animated: true)
+        self.pushWithTracking(vc, animated: true)
     }
 }
 
@@ -82,18 +88,33 @@ extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
 extension MeetDetailSceneCoordinator: MemberListViewCoordination {
     func pushMemberListView() {
         let vc = dependencies.makeMemberListViewController(coordinator: self)
-        navigationController.pushViewController(vc, animated: true)
+        self.pushWithTracking(vc, animated: true)
+    }
+}
+
+// MARK: - Plan Create Flow
+extension MeetDetailSceneCoordinator {
+    func presentPlanCreateView(meet: MeetSummary) {
+        let planCreateFlowCoordinator = dependencies.makePlanCreateFlowCoordinator(meet: meet,
+                                                                                   completion: { [weak self] plan in
+            guard let self,
+                  let planId = plan.id else { return }
+            self.presentPlanDetailView(postId: planId,
+                                       type: .plan)
+        })
+        start(coordinator: planCreateFlowCoordinator)
+        self.present(planCreateFlowCoordinator.navigationController)
     }
 }
 
 // MARK: - Plan Detail Flow
 extension MeetDetailSceneCoordinator {
-    func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType) {
-        let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
+    func presentPlanDetailView(postId: Int,
+                            type: PostType) {
+        let planDetailFlowCoordinator = dependencies.makePostDetailFlowCoordinator(postId: postId,
                                                                                    type: type)
         start(coordinator: planDetailFlowCoordinator)
-        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
+        self.present(planDetailFlowCoordinator.navigationController)
     }
 }
 

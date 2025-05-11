@@ -16,17 +16,15 @@ protocol PhotoService {
     func updatePhotoLimit(_ limit: Int)
 }
 
-final class DefaultPhotoService: PhotoService {
+final class DefaultPhotoService: NSObject, PhotoService, UIAdaptivePresentationControllerDelegate  {
 
     private var pickerView: PHPickerViewController?
     
+    private let alertManager = AlertManager.shared
+    
     private var imageObserver: ((SingleEvent<[UIImage]>) -> Void)?
     
-    private var limit: Int
-    
-    init(limit: Int = 1) {
-        self.limit = limit
-    }
+    private var limit: Int = 1
     
     public func presentImagePicker() -> Single<[UIImage]> {
         return Single.create { [weak self] emitter in
@@ -44,18 +42,37 @@ final class DefaultPhotoService: PhotoService {
     private func requestPhotoLibraryPermission() {
         PHPhotoLibrary.requestAuthorization { [weak self] status in
             guard let self = self else { return }
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 switch status {
                 case .authorized, .limited:
-                    self.configureImagePicker()
+                    self?.configureImagePicker()
                 case .denied, .restricted:
-                    //
-                    print("사진 라이브러리 접근 권한이 거부되었습니다.")
+                    self?.imageObserver?(.success([]))
+                    self?.showAppSettingAlert()
                 default:
-                    break
+                    self?.imageObserver?(.success([]))
                 }
             }
         }
+    }
+    
+    private func showAppSettingAlert() {
+        
+        let defaultAction: DefaultAlertAction = .init(text: L10n.cancle,
+                                                      textColor: .gray01,
+                                                      bgColor: .appTertiary)
+        
+        let appSettingAction: DefaultAlertAction = .init(text: L10n.setup,
+                                                         textColor: .defaultWhite,
+                                                         bgColor: .appPrimary,
+                                                         completion: {
+            AppSettingOpener.openAppSettings()
+        })
+        
+        alertManager.showWarningAlert(title: L10n.Photo.permissionInfo,
+                                      subTitle: L10n.Photo.permissionSubinfo,
+                                      defaultAction: defaultAction,
+                                      addAction: [appSettingAction])
     }
     
     private func configureImagePicker() {
@@ -65,16 +82,19 @@ final class DefaultPhotoService: PhotoService {
         configuration.selectionLimit = limit
         configuration.filter = .images
         pickerView = PHPickerViewController(configuration: configuration)
+        pickerView?.presentationController?.delegate = self
         guard let pickerView else { return }
         pickerView.delegate = self
         topView.present(pickerView, animated: true)
+    }
+    
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        self.imageObserver?(.success([]))
     }
 }
 
 extension DefaultPhotoService: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        print(#function, #line)
-                
         let group = DispatchGroup()
         var imageList: [UIImage] = []
         var order: [Int] = []

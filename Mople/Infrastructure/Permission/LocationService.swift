@@ -39,7 +39,7 @@ final class DefaultLocationService: NSObject, CLLocationManagerDelegate, Locatio
             .catchAndReturn(savedLocation)
     }
     
-    private func requestPremission() -> Observable<Location?> {
+    private func requestPermission() -> Observable<Location?> {
         return self.authorizationSubject
             .do(onSubscribed: { [weak self] in
                 self?.locationManager.requestWhenInUseAuthorization()
@@ -57,13 +57,14 @@ extension DefaultLocationService {
         case .authorizedWhenInUse:
             return requestLocationWithTimeout()
         case .notDetermined:
-            return requestPremission()
+            return requestPermission()
         default:
-            return .empty()
+            return .just(nil)
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager,
+                         didUpdateLocations locations: [CLLocation]) {
         guard let userLocation = locations.first?.coordinate else {
             locationSubject.onCompleted()
             return
@@ -75,19 +76,19 @@ extension DefaultLocationService {
         locationSubject.onCompleted()
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    func locationManager(_ manager: CLLocationManager,
+                         didChangeAuthorization status: CLAuthorizationStatus) {
         switch status {
-        case .authorizedWhenInUse, .authorizedAlways:
-            authorizationSubject.onNext(())
-            authorizationSubject.onCompleted()
         case .notDetermined:
             break
         default:
+            authorizationSubject.onNext(())
             authorizationSubject.onCompleted()
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    func locationManager(_ manager: CLLocationManager,
+                         didFailWithError error: Error) {
         locationSubject.onNext(savedLocation)
         locationSubject.onCompleted()
     }

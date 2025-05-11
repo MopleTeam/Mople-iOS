@@ -8,8 +8,8 @@
 import UIKit
 
 protocol CalendarCoordination: AnyObject {
-    func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType)
+    func pushPostDetailView(postId: Int,
+                            type: PostType)
 }
 
 final class CalendarFlowCoordinator: BaseCoordinator, CalendarCoordination {
@@ -24,39 +24,24 @@ final class CalendarFlowCoordinator: BaseCoordinator, CalendarCoordination {
     
     override func start() {
         let calendarVC = makeMainViewController()
-        self.navigationController.pushViewController(calendarVC, animated: false)
+        self.push(calendarVC, animated: false)
     }
 }
 
 // MARK: - Default View
 extension CalendarFlowCoordinator {
-    private func makeMainViewController() -> CalendarScheduleViewController {
-        let mainVC = dependencies.makeCalendarScheduleViewcontroller(coordinator: self)
-        let calendarContainer = mainVC.calendarContainer
-        let scheduleListContainer = mainVC.scheduleListContainer
-        addCalendarView(parentVC: mainVC, container: calendarContainer)
-        addScheduleListView(parentVC: mainVC, container: scheduleListContainer)
-        return mainVC
-    }
-    
-    private func addCalendarView(parentVC: CalendarScheduleViewController, container: UIView) {
-        let calendarVC = dependencies.makeCalendarViewController()
-        parentVC.add(child: calendarVC, container: container)
-    }
-    
-    private func addScheduleListView(parentVC: CalendarScheduleViewController, container: UIView) {
-        let calendarVC = dependencies.makeScheduleListViewController()
-        parentVC.add(child: calendarVC, container: container)
+    private func makeMainViewController() -> CalendarPostViewController {
+        return dependencies.makeCalendarScheduleViewcontroller(coordinator: self)
     }
 }
 
 // MARK: - Flow
 extension CalendarFlowCoordinator {
-    func pushPlanDetailView(postId: Int,
-                            type: PlanDetailType) {
+    func pushPostDetailView(postId: Int,
+                            type: PostType) {
         let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
                                                                                    type: type)
         start(coordinator: planDetailFlowCoordinator)
-        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
+        self.present(planDetailFlowCoordinator.navigationController)
     }
 }

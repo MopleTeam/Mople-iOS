@@ -9,24 +9,18 @@ import UIKit
 
 protocol PlanCreateSceneDependencies {
     func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController
-    func makeGroupSelectViewController() -> MeetSelectViewController
-    func makeDateSelectViewController() -> DateSelectViewController
-    func makeTimeSelectViewController() -> TimePickerViewController
     func makeSearchLocationCoordinator() -> BaseCoordinator
 }
 
 final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
 
     private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
-    private var commonReactor: CreatePlanViewReactor?
+    private var createPlanReactor: CreatePlanViewReactor?
     private let type: PlanCreationType
     
     init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory,
          type: PlanCreationType) {
         self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
         self.type = type
     }
     
@@ -37,39 +31,18 @@ final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
     }
 }
 
-extension PlanCreateSceneDIContainer {
-    func makeSearchLocationCoordinator() -> BaseCoordinator {
-        let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
-                                                              commonFactory: commonFactory,
-                                                              delegate: commonReactor!)
-        return searchLoactionDI.makeSearchLocationFlowCoordinator()
-    }
-}
-
+// MARK: - Default View
 extension PlanCreateSceneDIContainer {
     func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController {
-        makeCommonReactor(coordinator: coordinator)
-        return CreatePlanViewController(title: getViewTitle(),
-                                        reactor: commonReactor)
+        createPlanReactor = makeCreatePlanViewReactor(coordinator: coordinator)
+        return CreatePlanViewController(screenName: .plan_write,
+                                        title: getViewTitle(),
+                                        type: type,
+                                        reactor: createPlanReactor!)
     }
     
-    func makeGroupSelectViewController() -> MeetSelectViewController {
-        return MeetSelectViewController(reactor: commonReactor)
-    }
-    
-    func makeDateSelectViewController() -> DateSelectViewController {
-        return DateSelectViewController(reactor: commonReactor)
-    }
-    
-    func makeTimeSelectViewController() -> TimePickerViewController {
-        return TimePickerViewController(reactor: commonReactor)
-    }
-}
-
-// MARK: - 공통 ViewModel
-extension PlanCreateSceneDIContainer {
-    private func makeCommonReactor(coordinator: PlanCreateCoordination) {
-        commonReactor = .init(createPlanUseCase: makeCreatePlanUseCase(),
+    private func makeCreatePlanViewReactor(coordinator: PlanCreateCoordination) -> CreatePlanViewReactor {
+        return .init(createPlanUseCase: makeCreatePlanUseCase(),
                               editPlanUseCase: makeEditPlanUseCase(),
                               type: type,
                               coordinator: coordinator)
@@ -88,14 +61,24 @@ extension PlanCreateSceneDIContainer {
     }
 }
 
-// MARK: - Hpler
+// MARK: - Flow
+extension PlanCreateSceneDIContainer {
+    // MARK: - 장소 검색
+    func makeSearchLocationCoordinator() -> BaseCoordinator {
+        let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
+                                                              delegate: createPlanReactor)
+        return searchLoactionDI.makeSearchLocationFlowCoordinator()
+    }
+}
+
+// MARK: - Helper
 extension PlanCreateSceneDIContainer {
     private func getViewTitle() -> String {
         switch type {
-        case .create:
-            return "일정 생성"
+        case .newFromMeetList, .newInMeeting:
+            return L10n.createPlan
         case .edit:
-            return "일정 수정"
+            return L10n.editPlan
         }
     }
 }

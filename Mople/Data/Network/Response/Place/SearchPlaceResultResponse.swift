@@ -15,7 +15,7 @@ struct SearchPlaceResultResponse: Decodable {
 
 extension SearchPlaceResultResponse {
     func toDomain() -> SearchPlaceResult {
-        return .init(result: searchResult.map({ $0.toDomain() }),
+        return .init(places: searchResult.map({ $0.toDomain() }),
                      page: page,
                      isEnd: isEnd)
     }

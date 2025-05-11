@@ -24,7 +24,6 @@ enum MemberPositionType {
     }
 }
 
-#warning("영어, 한글, 숫자 정렬법 정리")
 struct MemberInfo: Equatable {
     let memberId: Int?
     let nickname: String?

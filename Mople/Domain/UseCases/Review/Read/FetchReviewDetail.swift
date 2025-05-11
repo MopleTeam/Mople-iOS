@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchReviewDetail {
-    func execute(reviewId: Int) -> Single<Review>
+    func execute(reviewId: Int) -> Observable<Review>
 }
 
 final class FetchReviewDetailUseCase: FetchReviewDetail {
@@ -20,7 +20,7 @@ final class FetchReviewDetailUseCase: FetchReviewDetail {
         self.repo = repo
     }
     
-    func execute(reviewId: Int) -> Single<Review> {
+    func execute(reviewId: Int) -> Observable<Review> {
         return repo.fetchReviewDetail(reviewId)
             .map { $0.toDomain() }
             .map { [weak self] review in
@@ -28,5 +28,6 @@ final class FetchReviewDetailUseCase: FetchReviewDetail {
                 verifyReview.verifyCreator(self?.userID)
                 return verifyReview
             }
+            .asObservable()
     }
 }

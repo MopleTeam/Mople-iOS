@@ -13,6 +13,7 @@ final class NotifyTableCell: UITableViewCell {
     
     // MARK: - Variables
     private var task: DownloadTask?
+    private var defaultColor: UIColor?
     
     // MARK: - UI Components
     private let thumbnailView: UIImageView = {
@@ -27,7 +28,7 @@ final class NotifyTableCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = ColorStyle.Gray._02
+        label.textColor = .gray02
         label.numberOfLines = 2
         return label
     }()
@@ -35,7 +36,7 @@ final class NotifyTableCell: UITableViewCell {
     private let subTitleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = ColorStyle.Gray._04
+        label.textColor = .gray04
         return label
     }()
     
@@ -72,6 +73,13 @@ final class NotifyTableCell: UITableViewCell {
         task = nil
     }
     
+    // MARK: - Highlight
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        let color = highlighted ? .bgPrimary : defaultColor
+        contentView.backgroundColor = color
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
         self.contentView.addSubview(mainStackView)
@@ -93,7 +101,8 @@ final class NotifyTableCell: UITableViewCell {
     }
     
     public func setReadStatus(isNew: Bool) {
-        contentView.backgroundColor = isNew ? ColorStyle.BG.primary : .clear
+        defaultColor = isNew ? .bgInput : .clear
+        contentView.backgroundColor = defaultColor
     }
 }
 

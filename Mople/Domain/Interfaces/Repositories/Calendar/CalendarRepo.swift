@@ -9,6 +9,6 @@ import RxSwift
 
 protocol CalendarRepo {
     func fetchAllDates() -> Single<AllPlanDateResponse>
-    func fetchMonthlyPlan(month: String) -> Single<MonthlyPlanResponse>
+    func fetchMonthlyPost(month: String) -> Single<MonthlyPostResponse>
 }
 

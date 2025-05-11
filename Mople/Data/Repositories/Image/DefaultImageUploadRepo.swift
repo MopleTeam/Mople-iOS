@@ -15,7 +15,7 @@ enum ImageUploadPath: String {
 }
 
 final class DefaultImageUploadRepo: BaseRepositories, ImageUploadRepo {
-    func uploadImage(data: Data, path: ImageUploadPath) -> Single<String?> {
+    func uploadImage(data: Data, path: ImageUploadPath) -> Single<String> {
         print(#function, #line)
         let imageUploadEndpoint = APIEndpoints.uploadImage(imageData: data,
                                                            folderPath: path)

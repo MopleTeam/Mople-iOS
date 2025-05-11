@@ -7,15 +7,15 @@
 
 import RxSwift
 
-class BaseRepositories {
+class BaseRepositories: LifeCycleLoggable {
     private(set) var networkService: AppNetworkService
     
     init(networkService: AppNetworkService) {
-        print(#function, #line, "LifeCycle Test \(String(describing: Self.self)) Created" )
         self.networkService = networkService
+        logLifeCycle()
     }
     
     deinit {
-        print(#function, #line, "LifeCycle Test \(String(describing: Self.self)) Deinit" )
+        logLifeCycle()
     }
 }

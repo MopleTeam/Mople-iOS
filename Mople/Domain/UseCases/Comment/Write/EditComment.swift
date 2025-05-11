@@ -10,7 +10,7 @@ import RxSwift
 protocol EditComment {
     func execute(postId: Int,
                  commentId: Int,
-                 comment: String) -> Single<[Comment]>
+                 comment: String) -> Observable<[Comment]>
 }
 
 final class EditCommentUseCase: EditComment {
@@ -24,7 +24,7 @@ final class EditCommentUseCase: EditComment {
     
     func execute(postId: Int,
                  commentId: Int,
-                 comment: String) -> Single<[Comment]> {
+                 comment: String) -> Observable<[Comment]> {
         return editCommentRepo
             .editComment(postId: postId,
                          commentId: commentId,
@@ -37,5 +37,6 @@ final class EditCommentUseCase: EditComment {
                 verifyReview.verifyWriter(self?.userId)
                 return verifyReview }
             }
+            .asObservable()
     }
 }

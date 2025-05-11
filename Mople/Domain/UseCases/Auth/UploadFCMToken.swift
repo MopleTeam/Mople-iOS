@@ -9,35 +9,30 @@ import RxSwift
 import FirebaseMessaging
 
 protocol UploadFCMToken {
-    func executeWhenLogin()
+    func execute() -> Observable<Void>
 }
 
-final class UploadFCMTokenUseCase: NSObject ,UploadFCMToken, MessagingDelegate {
+final class UploadFCMTokenUseCase: UploadFCMToken {
+        
     private let repo: FCMTokenUploadRepo
+    
     
     init(repo: FCMTokenUploadRepo) {
         self.repo = repo
-        super.init()
-        Messaging.messaging().delegate = self
     }
     
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print(#function, #line, "Path : # 토큰 ")
-        guard let fcmToken else { return }
-        
-        // 저장 토큰이 있다면 현재 토큰과 비교
-        if let saveToken = UserDefaults.getFCMToken(),
-           saveToken == fcmToken {
-            return
-        }
-        repo.uploadFCMToken(fcmToken)
-    }
-    
-    func executeWhenLogin() {
+    func execute() -> Observable<Void> {
         guard let currentToken = Messaging.messaging().fcmToken else {
-            return
+            return .just(())
         }
-        repo.uploadFCMToken(currentToken)
+        
+        if let lastUploadToken = UserDefaults.getFCMToken(),
+           currentToken == lastUploadToken {
+            return .just(())
+        }
+        
+        return repo.uploadFCMToken(currentToken)
+            .asObservable()
     }
 }
 

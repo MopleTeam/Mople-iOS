@@ -12,21 +12,14 @@ import RxSwift
 import RxCocoa
 
 final class HomeViewController: DefaultViewController, View {
- 
+    
     // MARK: - Reactor
     typealias Reactor = HomeViewReactor
-    private(set) var homeReactor: HomeViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
-    private let scrollView: UIScrollView = {
-        let view = UIScrollView()
-        view.showsVerticalScrollIndicator = false
-        return view
-    }()
     
-    private let contentView = UIView()
-    
+    // Header
     private let logoView: UIImageView = {
         let view = UIImageView()
         view.image = .logo
@@ -49,27 +42,38 @@ final class HomeViewController: DefaultViewController, View {
         sv.alignment = .center
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = UIEdgeInsets(top: 8, left: 20, bottom: 8, right: 20)
+        sv.clipsToBounds = false
         return sv
     }()
     
+    // Content
+    private let scrollView: UIScrollView = {
+        let view = UIScrollView()
+        view.showsVerticalScrollIndicator = false
+        view.refreshControl = .init()
+        return view
+    }()
+    
+    private let contentView = UIView()
+    
     private(set) var recentPlanContainerView = UIView()
-            
+    
     private let makeMeetButton: CardButton = {
         let btn = CardButton()
-        btn.setTitle(text: TextStyle.Home.createGroup)
+        btn.setTitle(text: L10n.Home.createMeet)
         btn.setImage(image: .makeGroup)
         return btn
     }()
     
-    private let makeScheduleButton: CardButton = {
+    private let makePlanButton: CardButton = {
         let btn = CardButton()
-        btn.setTitle(text: TextStyle.Home.createSchedule)
+        btn.setTitle(text: L10n.Home.createPlan)
         btn.setImage(image: .makeSchedule)
         return btn
     }()
     
     private lazy var buttonStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [makeMeetButton, makeScheduleButton])
+        let sv = UIStackView(arrangedSubviews: [makeMeetButton, makePlanButton])
         sv.axis = .horizontal
         sv.spacing = 8
         sv.distribution = .fillEqually
@@ -86,8 +90,7 @@ final class HomeViewController: DefaultViewController, View {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [topStackView,
-                                                recentPlanContainerView,
+        let sv = UIStackView(arrangedSubviews: [recentPlanContainerView,
                                                 buttonStackView,
                                                 spacerView])
         sv.axis = .vertical
@@ -96,10 +99,19 @@ final class HomeViewController: DefaultViewController, View {
         return sv
     }()
     
+    // MARK: - Refresh Control
+    private let refreshControl = UIRefreshControl()
+    
+    // MARK: - Child VC
+    private let recentPlanVC: RecentPlanViewController
+    
     // MARK: - LifeCycle
-    init(reactor: HomeViewReactor) {
-        super.init()
-        self.homeReactor = reactor
+    init(screenName: ScreenName,
+         reactor: HomeViewReactor,
+         recentPlanVC: RecentPlanViewController) {
+        self.recentPlanVC = recentPlanVC
+        super.init(screenName: screenName)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -110,18 +122,34 @@ final class HomeViewController: DefaultViewController, View {
         print(#function, #line)
         super.viewDidLoad()
         setupUI()
-        setReactor()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        ScreenTracking.track(with: self)
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = ColorStyle.BG.primary
+        setLayout()
+        setChildVC()
+        setScrollView()
+    }
+    
+    private func setLayout() {
+        self.view.backgroundColor = .bgPrimary
+        self.view.addSubview(topStackView)
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
         
+        topStackView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+        }
+        
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(topStackView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -147,42 +175,48 @@ final class HomeViewController: DefaultViewController, View {
         }
     }
     
+    private func setScrollView() {
+        scrollView.refreshControl = refreshControl
+    }
+    
+    private func setChildVC() {
+        self.add(child: recentPlanVC,
+                 container: recentPlanContainerView)
+    }
+    
     private func setNotifyButton(hasNotify: Bool) {
-        let image: UIImage = hasNotify ? .bellOn : .bellOn
+        let image: UIImage = hasNotify ? .bellOn : .bellOff
         notifyButton.setImage(image, for: .normal)
     }
 }
 
 // MARK: - Reactor Setup
 extension HomeViewController {
-    private func setReactor() {
-        reactor = homeReactor
-    }
-    
     func bind(reactor: HomeViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
-        setNotification(reactor: reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
-        rx.viewDidAppear
-            .take(1)
-            .map { Reactor.Action.checkNotificationPermission }
-            .bind(to: reactor.action)
+        setActionBind(reactor)
+        setNotificationBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor: reactor)
+            })
             .disposed(by: disposeBag)
-            
-        rx.viewWillAppear
-            .map { Reactor.Action.fetchNotifyStatus }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         makeMeetButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.createGroup) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        makeScheduleButton.rx.controlEvent(.touchUpInside)
+        makePlanButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.createPlan) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -191,31 +225,14 @@ extension HomeViewController {
             .map { Reactor.Action.flow(.notify) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-    }
-    
-    private func outputBind(_ reactor: Reactor) {
-        reactor.pulse(\.$hasNotify)
-            .asDriver(onErrorJustReturn: false)
-            .drive(with: self, onNext: { vc, hasNotify in
-                vc.setNotifyButton(hasNotify: hasNotify)
-            })
-            .disposed(by: disposeBag)
         
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(self.rx.isLoading)
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$error)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, err in
-                vc.handleError(err)
-            })
+        refreshControl.rx.controlEvent(.valueChanged)
+            .map { Reactor.Action.refresh }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func setNotification(reactor: Reactor) {
+    private func setNotificationBind(_ reactor: Reactor) {
         NotificationManager.shared.addPlanObservable()
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
@@ -230,10 +247,44 @@ extension HomeViewController {
             .map { Reactor.Action.updateMeet($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
+        
         NotificationManager.shared.addObservable(name: .midnightUpdate)
             .map { Reactor.Action.reloadDay }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        NotificationManager.shared.addObservable(name: .changedNotifyCount)
+            .map { Reactor.Action.fetchNotifyStatus }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setReactorStateBind(reactor: Reactor) {
+        reactor.pulse(\.$hasNotify)
+            .asDriver(onErrorJustReturn: false)
+            .drive(with: self, onNext: { vc, hasNotify in
+                vc.setNotifyButton(hasNotify: hasNotify)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isRefreshed)
+            .compactMap({ $0 })
+            .asDriver(onErrorJustReturn: ())
+            .map({ false })
+            .drive(refreshControl.rx.isRefreshing)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.handleError(err)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -252,17 +303,16 @@ extension HomeViewController {
 
 extension HomeViewController {
     private func showEmptyMeetAlert() {
-        let createAction: DefaultAlertAction = .init(text: "모임 생성하기",
-                                          completion: { [weak self] in
+        let createAction: DefaultAlertAction = .init(text: L10n.createMeet,
+                                                     completion: { [weak self] in
             self?.reactor?.action.onNext(.flow(.createGroup))
         })
-    
-        alertManager.showAlert(title: "아직 소속된 모임이 없어요",
-                               subTitle: "먼저 모임을 가입또는 생성해서 일정을 추가해보세요!",
-                               defaultAction: .init(text: "취소",
-                                                    textColor: ColorStyle.Gray._01,
-                                                    bgColor: ColorStyle.App.tertiary),
-                               addAction: [createAction])
+        
+        alertManager.showDefaultAlert(title: L10n.Home.emptyMeetInfo,
+                                      subTitle: L10n.Home.emptyMeetSubinfo,
+                                      defaultAction: .init(text: L10n.cancle,
+                                                           textColor: .gray01,
+                                                           bgColor: .appTertiary),
+                                      addAction: [createAction])
     }
 }
-

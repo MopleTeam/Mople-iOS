@@ -15,6 +15,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             case editProfile
             case setNotify
             case policy
+            case endMainFlow
         }
         
         case flow(Flow)
@@ -101,17 +102,18 @@ extension ProfileViewReactor {
         userId = userInfo.id
         return .just(.fetchUserInfo(userInfo))
     }
-
+    
     private func signOut() -> Observable<Mutation> {
-        guard let userId,
+        guard let userId = UserInfoStorage.shared.userInfo?.id,
               !isRequesting else { return .empty() }
         
         isRequesting = true
         
         let signOut = signOutUseCase.execute(userId: userId)
-            .asObservable()
+            .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.coordinator?.signOut()
+                self?.resetUserData()
+                self?.coordinator?.endMainFlow()
                 return .empty()
             }
         
@@ -127,9 +129,10 @@ extension ProfileViewReactor {
         isRequesting = true
         
         let deleteAccount = deleteAccountUseCase.execute()
-            .asObservable()
+            .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.coordinator?.signOut()
+                self?.resetUserData()
+                self?.coordinator?.endMainFlow()
                 return .empty()
             }
         
@@ -137,6 +140,12 @@ extension ProfileViewReactor {
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
+    }
+    
+    private func resetUserData() {
+        KeychainStorage.shared.deleteToken()
+        UserInfoStorage.shared.deleteEnitity()
+        UserDefaults.deleteFCMToken()
     }
 }
 
@@ -151,6 +160,9 @@ extension ProfileViewReactor {
             coordinator?.pushNotifyView()
         case .policy:
             coordinator?.pushPolicyView()
+        case .endMainFlow:
+            resetUserData()
+            coordinator?.endMainFlow()
         }
         return .empty()
     }

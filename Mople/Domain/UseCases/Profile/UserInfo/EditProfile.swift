@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol EditProfile {
-    func execute(request: ProfileEditRequest) -> Single<Void>
+    func execute(request: ProfileEditRequest) -> Observable<Void>
 }
 
 final class EditProfileUseCase: EditProfile {
@@ -24,9 +24,10 @@ final class EditProfileUseCase: EditProfile {
         print(#function, #line, "LifeCycle Test FetchUserInfoUseCase Deinit" )
     }
     
-    func execute(request: ProfileEditRequest) -> Single<Void> {
+    func execute(request: ProfileEditRequest) -> Observable<Void> {
         return self.userInfoRepo
             .editProfile(requestModel: request)
+            .asObservable()
     }
 }
 

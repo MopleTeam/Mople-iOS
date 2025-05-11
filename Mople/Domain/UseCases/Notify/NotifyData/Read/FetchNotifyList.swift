@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchNotifyList {
-    func execute() -> Single<[Notify]>
+    func execute() -> Observable<[Notify]>
 }
 
 final class FetchNotifyListUseCase: FetchNotifyList {
@@ -19,25 +19,25 @@ final class FetchNotifyListUseCase: FetchNotifyList {
         self.repo = repo
     }
     
-    func execute() -> Single<[Notify]> {
+    func execute() -> Observable<[Notify]> {
         let newCount = getNewCount()
         return repo.fetchNotifyList()
-            .observe(on: MainScheduler.instance)
+            .asObservable()
             .map { $0.map { $0.toDomain() } }
-            .map { [weak self] in
-                guard let self else { return [] }
+            .flatMap { [weak self] notifyList -> Observable<[Notify]> in
+                guard let self else { return .empty() }
                 if newCount > 0 {
-                    return updateReadStatus(list: $0, newCount: newCount)
+                    let adjustReadState = updateReadStatus(list: notifyList,
+                                                           newCount: newCount)
+                    return .just(adjustReadState)
                 } else {
-                    return $0
+                    return .just(notifyList)
                 }
             }
     }
     
     private func getNewCount() -> Int {
-        let newCount = UserInfoStorage.shared.userInfo?.notifyCount ?? 0
-        print(#function, #line, "newCount : \(newCount)" )
-        return newCount
+        return UserInfoStorage.shared.userInfo?.notifyCount ?? 0
     }
     
     private func updateReadStatus(list: [Notify], newCount: Int) -> [Notify] {

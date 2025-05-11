@@ -44,3 +44,6 @@ GoogleService-Info.plist
 
 # 시크릿 키 관리용 xcconfig
 Secrets.xcconfig
+
+# SwiftGen generated files
+Mople/Generated/L10n.swift

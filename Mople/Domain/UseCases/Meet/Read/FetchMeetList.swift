@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol FetchMeetList {
-    func execute() -> Single<[Meet]>
+    func execute() -> Observable<[Meet]>
 }
 
 final class FetchMeetListUseCase: FetchMeetList {
@@ -20,10 +20,11 @@ final class FetchMeetListUseCase: FetchMeetList {
         self.repo = repo
     }
     
-    func execute() -> Single<[Meet]> {
+    func execute() -> Observable<[Meet]> {
         return repo.fetchMeetList()
             .map { $0.map { response in
                 response.toDomain() }
             }
+            .asObservable()
     }
 }

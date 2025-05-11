@@ -24,8 +24,8 @@ final class ReviewEditFlowCoordinator: BaseCoordinator, ReviewEditViewCoordinati
     }
     
     override func start() {
-        let reviewEditView = dependencies.makePlanDetailViewController(coordinator: self)
-        navigationController.pushViewController(reviewEditView, animated: false)
+        let reviewEditView = dependencies.makeWriteReviewViewController(coordinator: self)
+        self.pushWithTracking(reviewEditView, animated: false)
     }
 }
 
@@ -33,7 +33,7 @@ final class ReviewEditFlowCoordinator: BaseCoordinator, ReviewEditViewCoordinati
 extension ReviewEditFlowCoordinator: MemberListViewCoordination {
     func pushMemberListView() {
         let view = dependencies.makeMemberListViewController(coordinator: self)
-        navigationController.pushViewController(view, animated: true)
+        self.pushWithTracking(view, animated: true)
     }
 }
 

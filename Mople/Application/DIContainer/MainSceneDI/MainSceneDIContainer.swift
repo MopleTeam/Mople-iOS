@@ -10,6 +10,9 @@ import UIKit
 typealias MainSceneDependencies = MainTapDependencies
 
 protocol MainTapDependencies {
+    // MARK: - TabBar
+    func makeMainTabBarController(coordinator: MainCoordination) -> MainTabBarController
+    
     // MARK: - Tabbar Configure
     func makeHomeFlowCoordinator() -> BaseCoordinator
     func makeMeetListFlowCoordinator() -> BaseCoordinator
@@ -20,23 +23,16 @@ protocol MainTapDependencies {
     func makeNotificationDestination(type: NotificationDestination) -> BaseCoordinator
 }
 
-final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
+final class MainSceneDIContainer: BaseContainer {
 
     private let isLogin: Bool
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
 
     init(isLogin: Bool,
          appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
+         commonFactory: ViewDependencies) {
         self.isLogin = isLogin
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
-        logLifeCycle()
-    }
-    
-    deinit {
-        logLifeCycle()
+        super.init(appNetworkService: appNetworkService,
+                   commonFactory: commonFactory)
     }
     
     func makeMainFlowCoordinator(navigationController: AppNaviViewController) -> MainSceneCoordinator {
@@ -46,11 +42,41 @@ final class MainSceneDIContainer: MainSceneDependencies, LifeCycleLoggable {
     }
 }
 
-// MARK: - Tabbar
+// MARK: - TabBar
+extension MainSceneDIContainer: MainSceneDependencies {
+    func makeMainTabBarController(coordinator: MainCoordination) -> MainTabBarController {
+        return MainTabBarController(reactor: makeMainTabBarReactor(coordinator: coordinator))
+    }
+    
+    private func makeMainTabBarReactor(coordinator: MainCoordination) -> MainTabBarReactor {
+        return .init(isLogin: isLogin,
+                     uploadFCMTokcnUseCase: makeUploadFCMTokenUseCase(),
+                     joinMeetUseCase: makeJoinMeetUseCase(),
+                     resetNotifyCountUseCase: makeResetNotifyCountUseCase(),
+                     notificationService: DefaultNotificationService(),
+                     coordinator: coordinator)
+    }
+    
+    private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
+        let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
+        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+    }
+    
+    private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
+        let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService)
+        return ResetNotifyCountUseCase(repo: notifyRepo)
+    }
+    
+    private func makeJoinMeetUseCase() -> JoinMeet {
+        let meetRepo = DefaultMeetRepo(networkService: appNetworkService)
+        return JoinMeetUseCase(repo: meetRepo)
+    }
+}
+
+// MARK: - TabBar Item
 extension MainSceneDIContainer {
     func makeHomeFlowCoordinator() -> BaseCoordinator {
-        let homeSceneDI = HomeSceneDIContainer(isLogin: isLogin,
-                                               appNetworkService: appNetworkService,
+        let homeSceneDI = HomeSceneDIContainer(appNetworkService: appNetworkService,
                                                commonFactory: commonFactory)
         return homeSceneDI.makeHomeFlowCoordinator()
     }
@@ -77,16 +103,35 @@ extension MainSceneDIContainer {
     }
 }
 
-// MARK: - handle NotificationDestination
+// MARK: - Handle Notification Destination
 extension MainSceneDIContainer {
     func makeNotificationDestination(type: NotificationDestination) -> BaseCoordinator {
         switch type {
         case let .meet(id):
-            return commonFactory.makeMeetDetailCoordiantor(meetId: id)
+            return makeMeetDetailFlowCoordinator(meetId: id)
         case let .plan(id):
-            return commonFactory.makePlanDetailCoordinator(postId: id, type: .plan)
+            return makePlanDetailFlowCoordinator(postId: id, type: .plan)
         case let .review(id):
-            return commonFactory.makePlanDetailCoordinator(postId: id, type: .review)
+            return makePlanDetailFlowCoordinator(postId: id, type: .review)
         }
+    }
+    
+    /// 모임상세 플로우
+    private func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
+        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      meetId: meetId,
+                                                      isJoin: false)
+        return meetDetailDI.makeMeetDetailCoordinator()
+    }
+    
+    /// 일정 상세 플로우
+    private func makePlanDetailFlowCoordinator(postId: Int,
+                                       type: PostType) -> BaseCoordinator {
+        let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      type: type,
+                                                      id: postId)
+        return planDetailDI.makePostDetailCoordinator()
     }
 }

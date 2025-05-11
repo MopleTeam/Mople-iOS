@@ -16,7 +16,6 @@ final class SignInViewController: BaseViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = SignInViewReactor
-    private var signInReactor: SignInViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -28,12 +27,12 @@ final class SignInViewController: BaseViewController, View {
         view.contentMode = .center
         return view
     }()
-
+    
     private let subTitle: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.App.subTitle
+        label.text = L10n.appSubTitle
         label.font = FontStyle.Title3.medium
-        label.textColor = ColorStyle.Gray._03
+        label.textColor = .gray03
         label.textAlignment = .center
         return label
     }()
@@ -50,28 +49,28 @@ final class SignInViewController: BaseViewController, View {
     
     private let kakaoLoginButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Login.kakao,
-                        font: FontStyle.Title3.semiBold,
-                        normalColor: ColorStyle.Gray._01)
+        btn.setTitle(text: L10n.Login.kakao,
+                     font: FontStyle.Title3.semiBold,
+                     normalColor: .gray01)
         
         btn.setImage(image: .kakao,
-                        imagePlacement: .leading,
-                        contentPadding: 8)
-        btn.setBgColor(normalColor: ColorStyle.Default.yellow)
+                     imagePlacement: .leading,
+                     contentPadding: 8)
+        btn.setBgColor(normalColor: .defaultYellow)
         btn.setRadius(8)
         return btn
     }()
     
     private let appleLoginButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Login.apple,
-                        font: FontStyle.Title3.semiBold,
-                        normalColor: ColorStyle.Default.white)
+        btn.setTitle(text: L10n.Login.apple,
+                     font: FontStyle.Title3.semiBold,
+                     normalColor: .defaultWhite)
         
         btn.setImage(image: .apple,
-                        imagePlacement: .leading,
-                        contentPadding: 8)
-        btn.setBgColor(normalColor: ColorStyle.Default.black)
+                     imagePlacement: .leading,
+                     contentPadding: 8)
+        btn.setBgColor(normalColor: .defaultBlack)
         btn.setRadius(8)
         return btn
     }()
@@ -95,9 +94,10 @@ final class SignInViewController: BaseViewController, View {
     }()
     
     // MARK: - LifeCycle
-    init(reactor: SignInViewReactor) {
-        super.init()
-        self.signInReactor = reactor
+    init(screenName: ScreenName,
+         reactor: SignInViewReactor) {
+        super.init(screenName: screenName)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -107,7 +107,6 @@ final class SignInViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
     }
     
     // MARK: - UI Setup
@@ -126,7 +125,7 @@ final class SignInViewController: BaseViewController, View {
         titleStackView.snp.makeConstraints { make in
             make.center.equalTo(titleContainerView)
             make.horizontalEdges.equalToSuperview()
-            make.top.greaterThanOrEqualToSuperview() 
+            make.top.greaterThanOrEqualToSuperview()
             make.bottom.lessThanOrEqualToSuperview()
         }
         
@@ -142,9 +141,6 @@ final class SignInViewController: BaseViewController, View {
 
 // MARK: - Reactor Setup
 extension SignInViewController {
-    private func setReactor() {
-        reactor = signInReactor
-    }
     
     func bind(reactor: SignInViewReactor) {
         inputBind(reactor)
@@ -152,6 +148,18 @@ extension SignInViewController {
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         self.appleLoginButton.rx.controlEvent(.touchUpInside)
             .map { _ in Reactor.Action.appleLogin }
             .bind(to: reactor.action)
@@ -163,13 +171,13 @@ extension SignInViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$error)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, err in
                 guard let title = err.info else { return }
-                vc.alertManager.showAlert(title: title)
+                vc.alertManager.showDefaultAlert(title: title)
             })
             .disposed(by: disposeBag)
     }

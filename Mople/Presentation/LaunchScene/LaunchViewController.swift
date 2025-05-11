@@ -7,6 +7,8 @@
 
 import UIKit
 import RxSwift
+import FirebaseAnalytics
+
 
 final class LaunchViewController: DefaultViewController {
     
@@ -25,9 +27,10 @@ final class LaunchViewController: DefaultViewController {
     }()
     
     // MARK: - LifeCycle
-    init(viewModel: LaunchViewModel) {
+    init(screenName: ScreenName,
+         viewModel: LaunchViewModel) {
         self.viewModel = viewModel
-        super.init()
+        super.init(screenName: screenName)
     }
     
     required init?(coder: NSCoder) {
@@ -37,39 +40,21 @@ final class LaunchViewController: DefaultViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        bind()
         checkAccount()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = ColorStyle.Default.white
+        self.view.backgroundColor = .defaultWhite
         self.view.addSubview(logoImage)
         
         logoImage.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-    }
-    
-    // MARK: - Bind
-    private func bind() {
-        viewModel.error
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { $0 }
-            .drive(with: self, onNext: { vc, err in
-                vc.handleError(err)
-            })
-            .disposed(by: disposeBag)
-    }
-    
-    private func handleError(_ err: Error) {
-        guard DataRequestError.isHandledError(err: err) == false else {
-            return
-        }
-        
-        alertManager.showDefatulErrorMessage(completion: { [weak self] in
-            self?.viewModel.showSignInFlow()
-        })
     }
     
     private func checkAccount() {

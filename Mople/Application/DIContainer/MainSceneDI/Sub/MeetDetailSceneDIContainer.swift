@@ -19,24 +19,29 @@ protocol MeetDetailSceneDependencies {
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     
     // MARK: - Flow
-    func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator
+    func makePlanCreateFlowCoordinator(meet: MeetSummary,
+                                       completion: ((Plan) -> Void)?) -> BaseCoordinator
+    
+    func makePostDetailFlowCoordinator(postId: Int,
+                                       type: PostType) -> BaseCoordinator
 }
 
-final class MeetDetailSceneDIContainer: MeetDetailSceneDependencies {
+final class MeetDetailSceneDIContainer: BaseContainer, MeetDetailSceneDependencies {
     
+    // MARK: - Variables
     private let meetId: Int
+    private let isJoin: Bool
 
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
     private var mainReactor: MeetDetailViewReactor?
     
     init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory,
-         meetId: Int) {
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
+         commonFactory: ViewDependencies,
+         meetId: Int,
+         isJoin: Bool) {
         self.meetId = meetId
+        self.isJoin = isJoin
+        super.init(appNetworkService: appNetworkService,
+                   commonFactory: commonFactory)
     }
     
     func makeMeetDetailCoordinator() -> MeetDetailSceneCoordinator {
@@ -45,12 +50,14 @@ final class MeetDetailSceneDIContainer: MeetDetailSceneDependencies {
     }
 }
 
+// MARK: - Default View
 extension MeetDetailSceneDIContainer {
     
-    // MARK: - Main
+    // MARK: - 메인
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController {
         makeDetailMeetViewReactor(coordinator: coordinator)
-        return .init(title: nil, reactor: mainReactor)
+        return .init(screenName: .meet_detail,
+                     title: nil, reactor: mainReactor)
     }
     
     private func makeDetailMeetViewReactor(coordinator: MeetDetailCoordination) {
@@ -65,7 +72,7 @@ extension MeetDetailSceneDIContainer {
     }
     
     
-    // MARK: - 예정된 일정리스트 뷰
+    // MARK: - 일정 리스트
     func makeMeetPlanListViewController() -> MeetPlanListViewController {
         return MeetPlanListViewController(
             reactor: makeMeetPlanListViewReactor()
@@ -94,7 +101,7 @@ extension MeetDetailSceneDIContainer {
         return DefaultPlanRepo(networkService: appNetworkService)
     }
     
-    // MARK: - 리뷰리스트 뷰
+    // MARK: - 리뷰 리스트
     func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController {
         return MeetReviewListViewController(
             reactor: makeMeetReviewListViewReactor(coordinator: coordinator))
@@ -102,37 +109,45 @@ extension MeetDetailSceneDIContainer {
     
     private func makeMeetReviewListViewReactor(coordinator: MeetDetailCoordination) -> MeetReviewListViewReactor {
         let reactor = MeetReviewListViewReactor(fetchReviewUseCase: makeFetchReviewListUsecase(),
-                                                coordinator: coordinator,
                                                 delegate: mainReactor!,
-                                                meetId: meetId)
+                                                meetId: meetId,
+                                                isJoin: isJoin)
         mainReactor?.reviewListCommands = reactor
         return reactor
     }
     
-    private func makeFetchReviewListUsecase() -> FetchReviewList {
+    private func makeFetchReviewListUsecase() -> FetchMeetReviewList {
         let repo = DefaultReviewRepo(networkService: appNetworkService)
-        return FetchReviewListUseCase(repo: repo)
+        return FetchMeetReviewListUseCase(repo: repo)
     }
-    
+}
+
+// MARK: - View
+extension MeetDetailSceneDIContainer {
     // MARK: - 모임 설정 뷰
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetSetupCoordination) -> MeetSetupViewController {
-        return .init(title: "모임 설정",
+        return .init(screenName: .meet_setting,
+                     title: L10n.Meetdetail.setup,
                      reactor: makeMeetSetupViewReactor(meet: meet,
                                                        coordinator: coordinator))
     }
     
     private func makeMeetSetupViewReactor(meet: Meet,
                                           coordinator: MeetSetupCoordination) -> MeetSetupViewReactor {
+        let repo = DefaultMeetRepo(networkService: appNetworkService)
         return .init(meet: meet,
-                     deleteMeetUseCase: makeDeleteMeetUseCase(),
+                     deleteMeetUseCase: makeDeleteMeetUseCase(repo: repo),
+                     inviteMeetUseCase: makeInviteMeetUseCase(repo: repo),
                      coordinator: coordinator)
     }
     
-    private func makeDeleteMeetUseCase() -> DeleteMeet {
-        return DeleteMeetUseCase(
-            repo: DefaultMeetRepo(networkService: appNetworkService)
-        )
+    private func makeDeleteMeetUseCase(repo: MeetRepo) -> DeleteMeet {
+        return DeleteMeetUseCase(repo: repo)
+    }
+    
+    private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
+        return InviteMeetUseCase(repo: repo)
     }
     
     // MARK: - 모임 수정 뷰
@@ -148,11 +163,26 @@ extension MeetDetailSceneDIContainer {
         return commonFactory.makeMemberListViewController(type: .meet(id: meetId),
                                                           coordinator: coordinator)
     }
+}
+
+// MARK: - Flow
+extension MeetDetailSceneDIContainer {
     
-    // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId,
-                                                       type: type)
+    // MARK: - 일정 생성
+    func makePlanCreateFlowCoordinator(meet: MeetSummary, completion: ((Plan) -> Void)?) -> BaseCoordinator {
+        let planCreateDI = PlanCreateSceneDIContainer(
+            appNetworkService: appNetworkService,
+            type: .newInMeeting(meet))
+        return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completion)
+    }
+    
+    // MARK: - 포스트 상세
+    func makePostDetailFlowCoordinator(postId: Int,
+                                       type: PostType) -> BaseCoordinator {
+        let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      type: type,
+                                                      id: postId)
+        return planDetailDI.makePostDetailCoordinator()
     }
 }

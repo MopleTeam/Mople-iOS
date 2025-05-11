@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol FetchAllPlanDate {
-    func execute() -> Single<[Date]>
+    func execute() -> Observable<[Date]>
 }
 
 final class FetchAllPlanDateUseCase: FetchAllPlanDate {
@@ -20,9 +20,10 @@ final class FetchAllPlanDateUseCase: FetchAllPlanDate {
         self.repo = repo
     }
     
-    func execute() -> Single<[Date]> {
+    func execute() -> Observable<[Date]> {
         return repo.fetchAllDates()
             .map { $0.toDomain() }
             .map { $0.dates }
+            .asObservable()
     }
 }

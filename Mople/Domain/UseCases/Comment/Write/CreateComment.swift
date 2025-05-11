@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol CreateComment {
-    func execute(postId: Int, comment: String) -> Single<[Comment]>
+    func execute(postId: Int, comment: String) -> Observable<[Comment]>
 }
 
 final class CreateCommentUseCase: CreateComment {
@@ -21,7 +21,7 @@ final class CreateCommentUseCase: CreateComment {
     }
     
     func execute(postId: Int,
-                 comment: String) -> Single<[Comment]> {
+                 comment: String) -> Observable<[Comment]> {
         return createCommentRepo
             .createComment(postId: postId, comment: comment)
             .map { $0.map { reponse in
@@ -32,6 +32,7 @@ final class CreateCommentUseCase: CreateComment {
                 verifyReview.verifyWriter(self?.userId)
                 return verifyReview }
             }
+            .asObservable()
     }
 }
 

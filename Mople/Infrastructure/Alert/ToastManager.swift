@@ -29,10 +29,10 @@ final class ToastManager {
                                            y: self.window!.frame.size.height-frameY,
                                            width: 320,
                                            height: 56))
-        label.backgroundColor = ColorStyle.Toast.defaultColor.withAlphaComponent(0.8)
+        label.backgroundColor = .toastPrimary
         label.addBlur(style: .systemUltraThinMaterialDark)
         label.setTitle(font: FontStyle.Body1.medium,
-                       color: ColorStyle.Default.white)
+                       color: .defaultWhite)
         label.setSpacing(12)
         label.setMargin(.init(top: 16, left: 20, bottom: 16, right: 20))
         label.layer.cornerRadius = 10

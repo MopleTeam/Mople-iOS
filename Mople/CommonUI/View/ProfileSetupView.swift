@@ -18,13 +18,9 @@ final class ProfileSetupView: UIView {
     // MARK: - UI Components
     private let imageContainerView = UIView()
     
-    fileprivate let profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = .defaultIProfile
-        imageView.contentMode = .scaleAspectFill
+    fileprivate let profileImageView: UserImageView = {
+        let imageView = UserImageView()
         imageView.isUserInteractionEnabled = true
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 40
         return imageView
     }()
     
@@ -35,20 +31,20 @@ final class ProfileSetupView: UIView {
         return imageView
     }()
     
-    fileprivate let nameTextFieldView: LabeledTextFieldView = {
-        let textField = LabeledTextFieldView(title: TextStyle.ProfileSetup.nameTitle,
-                                              placeholder: TextStyle.ProfileSetup.typingName,
-                                              maxTextCount: 15)
+    fileprivate let nameTextFieldView: LabeledTextField = {
+        let textField = LabeledTextField(title: L10n.CreateProfile.input,
+                                         placeholder: L10n.CreateProfile.inputPlaceholder,
+                                         maxTextCount: 15)
         return textField
     }()
     
     fileprivate let duplicateButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.ProfileSetup.checkBtnTitle,
+        btn.setTitle(text: L10n.CreateProfile.nameCheck,
                      font: FontStyle.Body1.semiBold,
-                     normalColor: ColorStyle.Default.white)
-        btn.setBgColor(normalColor: ColorStyle.App.secondary,
-                       disabledColor: ColorStyle.Primary.disable2)
+                     normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .appSecondary,
+                       disabledColor: .disableSecondary)
         btn.setRadius(6)
         btn.isEnabled = false
         return btn
@@ -65,9 +61,9 @@ final class ProfileSetupView: UIView {
     fileprivate let completeButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: ColorStyle.Default.white)
-        btn.setBgColor(normalColor: ColorStyle.App.primary,
-                       disabledColor: ColorStyle.Primary.disable)
+                     normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .appPrimary,
+                       disabledColor: .disablePrimary)
         btn.setRadius(8)
         btn.isEnabled = false
         return btn
@@ -114,10 +110,10 @@ final class ProfileSetupView: UIView {
     private func handleViewType(_ type: ProfileViewType) {
         switch type {
         case .create:
-            completeButton.title = TextStyle.ProfileCreate.completedTitle
+            completeButton.title = L10n.CreateProfile.complete
             mainStackView.spacing = 24
         case .update:
-            completeButton.title = TextStyle.ProfileEdit.completedTitle
+            completeButton.title = L10n.save
         }
     }
     
@@ -165,8 +161,7 @@ final class ProfileSetupView: UIView {
 // MARK: - Hlper
 extension ProfileSetupView {
     public func setProfile(_ profile: UserInfo) {
-        profileImageView.kfSetimage(profile.imagePath,
-                                             defaultImageType: .user)
+        profileImageView.setImage(profile.imagePath)
         setNickname(profile.name)
     }
     

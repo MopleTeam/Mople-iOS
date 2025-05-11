@@ -22,7 +22,7 @@ struct CalendarPlanResponse: Decodable {
 }
 
 extension CalendarPlanResponse {
-    func toDomain() -> MonthlyPlan {
+    func toDomain() -> MonthlyPost {
         return .init(
             id: self.planId,
             title: self.planName,

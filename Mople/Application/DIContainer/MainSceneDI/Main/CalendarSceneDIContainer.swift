@@ -9,30 +9,21 @@ import Foundation
 
 protocol CalendarSceneDependencies {
     // MARK: - View
-    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarScheduleViewController
-    func makeCalendarViewController() -> CalendarViewController
-    func makeScheduleListViewController() -> ScheduleListViewController
+    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarPostViewController
     
     // MARK: - Flow
     func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator
+                                       type: PostType) -> BaseCoordinator
 }
 
-final class CalendarSceneDIContainer {
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
-    private var mainView: CalendarScheduleViewController?
-    private var mainReactor: CalendarScheduleViewReactor?
-
-    init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
-    }
+final class CalendarSceneDIContainer: BaseContainer, CalendarSceneDependencies {
+    
+    private var mainView: CalendarPostViewController?
+    private var mainReactor: CalendarPostViewReactor?
     
     func makeCalendarFlowCoordinator() -> CalendarFlowCoordinator {
         let navi = AppNaviViewController(type: .main)
-        navi.tabBarItem = .init(title: TextStyle.Tabbar.calendar,
+        navi.tabBarItem = .init(title: L10n.calendar,
                                 image: .tabBarCalendar,
                                 selectedImage: nil)
         return .init(navigationController: navi,
@@ -40,23 +31,28 @@ final class CalendarSceneDIContainer {
     }
 }
 
-extension CalendarSceneDIContainer: CalendarSceneDependencies {
-    // MARK: - 기본
-    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarScheduleViewController {
-        mainView = CalendarScheduleViewController(title: TextStyle.Tabbar.calendar,
-                                                  reactor: makeCalendarViewReactor(coordinator: coordinator))
+// MARK: - Default View
+extension CalendarSceneDIContainer {
+    
+    // MARK: - 메인
+    func makeCalendarScheduleViewcontroller(coordinator: CalendarCoordination) -> CalendarPostViewController {
+        mainReactor = makeCalendarViewReactor(coordinator: coordinator)
+        mainView = CalendarPostViewController(screenName: .calendar,
+                                              title: L10n.calendar,
+                                              calendarVC: makeCalendarViewController(),
+                                              scheduleVC: makeScheduleListViewController(),
+                                              reactor: mainReactor!)
         return mainView!
     }
 
-    private func makeCalendarViewReactor(coordinator: CalendarCoordination) -> CalendarScheduleViewReactor {
-        mainReactor = CalendarScheduleViewReactor(coordinator: coordinator)
+    private func makeCalendarViewReactor(coordinator: CalendarCoordination) -> CalendarPostViewReactor {
+        mainReactor = CalendarPostViewReactor(coordinator: coordinator)
         return mainReactor!
     }
     
-    // MARK: - 캘린더
-    func makeCalendarViewController() -> CalendarViewController {
-        return .init(reactor: makeCalendarViewReactor(),
-                     verticalGestureObserver: mainView!.panGestureObserver)
+    // MARK: - 달력
+    private func makeCalendarViewController() -> CalendarViewController {
+        return .init(reactor: makeCalendarViewReactor())
     }
     
     private func makeCalendarViewReactor() -> CalendarViewReactor {
@@ -73,30 +69,36 @@ extension CalendarSceneDIContainer: CalendarSceneDependencies {
         )
     }
     
-    // MARK: - 스케줄 리스트
-    func makeScheduleListViewController() -> ScheduleListViewController {
-        let schdeuleListView = ScheduleListViewController(reactor: makeScheduleListReactor())
-        schdeuleListView.panGestureRequire(mainView!.scopeGesture)
-        return schdeuleListView
+    // MARK: - 일정 리스트
+    private func makeScheduleListViewController() -> PostListViewController {
+        return PostListViewController(reactor: makeScheduleListReactor())
     }
     
-    private func makeScheduleListReactor() -> ScheduleListReactor {
-        let reactor = ScheduleListReactor(
-            fetchMonthlyPlanUseCase: makeFetchMonthlyPlanUseCase(),
+    private func makeScheduleListReactor() -> PostListViewReactor {
+        let reactor = PostListViewReactor(
+            fetchMonthlyPostUseCase: makeFetchMonthlyPlanUseCase(),
             delegate: mainReactor!
         )
         mainReactor?.scheduleListCommands = reactor
         return reactor
     }
     
-    private func makeFetchMonthlyPlanUseCase() -> FetchMonthlyPlan {
-        return FetchMonthlyPlanUseCase(
+    private func makeFetchMonthlyPlanUseCase() -> FetchMonthlyPost {
+        return FetchMonthlyPostUseCase(
             repo: DefaultCalendarRepo(networkService: appNetworkService)
         )
     }
-    
-    // MARK: - 일정 상세 뷰
-    func makePlanDetailFlowCoordinator(postId: Int, type: PlanDetailType) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId, type: type)
+}
+
+// MARK: - Flow
+extension CalendarSceneDIContainer {
+    // MARK: - 일정 상세
+    func makePlanDetailFlowCoordinator(postId: Int, type: PostType) -> BaseCoordinator {
+        let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      type: type,
+                                                      id: postId)
+        return planDetailDI.makePostDetailCoordinator()
     }
 }
+

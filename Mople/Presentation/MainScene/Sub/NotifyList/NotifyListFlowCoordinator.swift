@@ -9,7 +9,7 @@ import UIKit
 
 protocol NotifyListFlowCoordination: AnyObject {
     func presentMeetDetailView(meetId: Int)
-    func presentPlanDetailView(postId: Int, type: PlanDetailType)
+    func presentPlanDetailView(postId: Int, type: PostType)
     func endFlow()
 }
 
@@ -21,11 +21,12 @@ final class NotifyListFlowCoordinator: BaseCoordinator, NotifyListFlowCoordinati
          navigationController: AppNaviViewController) {
         self.dependencies = dependencies
         super.init(navigationController: navigationController)
+        setDismissGestureCompletion()
     }
     
     override func start() {
         let notifyListVC = dependencies.makeNotifyListViewController(coordinator: self)
-        self.navigationController.pushViewController(notifyListVC, animated: false)
+        self.pushWithTracking(notifyListVC, animated: false)
     }
 }
 
@@ -36,15 +37,15 @@ extension NotifyListFlowCoordinator {
     func presentMeetDetailView(meetId: Int) {
         let meetDetailFlowCoordinator = dependencies.makeMeetDefailtViewCoordinator(meetId: meetId)
         start(coordinator: meetDetailFlowCoordinator)
-        navigationController.presentWithTransition(meetDetailFlowCoordinator.navigationController)
+        self.present(meetDetailFlowCoordinator.navigationController)
     }
     
     // 일정 & 리뷰 플로우
-    func presentPlanDetailView(postId: Int, type: PlanDetailType) {
+    func presentPlanDetailView(postId: Int, type: PostType) {
         let planDetailFlowCoordinator = dependencies.makePlanDetailFlowCoordinator(postId: postId,
                                                                                    type: type)
         start(coordinator: planDetailFlowCoordinator)
-        navigationController.presentWithTransition(planDetailFlowCoordinator.navigationController)
+        self.present(planDetailFlowCoordinator.navigationController)
     }
 }
 

@@ -11,6 +11,9 @@ import RxCocoa
 
 final class DefaultSheetViewController: UIViewController {
     
+    // MARK: - Closure
+    private var cancleAction: (() -> Void)? = nil
+    
     // MARK: - Variables
     private var disposeBag = DisposeBag()
     private let modalHeight: CGFloat = 195
@@ -24,23 +27,23 @@ final class DefaultSheetViewController: UIViewController {
     
     private let sheetView: UIView = {
         let view = UIView()
-        view.backgroundColor = ColorStyle.Default.white
+        view.backgroundColor = .defaultWhite
         view.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         view.layer.makeShadow(opactity: 0.1,
-                            radius: 16)
+                              radius: 16)
         return view
     }()
     
     private let grabberView: UIView = {
         let view = UIView()
-        view.backgroundColor = ColorStyle.App.tertiary
+        view.backgroundColor = .appTertiary
         view.layer.cornerRadius = 3
         return view
     }()
     
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
-        view.backgroundColor = ColorStyle.Default.white
+        view.backgroundColor = .defaultWhite
         return view
     }()
     
@@ -53,8 +56,10 @@ final class DefaultSheetViewController: UIViewController {
     }()
         
     // MARK: - LifeCycle
-    init(actions: [DefaultSheetAction]) {
+    init(actions: [DefaultSheetAction],
+         cancleAction: (() -> Void)? = nil) {
         super.init(nibName: nil, bundle: nil)
+        self.cancleAction = cancleAction
         addButtons(actions: actions)
         initialSetup()
     }
@@ -117,9 +122,6 @@ final class DefaultSheetViewController: UIViewController {
         
         tapGesture.rx.event
             .asDriver()
-            .do(onNext: { _ in
-                print(#function, #line, "Path : # 탭 제스처 ")
-            })
             .drive(with: self, onNext: { vc, _ in
                 vc.downModal()
             })
@@ -182,7 +184,7 @@ final class DefaultSheetViewController: UIViewController {
             self.view.layoutIfNeeded()
         }, completion: { [weak self] _ in
             self?.dismiss(animated: true,
-                          completion: completion)
+                          completion: completion ?? self?.cancleAction)
         })
     }
     
@@ -206,7 +208,7 @@ final class DefaultSheetViewController: UIViewController {
     
     // 배경 투명도 조정
     private func changeOpacity(opacity: CGFloat) {
-        let backColor = ColorStyle.Default.black
+        let backColor: UIColor = .defaultBlack
         self.view.backgroundColor = backColor.withAlphaComponent(opacity)
     }
 }
@@ -224,13 +226,13 @@ extension DefaultSheetViewController {
         btn.setButtonAlignment(.leading)
         btn.setTitle(text: action.text,
                      font: FontStyle.Body1.medium,
-                     normalColor: ColorStyle.Gray._02)
+                     normalColor: .gray02)
         btn.setLayoutMargins(inset: .init(top: 16, leading: 20, bottom: 16, trailing: 20))
         btn.setImage(image: action.image,
                      imagePlacement: .leading,
                      contentPadding: 8)
-        btn.setBgColor(normalColor: ColorStyle.Default.white,
-                       highlightColor: ColorStyle.BG.primary)
+        btn.setBgColor(normalColor: .defaultWhite,
+                       highlightColor: .bgPrimary)
         btn.addAction(makeAction(action.completion),
                       for: .touchUpInside)
         return btn

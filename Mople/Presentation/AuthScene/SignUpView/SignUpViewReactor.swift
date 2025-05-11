@@ -142,16 +142,23 @@ extension SignUpViewReactor {
     private func creationNickName() -> Observable<Mutation> {
         print(#function, #line)
         let createNickname = creationNickname.executue()
-            .asObservable()
-            .compactMap({ $0 })
-            .flatMap({ [weak self] name -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let createdNickname = Observable<Mutation>.just(.createdNickname(name))
-                let validCheckName = self.checkDuplicateAvaliable(name: name)
-                return Observable.concat([createdNickname, validCheckName])
-            })
+            .share(replay: 1)
         
-        return requestWithLoading(task: createNickname)
+        let updateNickName = createNickname
+            .map { Mutation.createdNickname($0) }
+        
+        let checkDuplicate = createNickname
+            .flatMap { [weak self] nickName -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return checkDuplicateAvaliable(name: nickName)
+            }
+        
+        let zipTask = Observable.zip([updateNickName, checkDuplicate])
+            .flatMap { result -> Observable<Mutation> in
+                return .from(result)
+            }
+        
+        return requestWithLoading(task: zipTask)
     }
     
     // MARK: - 닉네임 정규식 검사 및 업데이트
@@ -197,7 +204,6 @@ extension SignUpViewReactor {
         print(#function, #line)
         guard let name = signUpModel?.nickname else { return .empty() }
         let checkValidation = validationNickname.execute(name)
-            .asObservable()
             .map { Mutation.updateValidState($0)}
 
         return requestWithLoading(task: checkValidation)
@@ -207,18 +213,16 @@ extension SignUpViewReactor {
     private func requsetSignUp() -> Observable<Mutation> {
         guard isLoading == false else { return .empty() }
         isLoading = true
-        let image = currentState.profileImage
-
-        let signUp = imageUploadUseCase.execute(image)
-            .flatMap { [weak self] imagePath -> Single<Void> in
-                guard let self else { return .just(()) }
+    
+        let signUp = handleImageUpload()
+            .flatMap { [weak self] imagePath -> Observable<Void> in
+                guard let self else { return .empty() }
                 return self.signUp(imagePath)
             }
-            .flatMap({ [weak self] _ -> Single<Void> in
-                guard let self else { return .just(()) }
+            .flatMap({ [weak self] _ -> Observable<Void> in
+                guard let self else { return .empty() }
                 return self.fetchUserInfo.execute()
             })
-            .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] _ -> Observable<Mutation> in
                 self?.coordinator?.presentMainFlow()
@@ -231,8 +235,17 @@ extension SignUpViewReactor {
             })
     }
     
-    private func signUp(_ imagePath: String?) -> Single<Void> {
-        guard var signUpModel else { return .just(()) }
+    private func handleImageUpload() -> Observable<String?> {
+        guard let image = currentState.profileImage else {
+            return .just(nil)
+        }
+        
+        return imageUploadUseCase.execute(image)
+            .map { $0 }
+    }
+    
+    private func signUp(_ imagePath: String?) -> Observable<Void> {
+        guard var signUpModel else { return .empty() }
         signUpModel.image = imagePath
         return self.signUpUseCase.execute(request: signUpModel)
     }
@@ -245,9 +258,16 @@ extension SignUpViewReactor: LoadingReactor {
     }
     
     func catchErrorMutation(_ error: Error) -> Mutation {
-        guard let photoErr = error as? CompressionPhotoError else {
-            return .catchError(.unknown(error))
+        let err = handleError(error)
+        return .catchError(err)
+    }
+    
+    private func handleError(_ err: Error) -> SignUpError {
+        switch err {
+        case let err as CompressionPhotoError:
+            return .failSelectPhoto(err)
+        default:
+            return .unknown(err)
         }
-        return .catchError(.failSelectPhoto(photoErr))
     }
 }

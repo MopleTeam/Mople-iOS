@@ -24,7 +24,7 @@ final class AppTransition: NSObject {
     private weak var currentView: UIView?
     private weak var viewController: UIViewController?
     private weak var previousViewController: UIViewController?
-    private var completion: (() -> Void)?
+    private var dismissCompletion: (() -> Void)?
     
     // MARK: - LifeCycle
     init(type: TransitionType) {
@@ -37,8 +37,8 @@ final class AppTransition: NSObject {
         print(#function, #line, "Path : #0412 \(type) 트랜지션 해제 ")
     }
     
-    public func setGestureCompletion(completion: (() -> Void)?) {
-        self.completion = completion
+    public func setDismissGestureCompletion(completion: (() -> Void)?) {
+        self.dismissCompletion = completion
     }
 }
 
@@ -150,7 +150,7 @@ extension AppTransition: UIGestureRecognizerDelegate {
         }, completion: { [weak self] _ in
             currentView.removeFromSuperview()
             self?.viewController?.dismiss(animated: false)
-            self?.completion?()
+            self?.dismissCompletion?()
         })
     }
     

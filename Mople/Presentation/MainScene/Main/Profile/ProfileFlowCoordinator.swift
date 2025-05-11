@@ -11,7 +11,7 @@ protocol ProfileCoordination: AnyObject {
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
     func pushPolicyView()
-    func signOut()
+    func endMainFlow()
 }
 
 final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
@@ -27,7 +27,7 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
     
     override func start() {
         profileVC = dependencies.makeProfileViewController(coordinator: self)
-        navigationController.pushViewController(profileVC!, animated: false)
+        self.push(profileVC!, animated: false)
     }
 }
 
@@ -35,7 +35,7 @@ final class ProfileFlowCoordinator: BaseCoordinator, ProfileCoordination {
 extension ProfileFlowCoordinator: NotifySubscribeCoordination {
     func pushNotifyView() {
         let notifyView = dependencies.makeNotifyViewController(coordinator: self)
-        self.navigationController.pushViewController(notifyView, animated: true)
+        self.pushWithTracking(notifyView, animated: true)
     }
 }
 
@@ -43,23 +43,23 @@ extension ProfileFlowCoordinator: NotifySubscribeCoordination {
 extension ProfileFlowCoordinator {
     func pushPolicyView() {
         let policyView = dependencies.makePolicyViewController()
-        self.navigationController.pushViewController(policyView, animated: true)
+        self.pushWithTracking(policyView, animated: true)
     }
 }
 
-// MARK: - Prfile Edit Flow
+// MARK: - Profile Edit Flow
 extension ProfileFlowCoordinator: ProfileEditViewCoordination {
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          coordinator: self)
-        self.navigationController.presentWithTransition(profileEditView)
+        self.presentWithTracking(profileEditView)
     }
 }
 
 // MARK: - End Main Flow
 extension ProfileFlowCoordinator {
-    func signOut() {
-        (self.parentCoordinator as? MainCoordination)?.signOut()
+    func endMainFlow() {
+        (self.parentCoordinator as? MainCoordination)?.startLoginFlow()
     }
 }
 

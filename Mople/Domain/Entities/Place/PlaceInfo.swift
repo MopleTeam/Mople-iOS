@@ -35,14 +35,14 @@ struct PlaceInfo {
 
 extension PlaceInfo {
     init(plan: Plan) {
-        self.title = plan.addressTitle ?? "모임장소"
+        self.title = plan.addressTitle ?? L10n.nonName
         self.address = nil
         self.roadAddress = plan.address
         self.location = plan.location
     }
     
     init(review: Review) {
-        self.title = review.addressTitle ?? "모임장소"
+        self.title = review.addressTitle ?? L10n.nonName
         self.address = nil
         self.roadAddress = review.address
         self.location = review.location

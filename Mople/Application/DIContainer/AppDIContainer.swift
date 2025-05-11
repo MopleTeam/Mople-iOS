@@ -7,6 +7,21 @@
 
 import Foundation
 
+class BaseContainer: LifeCycleLoggable {
+    let appNetworkService: AppNetworkService
+    let commonFactory: ViewDependencies
+    
+    init(appNetworkService: AppNetworkService, commonFactory: ViewDependencies) {
+        self.appNetworkService = appNetworkService
+        self.commonFactory = commonFactory
+        logLifeCycle()
+    }
+    
+    deinit {
+        logLifeCycle()
+    }
+}
+
 final class AppDIContainer {
     
     // MARK: - 앱 서비스
@@ -24,7 +39,7 @@ final class AppDIContainer {
         return DefaultAppNetWorkService(dataTransferService: transferService)
     }()
     
-    lazy var commonDIContainer = CommonDIContainer(appNetworkService: appNetworkService)
+    lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService)
 }
 
 // MARK: - Make DIContainer
@@ -33,12 +48,18 @@ extension AppDIContainer {
     // MARK: - 런치 스크린
     func makeLaunchViewController(coordinator: LaunchCoordination) -> LaunchViewController {
         return LaunchViewController(
+            screenName: ScreenName.splash,
             viewModel: makeLaunchViewModel(coordinator: coordinator))
     }
     
     private func makeLaunchViewModel(coordinator: LaunchCoordination) -> LaunchViewModel {
-        return DefaultLaunchViewModel(fetchUserInfo: commonDIContainer.makeFetchUserInfoUseCase(),
+        let fetchUserRepo = DefaultUserInfoRepo(networkService: appNetworkService)
+        return DefaultLaunchViewModel(fetchUserInfoUseCase: makeFetchUserInfoUseCase(repo: fetchUserRepo),
                                       coordinator: coordinator)
+    }
+    
+    private func makeFetchUserInfoUseCase(repo: UserInfoRepo) -> FetchUserInfo {
+        return FetchUserInfoUseCase(userInfoRepo: repo)
     }
 
     // MARK: - 로그인 플로우

@@ -32,27 +32,21 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     private let imageContainer = UIView()
         
-    private let profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.image = .defaultIProfile
-        return imageView
-    }()
+    private let profileImageView = UserImageView()
     
     private let profileEditButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: ColorStyle.Gray._01)
+                     normalColor: .gray01)
         btn.setImage(image: .editPan)
         return btn
     }()
 
     private let notifyButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Profile.notifyTitle,
+        btn.setTitle(text: L10n.Profile.notify,
                      font: FontStyle.Title3.medium,
-                     normalColor: ColorStyle.Gray._01)
+                     normalColor: .gray01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
         btn.setLayoutMargins(inset: .zero)
@@ -61,9 +55,9 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     private let policyButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Profile.policyTitle,
+        btn.setTitle(text: L10n.Profile.policy,
                      font: FontStyle.Title3.medium,
-                     normalColor: ColorStyle.Gray._01)
+                     normalColor: .gray01)
         btn.setImage(image: .listArrow)
         btn.setButtonAlignment(.fill)
         btn.setLayoutMargins(inset: .zero)
@@ -73,25 +67,25 @@ final class ProfileViewController: TitleNaviViewController, View {
     
     private let versionLabel: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.Profile.versionTitle
+        label.text = L10n.Profile.version
         label.font = FontStyle.Title3.medium
-        label.textColor = ColorStyle.Gray._01
+        label.textColor = .gray01
         return label
     }()
     
     private let versionInfoLabel: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.Profile.version
+        label.text = AppConfiguration.version
         label.font = FontStyle.Title3.medium
-        label.textColor = ColorStyle.Gray._06
+        label.textColor = .gray06
         return label
     }()
     
     private let signOutButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Profile.logoutTitle,
+        btn.setTitle(text: L10n.Profile.signout,
                      font: FontStyle.Title3.medium,
-                     normalColor: ColorStyle.Gray._01)
+                     normalColor: .gray01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
         return btn
@@ -99,9 +93,9 @@ final class ProfileViewController: TitleNaviViewController, View {
 
     private let resignButton: BaseButton = {
         let btn = BaseButton()
-        btn.setTitle(text: TextStyle.Profile.resignTitle,
+        btn.setTitle(text: L10n.Profile.resign,
                      font: FontStyle.Title3.medium,
-                     normalColor: ColorStyle.Gray._01)
+                     normalColor: .gray01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
         return btn
@@ -113,7 +107,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         sv.spacing = 12
         sv.alignment = .center
         sv.distribution = .fill
-        sv.backgroundColor = ColorStyle.Default.white
+        sv.backgroundColor = .defaultWhite
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 40, left: 20, bottom: 40, right: 20)
         return sv
@@ -126,7 +120,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = ColorStyle.Default.white
+        sv.backgroundColor = .defaultWhite
         return sv
     }()
     
@@ -137,7 +131,7 @@ final class ProfileViewController: TitleNaviViewController, View {
         sv.distribution = .fillEqually
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 8, left: 20, bottom: 8, right: 20)
-        sv.backgroundColor = ColorStyle.Default.white
+        sv.backgroundColor = .defaultWhite
         return sv
     }()
     
@@ -149,15 +143,17 @@ final class ProfileViewController: TitleNaviViewController, View {
         sv.spacing  = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = ColorStyle.BG.secondary
+        sv.backgroundColor = .bgSecondary
         return sv
     }()
     
     // MARK: - LifeCycle
-    init(title: String,
+    init(screenName: ScreenName,
+         title: String?,
          reactor: ProfileViewReactor) {
-        super.init(title: title)
-        self.profileReactor = reactor
+        super.init(screenName: screenName,
+                   title: title)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -167,14 +163,16 @@ final class ProfileViewController: TitleNaviViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
         setAction()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        ScreenTracking.track(with: self)
     }
 
     // MARK: - UI Setup
-    
     private func setupUI() {
-        print(#function, #line)
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
@@ -244,17 +242,26 @@ final class ProfileViewController: TitleNaviViewController, View {
 
 // MARK: - Reactor Setup
 extension ProfileViewController {
-    private func setReactor() {
-        reactor = profileReactor
-    }
-     
+ 
     func bind(reactor: Reactor) {
         inputBind(reactor)
         outputBind(reactor)
-        setNotification(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+        setNotificationBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         reloadProfile
             .map { Reactor.Action.fetchUserInfo }
             .bind(to: reactor.action)
@@ -285,8 +292,20 @@ extension ProfileViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
+
+    private func setNotificationBind(_ reactor: Reactor) {
+        NotificationManager.shared.addObservable(name: .editProfile)
+            .map { Reactor.Action.fetchUserInfo }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        NotificationManager.shared.addObservable(name: .sessionExpired)
+            .map { Reactor.Action.flow(.endMainFlow) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$userProfile)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
@@ -294,12 +313,13 @@ extension ProfileViewController {
                 vc.setProfile(profile)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func setNotification(_ reactor: Reactor) {
-        NotificationManager.shared.addObservable(name: .editProfile)
-            .map { Reactor.Action.fetchUserInfo }
-            .bind(to: reactor.action)
+        
+        reactor.pulse(\.$error)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.alertManager.showDefatulErrorMessage()
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -307,35 +327,36 @@ extension ProfileViewController {
 extension ProfileViewController {
 
     private func showSignOutAlert() {
-        let signOutAction: DefaultAlertAction = .init(text: "네",
-                                               textColor: ColorStyle.Default.white,
-                                                      bgColor: ColorStyle.App.primary,
+        let signOutAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                      textColor: .defaultWhite,
+                                                      bgColor: .appPrimary,
                                                completion: { [weak self] in
             self?.signOut.onNext(())
         })
         
-        alertManager.showAlert(title: "로그아웃 하시겠어요?",
+        alertManager.showDefaultAlert(title: L10n.Profile.signoutInfo,
                                defaultAction: makeCancleAlertAction(),
                                addAction: [signOutAction])
     }
     
     private func showDeleteAccountAlert() {
-        let deleteAccountAction: DefaultAlertAction = .init(text: "회원탈퇴",
-                                                            textColor: ColorStyle.Default.white,
-                                                            bgColor: ColorStyle.App.secondary,
+        let deleteAccountAction: DefaultAlertAction = .init(text: L10n.Profile.resign,
+                                                            textColor: .defaultWhite,
+                                                            bgColor: .appSecondary,
                                                             completion: { [weak self] in
             self?.deleteAccount.onNext(())
         })
         
-        alertManager.showAlert(title: "로그아웃 하시겠어요?",
-                               defaultAction: makeCancleAlertAction(),
-                               addAction: [deleteAccountAction])
+        alertManager.showDefaultAlert(title: L10n.Profile.resignInfo,
+                                      subTitle: L10n.Profile.resignSubInfo,
+                                      defaultAction: makeCancleAlertAction(),
+                                      addAction: [deleteAccountAction])
     }
     
     private func makeCancleAlertAction() -> DefaultAlertAction {
-        return .init(text: "아니오",
-                     textColor: ColorStyle.Gray._01,
-                     bgColor: ColorStyle.App.tertiary)
+        return .init(text: L10n.no,
+                     textColor: .gray01,
+                     bgColor: .appTertiary)
     }
 }
 

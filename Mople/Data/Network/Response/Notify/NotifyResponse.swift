@@ -12,13 +12,20 @@ struct NotifyResponse: Decodable {
     let meetId: Int?
     let planId: Int?
     let reviewId: Int?
+    let meetName: String?
+    let meetImg: String?
     let payload: NotifyPayloadResponse?
+    let sendAt: String?
 }
 
 extension NotifyResponse {
     func toDomain() -> Notify {
         let notifyType = handleType()
+        let notifyDate = DateManager.parseServerFullDate(string: sendAt)
         return .init(id: notificationId,
+                     meetImgPath: meetImg,
+                     meetTitle: meetName,
+                     postDate: notifyDate,
                      type: notifyType,
                      payload: payload?.toDomain())
     }

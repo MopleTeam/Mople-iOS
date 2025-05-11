@@ -23,7 +23,7 @@ final class ThumbnailView: UIView {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,
-                       color: ColorStyle.Gray._04)
+                       color: .gray04)
         label.setSpacing(4)
         label.setTitleTopPadding(3)
         return label
@@ -79,8 +79,7 @@ final class ThumbnailView: UIView {
         guard let viewModel = viewModel else { return }
         loadImage(viewModel.thumbnailPath)
         groupTitleLabel.text = viewModel.name
-        memberCountLabel.text = "\(viewModel.memberCount ?? 0) 명"
-        setMemberCount(viewModel.countText)
+        setMemberCount(viewModel.memberCountString)
     }
     
     private func setMemberCount(_ countText: String?) {

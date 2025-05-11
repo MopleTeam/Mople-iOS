@@ -71,13 +71,13 @@ extension Endpoint {
         case .none:
             return headers
         case .accessToken:
-            guard let token = JWTTokenStorage.cachedToken?.accessToken else {
+            guard let token = KeychainStorage.cachedToken?.accessToken else {
                 throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Authorization":"Bearer \(token)"]
             return headers.merging(tokenHeader) { current, _ in current }
         case .refreshToken:
-            guard let token = JWTTokenStorage.cachedToken?.refreshToken else {
+            guard let token = KeychainStorage.cachedToken?.refreshToken else {
                 throw DataRequestError.expiredToken
             }
             let tokenHeader = ["Refresh":" \(token)"]
@@ -159,7 +159,6 @@ extension Requestable {
         
         if !bodyParameters.isEmpty {
             urlRequest.httpBody = bodyEncoder.encode(bodyParameters)
-            print(#function, #line, "# 30 : \(urlRequest.httpBody)" )
         }
         
         urlRequest.httpMethod = method.rawValue

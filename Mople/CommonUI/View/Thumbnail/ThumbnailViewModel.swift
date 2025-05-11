@@ -13,9 +13,9 @@ struct ThumbnailViewModel {
     var memberCount: Int?
     var lastPlanDate: Date?
     
-    var countText: String? {
+    var memberCountString: String? {
         guard let memberCount else { return nil }
-        return "\(memberCount) 명"
+        return L10n.peopleCount(memberCount)
     }
 }
 

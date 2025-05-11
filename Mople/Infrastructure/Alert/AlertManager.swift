@@ -14,9 +14,9 @@ struct DefaultAlertAction {
     let bgColor: UIColor
     let completion: (() -> Void)?
     
-    init(text: String = "확인",
-         textColor: UIColor = ColorStyle.Default.white,
-         bgColor: UIColor = ColorStyle.App.primary,
+    init(text: String = L10n.check,
+         textColor: UIColor = .defaultWhite,
+         bgColor: UIColor = .appPrimary,
          completion: (() -> Void)? = nil) {
         
         self.text = text
@@ -36,32 +36,44 @@ final class AlertManager {
         UIApplication.shared.topVC
     }
     
-    func showAlert(title: String,
-                   subTitle: String? = nil,
-                   defaultAction: DefaultAlertAction = .init(),
-                   addAction: [DefaultAlertAction] = []) {
+    func showDefaultAlert(title: String,
+                          subTitle: String? = nil,
+                          defaultAction: DefaultAlertAction = .init(),
+                          addAction: [DefaultAlertAction] = []) {
         let alert = DefaultAlertViewController(title: title,
-                                        subTitle: subTitle,
-                                        defaultAction: defaultAction,
-                                        addAction: addAction)
+                                               subTitle: subTitle,
+                                               defaultAction: defaultAction,
+                                               addAction: addAction)
         currentVC?.present(alert, animated: true)
     }
     
+    func showWarningAlert(title: String,
+                          subTitle: String? = nil,
+                          defaultAction: DefaultAlertAction = .init(),
+                          addAction: [DefaultAlertAction] = []) {
+        let alert = DefaultAlertViewController(title: title,
+                                               subTitle: subTitle,
+                                               defaultAction: defaultAction,
+                                               addAction: addAction)
+        alert.setWarningImage()
+        currentVC?.present(alert, animated: true)
+    }
+    
+    
+    // MARK: - 기본 시트 알림창
     func showActionSheet(
         title: String = "",
         message: String = "",
         preferredStyle: UIAlertController.Style = .actionSheet,
         actions: [UIAlertAction],
-        cancleCompletion: ((UIAlertAction) -> Void)? = nil,
-        completion: (() -> Void)? = nil
-    ) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredStyle)
-        actions.forEach { alert.addAction($0) }
-        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: { action in
-            cancleCompletion?(action)
-        }))
-        currentVC?.present(alert, animated: true, completion: completion)
-    }
+        cancleCompletion: ((UIAlertAction) -> Void)? = nil) {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: preferredStyle)
+            actions.forEach { alert.addAction($0) }
+            alert.addAction(UIAlertAction(title: L10n.cancle, style: .cancel, handler: { action in
+                cancleCompletion?(action)
+            }))
+            currentVC?.present(alert, animated: true)
+        }
 }
 
 // MARK: - 액션 만들기
@@ -79,8 +91,8 @@ extension AlertManager {
 extension AlertManager {
     // MARK: - 에러처리
     func showDefatulErrorMessage(completion: (() -> Void)? = nil) {
-        self.showAlert(title: "요청에 실패했습니다.\n잠시 후 다시 시도해주세요.",
-                       defaultAction: .init(completion: completion))
+        self.showWarningAlert(title: L10n.Error.default,
+                              defaultAction: .init(completion: completion))
     }
     
     // MARK: - Midnight Handling
@@ -91,14 +103,14 @@ extension AlertManager {
             completion?()
         })
         
-        self.showAlert(title: err.info,
-                       subTitle: err.subInfo,
-                       defaultAction: action)
+        self.showDefaultAlert(title: err.info,
+                              subTitle: err.subInfo,
+                              defaultAction: action)
     }
     
     // MARK: - NoResponse Type Handling
     func showResponseErrorMessage(err: ResponseError,
-                                 completion: (() -> Void)? = nil) {
+                                  completion: (() -> Void)? = nil) {
         guard case .noResponse(let type) = err else { return }
         
         let action = DefaultAlertAction(completion: { [weak self] in
@@ -106,8 +118,8 @@ extension AlertManager {
             completion?()
         })
         
-        self.showAlert(title: err.info,
-                       defaultAction: action)
+        self.showWarningAlert(title: err.info,
+                              defaultAction: action)
     }
     
     private func handleDeletePost(type: ResponseType) {

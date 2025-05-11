@@ -8,7 +8,7 @@
 import Foundation
 
 struct SearchPlaceResult {
-    let result: [PlaceInfo]
+    let places: [PlaceInfo]
     let page: Int
     let isEnd: Bool
 }

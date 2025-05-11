@@ -9,7 +9,7 @@ import Foundation
 
 protocol ReviewEditSceneDependencies {
     // MARK: - 기본 뷰
-    func makePlanDetailViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewContoller
+    func makeWriteReviewViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewController
     
     // MARK: - 이동 뷰
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
@@ -19,11 +19,11 @@ protocol ReviewEditSceneDependencies {
 final class ReviewEditSceneDIContainer: ReviewEditSceneDependencies {
 
     private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
+    private let commonFactory: ViewDependencies
     private let review: Review
     
     init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory,
+         commonFactory: ViewDependencies,
          review: Review) {
         self.appNetworkService = appNetworkService
         self.commonFactory = commonFactory
@@ -38,9 +38,10 @@ final class ReviewEditSceneDIContainer: ReviewEditSceneDependencies {
 
 // MARK: - 기본 뷰
 extension ReviewEditSceneDIContainer {
-    func makePlanDetailViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewContoller {
-        let title = review.isReviewd ? "후기 수정" : "후기 작성"
-        return .init(title: title,
+    func makeWriteReviewViewController(coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewController {
+        let title = review.isReviewd ? L10n.Review.edit : L10n.Review.create
+        return .init(screenName: .review_write,
+                     title: title,
                      reactor: makePlanDetailViewReactor(review: review,
                                                         coordinator: coordinator))
     }

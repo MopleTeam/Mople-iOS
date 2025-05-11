@@ -10,20 +10,20 @@ import RxSwift
 
 protocol ReviewImageUpload {
     func execute(id: Int,
-                 images: [UIImage]) -> Single<Void>
+                 images: [UIImage]) -> Observable<Void>
 }
 
 enum CompressionPhotosError: Error {
     case compressionFailed(indexs: [Int])
     
     var info: String {
-        return "사진을 업로드할 수 없어요."
+        return L10n.Error.Photo.upload
     }
     var subInfo: String {
         switch self {
         case let .compressionFailed(index):
             let str = index.map { "\($0)" }.joined(separator: ", ")
-            return "추가된 사진 중 \(str)번째 사진의 용량이 너무 커요."
+            return L10n.Error.Photo.mutipleCompression(str)
         }
     }
 }
@@ -37,10 +37,10 @@ final class ReviewImageUploadUseCase: ReviewImageUpload {
     }
     
     func execute(id: Int,
-                 images: [UIImage]) -> Single<Void> {
+                 images: [UIImage]) -> Observable<Void> {
         
-        return Single.deferred { [weak self] in
-            guard let self else { return .just(()) }
+        return Observable.deferred { [weak self] in
+            guard let self else { return .empty() }
             
             var compressImageDatas: [Data] = .init()
             var failIndexs: [Int] = .init()
@@ -49,8 +49,10 @@ final class ReviewImageUploadUseCase: ReviewImageUpload {
                                 failIndexs: &failIndexs)
             
             if failIndexs.isEmpty {
-                return repo.uploadReviewImages(id: id,
-                                               images: compressImageDatas)
+                return repo
+                    .uploadReviewImages(id: id,
+                                        images: compressImageDatas)
+                    .asObservable()
             } else {
                 return .error(CompressionPhotosError.compressionFailed(indexs: failIndexs))
             }

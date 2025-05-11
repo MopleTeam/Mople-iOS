@@ -10,7 +10,7 @@ import RxSwift
 
 protocol EditMeet {
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Single<Meet?>
+                 request: CreateMeetRequest) -> Observable<Meet>
 }
 
 final class EditMeetUseCase: EditMeet {
@@ -22,11 +22,12 @@ final class EditMeetUseCase: EditMeet {
     }
     
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Single<Meet?> {
+                 request: CreateMeetRequest) -> Observable<Meet> {
         return repo.editMeet(
             id: id,
             reqeust: request)
         .map { $0.toDomain() }
+        .asObservable()
     }
 }
 

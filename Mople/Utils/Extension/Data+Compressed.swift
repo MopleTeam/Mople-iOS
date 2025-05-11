@@ -12,10 +12,10 @@ enum CompressionPhotoError: Error {
     case compressionFailed
     
     var info: String {
-        return "사진을 업로드할 수 없어요."
+        return L10n.Error.Photo.upload
     }
     var subInfo: String {
-        return "선택된 사진의 용량이 너무 커요."
+        return L10n.Error.Photo.singleCompression
     }
 }
 

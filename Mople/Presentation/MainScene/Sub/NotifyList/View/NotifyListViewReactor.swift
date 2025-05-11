@@ -78,10 +78,8 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .updateNotifyList(notifyList):
-            print(#function, #line, "Path : # 알림 리스트 조정 ")
             newState.notifyList = notifyList
         case .resetNotifyCount:
-            print(#function, #line, "Path : # 알림 리셋 조정 ")
             newState.resetedCount = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
@@ -96,19 +94,24 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Requset
 extension NotifyListViewReactor {
     private func fetchNotifyAndResetCount() -> Observable<Mutation> {
-
-        let fetchNotify = fetchNotifyListUseCase.execute()
-            .asObservable()
-            .flatMap({ [weak self] notifyList -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                
-                return resetNotifyCountUseCase.execute()
-                    .asObservable()
-                    .map { _ in Mutation.updateNotifyList(notifyList) }
-            })
+        let fetchNotify = requestFetchNotify()
+        let resetNotifyCount = requestResetNotify()
         
-        return requestWithLoading(task: fetchNotify)
-            .concat(Observable<Mutation>.just(.resetNotifyCount))
+        let zipTask = Observable.zip([fetchNotify, resetNotifyCount])
+            .flatMap { result -> Observable<Mutation> in
+                return .from(result)
+            }
+        
+        return requestWithLoading(task: zipTask)
+    }
+    
+    private func requestFetchNotify() -> Observable<Mutation> {
+        return fetchNotifyListUseCase.execute()
+            .map { Mutation.updateNotifyList($0) }
+    }
+    private func requestResetNotify() -> Observable<Mutation> {
+        return resetNotifyCountUseCase.execute()
+            .map { Mutation.resetNotifyCount }
     }
 }
 
@@ -124,7 +127,6 @@ extension NotifyListViewReactor {
     }
     
     private func handleRouting(type: NotifyType) {
-        print(#function, #line, "#0411 : \(type)" )
         switch type {
         case let .meet(id):
             coordinator?.presentMeetDetailView(meetId: id)

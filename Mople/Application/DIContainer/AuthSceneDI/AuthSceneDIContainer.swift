@@ -13,19 +13,10 @@ protocol AUthSceneDependencies {
                                   coordinator: SignUpCoordination) -> SignUpViewController
 }
 
-final class AuthSceneDIContainer: AUthSceneDependencies {
+final class AuthSceneDIContainer: BaseContainer {
     
     private lazy var appleLoginService = DefaultAppleLoginService()
     private lazy var kakaoLoginService = DefaultKakaoLoginService()
-    
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
-    
-    init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
-    }
     
     func makeAuthFlowCoordinator(navigationController: AppNaviViewController) -> AuthSceneCoordinator {
         let flow = AuthSceneCoordinator(navigationController: navigationController,
@@ -34,11 +25,12 @@ final class AuthSceneDIContainer: AUthSceneDependencies {
     }
 }
 
-// MARK: - Login
-extension AuthSceneDIContainer {
+extension AuthSceneDIContainer: AUthSceneDependencies {
     
+    // MARK: - Default View
     func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController {
-        let signInView = SignInViewController(reactor: makeSignInViewReacotr(coordinator: coordinator))
+        let signInView = SignInViewController(screenName: .sign_in,
+                                              reactor: makeSignInViewReacotr(coordinator: coordinator))
         setAppleLoginProvider(signInView)
         return signInView
     }
@@ -49,51 +41,63 @@ extension AuthSceneDIContainer {
 
     private func makeSignInViewReacotr(coordinator: AuthFlowCoordination) -> SignInViewReactor {
         return SignInViewReactor(signInUseCase: makeSignInUseCase(),
-                                 fetchUserInfoUseCase: commonFactory.makeFetchUserInfoUseCase(),
+                                 fetchUserInfoUseCase: makeFetchUserInfoUseCase(),
                                  coordinator: coordinator)
     }
     
     private func makeSignInUseCase() -> SignIn {
+        let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
         return SignInUseCase(appleLoginService: appleLoginService,
                              kakaoLoginService: kakaoLoginService,
-                             authenticationRepo: makeAuthenticationRepo())
+                             authenticationRepo: authRepo)
     }
-}
-
-// MARK: - Profile Setup
-extension AuthSceneDIContainer {
+    
+    // MARK: - View
     func makeSignUpViewController(socialInfo: SocialInfo,
                                   coordinator: SignUpCoordination) -> SignUpViewController {
         return SignUpViewController(
+            screenName: .sign_up,
             signUpReactor: makeSignUpReactor(socialInfo: socialInfo,
                                              coordinator: coordinator))
     }
     
     private func makeSignUpReactor(socialInfo: SocialInfo,
                                    coordinator: SignUpCoordination) -> SignUpViewReactor {
+        let nickNameRepo = DefaultNicknameManagerRepo(networkService: appNetworkService)
         return .init(signUpUseCase: makeSignUpUseCase(),
-                     imageUploadUseCase: commonFactory.makeImageUploadUseCase(),
-                     validationNickname: commonFactory.makeDuplicateNicknameUseCase(),
-                     creationNickname: makeCreationNicknameUseCase(),
-                     fetchUserInfo: commonFactory.makeFetchUserInfoUseCase(),
+                     imageUploadUseCase: makeImageUploadUseCase(),
+                     validationNickname: makeDuplicateNicknameUseCase(repo: nickNameRepo),
+                     creationNickname: makeCreationNicknameUseCase(repo: nickNameRepo),
+                     fetchUserInfo: makeFetchUserInfoUseCase(),
                      photoService: DefaultPhotoService(),
                      socialInfo: socialInfo,
                      coordinator: coordinator)
     }
     
     private func makeSignUpUseCase() -> SignUp {
-        return SignUpUseCase(repo: makeAuthenticationRepo())
+        let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
+        return SignUpUseCase(repo: authRepo)
     }
     
-    private func makeCreationNicknameUseCase() -> CreationNickname {
-        let repo = DefaultNicknameManagerRepo(networkService: appNetworkService)
+    private func makeImageUploadUseCase() -> ImageUpload {
+        let imageRepo = DefaultImageUploadRepo(networkService: appNetworkService)
+        return ImageUploadUseCase(imageUploadRepo: imageRepo)
+    }
+    
+    private func makeCreationNicknameUseCase(repo: NicknameRepo) -> CreationNickname {
         return CreationNicknameUseCase(nickNameRepo: repo)
+    }
+    
+    private func makeDuplicateNicknameUseCase(repo: NicknameRepo) -> CheckDuplicateNickname {
+        return CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo)
     }
 }
 
+// MARK: - Common UseCase
 extension AuthSceneDIContainer {
-    private func makeAuthenticationRepo() -> AuthenticationRepo {
-        return DefaultAuthenticationRepo(networkService: appNetworkService)
+    private func makeFetchUserInfoUseCase() -> FetchUserInfo {
+        let userInfoRepo = DefaultUserInfoRepo(networkService: appNetworkService)
+        return FetchUserInfoUseCase(userInfoRepo: userInfoRepo)
     }
 }
 

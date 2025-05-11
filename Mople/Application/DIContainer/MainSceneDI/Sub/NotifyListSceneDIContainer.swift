@@ -12,20 +12,11 @@ protocol NotifyListSceneDependencies {
     
     func makeMeetDefailtViewCoordinator(meetId: Int) -> BaseCoordinator
     func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator
+                                       type: PostType) -> BaseCoordinator
     
 }
 
-final class NotifyListSceneDIContainer: NotifyListSceneDependencies {
-
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
-    
-    init(appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
-    }
+final class NotifyListSceneDIContainer: BaseContainer, NotifyListSceneDependencies {
     
     func makeNotifyListCoordinator() -> NotifyListFlowCoordinator {
         return .init(dependencies: self,
@@ -35,9 +26,10 @@ final class NotifyListSceneDIContainer: NotifyListSceneDependencies {
 
 extension NotifyListSceneDIContainer {
 
-    // MARK: - 기본 뷰
+    // MARK: - Default View
     func makeNotifyListViewController(coordinator: NotifyListFlowCoordination) -> NotifyListViewController {
-        return .init(title: "알림",
+        return .init(screenName: .notification,
+                     title: L10n.notifylist,
                      reactor: makeNotifyListViewReactor(coordinator: coordinator))
     }
     
@@ -57,13 +49,20 @@ extension NotifyListSceneDIContainer {
         return ResetNotifyCountUseCase(repo: repo)
     }
     
-    // MARK: - 플로우 이동
+    // MARK: - Flow
     func makeMeetDefailtViewCoordinator(meetId: Int) -> BaseCoordinator {
-        return commonFactory.makeMeetDetailCoordiantor(meetId: meetId)
+        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      meetId: meetId,
+                                                      isJoin: false)
+        return meetDetailDI.makeMeetDetailCoordinator()
     }
     
-    func makePlanDetailFlowCoordinator(postId: Int, type: PlanDetailType) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId,
-                                                       type: type)
+    func makePlanDetailFlowCoordinator(postId: Int, type: PostType) -> BaseCoordinator {
+        let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      type: type,
+                                                      id: postId)
+        return planDetailDI.makePostDetailCoordinator()
     }
 }

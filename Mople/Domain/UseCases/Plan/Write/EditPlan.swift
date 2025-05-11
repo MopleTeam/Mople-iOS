@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol EditPlan {
-    func execute(request: PlanRequest) -> Single<Plan>
+    func execute(request: PlanRequest) -> Observable<Plan>
 }
 
 final class EditPlanUseCase: EditPlan {
@@ -18,12 +18,13 @@ final class EditPlanUseCase: EditPlan {
         self.editPlanRepo = editPlanRepo
     }
     
-    func execute(request: PlanRequest) -> Single<Plan> {
+    func execute(request: PlanRequest) -> Observable<Plan> {
         return editPlanRepo.editPlan(request: request)
             .map {
                 var plan = $0.toDomain()
                 plan.isCreator = true
                 return plan
             }
+            .asObservable()
     }
 }

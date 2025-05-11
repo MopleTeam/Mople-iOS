@@ -30,7 +30,6 @@ final class DefaultKakaoLoginService: KakaoLoginService {
                              token: idToken,
                              email: email)
             }
-            .debug("kakao login debug test")
     }
     
     private func loginKakao() -> Single<String> {
@@ -62,7 +61,6 @@ final class DefaultKakaoLoginService: KakaoLoginService {
             }
             return Disposables.create()
         }
-        .debug("kakao login debug")
         .retryWithDelayAndCondition(retryCount: 10)
     }
     

@@ -8,7 +8,7 @@ import UIKit
 import RxSwift
 
 protocol FetchUserInfo {
-    func execute() -> Single<Void>
+    func execute() -> Observable<Void>
 }
 
 final class FetchUserInfoUseCase: FetchUserInfo {
@@ -24,7 +24,8 @@ final class FetchUserInfoUseCase: FetchUserInfo {
         print(#function, #line, "LifeCycle Test FetchUserInfoUseCase Deinit" )
     }
     
-    func execute() -> Single<Void> {
+    func execute() -> Observable<Void> {
         return self.userInfoRepo.updateUserInfo()
+            .asObservable()
     }
 }

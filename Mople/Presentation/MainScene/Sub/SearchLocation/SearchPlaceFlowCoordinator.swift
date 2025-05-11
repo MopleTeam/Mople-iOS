@@ -18,7 +18,7 @@ protocol SearchPlaceCoordination: AnyObject {
 final class SearchPlaceFlowCoordinator: BaseCoordinator, SearchPlaceCoordination {
     
     private let dependencies: SearchPlaceSceneDependencies
-    private var searchLoactionVC: SearchPlaceViewController?
+    private var searchPlaceVC: SearchPlaceViewController?
     private var searchResultVC: SearchResultViewController?
     private var detailPlaceVC: PlaceSelectViewController?
     
@@ -30,16 +30,16 @@ final class SearchPlaceFlowCoordinator: BaseCoordinator, SearchPlaceCoordination
     }
     
     override func start() {
-        searchLoactionVC = dependencies.makeSearchLocationViewController(coordinator: self)
-        self.navigationController.pushViewController(searchLoactionVC!, animated: false)
+        searchPlaceVC = dependencies.makeSearchPlaceViewController(coordinator: self)
+        self.pushWithTracking(searchPlaceVC!, animated: false)
     }
 }
 
 // MARK: - Empty View
 extension SearchPlaceFlowCoordinator {
     func updateEmptyViewVisibility(shouldShow: Bool) {
-        searchLoactionVC?.startView.isHidden = shouldShow
-        searchLoactionVC?.emptyView.isHidden = !shouldShow
+        searchPlaceVC?.startView.isHidden = shouldShow
+        searchPlaceVC?.emptyView.isHidden = !shouldShow
     }
 }
 
@@ -54,12 +54,12 @@ extension SearchPlaceFlowCoordinator {
     }
     
     private func showSearchResult() {
-        guard let searchLoactionVC,
+        guard let searchPlaceVC,
               searchResultVC == nil else { return }
-        let container = searchLoactionVC.placeListContainer
+        let container = searchPlaceVC.placeListContainer
         let vc = dependencies.makeSearchResultViewController()
         searchResultVC = vc
-        searchLoactionVC.add(child: vc, container: container)
+        searchPlaceVC.add(child: vc, container: container)
         container.isHidden = false
     }
     
@@ -67,26 +67,28 @@ extension SearchPlaceFlowCoordinator {
         guard searchResultVC != nil else { return }
         searchResultVC?.remove()
         searchResultVC = nil
-        searchLoactionVC?.placeListContainer.isHidden = true
+        searchPlaceVC?.placeListContainer.isHidden = true
     }
 }
 
 // MARK: - Detail Place View
 extension SearchPlaceFlowCoordinator {
     func showDetailPlaceView(with place: PlaceInfo) {
-        guard let searchLoactionVC,
+        guard let searchPlaceVC,
               detailPlaceVC == nil else { return }
-        let container = searchLoactionVC.detailPlaceContainer
+        let container = searchPlaceVC.detailPlaceContainer
         detailPlaceVC = dependencies.makePlaceSelectViewController(with: place)
-        searchLoactionVC.add(child: detailPlaceVC!, container: container)
+        searchPlaceVC.add(child: detailPlaceVC!, container: container)
         container.isHidden = false
+        openPlaceDetailView()
     }
     
     private func closeDetailPlace() {
         guard detailPlaceVC != nil else { return }
         detailPlaceVC?.remove()
         detailPlaceVC = nil
-        searchLoactionVC?.detailPlaceContainer.isHidden = true
+        searchPlaceVC?.detailPlaceContainer.isHidden = true
+        openSearchPlaceView()
     }
 }
 
@@ -110,5 +112,18 @@ extension SearchPlaceFlowCoordinator {
             self.clearUp()
             self.parentCoordinator?.didFinish(coordinator: self)
         }
+    }
+}
+
+// MARK: - Screen Tracking
+extension SearchPlaceFlowCoordinator {
+    private func openSearchPlaceView() {
+        guard let searchPlaceVC else { return }
+        ScreenTracking.track(with: searchPlaceVC)
+    }
+    
+    private func openPlaceDetailView() {
+        guard let detailPlaceVC else { return }
+        ScreenTracking.track(with: detailPlaceVC)
     }
 }

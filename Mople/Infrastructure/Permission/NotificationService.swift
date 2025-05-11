@@ -9,38 +9,45 @@ import UIKit
 import RxSwift
 
 protocol NotificationService {
-    func requestPermissions(completion: (() -> Void)?)
-    func checkPrePermissions() -> Observable<Bool>
+    func requestPermissions() -> Observable<Bool>
+    func checkNotifyPermissions() -> Observable<Bool>
 }
 
 final class DefaultNotificationService: NotificationService {
 
     let notificationCenter = UNUserNotificationCenter.current()
     
-    func requestPermissions(completion: (() -> Void)? = nil) {
-        
-        notificationCenter.getNotificationSettings { [weak self] settings in
-            guard let self else { return }
-            switch settings.authorizationStatus {
-            case .notDetermined:
-                requestAuthorization(completion: completion)
-            case .authorized, .provisional:
-                registerNotifications()
-            default:
-                break
+    func requestPermissions() -> Observable<Bool> {
+        return Observable.create { [weak self] emitter in
+            guard let self else { return Disposables.create() }
+            
+            notificationCenter.getNotificationSettings { [weak self] settings in
+                guard let self else {
+                    emitter.onCompleted()
+                    return
+                }
+    
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    requestAuthorization()
+                    emitter.onCompleted()
+                case .authorized, .provisional:
+                    emitter.onNext(true)
+                    emitter.onCompleted()
+                default:
+                    emitter.onCompleted()
+                    break
+                }
             }
+            
+            return Disposables.create()
         }
     }
     
-    private func requestAuthorization(completion: (() -> Void)? = nil) {
+    private func requestAuthorization() {
         notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, err in
-            print(#function, #line, "알림 허용여부 : \(granted)" )
-            if granted == true, err == nil {
-                self?.registerNotifications()
-            } else {
-                print(#function, #line, "알림 허용여부\(granted), \(err)" )
-            }
-            completion?()
+            guard granted == true, err == nil else { return }
+            self?.registerNotifications()
         }
     }
     
@@ -50,7 +57,7 @@ final class DefaultNotificationService: NotificationService {
         }
     }
     
-    func checkPrePermissions() -> Observable<Bool> {
+    func checkNotifyPermissions() -> Observable<Bool> {
         return Observable.create { [weak self] emitter in
             guard let self else { return Disposables.create() }
             notificationCenter.getNotificationSettings {

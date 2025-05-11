@@ -8,7 +8,7 @@ import Foundation
 import RxSwift
 
 protocol FetchPlanDetail {
-    func execute(planId: Int) -> Single<Plan>
+    func execute(planId: Int) -> Observable<Plan>
 }
 
 final class FetchPlanDetailUseCase: FetchPlanDetail {
@@ -20,7 +20,7 @@ final class FetchPlanDetailUseCase: FetchPlanDetail {
         self.repo = repo
     }
     
-    func execute(planId: Int) -> Single<Plan> {
+    func execute(planId: Int) -> Observable<Plan> {
         return repo.fetchPlanDetail(planId: planId)
             .map { $0.toDomain() }
             .map { [weak self] plan in
@@ -28,6 +28,7 @@ final class FetchPlanDetailUseCase: FetchPlanDetail {
                 verifyPlan.verifyCreator(self?.userID)
                 return verifyPlan
             }
+            .asObservable()
     }
 }
 

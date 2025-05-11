@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol SubscribeNotify {
-    func execute(type: SubscribeType, isSubscribe: Bool) -> Single<Void>
+    func execute(type: SubscribeType, isSubscribe: Bool) -> Observable<Void>
 }
 
 final class SubscribeNotifyUseCase: SubscribeNotify {
@@ -19,8 +19,10 @@ final class SubscribeNotifyUseCase: SubscribeNotify {
         self.repo = repo
     }
     
-    func execute(type: SubscribeType, isSubscribe: Bool) -> Single<Void> {
-        return repo.subscribeNotify(type: type,
-                                    isSubscribe: isSubscribe)
+    func execute(type: SubscribeType, isSubscribe: Bool) -> Observable<Void> {
+        return repo
+            .subscribeNotify(type: type,
+                             isSubscribe: isSubscribe)
+            .asObservable()
     }
 }

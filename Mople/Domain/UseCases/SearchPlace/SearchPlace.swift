@@ -10,7 +10,7 @@ import RxSwift
 protocol SearchPlace {
     func execute(query: String,
                  x: Double?,
-                 y: Double?) -> Single<SearchPlaceResult>
+                 y: Double?) -> Observable<SearchPlaceResult>
 }
 
 final class SearchPlaceUseCase: SearchPlace {
@@ -23,10 +23,11 @@ final class SearchPlaceUseCase: SearchPlace {
     
     func execute(query: String,
                  x: Double?,
-                 y: Double?) -> Single<SearchPlaceResult> {
+                 y: Double?) -> Observable<SearchPlaceResult> {
         
         return searchPlaceRepo
             .search(request: .init(query: query, x: x, y: y))
             .map { $0.toDomain() }
+            .asObservable()
     }
 }

@@ -1,0 +1,13 @@
+strings:
+  inputs:
+    - "Mople/Resources/Localization/ko.lproj/Localizable.strings"  # 실제 파일 경로
+  outputs:
+    templateName: structured-swift5
+    output: "Mople/Generated/L10n.swift"                  # 자동 생성될 Swift 파일
+
+fonts:
+  inputs:
+    - "Mople/Resources/Fonts"
+  outputs:
+    - templateName: swift5
+      output: "Mople/Generated/Fonts.swift"

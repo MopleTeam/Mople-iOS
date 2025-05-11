@@ -152,7 +152,6 @@ extension ReviewEditViewReactor {
                 guard let self else { return .empty() }
                 return requsetDeleteImage(id: id)
             })
-            .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 self?.postUpdateImage()
@@ -167,27 +166,26 @@ extension ReviewEditViewReactor {
         let addImages = currentState.images
             .filter { $0.isNew }
             .map { $0.image }
-
-        if addImages.isEmpty == false {
-            return imageUpload.execute(id: id,
-                                       images: addImages)
-                .asObservable()
-                .flatMap { Observable.just(()) }
-        } else {
+        
+        guard !addImages.isEmpty else {
             return .just(())
         }
+        
+        return imageUpload
+            .execute(id: id,
+                     images: addImages)
     }
     
     private func requsetDeleteImage(id: Int) -> Observable<Void> {
         let currentImageId: [String] = currentState.images.compactMap { $0.id }
         let deleteImageId: [String] = existingImageIds.filter { !currentImageId.contains($0) }
-        if deleteImageId.isEmpty == false {
-            return deleteReviewImage.execute(reviewId: id, imageIds: deleteImageId)
-                .asObservable()
-                .flatMap { Observable.just(()) }
-        } else {
+        
+        guard !deleteImageId.isEmpty else {
             return .just(())
         }
+        
+        return deleteReviewImage
+            .execute(reviewId: id, imageIds: deleteImageId)
     }
 
     // MARK: - 이미지 업데이트
@@ -206,7 +204,10 @@ extension ReviewEditViewReactor {
                 currentImage.append(contentsOf: images)
                 return currentImage
             })
-            .flatMap(updateImageState(_:))
+            .flatMap { [weak self] imageWraaper -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return updateImageState(imageWraaper)
+            }
     }
     
     private func deleteImage(index: Int) -> Observable<Mutation> {

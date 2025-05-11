@@ -8,25 +8,26 @@
 import RxSwift
 
 protocol FetchMemberList {
-    func execute(type: MemberListType) -> Single<MemberList>
+    func execute(type: MemberListType) -> Observable<MemberList>
 }
 
 final class FetchMemberUseCase: FetchMemberList {
     
-    private let memberListRepo: MemberListRepo
+    private let memberListRepo: MemberRepo
     
-    init(memberListRepo: MemberListRepo) {
+    init(memberListRepo: MemberRepo) {
         self.memberListRepo = memberListRepo
     }
     
-    func execute(type: MemberListType) -> Single<MemberList> {
+    func execute(type: MemberListType) -> Observable<MemberList> {
         return memberListRepo.execute(type: type)
             .map { $0.toDomain() }
-            .map { [weak self] in
-                guard let self else { return $0 }
-                var memberList = $0
+            .asObservable()
+            .flatMap { [weak self] members -> Observable<MemberList> in
+                guard let self else { return .empty() }
+                var memberList = members
                 self.assignPosition(memberList: &memberList, type: type)
-                return memberList
+                return .just(memberList)
             }
     }
     

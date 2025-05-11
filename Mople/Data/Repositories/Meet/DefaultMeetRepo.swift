@@ -41,4 +41,16 @@ final class DefaultMeetRepo: BaseRepositories, MeetRepo {
             try APIEndpoints.deleteMeet(id: id)
         }
     }
+    
+    func inviteMeet(id: Int) -> Single<String> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.inviteMeet(id: id)
+        }
+    }
+    
+    func joinMeet(code: String) -> Single<MeetResponse> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.joinMeet(code: code)
+        }
+    }
 }

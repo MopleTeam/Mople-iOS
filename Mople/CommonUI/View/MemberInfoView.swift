@@ -8,15 +8,18 @@
 import UIKit
 import SnapKit
 
-
-
 final class MemberInfoView: UIView {
     
-    private let profileView = ProfileView()
+    private let profileView: UserImageView = {
+        let view = UserImageView()
+        view.setLayer()
+        return view
+    }()
     
     private let positionTypeView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
+        
         return view
     }()
     

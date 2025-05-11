@@ -9,7 +9,8 @@ import Foundation
 import ReactorKit
 
 enum PlanCreationType {
-    case create([MeetSummary])
+    case newFromMeetList([MeetSummary])
+    case newInMeeting(MeetSummary)
     case edit(Plan)
 }
 
@@ -22,7 +23,7 @@ enum CreatePlanError: Error {
     var info: String? {
         switch self {
         case .invalid:
-            return "선택된 시간이 너무 이릅니다."
+            return L10n.Createplan.invaildDate
         default:
             return nil
         }
@@ -45,19 +46,22 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         }
 
         enum Flow {
-            case groupSelectView
-            case dateSelectView
-            case timeSelectView
             case placeSelectView
             case endProcess
         }
         
+        enum Notify {
+            case meet(MeetPayload)
+        }
+        
         case setValue(SetValue)
-        case flow(Flow)
-        case fetchPreviousPlan(Plan)
-        case fetchMeetList([MeetSummary])
-        case updateMeet(MeetPayload)
+        
+        case updateMeetList([MeetSummary])
+        case updateMeet(MeetSummary)
+        case updatePreviousPlan(Plan)
         case requestPlanCreation
+        case flow(Flow)
+        case notify(Notify)
     }
     
     enum Mutation {
@@ -71,6 +75,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         
         case updateValue(UpdateValue)
         case updatePreviousPlan(Plan)
+        case updateInitalMeet(MeetSummary)
         case updateMeetList(_ meets: [MeetSummary])
         case updateLoadingState(Bool)
         case catchError(CreatePlanError)
@@ -83,6 +88,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var selectedTime : DateComponents?
         @Pulse var selectedPlace: UploadPlace?
         @Pulse var meets: [MeetSummary] = []
+        @Pulse var isSelectMeetAvaliable: Bool = true
         @Pulse var isLoading: Bool = false
         @Pulse var error: CreatePlanError?
         @Pulse var previousPlan: Plan?
@@ -151,10 +157,12 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Initial Setup
     private func handleViewType() {
         switch type {
-        case let .create(meets):
-            action.onNext(.fetchMeetList(meets))
+        case let .newFromMeetList(meets):
+            action.onNext(.updateMeetList(meets))
+        case let .newInMeeting(meet):
+            action.onNext(.updateMeet(meet))
         case let .edit(plan):
-            action.onNext(.fetchPreviousPlan(plan))
+            action.onNext(.updatePreviousPlan(plan))
         }
     }
     
@@ -165,14 +173,16 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             return self.handleSetValueAction(value)
         case .requestPlanCreation:
             return self.handleCreation()
-        case let .fetchMeetList(meets):
+        case let .updateMeetList(meets):
             return .just(.updateMeetList(meets))
-        case .flow(let action):
-            return self.handleFlowAction(action)
-        case let .fetchPreviousPlan(plan):
+        case let .updatePreviousPlan(plan):
             return .just(.updatePreviousPlan(plan))
-        case let .updateMeet(payload):
-            return handleMeetPayload(payload)
+        case let .updateMeet(meet):
+            return .just(.updateInitalMeet(meet))
+        case let .flow(action):
+            return self.handleFlowAction(action)
+        case let .notify(action):
+            return handleNotifyAction(action)
         }
     }
     
@@ -181,16 +191,21 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .updateValue(value):
-            self.handleValueMutation(&newState, value: value)
         case .updateMeetList(let meets):
             newState.meets = meets
+        case let .updateInitalMeet(meet):
+            newState.seletedMeet = meet
+            newState.isSelectMeetAvaliable = false
+        case let .updatePreviousPlan(plan):
+            setPreviousPlan(state: &newState, plan)
+            newState.isSelectMeetAvaliable = false
+        case let .updateValue(value):
+            self.handleValueMutation(&newState, value: value)
         case .updateLoadingState(let isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
             newState.error = err
-        case let .updatePreviousPlan(plan):
-            setPreviousPlan(state: &newState, plan)
+        
         }
         
         return newState
@@ -242,6 +257,13 @@ extension CreatePlanViewReactor {
             return .just(.updateValue(.time(date)))
         }
     }
+    
+    private func handleNotifyAction(_ action: Action.Notify) -> Observable<Mutation> {
+        switch action {
+        case let .meet(payload):
+            return handleMeetPayload(payload)
+        }
+    }
 }
 
 // MARK: - Mutation Handling
@@ -272,7 +294,7 @@ extension CreatePlanViewReactor {
         }
         isLoading = true
         switch type {
-        case .create:
+        case .newFromMeetList, .newInMeeting:
             return createPlan(request: request)
         case .edit:
             return editPlan(request: request)
@@ -281,7 +303,6 @@ extension CreatePlanViewReactor {
     
     private func createPlan(request: PlanRequest) -> Observable<Mutation> {
         let uploadPlan = createPlanUseCase.execute(request: request)
-            .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] plan -> Observable<Mutation> in
                 self?.postNewPlan(plan)
@@ -302,7 +323,6 @@ extension CreatePlanViewReactor {
         }
         
         let editPlan = editPlanUseCase.execute(request: request)
-            .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] plan -> Observable<Mutation> in
                 self?.postNewPlan(plan)
@@ -324,7 +344,7 @@ extension CreatePlanViewReactor {
         let requestType: PlanRequestType
         
         switch type {
-        case .create:
+        case .newFromMeetList, .newInMeeting:
             guard let meetId = currentState.seletedMeet?.id else { return nil }
             requestType = .create(meetId: meetId)
         case let .edit(plan):
@@ -356,7 +376,7 @@ extension CreatePlanViewReactor {
 extension CreatePlanViewReactor {
     private func postNewPlan(_ plan: Plan) {
         switch type {
-        case .create:
+        case .newFromMeetList, .newInMeeting:
             NotificationManager.shared.postItem(.created(plan),
                                          from: self)
         case .edit:
@@ -378,12 +398,6 @@ extension CreatePlanViewReactor {
 extension CreatePlanViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
-        case .groupSelectView:
-            coordinator?.presentGroupSelectView()
-        case .dateSelectView:
-            coordinator?.presentDateSelectView()
-        case .timeSelectView:
-            coordinator?.presentTimeSelectView()
         case .placeSelectView:
             coordinator?.presentSearchLocationView()
         case .endProcess:
@@ -416,17 +430,8 @@ extension CreatePlanViewReactor: LoadingReactor {
     }
     
     private func getDataRequestError(err: DataRequestError) -> ResponseError? {
-        guard let meetId = getMeetId() else { return nil }
+        guard let meetId = currentState.seletedMeet?.id else { return nil }
         return DataRequestError.resolveNoResponseError(err: err,
                                                        responseType: .meet(id: meetId))
-    }
-    
-    private func getMeetId() -> Int? {
-        switch type {
-        case .create:
-            return currentState.seletedMeet?.id
-        case .edit:
-            return currentState.previousPlan?.meet?.id
-        }
     }
 }

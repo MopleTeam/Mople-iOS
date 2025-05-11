@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol SignIn {
-    func execute(platform: LoginPlatform) -> Single<Void>
+    func execute(platform: LoginPlatform) -> Observable<Void>
 }
 
 enum LoginError: Error {
@@ -23,13 +23,13 @@ enum LoginError: Error {
     var info: String? {
         switch self {
         case .appleAccountError:
-            return "설정에서 Apple 로그인 연동 해제 후\n다시 시도해 주세요."
+            return L10n.Error.Login.apple
         case .kakaoAccountError:
-            return "카카오 계정과 연동을 실패했습니다.\n다시 시도해 주세요."
+            return L10n.Error.Login.kakao
         case .completeError:
-            return "로그인에 실패했어요.\n다시 시도해 주세요."
+            return L10n.Error.Login.default
         case .unknown:
-            return "요청에 실패했습니다.\n잠시 후 다시 시도해주세요."
+            return L10n.Error.default
         case .notFoundInfo, .cancle, .handled:
             return nil
         }
@@ -61,7 +61,7 @@ final class SignInUseCase: SignIn {
     }
     
     // MARK: - SignIn
-    func execute(platform: LoginPlatform) -> Single<Void> {
+    func execute(platform: LoginPlatform) -> Observable<Void> {
         
         var socialLoginResult: SocialInfo?
         
@@ -72,6 +72,7 @@ final class SignInUseCase: SignIn {
                 return self.authenticationRepo
                     .signIn(social: accountInfo)
             })
+            .asObservable()
             .catch({ [weak self] err in
                 guard let self else { return .error(err) }
                 return .error(self.handleError(err, socialLoginResult))

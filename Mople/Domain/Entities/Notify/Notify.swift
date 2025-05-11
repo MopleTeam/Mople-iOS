@@ -15,9 +15,9 @@ enum NotifyType {
 
 struct Notify {
     let id: Int?
-    let meetImgPath: String? = "https://picsum.photos/id/1/200/300"
-    let meetTitle: String? = "모임 제목"
-    let postDate: Date = DateManager.getPreviousMonth(Date())
+    let meetImgPath: String?
+    let meetTitle: String? 
+    let postDate: Date?
     let type: NotifyType?
     let payload: NotifyPayload?
     var isNew: Bool = false

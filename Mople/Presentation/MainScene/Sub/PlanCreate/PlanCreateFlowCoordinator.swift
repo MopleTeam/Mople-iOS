@@ -8,9 +8,6 @@
 import UIKit
 
 protocol PlanCreateCoordination: AnyObject {
-    func presentGroupSelectView()
-    func presentDateSelectView()
-    func presentTimeSelectView()
     func presentSearchLocationView()
     func endFlow()
     func completed(with plan: Plan)
@@ -33,25 +30,7 @@ final class PlanCreateFlowCoordinator: BaseCoordinator, PlanCreateCoordination {
     
     override func start() {
         planCreateVC = dependencies.makePlanCreateViewController(coordinator: self)
-        navigationController.pushViewController(planCreateVC!, animated: false)
-    }
-}
-
-// MARK: - Picker View
-extension PlanCreateFlowCoordinator {
-    func presentGroupSelectView() {
-        let vc = dependencies.makeGroupSelectViewController()
-        navigationController.present(vc, animated: true)
-    }
-    
-    func presentDateSelectView() {
-        let vc = dependencies.makeDateSelectViewController()
-        navigationController.present(vc, animated: true)
-    }
-    
-    func presentTimeSelectView() {
-        let vc = dependencies.makeTimeSelectViewController()
-        navigationController.present(vc, animated: true)
+        self.pushWithTracking(planCreateVC!, animated: false)
     }
 }
 
@@ -60,7 +39,7 @@ extension PlanCreateFlowCoordinator {
     func presentSearchLocationView() {
         let flow = dependencies.makeSearchLocationCoordinator()
         self.start(coordinator: flow)
-        self.navigationController.presentWithTransition(flow.navigationController)
+        self.present(flow.navigationController)
     }
 }
 

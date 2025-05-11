@@ -16,7 +16,6 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = SearchPlaceViewReactor
-    private var searchPlaceReactor: SearchPlaceViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - UI Components
@@ -24,7 +23,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     private(set) var startView: DefaultEmptyView = {
         let view = DefaultEmptyView()
         view.setImage(image: .searchEmpty)
-        view.setTitle(text: "약속 장소를 검색해주세요")
+        view.setTitle(text: L10n.Searchplace.title)
         view.isUserInteractionEnabled = false
         return view
     }()
@@ -32,7 +31,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     private(set) var emptyView: DefaultEmptyView = {
         let view = DefaultEmptyView()
         view.setImage(image: .searchEmpty)
-        view.setTitle(text: "검색결과가 없어요")
+        view.setTitle(text: L10n.Searchplace.empty)
         view.isHidden = true
         view.isUserInteractionEnabled = false
         return view
@@ -51,9 +50,10 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     }()
         
     // MARK: - LifeCycle
-    init(reactor: SearchPlaceViewReactor?) {
-        super.init()
-        self.searchPlaceReactor = reactor
+    init(screenName: ScreenName,
+         reactor: SearchPlaceViewReactor?) {
+        super.init(screenName: screenName)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -63,12 +63,16 @@ class SearchPlaceViewController: SearchNaviViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
         setupKeyboardDismissGestrue()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
+        setLayout()
+        setSearchbar()
+    }
+    
+    private func setLayout() {
         self.view.addSubview(startView)
         self.view.addSubview(emptyView)
         self.view.addSubview(placeListContainer)
@@ -78,7 +82,7 @@ class SearchPlaceViewController: SearchNaviViewController, View {
             $0.snp.makeConstraints { make in
                 make.edges.equalToSuperview()
             }
-        } 
+        }
         
         [placeListContainer, detailPlaceContainer].forEach {
             $0.snp.makeConstraints { make in
@@ -88,20 +92,32 @@ class SearchPlaceViewController: SearchNaviViewController, View {
             }
         }
     }
+    
+    private func setSearchbar() {
+        self.searchBar.setInputPlaceHolder(text: L10n.Searchplace.input)
+    }
 }
 
 // MARK: - Reactor Setup
 extension SearchPlaceViewController {
-    private func setReactor() {
-        reactor = searchPlaceReactor
-    }
-    
     func bind(reactor: SearchPlaceViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         [searchBar.rx.searchEvent, searchBar.rx.searchButtonEvent].forEach {
             $0.map { Reactor.Action.searchPlace(query: $0) }
                 .bind(to: reactor.action)
@@ -132,7 +148,7 @@ extension SearchPlaceViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)

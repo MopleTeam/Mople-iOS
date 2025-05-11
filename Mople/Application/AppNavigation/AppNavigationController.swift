@@ -41,7 +41,7 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
     }
     
     public func setupDismissCompletion(completion: (() -> Void)?) {
-        dismissTransition.setGestureCompletion(completion: completion)
+        dismissTransition.setDismissGestureCompletion(completion: completion)
     }
 }
 

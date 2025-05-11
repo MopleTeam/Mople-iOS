@@ -9,7 +9,7 @@ import RxSwift
 
 protocol ParticipationPlan {
     func execute(planId: Int,
-                 isJoining: Bool) -> Single<Void>
+                 isJoining: Bool) -> Observable<Void>
 }
 
 final class ParticipationPlanUseCase: ParticipationPlan {
@@ -20,8 +20,10 @@ final class ParticipationPlanUseCase: ParticipationPlan {
     }
     
     func execute(planId: Int,
-                 isJoining: Bool) -> Single<Void> {
-        participationRepo.participationPlan(planId: planId,
-                                                   isJoining: isJoining)
+                 isJoining: Bool) -> Observable<Void> {
+        return participationRepo
+            .participationPlan(planId: planId,
+                               isJoining: isJoining)
+            .asObservable()
     }
 }

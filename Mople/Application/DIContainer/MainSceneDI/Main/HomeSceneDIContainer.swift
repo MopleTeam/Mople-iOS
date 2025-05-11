@@ -17,27 +17,15 @@ protocol HomeSceneDependencies {
     func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
                                        completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
     func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator
+                                       type: PostType) -> BaseCoordinator
     func makeNotifyListFlowCoordinator() -> BaseCoordinator
 }
 
-final class HomeSceneDIContainer {
+final class HomeSceneDIContainer: BaseContainer {
         
-    private let isLogin: Bool
-    private let appNetworkService: AppNetworkService
-    private let commonFactory: CommonSceneFactory
-
-    init(isLogin: Bool,
-         appNetworkService: AppNetworkService,
-         commonFactory: CommonSceneFactory) {
-        self.isLogin = isLogin
-        self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
-    }
-    
     func makeHomeFlowCoordinator() -> HomeFlowCoordinator {
         let navi = AppNaviViewController(type: .main)
-        navi.tabBarItem = .init(title: TextStyle.Tabbar.home,
+        navi.tabBarItem = .init(title: L10n.home,
                                 image: .home,
                                 selectedImage: nil)
         return .init(navigationController: navi,
@@ -45,26 +33,19 @@ final class HomeSceneDIContainer {
     }
 }
 
+// MARK: - Default View
 extension HomeSceneDIContainer: HomeSceneDependencies {
-    
-    // MARK: - 기본 화면
     func makeHomeViewController(coordinator: HomeFlowCoordinator) -> HomeViewController {
-        let parentVC = HomeViewController(reactor: makeHomeViewReactor(coordinator: coordinator))
-        addChildVC(parentVC: parentVC)
-        return parentVC
+        let reactor = makeHomeViewReactor(coordinator: coordinator)
+        let recentPlanVC = makeRecentPlanViewController(reactor: reactor)
+        return HomeViewController(screenName: .home,
+                                  reactor: reactor,
+                                  recentPlanVC: recentPlanVC)
     }
     
     private func makeHomeViewReactor(coordinator: HomeFlowCoordinator) -> HomeViewReactor {
-        return HomeViewReactor(isLogin: isLogin,
-                               uploadFCMTokcnUseCase: makeUploadFCMTokenUseCase(),
-                               fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
-                               notificationService: DefaultNotificationService(),
+        return HomeViewReactor(fetchRecentScheduleUseCase: makeRecentPlanUseCase(),
                                coordinator: coordinator)
-    }
-    
-    private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
-        let repo = DefaultFCMTokenRepo(networkService: appNetworkService)
-        return UploadFCMTokenUseCase(repo: repo)
     }
     
     private func makeRecentPlanUseCase() -> FetchHomeData {
@@ -72,39 +53,55 @@ extension HomeSceneDIContainer: HomeSceneDependencies {
         return FetchHomeDataUseCase(repo: repo)
     }
     
-    private func addChildVC(parentVC: HomeViewController) {
-        let recentPlanVC = HomePlanCollectionViewController(reactor: parentVC.homeReactor)
-        parentVC.add(child: recentPlanVC,
-                     container: parentVC.recentPlanContainerView)
+    private func makeRecentPlanViewController(reactor: HomeViewReactor) -> RecentPlanViewController {
+        return RecentPlanViewController(reactor: reactor)
     }
+}
+
+// MARK: - View
+extension HomeSceneDIContainer {
     
-    // MARK: - 뷰 이동
+    // MARK: - 모임생성
     func makeMeetCreateViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
         return commonFactory.makeCreateMeetViewController(isFlow: false,
                                                           isEdit: false,
                                                           type: .create,
                                                           coordinator: coordinator)
     }
+}
+
+// MARK: - Flow
+extension HomeSceneDIContainer {
     
-    // MARK: - 플로우 이동
-    /// 모임생성 플로우 생성
-    func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
-        return commonFactory.makeMeetDetailCoordiantor(meetId: meetId)
-    }
-        
-    /// 일정생성 플로우 생성
+    // MARK: - 일정생성
     func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
                                        completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
-        return commonFactory.makePlanCreateCoordinator(type: .create(meetList),
-                                                       completionHandler: completionHandler)
+        let planCreateDI = PlanCreateSceneDIContainer(
+            appNetworkService: appNetworkService,
+            type: .newFromMeetList(meetList))
+        return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completionHandler)
     }
     
-    /// 일정 상세 플로우 생성
+    // MARK: - 모임 상세 
+    func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
+        let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      meetId: meetId,
+                                                      isJoin: false)
+        return meetDetailDI.makeMeetDetailCoordinator()
+    }
+    
+    // MARK: - 일정 상세
     func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PlanDetailType) -> BaseCoordinator {
-        return commonFactory.makePlanDetailCoordinator(postId: postId, type: type)
+                                       type: PostType) -> BaseCoordinator {
+        let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
+                                                      commonFactory: commonFactory,
+                                                      type: type,
+                                                      id: postId)
+        return planDetailDI.makePostDetailCoordinator()
     }
     
+    // MARK: - 일정 리스트
     func makeNotifyListFlowCoordinator() -> BaseCoordinator {
         let notifyListSceneDI = NotifyListSceneDIContainer(appNetworkService: appNetworkService,
                                                            commonFactory: commonFactory)

@@ -175,7 +175,10 @@ extension CreateMeetViewReactor {
         return photoService.presentImagePicker()
             .asObservable()
             .map { $0.first }
-            .flatMap(handleUpdateImage(_:))
+            .flatMap { [weak self] image -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return handleUpdateImage(image)
+            }
     }
     
     private func handleUpdateImage(_ image: UIImage?) -> Observable<Mutation> {
@@ -190,6 +193,7 @@ extension CreateMeetViewReactor {
     }
     
     private func resetImage() -> Observable<Mutation> {
+        createRequest?.image = nil
         return .just(.updateImage(nil))
     }
     
@@ -210,57 +214,64 @@ extension CreateMeetViewReactor {
             })
     }
     
-    private func requestEditMeet(_ meet: Meet) -> Observable<Mutation> {
-        let selectedImage = currentState.image
-        
-        let editMeet = imageUploadUseCase.execute(selectedImage)
-            .flatMap { [weak self] imagePath -> Single<Meet?> in
-                guard let self,
-                      let id = meet.meetSummary?.id,
-                      var request = createRequest else { return .just(nil)}
-                request.image = imagePath ?? createRequest?.image
-                return editMeetUseCase.execute(id: id,
-                                               request: request)
-            }
-            .asObservable()
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] meet -> Observable<Mutation> in
-                guard let self,
-                      let meet else { return .empty() }
-                postNewMeet(meet)
-                handleCompletedTask(with: meet)
-                return .empty()
-            })
-        
-        return requestWithLoading(task: editMeet,
-                                  minimumExecutionTime: .seconds(1))
-    }
-    
+    // MARK: - 미팅 생성
     private func requestCreateMeet() -> Observable<Mutation> {
         
-        let selectedImage = currentState.image
-
-        let createMeet = imageUploadUseCase.execute(selectedImage)
-            .flatMap { [weak self] imagePath -> Single<Meet?> in
+        let createMeet = handleImageUpload()
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .flatMap { [weak self] imagePath -> Observable<Meet> in
                 guard let self,
-                      var request = createRequest else { return .just(nil) }
+                      var request = createRequest else { return .empty() }
                 request.image = imagePath
                 return createMeetUseCase.execute(requset: request)
             }
-            .asObservable()
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
-                guard let self,
-                      let meet else { return .empty() }
+                guard let self else { return .empty() }
                 postNewMeet(meet)
                 handleCompletedTask(with: meet)
                 return .empty()
             })
             
-        return requestWithLoading(task: createMeet,
-                                  minimumExecutionTime: .seconds(1))
+        return requestWithLoading(task: createMeet)
     }
     
+    // MARK: - 미팅 편집
+    private func requestEditMeet(_ meet: Meet) -> Observable<Mutation> {
+        
+        let editMeet = handleImageUpload()
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .flatMap { [weak self] imagePath -> Observable<Meet> in
+                guard let self,
+                      let id = meet.meetSummary?.id,
+                      var request = createRequest else { return .empty() }
+                request.image = imagePath ?? createRequest?.image
+                return editMeetUseCase.execute(id: id,
+                                               request: request)
+            }
+            .observe(on: MainScheduler.instance)
+            .flatMap({ [weak self] meet -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                postNewMeet(meet)
+                handleCompletedTask(with: meet)
+                return .empty()
+            })
+        
+        return requestWithLoading(task: editMeet)
+    }
+    
+    // MARK: - 이미지 업로드
+    private func handleImageUpload() -> Observable<String?> {
+        guard let image = currentState.image else {
+            return .just(nil)
+        }
+        
+        return imageUploadUseCase.execute(image)
+            .map { $0 }
+    }
+
+    
+    // MARK: - 완료 핸들링
     private func handleCompletedTask(with meet: Meet) {
         switch type {
         case .create:

@@ -14,7 +14,6 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     // MARK: - Reactor
     typealias Reactor = NotifyListViewReactor
-    private var notifyListReactor: NotifyListViewReactor?
     var disposeBag: DisposeBag = DisposeBag()
     
     // MARK: - Transition
@@ -22,9 +21,9 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     // MARK: - UI Components
     private let countView: CountView = {
-        let view = CountView(title: "새로운 알림")
+        let view = CountView(title: L10n.Notifylist.new)
         view.setFont(font: FontStyle.Body1.medium,
-                     textColor: ColorStyle.Gray._04)
+                     textColor: .gray04)
         return view
     }()
     
@@ -36,20 +35,20 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         return table
     }()
     
-    private let emptyPlanView: DefaultEmptyView = {
+    private let emptyNotifyView: DefaultEmptyView = {
         let view = DefaultEmptyView()
-        view.setTitle(text: TextStyle.Calendar.emptyTitle)
-        view.setImage(image: .emptyPlan)
-        view.clipsToBounds = true
-        view.isHidden = true
+        view.setTitle(text: L10n.Notifylist.empty)
+        view.setImage(image: .emptyNotify)
         return view
     }()
     
     // MARK: - LifeCycle
-    init(title: String?,
+    init(screenName: ScreenName,
+         title: String?,
          reactor: NotifyListViewReactor) {
-        super.init(title: title)
-        self.notifyListReactor = reactor
+        super.init(screenName: screenName,
+                   title: title)
+        self.reactor = reactor
     }
     
     required init?(coder: NSCoder) {
@@ -59,7 +58,6 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
     }
     
     // MARK: - UI Setup
@@ -71,7 +69,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     private func setLayout() {
         self.view.addSubview(countView)
-        self.view.addSubview(emptyPlanView)
+        self.view.addSubview(emptyNotifyView)
         self.view.addSubview(tableView)
         
         self.countView.snp.makeConstraints { make in
@@ -79,8 +77,8 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
             make.horizontalEdges.equalToSuperview()
         }
         
-        self.emptyPlanView.snp.makeConstraints { make in
-            make.top.equalTo(countView.snp.bottom).offset(16)
+        self.emptyNotifyView.snp.makeConstraints { make in
+            make.top.equalTo(self.titleViewBottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
         
@@ -100,22 +98,31 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     }
     
     private func setCount(_ count: Int) {
-        countView.countText = "\(count)개"
+        countView.countText = L10n.itemCount(count)
     }
 }
 
 // MARK: - Reactor Setup
 extension NotifyListViewController {
-    private func setReactor() {
-        reactor = notifyListReactor
-    }
-    
+
     func bind(reactor: NotifyListViewReactor) {
         inputBind(reactor)
-        outpubBind(reactor)
+        outputBind(reactor)
     }
 
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func setActionBind(_ reactor: Reactor) {
         tableView.rx.itemSelected
             .map { Reactor.Action.selectNotify(index: $0.row) }
             .bind(to: reactor.action)
@@ -127,7 +134,7 @@ extension NotifyListViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outpubBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$notifyList)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(
@@ -136,6 +143,7 @@ extension NotifyListViewController {
             ) { index, item, cell in
                 cell.configure(viewModel: .init(notify: item))
                 cell.setReadStatus(isNew: item.isNew)
+                cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         
@@ -150,11 +158,17 @@ extension NotifyListViewController {
             })
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$notifyList)
+            .asDriver(onErrorJustReturn: [])
+            .map { !$0.isEmpty }
+            .drive(with: self, onNext: { vc, hasNotify in
+                vc.tableView.isHidden = !hasNotify
+                vc.emptyNotifyView.isHidden = hasNotify
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$resetedCount)
             .compactMap({ $0 })
-            .do(onNext: { _ in
-                print(#function, #line, "Path : # 값이 들어옴 ")
-            })
             .asDriver(onErrorJustReturn: nil)
             .drive(onNext: { _ in
                 UIApplication.shared.applicationIconBadgeNumber = 0

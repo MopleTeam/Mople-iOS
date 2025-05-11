@@ -19,17 +19,17 @@ protocol ProfileSceneDependencies {
 final class ProfileSceneDIContainer: ProfileSceneDependencies {
  
     let appNetworkService: AppNetworkService
-    let commonFacoty: CommonSceneFactory
+    let commonFacoty: ViewDependencies
 
     init(appNetworkService: AppNetworkService,
-         commonFacoty: CommonSceneFactory) {
+         commonFacoty: ViewDependencies) {
         self.appNetworkService = appNetworkService
         self.commonFacoty = commonFacoty
     }
     
     func makeSetupFlowCoordinator() -> ProfileFlowCoordinator {
         let navigationController = AppNaviViewController(type: .main)
-        navigationController.tabBarItem = .init(title: TextStyle.Tabbar.profile,
+        navigationController.tabBarItem = .init(title: L10n.profile,
                                                 image: .person,
                                                 selectedImage: nil)
         return ProfileFlowCoordinator(navigationController: navigationController,
@@ -37,11 +37,11 @@ final class ProfileSceneDIContainer: ProfileSceneDependencies {
     }
 }
 
-// MARK: - 프로필 View
+// MARK: - Default View
 extension ProfileSceneDIContainer {
     func makeProfileViewController(coordinator: ProfileCoordination) -> ProfileViewController {
-        let title = TextStyle.Profile.title
-        return ProfileViewController(title: title,
+        return ProfileViewController(screenName: .profile,
+                                     title: L10n.profile,
                                      reactor: makeProfileViewReactor(coordinator: coordinator))
     }
     
@@ -64,36 +64,49 @@ extension ProfileSceneDIContainer {
     }
 }
 
-// MARK: - 프로필 편집 View
+// MARK: - View
 extension ProfileSceneDIContainer {
+    
+    // MARK: - 프로필 수정
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        coordinator: ProfileEditViewCoordination) -> ProfileEditViewController {
         return ProfileEditViewController(
+            screenName: .profile_write,
+            title: L10n.editProfile,
             editProfileReactor: makeProfileEditViewReactor(previousProfile: previousProfile,
                                                            coordinator: coordinator))
     }
     
     private func makeProfileEditViewReactor(previousProfile: UserInfo,
                                             coordinator: ProfileEditViewCoordination) -> ProfileEditViewReactor {
+        let userInfoRepo = DefaultUserInfoRepo(networkService: appNetworkService)
+        let nicknameRepo = DefaultNicknameManagerRepo(networkService: appNetworkService)
+        let imageRepo = DefaultImageUploadRepo(networkService: appNetworkService)
         return .init(previousProfile: previousProfile,
-                     editProfile: makeEditProfileUseCase(),
-                     imageUpload: commonFacoty.makeImageUploadUseCase(),
-                     validationNickname: commonFacoty.makeDuplicateNicknameUseCase(),
+                     editProfile: makeEditProfileUseCase(repo: userInfoRepo),
+                     imageUpload: makeImageUploadUseCase(repo: imageRepo),
+                     validationNickname: makeDuplicateNicknameUseCase(repo: nicknameRepo),
                      photoService: DefaultPhotoService(),
                      coordinator: coordinator)
     }
     
-    private func makeEditProfileUseCase() -> EditProfile {
-        return EditProfileUseCase(
-            userInfoRepo: DefaultUserInfoRepo(networkService: appNetworkService)
-        )
+    private func makeEditProfileUseCase(repo: UserInfoRepo) -> EditProfile {
+        return EditProfileUseCase(userInfoRepo: repo)
     }
-}
-
-// MARK: - 알림관리 View
-extension ProfileSceneDIContainer {
+    
+    private func makeDuplicateNicknameUseCase(repo: NicknameRepo) -> CheckDuplicateNickname {
+        return CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo)
+    }
+    
+    private func makeImageUploadUseCase(repo: ImageUploadRepo) -> ImageUpload {
+        return ImageUploadUseCase(imageUploadRepo: repo)
+    }
+    
+    // MARK: - 알림 관리
     func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController {
         return NotifySubcribeViewController(
+            screenName: .notification_setting,
+            title: L10n.Profile.notify,
             reactor: makeNotifySubscribeReactor(coordinator: coordinator)
         )
     }
@@ -102,6 +115,7 @@ extension ProfileSceneDIContainer {
         let repo = DefaultNotifySubscribeRepo(networkService: appNetworkService)
         return .init(fetchNotifyState: makeFetchNotifyState(repo: repo),
                      subscribeNotify: makeSubscribeNotify(repo: repo),
+                     uploadFCMTokcn: makeUploadFCMTokenUseCase(),
                      notificationService: makeNotifyService(),
                      coordinator: coordinator)
     }
@@ -114,14 +128,18 @@ extension ProfileSceneDIContainer {
         return SubscribeNotifyUseCase(repo: repo)
     }
     
+    private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
+        let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
+        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+    }
+    
     private func makeNotifyService() -> NotificationService {
         return DefaultNotificationService()
     }
-}
-
-// MARK: - 개인정보 처리방침 View
-extension ProfileSceneDIContainer {
+    
+    // MARK: - 개인정보 처리방침 View
     func makePolicyViewController() -> PolicyViewController {
-        return PolicyViewController()
+        return .init(screenName: .privacy_policy,
+                     title: L10n.Profile.policy)
     }
 }

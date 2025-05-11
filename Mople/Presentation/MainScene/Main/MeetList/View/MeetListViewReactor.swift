@@ -10,19 +10,28 @@ import ReactorKit
 final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case fetchMeetList
-        case selectMeet(index: Int)
+        enum Flow {
+            case showJoinMeet(Meet)
+            case selectMeet(index: Int)
+            case createMeet
+        }
+        
+        case flow(Flow)
         case updateMeet(_ meetPayload: MeetPayload)
+        case fetchMeetList
+        case refresh
     }
     
     enum Mutation {
         case fetchMeetList([Meet])
+        case completedRefresh
         case updateLoadingState(Bool)
         case catchError(Error)
     }
     
     struct State {
         @Pulse var meetList: [Meet] = []
+        @Pulse var isRefreshed: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
     }
@@ -58,9 +67,11 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchMeetList:
-            return fetchMeetList()
-        case let .selectMeet(index):
-            return presentMeetDetailView(index: index)
+            return fetchMeetListWithLoading()
+        case .refresh:
+            return refreshMeetList()
+        case let .flow(action):
+            return handleFlowAction(action)
         case let .updateMeet(meet):
             return self.handleMeetPayload(meet)
         }
@@ -72,6 +83,8 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchMeetList(meetList):
             newState.meetList = meetList
+        case .completedRefresh:
+            newState.isRefreshed = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -84,23 +97,51 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Request
 extension MeetListViewReactor {
+    
+    /// 모임 리스트 불러오기
     private func fetchMeetList() -> Observable<Mutation> {
-        
-        let fetchData = fetchUseCase.execute()
-            .asObservable()
+        return fetchUseCase.execute()
             .map { Mutation.fetchMeetList($0) }
-        
+    }
+    
+    /// 모임 리스트 로딩과 함께 불러오기
+    private func fetchMeetListWithLoading() -> Observable<Mutation> {
+        let fetchData = fetchMeetList()
         return requestWithLoading(task: fetchData)
+    }
+    
+    /// 모임 리스트 리프레쉬
+    private func refreshMeetList() -> Observable<Mutation> {
+        let refreshed = Observable.just(Mutation.completedRefresh)
+        return .concat([fetchMeetList(),
+                        refreshed])
     }
 }
 
 // MARK: - Coordination
 extension MeetListViewReactor {
-    private func presentMeetDetailView(index: Int) -> Observable<Mutation> {
-        guard let selectedGroup = currentState.meetList[safe: index],
-              let id = selectedGroup.meetSummary?.id else { return .empty() }
-        coordinator?.presentMeetDetailView(meetId: id)
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case let .showJoinMeet(meet):
+            presentJoinMeet(with: meet)
+        case let .selectMeet(index):
+            presentSelectedMeet(index: index)
+        case .createMeet:
+            coordinator?.presentMeetCreateView()
+        }
+        
         return .empty()
+    }
+    
+    private func presentSelectedMeet(index: Int) {
+        guard let selectedGroup = currentState.meetList[safe: index],
+              let id = selectedGroup.meetSummary?.id else { return  }
+        coordinator?.presentMeetDetailView(meetId: id, isJoin: false)
+    }
+    
+    private func presentJoinMeet(with meet: Meet) {
+        guard let meetId = meet.meetSummary?.id else { return }
+        coordinator?.presentMeetDetailView(meetId: meetId, isJoin: true)
     }
 }
 
@@ -108,6 +149,7 @@ extension MeetListViewReactor {
 // MARK: - Notify
 extension MeetListViewReactor {
     private func handleMeetPayload(_ payload: MeetPayload) -> Observable<Mutation> {
+        
         var meetList = currentState.meetList
         
         switch payload {

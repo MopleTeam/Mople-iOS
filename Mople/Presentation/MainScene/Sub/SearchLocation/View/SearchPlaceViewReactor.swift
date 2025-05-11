@@ -153,14 +153,17 @@ extension SearchPlaceViewReactor {
         let requestSearch = searchUseCase.execute(query: query,
                                                   x: userLocation?.longitude,
                                                   y: userLocation?.latitude)
-            .asObservable()
             .observe(on: MainScheduler.instance)
-            .filter({ [weak self] response in
-                let isEmpty = response.result.isEmpty
-                self?.updateSearchResultVisibility(result: response.result)
-                return !isEmpty
-            })
-            .map { Mutation.setPlace(.init(places: $0.result, isCached: false)) }
+            .flatMap { [weak self] result -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                let hasResult = !result.places.isEmpty
+                updateSearchResultVisibility(hasResult: hasResult)
+                
+                return hasResult
+                ? .just(.setPlace(.init(places: result.places,
+                                        isCached: false)))
+                : .empty()
+            }
         
         return requestWithLoading(task: requestSearch)
     }
@@ -222,9 +225,9 @@ extension SearchPlaceViewReactor {
     /// - 검색결과 유무
     ///     - 데이터 O : 결과창 표시
     ///     - 데이터 X : empty view 표시
-    private func updateSearchResultVisibility(result: [PlaceInfo]) {
-        self.coordinator?.updateEmptyViewVisibility(shouldShow: result.isEmpty)
-        self.coordinator?.updateSearchResultViewVisibility(shouldShow: !result.isEmpty)
+    private func updateSearchResultVisibility(hasResult: Bool) {
+        self.coordinator?.updateEmptyViewVisibility(shouldShow: !hasResult)
+        self.coordinator?.updateSearchResultViewVisibility(shouldShow: hasResult)
     }
 }
 

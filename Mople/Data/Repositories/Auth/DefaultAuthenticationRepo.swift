@@ -15,7 +15,7 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
         
         return self.networkService.basicRequest(endpoint: endpoint)
             .flatMap {
-                JWTTokenStorage.shared.saveToken($0)
+                KeychainStorage.shared.saveToken($0)
                 return .just(())
             }
     }
@@ -25,7 +25,7 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
         
         return networkService.basicRequest(endpoint: endpoint)
             .flatMap {
-                JWTTokenStorage.shared.saveToken($0)
+                KeychainStorage.shared.saveToken($0)
                 return .just(())
             }
     }

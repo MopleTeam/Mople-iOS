@@ -20,14 +20,14 @@ final class AppAppearance {
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: ColorStyle.Gray._05,
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.gray05,
                                                                          .font: FontStyle.App.tabbar]
         appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -5)
-        appearance.stackedLayoutAppearance.normal.iconColor = ColorStyle.App.icon
+        appearance.stackedLayoutAppearance.normal.iconColor = .appIcon
         
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: ColorStyle.App.secondary,
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.appSecondary,
                                                                            .font: FontStyle.App.tabbar]
-        appearance.stackedLayoutAppearance.selected.iconColor = ColorStyle.App.secondary
+        appearance.stackedLayoutAppearance.selected.iconColor = .appSecondary
         
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance

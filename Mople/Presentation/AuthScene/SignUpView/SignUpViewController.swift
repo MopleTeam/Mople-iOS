@@ -16,7 +16,6 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     
     // MARK: - Reactor
     typealias Reactor = SignUpViewReactor
-    private var signReactor: SignUpViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Observable
@@ -29,9 +28,9 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     // MARK: - UI Components
     private let mainTitle: UILabel = {
         let label = UILabel()
-        label.text = TextStyle.ProfileSetup.title
+        label.text = L10n.CreateProfile.header
         label.font = FontStyle.Heading.bold
-        label.textColor = ColorStyle.Gray._01
+        label.textColor = .gray01
         label.numberOfLines = 2
         return label
     }()
@@ -39,9 +38,10 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     private let profileSetupView = ProfileSetupView(type: .create)
 
     // MARK: - LifeCycle
-    init(signUpReactor: SignUpViewReactor) {
-        super.init()
-        self.signReactor = signUpReactor
+    init(screenName: ScreenName,
+         signUpReactor: SignUpViewReactor) {
+        super.init(screenName: screenName)
+        self.reactor = signUpReactor
     }
     
     required init?(coder: NSCoder) {
@@ -51,7 +51,6 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
         setAction()
         setupTapKeyboardDismiss()
     }
@@ -88,16 +87,24 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
 
 // MARK: - Reactor Setup
 extension SignUpViewController {
-    private func setReactor() {
-        reactor = signReactor
-    }
-    
     func bind(reactor: SignUpViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setActionBind(_ reactor: Reactor) {
         profileSetupView.rx.editName
             .compactMap({ $0 })
             .map { Reactor.Action.setNickname($0) }
@@ -125,7 +132,7 @@ extension SignUpViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$creationNickname)
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, name in
@@ -165,15 +172,15 @@ extension SignUpViewController {
             })
             .disposed(by: disposeBag)
     }
-    
+
     // MARK: - Error Handling
     private func handleError(_ err: SignUpError) {
         switch err {
         case .unknown:
             alertManager.showDefatulErrorMessage()
-        case .failSelectPhoto(let compressionPhotoError):
-            alertManager.showAlert(title: compressionPhotoError.info,
-                                   subTitle: compressionPhotoError.subInfo)
+        case let .failSelectPhoto(err):
+            alertManager.showDefaultAlert(title: err.info,
+                                   subTitle: err.subInfo)
         }
     }
 }
@@ -181,12 +188,12 @@ extension SignUpViewController {
 // MARK: - 이미지 선택
 extension SignUpViewController {
     private func showPhotos() {
-        let defaultPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경",
+        let defaultPhotoAction = alertManager.makeAction(title: L10n.Photo.defaultImage,
                                                          completion: { [weak self] in
             self?.resetImage.onNext(())
         })
         
-        let selectPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택",
+        let selectPhotoAction = alertManager.makeAction(title: L10n.Photo.selectImage,
                                                         completion: { [weak self] in
             self?.showAlbum.onNext(())
         })

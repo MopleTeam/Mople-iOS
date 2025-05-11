@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchCommentList {
-    func execute(postId: Int) -> Single<[Comment]>
+    func execute(postId: Int) -> Observable<[Comment]>
 }
 
 final class FetchCommentListUseCase: FetchCommentList {
@@ -20,7 +20,7 @@ final class FetchCommentListUseCase: FetchCommentList {
         self.repo = repo
     }
     
-    func execute(postId: Int) -> Single<[Comment]> {
+    func execute(postId: Int) -> Observable<[Comment]> {
         repo.fetchCommentList(postId: postId)
             .map { $0.map { response in
                 response.toDomain() }
@@ -30,6 +30,7 @@ final class FetchCommentListUseCase: FetchCommentList {
                 verifyReview.verifyWriter(self?.userId)
                 return verifyReview }
             }
+            .asObservable()
     }
 }
 

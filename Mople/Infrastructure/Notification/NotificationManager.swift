@@ -101,6 +101,11 @@ final class NotificationManager {
                 return payload
             }
     }
+
+    // MARK: - Scene Observable
+    func addEnterForeGroundObservable() -> Observable<Notification> {
+        return NotificationCenter.default.rx.notification(UIApplication.willEnterForegroundNotification)
+    }
     
     // MARK: - Log
     private func log(from sender: String, payload: Any) {
@@ -108,13 +113,37 @@ final class NotificationManager {
     }
 }
 
+
+// MARK: - Event Name
 extension Notification.Name {
+    
+    /// 모임
     static let meet = Notification.Name(String(describing: Meet.self))
+    
+    /// 일정
     static let plan = Notification.Name(String(describing: Plan.self))
+    
+    /// 후기
     static let review = Notification.Name(String(describing: Review.self))
+    
+    /// 일정 참여
     static let participating = Notification.Name("participating")
+    
+    /// 후기 작성
     static let postReview = Notification.Name("postReview")
+    
+    /// 자정 업데이트
     static let midnightUpdate = Notification.Name("midnightUpdate")
+    
+    /// 토큰 만료
     static let sessionExpired = Notification.Name("sessionExpired")
+    
+    /// 프로필 수정
     static let editProfile = Notification.Name("editProfile")
+    
+    /// 알림 카운트 업데이트
+    static let changedNotifyCount = Notification.Name("changedNotifyCount")
+    
+    /// FCM 토큰
+    static let updateFCMToken = Notification.Name("updateFCMToken")
 }

@@ -11,11 +11,13 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CreateMeetViewController: TitleNaviViewController, View, TransformKeyboardResponsive, DismissTansitionControllabel {
+final class CreateMeetViewController: TitleNaviViewController,
+                                      View,
+                                      TransformKeyboardResponsive,
+                                      DismissTansitionControllabel {
     
     // MARK: - Reactor
     typealias Reactor = CreateMeetViewReactor
-    private var createMeetReactor: CreateMeetViewReactor?
     var disposeBag = DisposeBag()
     
     // MARK: - Observable
@@ -60,19 +62,19 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         return imageView
     }()
     
-    private let textFieldView: LabeledTextFieldView = {
-        let textField = LabeledTextFieldView(title: TextStyle.CreateGroup.groupTitle,
-                                              placeholder: TextStyle.CreateGroup.placeholder,
-                                              maxTextCount: 30)
+    private let textFieldView: LabeledTextField = {
+        let textField = LabeledTextField(title: L10n.Createmeet.input,
+                                         placeholder: L10n.Createmeet.inputPlaceholder,
+                                         maxTextCount: 30)
         return textField
     }()
     
     private let completionButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: ColorStyle.Default.white)
-        btn.setBgColor(normalColor: ColorStyle.App.primary,
-                       disabledColor: ColorStyle.Primary.disable)
+                     normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .appPrimary,
+                       disabledColor: .disablePrimary)
         btn.setRadius(8)
         return btn
     }()
@@ -86,13 +88,15 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     }()
     
     // MARK: - LifeCycle
-    init(isFlow: Bool,
-         isEdit: Bool,
+    init(screenName: ScreenName,
          title: String?,
+         isFlow: Bool,
+         isEdit: Bool,
          reactor: CreateMeetViewReactor) {
         self.isEditMode = isEdit
-        super.init(title: title)
-        self.createMeetReactor = reactor
+        super.init(screenName: screenName,
+                   title: title)
+        self.reactor = reactor
         configureTransition(isNeed: !isFlow)
     }
     
@@ -103,7 +107,6 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setReactor()
         setupKeyboardEvent()
         setImageGestrue()
         setupTapKeyboardDismiss()
@@ -119,11 +122,11 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
     private func setupUI() {
         setupLayout()
         setNaviItem()
-        setTitle()
+        setCompleteTitle()
     }
     
     private func setupLayout() {
-        self.view.backgroundColor = ColorStyle.Default.white
+        self.view.backgroundColor = .defaultWhite
         self.view.addSubview(mainStackView)
         self.view.addSubview(completionButton)
         self.imageContainerView.addSubview(thumnailView)
@@ -161,8 +164,8 @@ final class CreateMeetViewController: TitleNaviViewController, View, TransformKe
         self.setBarItem(type: .left)
     }
     
-    private func setTitle() {
-        let title = isEditMode ? "저장" : TextStyle.CreateGroup.completedTitle
+    private func setCompleteTitle() {
+        let title = isEditMode ? L10n.save : L10n.create
         completionButton.title = title
     }
 }
@@ -183,16 +186,25 @@ extension CreateMeetViewController {
 
 // MARK: - Reactor Setup
 extension CreateMeetViewController {
-    private func setReactor() {
-        reactor = createMeetReactor
-    }
-    
+
     func bind(reactor: CreateMeetViewReactor) {
         inputBind(reactor)
         outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
+        setActionBind(reactor)
+    }
+    
+    private func outputBind(_ reactor: Reactor) {
+        self.rx.viewDidLoad
+            .subscribe(with: self, onNext: { vc, _ in
+                vc.setReactorStateBind(reactor)
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func setActionBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
             .map { Reactor.Action.endView }
             .bind(to: reactor.action)
@@ -223,7 +235,7 @@ extension CreateMeetViewController {
             .disposed(by: disposeBag)
     }
     
-    private func outputBind(_ reactor: Reactor) {
+    private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$image)
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, image in
@@ -267,7 +279,7 @@ extension CreateMeetViewController {
         case .unknown:
             alertManager.showDefatulErrorMessage()
         case .failSelectPhoto(let compressionPhotoError):
-            alertManager.showAlert(title: compressionPhotoError.info,
+            alertManager.showDefaultAlert(title: compressionPhotoError.info,
                                    subTitle: compressionPhotoError.subInfo)
         }
     }
@@ -276,8 +288,10 @@ extension CreateMeetViewController {
 // MARK: - 이미지 선택
 extension CreateMeetViewController {
     private func showPhotos() {
-        let defaultPhotoAction = alertManager.makeAction(title: "기본 이미지로 변경", completion: setDefaultImage)
-        let selectPhotoAction = alertManager.makeAction(title: "앨범에서 사진 선택", completion: presentPhotos)
+        let defaultPhotoAction = alertManager.makeAction(title: L10n.Photo.defaultImage,
+                                                         completion: setDefaultImage)
+        let selectPhotoAction = alertManager.makeAction(title: L10n.Photo.selectImage,
+                                                        completion: presentPhotos)
         
         if hasImage {
             alertManager.showActionSheet(actions: [selectPhotoAction, defaultPhotoAction])
@@ -306,9 +320,10 @@ extension CreateMeetViewController {
 // MARK: - 모임 프로필 수정
 extension CreateMeetViewController {
     private func setPreviousMeet(_ meet: Meet) {
+        textFieldView.text = meet.meetSummary?.name
         thumnailView.kfSetimage(meet.meetSummary?.imagePath,
                                 defaultImageType: .meet)
-        textFieldView.text = meet.meetSummary?.name
+        hasImage = thumnailView.image != nil
     }
 }
 

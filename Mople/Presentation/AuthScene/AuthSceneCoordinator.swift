@@ -24,20 +24,20 @@ final class AuthSceneCoordinator: BaseCoordinator, AuthFlowCoordination {
     
     override func start() {
         let vc = dependencies.makeSignInViewController(coordinator: self)
-        navigationController.pushViewController(vc, animated: false)
+        self.pushWithTracking(vc, animated: false)
     }
 }
 
-// MARK: - 프로필 뷰 전환
+// MARK: - View
 extension AuthSceneCoordinator {
     func pushSignUpView(_ socialInfo: SocialInfo) {
         let vc = self.dependencies.makeSignUpViewController(socialInfo: socialInfo,
                                                             coordinator: self)
-        self.navigationController.pushViewController(vc, animated: true)
+        self.pushWithTracking(vc, animated: true)
     }
 }
 
-// MARK: - 메인 뷰 전환
+// MARK: - Flow
 extension AuthSceneCoordinator: SignUpCoordination {
     
     func presentMainFlow() {

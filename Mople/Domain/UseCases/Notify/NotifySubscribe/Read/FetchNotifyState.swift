@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchNotifyState {
-    func execute() -> Single<[SubscribeType]>
+    func execute() -> Observable<[SubscribeType]>
 }
 
 final class FetchNotifyStateUseCase: FetchNotifyState {
@@ -19,7 +19,7 @@ final class FetchNotifyStateUseCase: FetchNotifyState {
         self.repo = repo
     }
     
-    func execute() -> Single<[SubscribeType]> {
+    func execute() -> Observable<[SubscribeType]> {
         return repo.fetchNotifyState()
             .map { $0.compactMap { typeString in
                 switch typeString {
@@ -31,5 +31,6 @@ final class FetchNotifyStateUseCase: FetchNotifyState {
                     return nil
                 }
             }}
+            .asObservable()
     }
 }

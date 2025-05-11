@@ -35,14 +35,13 @@ enum HTTPHeader {
 }
 
 struct APIEndpoints {
-    
     private static func getAccessTokenParameters() throws -> [String:String] {
-        guard let token = JWTTokenStorage.cachedToken?.accessToken else { throw DataRequestError.expiredToken }
+        guard let token = KeychainStorage.cachedToken?.accessToken else { throw DataRequestError.expiredToken }
         return ["Authorization":"Bearer \(token)"]
     }
     
     private static func getRefreshTokenParameters() throws -> [String:String] {
-        guard let token = JWTTokenStorage.cachedToken?.refreshToken else { throw DataRequestError.expiredToken }
+        guard let token = KeychainStorage.cachedToken?.refreshToken else { throw DataRequestError.expiredToken }
         return ["refreshToken": token]
     }
 }
@@ -143,7 +142,7 @@ extension APIEndpoints {
 // MARK: - 이미지 편집
 extension APIEndpoints {
     static func uploadImage(imageData: Data,
-                            folderPath: ImageUploadPath) -> Endpoint<String?> {
+                            folderPath: ImageUploadPath) -> Endpoint<String> {
         let boundary = UUID().uuidString
         let multipartFormEncoder = MultipartBodyEncoder(boundary: boundary)
         return try! Endpoint(path: "image/upload/\(folderPath.rawValue)",
@@ -227,6 +226,20 @@ extension APIEndpoints {
                             authenticationType: .accessToken,
                             method: .delete,
                             headerParameters: HTTPHeader.getReceiveAllHeader())
+    }
+    
+    static func inviteMeet(id: Int) throws -> Endpoint<String> {
+        return try Endpoint(path: "meet/invite/\(id)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+    
+    static func joinMeet(code: String) throws -> Endpoint<MeetResponse> {
+        return try Endpoint(path: "meet/join/\(code)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 }
 
@@ -419,7 +432,7 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
     
-    static func fetchCalendarPagingData(month: String) throws -> Endpoint<MonthlyPlanResponse> {
+    static func fetchCalendarPagingData(month: String) throws -> Endpoint<MonthlyPostResponse> {
         return try Endpoint(path: "plan/page",
                             authenticationType: .accessToken,
                             method: .get,
