@@ -386,16 +386,6 @@
 		52FE68642D510B86009EC8EC /* PlaceDetailViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FE68632D510B86009EC8EC /* PlaceDetailViewReactor.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		523A180E2DD12E9B0071BDBD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 52C72E7E2C4FBD6400CFF329 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 52C72E852C4FBD6400CFF329;
-			remoteInfo = Mople;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		52CC75DC2D1EA2AB000CC8B9 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -510,7 +500,6 @@
 		523A17FA2DD0A0730071BDBD /* PostSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSummary.swift; sourceTree = "<group>"; };
 		523A18022DD0E8660071BDBD /* PlanPostSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanPostSummary.swift; sourceTree = "<group>"; };
 		523A18042DD10DD10071BDBD /* UITableView+ResizeHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+ResizeHeader.swift"; sourceTree = "<group>"; };
-		523A180A2DD12E9B0071BDBD /* MopleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MopleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		523B9BFB2DC914F800DF2698 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		523B9C032DC9DDB400DF2698 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		523B9C072DCA9CBC00DF2698 /* Localizable.stringsdict */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; path = Localizable.stringsdict; sourceTree = "<group>"; };
@@ -776,13 +765,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		523A18072DD12E9B0071BDBD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		52C72E832C4FBD6400CFF329 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2126,7 +2108,6 @@
 			isa = PBXGroup;
 			children = (
 				52C72E862C4FBD6400CFF329 /* Mople.app */,
-				523A180A2DD12E9B0071BDBD /* MopleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3022,26 +3003,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		523A18092DD12E9B0071BDBD /* MopleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 523A18102DD12E9B0071BDBD /* Build configuration list for PBXNativeTarget "MopleTests" */;
-			buildPhases = (
-				523A18062DD12E9B0071BDBD /* Sources */,
-				523A18072DD12E9B0071BDBD /* Frameworks */,
-				523A18082DD12E9B0071BDBD /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				523A180F2DD12E9B0071BDBD /* PBXTargetDependency */,
-			);
-			name = MopleTests;
-			packageProductDependencies = (
-			);
-			productName = MopleTests;
-			productReference = 523A180A2DD12E9B0071BDBD /* MopleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		52C72E852C4FBD6400CFF329 /* Mople */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 52C72E9A2C4FBD6500CFF329 /* Build configuration list for PBXNativeTarget "Mople" */;
@@ -3094,10 +3055,6 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					523A18092DD12E9B0071BDBD = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 52C72E852C4FBD6400CFF329;
-					};
 					52C72E852C4FBD6400CFF329 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -3130,19 +3087,11 @@
 			projectRoot = "";
 			targets = (
 				52C72E852C4FBD6400CFF329 /* Mople */,
-				523A18092DD12E9B0071BDBD /* MopleTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		523A18082DD12E9B0071BDBD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		52C72E842C4FBD6400CFF329 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3190,13 +3139,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		523A18062DD12E9B0071BDBD /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		52C72E822C4FBD6400CFF329 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3549,14 +3491,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		523A180F2DD12E9B0071BDBD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 52C72E852C4FBD6400CFF329 /* Mople */;
-			targetProxy = 523A180E2DD12E9B0071BDBD /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		52C72E942C4FBD6500CFF329 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -3577,45 +3511,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		523A18112DD12E9B0071BDBD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = LNXWGGBBH6;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.SideProject.MopleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mople.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mople";
-			};
-			name = Debug;
-		};
-		523A18122DD12E9B0071BDBD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LNXWGGBBH6;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.SideProject.MopleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Mople.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Mople";
-			};
-			name = Release;
-		};
 		52C72E982C4FBD6500CFF329 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3830,15 +3725,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		523A18102DD12E9B0071BDBD /* Build configuration list for PBXNativeTarget "MopleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				523A18112DD12E9B0071BDBD /* Debug */,
-				523A18122DD12E9B0071BDBD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		52C72E812C4FBD6400CFF329 /* Build configuration list for PBXProject "Mople" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
