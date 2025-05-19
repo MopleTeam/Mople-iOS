@@ -48,27 +48,26 @@ extension ReviewEditSceneDIContainer {
     
     private func makePlanDetailViewReactor(review: Review,
                                            coordinator: ReviewEditFlowCoordinator) -> ReviewEditViewReactor {
+        let reviewRepo = DefaultReviewRepo(networkService: appNetworkService)
+        let imageRepo = DefaultImageUploadRepo(networkService: appNetworkService)
         return .init(review: review,
-                     deleteReviewImage: makeDeleteReviewUseCase(),
-                     imageUpload: makeReviewImageUploadUseCase(),
+                     fetchReview: makeFetchReviewUseCase(repo: reviewRepo),
+                     deleteReviewImage: makeDeleteReviewUseCase(repo: reviewRepo),
+                     imageUpload: makeReviewImageUploadUseCase(repo: imageRepo),
                      photoService: DefaultPhotoService(),
                      coordinator: coordinator)
     }
     
-    private func makeDeleteReviewUseCase() -> DeleteReviewImage {
-        return DeleteReviewImageUseCase(repo: makeReviewCommandRepo())
+    private func makeFetchReviewUseCase(repo: ReviewRepo) -> FetchReviewDetail {
+        return FetchReviewDetailUseCase(repo: repo)
     }
     
-    private func makeReviewCommandRepo() -> ReviewRepo {
-        return DefaultReviewRepo(networkService: appNetworkService)
+    private func makeDeleteReviewUseCase(repo: ReviewRepo) -> DeleteReviewImage {
+        return DeleteReviewImageUseCase(repo: repo)
     }
-    
-    private func makeReviewImageUploadUseCase() -> ReviewImageUpload {
-        return ReviewImageUploadUseCase(repo: makeReviewUploadRepo())
-    }
-    
-    private func makeReviewUploadRepo() -> ImageUploadRepo {
-        return DefaultImageUploadRepo(networkService: appNetworkService)
+
+    private func makeReviewImageUploadUseCase(repo: ImageUploadRepo) -> ReviewImageUpload {
+        return ReviewImageUploadUseCase(repo: repo)
     }
 }
 

@@ -70,10 +70,13 @@ final class PolicyViewController: TitleNaviViewController {
     }
     
     // MARK: - WebView Configure
-    func webViewConfigure() {
+    private func webViewConfigure() {
         let policyURLString = AppConfiguration.policyURL
         guard let policyURL = URL(string: policyURLString) else { return }
         webView.load(URLRequest(url: policyURL))
     }
+}
+
+extension PolicyViewController {
     
 }

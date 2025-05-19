@@ -52,6 +52,7 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     private var existingImageIds: [String] = []
     
     // MARK: - UseCase
+    private let fetchReviewUseCase: FetchReviewDetail
     private let deleteReviewImage: DeleteReviewImage
     private let imageUpload: ReviewImageUpload
     
@@ -63,11 +64,13 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - LifeCycle
     init(review: Review,
+         fetchReview: FetchReviewDetail,
          deleteReviewImage: DeleteReviewImage,
          imageUpload: ReviewImageUpload,
          photoService: PhotoService,
          coordinator: ReviewEditViewCoordination) {
         self.review = review
+        self.fetchReviewUseCase = fetchReview
         self.deleteReviewImage = deleteReviewImage
         self.imageUpload = imageUpload
         self.photoService = photoService
@@ -152,9 +155,13 @@ extension ReviewEditViewReactor {
                 guard let self else { return .empty() }
                 return requsetDeleteImage(id: id)
             })
+            .flatMap({ [weak self] _ -> Observable<Review> in
+                guard let self else { return .empty() }
+                return fetchReviewUseCase.execute(reviewId: id)
+            })
             .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.postUpdateImage()
+            .flatMap { [weak self] review -> Observable<Mutation> in
+                self?.postUpdateReview(review)
                 self?.coordiantor?.endFlow()
                 return .empty()
             }
@@ -240,8 +247,8 @@ extension ReviewEditViewReactor {
 
 // MARK: - Notify
 extension ReviewEditViewReactor {
-    private func postUpdateImage() {
-        NotificationManager.shared.post(name: .postReview)
+    private func postUpdateReview(_ review: Review) {
+        NotificationManager.shared.postItem(ReviewPayload.updated(review), from: self)
     }
 }
 

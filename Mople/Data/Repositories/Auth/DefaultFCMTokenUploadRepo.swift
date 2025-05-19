@@ -15,7 +15,6 @@ final class DefaultFCMTokenRepo: BaseRepositories, FCMTokenUploadRepo {
             try APIEndpoints.uploadFCMToken(token)
         }
         .do(onSuccess: {
-            print(#function, #line, "Path : # 토큰 업데이트 완료 ")
             UserDefaults.saveFCMToken(token)
         })
     }

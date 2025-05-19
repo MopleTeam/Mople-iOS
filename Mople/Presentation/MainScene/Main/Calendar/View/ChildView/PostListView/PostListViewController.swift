@@ -364,8 +364,8 @@ extension PostListViewController {
     
     private func syncIfCrossedCenterLine() {
         guard let topHeader = visibleHeaders.first,
-              let topHeaderFrame = topHeader.superview?.convert(topHeader.frame, to: self.view),
-              checkCenterPoint(targetPoint: topHeaderFrame.origin.y),
+              let topHeaderOriginY = topHeader.superview?.convert(topHeader.frame, to: self.view),
+              checkCenterPoint(targetPoint: topHeaderOriginY.origin.y),
               let foucsDate = dataSource?[topHeader.tag].date else { return }
 
         dateSyncObserver.accept(foucsDate)

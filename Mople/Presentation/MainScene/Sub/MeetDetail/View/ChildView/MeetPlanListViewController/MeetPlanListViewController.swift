@@ -24,6 +24,7 @@ final class MeetPlanListViewController: BaseViewController, View {
             
     // MARK: - Variables
     private var hasAppeared: Bool = false
+    private var isVisibleView: Bool = false
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -65,6 +66,16 @@ final class MeetPlanListViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        isVisibleView = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        isVisibleView = false
     }
     
     override func viewDidLayoutSubviews() {
@@ -162,6 +173,29 @@ extension MeetPlanListViewController {
             .map { Reactor.Action.updatePlan($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        NotificationManager.shared.addParticipatingObservable()
+            .filter { [weak self] _ in
+                return self?.isVisibleView == false
+            }
+            .compactMap { [weak self] payload -> Reactor.Action? in
+                guard let self else { return nil }
+                return resolveParticipation(with: payload)
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func resolveParticipation(with payload: PlanPayload) -> Reactor.Action? {
+        switch payload {
+        case let .created(plan):
+            guard let id = plan.id else { return nil }
+            return .switchParticipation(id: id)
+        case let .deleted(id):
+            return .switchParticipation(id: id)
+        default:
+            return nil
+        }
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {

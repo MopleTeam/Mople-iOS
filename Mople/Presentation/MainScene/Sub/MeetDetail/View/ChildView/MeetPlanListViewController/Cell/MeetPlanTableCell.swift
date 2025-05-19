@@ -226,7 +226,6 @@ extension MeetPlanTableCell {
     private func setParitipationAction() {
         participationButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { tableCell, _ in
-                print(#function, #line, "Path : # 참여 버튼 클릭 ")
                 tableCell.completeTapped?()
             })
             .disposed(by: disposeBag)

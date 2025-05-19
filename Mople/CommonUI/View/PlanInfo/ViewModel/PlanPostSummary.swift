@@ -16,7 +16,7 @@ struct PlanPostSummary: PostSummary {
     let addressTitle: String?
     let meet: MeetSummary?
     let location: Location
-    let isParticipation: Bool
+    var isParticipation: Bool
 }
 
 extension PlanPostSummary {

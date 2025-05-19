@@ -51,7 +51,11 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     private var postSummary: PostSummary?
     
     // MARK: - UI Components
-    private var postInfoView: PostInfoView?
+    private lazy var postInfoView: PostInfoView = {
+        let type: PostInfoType = postType == .plan ? .plan : .review
+        let view = PostInfoView(type: type)
+        return view
+    }()
     
     private(set) var commentContainer: UIView = {
         let view = UIView()
@@ -132,20 +136,19 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     private func setPostInfoView(with postSummary: PostSummary) {
-        let type: PostInfoType = postType == .plan ? .plan : .review
         self.postSummary = postSummary
-        postInfoView = .init(type: type)
-        postInfoView?.configure(with: postSummary)
-        commentVC.setHeaderView(postInfoView!)
-        setPlanInfoAction()
+        postInfoView.configure(with: postSummary)
+        commentVC.setHeaderView(postInfoView)
     }
     
     // MARK: - Action
     private func setAction() {
-        setNaviAction()
+        setMenuAction()
+        setFlowAction()
+        setPostAction()
     }
     
-    private func setNaviAction() {
+    private func setMenuAction() {
         self.naviBar.rightItemEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
@@ -155,14 +158,12 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     // MARK: - PlanInfo Action
-    private func setPlanInfoAction() {
+    private func setPostAction() {
         setCancleCommentAction()
-        setFlowAction()
-//        setParticipationAction() 작업대기#1 서버 버전 업데이트 대기
+        setParticipationAction()
     }
     
     private func setCancleCommentAction() {
-        guard let postInfoView else { return }
         let memberTapped = postInfoView.rx.memberTapped
             .asObservable()
         
@@ -182,7 +183,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     private func setFlowAction() {
-        guard let postInfoView else { return }
         postInfoView.rx.memberTapped
             .bind(to: memberListTapped)
             .disposed(by: disposeBag)
@@ -193,13 +193,12 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     private func setParticipationAction() {
-        guard let postInfoView,
-              let postSummary,
-              let postDate = postSummary.date,
-              !postSummary.isCreator,
-              postDate > Date() else { return }
+        guard postType == .plan else { return }
         
         postInfoView.rx.participationTapped
+            .do(onNext: { _ in
+                print(#function, #line, "Path : # 탭 ")
+            })
             .bind(to: participationTapped)
             .disposed(by: disposeBag)
     }
@@ -235,17 +234,22 @@ extension PostDetailViewController {
             .disposed(by: disposeBag)
         
         deletePost
-            .map { Reactor.Action.deletePost }
+            .map { Reactor.Action.post(.delete) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         reportPost
-            .map { Reactor.Action.reportPost }
+            .map { Reactor.Action.post(.report) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         cancleComment
-            .map { Reactor.Action.parentCommand(.cancleEditing) }
+            .map { Reactor.Action.comment(.cancleEditing) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        participationTapped
+            .map { Reactor.Action.post(.participation) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -278,7 +282,7 @@ extension PostDetailViewController {
         
         [keyboardSended, buttonSended].forEach {
             $0.map { comment in
-                Reactor.Action.parentCommand(.writeComment(comment))
+                Reactor.Action.comment(.writeComment(comment))
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -288,23 +292,28 @@ extension PostDetailViewController {
     
     private func setNotification(reactor: Reactor) {
         NotificationManager.shared.addPlanObservable()
-            .filter({ [weak self] payload in
-                self?.filterEdit(payload: payload) ?? false
-            })
-            .map { _ in Reactor.Action.updatePost }
+            .compactMap {[weak self] payload -> Plan? in
+                guard let self else { return nil }
+                return filterUpdateType(payload: payload)
+            }
+            .map { Reactor.Action.update(.plan($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        NotificationManager.shared.addObservable(name: .postReview)
-            .map { _ in Reactor.Action.updatePost }
+        NotificationManager.shared.addReviewObservable()
+            .compactMap {[weak self] payload -> Review? in
+                guard let self else { return nil }
+                return filterUpdateType(payload: payload)
+            }
+            .map { Reactor.Action.update(.review($0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
-    private func filterEdit<T>(payload: NotificationManager.Payload<T>) -> Bool {
+    private func filterUpdateType<T>(payload: NotificationManager.Payload<T>) -> T? {
         switch payload {
-        case .updated: return true
-        default: return false
+        case let .updated(item): return item
+        default: return nil
         }
     }
     
@@ -364,8 +373,8 @@ extension PostDetailViewController {
                                                  completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
-        case let .midnight(err):
-            alertManager.showDateErrorMessage(err: err,
+        case .midnight:
+            alertManager.showDateErrorMessage(err: DateTransitionError.midnightReset,
                                               completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
@@ -378,7 +387,6 @@ extension PostDetailViewController {
 // MARK: - Helper
 extension PostDetailViewController {
     private func setEditComment(_ comment: String?) {
-        print(#function, #line)
         let hasComment = comment != nil
         chatingTextFieldView.rx.text.onNext(comment)
         chatingTextFieldView.rx.isResign.onNext(!hasComment)

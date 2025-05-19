@@ -42,7 +42,6 @@ final class YearMonthPickerViewController: BaseViewController {
     }
     
     override func viewDidLoad() {
-        print(#function, #line)
         setupUI()
         setupAction()
     }

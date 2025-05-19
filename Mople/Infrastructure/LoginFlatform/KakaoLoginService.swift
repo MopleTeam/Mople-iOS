@@ -10,7 +10,7 @@ import RxSwift
 import KakaoSDKUser
 
 protocol KakaoLoginService {
-    func startKakaoLogin() -> Single<SocialInfo>
+    func startKakaoLogin() -> Observable<SocialInfo>
 }
 
 final class DefaultKakaoLoginService: KakaoLoginService {
@@ -23,45 +23,56 @@ final class DefaultKakaoLoginService: KakaoLoginService {
         print(#function, #line, "LifeCycle Test DefaultKakaoLoginService Deinit" )
     }
     
-    func startKakaoLogin() -> Single<SocialInfo> {
-        return Single.zip(loginKakao(), parseEmail())
-            .map { idToken, email in
-                return .init(provider: LoginPlatform.kakao.rawValue,
-                             token: idToken,
-                             email: email)
+    func startKakaoLogin() -> Observable<SocialInfo> {
+        return loginKakao()
+            .flatMap { [weak self] idToken -> Observable<SocialInfo> in
+                guard let self else { return .empty() }
+                
+                return parseEmail()
+                    .map { email -> SocialInfo in
+                        return .init(provider: LoginPlatform.kakao.rawValue,
+                                     token: idToken,
+                                     email: email)
+                    }
             }
     }
     
-    private func loginKakao() -> Single<String> {
-        return Single.create { emitter in
+    private func loginKakao() -> Observable<String> {
+        return Observable.create { emitter in
             
-            guard UserApi.isKakaoTalkLoginAvailable() else {
-                emitter(.failure(LoginError.kakaoAccountError))
-                return Disposables.create()
-            }
-            UserApi.shared.loginWithKakaoTalk { OAuthToken, error in
-                guard let idToken = OAuthToken?.idToken else {
-                    emitter(.failure(LoginError.kakaoAccountError))
-                    return
+            if UserApi.isKakaoTalkLoginAvailable() {
+                UserApi.shared.loginWithKakaoTalk { OAuthToken, error in
+                    guard let idToken = OAuthToken?.idToken else {
+                        emitter.onError(LoginError.kakaoAccountError)
+                        return
+                    }
+                    emitter.onNext(idToken)
                 }
-                emitter(.success(idToken))
+            } else {
+                UserApi.shared.loginWithKakaoAccount { OAuthToken, error in
+                    guard let idToken = OAuthToken?.idToken else {
+                        emitter.onError(LoginError.kakaoAccountError)
+                        return
+                    }
+                    emitter.onNext(idToken)
+                }
             }
+            
             return Disposables.create()
         }
     }
     
-    private func parseEmail() -> Single<String> {
-        return Single.create { emitter in
+    private func parseEmail() -> Observable<String> {
+        return Observable.create { emitter in
             UserApi.shared.me() {(user, _) in
                 guard let email = user?.kakaoAccount?.email else {
-                    emitter(.failure(LoginError.kakaoAccountError))
+                    emitter.onError(LoginError.kakaoAccountError)
                     return
                 }
-                emitter(.success(email))
+                emitter.onNext(email)
             }
             return Disposables.create()
         }
-        .retryWithDelayAndCondition(retryCount: 10)
+        .retry(10)
     }
-    
 }

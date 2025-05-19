@@ -19,6 +19,8 @@ final class PhotoBookViewController: TitleNaviViewController {
     private let imagePaths: [String]
     private let startIndex: Int
     private var isStart: Bool = false
+    private var isHideNaviBar: Bool = false
+    private let opacity: CGFloat = 0.5
     
     // MARK: - UI Components
     private let indicatorLabel: UILabel = {
@@ -39,6 +41,10 @@ final class PhotoBookViewController: TitleNaviViewController {
         return collectionView
     }()
     
+    // MARK: - Gestrue
+    private let tapGesture: UITapGestureRecognizer = .init()
+    private let panGesture: UIPanGestureRecognizer = .init()
+    
     // MARK: - LifeCycle
     init(screenName: ScreenName,
          title: String?,
@@ -48,8 +54,12 @@ final class PhotoBookViewController: TitleNaviViewController {
         self.imagePaths = imagePaths
         self.startIndex = selectedIndex
         super.init(screenName: screenName,
+                   initiallyNavigationBar: false,
                    title: title)
         self.coordinator = coordinator
+        
+        self.modalTransitionStyle = .coverVertical
+        self.modalPresentationStyle = .overFullScreen
     }
     
     required init?(coder: NSCoder) {
@@ -60,6 +70,8 @@ final class PhotoBookViewController: TitleNaviViewController {
         super.viewDidLoad()
         setupUI()
         setAction()
+        setGesture()
+        setGestureAction()
     }
     
     override func viewDidLayoutSubviews() {
@@ -87,21 +99,28 @@ final class PhotoBookViewController: TitleNaviViewController {
     }
     
     private func setLayout() {
-        setBlackBackground()
         self.view.addSubview(collectionView)
-        self.view.addSubview(indicatorLabel)
+        self.naviBar.addSubview(indicatorLabel)
+        setBackgroundColor()
+        addNaviBar()
         
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(titleViewBottom).offset(40)
-            make.bottom.equalToSuperview().inset(150)
-            make.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.height.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
         
         indicatorLabel.snp.makeConstraints { make in
             make.size.equalTo(40)
-            make.centerY.equalTo(naviBar)
+            make.centerY.equalToSuperview()
             make.trailing.equalTo(naviBar).inset(20)
         }
+    }
+    
+    public func setBackgroundColor() {
+        self.view.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
+        notchView.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
+        naviBar.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
+        naviBar.setTitleColor(.defaultWhite)
     }
     
     private func setStartIndexPage() {
@@ -114,14 +133,145 @@ final class PhotoBookViewController: TitleNaviViewController {
         isStart = true
     }
     
+    // MARK: - Set Gesture
+    private func setGesture() {
+        self.view.addGestureRecognizer(panGesture)
+        self.view.addGestureRecognizer(tapGesture)
+        panGesture.delegate = self
+        tapGesture.delegate = self
+    }
+    
+    private func setGestureAction() {
+        tapGesture.rx.event
+            .subscribe(with: self, onNext: { vc, event in
+                vc.handleTopHideWithAnimation(isHide: !vc.isHideNaviBar)
+                vc.isHideNaviBar.toggle()
+            })
+            .disposed(by: disposeBag)
+        
+        panGesture.rx.event
+            .subscribe(with: self, onNext: { vc, event in
+                vc.handlePanGesture(event)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Handle PanGesture
+    private func handlePanGesture(_ panGesture: UIPanGestureRecognizer) {
+        let velocityY = panGesture.velocity(in: self.view).y
+        let translationY = panGesture.translation(in: self.view).y
+        let viewHeight = view.frame.height
+        let adjustOpacity = opacity - opacity * (translationY / viewHeight)
+        
+        switch panGesture.state {
+        case .began:
+            handlePanGestureBegen()
+        case .changed:
+            handlePanGestureChanged(translationY: translationY,
+                                    opacity: adjustOpacity)
+        case .ended:
+            handlePanGestureEnded(translationY: translationY,
+                                  velocityY: velocityY)
+        default:
+            break
+        }
+    }
+    
+    private func handlePanGestureBegen() {
+        moveTopOutOfView()
+        hideTop(isHide: true)
+    }
+    
+    private func handlePanGestureChanged(translationY: CGFloat,
+                                         opacity: CGFloat) {
+        guard translationY > 0 else { return }
+        changeOpacity(opacity: opacity)
+        changeBottomOffset(offset: translationY)
+    }
+
+    private func handlePanGestureEnded(translationY: CGFloat,
+                                       velocityY: CGFloat) {
+        let viewHalfHeight = self.view.frame.height / 2
+        if translationY > viewHalfHeight || velocityY > 300 {
+            dismiss()
+        } else {
+            cancelDismiss()
+        }
+    }
+    
+    private func dismiss() {
+        UIView.animate(
+            withDuration: 0.33,
+            animations: {[weak self] in
+                guard let self else { return }
+                self.changeBottomOffset(offset: self.view.frame.height)
+                self.changeOpacity(opacity: 0)
+                self.view.layoutIfNeeded()
+            }, completion: { [weak self] _ in
+                self?.coordinator?.dismiss(completion: nil)
+            })
+    }
+    
+    private func cancelDismiss() {
+        UIView.animate(
+            withDuration: 0.33,
+            animations: {[weak self] in
+                guard let self else { return }
+                self.changeBottomOffset(offset: 0)
+                self.changeOpacity(opacity: opacity)
+                self.view.layoutIfNeeded()
+            }, completion: { [weak self] _ in
+                self?.hideTop(isHide: false)
+                self?.handleTopHideWithAnimation(isHide: false)
+            })
+    }
+    
+    // 뷰 내림 정도 조정
+    private func changeBottomOffset(offset: CGFloat) {
+        collectionView.snp.updateConstraints { make in
+            make.bottom.equalToSuperview().offset(offset)
+        }
+    }
+    
+    // 배경 투명도 조정
+    private func changeOpacity(opacity: CGFloat) {
+        let backColor: UIColor = .defaultBlack
+        self.view.backgroundColor = backColor.withAlphaComponent(opacity)
+    }
+    
+    
+    
+    // MARK: - Handle TapGesture
+    private func handleTopHideWithAnimation(isHide: Bool) {
+        UIView.animate(
+            withDuration: 0.33,
+            animations: { [weak self] in
+                if isHide {
+                    self?.moveTopOutOfView()
+                } else {
+                    self?.moveTopIntoView()
+                }
+                self?.view.layoutIfNeeded()
+            })
+    }
+    
     // MARK: - Action
     private func setAction() {
         self.naviBar.leftItemEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                vc.coordinator?.pop()
+                vc.coordinator?.dismiss(completion: nil)
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension PhotoBookViewController: UIGestureRecognizerDelegate {
+    
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let gestureLocation = gestureRecognizer.location(in: self.view)
+        return !naviBar.frame.contains(gestureLocation)
     }
 }
 

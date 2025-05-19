@@ -50,14 +50,9 @@ final class SignInUseCase: SignIn {
     init(appleLoginService: AppleLoginService,
          kakaoLoginService: KakaoLoginService,
          authenticationRepo: AuthenticationRepo) {
-        print(#function, #line, "LifeCycle Test SignInUseCase Created" )
         self.appleLoginService = appleLoginService
         self.kakaoLoginService = kakaoLoginService
         self.authenticationRepo = authenticationRepo
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test SignInUseCase Deinit" )
     }
     
     // MARK: - SignIn
@@ -66,8 +61,8 @@ final class SignInUseCase: SignIn {
         var socialLoginResult: SocialInfo?
         
         return handleLogin(platform)
-            .do(onSuccess: { socialLoginResult = $0 })
-            .flatMap({ [weak self] accountInfo in
+            .do(onNext: { socialLoginResult = $0 })
+            .flatMap({ [weak self] accountInfo -> Single<Void> in
                 guard let self else { return .just(()) }
                 return self.authenticationRepo
                     .signIn(social: accountInfo)
@@ -79,10 +74,11 @@ final class SignInUseCase: SignIn {
             })
     }
     
-    private func handleLogin(_ platform: LoginPlatform) -> Single<SocialInfo> {
+    private func handleLogin(_ platform: LoginPlatform) -> Observable<SocialInfo> {
         switch platform {
         case .apple:
             appleLoginService.startAppleLogin()
+                .asObservable()
         case .kakao:
             kakaoLoginService.startKakaoLogin()
         }

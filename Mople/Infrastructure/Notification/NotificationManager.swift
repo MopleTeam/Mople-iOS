@@ -69,7 +69,7 @@ final class NotificationManager {
         return makeObservable(name: .review)
     }
     
-    // MARK: - Participating
+    // MARK: - Meet Participation
     func postParticipating(_ payload: ParticipationPayload, from sender: Any) {
         NotificationCenter.default.post(name: .participating,
                                         object: nil,
@@ -128,9 +128,6 @@ extension Notification.Name {
     
     /// 일정 참여
     static let participating = Notification.Name("participating")
-    
-    /// 후기 작성
-    static let postReview = Notification.Name("postReview")
     
     /// 자정 업데이트
     static let midnightUpdate = Notification.Name("midnightUpdate")

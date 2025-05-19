@@ -184,7 +184,6 @@ extension ProfileEditViewReactor {
     
     // MARK: - 닉네임 중복검사
     private func checkNicknameDuplicate() -> Observable<Mutation> {
-        print(#function, #line)
         guard let name = profile?.nickname else { return .empty() }
         let checkValidation = duplicateCheck.execute(name)
             .map { Mutation.updateDuplicateState($0)}

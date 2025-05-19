@@ -56,7 +56,7 @@ extension PostDetailFlowCoordinator {
         let view = dependencies.makePhotoBookViewController(imagePaths: imagePaths,
                                                             index: index,
                                                             coordinator: self)
-        self.pushWithTracking(view, animated: true)
+        self.navigationController.present(view, animated: true)
     }
 }
 

@@ -75,6 +75,7 @@ extension PostDetailSceneDIContainer {
                                             fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(repo: reviewRepo),
                                             deletePlanUseCase: makeDeletePlanUseCase(repo: planRepo),
                                             deleteReviewUseCase: makeDeleteReviewUseCase(repo: reviewRepo),
+                                            participationPlanUseCase: makeParticipationPlanUseCase(repo: planRepo),
                                             reportUseCase: reportUseCase,
                                             coordinator: coordinator)
         return mainReactor!
@@ -87,6 +88,10 @@ extension PostDetailSceneDIContainer {
     
     private func makeDeletePlanUseCase(repo: PlanRepo) -> DeletePlan {
         return DeletePlanUseCase(repo: repo)
+    }
+    
+    private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {
+        return ParticipationPlanUseCase(participationRepo: repo)
     }
     
     private func makeFetchReviewDetailUseCase(repo: ReviewRepo) -> FetchReviewDetail {
@@ -135,6 +140,7 @@ extension PostDetailSceneDIContainer {
         return DefaultCommentRepo(networkService: appNetworkService)
     }
     
+    // MARK: - 신고 유즈케이스
     private func makeReportUseCase() -> ReportPost {
         let repo = DefaultReportRepo(networkService: appNetworkService)
         return ReportPostUseCase(repo: repo)

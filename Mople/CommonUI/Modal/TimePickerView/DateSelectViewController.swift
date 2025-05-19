@@ -40,7 +40,6 @@ final class DateSelectViewController: BaseViewController {
     }
     
     override func viewDidLoad() {
-        print(#function, #line)
         setupUI()
         setPresentationStyle()
         setAction()

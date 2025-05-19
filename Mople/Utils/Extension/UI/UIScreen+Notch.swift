@@ -11,7 +11,11 @@ extension UIScreen {
     
     private static let defaultBottomInset: CGFloat = 28
     
-    private static func getNotchSize() -> CGFloat {
+    static func getTopNotchSize() -> CGFloat {
+        return UIApplication.shared.keyWindow?.safeAreaInsets.top ?? 0
+    }
+    
+    static func getNotchSize() -> CGFloat {
         return UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
     }
 

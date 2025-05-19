@@ -10,24 +10,28 @@ import ReactorKit
 final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        enum Flow {
+            case selectNotify(index: Int)
+            case endFlow
+        }
+        
+        case flow(Flow)
         case fetchNotifyList
-        case selectNotify(index: Int)
-        case endFlow
+        case refresh
     }
     
     enum Mutation {
         case updateNotifyList([Notify])
-        case resetNotifyCount
+        case completedRefresh
         case updateLoadingState(Bool)
         case catchError(Error)
     }
     
     struct State {
         @Pulse var notifyList: [Notify] = []
-        @Pulse var resetedCount: Void?
+        @Pulse var isRefreshed: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
-        
     }
     
     var initialState: State = State()
@@ -63,12 +67,11 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .fetchNotifyList:
-            return fetchNotifyAndResetCount()
-        case let .selectNotify(index):
-            return handleNotifyTap(index: index)
-        case .endFlow:
-            coordinator?.endFlow()
-            return .empty()
+            return fetchNotifyWithLoading()
+        case let .flow(action):
+            return handleFlowAction(action)
+        case .refresh:
+            return refreshNotify()
         }
     }
     
@@ -79,8 +82,8 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateNotifyList(notifyList):
             newState.notifyList = notifyList
-        case .resetNotifyCount:
-            newState.resetedCount = ()
+        case .completedRefresh:
+            newState.isRefreshed = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -93,40 +96,58 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Requset
 extension NotifyListViewReactor {
-    private func fetchNotifyAndResetCount() -> Observable<Mutation> {
-        let fetchNotify = requestFetchNotify()
-        let resetNotifyCount = requestResetNotify()
-        
-        let zipTask = Observable.zip([fetchNotify, resetNotifyCount])
-            .flatMap { result -> Observable<Mutation> in
-                return .from(result)
-            }
-        
-        return requestWithLoading(task: zipTask)
-    }
-    
-    private func requestFetchNotify() -> Observable<Mutation> {
+    private func fetchNotify() -> Observable<Mutation> {
         return fetchNotifyListUseCase.execute()
             .map { Mutation.updateNotifyList($0) }
+            .concat(resetNotifyCount())
     }
-    private func requestResetNotify() -> Observable<Mutation> {
+    
+    private func resetNotifyCount() -> Observable<Mutation> {
         return resetNotifyCountUseCase.execute()
-            .map { Mutation.resetNotifyCount }
+            .flatMap { _ -> Observable<Mutation> in
+                return .empty()
+            }
+    }
+    
+    private func fetchNotifyWithLoading() -> Observable<Mutation> {
+        let fetchNoity = fetchNotify()
+        return requestWithLoading(task: fetchNoity)
+    }
+    
+    /// 모임 리스트 리프레쉬
+    private func refreshNotify() -> Observable<Mutation> {
+        return .concat([fetchNotify(),
+                        .just(Mutation.completedRefresh)])
     }
 }
 
 // MARK: - Coordination 
 extension NotifyListViewReactor {
-    private func handleNotifyTap(index: Int) -> Observable<Mutation> {
-        let currentNotify = currentState.notifyList
-        
-        guard let selectNotify = currentNotify[safe: index],
-              let notifyType = selectNotify.type else { return .empty() }
-        handleRouting(type: notifyType)
+    
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case .endFlow:
+            return endFlow()
+        case let .selectNotify(index):
+            return handleSelectedNotify(index: index)
+        }
+    }
+    
+    private func endFlow() -> Observable<Mutation> {
+        coordinator?.endFlow()
         return .empty()
     }
     
-    private func handleRouting(type: NotifyType) {
+    
+    private func handleSelectedNotify(index: Int) -> Observable<Mutation> {
+        guard let selectedType = currentState.notifyList[safe: index]?.type else {
+            return .empty()
+        }
+        
+        return handleNotifyFlowAction(type: selectedType)
+    }
+    
+    private func handleNotifyFlowAction(type: NotifyType) -> Observable<Mutation> {
         switch type {
         case let .meet(id):
             coordinator?.presentMeetDetailView(meetId: id)
@@ -137,6 +158,8 @@ extension NotifyListViewReactor {
             coordinator?.presentPlanDetailView(postId: id,
                                                type: .review)
         }
+        
+        return .empty()
     }
 }
 

@@ -112,9 +112,8 @@ extension MeetListViewReactor {
     
     /// 모임 리스트 리프레쉬
     private func refreshMeetList() -> Observable<Mutation> {
-        let refreshed = Observable.just(Mutation.completedRefresh)
         return .concat([fetchMeetList(),
-                        refreshed])
+                        .just(Mutation.completedRefresh)])
     }
 }
 

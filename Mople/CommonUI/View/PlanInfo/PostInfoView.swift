@@ -192,7 +192,7 @@ final class PostInfoView: UIView {
         switch type {
         case .plan:
             addMapView()
-//            addParticipationButton() 작업대기#1 서버 버전 업데이트 대기
+            addParticipationButton()
         case .review:
             addMapView()
         default:
@@ -227,7 +227,7 @@ final class PostInfoView: UIView {
     private func setPlanPostType(with planSummary: PlanPostSummary) {
         guard type == .plan else { return }
         setMapView(location: planSummary.location)
-//        setParticipationButton(planSummary: planSummary) 작업대기#1 서버 버전 업데이트 대기
+        setParticipationButton(planSummary: planSummary)
     }
     
     private func setReviewPostType(with reviewSummary: ReviewPostSummary) {
@@ -260,12 +260,6 @@ extension PostInfoView {
         }
     }
     
-    private func removeParticipationButton() {
-        guard mainStackView.arrangedSubviews.contains(participationButton) else { return }
-        mainStackView.removeArrangedSubview(participationButton)
-        participationButton.removeFromSuperview()
-    }
-    
     private func setParticipationButton(planSummary: PlanPostSummary) {
         guard !planSummary.isCreator,
               let planDate = planSummary.date,
@@ -273,11 +267,21 @@ extension PostInfoView {
             removeParticipationButton()
             return
         }
-        participationButton.title = planSummary.isParticipation
+        setParticipation(with: planSummary.isParticipation)
+    }
+    
+    private func setParticipation(with isParticipation: Bool) {
+        participationButton.title = isParticipation
         ? L10n.Meetdetail.planLeave
         : L10n.Meetdetail.planJoin
-        participationButton.updateSelectedBackColor(isSelected: planSummary.isParticipation)
-        participationButton.updateSelectedTextColor(isSelected: planSummary.isParticipation)
+        participationButton.updateSelectedBackColor(isSelected: isParticipation)
+        participationButton.updateSelectedTextColor(isSelected: isParticipation)
+    }
+    
+    private func removeParticipationButton() {
+        guard mainStackView.arrangedSubviews.contains(participationButton) else { return }
+        mainStackView.removeArrangedSubview(participationButton)
+        participationButton.removeFromSuperview()
     }
 }
 

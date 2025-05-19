@@ -18,7 +18,7 @@ protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
 
 enum PlanDetailError: Error {
     case noResponse(ResponseError)
-    case midnight(DateTransitionError)
+    case midnight
     case failComment
     case unknown(Error)
 }
@@ -26,17 +26,17 @@ enum PlanDetailError: Error {
 final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        enum ParentCommand {
-            case writeComment(_ comment: String)
-            case cancleEditing
+        enum Post {
+            case fetch
+            case delete
+            case report
+            case refresh
+            case participation
         }
         
-        enum ChildEvent {
-            case commentLoading(_ isLoading: Bool)
-            case editComment(_ comment: String?)
-            case changedOffsetY(_ offsetY: CGFloat)
-            case reportComment
-            case catchError(Error)
+        enum Comment {
+            case writeComment(_ comment: String)
+            case cancleEditing
         }
 
         enum Flow {
@@ -46,14 +46,24 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
             case endFlow
         }
         
-        case parentCommand(ParentCommand)
+        enum ChildEvent {
+            case commentLoading(_ isLoading: Bool)
+            case editComment(_ comment: String?)
+            case changedOffsetY(_ offsetY: CGFloat)
+            case reportComment
+            case catchError(Error)
+        }
+        
+        enum Update {
+            case plan(Plan)
+            case review(Review)
+        }
+        
+        case post(Post)
+        case comment(Comment)
+        case update(Update)
         case childEvent(ChildEvent)
         case flow(Flow)
-        case updatePost
-        case deletePost
-        case reportPost
-        case fetchPlanInfo
-        case refresh
     }
     
     enum Mutation {
@@ -74,6 +84,7 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var isLoading: Bool = false
         @Pulse var editComment: String?
         @Pulse var startOffsetY: CGFloat?
+        @Pulse var isParticipation: Bool?
         @Pulse var reported: Void?
         @Pulse var error: PlanDetailError?
     }
@@ -84,11 +95,11 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     private let type: PostType
     private var plan: Plan?
     private var review: Review?
-    private var placeInfo: PlaceInfo?
     
     // MARK: - Plan UseCase
     private let fetchPlanDetailUsecase: FetchPlanDetail
     private let deletePlanUseCase: DeletePlan
+    private let participationPlanUseCase: ParticipationPlan
     
     // MARK: - Review UseCase
     private let fetchReviewDetailUseCase: FetchReviewDetail
@@ -110,12 +121,14 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
          fetchReviewDetailUseCase: FetchReviewDetail,
          deletePlanUseCase: DeletePlan,
          deleteReviewUseCase: DeleteReview,
+         participationPlanUseCase: ParticipationPlan,
          reportUseCase: ReportPost,
          coordinator: PostDetailCoordination) {
         self.fetchPlanDetailUsecase = fetchPlanDetailUseCase
         self.fetchReviewDetailUseCase = fetchReviewDetailUseCase
         self.deletePlanUseCase = deletePlanUseCase
         self.deleteReviewUseCase = deleteReviewUseCase
+        self.participationPlanUseCase = participationPlanUseCase
         self.reportUseCase = reportUseCase
         self.coordinator = coordinator
         self.id = id
@@ -130,28 +143,22 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initial Setup
     private func initialAction() {
-        action.onNext(.fetchPlanInfo)
+        action.onNext(Action.post(.fetch))
     }
                         
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .fetchPlanInfo:
-            return handleLoadWithLoading()
-        case let .parentCommand(command):
-            return handleParentCommand(command)
+        case let .post(action):
+            return handlePostAction(action)
+        case let .comment(action):
+            return handleCommentAction(action)
         case let .childEvent(event):
             return handleChildAction(event)
         case let .flow(action):
             return handleFlowAction(action)
-        case .updatePost:
-            return handleEditPostNotify()
-        case .deletePost:
-            return deletePost()
-        case .reportPost:
-            return reportPost()
-        case .refresh:
-            return handleLoad()
+        case let .update(action):
+            return handlePostUpdateAction(action)
         }
     }
     
@@ -179,10 +186,94 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Action Handling
 extension PostDetailViewReactor {
     
-    // MARK: - Flow 관리
+    // MARK: - 포스트 관련 액션
+    private func handlePostAction(_ action: Action.Post) -> Observable<Mutation> {
+        switch action {
+        case .fetch:
+            return handlePostFetchWithLoading()
+        case .delete:
+            return deletePost()
+        case .report:
+            return reportPost()
+        case .refresh:
+            return handleRefresh()
+        case .participation:
+            return handleParticipation()
+        }
+    }
+    
+    /// 포스트가 일정인 경우 참여 핸들링
+    /// - 일정이 과거인 경우 : 플로우 종료 & midnight reset
+    /// - 일정이 사라진 경우 : 플로우 종료
+    /// - 일정 시간이 마감된 경우 : UI 업데이트
+    private func handleParticipation() -> Observable<Mutation> {
+        
+        guard let plan,
+              let planDate = plan.date else { return .empty() }
+        
+        switch planDate {
+        case _ where DateManager.isPastDay(on: planDate):
+            return .just(.catchError(.midnight))
+        case _ where planDate < Date():
+            guard let postSummary = currentState.postSummary else { return .empty() }
+            return .just(.updatePostSummary(postSummary))
+        default:
+            return requestParticipation(with: plan)
+        }
+    }
+    
+    private func requestParticipation(with plan: Plan) -> Observable<Mutation> {
+        var newPlan = plan
+        let currentParticipation = plan.isParticipation
+        
+        let requestParticipation = participationPlanUseCase
+            .execute(planId: id,
+                     isJoining: currentParticipation)
+            .flatMap { [weak self] _ -> Observable<Mutation> in
+                self?.plan = newPlan.updateParticipants()
+                self?.postParticipants(with: newPlan)
+                return .just(.updatePostSummary(PlanPostSummary(plan: newPlan)))
+            }
+        
+        return requestWithLoading(task: requestParticipation)
+    }
+    
+    private func postParticipants(with plan: Plan) {
+        guard let planId = plan.id else { return }
+        let payload: NotificationManager.ParticipationPayload
+        = plan.isParticipation
+        ? .participating(plan)
+        : .notParticipation(id: planId)
+        NotificationManager.shared.postParticipating(payload,
+                                                     from: self)
+    }
+    
+    // MARK: - 포스트 업데이트 액션
+    private func handlePostUpdateAction(_ action: Action.Update) -> Observable<Mutation> {
+        switch action {
+        case let .plan(plan):
+            self.plan = plan
+            return .just(.updatePostSummary(PlanPostSummary(plan: plan)))
+        case let .review(review):
+            self.review = review
+            return fetchReveiwImagesWithLoading(review)
+        }
+    }
+    
+    // MARK: - 댓글 액션 관리
+    private func handleCommentAction(_ command: Action.Comment) -> Observable<Mutation> {
+        switch command {
+        case let .writeComment(comment):
+            return writeComment(comment)
+        case .cancleEditing:
+            return cancleEditComment()
+        }
+    }
+    
+    // MARK: - Flow 관련 액션
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         guard isFlowPastSchedule(with: action) == false else {
-            return .just(.catchError(.midnight(.midnightReset)))
+            return .just(.catchError(.midnight))
         }
         switch action {
         case .memberList:
@@ -190,7 +281,8 @@ extension PostDetailViewReactor {
         case .editPost:
             handlePushEditPost()
         case .placeDetailView:
-            coordinator?.pushPlaceDetailView(place: placeInfo!)
+            guard let post = currentState.postSummary else { break }
+            coordinator?.pushPlaceDetailView(place: .init(post: post))
         case .endFlow:
             coordinator?.endFlow()
         }
@@ -201,7 +293,7 @@ extension PostDetailViewReactor {
     ///  - 과거 일정이라면 수정이 불가, 멤버리스트는 전환된 리뷰 Id로 진입해야하기 때문에 새로고침 필요
     private func isFlowPastSchedule(with flow: Action.Flow) -> Bool {
         guard flow == .editPost || flow == .memberList else { return false }
-        return isPastSchedule()
+        return isPastPostWhenPlanType()
     }
     
     private func handlePushMemberList() {
@@ -241,16 +333,6 @@ extension PostDetailViewReactor {
             return .just(.catchError(.failComment))
         }
     }
-    
-    // MARK: - 자식 리액터로 전달할 액션 관리
-    private func handleParentCommand(_ command: Action.ParentCommand) -> Observable<Mutation> {
-        switch command {
-        case let .writeComment(comment):
-            return writeComment(comment)
-        case .cancleEditing:
-            return cancleEditComment()
-        }
-    }
 }
 
 // MARK: - Mutation Handling
@@ -269,25 +351,8 @@ extension PostDetailViewReactor {
 // MARK: - Data Request
 extension PostDetailViewReactor {
     
-    /// 뷰 타입에 따라서 데이터 요청
-    private func handleLoad() -> Observable<Mutation> {
-        let loadMutation: Observable<Mutation>
-        
-        switch type {
-        case .plan:
-            loadMutation = fetchPlanDetail()
-        case .review:
-            loadMutation = fetchReviewDetail()
-        }
-        
-        return loadMutation
-            .do { [weak self] _ in
-                self?.commentListCommands?.completedRefreshed()
-            }
-    }
-    
     /// 뷰 타입에 따라서 로딩과 함께 데이터 요청
-    private func handleLoadWithLoading() -> Observable<Mutation> {
+    private func handlePostFetchWithLoading() -> Observable<Mutation> {
         switch type {
         case .plan:
             return fetchPlanDetailWithLoading()
@@ -301,7 +366,6 @@ extension PostDetailViewReactor {
         return fetchPlanDetailUsecase.execute(planId: id)
             .do(onNext: { [weak self] in
                 self?.plan = $0
-                self?.placeInfo = .init(plan: $0)
                 self?.fetchCommentList($0.id)
             })
             .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
@@ -320,7 +384,6 @@ extension PostDetailViewReactor {
         return fetchReviewDetailUseCase.execute(reviewId: id)
             .do(onNext: { [weak self] in
                 self?.review = $0
-                self?.placeInfo = .init(review: $0)
                 self?.fetchCommentList($0.postId)
             })
             .flatMap { [weak self] review -> Observable<Mutation> in
@@ -335,6 +398,23 @@ extension PostDetailViewReactor {
         let fetchReview = fetchReviewDetail()
             
         return requestWithLoading(task: fetchReview)
+    }
+    
+    /// 뷰 타입에 따라서 데이터 리프레쉬
+    private func handleRefresh() -> Observable<Mutation> {
+        let loadMutation: Observable<Mutation>
+        
+        switch type {
+        case .plan:
+            loadMutation = fetchPlanDetail()
+        case .review:
+            loadMutation = fetchReviewDetail()
+        }
+        
+        return loadMutation
+            .do { [weak self] _ in
+                self?.commentListCommands?.completedRefreshed()
+            }
     }
     
     /// 후기 이미지 불러오기
@@ -358,10 +438,17 @@ extension PostDetailViewReactor {
         }
     }
     
+    /// 로딩과 함께 후기 이미지 불러오기
+    private func fetchReveiwImagesWithLoading(_ review: Review) -> Observable<Mutation> {
+        let fetchReviewImage = fetchReviewImages(review)
+        
+        return requestWithLoading(task: fetchReviewImage)
+    }
+    
     /// 포스트 삭제하기
     private func deletePost() -> Observable<Mutation> {
-        guard isPastSchedule() == false else {
-            return .just(.catchError(.midnight(.midnightReset)))
+        guard isPastPostWhenPlanType() == false else {
+            return .just(.catchError(.midnight))
         }
         let deletePost = Observable.just(type)
             .flatMap { [weak self] type -> Observable<Void> in
@@ -385,8 +472,8 @@ extension PostDetailViewReactor {
     
     /// 포스트 신고하기
     private func reportPost() -> Observable<Mutation> {
-        guard isPastSchedule() == false else {
-            return .just(.catchError(.midnight(.midnightReset)))
+        guard isPastPostWhenPlanType() == false else {
+            return .just(.catchError(.midnight))
         }
         let reportPost = Observable.just(type)
             .flatMap { [weak self] type -> Observable<Void> in
@@ -406,7 +493,7 @@ extension PostDetailViewReactor {
     }
     
     /// 일정인 경우 삭제, 수정 요청하기 전 리뷰로 전환되지는 않았는지 체크
-    private func isPastSchedule() -> Bool {
+    private func isPastPostWhenPlanType() -> Bool {
         guard type == .plan,
               let planDate = plan?.date else { return false }
         return DateManager.isPastDay(on: planDate)
@@ -426,29 +513,6 @@ extension PostDetailViewReactor {
                                          from: self)
         }
     }
-    
-    private func handleEditPostNotify() -> Observable<Mutation> {
-        switch type {
-        case .plan:
-            return updatePlan()
-        case .review:
-            return updateReview()
-        }
-    }
-    
-    private func updatePlan() -> Observable<Mutation> {
-        return fetchPlanDetailWithLoading()
-    }
-    
-    private func updateReview() -> Observable<Mutation> {
-        return fetchReviewDetailWithLoading()
-            .observe(on: MainScheduler.instance)
-            .do(onNext: { [weak self] _ in
-                guard let self,
-                      let review = self.review else { return }
-                NotificationManager.shared.postItem(.updated(review), from: self)
-            })
-    }
 }
 
 // MARK: - Delegate
@@ -463,7 +527,6 @@ extension PostDetailViewReactor: CommentListDelegate  {
     }
     
     func showPhotoBook(index: Int) {
-        print(#function, #line)
         guard let reviewImages = review?.images,
               reviewImages.isEmpty == false else { return }
         
@@ -477,7 +540,7 @@ extension PostDetailViewReactor: CommentListDelegate  {
     }
     
     func refresh() {
-        action.onNext(.refresh)
+        action.onNext(.post(.refresh))
     }
 }
 

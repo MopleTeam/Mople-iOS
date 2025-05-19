@@ -119,7 +119,6 @@ final class HomeViewController: DefaultViewController, View {
     }
     
     override func viewDidLoad() {
-        print(#function, #line)
         super.viewDidLoad()
         setupUI()
     }

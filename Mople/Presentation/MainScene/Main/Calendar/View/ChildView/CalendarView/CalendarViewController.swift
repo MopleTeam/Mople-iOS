@@ -257,7 +257,6 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        print(#function, #line)
         setPreSelectedDateWhenMonth()
         syncCurrentPage()
     }
@@ -267,14 +266,12 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        print(#function, #line)
         preSelectedDate = date
         switchScope(type: .dateTap)
         updateCell(on: date, isSelected: true)
     }
 
     func calendar(_ calendar: FSCalendar, didDeselect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        print(#function, #line)
         updateCell(on: date, isSelected: false)
     }
 

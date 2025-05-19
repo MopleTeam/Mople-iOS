@@ -146,9 +146,6 @@ extension Reactive where Base: PhotoCollectionView {
     var selectPhoto: Observable<Int> {
         
         return base.cellSelectedRelay.asObservable()
-            .do(onNext: { _ in
-                print(#function, #line)
-            })
             .filter { [weak base] _ in
                 base?.isEditMode == false
             }

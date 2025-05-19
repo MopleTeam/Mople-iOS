@@ -5,7 +5,7 @@
 //  Created by CatSlave on 4/23/25.
 //
 
-import Foundation
+import UIKit
 import ReactorKit
 
 final class MainTabBarReactor: Reactor, LifeCycleLoggable {

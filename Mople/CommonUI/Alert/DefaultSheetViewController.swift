@@ -121,17 +121,12 @@ final class DefaultSheetViewController: UIViewController {
         self.view.addGestureRecognizer(tapGesture)
         
         tapGesture.rx.event
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
+            .bind(with: self, onNext: { vc, _ in
                 vc.downModal()
             })
             .disposed(by: disposeBag)
         
         panGesture.rx.event
-            .filter({ [weak self] in
-                guard let self else { return false }
-                return $0.translation(in: self.view).y >= 0
-            })
             .bind(with: self, onNext: { view, gesture in
                 view.handlePanGesture(gesture: gesture)
             })
@@ -139,33 +134,37 @@ final class DefaultSheetViewController: UIViewController {
     }
 
     private func handlePanGesture(gesture: UIPanGestureRecognizer) {
-        let velocity = gesture.velocity(in: self.view).y
+        let velocityY = gesture.velocity(in: self.view).y
         let translationY = gesture.translation(in: self.view).y
-        let adjustOpacity = opacity - opacity * translationY / modalHeight
+        let adjustOpacity = opacity - opacity * (translationY / modalHeight)
 
         switch gesture.state {
         case .changed:
-            changeOpacity(opacity: adjustOpacity)
-            handleChangedGesture(translationY: translationY)
+            handleChangedGesture(translationY: translationY,
+                                 opacity: adjustOpacity)
         case .ended:
             handleEndedGesture(translationY: translationY,
-                               velocityY: velocity)
+                               velocityY: velocityY)
         default:
             break
         }
     }
     
     // 제스처 진행 핸들링
-    private func handleChangedGesture(translationY: CGFloat) {
+    private func handleChangedGesture(translationY: CGFloat,
+                                      opacity: CGFloat) {
+        
         if translationY > modalHeight {
             downModal()
-        } else {
+        } else if translationY > 0 {
+            changeOpacity(opacity: opacity)
             changeBottomOffset(offset: translationY)
         }
     }
     
     // 제스처 종료 핸들링
-    private func handleEndedGesture(translationY: CGFloat, velocityY: CGFloat) {
+    private func handleEndedGesture(translationY: CGFloat,
+                                    velocityY: CGFloat) {
         let modalHalfHeight = modalHeight / 2
         if translationY > modalHalfHeight || velocityY > 300 {
             downModal()

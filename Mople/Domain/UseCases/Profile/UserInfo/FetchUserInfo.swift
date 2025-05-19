@@ -16,12 +16,7 @@ final class FetchUserInfoUseCase: FetchUserInfo {
     private let userInfoRepo: UserInfoRepo
     
     init(userInfoRepo: UserInfoRepo) {
-        print(#function, #line, "LifeCycle Test FetchUserInfoUseCase Created" )
         self.userInfoRepo = userInfoRepo
-    }
-    
-    deinit {
-        print(#function, #line, "LifeCycle Test FetchUserInfoUseCase Deinit" )
     }
     
     func execute() -> Observable<Void> {

@@ -390,7 +390,9 @@ extension PostListViewReactor {
     private func handleUpdate(_ planList: inout [MonthlyPost], plan: Plan) {
         guard let newDate = plan.date,
               let monthDate = DateManager.startOfMonth(newDate),
-              isActiveDate(on: monthDate) == false else { return }
+              isActiveDate(on: monthDate) == false else {
+            return
+        }
         
         if planList.isEmpty || canAddPlan(planDate: newDate) {
             planList.append(.init(plan: plan))
@@ -458,7 +460,10 @@ extension PostListViewReactor {
     
     /// 불러온 달 리스트에 추가
     private func updateLoadedList(newDate: Date) {
-        guard loadedDateList.contains(where: { $0 == newDate }) == false else { return }
+        guard loadedDateList.contains(where: { $0 == newDate }) == false else {
+            return
+        }
+        
         initialDateList.append(newDate)
         loadedDateList.append(newDate)
     }
@@ -476,9 +481,24 @@ extension PostListViewReactor {
         guard let deleteIndex = findPlanIndex(id: planId),
               let deleteDate = planList[deleteIndex].date else { return }
         planList.remove(at: deleteIndex)
-        guard isContainsDate(with: planList, date: deleteDate) == false else { return }
-        loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
+        deleteDateList(with: planList, deleteDate: deleteDate)
+        deleteLoadedMonthList(with: planList, deleteDate: deleteDate)
+    }
+    
+    private func deleteDateList(with postList: [MonthlyPost], deleteDate: Date) {
+        guard !postList.contains(where: {
+            guard let planDate = $0.date else { return true }
+            return DateManager.isSameDay(planDate, deleteDate)
+        }) else { return }
         delegate?.updateDateList(type: .delete(deleteDate))
+    }
+    
+    private func deleteLoadedMonthList(with postList: [MonthlyPost], deleteDate: Date) {
+        guard !postList.contains(where: {
+            guard let planDate = $0.date else { return true }
+            return DateManager.isSameMonth(planDate, deleteDate)
+        }) else { return }
+        loadedDateList.removeAll { return DateManager.isSameMonth($0, deleteDate) }
     }
 }
 
@@ -647,14 +667,6 @@ extension PostListViewReactor {
     /// monthList에서 date로부터 앞으로 가까운 날짜
     private func findNextActiveMonth(from date: Date) -> Date? {
         return monthDateList.filter { $0 > date }.min()
-    }
-    
-    /// list에 date가 포함되어 있는지 확인
-    private func isContainsDate(with list: [MonthlyPost], date: Date) -> Bool {
-        return list.contains {
-            guard let planDate = $0.date else { return false }
-            return DateManager.isSameDay(planDate, date)
-        }
     }
     
     /// 현재 일정 리스트에서 id와 해당하는 일정 인덱스 찾기

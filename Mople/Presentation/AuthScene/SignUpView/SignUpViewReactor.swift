@@ -140,7 +140,6 @@ extension SignUpViewReactor {
     
     // MARK: - 랜덤 닉네임 생성
     private func creationNickName() -> Observable<Mutation> {
-        print(#function, #line)
         let createNickname = creationNickname.executue()
             .share(replay: 1)
         
@@ -163,7 +162,6 @@ extension SignUpViewReactor {
     
     // MARK: - 닉네임 정규식 검사 및 업데이트
     private func updateNickname(_ name: String) -> Observable<Mutation> {
-        print(#function, #line)
         let resetDuplication = Observable
             .just(Mutation.updateValidState(nil))
         
@@ -174,7 +172,6 @@ extension SignUpViewReactor {
     }
     
     private func checkDuplicateAvaliable(name: String) -> Observable<Mutation> {
-        print(#function, #line)
         let canCheckDuplicate = Validator.checkNickname(name)
         setNickname(isValidName: canCheckDuplicate,
                     name: name)
@@ -188,20 +185,17 @@ extension SignUpViewReactor {
     
     // MARK: - 이미지 업데이트
     private func updateImage() -> Observable<Mutation> {
-        print(#function, #line)
         return photoService.presentImagePicker()
             .asObservable()
             .map { Mutation.updateImage($0.first) }
     }
     
     private func resetImage() -> Observable<Mutation> {
-        print(#function, #line)
         return .just(.updateImage(nil))
     }
     
     // MARK: - 닉네임 중복검사
     private func nickNameValidCheck() -> Observable<Mutation> {
-        print(#function, #line)
         guard let name = signUpModel?.nickname else { return .empty() }
         let checkValidation = validationNickname.execute(name)
             .map { Mutation.updateValidState($0)}

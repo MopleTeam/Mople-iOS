@@ -74,7 +74,6 @@ extension DefaultAppNetWorkService {
     private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
         return source.retry { err in
             err.flatMap { [weak self] err -> Single<Void> in
-                print(#function, #line, "#0325 api error : \(err)" )
                 guard let self,
                       let dataTransferErr = err as? DataTransferError else {
                     return .error(DataRequestError.unknown)

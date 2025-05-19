@@ -63,7 +63,6 @@ final class TimePickerViewController: BaseViewController {
     }
     
     override func viewDidLoad() {
-        print(#function, #line)
         setupUI()
         setPresentationStyle()
         bind()

@@ -89,8 +89,6 @@ extension KeychainStorage {
               let token = try? JSONDecoder().decode(Token.self, from: tokens) else {
             return
         }
-        
-        print(#function, #line, "token info : \(token)" )
                 
         Self.cachedToken = token
     }
@@ -116,6 +114,7 @@ extension KeychainStorage {
             return nil
         }
         Self.cachedToken = token
+        print(#function, #line, "토큰 : \(token)" )
         
         return token
     }

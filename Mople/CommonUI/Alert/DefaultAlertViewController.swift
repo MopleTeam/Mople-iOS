@@ -23,6 +23,7 @@ final class DefaultAlertViewController: UIViewController {
         label.textColor = .gray01
         label.font = FontStyle.Title2.semiBold
         label.textAlignment = .center
+        label.numberOfLines = 2
         return label
     }()
     

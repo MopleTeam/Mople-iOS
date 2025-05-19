@@ -18,6 +18,7 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         case selectedPlan(index: Int)
         case requestPlanList
         case requsetParticipation(id: Int, isJoining: Bool)
+        case switchParticipation(id: Int)
         case updatePlan(_ planPayload: PlanPayload)
         case refresh
     }
@@ -36,6 +37,7 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Variables
     var initialState: State = State()
     private let meetId: Int
+    private var selectedPlanId: Int?
     
     // MARK: - UseCase
     private let fetchPlanUseCase: FetchMeetPlanList
@@ -71,6 +73,8 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
             return presentPlanDetailView(index: index)
         case let .updatePlan(payload):
             return handlePlanPayload(payload)
+        case let .switchParticipation(id):
+            return switchParticipation(planId: id)
         case .refresh:
             return refreshPlanList()
         }
@@ -117,9 +121,9 @@ extension MeetPlanListViewReactor {
     }
 
     // MARK: - 참여 핸들링
-    // 일정 시간이 마감된 경우 : UI 업데이트
     // 일정이 과거인 경우 : reload post
     // 일정이 사라진 경우 : delete post
+    // 일정 시간이 마감된 경우 : UI 업데이트
     private func handleParticipation(planId: Int,
                                      isJoining: Bool) -> Observable<Mutation> {
         
@@ -141,8 +145,9 @@ extension MeetPlanListViewReactor {
     private func requestParticipation(id: Int,
                                       planIndex: Int,
                                       isJoining: Bool) -> Observable<Mutation> {
-        let requestParticipation = participationPlanUseCase.execute(planId: id,
-                                                                    isJoining: isJoining)
+        let requestParticipation = participationPlanUseCase
+            .execute(planId: id,
+                     isJoining: isJoining)
             .catch({ [weak self] in
                 let err = self?.resolveParticipationError(err: $0,
                                                           planId: id)
@@ -164,14 +169,13 @@ extension MeetPlanListViewReactor {
     }
     
     private func postParticipants(with plan: Plan) {
-        if plan.isParticipation {
-            NotificationManager.shared.postParticipating(.participating(plan),
-                                                  from: self)
-        } else {
-            guard let id = plan.id else { return }
-            NotificationManager.shared.postParticipating(.notParticipation(id: id),
-                                                  from: self)
-        }
+        guard let planId = plan.id else { return }
+        let payload: NotificationManager.ParticipationPayload
+        = plan.isParticipation
+        ? .participating(plan)
+        : .notParticipation(id: planId)
+        NotificationManager.shared.postParticipating(payload,
+                                                     from: self)
     }
     
     private func resolveParticipationError(err: Error,
@@ -200,6 +204,7 @@ extension MeetPlanListViewReactor {
         guard let date = plan.date else { return }
         
         if DateManager.isPastDay(on: date) == false {
+            selectedPlanId = id
             delegate?.selectedPlan(id: id,
                                    type: .plan)
         } else {
@@ -210,6 +215,8 @@ extension MeetPlanListViewReactor {
 
 // MARK: - Notify
 extension MeetPlanListViewReactor {
+    
+    // MARK: - Plan Payload
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         var planList = currentState.plans
         
@@ -240,6 +247,16 @@ extension MeetPlanListViewReactor {
     
     private func deletePlan(_ planList: inout [Plan], planId: Int) {
         planList.removeAll { $0.id == planId }
+    }
+    
+    // MARK: - Plan Particiaption
+    private func switchParticipation(planId: Int) -> Observable<Mutation> {
+        var currentPlans = currentState.plans
+        guard let switchIndex = currentPlans.firstIndex(where: { $0.id == planId }) else {
+            return .empty()
+        }
+        currentPlans[switchIndex].updateParticipants()
+        return .just(.fetchPlanList(currentPlans))
     }
 }
 

@@ -5,7 +5,7 @@
 //  Created by CatSlave on 1/6/25.
 //
 
-import Foundation
+import UIKit
 import RealmSwift
 import RxSwift
 
@@ -98,6 +98,8 @@ final class UserInfoStorage {
     }
     
     func resetNotifyCount() {
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
         guard let userInfo = userInfoData.first else { return }
     
         try! realmDB.write({

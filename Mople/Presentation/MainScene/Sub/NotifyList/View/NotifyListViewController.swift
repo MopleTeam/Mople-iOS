@@ -42,6 +42,9 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         return view
     }()
     
+    // MARK: - Refresh Control
+    private let refreshControl = UIRefreshControl()
+    
     // MARK: - LifeCycle
     init(screenName: ScreenName,
          title: String?,
@@ -93,6 +96,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     }
     
     private func setupTableView() {
+        tableView.refreshControl = refreshControl
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(NotifyTableCell.self, forCellReuseIdentifier: NotifyTableCell.reuseIdentifier)
     }
@@ -124,12 +128,17 @@ extension NotifyListViewController {
 
     private func setActionBind(_ reactor: Reactor) {
         tableView.rx.itemSelected
-            .map { Reactor.Action.selectNotify(index: $0.row) }
+            .map { Reactor.Action.flow(.selectNotify(index: $0.row)) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        refreshControl.rx.controlEvent(.valueChanged)
+            .map { Reactor.Action.refresh }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         self.naviBar.leftItemEvent
-            .map { Reactor.Action.endFlow }
+            .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -167,12 +176,11 @@ extension NotifyListViewController {
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$resetedCount)
+        reactor.pulse(\.$isRefreshed)
             .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: nil)
-            .drive(onNext: { _ in
-                UIApplication.shared.applicationIconBadgeNumber = 0
-            })
+            .asDriver(onErrorJustReturn: ())
+            .map({ false })
+            .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$isLoading)

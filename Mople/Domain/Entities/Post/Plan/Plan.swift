@@ -41,14 +41,10 @@ extension Plan {
         isCreator = creatorId == userId
     }
     
+    @discardableResult
     mutating func updateParticipants() -> Self {
-        if isParticipation {
-            isParticipation = false
-            participationCount -= 1
-        } else {
-            isParticipation = true
-            participationCount += 1
-        }
+        participationCount += isParticipation ? -1 : 1
+        isParticipation.toggle()
         return self
     }
 }

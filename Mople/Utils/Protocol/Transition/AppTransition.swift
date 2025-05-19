@@ -166,7 +166,8 @@ extension AppTransition: UIGestureRecognizerDelegate {
     }
     
     private func animateTransition(duration: CGFloat,
-                                animations: @escaping (() -> Void), completion: ((Bool) -> Void)?) {
+                                   animations: @escaping (() -> Void),
+                                   completion: ((Bool) -> Void)?) {
         UIView.animate(withDuration: duration,
                        delay: 0,
                        options: .curveEaseOut,

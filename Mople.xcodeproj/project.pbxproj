@@ -3038,7 +3038,7 @@
 				52D8642E2D264271000F8378 /* NMapsMap */,
 				52C013732DC0FFDB00B154F2 /* FirebaseAnalyticsWithoutAdIdSupport */,
 			);
-			productName = Group;
+			productName = Mople;
 			productReference = 52C72E862C4FBD6400CFF329 /* Mople.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -3571,6 +3571,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3628,6 +3629,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -3648,9 +3650,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mople/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 접근";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 요청";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진첩 접근";
+				INFOPLIST_KEY_CFBundleDisplayName = "모플";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자 위치 기반 서비스를 제공하기 위해 위치 정보 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필과 게시글 사진 업로드 기능을 사용하기 위해 사진 라이브러리 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
@@ -3693,9 +3696,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mople/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 접근";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 요청";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진첩 접근";
+				INFOPLIST_KEY_CFBundleDisplayName = "모플";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자 위치 기반 서비스를 제공하기 위해 위치 정보 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필과 게시글 사진 업로드 기능을 사용하기 위해 사진 라이브러리 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";

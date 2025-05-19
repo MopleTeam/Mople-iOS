@@ -47,7 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func remoteNotifications() {
-        print(#function, #line)
         UNUserNotificationCenter.current().delegate = self
     }
     
@@ -104,7 +103,6 @@ extension AppDelegate {
 
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        guard let fcmToken else { return }
         NotificationManager.shared.post(name: .updateFCMToken)
     }
 }

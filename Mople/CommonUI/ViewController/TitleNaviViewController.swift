@@ -13,25 +13,51 @@ import SnapKit
 class TitleNaviViewController: DefaultViewController {
     
     // MARK: - Variables
+    private let initiallyNavigationBar: Bool
+        
     public var titleViewBottom: ConstraintItem {
-        return naviBar.snp.bottom
+        if self.view.subviews.contains(naviBar) {
+            return naviBar.snp.bottom
+        } else {
+            return notchView.snp.bottom
+        }
+    }
+    
+    fileprivate var superTapViewHeight: CGFloat {
+        return notchView.frame.height
+    }
+    
+    fileprivate var naviBarViewHeight: CGFloat {
+        return naviBar.frame.height
     }
     
     // MARK: - UI Components
-    private let superTopView = UIView()
+    public let notchView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .defaultWhite
+        view.layer.zPosition = 2
+        return view
+    }()
     
-    private(set) var naviBar = TitleNaviBar()
+    public var naviBar: TitleNaviBar = {
+        let navi = TitleNaviBar()
+        navi.backgroundColor = .defaultWhite
+        navi.layer.zPosition = 1
+        return navi
+    }()
 
     // MARK: - LifeCycle
     init(screenName: ScreenName? = nil,
+         initiallyNavigationBar: Bool = true,
          title: String?) {
+        self.initiallyNavigationBar = initiallyNavigationBar
         super.init(screenName: screenName)
         setTitle(title)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialsetup()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -39,33 +65,31 @@ class TitleNaviViewController: DefaultViewController {
     }
     
     // MARK: - UI Setup
-    private func initialsetup() {
+    private func setupUI() {
         setLayer()
         setNavigation()
-        setupUI()
     }
     
     private func setLayer() {
         self.view.backgroundColor = .defaultWhite
-        self.view.addSubview(superTopView)
-        self.view.addSubview(naviBar)
-        
-        superTopView.snp.makeConstraints { make in
+        self.view.addSubview(notchView)        
+        notchView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
-            make.bottom.equalTo(self.naviBar.snp.top)
+            make.height.equalTo(UIScreen.getTopNotchSize())
         }
         
-        naviBar.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide)
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(56)
+        if initiallyNavigationBar {
+            addNaviBar()
         }
     }
     
-    private func setupUI() {
-        [superTopView, naviBar].forEach {
-            $0.backgroundColor = .defaultWhite
-            $0.layer.zPosition = 1
+    public func addNaviBar() {
+        self.view.addSubview(naviBar)
+
+        naviBar.snp.makeConstraints { make in
+            make.top.equalTo(notchView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(56)
         }
     }
     
@@ -79,13 +103,26 @@ class TitleNaviViewController: DefaultViewController {
     }
 }
 
-// MARK: - 배경 설정
+// MARK: - Set NaviBar
 extension TitleNaviViewController {
-    public func setBlackBackground() {
-        self.superTopView.backgroundColor = .black
-        self.view.backgroundColor = .black
-        self.naviBar.backgroundColor = .black
-        self.naviBar.setTitleColor(.defaultWhite)
+    public func moveTopOutOfView() {
+        let adjustOffset = -(superTapViewHeight + naviBarViewHeight)
+        setTopOffset(adjustOffset)
+    }
+    
+    public func moveTopIntoView() {
+        setTopOffset(0)
+    }
+    
+    public func hideTop(isHide: Bool) {
+        notchView.isHidden = isHide
+        naviBar.isHidden = isHide
+    }
+    
+    private func setTopOffset(_ offset: CGFloat) {
+        notchView.snp.updateConstraints { make in
+            make.top.equalToSuperview().offset(offset)
+        }
     }
 }
 
@@ -99,4 +136,3 @@ extension TitleNaviViewController {
         naviBar.hideBarItem(type: type, isHidden: isHidden)
     }
 }
-
