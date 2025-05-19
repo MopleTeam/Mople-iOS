@@ -14,6 +14,7 @@ final class ThumbnailView: UIView {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
+        view.layer.makeLine(width: 1)
         return view
     }()
     
