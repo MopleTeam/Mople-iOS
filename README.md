@@ -3,15 +3,18 @@
 ![Swift Version](https://img.shields.io/badge/swift-15.0-orange) 
 
 # Download
-[![앱 스크린샷](https://github.com/user-attachments/assets/dd57805b-1111-473c-b30d-3cfa0ad01112)](https://apps.apple.com/kr/app/%EB%AA%A8%ED%94%8C-%EB%AA%A8%EC%9E%84%ED%94%8C%EB%9E%98%EB%84%88/id6738402542)
-
 <a href="https://apps.apple.com/kr/app/모임플래너/id6738402542">
   <img src="https://github.com/user-attachments/assets/dd57805b-1111-473c-b30d-3cfa0ad01112"
-       alt="모임플래너 앱 이미지"
+       alt="모임플래너 앱(iOS) 이미지"
        width="320"
        style="border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
 </a>
-
+<a href="https://play.google.com/store/apps/details?id=com.moim.moimtable">
+  <img src="[https://github.com/user-attachments/assets/dd57805b-1111-473c-b30d-3cfa0ad01112](https://github.com/user-attachments/assets/2be162b3-b6b6-4120-b7a6-4c018aacc85b)"
+       alt="모임플래너 앱(안드로이드) 이미지"
+       width="320"
+       style="border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />
+</a>
 
 ## Architecture
 <img width="500" alt="아키텍쳐 구성도_1" src="https://github.com/user-attachments/assets/ed1d4cd5-574b-4293-84d9-0b0a4d0594e6" />
