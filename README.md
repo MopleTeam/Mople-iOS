@@ -17,6 +17,7 @@
 - 지도 시스템 : NMAPSMap
 - 캘린더 : FSCalendar
 - 알림 수신 및 화면 트랙킹 : Firebase
+- 리소스 관리 : SwiftGen
 - 협업 툴 : Jira, Notion, Discord, Figma
 
 ## Experience
