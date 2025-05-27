@@ -267,6 +267,11 @@ extension ProfileViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        profileImageView.rx.tap
+            .map { Reactor.Action.flow(.showProfileImage) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         profileEditButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.editProfile) }
             .bind(to: reactor.action)

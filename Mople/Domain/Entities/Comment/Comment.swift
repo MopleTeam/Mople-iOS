@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Comment: Hashable, Equatable {
+struct Comment: Hashable, Comparable {
     var id: Int?
     var writerId: Int?
     var writerName: String?

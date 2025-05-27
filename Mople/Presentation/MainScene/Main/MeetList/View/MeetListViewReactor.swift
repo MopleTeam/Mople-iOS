@@ -163,7 +163,7 @@ extension MeetListViewReactor {
     }
     
     private func addMeet(_ meetList: inout [Meet], meet: Meet) {
-        meetList.insert(meet, at: 0)
+        meetList.append(meet)
     }
     
     private func updatedMeet(_ meetList: inout [Meet], meet: Meet) {

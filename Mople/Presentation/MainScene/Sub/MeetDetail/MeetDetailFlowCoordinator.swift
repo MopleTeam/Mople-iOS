@@ -14,6 +14,8 @@ protocol MeetDetailCoordination: AnyObject {
     
     // MARK: - Move To View
     func pushMeetSetupView(meet: Meet)
+    func presentPhotoView(title: String?,
+                          imagePath: String?)
     
     // MARK: - Move To Flow
     func presentPlanCreateView(meet: MeetSummary)
@@ -62,6 +64,17 @@ extension MeetDetailSceneCoordinator {
     }
 }
 
+// MARK: - Meet Photo View
+extension MeetDetailSceneCoordinator {
+    func presentPhotoView(title: String?,
+                          imagePath: String?) {
+        let vc = dependencies.makeMeetImageViewController(imagePath: imagePath,
+                                                          title: title,
+                                                          coordinator: self)
+        self.presentWithTracking(vc)
+    }
+}
+
 // MARK: - Meet Setup View
 extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     func pushMeetSetupView(meet: Meet) {
@@ -86,6 +99,11 @@ extension MeetDetailSceneCoordinator: MeetCreateViewCoordination {
 
 // MARK: - MemberList View
 extension MeetDetailSceneCoordinator: MemberListViewCoordination {
+    func presentPhotoView(imagePath: String?) {
+        self.presentPhotoView(title: nil,
+                              imagePath: imagePath)
+    }
+    
     func pushMemberListView() {
         let vc = dependencies.makeMemberListViewController(coordinator: self)
         self.pushWithTracking(vc, animated: true)

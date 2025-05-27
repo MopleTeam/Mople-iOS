@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import RxSwift
 import SnapKit
 
 final class MemberInfoView: UIView {
     
-    private let profileView: UserImageView = {
+    public let profileView: UserImageView = {
         let view = UserImageView()
         view.setLayer()
         return view

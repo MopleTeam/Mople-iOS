@@ -95,7 +95,7 @@ extension CalendarSceneDIContainer {
     // MARK: - 일정 상세
     func makePlanDetailFlowCoordinator(postId: Int, type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
+                                                      commonFactory: commonViewFactory,
                                                       type: type,
                                                       id: postId)
         return planDetailDI.makePostDetailCoordinator()

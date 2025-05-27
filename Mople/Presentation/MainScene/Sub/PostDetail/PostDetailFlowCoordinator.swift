@@ -10,10 +10,12 @@ import UIKit
 protocol PostDetailCoordination: AnyObject {
     func pushMemberListView(postId: Int)
     func pushPlaceDetailView(place: PlaceInfo)
-    func pushPhotoView(index: Int,
-                       imagePaths: [String])
+    func pushReviewEditView(review: Review)
+    func presentPhotoView(title: String?,
+                       index: Int,
+                       imagePaths: [String],
+                       defaultType: UIImageView.DefaultImageType)
     func presentPlanEditFlow(plan: Plan)
-    func presentReviewEditFlow(review: Review)
     func endFlow()
 }
 
@@ -44,28 +46,49 @@ extension PostDetailFlowCoordinator {
 // MARK: - Member List View
 extension PostDetailFlowCoordinator: MemberListViewCoordination {
     func pushMemberListView(postId: Int) {
-        let view = dependencies.makeMemberListViewController(coordinator: self)
-        self.pushWithTracking(view, animated: true)
+        let vc = dependencies.makeMemberListViewController(coordinator: self)
+        self.pushWithTracking(vc, animated: true)
+    }
+    
+    func presentPhotoView(imagePath: String?) {
+        let imagePaths = [imagePath].compactMap { $0 }
+        self.presentPhotoView(title: nil,
+                              index: 0,
+                              imagePaths: imagePaths,
+                              defaultType: .user)
+    }
+}
+
+// MARK: - Review Edit View
+extension PostDetailFlowCoordinator: ReviewEditViewCoordination {
+    func pushReviewEditView(review: Review) {
+        let vc = dependencies.makeReviewEditViewController(review: review,
+                                                           coordinator: self)
+        self.pushWithTracking(vc)
     }
 }
 
 // MARK: - Photo View
 extension PostDetailFlowCoordinator {
-    func pushPhotoView(index: Int,
-                       imagePaths: [String]) {
-        let view = dependencies.makePhotoBookViewController(imagePaths: imagePaths,
-                                                            index: index,
-                                                            coordinator: self)
-        self.navigationController.present(view, animated: true)
+    func presentPhotoView(title: String?,
+                          index: Int,
+                          imagePaths: [String],
+                          defaultType: UIImageView.DefaultImageType) {
+        let vc = dependencies.makePhotoBookViewController(title: title,
+                                                          imagePaths: imagePaths,
+                                                          defaultType: defaultType,
+                                                          coordinator: self)
+        vc.selectedIndex = index
+        self.presentWithTracking(vc)
     }
 }
 
 // MARK: - Detail Place View
 extension PostDetailFlowCoordinator: PlaceDetailCoordination {
     func pushPlaceDetailView(place: PlaceInfo) {
-        let view = dependencies.makePlaceDetailViewController(place: place,
+        let vc = dependencies.makePlaceDetailViewController(place: place,
                                                               coordinator: self)
-        self.pushWithTracking(view, animated: true)
+        self.pushWithTracking(vc, animated: true)
     }
 }
 
@@ -75,13 +98,6 @@ extension PostDetailFlowCoordinator {
     // 일정 수정 플로우
     func presentPlanEditFlow(plan: Plan) {
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
-        self.start(coordinator: flow)
-        self.present(flow.navigationController)
-    }
-    
-    // 리뷰 수정 플로우
-    func presentReviewEditFlow(review: Review) {
-        let flow = dependencies.makeReviewEditFlowCoordinator(review: review)
         self.start(coordinator: flow)
         self.present(flow.navigationController)
     }

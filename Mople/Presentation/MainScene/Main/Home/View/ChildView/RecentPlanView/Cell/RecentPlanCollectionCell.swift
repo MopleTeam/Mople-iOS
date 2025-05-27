@@ -15,9 +15,10 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
         let view = ThumbnailView(thumbnailSize: 28,
                                       thumbnailRadius: 6)
         view.setTitleLabel(font: FontStyle.Body2.semiBold,
-                           color: .gray02)
+                           color: .gray04)
         view.setSpacing(8)
         view.addArrowImageView()
+        view.isUserInteractionEnabled = false
         return view
     }()
     

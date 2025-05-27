@@ -12,6 +12,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         enum Flow {
+            case showProfileImage
             case editProfile
             case setNotify
             case policy
@@ -153,6 +154,9 @@ extension ProfileViewReactor {
 extension ProfileViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
+        case .showProfileImage:
+            let profileImagePath = currentState.userProfile?.imagePath
+            coordinator?.presentProfileImageView(imagePath: profileImagePath)
         case .editProfile:
             guard let previousProfile = currentState.userProfile else { return .empty() }
             coordinator?.presentEditView(previousProfile: previousProfile)

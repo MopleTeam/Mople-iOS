@@ -52,9 +52,10 @@ final class PhotoBookCollectionCell: UICollectionViewCell {
         self.scrollView.delegate = self
     }
     
-    public func setPhoto(_ path: String) {
+    public func setPhoto(_ path: String?,
+                         defaultImageType: UIImageView.DefaultImageType) {
         imageView.kfSetimage(path,
-                             defaultImageType: .history)
+                             defaultImageType: defaultImageType)
     }
 }
 

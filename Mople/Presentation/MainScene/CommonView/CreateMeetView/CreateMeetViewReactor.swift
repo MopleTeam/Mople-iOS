@@ -300,7 +300,12 @@ extension CreateMeetViewReactor {
 // MARK: - Coordination
 extension CreateMeetViewReactor {
     private func endTask() -> Observable<Mutation> {
-        coordinator?.dismiss(completion: nil)
+        switch type {
+        case .create:
+            coordinator?.dismiss(completion: nil)
+        case .edit:
+            coordinator?.pop()
+        }
         return .empty()
     }
 }

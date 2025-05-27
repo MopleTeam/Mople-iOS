@@ -32,6 +32,7 @@ final class CreateCommentUseCase: CreateComment {
                 verifyReview.verifyWriter(self?.userId)
                 return verifyReview }
             }
+            .map({ $0.sorted(by: >) })
             .asObservable()
     }
 }

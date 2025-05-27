@@ -13,16 +13,17 @@ protocol SearchPlaceSceneDependencies {
     func makePlaceSelectViewController(with place: PlaceInfo) -> PlaceSelectViewController
 }
 
-final class SearchLocationSceneDIContainer: SearchPlaceSceneDependencies {
+final class SearchLocationSceneDIContainer: BaseContainer, SearchPlaceSceneDependencies {
 
-    private let appNetworkService: AppNetworkService
     private var commonReactor: SearchPlaceViewReactor?
     private weak var delegate: SearchPlaceDelegate?
     
     init(appNetworkService: AppNetworkService,
+         commonViewFactory: ViewDependencies,
          delegate: SearchPlaceDelegate?) {
-        self.appNetworkService = appNetworkService
         self.delegate = delegate
+        super.init(appNetworkService: appNetworkService,
+                   commonFactory: commonViewFactory)
     }
     
     func makeSearchLocationFlowCoordinator() -> BaseCoordinator {

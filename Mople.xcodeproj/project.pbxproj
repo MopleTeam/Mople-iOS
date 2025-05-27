@@ -67,8 +67,6 @@
 		5221B12E2D541244004859C9 /* ReviewEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B12D2D541244004859C9 /* ReviewEditViewController.swift */; };
 		5221B1302D54188F004859C9 /* ReviewEditViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B12F2D54188F004859C9 /* ReviewEditViewReactor.swift */; };
 		5221B1332D5432E3004859C9 /* Reactor+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B1322D5432E3004859C9 /* Reactor+Loading.swift */; };
-		5221B1352D5436C6004859C9 /* ReviewEditFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B1342D5436C6004859C9 /* ReviewEditFlowCoordinator.swift */; };
-		5221B1372D543749004859C9 /* ReviewEditSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B1362D543749004859C9 /* ReviewEditSceneDIContainer.swift */; };
 		5221B1392D548011004859C9 /* PhotoCollectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5221B1382D548011004859C9 /* PhotoCollectionHeaderView.swift */; };
 		522649662D37288200E38029 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522649652D37288200E38029 /* NotificationManager.swift */; };
 		5226496A2D37946300E38029 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522649692D37946300E38029 /* MapView.swift */; };
@@ -460,8 +458,6 @@
 		5221B12D2D541244004859C9 /* ReviewEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewEditViewController.swift; sourceTree = "<group>"; };
 		5221B12F2D54188F004859C9 /* ReviewEditViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewEditViewReactor.swift; sourceTree = "<group>"; };
 		5221B1322D5432E3004859C9 /* Reactor+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactor+Loading.swift"; sourceTree = "<group>"; };
-		5221B1342D5436C6004859C9 /* ReviewEditFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewEditFlowCoordinator.swift; sourceTree = "<group>"; };
-		5221B1362D543749004859C9 /* ReviewEditSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewEditSceneDIContainer.swift; sourceTree = "<group>"; };
 		5221B1382D548011004859C9 /* PhotoCollectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionHeaderView.swift; sourceTree = "<group>"; };
 		522649652D37288200E38029 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		522649692D37946300E38029 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -1078,8 +1074,9 @@
 		5221B12C2D54121D004859C9 /* ReviewEdit */ = {
 			isa = PBXGroup;
 			children = (
-				5221B1342D5436C6004859C9 /* ReviewEditFlowCoordinator.swift */,
-				523E760F2D5CC37B00BD22CB /* View */,
+				523E76142D5D2E0D00BD22CB /* ImageWrapper.swift */,
+				5221B12F2D54188F004859C9 /* ReviewEditViewReactor.swift */,
+				5221B12D2D541244004859C9 /* ReviewEditViewController.swift */,
 			);
 			path = ReviewEdit;
 			sourceTree = "<group>";
@@ -1367,16 +1364,6 @@
 			path = Post;
 			sourceTree = "<group>";
 		};
-		523E760F2D5CC37B00BD22CB /* View */ = {
-			isa = PBXGroup;
-			children = (
-				523E76142D5D2E0D00BD22CB /* ImageWrapper.swift */,
-				5221B12F2D54188F004859C9 /* ReviewEditViewReactor.swift */,
-				5221B12D2D541244004859C9 /* ReviewEditViewController.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
 		523E76252D5EA41B00BD22CB /* PhotoView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1557,6 +1544,7 @@
 		527DBE2D2CE89360008BB20E /* CommonView */ = {
 			isa = PBXGroup;
 			children = (
+				523E76252D5EA41B00BD22CB /* PhotoView */,
 				522958422D5207B300AE4EC3 /* MemberListView */,
 				522958412D5207A800AE4EC3 /* CreateMeetView */,
 			);
@@ -1869,8 +1857,8 @@
 			children = (
 				52CB0B4A2C7321A7002B6D20 /* NetworkService.swift */,
 				52CB0B482C732186002B6D20 /* DataTransferService.swift */,
-				52E238472C7733320066C9A3 /* AppNetworkService.swift */,
 				52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */,
+				52E238472C7733320066C9A3 /* AppNetworkService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -2333,8 +2321,8 @@
 		52CD8BE92DBBD8540037E8BF /* SubView */ = {
 			isa = PBXGroup;
 			children = (
+				5221B12C2D54121D004859C9 /* ReviewEdit */,
 				52FE68602D508596009EC8EC /* PlaceDetail */,
-				523E76252D5EA41B00BD22CB /* PhotoView */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -2401,7 +2389,6 @@
 				52D8645A2D2A027C000F8378 /* MeetDetailSceneDIContainer.swift */,
 				52818C832D1AC8F70001E30B /* SearchLocationSceneDIContainer.swift */,
 				529CCD492D3232C70041CBB7 /* PostDetailSceneDIContainer.swift */,
-				5221B1362D543749004859C9 /* ReviewEditSceneDIContainer.swift */,
 				5201853D2DA8E6FE00C2B4FC /* NotifyListSceneDIContainer.swift */,
 			);
 			path = Sub;
@@ -2946,7 +2933,6 @@
 				52D864502D29FC47000F8378 /* MeetDetail */,
 				526B985C2CEDBBF6002488C5 /* PlanCreate */,
 				529CCD522D323FAF0041CBB7 /* PostDetail */,
-				5221B12C2D54121D004859C9 /* ReviewEdit */,
 				520185382DA8E5A400C2B4FC /* NotifyList */,
 			);
 			path = Sub;
@@ -3286,7 +3272,6 @@
 				52EA24D32DB2268B00879951 /* SignOut.swift in Sources */,
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				52A2752D2DAFD997007D72CE /* SheetManager.swift in Sources */,
-				5221B1372D543749004859C9 /* ReviewEditSceneDIContainer.swift in Sources */,
 				52EC04EF2D3E5C9100000C99 /* CommentResponse.swift in Sources */,
 				52A3885C2D688E2F001439C7 /* DeleteMeet.swift in Sources */,
 				523A18052DD10DD10071BDBD /* UITableView+ResizeHeader.swift in Sources */,
@@ -3350,7 +3335,6 @@
 				52B8E1232D5392EA00F7FF59 /* PhotoCollectionView.swift in Sources */,
 				52EA6DFB2CF78F9D00EFD753 /* SocialInfo.swift in Sources */,
 				522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */,
-				5221B1352D5436C6004859C9 /* ReviewEditFlowCoordinator.swift in Sources */,
 				520185242DA7A0C800C2B4FC /* Notify.swift in Sources */,
 				52CB0B4B2C7321A7002B6D20 /* NetworkService.swift in Sources */,
 				5214F8CE2D2D5C0600E8CE9C /* SearchPlaceTableCellModel.swift in Sources */,
@@ -3664,7 +3648,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3710,7 +3694,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -26,8 +26,9 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         }
         
         enum ChildEvent {
+            case showHistory(startIndex: Int)
+            case showUserImage(imagePath: String?)
             case offsetChanged(_ offsetY: CGFloat)
-            case selectedPhoto(Int)
             case editComment
             case refresh
         }
@@ -143,10 +144,12 @@ extension CommentListViewReactor {
             editComment()
         case let .offsetChanged(offsetY):
             changedCommentListTableOffsetY(offsetY)
-        case let .selectedPhoto(index):
+        case let .showHistory(index):
             showPhotoBook(index: index)
         case .refresh:
             refreshData()
+        case let .showUserImage(imagePath):
+            showUserImage(imagePath)
         }
         
         return .empty()
@@ -162,7 +165,11 @@ extension CommentListViewReactor {
     }
     
     private func showPhotoBook(index: Int) {
-        delegate?.showPhotoBook(index: index)
+        delegate?.showReviewPhoto(index: index)
+    }
+    
+    private func showUserImage(_ imagePath: String?) {
+        delegate?.showUserImage(imagePath: imagePath)
     }
     
     private func refreshData() {
@@ -178,7 +185,6 @@ extension CommentListViewReactor {
         
         return fetchCommentListUseCase.execute(postId: postId)
             .catchAndReturn([])
-            .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 let addSection = addCommentSectionModel(comments)
@@ -220,7 +226,6 @@ extension CommentListViewReactor {
         let createComment = createCommentUseCase
             .execute(postId: postId,
                      comment: comment)
-            .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 self.selectedComment = nil
@@ -245,7 +250,6 @@ extension CommentListViewReactor {
             .execute(postId: postId,
                      commentId: commentId,
                      comment: comment)
-            .map({ $0.sorted(by: <) })
             .flatMap({ [weak self] comments -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 self.selectedComment = nil

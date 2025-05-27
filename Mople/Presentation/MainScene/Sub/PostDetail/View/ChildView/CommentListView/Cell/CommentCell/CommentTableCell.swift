@@ -8,7 +8,6 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import RxRelay
 import SnapKit
 
 final class CommentTableCell: UITableViewCell {
@@ -18,6 +17,7 @@ final class CommentTableCell: UITableViewCell {
     
     // MARK: - Closure
     var menuTapped: (() -> Void)?
+    var profileTapped: (() -> Void)?
     
     // MARK: - UI Components
     private let profileView: UserImageView = {
@@ -49,12 +49,18 @@ final class CommentTableCell: UITableViewCell {
         return button
     }()
     
-    private let commentLabel: UILabel = {
-        let label = UILabel()
-        label.font = FontStyle.Body1.medium
-        label.textColor = .gray03
-        label.numberOfLines = 0
-        return label
+    private let commentTextView: UITextView = {
+        let view = UITextView()
+        view.font = FontStyle.Body1.medium
+        view.textColor = .gray03
+        view.dataDetectorTypes = .link
+        view.isUserInteractionEnabled = true
+        view.isSelectable = true
+        view.isScrollEnabled = false
+        view.isEditable = false
+        view.textContainer.lineFragmentPadding = 0
+        view.textContainerInset = .zero
+        return view
     }()
     
     private lazy var commentHeaderView: UIStackView = {
@@ -67,7 +73,7 @@ final class CommentTableCell: UITableViewCell {
     }()
     
     private lazy var commentView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentLabel])
+        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentTextView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -94,7 +100,8 @@ final class CommentTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
-        setAction()
+        setMenuAction()
+        setImageTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -124,7 +131,7 @@ final class CommentTableCell: UITableViewCell {
             make.height.equalTo(24)
         }
         
-        commentLabel.snp.makeConstraints { make in
+        commentTextView.snp.makeConstraints { make in
             make.height.greaterThanOrEqualTo(20)
         }
         
@@ -135,10 +142,19 @@ final class CommentTableCell: UITableViewCell {
     }
     
     // MARK: - Action
-    private func setAction() {
+    private func setMenuAction() {
         self.menuButton.rx.controlEvent(.touchUpInside)
             .subscribe(with: self, onNext: { cell, _ in
                 cell.menuTapped?()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Gesture
+    private func setImageTapGesture() {
+        self.profileView.rx.tap
+            .subscribe(with: self, onNext: { cell, _ in
+                cell.profileTapped?()
             })
             .disposed(by: disposeBag)
     }
@@ -147,7 +163,7 @@ final class CommentTableCell: UITableViewCell {
     public func configure(_ viewModel: CommentTableCellModel) {
         self.profileView.setImage(viewModel.writerImagePath)
         self.nameLabel.text = viewModel.writerName
-        self.commentLabel.text = viewModel.comment
+        self.commentTextView.text = viewModel.comment
         self.timeLabel.text = viewModel.commentDate
         self.borderView.isHidden = viewModel.isLastComment
     }

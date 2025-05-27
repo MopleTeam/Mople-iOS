@@ -10,22 +10,15 @@ import UIKit
 protocol ProfileSceneDependencies {
     // MARK: - View
     func makeProfileViewController(coordinator: ProfileCoordination) -> ProfileViewController
+    func makeProfileImageViewController(imagePath: String?,
+                                        coordinator: NavigationCloseable) -> PhotoBookViewController
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        coordinator: ProfileEditViewCoordination) -> ProfileEditViewController
     func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController
     func makePolicyViewController() -> PolicyViewController
 }
 
-final class ProfileSceneDIContainer: ProfileSceneDependencies {
- 
-    let appNetworkService: AppNetworkService
-    let commonFacoty: ViewDependencies
-
-    init(appNetworkService: AppNetworkService,
-         commonFacoty: ViewDependencies) {
-        self.appNetworkService = appNetworkService
-        self.commonFacoty = commonFacoty
-    }
+final class ProfileSceneDIContainer: BaseContainer, ProfileSceneDependencies {
     
     func makeSetupFlowCoordinator() -> ProfileFlowCoordinator {
         let navigationController = AppNaviViewController(type: .main)
@@ -66,6 +59,16 @@ extension ProfileSceneDIContainer {
 
 // MARK: - View
 extension ProfileSceneDIContainer {
+    
+    // MARK: - 이미지 뷰
+    func makeProfileImageViewController(imagePath: String?,
+                                        coordinator: NavigationCloseable) -> PhotoBookViewController {
+        let imagePaths = [imagePath].compactMap { $0 }
+        return commonViewFactory.makePhotoViewController(title: L10n.profile,
+                                                         imagePath: imagePaths,
+                                                         defaultImageType: .user,
+                                                         coordinator: coordinator)
+    }
     
     // MARK: - 프로필 수정
     func makeProfileEditViewController(previousProfile: UserInfo,

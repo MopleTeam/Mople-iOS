@@ -21,6 +21,7 @@ final class CommentListViewController: BaseViewController, View {
     // MARK: - Observable
     private let offset: PublishSubject<CGFloat> = .init()
     private let selectedPhoto: PublishSubject<Int> = .init()
+    private let userProfileTap: PublishSubject<String?> = .init()
     private let selectedComment: PublishSubject<Comment?> = .init()
     private let editComment: PublishSubject<Void> = .init()
     private let deleteComment: PublishSubject<Void> = .init()
@@ -121,12 +122,17 @@ extension CommentListViewController {
             .disposed(by: disposeBag)
         
         selectedPhoto
-            .map { Reactor.Action.childEvent(.selectedPhoto($0)) }
+            .map { Reactor.Action.childEvent(.showHistory(startIndex: $0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         selectedComment
             .map { Reactor.Action.selctedComment(comment: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        userProfileTap
+            .map { Reactor.Action.childEvent(.showUserImage(imagePath: $0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -154,11 +160,10 @@ extension CommentListViewController {
         
         reactor.pulse(\.$createdCompletion)
             .observe(on: MainScheduler.asyncInstance)
-            .delay(.milliseconds(20), scheduler: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, _ in
-                vc.moveToLastComment()
+                vc.moveToRecentComment()
             })
             .disposed(by: disposeBag)
         
@@ -202,6 +207,10 @@ extension CommentListViewController {
             self?.selectedComment.onNext(comment)
             self?.handleCommentAction(comment)
         }
+        cell.profileTapped = { [weak self] in
+            self?.userProfileTap.onNext(comment.writerThumbnailPath)
+        }
+        
         return cell
     }
     
@@ -312,8 +321,11 @@ extension CommentListViewController {
 
 // MARK: - Helper
 extension CommentListViewController {
-    private func moveToLastComment() {
-        tableView.scrollToBottom(animated: false)
+    private func moveToRecentComment() {
+        let lastSection = tableView.numberOfSections - 1
+        tableView.scrollToRow(at: .init(row: 0, section: lastSection),
+                              at: .middle,
+                              animated: true)
     }
 }
 

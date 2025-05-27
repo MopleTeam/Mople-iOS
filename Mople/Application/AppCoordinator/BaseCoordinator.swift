@@ -101,6 +101,14 @@ extension BaseCoordinator {
     }
     
     func presentWithTracking(_ viewController: UIViewController,
+                             animated: Bool = true,
+                             completion: (() -> Void)? = nil) {
+        self.navigationController.present(viewController,
+                                          animated: animated,
+                                          completion: completion)
+    }
+    
+    func slidePresentWithTracking(_ viewController: UIViewController,
                              completion: (() -> Void)? = nil) {
         self.present(viewController, completion: completion)
         ScreenTracking.track(with: viewController)

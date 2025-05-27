@@ -11,7 +11,8 @@ import ReactorKit
 protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
     func editComment(_ comment: String?)
     func setCommentListTableOffsetY(_ offsetY: CGFloat)
-    func showPhotoBook(index: Int)
+    func showReviewPhoto(index: Int)
+    func showUserImage(imagePath: String?)
     func reportComment()
     func refresh()
 }
@@ -314,7 +315,7 @@ extension PostDetailViewReactor {
             coordinator?.presentPlanEditFlow(plan: plan)
         case .review:
             guard let review else { return }
-            coordinator?.presentReviewEditFlow(review: review)
+            coordinator?.pushReviewEditView(review: review)
         }
     }
     
@@ -526,13 +527,23 @@ extension PostDetailViewReactor: CommentListDelegate  {
         action.onNext(.childEvent(.changedOffsetY(offsetY)))
     }
     
-    func showPhotoBook(index: Int) {
+    func showReviewPhoto(index: Int) {
         guard let reviewImages = review?.images,
               reviewImages.isEmpty == false else { return }
         
         let imagePaths = reviewImages.compactMap { $0.path }
-        coordinator?.pushPhotoView(index: index,
-                                   imagePaths: imagePaths)
+        coordinator?.presentPhotoView(title: L10n.Review.photoHeader,
+                                   index: index,
+                                   imagePaths: imagePaths,
+                                   defaultType: .history)
+    }
+    
+    func showUserImage(imagePath: String?) {
+        let imagePaths = [imagePath].compactMap { $0 }
+        coordinator?.presentPhotoView(title: nil,
+                                   index: 0,
+                                   imagePaths: imagePaths,
+                                   defaultType: .user)
     }
     
     func reportComment() {

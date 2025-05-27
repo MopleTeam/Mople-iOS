@@ -174,7 +174,7 @@ extension ReviewEditViewController {
 
     private func setActionBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
-            .map { Reactor.Action.flow(.endFlow) }
+            .map { Reactor.Action.flow(.endView) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         

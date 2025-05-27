@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ProfileCoordination: AnyObject {
+    func presentProfileImageView(imagePath: String?)
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
     func pushPolicyView()
@@ -47,12 +48,22 @@ extension ProfileFlowCoordinator {
     }
 }
 
+// MARK: - Profile Image View
+extension ProfileFlowCoordinator {
+    func presentProfileImageView(imagePath: String?) {
+        let vc = dependencies.makeProfileImageViewController(imagePath: imagePath,
+                                                             coordinator: self)
+        self.presentWithTracking(vc)
+    }
+}
+
+
 // MARK: - Profile Edit Flow
 extension ProfileFlowCoordinator: ProfileEditViewCoordination {
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          coordinator: self)
-        self.presentWithTracking(profileEditView)
+        self.slidePresentWithTracking(profileEditView)
     }
 }
 

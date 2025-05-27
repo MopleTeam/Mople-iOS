@@ -18,6 +18,7 @@ final class PostListTableCell: UITableViewCell {
                            color: .gray02)
         view.setSpacing(8)
         view.addArrowImageView()
+        view.isUserInteractionEnabled = false
         return view
     }()
     

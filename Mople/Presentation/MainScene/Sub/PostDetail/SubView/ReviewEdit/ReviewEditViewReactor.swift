@@ -8,6 +8,11 @@ import UIKit
 import Kingfisher
 import ReactorKit
 
+protocol ReviewEditViewCoordination: NavigationCloseable {
+    func pushMemberListView(postId: Int)
+    func endFlow()
+}
+
 enum ReviewEditError: Error {
     case noResponse(ResponseError)
     case failSelectPhoto(CompressionPhotosError)
@@ -19,6 +24,7 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         enum Flow {
             case showMemberList
+            case endView
             case endFlow
         }
         
@@ -162,7 +168,7 @@ extension ReviewEditViewReactor {
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] review -> Observable<Mutation> in
                 self?.postUpdateReview(review)
-                self?.coordiantor?.endFlow()
+                self?.coordiantor?.pop()
                 return .empty()
             }
         
@@ -257,7 +263,10 @@ extension ReviewEditViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
         case .showMemberList:
-            coordiantor?.pushMemberListView()
+            guard let id = review.id else { return .empty() }
+            coordiantor?.pushMemberListView(postId: id)
+        case .endView:
+            coordiantor?.pop()
         case .endFlow:
             coordiantor?.endFlow()
         }

@@ -17,7 +17,7 @@ protocol MeetListSceneDependencies {
                                        isJoin: Bool) -> BaseCoordinator
 }
 
-final class MeetListSceneDIConatiner: BaseContainer {
+final class MeetListSceneDIConatiner: BaseContainer, MeetListSceneDependencies {
     func makeMeetListFlowCoordinator() -> MeetListFlowCoordinator {
         let navi = AppNaviViewController(type: .main)
         navi.tabBarItem = .init(title: L10n.meetlist,
@@ -29,7 +29,7 @@ final class MeetListSceneDIConatiner: BaseContainer {
 }
 
 // MARK: - Default View
-extension MeetListSceneDIConatiner: MeetListSceneDependencies {
+extension MeetListSceneDIConatiner {
     
     func makeMeetListViewController(coordinator: MeetListFlowCoordination) -> MeetListViewController {
         return MeetListViewController(screenName: .meet_list,
@@ -53,7 +53,7 @@ extension MeetListSceneDIConatiner {
     
     // MARK: - 모임 생성
     func makeCreateMeetViewController(coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(isFlow: false,
+        return commonViewFactory.makeCreateMeetViewController(isFlow: false,
                                                           isEdit: false,
                                                           type: .create,
                                                           coordinator: coordinator)
@@ -67,7 +67,7 @@ extension MeetListSceneDIConatiner {
     func makeMeetDetailFlowCoordiantor(meetId: Int,
                                        isJoin: Bool) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
+                                                      commonFactory: commonViewFactory,
                                                       meetId: meetId,
                                                       isJoin: isJoin)
         return meetDetailDI.makeMeetDetailCoordinator()

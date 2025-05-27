@@ -15,6 +15,8 @@ extension UIImageView {
         case user
         case weather
         case history
+        
+        
         var image: UIImage {
             switch self {
             case .meet:

@@ -41,7 +41,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     private let mapTapped: PublishRelay<Void> = .init()
     private let participationTapped: PublishRelay<Void> = .init()
     private let cancleComment: PublishRelay<Void> = .init()
-
     private let editPost: PublishSubject<Void> = .init()
     private let deletePost: PublishSubject<Void> = .init()
     private let reportPost: PublishSubject<Void> = .init()
@@ -214,7 +213,6 @@ extension PostDetailViewController {
     
     private func inputBind(_ reactor: Reactor) {
         setActionBind(reactor)
-        setWriteActionBind(reactor)
         setNotification(reactor: reactor)
         setFlowActionBind(reactor)
     }
@@ -252,6 +250,11 @@ extension PostDetailViewController {
             .map { Reactor.Action.post(.participation) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        chatingTextFieldView.rx.sendText
+            .map({ Reactor.Action.comment(.writeComment($0)) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func setFlowActionBind(_ reactor: Reactor) {
@@ -275,20 +278,6 @@ extension PostDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
-    
-    private func setWriteActionBind(_ reactor: Reactor) {
-        let keyboardSended = chatingTextFieldView.rx.keyboardSendButtonTapped
-        let buttonSended = chatingTextFieldView.rx.sendButtonTapped
-        
-        [keyboardSended, buttonSended].forEach {
-            $0.map { comment in
-                Reactor.Action.comment(.writeComment(comment))
-            }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        }
-    }
-    
     
     private func setNotification(reactor: Reactor) {
         NotificationManager.shared.addPlanObservable()
@@ -388,8 +377,8 @@ extension PostDetailViewController {
 extension PostDetailViewController {
     private func setEditComment(_ comment: String?) {
         let hasComment = comment != nil
-        chatingTextFieldView.rx.text.onNext(comment)
-        chatingTextFieldView.rx.isResign.onNext(!hasComment)
+        chatingTextFieldView.textView.text = comment
+        chatingTextFieldView.textView.rx.isResign.onNext(!hasComment)
     }
     
     private func setStartOffsetY(_ offsetY: CGFloat) {

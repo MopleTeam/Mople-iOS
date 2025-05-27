@@ -17,6 +17,7 @@ final class DefaultTextField: UIView {
         case right
     }
     
+    // MARK: - Variables
     public var text: String? {
         get {
             return inputTextField.text
@@ -27,8 +28,10 @@ final class DefaultTextField: UIView {
     
     private var maxCount: Int?
     
+    // MARK: - Observable
     fileprivate let editingObservable: BehaviorRelay<Bool> = .init(value: false)
     
+    // MARK: - UI Components
     private let textFieldContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .bgInput
@@ -44,6 +47,7 @@ final class DefaultTextField: UIView {
         return textField
     }()
     
+    // MARK: - LifeCycle
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
@@ -54,6 +58,7 @@ final class DefaultTextField: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
         self.addSubview(textFieldContainer)
         self.textFieldContainer.addSubview(inputTextField)

@@ -18,6 +18,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
+    private let userProfileTap: PublishSubject<String?> = .init()
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -106,12 +107,17 @@ extension MemberListViewController {
     
     private func setActionBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
-            .map { Reactor.Action.endView }
+            .map { Reactor.Action.flow(.endView) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         endFlow
-            .map { Reactor.Action.endFlow }
+            .map { Reactor.Action.flow(.endFlow) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        userProfileTap
+            .map { Reactor.Action.flow(.showUserImage(imagePath: $0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -125,7 +131,10 @@ extension MemberListViewController {
         reactor.pulse(\.$members)
             .asDriver(onErrorJustReturn: [])
             .drive(self.tableView.rx.items(cellIdentifier: MemberListTableCell.reuseIdentifier,
-                                           cellType: MemberListTableCell.self)) { index, item, cell in
+                                           cellType: MemberListTableCell.self)) { [weak self] index, item, cell in
+                cell.profileTapped = { [weak self] in
+                    self?.userProfileTap.onNext(item.imagePath)
+                }
                 cell.configure(with: .init(memberInfo: item))
                 cell.selectionStyle = .none
             }

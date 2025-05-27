@@ -35,7 +35,7 @@ final class HomeFlowCoordinator: BaseCoordinator, HomeFlowCoordination {
 extension HomeFlowCoordinator: MeetCreateViewCoordination  {
     func presentMeetCreateView() {
         let meetCreateVC = dependencies.makeMeetCreateViewController(coordinator: self)
-        self.presentWithTracking(meetCreateVC)
+        self.slidePresentWithTracking(meetCreateVC)
     }
     
     func completed(with meet: Meet) {

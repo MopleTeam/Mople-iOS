@@ -32,7 +32,7 @@ final class MeetListFlowCoordinator: BaseCoordinator, MeetListFlowCoordination {
 extension MeetListFlowCoordinator: MeetCreateViewCoordination {
     func presentMeetCreateView() {
         let meetCreateVC = dependency.makeCreateMeetViewController(coordinator: self)
-        self.presentWithTracking(meetCreateVC)
+        self.slidePresentWithTracking(meetCreateVC)
     }
     
     func completed(with meet: Meet) {

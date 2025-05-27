@@ -12,16 +12,17 @@ protocol PlanCreateSceneDependencies {
     func makeSearchLocationCoordinator() -> BaseCoordinator
 }
 
-final class PlanCreateSceneDIContainer: PlanCreateSceneDependencies {
+final class PlanCreateSceneDIContainer: BaseContainer, PlanCreateSceneDependencies {
 
-    private let appNetworkService: AppNetworkService
     private var createPlanReactor: CreatePlanViewReactor?
     private let type: PlanCreationType
     
     init(appNetworkService: AppNetworkService,
+         commonViewFactory: ViewDependencies,
          type: PlanCreationType) {
-        self.appNetworkService = appNetworkService
         self.type = type
+        super.init(appNetworkService: appNetworkService,
+                   commonFactory: commonViewFactory)
     }
     
     func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)? = nil) -> BaseCoordinator {
@@ -66,6 +67,7 @@ extension PlanCreateSceneDIContainer {
     // MARK: - 장소 검색
     func makeSearchLocationCoordinator() -> BaseCoordinator {
         let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
+                                                              commonViewFactory: commonViewFactory,
                                                               delegate: createPlanReactor)
         return searchLoactionDI.makeSearchLocationFlowCoordinator()
     }

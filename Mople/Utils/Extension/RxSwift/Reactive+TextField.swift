@@ -19,3 +19,15 @@ extension Reactive where Base: UITextField {
         }
     }
 }
+
+extension Reactive where Base: UITextView {
+    var isResign: Binder<Bool> {
+        return Binder(self.base) { textField, isResign in
+            if isResign {
+                textField.resignFirstResponder()
+            } else {
+                textField.becomeFirstResponder()
+            }
+        }
+    }
+}

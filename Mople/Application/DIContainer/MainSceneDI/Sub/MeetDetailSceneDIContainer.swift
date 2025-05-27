@@ -17,6 +17,9 @@ protocol MeetDetailSceneDependencies {
     func makeEditMeetViewController(previousMeet: Meet,
                                     coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
+    func makeMeetImageViewController(imagePath: String?,
+                                     title: String?,
+                                     coordinator: NavigationCloseable) -> PhotoBookViewController
     
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meet: MeetSummary,
@@ -152,7 +155,7 @@ extension MeetDetailSceneDIContainer {
     
     // MARK: - 모임 수정 뷰
     func makeEditMeetViewController(previousMeet: Meet, coordinator: MeetCreateViewCoordination) -> CreateMeetViewController {
-        return commonFactory.makeCreateMeetViewController(isFlow: true,
+        return commonViewFactory.makeCreateMeetViewController(isFlow: true,
                                                           isEdit: true,
                                                           type: .edit(previousMeet),
                                                           coordinator: coordinator)
@@ -160,8 +163,19 @@ extension MeetDetailSceneDIContainer {
     
     // MARK: - 멤버 리스트 뷰
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
-        return commonFactory.makeMemberListViewController(type: .meet(id: meetId),
+        return commonViewFactory.makeMemberListViewController(type: .meet(id: meetId),
                                                           coordinator: coordinator)
+    }
+    
+    // MARK: - 포토뷰
+    func makeMeetImageViewController(imagePath: String?,
+                                     title: String?,
+                                     coordinator: NavigationCloseable) -> PhotoBookViewController {
+        let imagePaths = [imagePath].compactMap { $0 }
+        return commonViewFactory.makePhotoViewController(title: title,
+                                                         imagePath: imagePaths,
+                                                         defaultImageType: .meet,
+                                                         coordinator: coordinator)
     }
 }
 
@@ -172,6 +186,7 @@ extension MeetDetailSceneDIContainer {
     func makePlanCreateFlowCoordinator(meet: MeetSummary, completion: ((Plan) -> Void)?) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
+            commonViewFactory: commonViewFactory,
             type: .newInMeeting(meet))
         return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completion)
     }
@@ -180,7 +195,7 @@ extension MeetDetailSceneDIContainer {
     func makePostDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
+                                                      commonFactory: commonViewFactory,
                                                       type: type,
                                                       id: postId)
         return planDetailDI.makePostDetailCoordinator()

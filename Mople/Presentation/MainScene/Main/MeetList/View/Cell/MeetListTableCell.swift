@@ -19,6 +19,7 @@ final class MeetListTableCell: UITableViewCell {
         view.setTitleLabel(font: FontStyle.Title3.semiBold,
                            color: .gray01)
         view.setSpacing(12)
+        view.isUserInteractionEnabled = false
         return view
     }()
     

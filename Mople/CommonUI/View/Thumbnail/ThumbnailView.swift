@@ -6,15 +6,18 @@
 //
 
 import UIKit
+import RxSwift
 import SnapKit
 
 final class ThumbnailView: UIView {
     
+    // MARK: - UI Components
     private let thumbnailView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
         view.layer.makeLine(width: 1)
+        view.isUserInteractionEnabled = true
         return view
     }()
     
@@ -55,19 +58,24 @@ final class ThumbnailView: UIView {
         return sv
     }()
     
+    // MARK: - Gesture
+    fileprivate let imageTapGesture: UITapGestureRecognizer = .init()
     
+    // MARK: - LifeCycle
     init(thumbnailSize: CGFloat,
          thumbnailRadius: CGFloat) {
         super.init(frame: .zero)
         setupUI()
         setThumbnail(size: thumbnailSize,
                      radius: thumbnailRadius)
+        setupImageGesture()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - UI Setup
     private func setupUI() {
         addSubview(mainStackView)
         
@@ -94,6 +102,11 @@ final class ThumbnailView: UIView {
     private func loadImage(_ path: String?) {
         thumbnailView.kfSetimage(path, defaultImageType: .meet)
     }
+    
+    // MARK: - Gesture Setup
+    private func setupImageGesture() {
+        self.thumbnailView.addGestureRecognizer(imageTapGesture)
+    }
 }
 
 extension ThumbnailView {
@@ -119,5 +132,12 @@ extension ThumbnailView {
     
     public func setSpacing(_ space: CGFloat) {
         mainStackView.spacing = space
+    }
+}
+
+extension Reactive where Base: ThumbnailView {
+    var imageTap: Observable<Void> {
+        return base.imageTapGesture.rx.event
+            .map { _ in }
     }
 }

@@ -17,10 +17,11 @@ final class PhotoBookViewController: TitleNaviViewController {
     // MARK: - Variables
     private var disposeBag = DisposeBag()
     private let imagePaths: [String]
-    private let startIndex: Int
-    private var isStart: Bool = false
+    private let defaultImageType: UIImageView.DefaultImageType
     private var isHideNaviBar: Bool = false
     private let opacity: CGFloat = 0.5
+    public var selectedIndex: Int = 0
+    public var isViewStarted: Bool = false
     
     // MARK: - UI Components
     private let indicatorLabel: UILabel = {
@@ -49,21 +50,24 @@ final class PhotoBookViewController: TitleNaviViewController {
     init(screenName: ScreenName,
          title: String?,
          imagePaths: [String],
-         selectedIndex: Int,
+         defaultImageType: UIImageView.DefaultImageType,
          coordinator: NavigationCloseable) {
         self.imagePaths = imagePaths
-        self.startIndex = selectedIndex
+        self.defaultImageType = defaultImageType
         super.init(screenName: screenName,
                    initiallyNavigationBar: false,
                    title: title)
         self.coordinator = coordinator
-        
-        self.modalTransitionStyle = .coverVertical
-        self.modalPresentationStyle = .overFullScreen
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func initialSetup() {
+        self.modalTransitionStyle = .coverVertical
+        self.modalPresentationStyle = .overFullScreen
     }
     
     override func viewDidLoad() {
@@ -71,12 +75,12 @@ final class PhotoBookViewController: TitleNaviViewController {
         setupUI()
         setAction()
         setGesture()
-        setGestureAction()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        setStartIndexPage()
+        scrollToSelectedIndex()
+        isViewStarted = true
     }
     
     // MARK: - UI Setup
@@ -84,6 +88,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         setCollectionView()
         setLayout()
         setNavi()
+        setIndicatorLabel()
     }
     
     private func setCollectionView() {
@@ -116,42 +121,49 @@ final class PhotoBookViewController: TitleNaviViewController {
         }
     }
     
-    public func setBackgroundColor() {
+    private func setBackgroundColor() {
         self.view.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
         notchView.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
         naviBar.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
         naviBar.setTitleColor(.defaultWhite)
     }
     
-    private func setStartIndexPage() {
-        guard isStart == false else { return }
-        collectionView.scrollToItem(at: .init(row: startIndex,
+    private func scrollToSelectedIndex() {
+        let maxCount = collectionView.numberOfItems(inSection: 0)
+        guard !isViewStarted,
+              selectedIndex != 0,
+              selectedIndex < maxCount else { return }
+        collectionView.scrollToItem(at: .init(row: selectedIndex,
                                               section: 0),
                                     at: .centeredHorizontally,
                                     animated: false)
-        setIndicatorLabel(startIndex + 1)
-        isStart = true
     }
     
     // MARK: - Set Gesture
     private func setGesture() {
-        self.view.addGestureRecognizer(panGesture)
-        self.view.addGestureRecognizer(tapGesture)
-        panGesture.delegate = self
-        tapGesture.delegate = self
+        setPanGesture()
+        setTapGesture()
     }
     
-    private func setGestureAction() {
-        tapGesture.rx.event
-            .subscribe(with: self, onNext: { vc, event in
-                vc.handleTopHideWithAnimation(isHide: !vc.isHideNaviBar)
-                vc.isHideNaviBar.toggle()
-            })
-            .disposed(by: disposeBag)
+    private func setPanGesture() {
+        self.view.addGestureRecognizer(panGesture)
+        panGesture.delegate = self
         
         panGesture.rx.event
             .subscribe(with: self, onNext: { vc, event in
                 vc.handlePanGesture(event)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func setTapGesture() {
+        self.view.addGestureRecognizer(tapGesture)
+        tapGesture.delegate = self
+        
+        tapGesture.rx.event
+            .subscribe(with: self, onNext: { vc, event in
+                vc.handleTopHideWithAnimation(isHide: !vc.isHideNaviBar)
+                vc.isHideNaviBar.toggle()
             })
             .disposed(by: disposeBag)
     }
@@ -267,8 +279,6 @@ final class PhotoBookViewController: TitleNaviViewController {
 }
 
 extension PhotoBookViewController: UIGestureRecognizerDelegate {
-    
-    
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let gestureLocation = gestureRecognizer.location(in: self.view)
         return !naviBar.frame.contains(gestureLocation)
@@ -278,14 +288,17 @@ extension PhotoBookViewController: UIGestureRecognizerDelegate {
 extension PhotoBookViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        imagePaths.count
+        return max(imagePaths.count, 1)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoBookCollectionCell.reuseIdentifier,
             for: indexPath) as! PhotoBookCollectionCell
-        cell.setPhoto(imagePaths[indexPath.item])
+        
+        let imagePath = imagePaths[safe: indexPath.item]
+        cell.setPhoto(imagePath,
+                      defaultImageType: defaultImageType)
         return cell
     }
 }
@@ -308,12 +321,15 @@ extension PhotoBookViewController: UIScrollViewDelegate {
         let contentOffsetY = scrollView.contentOffset.x
         let scrollViewWidth = scrollView.bounds.width
         let index = Int(contentOffsetY / scrollViewWidth)
-        let pageIndex = index + 1
-        setIndicatorLabel(pageIndex)
+        setIndicatorLabel(index)
     }
     
-    private func setIndicatorLabel(_ pageIndex: Int) {
-        indicatorLabel.text = "\(pageIndex)/\(imagePaths.count)"
+    private func setIndicatorLabel(_ pageIndex: Int = 0) {
+        if imagePaths.count > 1 {
+            indicatorLabel.text = "\(pageIndex + 1)/\(imagePaths.count)"
+        } else {
+            indicatorLabel.isHidden = true
+        }
     }
 }
 

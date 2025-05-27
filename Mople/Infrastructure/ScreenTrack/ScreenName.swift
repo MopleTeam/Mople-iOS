@@ -46,10 +46,14 @@ enum ScreenName: String {
 
     // MARK: - Profile
     case profile_write
+    case profile_image
 
     // MARK: - Policy
     case privacy_policy
 
     // MARK: - Map
     case map_detail
+    
+    // MARK: - Photo
+    case photo
 }

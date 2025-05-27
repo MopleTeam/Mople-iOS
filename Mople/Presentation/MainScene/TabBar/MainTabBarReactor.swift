@@ -119,6 +119,9 @@ extension MainTabBarReactor {
 // MARK: - Handle Join Meet
 extension MainTabBarReactor {
     private func requestJoinMeet(code: String) -> Observable<Mutation> {
+        guard !isRequesting else { return .empty() }
+        isRequesting = true
+        
         let joinMeet = joinMeetUseCae.execute(code: code)
             .observe(on: MainScheduler.asyncInstance)
             .flatMap { [weak self] meet -> Observable<Mutation> in
@@ -129,6 +132,9 @@ extension MainTabBarReactor {
             }
         
         return requestWithLoading(task: joinMeet)
+            .do(onDispose: { [weak self] in
+                self?.isRequesting = false
+            })
     }
     
     private func postAddMeet(with meet: Meet) {

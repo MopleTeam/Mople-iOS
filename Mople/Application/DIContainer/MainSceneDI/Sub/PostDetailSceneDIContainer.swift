@@ -16,13 +16,16 @@ protocol PostDetailSceneDependencies {
     func makePlaceDetailViewController(place: PlaceInfo,
                                        coordinator: PlaceDetailCoordination) -> PlaceDetailViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
-    func makePhotoBookViewController(imagePaths: [String],
-                                     index: Int,
+    func makePhotoBookViewController(title: String?,
+                                     imagePaths: [String],
+                                     defaultType: UIImageView.DefaultImageType,
                                      coordinator: NavigationCloseable) -> PhotoBookViewController
     
+    func makeReviewEditViewController(review: Review,
+                                      coordinator: ReviewEditViewCoordination) -> ReviewEditViewController
+
     // MARK: - 이동 플로우
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
-    func makeReviewEditFlowCoordinator(review: Review) -> BaseCoordinator
 }
 
 final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependencies {
@@ -167,7 +170,7 @@ extension PostDetailSceneDIContainer {
     
     // MARK: - 멤버 리스트
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
-        return commonFactory.makeMemberListViewController(type: getMemberListType(),
+        return commonViewFactory.makeMemberListViewController(type: getMemberListType(),
                                                           coordinator: coordinator)
     }
     
@@ -179,15 +182,49 @@ extension PostDetailSceneDIContainer {
         }
     }
     
+    // MARK: - 리뷰 편집
+    func makeReviewEditViewController(review: Review,
+                                       coordinator: ReviewEditViewCoordination) -> ReviewEditViewController {
+        let title = review.isReviewd ? L10n.Review.edit : L10n.Review.create
+        return .init(screenName: .review_write,
+                     title: title,
+                     reactor: makePlanDetailViewReactor(review: review,
+                                                        coordinator: coordinator))
+    }
+    
+    private func makePlanDetailViewReactor(review: Review,
+                                           coordinator: ReviewEditViewCoordination) -> ReviewEditViewReactor {
+        let reviewRepo = DefaultReviewRepo(networkService: appNetworkService)
+        let imageRepo = DefaultImageUploadRepo(networkService: appNetworkService)
+        return .init(review: review,
+                     fetchReview: makeFetchReviewUseCase(repo: reviewRepo),
+                     deleteReviewImage: makeDeleteReviewUseCase(repo: reviewRepo),
+                     imageUpload: makeReviewImageUploadUseCase(repo: imageRepo),
+                     photoService: DefaultPhotoService(),
+                     coordinator: coordinator)
+    }
+    
+    private func makeFetchReviewUseCase(repo: ReviewRepo) -> FetchReviewDetail {
+        return FetchReviewDetailUseCase(repo: repo)
+    }
+    
+    private func makeDeleteReviewUseCase(repo: ReviewRepo) -> DeleteReviewImage {
+        return DeleteReviewImageUseCase(repo: repo)
+    }
+    
+    private func makeReviewImageUploadUseCase(repo: ImageUploadRepo) -> ReviewImageUpload {
+        return ReviewImageUploadUseCase(repo: repo)
+    }
+    
     // MARK: - 포토북
-    func makePhotoBookViewController(imagePaths: [String],
-                                     index: Int,
+    func makePhotoBookViewController(title: String?,
+                                     imagePaths: [String],
+                                     defaultType: UIImageView.DefaultImageType,
                                      coordinator: NavigationCloseable) -> PhotoBookViewController {
-        return PhotoBookViewController(screenName: .review_image,
-                                       title: L10n.Review.photoHeader,
-                                       imagePaths: imagePaths,
-                                       selectedIndex: index,
-                                       coordinator: coordinator)
+        return commonViewFactory.makePhotoViewController(title: title,
+                                                         imagePath: imagePaths,
+                                                         defaultImageType: defaultType,
+                                                         coordinator: coordinator)
     }
 }
 
@@ -198,17 +235,9 @@ extension PostDetailSceneDIContainer {
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
+            commonViewFactory: commonViewFactory,
             type: .edit(plan))
         return planCreateDI.makePlanCreateFlowCoordinator()
-    }
-    
-    // MARK: - 리뷰 편집
-    func makeReviewEditFlowCoordinator(review: Review) -> BaseCoordinator {
-        let reviewEditDI = ReviewEditSceneDIContainer(
-            appNetworkService: appNetworkService,
-            commonFactory: commonFactory,
-            review: review)
-        return reviewEditDI.makeReviewEditCoordinator()
     }
 }
 

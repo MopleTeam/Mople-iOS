@@ -187,6 +187,11 @@ extension MeetDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
                 
+        self.thumbnailView.rx.imageTap
+            .map { Reactor.Action.flow(.showMeetImage) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         self.addPlanButton.rx.tap
             .map { Reactor.Action.flow(.createPlan) }
             .bind(to: reactor.action)

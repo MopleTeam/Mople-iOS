@@ -43,10 +43,6 @@ final class LaunchViewController: DefaultViewController {
         checkAccount()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         self.view.backgroundColor = .defaultWhite

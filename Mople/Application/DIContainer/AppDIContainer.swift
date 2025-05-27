@@ -9,11 +9,12 @@ import Foundation
 
 class BaseContainer: LifeCycleLoggable {
     let appNetworkService: AppNetworkService
-    let commonFactory: ViewDependencies
+    let commonViewFactory: ViewDependencies
     
-    init(appNetworkService: AppNetworkService, commonFactory: ViewDependencies) {
+    init(appNetworkService: AppNetworkService,
+         commonFactory: ViewDependencies) {
         self.appNetworkService = appNetworkService
-        self.commonFactory = commonFactory
+        self.commonViewFactory = commonFactory
         logLifeCycle()
     }
     

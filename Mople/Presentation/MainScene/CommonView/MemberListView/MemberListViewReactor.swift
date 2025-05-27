@@ -8,6 +8,7 @@ import UIKit
 import ReactorKit
 
 protocol MemberListViewCoordination: NavigationCloseable {
+    func presentPhotoView(imagePath: String?)
     func endFlow()
 }
 
@@ -25,9 +26,14 @@ enum MemberListError: Error {
 final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        enum Flow {
+            case showUserImage(imagePath: String?)
+            case endFlow
+            case endView
+        }
+        
         case fetchPlanMemeber
-        case endFlow
-        case endView
+        case flow(Flow)
     }
     
     enum Mutation {
@@ -77,12 +83,8 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchPlanMemeber:
             return fetchPlanMember()
-        case .endView:
-            coordinator?.pop()
-            return .empty()
-        case .endFlow:
-            coordinator?.endFlow()
-            return .empty()
+        case let .flow(action):
+            return handleFlowAction(action)
         }
     }
     
@@ -100,6 +102,21 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         }
         
         return newState
+    }
+}
+
+// MARK: - Action Handling
+extension MemberListViewReactor {
+    private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case let .showUserImage(imagePath):
+            coordinator?.presentPhotoView(imagePath: imagePath)
+        case .endFlow:
+            coordinator?.endFlow()
+        case .endView:
+            coordinator?.pop()
+        }
+        return .empty()
     }
 }
 

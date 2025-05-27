@@ -6,9 +6,16 @@
 //
 
 import UIKit
+import RxSwift
 import SnapKit
 
 final class MemberListTableCell: UITableViewCell {
+    
+    // MARK: - Variables
+    private var disposeBag = DisposeBag()
+    
+    // MARK: - Closure
+    var profileTapped: (() -> Void)?
         
     // MARK: - UI Components
     private let memberInfoView: MemberInfoView = {
@@ -39,6 +46,7 @@ final class MemberListTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        setImageTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -65,6 +73,15 @@ final class MemberListTableCell: UITableViewCell {
         nameLabel.text = viewModel.nickName
         memberInfoView.setConfigure(imagePath: viewModel.imagePath,
                                     position: viewModel.position)
+    }
+    
+    // MARK: - Gesture
+    private func setImageTapGesture() {
+        self.memberInfoView.profileView.rx.tap
+            .subscribe(with: self, onNext: { cell, _ in
+                cell.profileTapped?()
+            })
+            .disposed(by: disposeBag)
     }
 }
 

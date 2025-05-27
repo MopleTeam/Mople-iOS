@@ -77,28 +77,28 @@ extension MainSceneDIContainer: MainSceneDependencies {
 extension MainSceneDIContainer {
     func makeHomeFlowCoordinator() -> BaseCoordinator {
         let homeSceneDI = HomeSceneDIContainer(appNetworkService: appNetworkService,
-                                               commonFactory: commonFactory)
+                                               commonFactory: commonViewFactory)
         return homeSceneDI.makeHomeFlowCoordinator()
     }
     
     // MARK: - 모임 리스트
     func makeMeetListFlowCoordinator() -> BaseCoordinator {
         let meetListSceneDI = MeetListSceneDIConatiner(appNetworkService: appNetworkService,
-                                                       commonFactory: commonFactory)
+                                                       commonFactory: commonViewFactory)
         return meetListSceneDI.makeMeetListFlowCoordinator()
     }
     
     // MARK: - 캘린더
     func makeCalendarFlowCoordinator() -> BaseCoordinator {
         let calendarSceneDI = CalendarSceneDIContainer(appNetworkService: appNetworkService,
-                                                       commonFactory: commonFactory)
+                                                       commonFactory: commonViewFactory)
         return calendarSceneDI.makeCalendarFlowCoordinator()
     }
 
     // MARK: - 프로필
     func makeProfileCoordinator() -> BaseCoordinator {
         let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService,
-                                                commonFacoty: commonFactory)
+                                                commonFactory: commonViewFactory)
         return profileDI.makeSetupFlowCoordinator()
     }
 }
@@ -119,7 +119,7 @@ extension MainSceneDIContainer {
     /// 모임상세 플로우
     private func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
+                                                      commonFactory: commonViewFactory,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -129,7 +129,7 @@ extension MainSceneDIContainer {
     private func makePlanDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
-                                                      commonFactory: commonFactory,
+                                                      commonFactory: commonViewFactory,
                                                       type: type,
                                                       id: postId)
         return planDetailDI.makePostDetailCoordinator()

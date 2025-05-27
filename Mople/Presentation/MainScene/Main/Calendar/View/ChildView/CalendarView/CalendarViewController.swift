@@ -114,7 +114,7 @@ final class CalendarViewController: BaseViewController, View {
 
     private func setCalendarAppearance() {
         calendar.appearance.weekdayTextColor = .gray05
-        calendar.appearance.titleSelectionColor = .appPrimary
+        calendar.appearance.titleSelectionColor = .gray01
         calendar.appearance.titleFont = FontStyle.Title3.semiBold
         calendar.appearance.weekdayFont = FontStyle.Body1.medium
         calendar.appearance.todayColor = .clear
@@ -126,7 +126,7 @@ final class CalendarViewController: BaseViewController, View {
         scopeObserver
             .distinctUntilChanged()
             .map { $0 == .month }
-            .bind(to: self.view.rx.isUserInteractionEnabled)
+            .bind(to: self.calendar.collectionView.rx.isScrollEnabled)
             .disposed(by: disposeBag)
     }
     
@@ -261,17 +261,29 @@ extension CalendarViewController: FSCalendarDelegate {
         syncCurrentPage()
     }
 
-    func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
-        return events.contains { DateManager.isSameDay($0, date) }
-    }
-
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-        preSelectedDate = date
-        switchScope(type: .dateTap)
-        updateCell(on: date, isSelected: true)
+        if calendar.scope == .month {
+            
+            guard events.contains(where: { DateManager.isSameDay($0, date) }) else { return }
+            print(#function, #line, "Path : # month event ")
+            preSelectedDate = date
+            switchScope(type: .dateTap)
+            updateCell(on: date, isSelected: true)
+        } else {
+            if events.contains(where: { DateManager.isSameDay($0, date) }) {
+                print(#function, #line, "Path : # week event ")
+                preSelectedDate = date
+                switchScope(type: .dateTap)
+                updateCell(on: date, isSelected: true)
+            } else {
+                print(#function, #line, "Path : # not event ")
+                changeMonthScope(animated: true)
+            }
+        }
     }
 
     func calendar(_ calendar: FSCalendar, didDeselect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        guard events.contains(where: { DateManager.isSameDay($0, date) }) else { return }
         updateCell(on: date, isSelected: false)
     }
 
@@ -327,7 +339,7 @@ extension CalendarViewController {
             changeScope()
             handleEmptyMonthEvent()
         case .dateTap:
-            changeScope()
+            changeWeekScope(animated: true)
         }
     }
 
@@ -423,7 +435,8 @@ extension CalendarViewController {
     // 확인
     /// 선택된 셀 구분
     private func checkSelected(on date: Date) -> Bool {
-        guard let selectedDate = calendar.selectedDate else { return false }
+        guard events.contains(where: { DateManager.isSameDay($0, date) }),
+              let selectedDate = calendar.selectedDate else { return false }
         return DateManager.isSameDay(date, selectedDate)
     }
 }
@@ -646,6 +659,7 @@ extension CalendarViewController {
 
     /// 기본값으로 첫 이벤트 preSelectedDate에 할당
     private func setDefaulsePreDate() {
+        guard calendar.scope == .month else { return }
         let currentDate = calendar.currentPage
         preSelectedDate = findFirstEvent(on: currentDate)
         ?? findSmallestNextMonth(on: currentDate)

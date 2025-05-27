@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 import Kingfisher
 
 final class UserImageView: UIImageView {
@@ -13,11 +14,17 @@ final class UserImageView: UIImageView {
     // MARK: - Variables
     private var isSetRadius: Bool = false
     private var task: DownloadTask?
+    fileprivate var imagePath: String?
+    
+    // MARK: - Gesture
+    fileprivate let tapGesture: UITapGestureRecognizer = .init()
     
     // MARK: - LifeCycle
     init() {
         super.init(frame: .zero)
+        self.isUserInteractionEnabled = true
         defaultImage()
+        setGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -45,10 +52,16 @@ final class UserImageView: UIImageView {
         self.image = .defaultUser
         self.contentMode = .scaleAspectFill
     }
+    
+    // MARK: - Setup Gesture
+    private func setGesture() {
+        self.addGestureRecognizer(tapGesture)
+    }
 }
 
 extension UserImageView {
     public func setImage(_ path: String?) {
+        self.imagePath = path
         task = self.kfSetimage(path, defaultImageType: .user)
     }
     
@@ -58,6 +71,13 @@ extension UserImageView {
     
     public func setLayer() {
         self.layer.makeLine(width: 1)
+    }
+}
+
+extension Reactive where Base: UserImageView {
+    var tap: Observable<Void> {
+        return base.tapGesture.rx.event
+            .map { _ in }
     }
 }
 

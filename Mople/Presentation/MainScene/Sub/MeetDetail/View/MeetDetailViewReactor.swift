@@ -27,6 +27,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             case pushMeetSetupView
             case createPlan
             case endFlow
+            case showMeetImage
         }
 
         enum Loading {
@@ -160,6 +161,12 @@ extension MeetDetailViewReactor {
             coordinator?.presentPlanCreateView(meet: meet)
         case .endFlow:
             coordinator?.endFlow()
+        case .showMeetImage:
+            let meetSummary = currentState.meet?.meetSummary
+            let title = meetSummary?.name
+            let imagePath = meetSummary?.imagePath
+            coordinator?.presentPhotoView(title: title,
+                                          imagePath: imagePath)
         }
         
         return .empty()

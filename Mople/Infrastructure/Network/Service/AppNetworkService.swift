@@ -72,19 +72,32 @@ final class DefaultAppNetWorkService: AppNetworkService {
 extension DefaultAppNetWorkService {
     
     private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
-        return source.retry { err in
-            err.flatMap { [weak self] err -> Single<Void> in
+        return source
+            .catch({ [weak self] in
                 guard let self,
-                      let dataTransferErr = err as? DataTransferError else {
+                      let transferError = $0 as? DataTransferError else {
                     return .error(DataRequestError.unknown)
                 }
-
-                return handleDataTransferError(err: dataTransferErr)
-            }.take(1)
-        }
+                let resolveError = resolveDataTransferError(err: transferError)
+                return .error(resolveError)
+            })
+            .retry { err in
+                err.flatMap { [weak self] err -> Single<Void> in
+                    guard let self,
+                          let requestError = err as? DataRequestError else {
+                        return .error(DataRequestError.unknown)
+                    }
+                    
+                    if requestError == .expiredToken {
+                        return reissueTokenIfNeeded().asSingle()
+                    } else {
+                        return .error(requestError)
+                    }
+                }
+            }
     }
     
-    private func handleDataTransferError(err: DataTransferError) -> Single<Void> {
+    private func resolveDataTransferError(err: DataTransferError) -> DataRequestError {
         switch err {
         case let .networkFailure(err):
             switch err {
@@ -93,16 +106,14 @@ extension DefaultAppNetWorkService {
             default:
                 errorHandlingService.handleError(.serverUnavailable)
             }
-            return .error(DataRequestError.handled)
+            return .handled
         case .expiredToken:
-            return reissueTokenIfNeeded().asSingle()
+            return .expiredToken
         case .noResponse:
-            return .error(DataRequestError.noResponse)
-        case .badRequest:
-            return .error(DataRequestError.handled)
+            return .noResponse
         default:
             errorHandlingService.handleError(.unknown)
-            return .error(DataRequestError.handled)
+            return .handled
         }
     }
     
@@ -132,18 +143,18 @@ extension DefaultAppNetWorkService {
         return Single.deferred { [weak self] in
             guard let self else { return .just(()) }
             
-            guard let refreshEndpoint = try? APIEndpoints.reissueToken() else {
-                errorHandlingService.handleError(.expiredToken)
-                return .error(DataRequestError.handled)
+            do {
+                let refreshEndpoint = try APIEndpoints.reissueToken()
+                return self.dataTransferService
+                    .request(with: refreshEndpoint)
+                    .observe(on: MainScheduler.instance)
+                    .flatMap({
+                        KeychainStorage.shared.saveToken($0)
+                        return .just(())
+                    })
+            } catch {
+                return .error(error)
             }
-            
-            return self.dataTransferService
-                .request(with: refreshEndpoint)
-                .observe(on: MainScheduler.instance)
-                .flatMap({
-                    KeychainStorage.shared.saveToken($0)
-                    return .just(())
-                })
         }
     }
 }
