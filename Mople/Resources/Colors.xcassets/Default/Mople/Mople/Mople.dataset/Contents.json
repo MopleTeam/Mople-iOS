@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "Mople.entitlements",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

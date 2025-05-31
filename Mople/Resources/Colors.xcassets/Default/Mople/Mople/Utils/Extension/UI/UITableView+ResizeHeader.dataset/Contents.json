@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "UITableView+ResizeHeader.swift",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
