@@ -34,10 +34,9 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return view
     }()
     
-    private let thumbnailView: ThumbnailView = {
-        let view = ThumbnailView(thumbnailSize: 56,
-                                      thumbnailRadius: 12)
-        view.addMemberCountLabel()
+    private let thumbnailView: MeetDetailThumbnail = {
+        let view = MeetDetailThumbnail(thumbnailSize: 56,
+                                       thumbnailRadius: 12)
         view.setTitleLabel(font: FontStyle.Title2.semiBold,
                            color: .gray01)
         view.setSpacing(12)
@@ -205,6 +204,12 @@ extension MeetDetailViewController {
         self.endFlow
             .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        self.thumbnailView.memberListButton.rx.tap
+            .subscribe(with: self, onNext: { vc, _ in
+                print(#function, #line, "Path : # 탭 ")
+            })
             .disposed(by: disposeBag)
     }
 

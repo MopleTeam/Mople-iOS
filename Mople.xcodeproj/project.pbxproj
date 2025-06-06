@@ -239,6 +239,7 @@
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
 		52A787762D0348B400A633B3 /* DateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* DateSelectViewController.swift */; };
 		52A7E35F2D686A57004782AF /* NSMutableAttributedString+Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */; };
+		52A8B7062DF2E741001AF847 /* MeetThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */; };
 		52AAAF8D2D92970300CA9CE1 /* ErrorHandlingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */; };
 		52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */; };
 		52AD4B6F2D5B1BFC00FCA929 /* ProfileEditRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */; };
@@ -625,6 +626,7 @@
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* DateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSelectViewController.swift; sourceTree = "<group>"; };
 		52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Highlight.swift"; sourceTree = "<group>"; };
+		52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetThumbnailView.swift; sourceTree = "<group>"; };
 		52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandlingService.swift; sourceTree = "<group>"; };
 		52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditRequest.swift; sourceTree = "<group>"; };
@@ -1519,6 +1521,7 @@
 			children = (
 				52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */,
 				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
+				52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */,
 			);
 			path = Thumbnail;
 			sourceTree = "<group>";
@@ -3263,6 +3266,7 @@
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
 				52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */,
+				52A8B7062DF2E741001AF847 /* MeetThumbnailView.swift in Sources */,
 				524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
