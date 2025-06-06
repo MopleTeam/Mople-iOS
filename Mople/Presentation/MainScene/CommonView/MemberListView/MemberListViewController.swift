@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 import ReactorKit
 
 final class MemberListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
@@ -16,9 +17,17 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     typealias Reactor = MemberListViewReactor
     var disposeBag = DisposeBag()
     
+    // MARK: - Variables
+    private let viewType: MemberListType
+    private let sectionHeight: CGFloat = 60
+    
     // MARK: - Observer
     private let endFlow: PublishSubject<Void> = .init()
     private let userProfileTap: PublishSubject<String?> = .init()
+    private let invite: PublishSubject<Void> = .init()
+    
+    // MARK: - DataSource
+    private var dataSource: RxTableViewSectionedReloadDataSource<MembersSectionModel>?
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -31,8 +40,9 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     }()
 
     private let tableView: UITableView = {
-        let table = UITableView()
-        table.backgroundColor = .clear
+        let table = UITableView(frame: .zero, style: .grouped)
+        table.sectionHeaderTopPadding = 0
+        table.backgroundColor = .defaultWhite
         table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
         table.clipsToBounds = true
@@ -42,7 +52,9 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     // MARK: - LifeCycle
     init(screenName: ScreenName,
          title: String?,
-         reactor: MemberListViewReactor) {
+         reactor: MemberListViewReactor,
+         type: MemberListType) {
+        viewType = type
         super.init(screenName: screenName,
                    title: title)
         self.reactor = reactor
@@ -55,6 +67,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupDataSource()
     }
     
     // MARK: - UI Setup
@@ -72,14 +85,21 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(MemberListTableCell.self,
                                 forCellReuseIdentifier: MemberListTableCell.reuseIdentifier)
+        tableView.register(MemberTableHeader.self, forHeaderFooterViewReuseIdentifier: MemberTableHeader.reuseIdentifier)
     }
     
     private func setLayout() {
         self.view.backgroundColor = .defaultWhite
+        view.addSubview(countView)
         view.addSubview(tableView)
         
+        countView.snp.makeConstraints { make in
+            make.top.equalTo(self.titleViewBottom).offset(28)
+            make.horizontalEdges.equalToSuperview()
+        }
+        
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(self.titleViewBottom)
+            make.top.equalTo(countView.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
     }
@@ -130,14 +150,7 @@ extension MemberListViewController {
         
         reactor.pulse(\.$members)
             .asDriver(onErrorJustReturn: [])
-            .drive(self.tableView.rx.items(cellIdentifier: MemberListTableCell.reuseIdentifier,
-                                           cellType: MemberListTableCell.self)) { [weak self] index, item, cell in
-                cell.profileTapped = { [weak self] in
-                    self?.userProfileTap.onNext(item.imagePath)
-                }
-                cell.configure(with: .init(memberInfo: item))
-                cell.selectionStyle = .none
-            }
+            .drive(tableView.rx.items(dataSource: dataSource!))
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$members)
@@ -156,6 +169,22 @@ extension MemberListViewController {
             })
             .disposed(by: disposeBag)
     }
+    
+    private func setupDataSource() {
+        
+        dataSource = RxTableViewSectionedReloadDataSource<MembersSectionModel>(
+            configureCell: { [weak self] dataSource, tableView, indexPath, item in
+                guard let self else { return UITableViewCell() }
+                let cell = tableView.dequeueReusableCell(withIdentifier: MemberListTableCell.reuseIdentifier) as! MemberListTableCell
+                cell.profileTapped = { [weak self] in
+                    self?.userProfileTap.onNext(item.imagePath)
+                }
+                cell.configure(with: .init(memberInfo: item))
+                cell.selectionStyle = .none
+                return cell
+            }
+        )
+    }
 
     
     // MARK: - 에러 핸들링
@@ -169,5 +198,24 @@ extension MemberListViewController {
         case .unknown:
             alertManager.showDefatulErrorMessage()
         }
+    }
+}
+
+extension MemberListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard case .meet = viewType else { return nil }
+        let header = tableView.dequeueReusableHeaderFooterView(
+            withIdentifier: MemberTableHeader.reuseIdentifier) as! MemberTableHeader
+        
+        header.rx.tapped
+            .bind(to: invite)
+            .disposed(by: disposeBag)
+        
+        return header
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        guard case .meet = viewType else { return 0 }
+        return sectionHeight
     }
 }

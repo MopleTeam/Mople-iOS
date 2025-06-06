@@ -37,13 +37,13 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     enum Mutation {
-        case updateMember([MemberInfo])
+        case updateMember([MembersSectionModel])
         case updateLoadingState(Bool)
         case catchError(MemberListError)
     }
     
     struct State {
-        @Pulse var members: [MemberInfo] = []
+        @Pulse var members: [MembersSectionModel] = []
         @Pulse var isLoading: Bool = false
         @Pulse var error: MemberListError?
     }
@@ -94,7 +94,7 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .updateMember(members):
-            newState.members = sortMembersByPosition(members)
+            newState.members = members
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .catchError(err):
@@ -124,7 +124,12 @@ extension MemberListViewReactor {
 extension MemberListViewReactor {
     private func fetchPlanMember() -> Observable<Mutation> {
         let fetchMember = fetchMemberUseCase.execute(type: type)
-            .map { Mutation.updateMember($0.membsers) }
+            .map({ [weak self] memberList -> [MemberInfo] in
+                guard let self else { return [] }
+                return sortMembersByPosition(memberList.membsers)
+            })
+            .map { [MembersSectionModel(items: $0)] }
+            .map { Mutation.updateMember($0) }
         
         return requestWithLoading(task: fetchMember)
     }

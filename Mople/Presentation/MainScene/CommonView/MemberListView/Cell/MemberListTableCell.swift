@@ -18,13 +18,54 @@ final class MemberListTableCell: UITableViewCell {
     var profileTapped: (() -> Void)?
         
     // MARK: - UI Components
-    private let memberInfoView: MemberInfoView = {
+    private let memberView = MemberListView()
+    
+    // MARK: - LifeCycle
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+        setImageTapGesture()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
+        self.backgroundColor = .clear
+        self.contentView.addSubview(memberView)
+        
+        memberView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview().inset(4)
+        }
+    }
+
+    public func configure(with viewModel: MemberListTableCellModel) {
+        memberView.configure(with: viewModel)
+    }
+    
+    // MARK: - Gesture
+    private func setImageTapGesture() {
+        self.memberView.memberInfoView.profileView.rx.tap
+            .subscribe(with: self, onNext: { cell, _ in
+                cell.profileTapped?()
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+final class MemberListView: UIView {
+    
+    public let memberInfoView: MemberInfoView = {
         let view = MemberInfoView()
         view.layer.cornerRadius = 20
         return view
     }()
     
-    private let nameLabel: UILabel = {
+    public let nameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.medium
         label.textColor = .gray02
@@ -42,26 +83,23 @@ final class MemberListTableCell: UITableViewCell {
         return sv
     }()
     
-    // MARK: - LifeCycle
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
         setupUI()
-        setImageTapGesture()
     }
     
-    required init?(coder: NSCoder) {
+    @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .clear
-        self.contentView.addSubview(mainStackView)
+        self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.top.equalToSuperview()
-            make.bottom.equalTo(4)
+            make.edges.equalToSuperview()
         }
         
         memberInfoView.snp.makeConstraints { make in
@@ -74,15 +112,4 @@ final class MemberListTableCell: UITableViewCell {
         memberInfoView.setConfigure(imagePath: viewModel.imagePath,
                                     position: viewModel.position)
     }
-    
-    // MARK: - Gesture
-    private func setImageTapGesture() {
-        self.memberInfoView.profileView.rx.tap
-            .subscribe(with: self, onNext: { cell, _ in
-                cell.profileTapped?()
-            })
-            .disposed(by: disposeBag)
-    }
 }
-
-

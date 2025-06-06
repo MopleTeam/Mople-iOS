@@ -195,9 +195,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
         guard postType == .plan else { return }
         
         postInfoView.rx.participationTapped
-            .do(onNext: { _ in
-                print(#function, #line, "Path : # 탭 ")
-            })
             .bind(to: participationTapped)
             .disposed(by: disposeBag)
     }

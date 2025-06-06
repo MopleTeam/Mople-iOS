@@ -84,7 +84,8 @@ extension ViewDIContainer {
         return MemberListViewController(screenName: .participant_list,
                                         title: "참여자 목록",
                                         reactor: makeMemberListViewReactor(type: type,
-                                                                           coordinator: coordinator))
+                                                                           coordinator: coordinator),
+                                        type: type)
     }
     
     private func makeMemberListViewReactor(type: MemberListType,

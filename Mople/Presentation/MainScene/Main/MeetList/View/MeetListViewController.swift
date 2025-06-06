@@ -78,11 +78,6 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
         setupUI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        ScreenTracking.track(with: self)
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         setLayout()
