@@ -60,18 +60,25 @@ extension MeetDetailSceneDIContainer {
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController {
         makeDetailMeetViewReactor(coordinator: coordinator)
         return .init(screenName: .meet_detail,
-                     title: nil, reactor: mainReactor)
+                     title: nil,
+                     reactor: mainReactor)
     }
     
     private func makeDetailMeetViewReactor(coordinator: MeetDetailCoordination) {
-        self.mainReactor = .init(fetchMeetUseCase: makeFetchMeetDetailUseCase(),
+        let meetRepo = DefaultMeetRepo(networkService: appNetworkService)
+        self.mainReactor = .init(fetchMeetUseCase: makeFetchMeetDetailUseCase(repo: meetRepo),
+                                 inviteMeetUseCase: makeInviteMeetUseCase(repo: meetRepo),
                                  coordinator: coordinator,
                                  meetID: meetId)
     }
     
-    private func makeFetchMeetDetailUseCase() -> FetchMeetDetail {
+    private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         return FetchMeetDetailUseCase(repo: repo)
+    }
+    
+    private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
+        return InviteMeetUseCase(repo: repo)
     }
     
     

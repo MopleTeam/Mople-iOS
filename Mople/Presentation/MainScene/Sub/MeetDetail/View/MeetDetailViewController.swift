@@ -207,9 +207,8 @@ extension MeetDetailViewController {
             .disposed(by: disposeBag)
         
         self.thumbnailView.inviteButton.rx.tap
-            .subscribe(with: self, onNext: { vc, _ in
-                print(#function, #line, "Path : # 탭 ")
-            })
+            .map { Reactor.Action.invite }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 
@@ -231,6 +230,18 @@ extension MeetDetailViewController {
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, meet in
                 vc.thumbnailView.configure(with: .init(meet: meet))
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$inviteUrl)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { [weak self] url -> String? in
+                guard let self,
+                      let url else { return nil }
+                return makeInviteMessage(with: url)
+            }
+            .drive(with: self, onNext: { vc, url in
+                vc.showActivityViewController(items: [url])
             })
             .disposed(by: disposeBag)
         
@@ -287,4 +298,15 @@ extension MeetDetailViewController {
     }
 }
 
-
+// MARK: - Invite
+extension MeetDetailViewController {
+    private func makeInviteMessage(with url: String) -> String {
+        let inviteComment = L10n.Meetdetail.inviteMessage
+        return inviteComment + "\n" + url
+    }
+    
+    private func showActivityViewController(items: [Any]) {
+        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        self.present(ac, animated: true)
+    }
+}

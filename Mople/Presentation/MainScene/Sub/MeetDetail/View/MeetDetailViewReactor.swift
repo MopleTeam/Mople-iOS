@@ -37,6 +37,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case fetchMeetInfo
         case refresh
+        case invite
         case flow(Flow)
         case loading(Loading)
         case editMeet(MeetPayload)
@@ -48,12 +49,13 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case updateMeetInfoLoading(Bool)
         case updatePlanListLoading(Bool)
         case updateReviewListLoading(Bool)
+        case updateInviteUrl(String)
         case catchError(MeetDetailError)
     }
     
     struct State {
         @Pulse var meet: Meet?
-        @Pulse var message: String?
+        @Pulse var inviteUrl: String?
         @Pulse var meetInfoLoaded: Bool = false
         @Pulse var futurePlanLoaded: Bool = false
         @Pulse var pastPlanLoaded: Bool = false
@@ -63,9 +65,11 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Variables
     var initialState: State = State()
     private let meetId: Int
+    private var isLoading = false
     
     // MARK: - UseCase
     private let fetchMeetUseCase: FetchMeetDetail
+    private let inviteMeetUseCase: InviteMeet
     
     // MARK: - Coordinator
     private weak var coordinator: MeetDetailCoordination?
@@ -76,9 +80,11 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - LifeCycle
     init(fetchMeetUseCase: FetchMeetDetail,
+         inviteMeetUseCase: InviteMeet,
          coordinator: MeetDetailCoordination,
          meetID: Int) {
         self.fetchMeetUseCase = fetchMeetUseCase
+        self.inviteMeetUseCase = inviteMeetUseCase
         self.coordinator = coordinator
         self.meetId = meetID
         initialAction()
@@ -99,6 +105,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchMeetInfo:
             return fetchMeetInfo()
+        case .invite:
+            return requestInviteUrl()
         case let .editMeet(payload):
             return handleMeetPayload(with: payload)
         case .refresh:
@@ -119,6 +127,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .setMeetInfo(meet):
             newState.meet = meet
+        case let .updateInviteUrl(url):
+            newState.inviteUrl = url
         case let .updateMeetInfoLoading(isLoading):
             newState.meetInfoLoaded = isLoading
         case let .updatePlanListLoading(isLoading):
@@ -144,6 +154,18 @@ extension MeetDetailViewReactor {
             }
         
         return requestWithLoading(task: fetchMeet)
+    }
+    
+    private func requestInviteUrl() -> Observable<Mutation> {
+        guard let meetId = currentState.meet?.meetSummary?.id, !isLoading else { return .empty() }
+        isLoading = true
+        let inviteMeet = inviteMeetUseCase.execute(id: meetId)
+            .map { Mutation.updateInviteUrl($0) }
+        
+        return requestWithLoading(task: inviteMeet)
+            .do(onDispose: { [weak self] in
+                self?.isLoading = false
+            })
     }
 }
 

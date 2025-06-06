@@ -38,13 +38,11 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         case updateMeet(_ meet: Meet)
         case checkHost(_ isHost: Bool)
         case updateLoadingState(Bool)
-        case updateInviteUrl(String)
         case catchError(MeetSetupError?)
     }
     
     struct State {
         @Pulse var meet: Meet?
-        @Pulse var inviteUrl: String?
         @Pulse var isHost: Bool = false
         @Pulse var isLoading: Bool = false
         @Pulse var error: MeetSetupError?
@@ -101,8 +99,6 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateMeet(meet):
             newState.meet = meet
-        case let .updateInviteUrl(url):
-            newState.inviteUrl = url
         case let .checkHost(isHost):
             newState.isHost = isHost
         case let .updateLoadingState(isLoading):
