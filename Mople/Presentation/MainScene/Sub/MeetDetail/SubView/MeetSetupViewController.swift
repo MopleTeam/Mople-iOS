@@ -371,7 +371,7 @@ extension MeetSetupViewController {
 // MARK: - Invite
 extension MeetSetupViewController {
     private func makeInviteMessage(with url: String) -> String {
-        let inviteComment = L10n.Meetdetail.invite
+        let inviteComment = L10n.Meetdetail.inviteMessage
         return inviteComment + "\n" + url
     }
     

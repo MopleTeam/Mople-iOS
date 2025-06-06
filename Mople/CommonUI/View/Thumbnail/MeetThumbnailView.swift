@@ -43,7 +43,7 @@ final class MeetDetailThumbnail: ThumbnailView {
     
     override func setMemberCount(_ countText: String?) {
         guard let countText else { return }
-        memberCountLabel.text = countText + "초대하기"
+        memberCountLabel.text = countText + " · " + L10n.Meetdetail.invite
         memberCountLabel.addContent(with: arrowImageView, size: .init(width: 20, height: 20))
         memberCountLabel.setSpacing(0)
         memberCountLabel.isUserInteractionEnabled = false
