@@ -33,17 +33,20 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         }
         
         case fetchPlanMemeber
+        case invite
         case flow(Flow)
     }
     
     enum Mutation {
         case updateMember([MembersSectionModel])
+        case updateInviteUrl(String)
         case updateLoadingState(Bool)
         case catchError(MemberListError)
     }
     
     struct State {
         @Pulse var members: [MembersSectionModel] = []
+        @Pulse var inviteUrl: String?
         @Pulse var isLoading: Bool = false
         @Pulse var error: MemberListError?
     }
@@ -51,9 +54,11 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Variables
     var initialState: State = State()
     private let type: MemberListType
+    private var isLoading = false
     
     // MARK: - UseCase
     private let fetchMemberUseCase: FetchMemberList
+    private let inviteMeetUseCase: InviteMeet
     
     // MARK: - Coordinator
     private weak var coordinator: MemberListViewCoordination?
@@ -61,8 +66,10 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - LifeCycle
     init(type: MemberListType,
          fetchMemberUseCase: FetchMemberList,
+         inviteMeetUseCase: InviteMeet,
          coordinator: MemberListViewCoordination) {
         self.fetchMemberUseCase = fetchMemberUseCase
+        self.inviteMeetUseCase = inviteMeetUseCase
         self.coordinator = coordinator
         self.type = type
         initialAction()
@@ -83,6 +90,8 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchPlanMemeber:
             return fetchPlanMember()
+        case .invite:
+            return requestInviteUrl()
         case let .flow(action):
             return handleFlowAction(action)
         }
@@ -95,6 +104,8 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateMember(members):
             newState.members = members
+        case let .updateInviteUrl(url):
+            newState.inviteUrl = url
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
         case let .catchError(err):
@@ -140,6 +151,21 @@ extension MemberListViewReactor {
         case let .plan(id): return id.map { .plan(id: $0) }
         case let .review(id): return id.map { .review(id: $0) }
         }
+    }
+    
+    private func requestInviteUrl() -> Observable<Mutation> {
+        guard case .meet(let id) = type,
+              let id,
+              !isLoading else { return .empty() }
+        
+        isLoading = true
+        let inviteMeet = inviteMeetUseCase.execute(id: id)
+            .map { Mutation.updateInviteUrl($0) }
+        
+        return requestWithLoading(task: inviteMeet)
+            .do(onDispose: { [weak self] in
+                self?.isLoading = false
+            })
     }
 }
 

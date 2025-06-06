@@ -90,14 +90,21 @@ extension ViewDIContainer {
     
     private func makeMemberListViewReactor(type: MemberListType,
                                            coordinator: MemberListViewCoordination) -> MemberListViewReactor {
-        let memberRepo = DefaultMemberRepo(networkService: appNetworkService)
+        
         return .init(type: type,
-                     fetchMemberUseCase: makeFetchMemberUseCase(repo: memberRepo),
+                     fetchMemberUseCase: makeFetchMemberUseCase(),
+                     inviteMeetUseCase: makeInviteMeetUseCase(),
                      coordinator: coordinator)
     }
     
-    private func makeFetchMemberUseCase(repo: MemberRepo) -> FetchMemberList {
+    private func makeFetchMemberUseCase() -> FetchMemberList {
+        let repo = DefaultMemberRepo(networkService: appNetworkService)
         return FetchMemberUseCase(memberListRepo: repo)
+    }
+    
+    private func makeInviteMeetUseCase() -> InviteMeet {
+        let repo = DefaultMeetRepo(networkService: appNetworkService)
+        return InviteMeetUseCase(repo: repo)
     }
     
     // MARK: - 포토뷰

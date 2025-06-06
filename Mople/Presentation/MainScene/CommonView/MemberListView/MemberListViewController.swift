@@ -126,6 +126,16 @@ extension MemberListViewController {
     }
     
     private func setActionBind(_ reactor: Reactor) {
+        userProfileTap
+            .map { Reactor.Action.flow(.showUserImage(imagePath: $0)) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        invite
+            .map { Reactor.Action.invite }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         naviBar.leftItemEvent
             .map { Reactor.Action.flow(.endView) }
             .bind(to: reactor.action)
@@ -136,16 +146,20 @@ extension MemberListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        userProfileTap
-            .map { Reactor.Action.flow(.showUserImage(imagePath: $0)) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+        
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$isLoading)
-            .asDriver(onErrorJustReturn: false)
-            .drive(self.rx.isLoading)
+        reactor.pulse(\.$inviteUrl)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { [weak self] url -> String? in
+                guard let self,
+                      let url else { return nil }
+                return makeInviteMessage(with: url)
+            }
+            .drive(with: self, onNext: { vc, url in
+                vc.showActivityViewController(items: [url])
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$members)
@@ -155,10 +169,15 @@ extension MemberListViewController {
         
         reactor.pulse(\.$members)
             .asDriver(onErrorJustReturn: [])
-            .map({ $0.count })
+            .map({ $0.reduce(0, { $0 + $1.items.count}) })
             .drive(with: self, onNext: { vc, count in
                 vc.countView.countText = L10n.peopleCount(count)
             })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)
@@ -217,5 +236,18 @@ extension MemberListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard case .meet = viewType else { return 0 }
         return sectionHeight
+    }
+}
+
+// MARK: - Invite
+extension MemberListViewController {
+    private func makeInviteMessage(with url: String) -> String {
+        let inviteComment = L10n.Meetdetail.inviteMessage
+        return inviteComment + "\n" + url
+    }
+    
+    private func showActivityViewController(items: [Any]) {
+        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        self.present(ac, animated: true)
     }
 }
