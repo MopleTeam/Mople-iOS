@@ -150,7 +150,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     private func setupNavi() {
         self.setBarItem(type: .left)
-        self.setBarItem(type: .right, image: .invite)
     }
     
     private func setLayout() {
@@ -255,11 +254,6 @@ extension MeetSetupViewController {
     private func setActionBind(_ reactor: Reactor) {
         naviBar.leftItemEvent
             .map { Reactor.Action.flow(.pop) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        naviBar.rightItemEvent
-            .map { Reactor.Action.invite }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
