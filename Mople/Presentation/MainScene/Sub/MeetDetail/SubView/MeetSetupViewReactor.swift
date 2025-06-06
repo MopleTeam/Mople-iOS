@@ -28,7 +28,6 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
             case endFlow
         }
         
-        case invite
         case setMeet(_ meet: Meet)
         case editMeet(MeetPayload)
         case flow(Flow)
@@ -39,13 +38,11 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         case updateMeet(_ meet: Meet)
         case checkHost(_ isHost: Bool)
         case updateLoadingState(Bool)
-        case updateInviteUrl(String)
         case catchError(MeetSetupError?)
     }
     
     struct State {
         @Pulse var meet: Meet?
-        @Pulse var inviteUrl: String?
         @Pulse var isHost: Bool = false
         @Pulse var isLoading: Bool = false
         @Pulse var error: MeetSetupError?
@@ -57,7 +54,6 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - UseCase
     private let deleteMeetUseCase: DeleteMeet
-    private let inviteMeetUseCase: InviteMeet
     
     // MARK: - Coordinator
     private weak var coordinator: MeetSetupCoordination?
@@ -65,10 +61,8 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - LifeCycle
     init(meet: Meet,
          deleteMeetUseCase: DeleteMeet,
-         inviteMeetUseCase: InviteMeet,
          coordinator: MeetSetupCoordination) {
         self.deleteMeetUseCase = deleteMeetUseCase
-        self.inviteMeetUseCase = inviteMeetUseCase
         self.coordinator = coordinator
         initialAction(meet: meet)
         logLifeCycle()
@@ -87,8 +81,6 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
     func mutate(action: Action) -> Observable<Mutation> {
         guard isLoading == false else { return .empty() }
         switch action {
-        case .invite:
-            return requestInviteUrl()
         case let .setMeet(Meet):
             return setMeetInfo(Meet)
         case let .flow(action):
@@ -107,8 +99,6 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateMeet(meet):
             newState.meet = meet
-        case let .updateInviteUrl(url):
-            newState.inviteUrl = url
         case let .checkHost(isHost):
             newState.isHost = isHost
         case let .updateLoadingState(isLoading):
@@ -149,18 +139,6 @@ extension MeetSetupViewReactor {
             }
         
         return requestWithLoading(task: deleteMeet)
-            .do(onDispose: { [weak self] in
-                self?.isLoading = false
-            })
-    }
-    
-    private func requestInviteUrl() -> Observable<Mutation> {
-        guard let meetId = currentState.meet?.meetSummary?.id else { return .empty() }
-        isLoading = true
-        let inviteMeet = inviteMeetUseCase.execute(id: meetId)
-            .map { Mutation.updateInviteUrl($0) }
-        
-        return requestWithLoading(task: inviteMeet)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false
             })

@@ -150,7 +150,6 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     
     private func setupNavi() {
         self.setBarItem(type: .left)
-        self.setBarItem(type: .right, image: .invite)
     }
     
     private func setLayout() {
@@ -258,11 +257,6 @@ extension MeetSetupViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        naviBar.rightItemEvent
-            .map { Reactor.Action.invite }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         endFlow
             .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
@@ -297,18 +291,6 @@ extension MeetSetupViewController {
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, meet in
                 vc.setMeetInfo(meet)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$inviteUrl)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap { [weak self] url -> String? in
-                guard let self,
-                      let url else { return nil }
-                return makeInviteMessage(with: url)
-            }
-            .drive(with: self, onNext: { vc, url in
-                vc.showActivityViewController(items: [url])
             })
             .disposed(by: disposeBag)
         
@@ -371,18 +353,5 @@ extension MeetSetupViewController {
                                  textColor: .gray01,
                                  bgColor: .appTertiary),
             addAction: [action])
-    }
-}
-
-// MARK: - Invite
-extension MeetSetupViewController {
-    private func makeInviteMessage(with url: String) -> String {
-        let inviteComment = L10n.Meetdetail.invite
-        return inviteComment + "\n" + url
-    }
-    
-    private func showActivityViewController(items: [Any]) {
-        let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        self.present(ac, animated: true)
     }
 }

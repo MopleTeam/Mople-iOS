@@ -239,6 +239,9 @@
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
 		52A787762D0348B400A633B3 /* DateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* DateSelectViewController.swift */; };
 		52A7E35F2D686A57004782AF /* NSMutableAttributedString+Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */; };
+		52A8B7062DF2E741001AF847 /* MeetThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */; };
+		52A8B7082DF32E3E001AF847 /* MemberListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A8B7072DF32E3E001AF847 /* MemberListSectionModel.swift */; };
+		52A8B70B2DF33577001AF847 /* MemberTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A8B70A2DF33577001AF847 /* MemberTableHeader.swift */; };
 		52AAAF8D2D92970300CA9CE1 /* ErrorHandlingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */; };
 		52AD4B6C2D5A471000FCA929 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */; };
 		52AD4B6F2D5B1BFC00FCA929 /* ProfileEditRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */; };
@@ -625,6 +628,9 @@
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* DateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSelectViewController.swift; sourceTree = "<group>"; };
 		52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Highlight.swift"; sourceTree = "<group>"; };
+		52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetThumbnailView.swift; sourceTree = "<group>"; };
+		52A8B7072DF32E3E001AF847 /* MemberListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListSectionModel.swift; sourceTree = "<group>"; };
+		52A8B70A2DF33577001AF847 /* MemberTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberTableHeader.swift; sourceTree = "<group>"; };
 		52AAAF8C2D92970300CA9CE1 /* ErrorHandlingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandlingService.swift; sourceTree = "<group>"; };
 		52AD4B6B2D5A471000FCA929 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		52AD4B6E2D5B1BFC00FCA929 /* ProfileEditRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditRequest.swift; sourceTree = "<group>"; };
@@ -888,12 +894,12 @@
 			path = Write;
 			sourceTree = "<group>";
 		};
-		5207C9112CB1E10400BB27A6 /* ViewModel */ = {
+		5207C9112CB1E10400BB27A6 /* SectionModel */ = {
 			isa = PBXGroup;
 			children = (
 				52CB41DD2CA2EC2B0071679D /* PostListSectionModel.swift */,
 			);
-			path = ViewModel;
+			path = SectionModel;
 			sourceTree = "<group>";
 		};
 		5208C1722CBE2B03006272E8 /* Kingfisher */ = {
@@ -1147,7 +1153,9 @@
 			children = (
 				522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */,
 				522958432D5207C300AE4EC3 /* MemberListViewController.swift */,
+				52A8B7072DF32E3E001AF847 /* MemberListSectionModel.swift */,
 				522958472D5207EE00AE4EC3 /* Cell */,
+				52A8B7092DF3356A001AF847 /* Header */,
 			);
 			path = MemberListView;
 			sourceTree = "<group>";
@@ -1406,7 +1414,7 @@
 			children = (
 				528E0A032D6BB20C00832BA7 /* PostListViewReactor.swift */,
 				5259B00C2C9FD316006B2711 /* PostListViewController.swift */,
-				5207C9112CB1E10400BB27A6 /* ViewModel */,
+				5207C9112CB1E10400BB27A6 /* SectionModel */,
 				52E99EE72CA1B3C5007E552C /* HeaderView */,
 				5259B01B2CA03897006B2711 /* Cell */,
 			);
@@ -1519,6 +1527,7 @@
 			children = (
 				52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */,
 				5259B0132C9FF32F006B2711 /* ThumbnailView.swift */,
+				52A8B7052DF2E741001AF847 /* MeetThumbnailView.swift */,
 			);
 			path = Thumbnail;
 			sourceTree = "<group>";
@@ -1914,6 +1923,14 @@
 				52C520102D0D99C00085F5F7 /* Cell */,
 			);
 			path = MeetSelectView;
+			sourceTree = "<group>";
+		};
+		52A8B7092DF3356A001AF847 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				52A8B70A2DF33577001AF847 /* MemberTableHeader.swift */,
+			);
+			path = Header;
 			sourceTree = "<group>";
 		};
 		52AAAF8B2D8DA66000CA9CE1 /* HomeData */ = {
@@ -3263,6 +3280,7 @@
 				5231DF472D2F9F9000D52529 /* CreateMeetRequest.swift in Sources */,
 				529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */,
 				52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */,
+				52A8B7062DF2E741001AF847 /* MeetThumbnailView.swift in Sources */,
 				524B2F6C2D34046E00D80B12 /* AppNavigationController.swift in Sources */,
 				5200C36E2CFF66D000C0CEFC /* Single+retry.swift in Sources */,
 				527A3E8F2C836192007FE63B /* HomeViewController.swift in Sources */,
@@ -3330,6 +3348,7 @@
 				529003012D95455A0059AB34 /* ResponseError.swift in Sources */,
 				5214F8B32D2C9CC200E8CE9C /* MeetSummaryResponse.swift in Sources */,
 				52EC04CB2D3BF4DA00000C99 /* ImageUpload.swift in Sources */,
+				52A8B7082DF32E3E001AF847 /* MemberListSectionModel.swift in Sources */,
 				527A3E722C8302AA007FE63B /* FetchHomeData.swift in Sources */,
 				5201853A2DA8E5B800C2B4FC /* NotifyListFlowCoordinator.swift in Sources */,
 				52B8E1232D5392EA00F7FF59 /* PhotoCollectionView.swift in Sources */,
@@ -3410,6 +3429,7 @@
 				523E76152D5D2E0D00BD22CB /* ImageWrapper.swift in Sources */,
 				52A6A04F2D42CC520041CDE9 /* PhotoViewTableCell.swift in Sources */,
 				523A17FB2DD0A0730071BDBD /* PostSummary.swift in Sources */,
+				52A8B70B2DF33577001AF847 /* MemberTableHeader.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				52EC04FE2D3E811000000C99 /* CommentTableCellModel.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* UIImageView+Kingfisher.swift in Sources */,
