@@ -15,7 +15,7 @@ final class MeetDetailThumbnail: ThumbnailView {
         return view
     }()
     
-    public let memberListButton = UIButton()
+    public let inviteButton = UIButton()
     
     override init(thumbnailSize: CGFloat,
                   thumbnailRadius: CGFloat) {
@@ -29,10 +29,10 @@ final class MeetDetailThumbnail: ThumbnailView {
     }
     
     private func setLayout() {
-        memberListButton.addSubview(memberCountLabel)
-        groupInfoStackView.addArrangedSubview(memberListButton)
+        inviteButton.addSubview(memberCountLabel)
+        groupInfoStackView.addArrangedSubview(inviteButton)
 
-        memberListButton.snp.makeConstraints { make in
+        inviteButton.snp.makeConstraints { make in
             make.height.equalTo(20)
         }
         

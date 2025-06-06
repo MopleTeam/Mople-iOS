@@ -206,7 +206,7 @@ extension MeetDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.thumbnailView.memberListButton.rx.tap
+        self.thumbnailView.inviteButton.rx.tap
             .subscribe(with: self, onNext: { vc, _ in
                 print(#function, #line, "Path : # 탭 ")
             })
