@@ -141,16 +141,11 @@ extension MeetDetailSceneDIContainer {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         return .init(meet: meet,
                      deleteMeetUseCase: makeDeleteMeetUseCase(repo: repo),
-                     inviteMeetUseCase: makeInviteMeetUseCase(repo: repo),
                      coordinator: coordinator)
     }
     
     private func makeDeleteMeetUseCase(repo: MeetRepo) -> DeleteMeet {
         return DeleteMeetUseCase(repo: repo)
-    }
-    
-    private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
-        return InviteMeetUseCase(repo: repo)
     }
     
     // MARK: - 모임 수정 뷰
