@@ -19,7 +19,7 @@ final class MeetPlanListViewController: BaseViewController, View {
     
     // MARK: - Observable
     private let participation: PublishSubject<(id: Int,
-                                               isJoining: Bool)> = .init()
+                                               isJoin: Bool)> = .init()
     private let refresh: PublishSubject<Void> = .init()
             
     // MARK: - Variables
@@ -158,7 +158,7 @@ extension MeetPlanListViewController {
         
         participation
             .map { Reactor.Action.requsetParticipation(id: $0.id,
-                                                       isJoining: $0.isJoining) }
+                                                       isJoin: $0.isJoin) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -217,7 +217,7 @@ extension MeetPlanListViewController {
                 cell.completeTapped = { [weak self] in
                     guard let planId = item.id else { return }
                     self?.handleParticipationPlan(id: planId,
-                                                  isJoining: item.isParticipation)
+                                                  isJoin: item.isParticipation)
                 }
             }
             .disposed(by: disposeBag)
@@ -230,10 +230,35 @@ extension MeetPlanListViewController {
             })
             .disposed(by: disposeBag)
     }
+}
+
+// MARK: - Handle Plan Participation
+extension MeetPlanListViewController {
     
-    /// 참여, 불참 요청
-    private func handleParticipationPlan(id: Int, isJoining: Bool) {
-        participation.onNext((id, isJoining))
+    /// 일정 참여 핸들링
+    private func handleParticipationPlan(id: Int, isJoin: Bool) {
+        if !isJoin {
+            participation.onNext((id, true))
+        } else {
+            showLeavePlanAlert(id: id)
+        }
+    }
+    
+    
+    /// 일정 떠나기 알림
+    /// - Parameter id: 일정 ID
+    private func showLeavePlanAlert(id: Int) {
+        let createAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                     bgColor: .appSecondary,
+                                                     completion: { [weak self] in
+            self?.participation.onNext((id, false))
+        })
+        
+        alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
+                                      defaultAction: .init(text: L10n.cancle,
+                                                           textColor: .gray01,
+                                                           bgColor: .appTertiary),
+                                      addAction: [createAction])
     }
 }
 
