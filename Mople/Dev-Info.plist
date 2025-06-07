@@ -37,7 +37,7 @@
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).invite</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>mople</string>
+				<string>mopleDev</string>
 			</array>
 		</dict>
 	</array>
