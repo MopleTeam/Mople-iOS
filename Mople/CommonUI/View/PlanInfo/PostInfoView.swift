@@ -272,7 +272,7 @@ extension PostInfoView {
     
     private func setParticipation(with isParticipation: Bool) {
         participationButton.title = isParticipation
-        ? L10n.Meetdetail.planLeave
+        ? L10n.Meetdetail.planJoined
         : L10n.Meetdetail.planJoin
         participationButton.updateSelectedBackColor(isSelected: isParticipation)
         participationButton.updateSelectedTextColor(isSelected: isParticipation)

@@ -14,7 +14,7 @@ protocol PlanRepo {
     func fetchMeetPlanList(_ meetId: Int) -> Single<[PlanResponse]>
     func createPlan(request: PlanRequest) -> Single<PlanResponse>
     func participationPlan(planId: Int,
-                                  isJoining: Bool) -> Single<Void>
+                                  isJoin: Bool) -> Single<Void>
     func editPlan(request: PlanRequest) -> Single<PlanResponse>
     func deletePlan(id: Int) -> Single<Void>
 }

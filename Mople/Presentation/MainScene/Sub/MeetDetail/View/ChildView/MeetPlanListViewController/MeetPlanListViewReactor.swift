@@ -17,7 +17,7 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     enum Action {
         case selectedPlan(index: Int)
         case requestPlanList
-        case requsetParticipation(id: Int, isJoining: Bool)
+        case requsetParticipation(id: Int, isJoin: Bool)
         case switchParticipation(id: Int)
         case updatePlan(_ planPayload: PlanPayload)
         case refresh
@@ -67,8 +67,8 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .requestPlanList:
             return fetchPlanList()
-        case let .requsetParticipation(id, isJoining):
-            return handleParticipation(planId: id, isJoining: isJoining)
+        case let .requsetParticipation(id, isJoin):
+            return handleParticipation(planId: id, isJoin: isJoin)
         case let .selectedPlan(index):
             return presentPlanDetailView(index: index)
         case let .updatePlan(payload):
@@ -125,7 +125,7 @@ extension MeetPlanListViewReactor {
     // 일정이 사라진 경우 : delete post
     // 일정 시간이 마감된 경우 : UI 업데이트
     private func handleParticipation(planId: Int,
-                                     isJoining: Bool) -> Observable<Mutation> {
+                                     isJoin: Bool) -> Observable<Mutation> {
         
         guard let planIndex = currentState.plans.firstIndex(where: { $0.id == planId }),
               let planDate = currentState.plans[safe: planIndex]?.date else { return .empty() }
@@ -138,16 +138,16 @@ extension MeetPlanListViewReactor {
         default:
             return requestParticipation(id: planId,
                                         planIndex: planIndex,
-                                        isJoining: isJoining)
+                                        isJoin: isJoin)
         }
     }
     
     private func requestParticipation(id: Int,
                                       planIndex: Int,
-                                      isJoining: Bool) -> Observable<Mutation> {
+                                      isJoin: Bool) -> Observable<Mutation> {
         let requestParticipation = participationPlanUseCase
             .execute(planId: id,
-                     isJoining: isJoining)
+                     isJoin: isJoin)
             .catch({ [weak self] in
                 let err = self?.resolveParticipationError(err: $0,
                                                           planId: id)

@@ -87,6 +87,7 @@
 "meetdetail.plan_end" = "해당 약속은 마감되었어요";
 "meetdetail.Plan_join" = "약속 참여하기";
 "meetdetail.plan_joined" = "약속 참여중";
+"meetdetail.plan_leave_info" = "약속참여를 취소할까요?";
 "meetdetail.invite" = "초대하기";
 
 // MARK: - Meet Detail Setup
@@ -177,7 +178,7 @@
 "check" = "확인";
 "save" = "저장";
 "cancle" = "취소";
-"yes" = "예";
+"yes" = "네";
 "no" = "아니오";
 "participant_count" = "%d명 참여";
 "people_count" = "%d명";

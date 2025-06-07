@@ -36,10 +36,9 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     
     // MARK: - Observable
     private let endFlow: PublishSubject<Void> = .init()
-    
     private let memberListTapped: PublishRelay<Void> = .init()
     private let mapTapped: PublishRelay<Void> = .init()
-    private let participationTapped: PublishRelay<Void> = .init()
+    private let participation: PublishRelay<Void> = .init()
     private let cancleComment: PublishRelay<Void> = .init()
     private let editPost: PublishSubject<Void> = .init()
     private let deletePost: PublishSubject<Void> = .init()
@@ -195,7 +194,9 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
         guard postType == .plan else { return }
         
         postInfoView.rx.participationTapped
-            .bind(to: participationTapped)
+            .subscribe(with: self, onNext: { vc, isJoin in
+                vc.handleParticipationPlan()
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -243,7 +244,7 @@ extension PostDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        participationTapped
+        participation
             .map { Reactor.Action.post(.participation) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -367,6 +368,33 @@ extension PostDetailViewController {
         case .unknown, .failComment:
             alertManager.showDefatulErrorMessage()
         }
+    }
+}
+
+// MARK: - Handle Plan Participation
+extension PostDetailViewController {
+    private func handleParticipationPlan() {
+        guard let planSummary = postSummary as? PlanPostSummary else { return }
+        
+        if !planSummary.isParticipation {
+            participation.accept(())
+        } else {
+            showLeavePlanAlert()
+        }
+    }
+    
+    private func showLeavePlanAlert() {
+        let createAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                     bgColor: .appSecondary,
+                                                     completion: { [weak self] in
+            self?.participation.accept(())
+        })
+        
+        alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
+                                      defaultAction: .init(text: L10n.cancle,
+                                                           textColor: .gray01,
+                                                           bgColor: .appTertiary),
+                                      addAction: [createAction])
     }
 }
 
