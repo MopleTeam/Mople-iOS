@@ -8,6 +8,12 @@
 import Foundation
 
 enum AppConfiguration {
+    #if DEV
+    static let schemeTitle = "mopleDev"
+    #else
+    static let schemeTitle = "mople"
+    #endif
+    
     static let apiBaseURL = getValue(forKey: "ApiBaseURL")
     static let policyURL = getValue(forKey: "PolicyURL")
     static let kakaoKey = getValue(forKey: "KakaoKey")

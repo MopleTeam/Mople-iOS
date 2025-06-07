@@ -115,9 +115,8 @@ extension AppFlowCoordinator {
 extension AppFlowCoordinator {
     func handleInvite(with url: URL) {
         guard let scheme = url.scheme,
-              scheme == "mople",
+              scheme == AppConfiguration.schemeTitle,
               let inviteCode = url.queryParameters["code"] else { return }
-        
         mainReadySubject
             .take(1)
             .subscribe(onNext: { [weak self] in
