@@ -86,7 +86,7 @@
 "meetdetail.reviwelist" = "지난 약속";
 "meetdetail.plan_end" = "해당 약속은 마감되었어요";
 "meetdetail.Plan_join" = "약속 참여하기";
-"meetdetail.plan_leave" = "약속 불참";
+"meetdetail.plan_joined" = "약속 참여중";
 "meetdetail.invite" = "초대하기";
 
 // MARK: - Meet Detail Setup
