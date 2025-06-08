@@ -86,7 +86,6 @@ final class SearchPlaceViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initial Setup
     private func initialAction() {
-        action.onNext(.updateUserLocation)
         action.onNext(.fetchCahcedPlace)
     }
     

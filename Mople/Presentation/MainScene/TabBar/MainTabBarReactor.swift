@@ -55,16 +55,10 @@ final class MainTabBarReactor: Reactor, LifeCycleLoggable {
         self.joinMeetUseCae = joinMeetUseCase
         self.notificationService = notificationService
         self.coordinator = coordinator
-        initialAction()
     }
     
     deinit {
         logLifeCycle()
-    }
-    
-    // MARK: - Initial Setup
-    private func initialAction() {
-        action.onNext(.checkNotificationPermission)
     }
     
     // MARK: - State Mutation
