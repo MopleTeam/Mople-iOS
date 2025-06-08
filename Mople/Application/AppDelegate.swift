@@ -8,6 +8,7 @@
 import UIKit
 import KakaoSDKCommon
 import FirebaseCore
+import Firebase
 import FirebaseMessaging
 import KakaoSDKAuth
 import NMapsMap
