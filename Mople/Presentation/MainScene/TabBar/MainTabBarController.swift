@@ -123,6 +123,7 @@ extension MainTabBarController {
         self.rx.viewDidAppear
             .subscribe(with: self, onNext: { vc, _ in
                 vc.setReactorStateBind(reactor)
+                vc.reactor?.action.onNext(.checkNotificationPermission)
             })
             .disposed(by: disposeBag)
     }
