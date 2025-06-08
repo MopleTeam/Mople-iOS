@@ -321,6 +321,7 @@
 		52D9651A2D201756000610B2 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; };
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
+		52DCFFE62DF5BDC600D0A7E5 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 52DCFFE52DF5BDC600D0A7E5 /* FirebaseCrashlytics */; };
 		52DF6DF72DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */; };
 		52DF6DF92DAE3EDD00204297 /* DefaultSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF82DAE3EDD00204297 /* DefaultSwitchView.swift */; };
 		52DF6DFC2DAE44BB00204297 /* AppSettingOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */; };
@@ -1176,6 +1177,7 @@
 				525DFD072CCB640000835312 /* KakaoSDKUser in Frameworks */,
 				52EA6DF62CF75A6600EFD753 /* FirebaseCore in Frameworks */,
 				529291E42DF45EE2005A9453 /* NMapsMap in Frameworks */,
+				52DCFFE62DF5BDC600D0A7E5 /* FirebaseCrashlytics in Frameworks */,
 				525AA90C2C915C6D0087913F /* FSCalendar in Frameworks */,
 				52E2383A2C765A2D0066C9A3 /* ReactorKit in Frameworks */,
 				529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */,
@@ -3433,6 +3435,7 @@
 				52C72E842C4FBD6400CFF329 /* Resources */,
 				52CC75DC2D1EA2AB000CC8B9 /* Embed Frameworks */,
 				52E6AEA92DC90ECD006B5CB2 /* SwiftGen */,
+				52DCFFE42DF5B8EE00D0A7E5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -3458,6 +3461,7 @@
 				52D965192D201756000610B2 /* RealmSwift */,
 				52C013732DC0FFDB00B154F2 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				529291E32DF45EE2005A9453 /* NMapsMap */,
+				52DCFFE52DF5BDC600D0A7E5 /* FirebaseCrashlytics */,
 			);
 			productName = Mople;
 			productReference = 52C72E862C4FBD6400CFF329 /* Mople.app */;
@@ -3600,6 +3604,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		52DCFFE42DF5B8EE00D0A7E5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}.debug.dylib",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
 		52E6AEA92DC90ECD006B5CB2 /* SwiftGen */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -4423,6 +4450,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4481,6 +4509,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -4519,6 +4548,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.4;
+				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4565,6 +4595,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.4;
+				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4954,6 +4985,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 52D965182D201756000610B2 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
+		};
+		52DCFFE52DF5BDC600D0A7E5 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseCrashlytics;
 		};
 		52E238392C765A2D0066C9A3 /* ReactorKit */ = {
 			isa = XCSwiftPackageProductDependency;
