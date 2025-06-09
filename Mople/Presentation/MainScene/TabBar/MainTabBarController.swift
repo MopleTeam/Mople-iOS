@@ -16,12 +16,16 @@ final class MainTabBarController: UITabBarController, View {
     typealias Reactor = MainTabBarReactor
     var disposeBag: DisposeBag = DisposeBag()
     
+    // MARK: - Variables
+    private var isDidRander = false
+    
     // MARK: - Alert
     private let alertManager = AlertManager.shared
     
     // MARK: - Observable
     private let joinMeetSubject: PublishSubject<String> = .init()
     private let resetNotifySubject: PublishSubject<Void> = .init()
+    private let reqeusetNotification: PublishSubject<Void> = .init()
     
     // MARK: - Indicator
     private let indicator: UIActivityIndicatorView = {
@@ -34,9 +38,10 @@ final class MainTabBarController: UITabBarController, View {
     // MARK: - UI Components
     private let borderView: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .clear
         view.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         view.layer.makeLine(width: 1, color: .appStroke)
+        view.isUserInteractionEnabled = false
         return view
     }()
     
@@ -44,7 +49,6 @@ final class MainTabBarController: UITabBarController, View {
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
-        print(#function, #line, "LifeCycle Test DefaultTabBarController Created" )
     }
     
     required init?(coder: NSCoder) {
@@ -55,20 +59,26 @@ final class MainTabBarController: UITabBarController, View {
         print(#function, #line, "LifeCycle Test DefaultTabBarController Deinit" )
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        setTabBar()
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        viewDidRender()
         updateTabBarFrame()
+    }
+    
+    private func viewDidRender() {
+        guard !isDidRander else { return }
+        isDidRander = true
+        setTabBar()
+        setupUI()
+        trackingTapVC()
+        setReactorStateBind(reactor!)
+        checkNotifyPermisstion()
     }
 
     // MARK: - Setup UI
     private func setupUI() {
         self.view.addSubview(indicator)
+        self.tabBar.backgroundColor = .defaultWhite
         self.tabBar.addSubview(borderView)
         
         indicator.snp.makeConstraints { make in
@@ -83,7 +93,7 @@ final class MainTabBarController: UITabBarController, View {
     }
     
     private func setTabBar() {
-        tabBar.delegate = self
+        self.delegate = self
         tabBar.clipsToBounds = false
         tabBar.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         tabBar.layer.makeShadow(opactity: 0.02,
@@ -105,27 +115,21 @@ final class MainTabBarController: UITabBarController, View {
             indicator.stopAnimating()
         }
     }
+    
+    private func checkNotifyPermisstion() {
+        reqeusetNotification.onNext(())
+    }
 }
 
 // MARK: - Reactor Setup
 extension MainTabBarController {
     func bind(reactor: MainTabBarReactor) {
         inputBind(reactor)
-        outputBind(reactor)
     }
     
     private func inputBind(_ reactor: Reactor) {
         setActionBind(reactor)
         setNotificationBind(reactor)
-    }
-
-    private func outputBind(_ reactor: Reactor) {
-        self.rx.viewDidAppear
-            .subscribe(with: self, onNext: { vc, _ in
-                vc.setReactorStateBind(reactor)
-                vc.reactor?.action.onNext(.checkNotificationPermission)
-            })
-            .disposed(by: disposeBag)
     }
 
     private func setActionBind(_ reactor: Reactor) {
@@ -138,10 +142,17 @@ extension MainTabBarController {
             .map { Reactor.Action.resetNotify }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        reqeusetNotification
+            .observe(on: MainScheduler.asyncInstance)
+            .map { Reactor.Action.checkNotificationPermission }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func setNotificationBind(_ reactor: Reactor) {
         NotificationManager.shared.addObservable(name: .updateFCMToken)
+            .observe(on: MainScheduler.asyncInstance)
             .map { Reactor.Action.checkNotificationPermission }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -166,6 +177,19 @@ extension MainTabBarController {
     }
 }
 
+extension MainTabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        trackingTapVC()
+    }
+    
+    private func trackingTapVC() {
+        guard let currentVC = UIApplication.shared.topVC,
+              let screenVC = currentVC as? BaseViewController else { return }
+        ScreenTracking.track(with: screenVC)
+    }
+}
+
+// MARK: - Helper
 extension MainTabBarController {
     func viewController<T: UIViewController>(ofType type: T.Type) -> T? {
         let navs = viewControllers as? [UINavigationController] ?? []

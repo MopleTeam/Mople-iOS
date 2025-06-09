@@ -92,6 +92,7 @@ final class MainTabBarReactor: Reactor, LifeCycleLoggable {
 // MARK: - Permission
 extension MainTabBarReactor {
     private func requestNotificationPermission() -> Observable<Mutation> {
+        print(#function, #line, "Path : # 시점 테스트 ")
         return notificationService.requestPermissions()
             .flatMap { [weak self] isAllow -> Observable<Mutation> in
                 guard let self,
