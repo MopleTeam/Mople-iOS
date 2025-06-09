@@ -4550,7 +4550,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4598,7 +4598,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
