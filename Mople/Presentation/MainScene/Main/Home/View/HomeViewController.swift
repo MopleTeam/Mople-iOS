@@ -123,11 +123,6 @@ final class HomeViewController: DefaultViewController, View {
         setupUI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        ScreenTracking.track(with: self)
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         setLayout()

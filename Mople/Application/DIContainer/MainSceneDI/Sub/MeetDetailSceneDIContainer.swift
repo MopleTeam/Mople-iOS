@@ -73,7 +73,6 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
-        let repo = DefaultMeetRepo(networkService: appNetworkService)
         return FetchMeetDetailUseCase(repo: repo)
     }
     
@@ -90,25 +89,21 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeMeetPlanListViewReactor() -> MeetPlanListViewReactor {
-        let reactor = MeetPlanListViewReactor(fetchPlanUseCase: makeFetchMeetPlanUsecase(),
-                                              participationPlanUseCase: makeParticipationPlanUseCase(),
+        let repo = DefaultPlanRepo(networkService: appNetworkService)
+        let reactor = MeetPlanListViewReactor(fetchPlanUseCase: makeFetchMeetPlanUsecase(repo: repo),
+                                              participationPlanUseCase: makeParticipationPlanUseCase(repo: repo),
                                               delegate: mainReactor!,
                                               meetId: meetId)
         mainReactor?.planListCommands = reactor
         return reactor
     }
     
-    private func makeFetchMeetPlanUsecase() -> FetchMeetPlanList {
-        let repo = DefaultPlanRepo(networkService: appNetworkService)
+    private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchMeetPlanList {
         return FetchMeetPlanListUsecase(repo: repo)
     }
     
-    private func makeParticipationPlanUseCase() -> ParticipationPlan {
-        return ParticipationPlanUseCase(participationRepo: makeParticipationPlanRepo())
-    }
-    
-    private func makeParticipationPlanRepo() -> PlanRepo {
-        return DefaultPlanRepo(networkService: appNetworkService)
+    private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {
+        return ParticipationPlanUseCase(participationRepo: repo)
     }
     
     // MARK: - 리뷰 리스트

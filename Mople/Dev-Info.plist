@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>mainScheme</key>
+	<string>$(MAIN_SCHEME)</string>
 	<key>ApiBaseURL</key>
 	<string>$(API_BASE_URL)</string>
 	<key>CFBundleLocalizations</key>
@@ -37,7 +39,7 @@
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).invite</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>mopleDev</string>
+				<string>mopledev</string>
 			</array>
 		</dict>
 	</array>

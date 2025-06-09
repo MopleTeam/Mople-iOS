@@ -322,6 +322,7 @@
 		52D9651B2D201760000610B2 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 52D965192D201756000610B2 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */; };
 		52DCFFE62DF5BDC600D0A7E5 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 52DCFFE52DF5BDC600D0A7E5 /* FirebaseCrashlytics */; };
+		52DCFFE82DF5D64300D0A7E5 /* GoogleService-Dev-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52DCFFE72DF5D64300D0A7E5 /* GoogleService-Dev-Info.plist */; };
 		52DF6DF72DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */; };
 		52DF6DF92DAE3EDD00204297 /* DefaultSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DF82DAE3EDD00204297 /* DefaultSwitchView.swift */; };
 		52DF6DFC2DAE44BB00204297 /* AppSettingOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */; };
@@ -707,7 +708,6 @@
 		52E95FE72DF453050036CBCF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52C72E922C4FBD6500CFF329 /* Assets.xcassets */; };
 		52E95FE82DF453050036CBCF /* Pretendard-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E2A2C6B2A450026B601 /* Pretendard-Regular.ttf */; };
 		52E95FE92DF453050036CBCF /* Pretendard-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E2C2C6B2A450026B601 /* Pretendard-Black.ttf */; };
-		52E95FEA2DF453050036CBCF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52EA6DF22CF756F600EFD753 /* GoogleService-Info.plist */; };
 		52E95FEB2DF453050036CBCF /* Pretendard-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E292C6B2A450026B601 /* Pretendard-ExtraLight.ttf */; };
 		52E95FEC2DF453050036CBCF /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 523B9C072DCA9CBC00DF2698 /* Localizable.stringsdict */; };
 		52E95FED2DF453050036CBCF /* Pretendard-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52B87E2E2C6B2A450026B601 /* Pretendard-Thin.ttf */; };
@@ -1094,6 +1094,7 @@
 		52D8648A2D2A9400000F8378 /* MeetReviewListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetReviewListViewController.swift; sourceTree = "<group>"; };
 		52D864912D2BA2DF000F8378 /* PostListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListViewModel.swift; sourceTree = "<group>"; };
 		52D9651D2D23B7A5000610B2 /* KeyboardDismissable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDismissable.swift; sourceTree = "<group>"; };
+		52DCFFE72DF5D64300D0A7E5 /* GoogleService-Dev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Dev-Info.plist"; sourceTree = "<group>"; };
 		52DF6DF62DACFF7F00204297 /* DefaultNotifySubscribeRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNotifySubscribeRepo.swift; sourceTree = "<group>"; };
 		52DF6DF82DAE3EDD00204297 /* DefaultSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSwitchView.swift; sourceTree = "<group>"; };
 		52DF6DFB2DAE44BB00204297 /* AppSettingOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingOpener.swift; sourceTree = "<group>"; };
@@ -2541,6 +2542,7 @@
 			children = (
 				52C72E972C4FBD6500CFF329 /* Info.plist */,
 				52E95FFA2DF453050036CBCF /* Dev-Info.plist */,
+				52DCFFE72DF5D64300D0A7E5 /* GoogleService-Dev-Info.plist */,
 				52EA6DF22CF756F600EFD753 /* GoogleService-Info.plist */,
 				52A2752E2DB1C038007D72CE /* Secrets.xcconfig */,
 				52CB0B382C72A564002B6D20 /* Application */,
@@ -3589,9 +3591,9 @@
 				52E95FE72DF453050036CBCF /* Assets.xcassets in Resources */,
 				52E95FE82DF453050036CBCF /* Pretendard-Regular.ttf in Resources */,
 				52E95FE92DF453050036CBCF /* Pretendard-Black.ttf in Resources */,
-				52E95FEA2DF453050036CBCF /* GoogleService-Info.plist in Resources */,
 				52E95FEB2DF453050036CBCF /* Pretendard-ExtraLight.ttf in Resources */,
 				52E95FEC2DF453050036CBCF /* Localizable.stringsdict in Resources */,
+				52DCFFE82DF5D64300D0A7E5 /* GoogleService-Dev-Info.plist in Resources */,
 				52E95FED2DF453050036CBCF /* Pretendard-Thin.ttf in Resources */,
 				52E95FEE2DF453050036CBCF /* Base in Resources */,
 				52E95FEF2DF453050036CBCF /* Localizable.strings in Resources */,
@@ -4547,6 +4549,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MAIN_SCHEME = mople;
 				MARKETING_VERSION = 1.0.4;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
@@ -4594,6 +4597,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MAIN_SCHEME = mople;
 				MARKETING_VERSION = 1.0.4;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
@@ -4641,7 +4645,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MAIN_SCHEME = mopledev;
+				MARKETING_VERSION = 1.0.5;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;
@@ -4688,7 +4693,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MAIN_SCHEME = mopledev;
+				MARKETING_VERSION = 1.0.5;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;

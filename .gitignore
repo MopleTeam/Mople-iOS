@@ -41,6 +41,7 @@ fastlane/screenshots/**/*.png
 
 # Firebase 설정 파일 (개인별로 다름)
 GoogleService-Info.plist
+GoogleService-Dev-Info.plist
 
 # 시크릿 키 관리용 xcconfig
 Secrets.xcconfig

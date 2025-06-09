@@ -165,11 +165,6 @@ final class ProfileViewController: TitleNaviViewController, View {
         setupUI()
         setAction()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        ScreenTracking.track(with: self)
-    }
 
     // MARK: - UI Setup
     private func setupUI() {

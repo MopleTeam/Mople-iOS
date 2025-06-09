@@ -97,11 +97,6 @@ final class CalendarPostViewController: TitleNaviViewController, View {
     
     private var isFirst: Bool = true
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        ScreenTracking.track(with: self)
-    }
-    
     // MARK: - UI Setup
     private func setupUI() {
         setupNavi()
