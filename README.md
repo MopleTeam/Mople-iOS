@@ -82,11 +82,51 @@
 ### 🎞️ 애니메이션
   - 부드러운 애니메이션을 활용한 화면 전환
   - 네비게이션 간 자연스러운 전환을 위한 Transition 구현
- 
-## 스크린샷
-<img width="1000" alt="무제 12_1" src="https://github.com/user-attachments/assets/00fce7b8-715c-4c19-a4d6-7ae7244f13fc" />
-<img width="1000" alt="무제 13_1" src="https://github.com/user-attachments/assets/d6cc99f3-7005-46ca-a4d0-6b032ec7db59" />
 
-![May-05-2025 07-24-07](https://github.com/user-attachments/assets/e6accc75-38f0-426c-aae6-32c825035c38)
-![May-05-2025 07-23-41](https://github.com/user-attachments/assets/94d311e1-cdb4-4894-a071-f1290f5394e4)
-![May-05-2025 07-22-49](https://github.com/user-attachments/assets/a9d92888-eae6-4c0b-9469-af94019565b7)
+## 시연 영상
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <b>스플래시</b><br>
+        <img src="https://github.com/user-attachments/assets/3066910a-1e51-42fa-af18-20fbcc5c3f04" width="250">
+      </td>
+      <td align="center">
+        <b>로그인</b><br>
+        <img src="https://github.com/user-attachments/assets/f8830482-3997-4a3c-a715-14828ed6c1e8" width="250">
+      </td>
+      <td align="center">
+        <b>회원가입</b><br>
+        <img src="https://github.com/user-attachments/assets/72d7ef08-a9e0-49cf-b97a-90899fae5005" width="250">
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <b>달력 화면 1</b><br>
+        <img src="https://github.com/user-attachments/assets/243bdf88-f61f-4a78-89ac-f6028805e2b5" width="250">
+      </td>
+      <td align="center">
+        <b>달력 화면 2</b><br>
+        <img src="https://github.com/user-attachments/assets/56c9aad6-0929-41eb-96f3-4edf8a5ba4e9" width="250">
+      </td>
+      <td align="center">
+        <b>시트뷰</b><br>
+        <img src="https://github.com/user-attachments/assets/7967ee9d-8128-47c1-92f0-0e61f8582bb5" width="250">
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <b>알림창</b><br>
+        <img src="https://github.com/user-attachments/assets/e7abfbb5-5a66-4411-a86a-cdbd31cce596" width="250">
+      </td>
+      <td align="center">
+        <b>댓글</b><br>
+        <img src="https://github.com/user-attachments/assets/e361c1cb-20aa-43fe-bad8-8726923624f3" width="250">
+      </td>
+      <td align="center">
+        <b>로그아웃</b><br>
+        <img src="https://github.com/user-attachments/assets/5b0e6bb3-2c3f-4c7c-b6f2-79ebfcefb36a" width="250">
+      </td>
+    </tr>
+  </table>
+</div>
