@@ -8,6 +8,7 @@
 import UIKit
 import KakaoSDKCommon
 import FirebaseCore
+import Firebase
 import FirebaseMessaging
 import KakaoSDKAuth
 import NMapsMap
@@ -92,7 +93,7 @@ extension AppDelegate {
     
     private func registerNaverMap() {
         let naverId = AppConfiguration.naverID
-        NMFAuthManager.shared().clientId = naverId
+        NMFAuthManager.shared().ncpKeyId = naverId
     }
     
     private func handleKakaoLogin(with url: URL) {

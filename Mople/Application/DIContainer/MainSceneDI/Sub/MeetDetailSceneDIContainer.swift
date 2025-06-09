@@ -60,18 +60,25 @@ extension MeetDetailSceneDIContainer {
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController {
         makeDetailMeetViewReactor(coordinator: coordinator)
         return .init(screenName: .meet_detail,
-                     title: nil, reactor: mainReactor)
+                     title: nil,
+                     reactor: mainReactor)
     }
     
     private func makeDetailMeetViewReactor(coordinator: MeetDetailCoordination) {
-        self.mainReactor = .init(fetchMeetUseCase: makeFetchMeetDetailUseCase(),
+        let meetRepo = DefaultMeetRepo(networkService: appNetworkService)
+        self.mainReactor = .init(fetchMeetUseCase: makeFetchMeetDetailUseCase(repo: meetRepo),
+                                 inviteMeetUseCase: makeInviteMeetUseCase(repo: meetRepo),
                                  coordinator: coordinator,
                                  meetID: meetId)
     }
     
-    private func makeFetchMeetDetailUseCase() -> FetchMeetDetail {
+    private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         return FetchMeetDetailUseCase(repo: repo)
+    }
+    
+    private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
+        return InviteMeetUseCase(repo: repo)
     }
     
     
@@ -141,16 +148,11 @@ extension MeetDetailSceneDIContainer {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         return .init(meet: meet,
                      deleteMeetUseCase: makeDeleteMeetUseCase(repo: repo),
-                     inviteMeetUseCase: makeInviteMeetUseCase(repo: repo),
                      coordinator: coordinator)
     }
     
     private func makeDeleteMeetUseCase(repo: MeetRepo) -> DeleteMeet {
         return DeleteMeetUseCase(repo: repo)
-    }
-    
-    private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
-        return InviteMeetUseCase(repo: repo)
     }
     
     // MARK: - 모임 수정 뷰

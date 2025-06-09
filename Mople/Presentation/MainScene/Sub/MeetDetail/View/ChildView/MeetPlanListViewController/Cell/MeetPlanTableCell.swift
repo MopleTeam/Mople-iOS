@@ -217,7 +217,7 @@ extension MeetPlanTableCell {
     private func setParticipation(_ isParticipant: Bool) {
         setParitipationAction()
         participationButton.title = isParticipant
-        ? L10n.Meetdetail.planLeave
+        ? L10n.Meetdetail.planJoined
         : L10n.Meetdetail.planJoin
         participationButton.updateSelectedBackColor(isSelected: isParticipant)
         participationButton.updateSelectedTextColor(isSelected: isParticipant)

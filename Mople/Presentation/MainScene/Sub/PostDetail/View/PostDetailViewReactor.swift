@@ -229,7 +229,7 @@ extension PostDetailViewReactor {
         
         let requestParticipation = participationPlanUseCase
             .execute(planId: id,
-                     isJoining: currentParticipation)
+                     isJoin: !currentParticipation)
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 self?.plan = newPlan.updateParticipants()
                 self?.postParticipants(with: newPlan)

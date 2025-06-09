@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import SnapKit
 
-final class ThumbnailView: UIView {
+class ThumbnailView: UIView {
     
     // MARK: - UI Components
     private let thumbnailView: UIImageView = {
@@ -23,7 +23,7 @@ final class ThumbnailView: UIView {
     
     private let groupTitleLabel = UILabel()
     
-    private let memberCountLabel: IconLabel = {
+    public lazy var memberCountLabel: IconLabel = {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,
@@ -40,7 +40,7 @@ final class ThumbnailView: UIView {
         return view
     }()
     
-    private lazy var groupInfoStackView: UIStackView = {
+    public lazy var groupInfoStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [groupTitleLabel])
         sv.axis = .vertical
         sv.spacing = 4
@@ -91,7 +91,7 @@ final class ThumbnailView: UIView {
         setMemberCount(viewModel.memberCountString)
     }
     
-    private func setMemberCount(_ countText: String?) {
+    public func setMemberCount(_ countText: String?) {
         guard groupInfoStackView.subviews.contains(where: {
             $0 is IconLabel
         }) else { return }

@@ -113,6 +113,7 @@ extension SearchPlaceViewController {
         self.rx.viewDidLoad
             .subscribe(with: self, onNext: { vc, _ in
                 vc.setReactorStateBind(reactor)
+                vc.reactor?.action.onNext(.updateUserLocation)
             })
             .disposed(by: disposeBag)
     }

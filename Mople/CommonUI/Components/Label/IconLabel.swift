@@ -46,7 +46,7 @@ final class IconLabel: UIView {
         let sv = UIStackView(arrangedSubviews: [imageContainerView, labelContainerView])
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.alignment = .fill
+        sv.alignment = .top
         return sv
     }()
     
@@ -73,6 +73,7 @@ final class IconLabel: UIView {
         
         mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+            make.height.greaterThanOrEqualTo(iconSize.height)
         }
         
         imageContainerView.snp.makeConstraints { make in
@@ -124,6 +125,14 @@ extension IconLabel {
     
     public func hideIcon(isHide: Bool) {
         imageContainerView.isHidden = isHide
+    }
+    
+    public func addContent(with content: UIView, size: CGSize) {
+        mainStackView.addArrangedSubview(content)
+        
+        content.snp.makeConstraints { make in
+            make.size.equalTo(size)
+        }
     }
 }
 
