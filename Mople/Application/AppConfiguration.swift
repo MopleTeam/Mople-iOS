@@ -16,6 +16,7 @@ enum AppConfiguration {
     static let naverID = getValue(forKey: "NaverClientId")
     static let bundleID = Bundle.main.bundleIdentifier ?? "UNKNOWN"
     static let version = Bundle.main.releaseVersionNumber ?? "0.0"
+    static let firebaseDevInfo = Bundle.main.path(forResource: "GoogleService-Dev-Info", ofType: "plist")
     
     private static func getValue(forKey key: String) -> String {
         guard let value = Bundle.main.object(forInfoDictionaryKey: key) as? String else {
