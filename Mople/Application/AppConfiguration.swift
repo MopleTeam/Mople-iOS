@@ -8,6 +8,13 @@
 import Foundation
 
 enum AppConfiguration {
+    
+    enum Network {
+        static let defaultHeaders: [String: String] = [
+            "os" : "iOS",
+            "version": AppConfiguration.version
+        ]
+    }
 
     static let schemeTitle = getValue(forKey: "mainScheme")
     static let apiBaseURL = getValue(forKey: "ApiBaseURL")
