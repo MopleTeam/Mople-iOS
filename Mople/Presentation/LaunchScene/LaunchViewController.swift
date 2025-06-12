@@ -14,6 +14,7 @@ final class LaunchViewController: DefaultViewController {
     
     // MARK: - Variables
     private var disposeBag = DisposeBag()
+    private var isForceUpdate: Bool = false
     
     // MARK: - ViewModel
     private let viewModel: LaunchViewModel
@@ -41,6 +42,7 @@ final class LaunchViewController: DefaultViewController {
         super.viewDidLoad()
         setupUI()
         checkAccount()
+        bind()
     }
     
     // MARK: - UI Setup
@@ -54,6 +56,47 @@ final class LaunchViewController: DefaultViewController {
     }
     
     private func checkAccount() {
-        viewModel.checkEntry()
+        viewModel.checkAppVersion()
+    }
+    
+    private func bind() {
+        self.viewModel.errObservable
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, err in
+                vc.handleLaunchError(err)
+            })
+            .disposed(by: disposeBag)
+        
+        NotificationManager.shared.addEnterForeGroundObservable()
+            .filter({ [weak self] _ in
+                return self?.isForceUpdate == true
+            })
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { vc, _ in
+                vc.showForceUpdateAlert()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func handleLaunchError(_ err: LaunchError) {
+        switch err {
+        case .forceUpdateRequired:
+            isForceUpdate = true
+            showForceUpdateAlert()
+        }
+    }
+    
+    private func showForceUpdateAlert() {
+        alertManager.showDefaultAlert(title: L10n.AppForceUpdate.title,
+                                      subTitle: L10n.AppForceUpdate.message,
+                                      defaultAction: .init(completion: { [weak self] in
+            self?.openMopleAppStor()
+        }))
+    }
+    
+    private func openMopleAppStor() {
+        guard let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id6738402542") else { return }
+        UIApplication.shared.open(appStoreURL)
     }
 }

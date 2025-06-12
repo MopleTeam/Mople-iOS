@@ -8,25 +8,38 @@ import UIKit
 import RxSwift
 
 protocol LaunchViewModel: AnyObject {
-    func checkEntry()
-    func showSignInFlow()
+    var errObservable: Observable<LaunchError?> { get }
+    func checkAppVersion()
+}
+
+enum LaunchError: Error {
+    case forceUpdateRequired
 }
 
 final class DefaultLaunchViewModel: LaunchViewModel {
     
     private var disposeBag = DisposeBag()
     
+    // MARK: - Observable
+    private let lauchErrorObservable: PublishSubject<LaunchError?> = .init()
+    var errObservable: Observable<LaunchError?> {
+        lauchErrorObservable
+    }
+    
     // MARK: - Coordinator
     private weak var coordinator: LaunchCoordination?
     
     // MARK: - Usecase
     private let fetchUserInfoUseCase: FetchUserInfo
+    private let checkAppVersionUseCase: CheckVersion
     
     // MARK: - LifeCycle
     init(fetchUserInfoUseCase: FetchUserInfo,
+         checkAppVersionUseCase: CheckVersion,
          coordinator: LaunchCoordination) {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Created" )
         self.fetchUserInfoUseCase = fetchUserInfoUseCase
+        self.checkAppVersionUseCase = checkAppVersionUseCase
         self.coordinator = coordinator
     }
     
@@ -34,18 +47,33 @@ final class DefaultLaunchViewModel: LaunchViewModel {
         print(#function, #line, "LifeCycle Test DefaultLaunchViewModel Deinit" )
     }
     
-    // MARK: - Account Check
-    func checkEntry() {
+    // MARK: - Version & Token Check
+    func checkAppVersion() {
+        fetchAppVersion()
+    }
+    
+    private func checkEntry() {
         if KeychainStorage.shared.hasToken() {
             fetchUser()
         } else {
-            showSignInFlow()
+            coordinator?.loginFlowStart()
         }
     }
     
-    func showSignInFlow() {
-        coordinator?.loginFlowStart()
+    // MARK: - Data Request
+    private func fetchAppVersion() {
+        checkAppVersionUseCase.executue()
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vm, status in
+                if status.forceUpdate {
+                    vm.lauchErrorObservable.onNext(.forceUpdateRequired)
+                } else {
+                    vm.checkEntry()
+                }
+            })
+            .disposed(by: disposeBag)
     }
+ 
     
     private func fetchUser() {
         fetchUserInfoUseCase.execute()
@@ -55,7 +83,7 @@ final class DefaultLaunchViewModel: LaunchViewModel {
                 vm.coordinator?.mainFlowStart(isLogin: false)
             }, onError: { vm, err in
                 vm.resetUserData()
-                vm.showSignInFlow()
+                vm.coordinator?.loginFlowStart()
             })
             .disposed(by: disposeBag)
     }
