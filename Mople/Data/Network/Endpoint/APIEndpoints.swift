@@ -69,6 +69,15 @@ extension APIEndpoints {
     }
 }
 
+// MARK: - Force Update
+extension APIEndpoints {
+    static func checkAppVersionUpdate() -> Endpoint<UpdateStatusResponse> {
+        return try! Endpoint(path: "policy/force-update/status",
+                             method: .get,
+                             headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+}
+
 // MARK: - Login
 extension APIEndpoints {
     static func signUp(request: SignUpRequest) -> Endpoint<Data> {
