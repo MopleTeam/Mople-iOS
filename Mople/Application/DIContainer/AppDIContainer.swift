@@ -31,7 +31,10 @@ final class AppDIContainer {
         
         let baseUrl = AppConfiguration.apiBaseURL
         
-        let config = ApiDataNetworkConfig(baseURL: URL(string: baseUrl))
+        let config = ApiDataNetworkConfig(
+            baseURL: URL(string: baseUrl),
+            headers: AppConfiguration.Network.defaultHeaders
+        )
         
         let apiDataNetwork = DefaultNetworkService(config: config)
         
