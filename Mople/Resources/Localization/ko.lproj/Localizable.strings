@@ -6,6 +6,10 @@
   
 */
 
+// MARK: - 강제 업데이트
+"app_forceUpdate.title" = "업데이트 안내";
+"app_forceUpdate.message" = "보다 좋은 서비스를 위해\n최신 버전으로 업데이트가 필요합니다";
+
 // MARK: - 로그인 화면
 "app_subTitle"      = "모임부터 약속까지 간편한 관리";
 "login.kakao"    = "카카오로 시작하기";
