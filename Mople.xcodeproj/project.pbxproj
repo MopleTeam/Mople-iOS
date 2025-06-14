@@ -154,6 +154,16 @@
 		526B98662CEE0DC1002488C5 /* LabeledButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526B98652CEE0DC1002488C5 /* LabeledButton.swift */; };
 		526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */; };
 		526FA3C72C65DE5800D2F2B5 /* KeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */; };
+		52728C632DFACB3500883FB1 /* UpdateStatusResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C622DFACB3500883FB1 /* UpdateStatusResponse.swift */; };
+		52728C642DFACB3500883FB1 /* UpdateStatusResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C622DFACB3500883FB1 /* UpdateStatusResponse.swift */; };
+		52728C672DFACBF300883FB1 /* UpdateStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C662DFACBF300883FB1 /* UpdateStatus.swift */; };
+		52728C682DFACBF300883FB1 /* UpdateStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C662DFACBF300883FB1 /* UpdateStatus.swift */; };
+		52728C6D2DFACCDE00883FB1 /* AppVersionRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C6C2DFACCDE00883FB1 /* AppVersionRepo.swift */; };
+		52728C6E2DFACCDE00883FB1 /* AppVersionRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C6C2DFACCDE00883FB1 /* AppVersionRepo.swift */; };
+		52728C702DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */; };
+		52728C712DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */; };
+		52728C742DFACDB800883FB1 /* CheckVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C732DFACDB800883FB1 /* CheckVersion.swift */; };
+		52728C752DFACDB800883FB1 /* CheckVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C732DFACDB800883FB1 /* CheckVersion.swift */; };
 		52741EC32D11565B00C249A6 /* DefaultModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC22D11565B00C249A6 /* DefaultModalView.swift */; };
 		52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */; };
 		52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECB2D11A57E00C249A6 /* UploadPlace.swift */; };
@@ -934,6 +944,11 @@
 		526B98652CEE0DC1002488C5 /* LabeledButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledButton.swift; sourceTree = "<group>"; };
 		526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BounceAnimate.swift"; sourceTree = "<group>"; };
 		526FA3C62C65DE5800D2F2B5 /* KeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardResponsive.swift; sourceTree = "<group>"; };
+		52728C622DFACB3500883FB1 /* UpdateStatusResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStatusResponse.swift; sourceTree = "<group>"; };
+		52728C662DFACBF300883FB1 /* UpdateStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateStatus.swift; sourceTree = "<group>"; };
+		52728C6C2DFACCDE00883FB1 /* AppVersionRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionRepo.swift; sourceTree = "<group>"; };
+		52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultVersionCheckRepo.swift; sourceTree = "<group>"; };
+		52728C732DFACDB800883FB1 /* CheckVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckVersion.swift; sourceTree = "<group>"; };
 		52741EC22D11565B00C249A6 /* DefaultModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModalView.swift; sourceTree = "<group>"; };
 		52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewModel.swift; sourceTree = "<group>"; };
 		52741ECB2D11A57E00C249A6 /* UploadPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPlace.swift; sourceTree = "<group>"; };
@@ -1941,6 +1956,46 @@
 			path = UI;
 			sourceTree = "<group>";
 		};
+		52728C612DFACB1E00883FB1 /* VersionCheck */ = {
+			isa = PBXGroup;
+			children = (
+				52728C622DFACB3500883FB1 /* UpdateStatusResponse.swift */,
+			);
+			path = VersionCheck;
+			sourceTree = "<group>";
+		};
+		52728C692DFACC0500883FB1 /* VersionCheck */ = {
+			isa = PBXGroup;
+			children = (
+				52728C662DFACBF300883FB1 /* UpdateStatus.swift */,
+			);
+			path = VersionCheck;
+			sourceTree = "<group>";
+		};
+		52728C6A2DFACCAF00883FB1 /* VesionCheck */ = {
+			isa = PBXGroup;
+			children = (
+				52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */,
+			);
+			path = VesionCheck;
+			sourceTree = "<group>";
+		};
+		52728C6B2DFACCC400883FB1 /* AppVersionRepo */ = {
+			isa = PBXGroup;
+			children = (
+				52728C6C2DFACCDE00883FB1 /* AppVersionRepo.swift */,
+			);
+			path = AppVersionRepo;
+			sourceTree = "<group>";
+		};
+		52728C722DFACDA200883FB1 /* CheckVersion */ = {
+			isa = PBXGroup;
+			children = (
+				52728C732DFACDB800883FB1 /* CheckVersion.swift */,
+			);
+			path = CheckVersion;
+			sourceTree = "<group>";
+		};
 		52741EC42D116A5600C249A6 /* Thumbnail */ = {
 			isa = PBXGroup;
 			children = (
@@ -2388,6 +2443,7 @@
 		52B6F63C2C77655C00DA2D75 /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				52728C6B2DFACCC400883FB1 /* AppVersionRepo */,
 				52EC04DD2D3E1E5900000C99 /* Auth */,
 				5231DF3F2D2F96B000D52529 /* Profile */,
 				5231DF412D2F96CF00D52529 /* Meet */,
@@ -2578,6 +2634,7 @@
 		52C857B72D0862CB00765FB3 /* Response */ = {
 			isa = PBXGroup;
 			children = (
+				52728C612DFACB1E00883FB1 /* VersionCheck */,
 				525E2A862DBCFEC10025EA90 /* Post */,
 				5201851C2DA79D2800C2B4FC /* Notify */,
 				52B8E11D2D53449000F7FF59 /* Member */,
@@ -2925,6 +2982,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				52728C692DFACC0500883FB1 /* VersionCheck */,
 				523A18012DD0CC1A0071BDBD /* Post */,
 				520185252DA7A0CB00C2B4FC /* Notify */,
 				52AAAF8B2D8DA66000CA9CE1 /* HomeData */,
@@ -2972,6 +3030,7 @@
 		52E238302C74BFA10066C9A3 /* UseCases */ = {
 			isa = PBXGroup;
 			children = (
+				52728C722DFACDA200883FB1 /* CheckVersion */,
 				5231DF602D2FBDC200D52529 /* Auth */,
 				5231DF612D2FBDCE00D52529 /* Profile */,
 				5231DF652D2FBE7200D52529 /* Meet */,
@@ -3011,6 +3070,7 @@
 			isa = PBXGroup;
 			children = (
 				5231DF4B2D2FA23000D52529 /* BaseRepositories.swift */,
+				52728C6A2DFACCAF00883FB1 /* VesionCheck */,
 				52EC04CF2D3E157700000C99 /* Auth */,
 				52EC04DE2D3E1E6300000C99 /* Profile */,
 				5231DF482D2FA1B300D52529 /* Meet */,
@@ -3687,6 +3747,7 @@
 				523E760B2D5B84E100BD22CB /* LaunchViewModel.swift in Sources */,
 				5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */,
 				52BBF6BB2CE23E1700564F11 /* Reactive+TextField.swift in Sources */,
+				52728C6E2DFACCDE00883FB1 /* AppVersionRepo.swift in Sources */,
 				5211F9082C86F2DB00403980 /* RecentPlanCollectionCell.swift in Sources */,
 				5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */,
 				52F83A4A2D34D820003DD790 /* HomeSceneDIContainer.swift in Sources */,
@@ -3724,6 +3785,7 @@
 				52BBF6BD2CE2536200564F11 /* UIStackView+Reverse.swift in Sources */,
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				52F83A812D363E57003DD790 /* TransitionControllable.swift in Sources */,
+				52728C712DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */,
 				523B9C0A2DCB052200DF2698 /* PostListTableCell.swift in Sources */,
 				529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */,
 				5211F9032C86E41900403980 /* RecentPlanViewController.swift in Sources */,
@@ -3771,11 +3833,13 @@
 				5201851B2DA79CA800C2B4FC /* NotifyListViewController.swift in Sources */,
 				52F1535B2D04ACD0001A7BF5 /* Collection+SafeElement.swift in Sources */,
 				5283DE602CCCC2D5006B7B45 /* KakaoLoginService.swift in Sources */,
+				52728C642DFACB3500883FB1 /* UpdateStatusResponse.swift in Sources */,
 				52D864922D2BA2DF000F8378 /* PostListViewModel.swift in Sources */,
 				5201852F2DA7BF2800C2B4FC /* FetchNotifyList.swift in Sources */,
 				52B6F63B2C77655200DA2D75 /* AuthenticationRepo.swift in Sources */,
 				52C857AE2D07A71500765FB3 /* CreatePlan.swift in Sources */,
 				523645302C8EE518009E0784 /* DefaultEmptyView.swift in Sources */,
+				52728C682DFACBF300883FB1 /* UpdateStatus.swift in Sources */,
 				52EC04DA2D3E1B7A00000C99 /* CreationNickname.swift in Sources */,
 				5268BA402D3F758A000C5F3A /* EditComment.swift in Sources */,
 				528E09F32D6B9A5600832BA7 /* CalendarPlanResponse.swift in Sources */,
@@ -3999,6 +4063,7 @@
 				529629172D5EC66500003F66 /* PhotoBookCollectionCell.swift in Sources */,
 				529CCD562D323FDF0041CBB7 /* PostDetailViewController.swift in Sources */,
 				527DBE2F2CE8965A008BB20E /* CreateMeetViewController.swift in Sources */,
+				52728C742DFACDB800883FB1 /* CheckVersion.swift in Sources */,
 				524E33D42C80508C004B15FC /* AlertManager.swift in Sources */,
 				52D8646C2D2A35CF000F8378 /* FetchMeetDetail.swift in Sources */,
 				52EA6E1F2CF8C65900EFD753 /* DefaultFCMTokenUploadRepo.swift in Sources */,
@@ -4038,6 +4103,7 @@
 				52E95E822DF453050036CBCF /* LaunchViewModel.swift in Sources */,
 				52E95E832DF453050036CBCF /* YearMonthPickerViewController.swift in Sources */,
 				52E95E842DF453050036CBCF /* Reactive+TextField.swift in Sources */,
+				52728C6D2DFACCDE00883FB1 /* AppVersionRepo.swift in Sources */,
 				52E95E852DF453050036CBCF /* RecentPlanCollectionCell.swift in Sources */,
 				52E95E862DF453050036CBCF /* UserInfo.swift in Sources */,
 				52E95E872DF453050036CBCF /* HomeSceneDIContainer.swift in Sources */,
@@ -4075,6 +4141,7 @@
 				52E95EA72DF453050036CBCF /* UIStackView+Reverse.swift in Sources */,
 				52E95EA82DF453050036CBCF /* WeatherView.swift in Sources */,
 				52E95EA92DF453050036CBCF /* TransitionControllable.swift in Sources */,
+				52728C702DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */,
 				52E95EAA2DF453050036CBCF /* PostListTableCell.swift in Sources */,
 				52E95EAB2DF453050036CBCF /* LifeCycleLoggable.swift in Sources */,
 				52E95EAC2DF453050036CBCF /* RecentPlanViewController.swift in Sources */,
@@ -4122,11 +4189,13 @@
 				52E95ED62DF453050036CBCF /* NotifyListViewController.swift in Sources */,
 				52E95ED72DF453050036CBCF /* Collection+SafeElement.swift in Sources */,
 				52E95ED82DF453050036CBCF /* KakaoLoginService.swift in Sources */,
+				52728C632DFACB3500883FB1 /* UpdateStatusResponse.swift in Sources */,
 				52E95ED92DF453050036CBCF /* PostListViewModel.swift in Sources */,
 				52E95EDA2DF453050036CBCF /* FetchNotifyList.swift in Sources */,
 				52E95EDB2DF453050036CBCF /* AuthenticationRepo.swift in Sources */,
 				52E95EDC2DF453050036CBCF /* CreatePlan.swift in Sources */,
 				52E95EDD2DF453050036CBCF /* DefaultEmptyView.swift in Sources */,
+				52728C672DFACBF300883FB1 /* UpdateStatus.swift in Sources */,
 				52E95EDE2DF453050036CBCF /* CreationNickname.swift in Sources */,
 				52E95EDF2DF453050036CBCF /* EditComment.swift in Sources */,
 				52E95EE02DF453050036CBCF /* CalendarPlanResponse.swift in Sources */,
@@ -4350,6 +4419,7 @@
 				52E95FBA2DF453050036CBCF /* PhotoBookCollectionCell.swift in Sources */,
 				52E95FBB2DF453050036CBCF /* PostDetailViewController.swift in Sources */,
 				52E95FBC2DF453050036CBCF /* CreateMeetViewController.swift in Sources */,
+				52728C752DFACDB800883FB1 /* CheckVersion.swift in Sources */,
 				52E95FBD2DF453050036CBCF /* AlertManager.swift in Sources */,
 				52E95FBE2DF453050036CBCF /* FetchMeetDetail.swift in Sources */,
 				52E95FBF2DF453050036CBCF /* DefaultFCMTokenUploadRepo.swift in Sources */,
@@ -4550,7 +4620,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4598,7 +4668,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4646,7 +4716,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;
@@ -4694,7 +4764,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;

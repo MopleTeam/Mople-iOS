@@ -88,7 +88,7 @@ extension AppDelegate {
     
     private func registerFirebase() {
         #if DEV
-        guard let filePath = Bundle.main.path(forResource: "GoogleService-Dev-Info", ofType: "plist"),
+        guard let filePath = AppConfiguration.firebaseDevInfo,
               let options = FirebaseOptions(contentsOfFile: filePath) else { return }
         FirebaseApp.configure(options: options)
         #else

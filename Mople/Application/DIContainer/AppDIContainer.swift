@@ -31,7 +31,10 @@ final class AppDIContainer {
         
         let baseUrl = AppConfiguration.apiBaseURL
         
-        let config = ApiDataNetworkConfig(baseURL: URL(string: baseUrl))
+        let config = ApiDataNetworkConfig(
+            baseURL: URL(string: baseUrl),
+            headers: AppConfiguration.Network.defaultHeaders
+        )
         
         let apiDataNetwork = DefaultNetworkService(config: config)
         
@@ -56,11 +59,17 @@ extension AppDIContainer {
     private func makeLaunchViewModel(coordinator: LaunchCoordination) -> LaunchViewModel {
         let fetchUserRepo = DefaultUserInfoRepo(networkService: appNetworkService)
         return DefaultLaunchViewModel(fetchUserInfoUseCase: makeFetchUserInfoUseCase(repo: fetchUserRepo),
+                                      checkAppVersionUseCase: makeCheckAppVersionUseCase(),
                                       coordinator: coordinator)
     }
     
     private func makeFetchUserInfoUseCase(repo: UserInfoRepo) -> FetchUserInfo {
         return FetchUserInfoUseCase(userInfoRepo: repo)
+    }
+    
+    private func makeCheckAppVersionUseCase() -> CheckVersion {
+        let repo = DefaultAppVersionRepo(networkService: appNetworkService)
+        return CheckVersionUseCase(repo: repo)
     }
 
     // MARK: - 로그인 플로우
