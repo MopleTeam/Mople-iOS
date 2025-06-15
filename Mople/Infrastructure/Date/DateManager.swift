@@ -155,6 +155,10 @@ extension DateManager {
         
         return (targetMonth - todayMonth) + (targetYear - todayYear) * 12
     }
+    
+    static func weekBasedYear(_ date: Date) -> Int {
+        return DateManager.calendar.component(.yearForWeekOfYear, from: date)
+    }
 }
 
 // MARK: - 전환

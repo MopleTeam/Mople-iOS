@@ -50,30 +50,38 @@ final class CalendarViewReactor: Reactor {
         case changeMonthScope
         case updatePage(Date)
         case updateScrollDate(Date)
-        case updateDates([Date])
+        case updateEvents([Date])
+        case updateHolidays([Date])
+        case completedDateLoad
     }
     
     struct State {
-        @Pulse var dates: [Date] = []
+        @Pulse var events: [Date] = []
+        @Pulse var holidays: [Date] = []
         @Pulse var scrollDate: Date?
         @Pulse var page: Date?
         @Pulse var changeScope: Void?
         @Pulse var changeMonthScope: Void?
+        @Pulse var completedLoad: Void?
     }
     
     // MARK: - Variables
     var initialState: State = State()
+    private var loadedHolidayYears: Set<Int> = .init()
     
     // MARK: - UseCase
     private let fetchCalendarDatesUseCase: FetchAllPlanDate
+    private let fetchHolidaysUseCase: FetchHolidays
     
     // MARK: - Delegate
     private weak var delegate: CalendarReactorDelegate?
     
     // MARK: - LifeCycle
     init(fetchCalendraDatesUseCase: FetchAllPlanDate,
+         fetchHolidaysUseCase: FetchHolidays,
          delegate: CalendarReactorDelegate?) {
         self.fetchCalendarDatesUseCase = fetchCalendraDatesUseCase
+        self.fetchHolidaysUseCase = fetchHolidaysUseCase
         self.delegate = delegate
         initialSetup()
     }
@@ -89,7 +97,7 @@ final class CalendarViewReactor: Reactor {
         case let .parentCommand(commmand):
             return handleCommands(commmand)
         case .fetchDates:
-            return fetchDates()
+            return fetchEventAndHoliday()
         case let .childEvent(action):
             return handleDelegateFromAction(action: action)
         }
@@ -100,8 +108,10 @@ final class CalendarViewReactor: Reactor {
         var newState = state
         
         switch mutation {
-        case let .updateDates(dates):
-            newState.dates = dates.map({ DateManager.startOfDay($0) })
+        case let .updateEvents(dates):
+            newState.events = dates.map({ DateManager.startOfDay($0) })
+        case let .updateHolidays(holidays):
+            newState.holidays = holidays
         case let .updateScrollDate(date):
             newState.scrollDate = date
         case let .updatePage(month):
@@ -110,6 +120,8 @@ final class CalendarViewReactor: Reactor {
             newState.changeScope = ()
         case .changeMonthScope:
             newState.changeMonthScope = ()
+        case .completedDateLoad:
+            newState.completedLoad = ()
         }
         
         return newState
@@ -139,7 +151,7 @@ extension CalendarViewReactor {
         case .changeScope:
             return .just(.changeScope)
         case let .editDateList(dateList):
-            return .just(.updateDates(dateList))
+            return .just(.updateEvents(dateList))
         case let .changePage(month):
             return .just(.updatePage(month))
         }
@@ -148,21 +160,63 @@ extension CalendarViewReactor {
 
 // MARK: - Data Request
 extension CalendarViewReactor {
-    private func fetchDates() -> Observable<Mutation> {
-        let fetchDates = fetchCalendarDatesUseCase.execute()
+    
+    // MARK: - Inital Date Load
+    private func fetchEventAndHoliday() -> Observable<Mutation> {
+        
+        let currentYear = DateManager.todayComponents.year
+        
+        let fetchDateAndHolidays = Observable.zip([fetchEvent(),
+                                                   fetchHolidays(for: currentYear)])
+            .flatMap { result -> Observable<Mutation> in
+                return .from(result)
+            }
+        
+        return .concat([requestWithLoading(task: fetchDateAndHolidays),
+                        .just(.completedDateLoad)] )
+    }
+    
+    private func fetchEvent() -> Observable<Mutation> {
+        return fetchCalendarDatesUseCase.execute()
             .catchAndReturn([])
             .flatMap { [weak self] result -> Observable<Mutation> in
                 self?.updatePlanMonthList(from: result)
-                let updateDate = Mutation.updateDates(result)
+                let updateDate = Mutation.updateEvents(result)
                 let setMonthScope = Mutation.changeMonthScope
                 return .from([updateDate, setMonthScope])
             }
+    }
+    
+    private func fetchHolidays(for year: Int?) -> Observable<Mutation> {
+        guard let year,
+              needsToFetchHolidays(for: year)
+               else { return .empty()}
         
-        return requestWithLoading(task: fetchDates)
+        return  fetchHolidaysUseCase.execute(for: year)
+            .do(onNext: { [weak self] _ in
+                self?.markHolidayYearAsLoaded(year)
+            })
+            .map { $0.compactMap { $0.date } }
+            .map { Mutation.updateHolidays($0) }
+    }
+    
+    private func needsToFetchHolidays(for year: Int) -> Bool {
+        return !loadedHolidayYears.contains(year)
+    }
+    
+    private func markHolidayYearAsLoaded(_ year: Int) {
+        loadedHolidayYears.insert(year)
     }
     
     private func updatePlanMonthList(from dateList: [Date]) {
         delegate?.updatePostMonthList(dateList)
+    }
+    
+    // MARK: - Request With Loading
+    private func fetchHolidaysWithLoading(for year: Int?) -> Observable<Mutation> {
+        let fetchHolidays = fetchHolidays(for: year)
+        return .concat([fetchHolidays,
+                        .just(.completedDateLoad)])
     }
 }
 
@@ -181,7 +235,7 @@ extension CalendarViewReactor: CalendarCommands {
     }
     
     func deleteMonth(month: Date) {
-        var datelist = currentState.dates
+        var datelist = currentState.events
         
         datelist.removeAll { DateManager.isSameMonth($0, month) }
         
@@ -189,7 +243,7 @@ extension CalendarViewReactor: CalendarCommands {
     }
     
     func updateEvent(type: EventUpdateType) {
-        var dateList = currentState.dates
+        var dateList = currentState.events
         
         switch type {
         case let .add(newDate):

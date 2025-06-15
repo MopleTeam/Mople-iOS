@@ -28,12 +28,14 @@ final class CalendarViewController: BaseViewController, View {
     private var preSelectedDate: Date?
     private let currentCalendar = DateManager.calendar
     private var events: [Date] = []
+    private var holidays: [Date] = []
     private var isSystemDragging: Bool = false
     public var currentHeight: CGFloat?
 
     // MARK: - Observable
     private let scopeObserver: PublishRelay<ScopeType> = .init()
     private let pageObserver: PublishRelay<Date> = .init()
+    private let yearObserver: PublishRelay<Int> = .init()
     private let monthObserver: PublishRelay<DateComponents> = .init()
     private let dateSelectionObserver: PublishRelay<Date> = .init()
 
@@ -190,14 +192,21 @@ extension CalendarViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$dates)
+        reactor.pulse(\.$events)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, events in
-                vc.updateEvents(with: events)
+                vc.events = events
                 vc.setDefaulsePreDate()
             })
             .disposed(by: disposeBag)
      
+        reactor.pulse(\.$holidays)
+            .asDriver(onErrorJustReturn: [])
+            .drive(with: self, onNext: { vc, holidays in
+                vc.holidays = holidays
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$page)
             .observe(on: MainScheduler.instance)
             .asDriver(onErrorJustReturn: nil)
@@ -232,6 +241,13 @@ extension CalendarViewController {
                 vc.changeMonthScope(animated: false)
             })
             .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$completedLoad)
+            .asDriver(onErrorJustReturn: nil)
+            .drive(with: self, onNext: { vc, _ in
+                vc.calendar.reloadData()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -257,6 +273,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
+        updateCurrentYear()
         setPreSelectedDateWhenMonth()
         syncCurrentPage()
     }
@@ -297,6 +314,8 @@ extension CalendarViewController: FSCalendarDelegate {
 
 extension CalendarViewController: FSCalendarDelegateAppearance {
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
+        
+        
 
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
@@ -412,11 +431,12 @@ extension CalendarViewController {
 
 // MARK: - 셀 업데이트
 extension CalendarViewController {
-    /// 이벤트 업데이트
-    /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
-    private func updateEvents(with events: [Date]) {
-        self.events = events
-        calendar.reloadData()
+
+    /// 연도가 바뀔 때 공유
+    private func updateCurrentYear() {
+        let currentDate = calendar.currentPage
+        let currentYear = DateManager.weekBasedYear(currentDate)
+        yearObserver.accept(currentYear)
     }
 
     // 확인

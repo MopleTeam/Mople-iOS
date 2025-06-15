@@ -56,17 +56,20 @@ extension CalendarSceneDIContainer {
     }
     
     private func makeCalendarViewReactor() -> CalendarViewReactor {
-        let reactor = CalendarViewReactor(fetchCalendraDatesUseCase:
-                                            makeFetchCalendarDatesUseCase(),
+        let calendarRepo = DefaultCalendarRepo(networkService: appNetworkService)
+        let reactor = CalendarViewReactor(fetchCalendraDatesUseCase: makeFetchCalendarDatesUseCase(repo: calendarRepo),
+                                          fetchHolidaysUseCase: makeFetchHolidaysUseCase(repo: calendarRepo),
                                           delegate: mainReactor!)
         mainReactor?.calendarCommands = reactor
         return reactor
     }
     
-    private func makeFetchCalendarDatesUseCase() -> FetchAllPlanDate {
-        return FetchAllPlanDateUseCase(
-            repo: DefaultCalendarRepo(networkService: appNetworkService)
-        )
+    private func makeFetchCalendarDatesUseCase(repo: CalendarRepo) -> FetchAllPlanDate {
+        return FetchAllPlanDateUseCase(repo: repo)
+    }
+    
+    private func makeFetchHolidaysUseCase(repo: CalendarRepo) -> FetchHolidays {
+        return FetchHolidaysUseCase(repo: repo)
     }
     
     // MARK: - 일정 리스트
