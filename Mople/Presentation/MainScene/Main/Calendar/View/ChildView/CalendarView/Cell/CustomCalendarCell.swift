@@ -30,7 +30,6 @@ final class CustomCalendarCell: FSCalendarCell {
     // MARK: - UI Setup
     private func setupViews() {
         contentView.addSubview(indicatorView)
-        
         indicatorView.snp.makeConstraints { make in
             make.size.equalTo(40)
             make.center.equalTo(titleLabel)

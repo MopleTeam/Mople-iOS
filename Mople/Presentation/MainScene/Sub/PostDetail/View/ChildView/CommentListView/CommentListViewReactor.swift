@@ -233,8 +233,7 @@ extension CommentListViewReactor {
                 return .just(addCommentSectionModel(comments))
             })
 
-        return requestWithLoading(task: createComment,
-                                  minimumExecutionTime: .milliseconds(300))
+        return requestWithLoading(task: createComment)
             .flatMap { addSection -> Observable<Mutation> in
                 return .of(addSection, .createdComment)
             }
