@@ -23,11 +23,14 @@ final class PostListViewController: BaseViewController, View {
     private var visibleHeaders: [UIView] = []
     private var saveOffsetY: CGFloat = 0
     private let tableHeaderHeight: CGFloat = 28
+    private var isUserInteration: Bool = false
 
     // MARK: - Observable
-    private let dateSyncObserver: PublishRelay<Date> = .init()
-    private let scrollEndObserver: PublishRelay<ScheduleFetchType?> = .init()
-    private let userInteratingObserver: BehaviorRelay<Bool> = .init(value: false)
+    fileprivate let foucsDateObserver: PublishRelay<Date> = .init()
+    fileprivate let selectedPostObserver: PublishSubject<MonthlyPost?> = .init()
+    private let fetchObserver: PublishSubject<Date> = .init()
+    private let scrollFetchObserver: PublishRelay<ScrollFetchType?> = .init()
+    private let specificFetchObserver: PublishSubject<Date> = .init()
     
     // MARK: - UI Components
     private let tableView: UITableView = {
@@ -71,10 +74,10 @@ final class PostListViewController: BaseViewController, View {
     private func setupUI() {
         setLayout()
         setupTableView()
+        setAction()
     }
     
     private func setLayout() {
-        self.view.backgroundColor = .bgPrimary
         view.addSubview(tableView)
         view.addSubview(emptyPostView)
         tableView.snp.makeConstraints { make in
@@ -110,6 +113,16 @@ final class PostListViewController: BaseViewController, View {
         
         return dataSource!
     }
+    
+    // MARK: - Action
+    private func setAction() {
+        self.tableView.rx.itemSelected
+            .compactMap({ [weak self] index -> MonthlyPost? in
+                return self?.findSelctedPlan(at: index)
+            })
+            .bind(to: selectedPostObserver)
+            .disposed(by: disposeBag)
+    }
 }
 
 // MARK: - Reactor Setup
@@ -132,30 +145,22 @@ extension PostListViewController {
     }
     
     private func setActionBind(_ reactor: Reactor) {
-        self.dateSyncObserver
-            .filter({ [weak self] _ in
-                self?.userInteratingObserver.value == true
-            })
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.childEvent(.scrollToDate($0)) }
+        self.fetchObserver
+            .map { Reactor.Action.fetchMonthPost(month: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        self.scrollEndObserver
+        self.scrollFetchObserver
             .throttle(.seconds(1),
                       latest: false,
                       scheduler: MainScheduler.instance)
             .compactMap({ $0 })
-            .map { Reactor.Action.getMorePost($0) }
+            .map { Reactor.Action.fetchAdditionalPost(fetchType: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        self.tableView.rx.itemSelected
-            .compactMap({ [weak self] indexPath -> Reactor.Action? in
-                guard let selectedPlan = self?.findSelctedPlan(at: indexPath) else { return nil }
-                return .childEvent(.selectedPost(selectedPlan))
-            })
+        self.specificFetchObserver
+            .map { Reactor.Action.fetchInitialPost(startDate: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -194,17 +199,6 @@ extension PostListViewController {
                 vc.visibleHeaders.removeAll()
             })
             .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$selectedDate)
-            .filter({ [weak self] _ in
-                self?.userInteratingObserver.value == false
-            })
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, selectDate in
-                vc.scrollSelectedDate(selectDate)
-            })
-            .disposed(by: disposeBag)
     }
 }
 
@@ -236,7 +230,7 @@ extension PostListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         self.visibleHeaders.append(view)
         self.visibleHeaders.sort { $0.tag < $1.tag }
-        shouldRequestMoreData(for: section)
+        handleScrollPagination(for: section)
     }
     
     func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
@@ -244,20 +238,16 @@ extension PostListViewController: UITableViewDelegate {
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        userInteratingObserver.accept(true)
+        isUserInteration = true
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        userInteratingObserver.accept(false)
+        isUserInteration = false
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        handleIsUserInteractingWithVelocity(velocity)
-    }
-    
-    private func handleIsUserInteractingWithVelocity(_ velocity: CGPoint) {
         guard velocity.y == 0 else { return }
-        userInteratingObserver.accept(false)
+        isUserInteration = false
     }
 }
 
@@ -268,7 +258,7 @@ extension PostListViewController {
         handleScrollForSyncDate(scrollView)
         handleScrollForDataLoad(scrollView)
     }
-
+    
     private func handleScrollForSyncDate(_ scrollView: UIScrollView) {
         if scrollView.isBottom() {
             syncIfLastContent()
@@ -277,11 +267,6 @@ extension PostListViewController {
         }
     }
     
-    /// 유저의 액션일 때만 willDisplayHeaderView로 데이터를 추가하고 있는 상황
-    /// 특정 조건에 의해 Y의 첫 지점 또는 마지막 지점으로 시스템 이동
-    /// - 유저의 이동이 아님으로 데이터를 추가로 받아오지 않음
-    /// 이를 방지하기 위해 willDisplayHeaderView와 별개로 추가 요청
-    /// `scrollViewDidScroll`에서 Y 지점을 판단하여 데이터를 요청함
     private func handleScrollForDataLoad(_ scrollView: UIScrollView) {
         if scrollView.isRefresh(threshold: -20) {
             addPreviousPlan()
@@ -293,8 +278,9 @@ extension PostListViewController {
 
 // MARK: - 추가 데이터 상태 및 요청
 extension PostListViewController {
-    private func shouldRequestMoreData(for section: Int) {
-        guard let sectionCount = dataSource?.sectionModels.count else { return }
+    private func handleScrollPagination(for section: Int) {
+        guard isUserInteration,
+              let sectionCount = dataSource?.sectionModels.count else { return }
         if section == 1 {
             addPreviousPlan()
         } else if sectionCount == section + 1 {
@@ -304,17 +290,15 @@ extension PostListViewController {
     
     private func addNextPlan() {
         guard canLoadMore(loadState: .next) else { return }
-        scrollEndObserver.accept(.next)
+        scrollFetchObserver.accept(.next)
     }
     
     private func addPreviousPlan() {
         guard canLoadMore(loadState: .previous) else { return }
-        scrollEndObserver.accept(.previous)
+        scrollFetchObserver.accept(.previous)
     }
     
     private func canLoadMore(loadState: LoadState) -> Bool {
-        guard userInteratingObserver.value else { return false }
-        
         switch reactor?.loadState {
         case .all, loadState:
             return true
@@ -330,12 +314,16 @@ extension PostListViewController {
     /// 캘린더에서 선택된 날짜에 맞추어 테이블뷰의 IndexPath 조정
     /// - Parameter selectDate: 캘린더에서 넘어온 날짜 및 IndexPath로 Scroll시 Animate 유무
     private func scrollSelectedDate(_ selectDate: Date) {
-        guard let models = dataSource?.sectionModels else { return }
-        guard let headerIndex = models.firstIndex(where: {
-            guard let sectionDate = $0.date else { return false }
-            return DateManager.isSameDay(sectionDate, selectDate)
-        }) else { return }
-        tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
+        guard let models = dataSource?.sectionModels,
+              let headerIndex = models.firstIndex(where: {
+                  guard let sectionDate = $0.date else { return false }
+                  return DateManager.isSameDay(sectionDate, selectDate)
+              }) else { return }
+        
+        tableView.layoutIfNeeded()
+        DispatchQueue.main.async {
+            self.tableView.scrollToRow(at: .init(row: 0, section: headerIndex), at: .middle, animated: false)
+        }
     }
     
     private func adjustOffsetWhenUpdatePost(list: [MonthlyPost]) {
@@ -363,24 +351,19 @@ extension PostListViewController {
 extension PostListViewController {
     
     private func syncIfCrossedCenterLine() {
+        guard isUserInteration else { return }
         guard let topHeader = visibleHeaders.first,
               let topHeaderOriginY = topHeader.superview?.convert(topHeader.frame, to: self.view),
               checkCenterPoint(targetPoint: topHeaderOriginY.origin.y),
               let foucsDate = dataSource?[topHeader.tag].date else { return }
 
-        dateSyncObserver.accept(foucsDate)
+        foucsDateObserver.accept(foucsDate)
     }
     
     private func syncIfLastContent() {
-        guard let lastComponents = dataSource?.sectionModels.last?.date else { return }
-        dateSyncObserver.accept(lastComponents)
-    }
-}
-
-// MARK: - Gesture
-extension PostListViewController {
-    public func panGestureRequire(_ gesture: UIPanGestureRecognizer) {
-        self.tableView.panGestureRecognizer.require(toFail: gesture)
+        guard isUserInteration,
+              let lastComponents = dataSource?.sectionModels.last?.date else { return }
+        foucsDateObserver.accept(lastComponents)
     }
 }
 
@@ -400,5 +383,35 @@ extension PostListViewController {
         guard tableView.isDragging else { return }
         let currentOffset = tableView.contentOffset
         tableView.setContentOffset(currentOffset, animated: false)
+    }
+}
+
+// MARK: - Will Edit Coded
+extension PostListViewController {
+    public func fetchMonthlyEvent(in month: Date) {
+        let startMonth = DateManager.startOfDay(month)
+        fetchObserver.onNext(startMonth)
+    }
+    
+    public func scrollToDate(at date: Date) {
+        scrollSelectedDate(date)
+    }
+    
+    public func fetchSpecificMonth(at month: Date) {
+        let startMonth = DateManager.startOfDay(month)
+        specificFetchObserver.onNext(startMonth)
+    }
+}
+
+extension Reactive where Base: PostListViewController {
+    var foucsDate: Observable<Date> {
+        return base.foucsDateObserver
+            .observe(on: MainScheduler.instance)
+            .distinctUntilChanged()
+    }
+    
+    var selectedPost: Observable<MonthlyPost> {
+        return base.selectedPostObserver
+            .compactMap { $0 }
     }
 }

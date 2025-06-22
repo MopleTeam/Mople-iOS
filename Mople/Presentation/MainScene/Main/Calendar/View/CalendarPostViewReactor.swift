@@ -9,18 +9,11 @@ import UIKit
 import ReactorKit
 
 protocol CalendarReactorDelegate: AnyObject, ChildLoadingDelegate {
-    func updatePage(_ page: Date)
-    func updateMonth(_ month: DateComponents)
     func updatePostMonthList(_ list: [Date])
-    func updateScope(_ scope: ScopeType)
-    func selectedDate(date: Date)
 }
 
 protocol PostListReactorDelegate: AnyObject, ChildLoadingDelegate {
-    func scrollToDate(date: Date)
     func updateDateList(type: EventUpdateType)
-    func selectedPost(id: Int, type: PostType)
-    func deleteMonth(month: Date)
 }
 
 enum CalendarError: Error {
@@ -33,9 +26,8 @@ final class CalendarPostViewReactor: Reactor, LifeCycleLoggable {
     typealias ScopeChangeType = CalendarViewController.ScopeChangeType
     
     enum Action {
-        enum CalendarActions {
-            case changedMonth(DateComponents)
-            case changedScope(ScopeType)
+        enum Flow {
+            case postDetail(MonthlyPost)
         }
         
         enum Notify {
@@ -45,28 +37,18 @@ final class CalendarPostViewReactor: Reactor, LifeCycleLoggable {
             case midnightUpdate
         }
         
-        case calendarAction(CalendarActions)
-        case changeScope
-        case changeMonth(Date)
+        case flow(Flow)
         case changeLoadingState(Bool)
         case notify(Notify)
         case catchError(CalendarError)
     }
     
     enum Mutation {
-        enum CalendarEvents {
-            case updateMonth(DateComponents)
-            case updateScope(ScopeType)
-        }
-        
-        case calendarEvent(CalendarEvents)
         case updateLoadingState(Bool)
         case catchError(CalendarError)
     }
     
     struct State {
-        @Pulse var scope: ScopeType = .month
-        @Pulse var changeMonth: DateComponents?
         @Pulse var isLoading: Bool = false
         @Pulse var error: CalendarError?
     }
@@ -94,16 +76,12 @@ final class CalendarPostViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .calendarAction(action):
-            return handleCalendarAction(action)
-        case let .changeMonth(month):
-            return monthChange(month)
-        case .changeScope:
-            return calendarScopeChange()
-        case let .changeLoadingState(isLoad):
-            return .just(.updateLoadingState(isLoad))
         case let .notify(action):
             return handleNotification(action: action)
+        case let .flow(action):
+            return handleFlow(action: action)
+        case let .changeLoadingState(isLoad):
+            return .just(.updateLoadingState(isLoad))
         case let .catchError(err):
             return .just(.catchError(err))
         }
@@ -114,9 +92,6 @@ final class CalendarPostViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .calendarEvent(event):
-            handleCalendarEvent(state: &newState,
-                                event: event)
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -128,15 +103,6 @@ final class CalendarPostViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Action Handling
 extension CalendarPostViewReactor {
-    private func handleCalendarAction(_ action: Action.CalendarActions) -> Observable<Mutation> {
-        switch action {
-        case let .changedMonth(page):
-            return .just(.calendarEvent(.updateMonth(page)))
-        case let .changedScope(scope):
-            return .just(.calendarEvent(.updateScope(scope)))
-        }
-    }
-    
     private func handleNotification(action: Action.Notify) -> Observable<Mutation> {
         switch action {
         case let .updateMeet(payload):
@@ -151,72 +117,50 @@ extension CalendarPostViewReactor {
     }
 }
 
-extension CalendarPostViewReactor {
-    private func handleCalendarEvent(state: inout State, event: Mutation.CalendarEvents) {
-        switch event {
-        case let .updateMonth(month):
-            state.changeMonth = month
-        case let .updateScope(scope):
-            state.scope = scope
-        }
-    }
-}
-
-// MARK: - 부모 -> 자식
-extension CalendarPostViewReactor {
-    private func monthChange(_ month: Date) -> Observable<Mutation> {
-        scheduleListCommands?.fetchMonthPlan(on: month)
-        calendarCommands?.changePage(on: month)
-        return .empty()
-    }
-    
-    private func calendarScopeChange() -> Observable<Mutation> {
-        calendarCommands?.changeScope()
-        return .empty()
-    }
-}
-
 // MARK: - Calendar Deleagte
 extension CalendarPostViewReactor: CalendarReactorDelegate {
-    
-    func updateScope(_ scope: ScopeType) {
-        action.onNext(.calendarAction(.changedScope(scope)))
-    }
-    
-    func updateMonth(_ month: DateComponents) {
-        action.onNext(.calendarAction(.changedMonth(month)))
-    }
-    
     func updatePostMonthList(_ list: [Date]) {
         scheduleListCommands?.setInitialList(with: list)
-    }
-    
-    func updatePage(_ page: Date) {
-        scheduleListCommands?.loadMonthlyPost(on: page)
-    }
-    
-    func selectedDate(date: Date) {
-        scheduleListCommands?.selectedDate(on: date)
     }
 }
 
 // MARK: - Post List Delegate
 extension CalendarPostViewReactor: PostListReactorDelegate {
-    func scrollToDate(date: Date) {
-        calendarCommands?.scrollToDate(on: date)
-    }
-    
-    func selectedPost(id: Int, type: PostType) {
-        coordinator?.pushPostDetailView(postId: id,
-                                        type: type)
-    }
-    
     func updateDateList(type: EventUpdateType) {
         calendarCommands?.updateEvent(type: type)
     }
+}
+
+// MARK: - Coordination
+extension CalendarPostViewReactor {
+    private func handleFlow(action: Action.Flow) -> Observable<Mutation> {
+        switch action {
+        case let .postDetail(monthlyPost):
+            guard let id = monthlyPost.id else { return .empty() }
+            let postType: PostType = monthlyPost.type == .plan ? .plan : .review
+            coordinator?.pushPostDetailView(postId: id, type: postType)
+        }
+        
+        return .empty()
+    }
     
-    func deleteMonth(month: Date) {
-        calendarCommands?.deleteMonth(month: month)
+    /// 일정 선택 시 타입과 날짜를 확인 후 맞는 타입으로 delegate에게 전달
+    private func checkVaildPost(with monthlyPost: MonthlyPost) -> Observable<Mutation> {
+        if isValidPost(with: monthlyPost) {
+            guard let id = monthlyPost.id else { return .empty() }
+            let postType: PostType = monthlyPost.type == .plan ? .plan : .review
+            coordinator?.pushPostDetailView(postId: id, type: postType)
+            return .empty()
+        } else {
+            return .just(.catchError(.midnight(.midnightReset)))
+        }
+    }
+    
+    private func isValidPost(with post: MonthlyPost) -> Bool {
+        guard let postDate = post.date else { return false }
+        let isReview = post.type == .review
+        let isPlan = !DateManager.isPastDay(on: postDate)
+        return isReview || isPlan
     }
 }
 
