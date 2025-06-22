@@ -27,74 +27,33 @@ final class DefaultAppNetWorkService: AppNetworkService {
         self.dataTransferService = dataTransferService
     }
     
-    /// 토큰을 사용하지 않음으로 재요청(retry)이 필요하지 않은 일반적인 요청
-    func basicRequest<T: Decodable, E: ResponseRequestable>(
+    /// 응답 값이 있는 요청
+    func basicRequest<E: ResponseRequestable>(
         endpoint: E
-    ) -> Single<T> where E.Response == T {
-        return self.dataTransferService.request(with: endpoint)
-    }
-
-    /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
-    /// - Response 값이 있는 경우
-    func authenticatedRequest<E: ResponseRequestable>(
-        endpointClosure: @escaping () throws -> E
     ) -> Single<E.Response> where E.Response: Decodable {
-        return retryWithToken(
-            Single.deferred {
-                do {
-                    let endpoint = try endpointClosure()
-                    return self.dataTransferService.request(with: endpoint)
-                } catch {
-                    return .error(error)
-                }
-            }
-        )
-    }
-        
-    /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
-    /// - Response 값이 없는 (Void)
-    func authenticatedRequest<E: ResponseRequestable>(
-        endpointClosure: @escaping () throws -> E
-    ) -> Single<Void> where E.Response == Void {
-        return retryWithToken(
-            Single.deferred {
-                do {
-                    let endpoint = try endpointClosure()
-                    return self.dataTransferService.request(with: endpoint)
-                } catch {
-                    return .error(error)
-                }
-            }
-        )
-    }
-}
-
-extension DefaultAppNetWorkService {
-    
-    private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
-        return source
-            .catch({ [weak self] in
-                guard let self,
-                      let transferError = $0 as? DataTransferError else {
-                    return .error(DataRequestError.unknown)
-                }
-                let resolveError = resolveDataTransferError(err: transferError)
+        return self.dataTransferService.request(with: endpoint)
+            .catch({
+                let resolveError = self.handleDatTransferError($0)
                 return .error(resolveError)
             })
-            .retry { err in
-                err.flatMap { [weak self] err -> Single<Void> in
-                    guard let self,
-                          let requestError = err as? DataRequestError else {
-                        return .error(DataRequestError.unknown)
-                    }
-                    
-                    if requestError == .expiredToken {
-                        return reissueTokenIfNeeded().asSingle()
-                    } else {
-                        return .error(requestError)
-                    }
-                }
-            }
+    }
+    
+    /// 응답 값이 없는 요청
+    func basicRequest<E: ResponseRequestable>(
+        endpoint: E
+    ) -> Single<Void> where E.Response == Void {
+        return self.dataTransferService.request(with: endpoint)
+            .catch({
+                let resolveError = self.handleDatTransferError($0)
+                return .error(resolveError)
+            })
+    }
+
+    private func handleDatTransferError(_ error: Error) -> DataRequestError {
+        guard let transferError = error as? DataTransferError else {
+            return DataRequestError.unknown
+        }
+        return resolveDataTransferError(err: transferError)
     }
     
     private func resolveDataTransferError(err: DataTransferError) -> DataRequestError {
@@ -115,6 +74,61 @@ extension DefaultAppNetWorkService {
             errorHandlingService.handleError(.unknown)
             return .handled
         }
+    }
+}
+
+// MARK: - With Token
+extension DefaultAppNetWorkService {
+    /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
+    /// - Response 값이 있는 경우
+    func authenticatedRequest<E: ResponseRequestable>(
+        endpointClosure: @escaping () throws -> E
+    ) -> Single<E.Response> where E.Response: Decodable {
+        return retryWithToken(
+            Single.deferred {
+                do {
+                    let endpoint = try endpointClosure()
+                    return self.basicRequest(endpoint: endpoint)
+                } catch {
+                    return .error(error)
+                }
+            }
+        )
+    }
+        
+    /// 토큰을 사용함으로 토큰 만료 시 재요청(retry)이 필요
+    /// - Response 값이 없는 (Void)
+    func authenticatedRequest<E: ResponseRequestable>(
+        endpointClosure: @escaping () throws -> E
+    ) -> Single<Void> where E.Response == Void {
+        return retryWithToken(
+            Single.deferred {
+                do {
+                    let endpoint = try endpointClosure()
+                    return self.basicRequest(endpoint: endpoint)
+                } catch {
+                    return .error(error)
+                }
+            }
+        )
+    }
+    
+    private func retryWithToken<T>(_ source: Single<T>) -> Single<T> {
+        return source
+            .retry { err in
+                err.flatMap { [weak self] err -> Single<Void> in
+                    guard let self,
+                          let requestError = err as? DataRequestError else {
+                        return .error(DataRequestError.unknown)
+                    }
+                    
+                    if requestError == .expiredToken {
+                        return reissueTokenIfNeeded().asSingle()
+                    } else {
+                        return .error(requestError)
+                    }
+                }
+            }
     }
     
     private func reissueTokenIfNeeded() -> Observable<Void> {

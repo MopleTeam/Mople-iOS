@@ -113,6 +113,9 @@ final class DefaultNetworkSessionManager: NetworkSessionManager {
                 return (response, data)
             })
             .asSingle()
+            .timeout(.seconds(10),
+                     other: .error(NetworkError.notConnectedServer),
+                     scheduler: MainScheduler.instance)
     }
 }
 
