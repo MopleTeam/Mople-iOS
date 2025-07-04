@@ -46,7 +46,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
     
     private func setPageViews() {
         planListVC = dependencies.makeMeetPlanListViewController()
-        reviewListVC = dependencies.makeMeetReviewListViewController(coordinator: self)
+        reviewListVC = dependencies.makeMeetReviewListViewController()
         detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
     }
 }

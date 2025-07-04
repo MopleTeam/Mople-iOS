@@ -49,11 +49,13 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
     private func setupUI() {
         setupTableView()
+        setEdgeGesture()
         setLayout()
     }
     
@@ -78,6 +80,13 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
         } else {
             tableView.tableHeaderView = nil
         }
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        tableView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
     
     // MARK: - Reactor Setup

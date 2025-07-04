@@ -14,7 +14,11 @@ final class AppNaviViewController: UINavigationController, TransitionControllabl
         case sub
     }
     
+    // MARK: - Variables
     private let type: NaviType
+    
+    // MARK: - Gesture
+    var edgeGesture: UIGestureRecognizer { dismissTransition.edgeGesture }
     
     // MARK: - Transition
     lazy var presentTransition: AppTransition = .init(type: .present)
