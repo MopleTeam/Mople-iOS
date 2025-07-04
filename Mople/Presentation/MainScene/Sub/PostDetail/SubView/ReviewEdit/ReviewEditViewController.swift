@@ -155,8 +155,8 @@ final class ReviewEditViewController: TitleNaviViewController, View {
     // MARK: - Gesture
     private func setEdgeGesture() {
         guard let currentNavi = self.findCurrentNavigation(),
-              let appNavi = currentNavi as? AppNaviViewController else { return }
-        scrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
+              let edgeGesture = currentNavi.interactivePopGestureRecognizer else { return }
+        scrollView.panGestureRecognizer.require(toFail: edgeGesture)
     }
 }
 

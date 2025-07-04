@@ -108,8 +108,8 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     // MARK: - Gesture
     private func setEdgeGesture() {
         guard let currentNavi = self.findCurrentNavigation(),
-              let appNavi = currentNavi as? AppNaviViewController else { return }
-        tableView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
+              let edgeGesture = currentNavi.interactivePopGestureRecognizer else { return }
+        tableView.panGestureRecognizer.require(toFail: edgeGesture)
     }
 }
 
