@@ -70,7 +70,7 @@
 </div>
 
 ## Architecture
-<img width="500" alt="아키텍쳐 구성도_1" src="https://github.com/user-attachments/assets/ed1d4cd5-574b-4293-84d9-0b0a4d0594e6" />
+<img width="800" alt="아키텍쳐 구성도_1" src="https://github.com/user-attachments/assets/7365c52c-5b93-4247-a3d5-462bdedc83b9" />
 
 ## Stack
 ### 🏗️ Architecture & Design Pattern
