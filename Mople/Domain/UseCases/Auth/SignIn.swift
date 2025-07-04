@@ -89,14 +89,14 @@ final class SignInUseCase: SignIn {
         switch error {
         case let err as LoginError:
             return err
-        case let transferError as DataTransferError:
+        case let transferError as DataRequestError:
             return handleTransferError(transferError, socialLoginResult: socialLoginResult)
         default:
             return .unknown(error)
         }
     }
     
-    private func handleTransferError(_ error: DataTransferError, socialLoginResult: SocialInfo?) -> LoginError {
+    private func handleTransferError(_ error: DataRequestError, socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
         case .noResponse:
             guard let socialLoginResult else { return .completeError }
