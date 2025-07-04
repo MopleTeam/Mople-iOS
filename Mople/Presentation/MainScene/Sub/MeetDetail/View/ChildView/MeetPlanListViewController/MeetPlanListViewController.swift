@@ -232,6 +232,12 @@ extension MeetPlanListViewController {
     }
 }
 
+extension MeetPlanListViewController: EdgeGestureConfigurable {
+    func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        tableView.panGestureRecognizer.require(toFail: edgeGesture)
+    }
+}
+
 // MARK: - Handle Plan Participation
 extension MeetPlanListViewController {
     

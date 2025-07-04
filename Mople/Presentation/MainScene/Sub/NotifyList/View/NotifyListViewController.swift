@@ -61,6 +61,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -103,6 +104,13 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     private func setCount(_ count: Int) {
         countView.countText = L10n.itemCount(count)
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        tableView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
 }
 

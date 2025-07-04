@@ -208,6 +208,8 @@
 		5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6BC2CDA0BCA00B855CB /* Comment.swift */; };
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
 		5286C4D92C536BE50083F432 /* JWTTokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* JWTTokenStorage.swift */; };
+		528C196F2E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */; };
+		528C19702E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */; };
 		528D27C72C79F6B800178F14 /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoService.swift */; };
 		528E09E02D6B8FEB00832BA7 /* CalendarViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */; };
 		528E09E32D6B918E00832BA7 /* AllPlanDateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */; };
@@ -996,6 +998,7 @@
 		5285E6BC2CDA0BCA00B855CB /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* JWTTokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWTTokenStorage.swift; sourceTree = "<group>"; };
+		528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+RootNavi.swift"; sourceTree = "<group>"; };
 		528D27C62C79F6B800178F14 /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
 		528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewReactor.swift; sourceTree = "<group>"; };
 		528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPlanDateResponse.swift; sourceTree = "<group>"; };
@@ -1951,6 +1954,7 @@
 			children = (
 				5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
+				528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				5211F9142C89D56D00403980 /* UIView+Identifier.swift */,
 				526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */,
@@ -4075,6 +4079,7 @@
 				52AD4B722D5B808D00FCA929 /* LaunchViewController.swift in Sources */,
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
 				5214F87D2D2BA88600E8CE9C /* RecentPlanViewModel.swift in Sources */,
+				528C19702E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52B8E11C2D53421300F7FF59 /* DefaultMemberRepo.swift in Sources */,
 				523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */,
@@ -4434,6 +4439,7 @@
 				52E95FAF2DF453050036CBCF /* LaunchViewController.swift in Sources */,
 				52E95FB02DF453050036CBCF /* KeyboardDismissable.swift in Sources */,
 				52E95FB12DF453050036CBCF /* RecentPlanViewModel.swift in Sources */,
+				528C196F2E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52E95FB22DF453050036CBCF /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52E95FB32DF453050036CBCF /* DefaultMemberRepo.swift in Sources */,
 				52E95FB42DF453050036CBCF /* MeetListViewReactor.swift in Sources */,

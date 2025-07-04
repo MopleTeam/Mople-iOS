@@ -111,6 +111,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         setupUI()
         setupTapKeyboardDismiss()
         setAction()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -194,6 +195,13 @@ final class CreatePlanViewController: TitleNaviViewController, View {
                 vc.presentMeetPickerVC(meetList: meetList)
             })
             .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        scrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
 }
 

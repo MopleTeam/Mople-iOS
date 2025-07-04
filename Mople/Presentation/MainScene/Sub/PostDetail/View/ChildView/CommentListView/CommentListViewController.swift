@@ -60,6 +60,7 @@ final class CommentListViewController: BaseViewController, View {
         super.viewDidLoad()
         setupDataSource()
         setupUI()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -87,6 +88,13 @@ final class CommentListViewController: BaseViewController, View {
     public func setHeaderView(_ headerView: UIView) {
         self.tableView.tableHeaderView = headerView
         tableView.resizeHeaderView()
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        tableView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
 }
 

@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol EdgeGestureConfigurable {
+    func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer)
+}
+
 enum TransitionType {
     case present
     case dismiss
@@ -20,6 +24,7 @@ final class AppTransition: NSObject {
     private weak var animator: UIViewImplicitlyAnimating?
     
     // MARK: - 제스처 활용 용도
+    public lazy var edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handlePanGesture))
     private var initialFrame: CGRect?
     private weak var currentView: UIView?
     private weak var viewController: UIViewController?
@@ -93,10 +98,9 @@ extension AppTransition: UIViewControllerAnimatedTransitioning {
 extension AppTransition: UIGestureRecognizerDelegate {
     func setupDismissGesture(for viewController: UIViewController) {
         self.viewController = viewController
-        let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handlePanGesture))
-        gesture.edges = .left
-        gesture.delegate = self
-        viewController.view.addGestureRecognizer(gesture)
+        edgeGesture.edges = .left
+        edgeGesture.delegate = self
+        viewController.view.addGestureRecognizer(edgeGesture)
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {

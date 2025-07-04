@@ -11,7 +11,7 @@ protocol MeetDetailSceneDependencies {
     // MARK: - View
     func makeMeetDetailViewController(coordinator: MeetDetailCoordination) -> MeetDetailViewController
     func makeMeetPlanListViewController() -> MeetPlanListViewController
-    func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController
+    func makeMeetReviewListViewController() -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetSetupCoordination) -> MeetSetupViewController
     func makeEditMeetViewController(previousMeet: Meet,
@@ -107,12 +107,12 @@ extension MeetDetailSceneDIContainer {
     }
     
     // MARK: - 리뷰 리스트
-    func makeMeetReviewListViewController(coordinator: MeetDetailCoordination) -> MeetReviewListViewController {
+    func makeMeetReviewListViewController() -> MeetReviewListViewController {
         return MeetReviewListViewController(
-            reactor: makeMeetReviewListViewReactor(coordinator: coordinator))
+            reactor: makeMeetReviewListViewReactor())
     }
     
-    private func makeMeetReviewListViewReactor(coordinator: MeetDetailCoordination) -> MeetReviewListViewReactor {
+    private func makeMeetReviewListViewReactor() -> MeetReviewListViewReactor {
         let reactor = MeetReviewListViewReactor(fetchReviewUseCase: makeFetchReviewListUsecase(),
                                                 delegate: mainReactor!,
                                                 meetId: meetId,

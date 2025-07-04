@@ -96,6 +96,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        configureEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -147,6 +148,17 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private func setupNavi() {
         self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .list)
+    }
+    
+    // MARK: - Gesture
+    private func configureEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        
+        pageController.viewControllers?.forEach {
+            guard let gestureVC = $0 as? EdgeGestureConfigurable else { return }
+            gestureVC.configureEdgeGesture(appNavi.edgeGesture)
+        }
     }
 }
 

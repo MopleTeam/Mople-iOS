@@ -97,6 +97,7 @@ final class ReviewEditViewController: TitleNaviViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -149,6 +150,13 @@ final class ReviewEditViewController: TitleNaviViewController, View {
     
     private func setNaviItem() {
         self.setBarItem(type: .left)
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let appNavi = currentNavi as? AppNaviViewController else { return }
+        scrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
 }
 
