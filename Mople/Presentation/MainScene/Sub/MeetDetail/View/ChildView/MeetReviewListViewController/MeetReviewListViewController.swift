@@ -113,6 +113,12 @@ final class MeetReviewListViewController: BaseViewController, View {
     }
 }
 
+extension MeetReviewListViewController: EdgeGestureConfigurable {
+    func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        tableView.panGestureRecognizer.require(toFail: edgeGesture)
+    }
+}
+
 // MARK: - Reactor Setup
 extension MeetReviewListViewController {
     

@@ -130,6 +130,10 @@ extension DateManager {
     static func isWithinRange(target: Date, from: Date, to: Date) -> Bool {
         return from <= target && to >= target
     }
+    
+    static func isSunday(_ date: Date) -> Bool {
+        return Calendar.current.component(.weekday, from: date) == 1
+    }
 }
 
 // MARK: - 추출
@@ -154,6 +158,10 @@ extension DateManager {
         let targetMonth = calendar.component(.month, from: date)
         
         return (targetMonth - todayMonth) + (targetYear - todayYear) * 12
+    }
+    
+    static func weekBasedYear(_ date: Date) -> Int {
+        return DateManager.calendar.component(.yearForWeekOfYear, from: date)
     }
 }
 

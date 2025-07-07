@@ -9,18 +9,14 @@ import Foundation
 import ReactorKit
 
 protocol PostListCommands: AnyObject {
-    func resetPostList()
     func updateWhenMidnight()
     func setInitialList(with list: [Date])
-    func fetchMonthPlan(on month: Date)
-    func loadMonthlyPost(on month: Date)
-    func selectedDate(on date: Date)
     func editMeet(payload: MeetPayload)
     func editPlan(payload: PlanPayload)
     func editReview(payload: ReviewPayload)
 }
 
-enum ScheduleFetchType {
+enum ScrollFetchType {
     case next
     case previous
 }
@@ -35,43 +31,27 @@ enum LoadState {
 final class PostListViewReactor: Reactor {
     
     enum Action {
-        enum ParentCommand {
-            case resetPost
-            case selectedDate(Date)
-            case fecthPost(Date)
-            case fetchMorePost(on: Date, type: ScheduleFetchType)
-            case editPostList([MonthlyPost])
-            case reloadMonth([Date])
-        }
-        
-        enum ChildEvent {
-            case scrollToDate(Date)
-            case selectedPost(MonthlyPost)
-        }
-        
-        case parentCommand(ParentCommand)
-        case childEvent(ChildEvent)
-        case getMorePost(ScheduleFetchType)
+        case fetchInitialPost(startDate: Date)
+        case fetchAdditionalPost(fetchType: ScrollFetchType)
+        case fetchMonthPost(month: Date)
+        case editPostList([MonthlyPost])
+        case reloadMonth([Date])
     }
     
     enum Mutation {
         case updateInitialPost([MonthlyPost])
         case updateNextPost([MonthlyPost])
         case updatePreviousPost([MonthlyPost])
-        case updateSelectedDate(Date)
-        case resetPost
     }
     
     struct State {
         @Pulse var postList: [MonthlyPost] = []
-        @Pulse var selectedDate: Date?
         @Pulse var previousPostList: [MonthlyPost] = []
         @Pulse var reset: Void?
     }
     
     // MARK: - Variables
     var initialState: State = State()
-    private var currentMonth: Date?
     private var initialDateList: [Date] = []
     private var monthDateList: [Date] = []
     private var loadedDateList: [Date] = []
@@ -95,14 +75,16 @@ final class PostListViewReactor: Reactor {
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .parentCommand(command):
-            return handleParentCommand(command)
-        case let .childEvent(event):
-            return handleChildEvent(event)
-        case let .getMorePost(type):
-            guard let lastLoadMonth else { return .empty() }
-            return moreFetchPost(on: lastLoadMonth,
-                                        type: type)
+        case let .fetchInitialPost(initialDate):
+            return fetchInitialPost(with: initialDate)
+        case let .fetchAdditionalPost(fetchType):
+            return moreFetchPost(type: fetchType)
+        case let .fetchMonthPost(month):
+            return loadMonthlyPost(on: month)
+        case let .editPostList(postlist):
+            return .just(.updateInitialPost(postlist))
+        case let .reloadMonth(reloadlist):
+            return reloadPost(months: reloadlist)
         }
     }
     
@@ -118,48 +100,10 @@ final class PostListViewReactor: Reactor {
             newState.previousPostList = list
         case let .updateInitialPost(list):
             newState.postList = list
-        case let .updateSelectedDate(date):
-            newState.selectedDate = date
-        case .resetPost:
-            newState.postList = []
             newState.reset = ()
         }
         
         return newState
-    }
-}
-
-// MARK: - Action Handling
-extension PostListViewReactor {
-    private func handleParentCommand(_ command: Action.ParentCommand) -> Observable<Mutation> {
-        switch command {
-        case let .fecthPost(month):
-            return fetchInitialPost(with: month)
-        case let .fetchMorePost(month,
-                               fetchType):
-            return moreFetchPost(on: month,
-                                        type: fetchType)
-        case let .selectedDate(date):
-            return .just(.updateSelectedDate(date))
-        case .resetPost:
-            return .just(.resetPost)
-        case let .editPostList(planList):
-            return .just(.updateInitialPost(planList))
-        case let .reloadMonth(month):
-            return reloadPost(months: month)
-        }
-    }
-    
-    private func handleChildEvent(_ event: Action.ChildEvent) -> Observable<Mutation> {
-        switch event {
-        case let .scrollToDate(date):
-            delegate?.scrollToDate(date: date)
-            currentMonth = DateManager.startOfMonth(date)
-        case let .selectedPost(plan):
-            handleSelectedPost(with: plan)
-        }
-        
-        return .empty()
     }
 }
 
@@ -171,9 +115,7 @@ extension PostListViewReactor {
         guard let monthString = DateManager.toString(date: month, format: .month) else {
             return .just([])
         }
-        
-        updateRemainingMonth(month: month)
-        
+                
         return fetchMonthlyPostUseCase.execute(month: monthString)
             .catchAndReturn([])
             .do(onNext: { [weak self] planList in
@@ -188,6 +130,7 @@ extension PostListViewReactor {
         let observables = monthList.compactMap { [weak self] in
             self?.fetchPost(month: $0)
         }
+
         return Observable.zip(observables)
             .map { $0.flatMap { $0 } }
     }
@@ -198,6 +141,7 @@ extension PostListViewReactor {
     /// 받아온 일정의 갯수가 5개 이하라면 재요청
     
     private func fetchInitialPost(with month: Date) -> Observable<Mutation> {
+        resetPostList()
         let fetchPlan = fetchTimelinePost(with: month)
         return requestWithLoading(task: fetchPlan)
     }
@@ -222,18 +166,32 @@ extension PostListViewReactor {
             })
     }
     
-    // MARK: - 스크롤시 데이터 불러오기
+    // MARK: - 포스트 추가로 불러오기
+    private func loadMonthlyPost(on month: Date) -> Observable<Mutation> {
+        guard let fetchType = getLoadMonthType(with: month),
+              hasContainLoadMonth(with: month, type: fetchType) else { return .empty() }
+        
+        return moreFetchPost(type: fetchType)
+    }
     
+    private func getLoadMonthType(with month: Date) -> ScrollFetchType? {
+        guard let lastLoadMonth else { return nil }
+        return month > lastLoadMonth ? .next : .previous
+    }
+        
     /// 스크롤 방향에 따라서 추가 일정 요청
-    private func moreFetchPost(on date: Date,
-                                      type: ScheduleFetchType) -> Observable<Mutation> {
-        guard isLoading == false else { return .empty() }
+    private func moreFetchPost(type: ScrollFetchType) -> Observable<Mutation> {
+        guard isLoading == false,
+              let lastLoadMonth else { return .empty() }
         isLoading = true
         
-        let fetchPostObserver = moreFetchPostIfNeeded(on: date,
+        let fetchPostObserver = moreFetchPostIfNeeded(on: lastLoadMonth,
                                                              type: type)
             .catchAndReturn([])
             .flatMap { postList -> Observable<Mutation> in
+                guard postList.isEmpty == false else {
+                    return .empty()
+                }
                 switch type {
                 case .next:
                     return .just(.updateNextPost(postList))
@@ -252,9 +210,8 @@ extension PostListViewReactor {
     /// 응답받은 일정의 갯수가 5개 이하인 경우 추가요청
     private func moreFetchPostIfNeeded(on date: Date,
                                               with accumulated: [MonthlyPost] = [],
-                                              type: ScheduleFetchType) -> Observable<[MonthlyPost]> {
-        guard let fetchDate = getMoreFetchDate(on: date,
-                                               type: type) else { return .just(accumulated) }
+                                              type: ScrollFetchType) -> Observable<[MonthlyPost]> {
+        guard let fetchDate = findNextFetchDate(on: date, type: type) else { return .just(accumulated) }
         
         return fetchPost(month: fetchDate)
             .map({ $0 + accumulated })
@@ -297,35 +254,6 @@ extension PostListViewReactor {
     }
 }
 
-// MARK: - Selected Plan
-extension PostListViewReactor {
-    
-    /// 일정 선택 시 타입과 날짜를 확인 후 맞는 타입으로 delegate에게 전달
-    private func handleSelectedPost(with post: MonthlyPost) {
-        guard let id = post.id else { return }
-        if post.type == .plan {
-            handlePostDate(id: id,
-                          with: post)
-        } else {
-            delegate?.selectedPost(id: id,
-                                   type: .review)
-        }
-    }
-    
-    private func handlePostDate(id: Int,
-                               with plan: MonthlyPost) {
-        guard let date = plan.date else { return }
-        
-        if DateManager.isPastDay(on: date) == false {
-            delegate?.selectedPost(id: id,
-                                   type: .plan)
-        } else {
-            parent?.catchError(DateTransitionError.midnightReset,
-                               index: 1)
-        }
-    }
-}
-
 // MARK: - Notify
 extension PostListViewReactor {
     
@@ -339,7 +267,8 @@ extension PostListViewReactor {
             updateMeet(&planList, meet: meetSummary)
         default: break
         }
-        action.onNext(.parentCommand(.editPostList(planList)))
+        
+        action.onNext(.editPostList(planList))
     }
     
     func editPlan(payload: PlanPayload) {
@@ -354,7 +283,7 @@ extension PostListViewReactor {
         case let .deleted(id):
             self.deletePlan(&planList, planId: id)
         }
-        action.onNext(.parentCommand(.editPostList(planList)))
+        action.onNext(.editPostList(planList))
     }
     
     func editReview(payload: ReviewPayload) {
@@ -367,7 +296,7 @@ extension PostListViewReactor {
             break
         }
         
-        action.onNext(.parentCommand(.editPostList(planList)))
+        action.onNext(.editPostList(planList))
     }
     
     // MARK: - 모임 변경
@@ -436,7 +365,6 @@ extension PostListViewReactor {
     }
     
     /// 불러온 날짜 중 가장 작은 것과 그 이전 날짜 사이라면 추가 (그 이전 날짜가 없어도 추가)
-    /// -
     private func isBetweenPreviousDate(newDate: Date,
                                        firstLoaded: Date) -> Bool {
         guard newDate < firstLoaded else { return false }
@@ -514,9 +442,9 @@ extension PostListViewReactor {
     
     /// 요청 가능한 상태 업데이트
     private func updateLoadState() {
-        guard let currentMonth else { return }
-        let isNext = monthDateList.contains { $0 > currentMonth }
-        let isPrevious = monthDateList.contains { $0 < currentMonth }
+        guard let lastLoadMonth else { return }
+        let isNext = monthDateList.contains { $0 > lastLoadMonth }
+        let isPrevious = monthDateList.contains { $0 < lastLoadMonth }
         
         loadState =
         switch (isNext, isPrevious) {
@@ -536,18 +464,21 @@ extension PostListViewReactor {
                                                    with: planList.compactMap({ $0.date })))
         } else {
             initialDateList.removeAll { $0 == month }
-            delegate?.deleteMonth(month: month)
+            delegate?.updateDateList(type: .deleteMonth(month))
         }
+        updateRemainingMonth(month: month)
+        // 첫 이벤트 불러올 때 lastloaded 가 나중에 설정돼서 loadstate 제대로 설정안됨
     }
 }
 
 // MARK: - Commands
 extension PostListViewReactor: PostListCommands {
-
     // 기본 일정 설정하기
     func setInitialList(with list: [Date]) {
+        let currentMonth = DateManager.startOfMonth(Date())!
+        let startMonth = lastLoadMonth ?? currentMonth
         setIntialDatelist(with: list)
-        fetchMonthPlan(on: currentMonth ?? Date())
+        action.onNext(.fetchInitialPost(startDate: startMonth))
     }
     
     // 캘린더로부터 넘어온 일정에서 월단위로 필터링
@@ -557,31 +488,7 @@ extension PostListViewReactor: PostListCommands {
         initialDateList = Array(distinctDates)
     }
     
-    // 페이지에 해당하는 일정 불러오기
-    func fetchMonthPlan(on month: Date) {
-        currentMonth = DateManager.startOfMonth(month)
-        resetPostList()
-        guard let currentMonth else { return }
-        action.onNext(.parentCommand(.fecthPost(currentMonth)))
-    }
-    
-    // 페이지에 해당하는 일정 불러오기
-    func loadMonthlyPost(on month: Date) {
-        guard let startMonth = DateManager.startOfMonth(month),
-              let fetchType = getLoadMonthType(with: startMonth),
-              isContainLoadMonth(with: startMonth, type: fetchType) else { return }
-        
-        currentMonth = startMonth
-        action.onNext(.parentCommand(.fetchMorePost(on: startMonth,
-                                                   type: fetchType)))
-    }
-    
-    private func getLoadMonthType(with month: Date) -> ScheduleFetchType? {
-        guard let currentMonth else { return nil }
-        return month > currentMonth ? .next : .previous
-    }
-    
-    private func isContainLoadMonth(with month: Date, type: ScheduleFetchType) -> Bool {
+    private func hasContainLoadMonth(with month: Date, type: ScrollFetchType) -> Bool {
         switch type {
         case .next:
             return loadedDateList.contains { $0 >= month } == false
@@ -590,9 +497,12 @@ extension PostListViewReactor: PostListCommands {
         }
     }
     
-    // 캘린더에서 선택된 날짜 스케줄리스트와 동기화
-    func selectedDate(on date: Date) {
-        action.onNext(.parentCommand(.selectedDate(date)))
+    // 초기셋업
+    private func resetPostList() {
+        isLoading = false
+        loadState = .none
+        monthDateList = initialDateList
+        loadedDateList.removeAll()
     }
     
     // 만료된 일정이 있는 경우 업데이트
@@ -606,38 +516,17 @@ extension PostListViewReactor: PostListCommands {
             reloadMonth.insert(month)
         }
         guard reloadMonth.isEmpty == false else { return }
-        action.onNext(.parentCommand(.reloadMonth(Array(reloadMonth))))
-    }
-    
-    // 초기셋업
-    func resetPostList() {
-        isLoading = false
-        loadState = .none
-        lastLoadMonth = nil
-        monthDateList = initialDateList
-        loadedDateList.removeAll()
-        action.onNext(.parentCommand(.resetPost))
+        action.onNext(.reloadMonth(Array(reloadMonth)))
     }
 }
 
 // MARK: - Helper
 extension PostListViewReactor {
     
-    /// type에 따라서 요청할 month
-    // 스케줄리스트에서 추가요청 할 땐 monthDateList에 값이 없으나 캘린더에서 추가요청 할 땐 monthDateList에 값이 있을 수 있음
-    private func getMoreFetchDate(on date: Date,
-                                  type: ScheduleFetchType) -> Date? {
-        if monthDateList.contains(where: { $0 == date }) {
-            return date
-        } else {
-            return findNextFetchDate(on: date, type: type)
-        }
-    }
-    
     /// monthList에서 마지막으로 불러온 날짜와 가까운 날짜
     /// - Parameter type: 가까운 기준 (이전 or 다음)
     private func findNextFetchDate(on date: Date,
-                                   type: ScheduleFetchType) -> Date? {
+                                   type: ScrollFetchType) -> Date? {
         switch type {
         case .next:
             return findNextActiveMonth(from: date)
@@ -650,9 +539,10 @@ extension PostListViewReactor {
     /// - Parameter date: 타켓 날짜
     /// - Returns: 불러올 달 리스트
     private func findTimelineList(from date: Date) -> [Date] {
-        return [findPreviousActiveMonth(from: date),
-                findSameActiveMonth(from: date),
-                findNextActiveMonth(from: date)].compactMap { $0 }
+        guard let startMonth = DateManager.startOfMonth(date) else { return [] }
+        return [findPreviousActiveMonth(from: startMonth),
+                findSameActiveMonth(from: startMonth),
+                findNextActiveMonth(from: startMonth)].compactMap { $0 }
     }
     
     private func findSameActiveMonth(from date: Date) -> Date? {

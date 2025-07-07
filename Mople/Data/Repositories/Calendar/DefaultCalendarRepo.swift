@@ -14,6 +14,12 @@ final class DefaultCalendarRepo: BaseRepositories, CalendarRepo {
         }
     }
     
+    func fetchHolidays(for year: Int) -> Single<[HolidayResponse]> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.fetchHolidays(for: year)
+        }
+    }
+    
     func fetchMonthlyPost(month: String) -> Single<MonthlyPostResponse> {
         return networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarPagingData(month: month)

@@ -20,38 +20,32 @@ protocol ChildLoadingReactor: AnyObject {
 
 extension ChildLoadingReactor {
     
-    var index: Int { 1 }
+    var index: Int { 0 }
 
     func requestWithLoading(task: Observable<Mutation>,
-                            minimumExecutionTime: RxTimeInterval = .seconds(0),
-                            defferredLoadingDelay: RxTimeInterval = .milliseconds(0),
-                            completionHandler: (() -> Void)? = nil
+                            defferredLoadingDelay: RxTimeInterval = .milliseconds(0)
     ) -> Observable<Mutation> {
-        let executionTimer = Observable<Int>.timer(minimumExecutionTime, scheduler: MainScheduler.instance)
         
-        let loadingStop = Observable.just(())
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                completionHandler?()
-                parent?.updateLoadingState(false, index: index)
-                return .empty()
-            }
-                
-        let newTask = Observable.zip(task, executionTimer)
-            .map { $0.0 }
+        var isCompleted = false
+        
+        let newTask = task
+            .do(onDispose: { [weak self] in
+                let index = self?.index ?? 0
+                self?.parent?.updateLoadingState(false, index: index)
+                isCompleted = true
+            })
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
             }
-            .concat(loadingStop)
-            .share(replay: 1)
         
         let loadingStart = Observable.just(())
             .delay(defferredLoadingDelay, scheduler: MainScheduler.instance)
-            .take(until: newTask)
             .flatMap({ [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                parent?.updateLoadingState(true, index: index)
+                if let self,
+                   !isCompleted {
+                    parent?.updateLoadingState(true, index: index)
+                }
                 return .empty()
             })
             
@@ -59,9 +53,6 @@ extension ChildLoadingReactor {
     }
     
     private func catchError(_ error: Error) -> Observable<Mutation> {
-        
-        parent?.updateLoadingState(false, index: index)
-        
         if DataRequestError.isHandledError(err: error) == false {
             parent?.catchError(error, index: index)
         }

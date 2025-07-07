@@ -164,6 +164,12 @@
 		52728C712DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */; };
 		52728C742DFACDB800883FB1 /* CheckVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C732DFACDB800883FB1 /* CheckVersion.swift */; };
 		52728C752DFACDB800883FB1 /* CheckVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C732DFACDB800883FB1 /* CheckVersion.swift */; };
+		52728C7A2DFE76FA00883FB1 /* HolidayResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C792DFE76FA00883FB1 /* HolidayResponse.swift */; };
+		52728C7B2DFE76FA00883FB1 /* HolidayResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C792DFE76FA00883FB1 /* HolidayResponse.swift */; };
+		52728C7E2DFE795700883FB1 /* Holidays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C7D2DFE795700883FB1 /* Holidays.swift */; };
+		52728C7F2DFE795700883FB1 /* Holidays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C7D2DFE795700883FB1 /* Holidays.swift */; };
+		52728C812DFE7A9E00883FB1 /* FetchHolidays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C802DFE7A9E00883FB1 /* FetchHolidays.swift */; };
+		52728C822DFE7A9E00883FB1 /* FetchHolidays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52728C802DFE7A9E00883FB1 /* FetchHolidays.swift */; };
 		52741EC32D11565B00C249A6 /* DefaultModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC22D11565B00C249A6 /* DefaultModalView.swift */; };
 		52741EC82D116A8300C249A6 /* ThumbnailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */; };
 		52741ECC2D11A57E00C249A6 /* UploadPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52741ECB2D11A57E00C249A6 /* UploadPlace.swift */; };
@@ -202,6 +208,8 @@
 		5285E6BD2CDA0BCA00B855CB /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6BC2CDA0BCA00B855CB /* Comment.swift */; };
 		5285E6C42CDB1EBB00B855CB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5285E6C32CDB1EBB00B855CB /* UserInfo.swift */; };
 		5286C4D92C536BE50083F432 /* JWTTokenStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5286C4D82C536BE50083F432 /* JWTTokenStorage.swift */; };
+		528C196F2E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */; };
+		528C19702E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */; };
 		528D27C72C79F6B800178F14 /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D27C62C79F6B800178F14 /* PhotoService.swift */; };
 		528E09E02D6B8FEB00832BA7 /* CalendarViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */; };
 		528E09E32D6B918E00832BA7 /* AllPlanDateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */; };
@@ -949,6 +957,9 @@
 		52728C6C2DFACCDE00883FB1 /* AppVersionRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionRepo.swift; sourceTree = "<group>"; };
 		52728C6F2DFACD3000883FB1 /* DefaultVersionCheckRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultVersionCheckRepo.swift; sourceTree = "<group>"; };
 		52728C732DFACDB800883FB1 /* CheckVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckVersion.swift; sourceTree = "<group>"; };
+		52728C792DFE76FA00883FB1 /* HolidayResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolidayResponse.swift; sourceTree = "<group>"; };
+		52728C7D2DFE795700883FB1 /* Holidays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Holidays.swift; sourceTree = "<group>"; };
+		52728C802DFE7A9E00883FB1 /* FetchHolidays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchHolidays.swift; sourceTree = "<group>"; };
 		52741EC22D11565B00C249A6 /* DefaultModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModalView.swift; sourceTree = "<group>"; };
 		52741EC72D116A8300C249A6 /* ThumbnailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailViewModel.swift; sourceTree = "<group>"; };
 		52741ECB2D11A57E00C249A6 /* UploadPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPlace.swift; sourceTree = "<group>"; };
@@ -987,6 +998,7 @@
 		5285E6BC2CDA0BCA00B855CB /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5285E6C32CDB1EBB00B855CB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		5286C4D82C536BE50083F432 /* JWTTokenStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWTTokenStorage.swift; sourceTree = "<group>"; };
+		528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+RootNavi.swift"; sourceTree = "<group>"; };
 		528D27C62C79F6B800178F14 /* PhotoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
 		528E09DF2D6B8FEB00832BA7 /* CalendarViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewReactor.swift; sourceTree = "<group>"; };
 		528E09E22D6B918E00832BA7 /* AllPlanDateResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPlanDateResponse.swift; sourceTree = "<group>"; };
@@ -1942,6 +1954,7 @@
 			children = (
 				5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
+				528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */,
 				5211F90C2C87339300403980 /* UICollectionView+Snaping.swift */,
 				5211F9142C89D56D00403980 /* UIView+Identifier.swift */,
 				526F45002C96000100C347C7 /* UIView+BounceAnimate.swift */,
@@ -1994,6 +2007,14 @@
 				52728C732DFACDB800883FB1 /* CheckVersion.swift */,
 			);
 			path = CheckVersion;
+			sourceTree = "<group>";
+		};
+		52728C7C2DFE794A00883FB1 /* Holiday */ = {
+			isa = PBXGroup;
+			children = (
+				52728C7D2DFE795700883FB1 /* Holidays.swift */,
+			);
+			path = Holiday;
 			sourceTree = "<group>";
 		};
 		52741EC42D116A5600C249A6 /* Thumbnail */ = {
@@ -2202,6 +2223,7 @@
 				528E09F02D6B9A3900832BA7 /* MonthlyPostResponse.swift */,
 				528E09F22D6B9A5600832BA7 /* CalendarPlanResponse.swift */,
 				528E09EA2D6B98BD00832BA7 /* CalendarReviewResponse.swift */,
+				52728C792DFE76FA00883FB1 /* HolidayResponse.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -2235,6 +2257,7 @@
 			isa = PBXGroup;
 			children = (
 				528E09FF2D6B9E3800832BA7 /* FetchAllPlanDate.swift */,
+				52728C802DFE7A9E00883FB1 /* FetchHolidays.swift */,
 				528E0A012D6B9E4200832BA7 /* FetchMonthlyPost.swift */,
 			);
 			path = Calendar;
@@ -2982,6 +3005,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				52728C7C2DFE794A00883FB1 /* Holiday */,
 				52728C692DFACC0500883FB1 /* VersionCheck */,
 				523A18012DD0CC1A0071BDBD /* Post */,
 				520185252DA7A0CB00C2B4FC /* Notify */,
@@ -3738,6 +3762,7 @@
 				52CD8BE12DB9AED50037E8BF /* URL+Query.swift in Sources */,
 				52266BF82CBD471A007D03EB /* ProfileViewReactor.swift in Sources */,
 				524B2F6E2D34048100D80B12 /* AppTransition.swift in Sources */,
+				52728C7F2DFE795700883FB1 /* Holidays.swift in Sources */,
 				523E76232D5D598700BD22CB /* ReviewImageUpload.swift in Sources */,
 				52E99EE92CA1B3EA007E552C /* PostListTableHeaderView.swift in Sources */,
 				528E09E62D6B921E00832BA7 /* AllPlanDate.swift in Sources */,
@@ -3786,6 +3811,7 @@
 				5259B0162CA013A8006B2711 /* WeatherView.swift in Sources */,
 				52F83A812D363E57003DD790 /* TransitionControllable.swift in Sources */,
 				52728C712DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */,
+				52728C812DFE7A9E00883FB1 /* FetchHolidays.swift in Sources */,
 				523B9C0A2DCB052200DF2698 /* PostListTableCell.swift in Sources */,
 				529CCD512D3239680041CBB7 /* LifeCycleLoggable.swift in Sources */,
 				5211F9032C86E41900403980 /* RecentPlanViewController.swift in Sources */,
@@ -3923,6 +3949,7 @@
 				52818C822D1A98040001E30B /* SearchPlaceFlowCoordinator.swift in Sources */,
 				529CCD5A2D3267710041CBB7 /* PostDetailViewReactor.swift in Sources */,
 				5296291F2D5F4F6700003F66 /* ReportRepo.swift in Sources */,
+				52728C7A2DFE76FA00883FB1 /* HolidayResponse.swift in Sources */,
 				52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */,
 				52D8648B2D2A9400000F8378 /* MeetReviewListViewController.swift in Sources */,
 				528E09E02D6B8FEB00832BA7 /* CalendarViewReactor.swift in Sources */,
@@ -4052,6 +4079,7 @@
 				52AD4B722D5B808D00FCA929 /* LaunchViewController.swift in Sources */,
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
 				5214F87D2D2BA88600E8CE9C /* RecentPlanViewModel.swift in Sources */,
+				528C19702E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52B8E11C2D53421300F7FF59 /* DefaultMemberRepo.swift in Sources */,
 				523645432C901CF7009E0784 /* MeetListViewReactor.swift in Sources */,
@@ -4094,6 +4122,7 @@
 				52E95E792DF453050036CBCF /* URL+Query.swift in Sources */,
 				52E95E7A2DF453050036CBCF /* ProfileViewReactor.swift in Sources */,
 				52E95E7B2DF453050036CBCF /* AppTransition.swift in Sources */,
+				52728C7E2DFE795700883FB1 /* Holidays.swift in Sources */,
 				52E95E7C2DF453050036CBCF /* ReviewImageUpload.swift in Sources */,
 				52E95E7D2DF453050036CBCF /* PostListTableHeaderView.swift in Sources */,
 				52E95E7E2DF453050036CBCF /* AllPlanDate.swift in Sources */,
@@ -4142,6 +4171,7 @@
 				52E95EA82DF453050036CBCF /* WeatherView.swift in Sources */,
 				52E95EA92DF453050036CBCF /* TransitionControllable.swift in Sources */,
 				52728C702DFACD3000883FB1 /* DefaultVersionCheckRepo.swift in Sources */,
+				52728C822DFE7A9E00883FB1 /* FetchHolidays.swift in Sources */,
 				52E95EAA2DF453050036CBCF /* PostListTableCell.swift in Sources */,
 				52E95EAB2DF453050036CBCF /* LifeCycleLoggable.swift in Sources */,
 				52E95EAC2DF453050036CBCF /* RecentPlanViewController.swift in Sources */,
@@ -4279,6 +4309,7 @@
 				52E95F2E2DF453050036CBCF /* SearchPlaceFlowCoordinator.swift in Sources */,
 				52E95F2F2DF453050036CBCF /* PostDetailViewReactor.swift in Sources */,
 				52E95F302DF453050036CBCF /* ReportRepo.swift in Sources */,
+				52728C7B2DFE76FA00883FB1 /* HolidayResponse.swift in Sources */,
 				52E95F312DF453050036CBCF /* MeetSelectTableViewCell.swift in Sources */,
 				52E95F322DF453050036CBCF /* MeetReviewListViewController.swift in Sources */,
 				52E95F332DF453050036CBCF /* CalendarViewReactor.swift in Sources */,
@@ -4408,6 +4439,7 @@
 				52E95FAF2DF453050036CBCF /* LaunchViewController.swift in Sources */,
 				52E95FB02DF453050036CBCF /* KeyboardDismissable.swift in Sources */,
 				52E95FB12DF453050036CBCF /* RecentPlanViewModel.swift in Sources */,
+				528C196F2E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52E95FB22DF453050036CBCF /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52E95FB32DF453050036CBCF /* DefaultMemberRepo.swift in Sources */,
 				52E95FB42DF453050036CBCF /* MeetListViewReactor.swift in Sources */,
@@ -4620,7 +4652,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4668,7 +4700,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4716,7 +4748,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;
@@ -4764,7 +4796,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;

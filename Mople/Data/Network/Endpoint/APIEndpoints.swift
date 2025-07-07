@@ -441,6 +441,14 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
     
+    static func fetchHolidays(for year: Int) throws -> Endpoint<[HolidayResponse]> {
+        return try Endpoint(path: "holiday",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: ["year":"\(year)"])
+    }
+    
     static func fetchCalendarPagingData(month: String) throws -> Endpoint<MonthlyPostResponse> {
         return try Endpoint(path: "plan/page",
                             authenticationType: .accessToken,

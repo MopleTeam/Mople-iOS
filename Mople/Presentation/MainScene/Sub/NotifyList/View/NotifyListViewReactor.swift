@@ -102,19 +102,18 @@ extension NotifyListViewReactor {
             .concat(resetNotifyCount())
     }
     
+    private func fetchNotifyWithLoading() -> Observable<Mutation> {
+        return requestWithLoading(task: fetchNotify())
+            .concat(resetNotifyCount())
+    }
+    
     private func resetNotifyCount() -> Observable<Mutation> {
         return resetNotifyCountUseCase.execute()
             .flatMap { _ -> Observable<Mutation> in
                 return .empty()
             }
     }
-    
-    private func fetchNotifyWithLoading() -> Observable<Mutation> {
-        let fetchNoity = fetchNotify()
-        return requestWithLoading(task: fetchNoity)
-    }
-    
-    /// 모임 리스트 리프레쉬
+
     private func refreshNotify() -> Observable<Mutation> {
         return .concat([fetchNotify(),
                         .just(Mutation.completedRefresh)])

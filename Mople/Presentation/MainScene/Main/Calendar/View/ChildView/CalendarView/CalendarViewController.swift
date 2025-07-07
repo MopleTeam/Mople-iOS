@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 import RxRelay
@@ -24,44 +25,91 @@ final class CalendarViewController: BaseViewController, View {
     var disposeBag = DisposeBag()
 
     // MARK: - Variables
-    /// UI에 표시됨을 방지하기 위해 임시로 선택된 날짜
+    private let topInset: CGFloat = 16
+    private let weekHeaderHeight: CGFloat = 36
+    private let weekDayVerticalPadding: CGFloat = 5
+    private let defaultHorizonPadding: CGFloat = 24
+    private let grabberHeight: CGFloat = 41
+    private let lineHeight: CGFloat = 1
     private var preSelectedDate: Date?
     private let currentCalendar = DateManager.calendar
     private var events: [Date] = []
+    private var holidays: [Date] = []
     private var isSystemDragging: Bool = false
-    public var currentHeight: CGFloat?
 
     // MARK: - Observable
-    private let scopeObserver: PublishRelay<ScopeType> = .init()
-    private let pageObserver: PublishRelay<Date> = .init()
-    private let monthObserver: PublishRelay<DateComponents> = .init()
-    private let dateSelectionObserver: PublishRelay<Date> = .init()
-
+    fileprivate let scopeObserver: PublishRelay<ScopeType> = .init()
+    fileprivate let pageObserver: PublishRelay<Date> = .init()
+    fileprivate let selectedDateObserver: PublishRelay<Date> = .init()
+    fileprivate let heightObserver: PublishRelay<CGFloat> = .init()
+    private let yearObserver: PublishRelay<Int> = .init()
+    
     // MARK: - Gestrue
-    private var panGesture: UIPanGestureRecognizer?
     private var gestureDirection: GestureDirection?
     private var startCalendarOffset: CGPoint?
     private var horizonGestureCount: Int = 0
 
     // MARK: - UI Components
-    public let calendar: FSCalendar = {
+    private let topInsetView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .defaultWhite
+        return view
+    }()
+    
+    public lazy var calendar: FSCalendar = {
         let calendar = FSCalendar()
+        calendar.backgroundColor = .defaultWhite
         calendar.scrollDirection = .horizontal
-        calendar.adjustsBoundingRectWhenChangingMonths = true
+        calendar.adjustsBoundingRectWhenChangingMonths = false
         calendar.placeholderType = .none
         calendar.headerHeight = 0
-        calendar.rowHeight = 60
-        calendar.collectionViewLayout.sectionInsets = .init(top: 5, left: 24, bottom: 5, right: 24)
-        calendar.locale = Locale(identifier: "ko_KR")
+        calendar.layer.zPosition = 1
+        // FSCalendar 섹션 기본값 (5, 0, 5, 0)
+        calendar.collectionViewLayout.sectionInsets = .init(top: weekDayVerticalPadding,
+                                                            left: defaultHorizonPadding,
+                                                            bottom: weekDayVerticalPadding,
+                                                            right: defaultHorizonPadding)
         return calendar
     }()
 
     private let weekContainerView = UIView()
+    
+    private let grabberBackView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .bgPrimary
+        return view
+    }()
+
+    private let grabberContainer: UIView = {
+        let view = UIView()
+        view.isUserInteractionEnabled = false
+        view.layer.makeCornes(radius: 20, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
+        view.clipsToBounds = true
+        view.backgroundColor = .defaultWhite
+        return view
+    }()
+    
+    private let grabberView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .appTertiary
+        view.layer.cornerRadius = 3
+        view.isHidden = true
+        return view
+    }()
+    
+    // MARK: - Gesture
+    private let panGesture: UIPanGestureRecognizer = {
+        let panGesture = UIPanGestureRecognizer()
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 2
+        return panGesture
+    }()
 
     // MARK: - LifeCycle
     init(reactor: CalendarViewReactor) {
         super.init()
         self.reactor = reactor
+        self.view.clipsToBounds = false
     }
 
     required init?(coder: NSCoder) {
@@ -71,40 +119,68 @@ final class CalendarViewController: BaseViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setObservable()
     }
 
     // MARK: - UI Setup
     private func setupUI() {
         setCalendar()
         setLayout()
+        scopeBind()
+        setPanGesture()
     }
     
     private func setLayout() {
-        view.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
         view.backgroundColor = .defaultWhite
+        view.addSubview(topInsetView)
         view.addSubview(calendar)
+        view.addSubview(grabberBackView)
+        grabberBackView.addSubview(grabberContainer)
+        grabberContainer.addSubview(grabberView)
 
         calendar.addSubview(weekContainerView)
         weekContainerView.addSubview(calendar.calendarWeekdayView)
+        
+        topInsetView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.height.equalTo(topInset)
+        }
 
         calendar.snp.makeConstraints { make in
-            let calendarMaxHeight = calendar.weekdayHeight + (calendar.rowHeight * 6)
-            make.top.horizontalEdges.equalToSuperview()
-            make.height.equalTo(calendarMaxHeight)
+            make.top.equalTo(topInsetView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(280 + weekHeaderHeight)
         }
 
         weekContainerView.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(36)
+            make.horizontalEdges.equalToSuperview().inset(defaultHorizonPadding)
+            make.height.equalTo(weekHeaderHeight)
         }
 
         calendar.calendarWeekdayView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        grabberBackView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(grabberHeight + lineHeight)
+        }
+        
+        grabberContainer.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
+            make.bottom.equalToSuperview().inset(lineHeight)
+        }
+        
+        grabberView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().inset(16)
+            make.width.equalTo(80)
+            make.height.equalTo(5)
+        }
     }
-
+        
     private func setCalendar() {
         calendar.delegate = self
         calendar.dataSource = self
@@ -114,7 +190,6 @@ final class CalendarViewController: BaseViewController, View {
 
     private func setCalendarAppearance() {
         calendar.appearance.weekdayTextColor = .gray05
-        calendar.appearance.titleSelectionColor = .gray01
         calendar.appearance.titleFont = FontStyle.Title3.semiBold
         calendar.appearance.weekdayFont = FontStyle.Body1.medium
         calendar.appearance.todayColor = .clear
@@ -122,21 +197,21 @@ final class CalendarViewController: BaseViewController, View {
     }
 
     // MARK: - Gesture Setup
-    private func setObservable() {
-        scopeObserver
-            .distinctUntilChanged()
-            .map { $0 == .month }
-            .bind(to: self.calendar.collectionView.rx.isScrollEnabled)
+    private func setPanGesture() {
+        self.view.addGestureRecognizer(panGesture)
+        
+        panGesture.rx.event
+            .bind(with: self, onNext: { vc, gesture in
+                vc.handleGesture(gesture)
+            })
             .disposed(by: disposeBag)
     }
     
-    public func setPanGesture(gesture: UIPanGestureRecognizer) {
-        self.panGesture = gesture
-        
-        panGesture!.rx.event
-            .observe(on: MainScheduler.instance)
-            .bind(with: self, onNext: { vc, gesture in
-                vc.handleGesture(gesture)
+    private func scopeBind() {
+        scopeObserver
+            .bind(with: self, onNext: { vc, scope in
+                vc.updateGrabberBackColor(scope)
+                vc.updateGrabberVisible(scope)
             })
             .disposed(by: disposeBag)
     }
@@ -162,74 +237,33 @@ extension CalendarViewController {
     }
     
     private func setActionBind(_ reactor: Reactor) {
-        scopeObserver
+        yearObserver
             .distinctUntilChanged()
-            .map { Reactor.Action.childEvent(.changedScope($0)) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        pageObserver
-            .filter({ [weak self] _ in
-                return self?.calendar.scope == .month
-            })
-            .map { Reactor.Action.childEvent(.changedPage($0)) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        monthObserver
-            .map { Reactor.Action.childEvent(.changeMonth($0)) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
-        dateSelectionObserver
-            .compactMap({ $0 })
-            .observe(on: MainScheduler.instance)
-            .map { Reactor.Action.childEvent(.selectedDate($0)) }
+            .map { Reactor.Action.fetchHolidays(year: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$dates)
+        reactor.pulse(\.$events)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, events in
-                vc.updateEvents(with: events)
+                vc.events = events
                 vc.setDefaulsePreDate()
             })
             .disposed(by: disposeBag)
      
-        reactor.pulse(\.$page)
-            .observe(on: MainScheduler.instance)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, date in
-                vc.moveToPage(on: date)
-            })
-            .disposed(by: disposeBag)
-
-        reactor.pulse(\.$scrollDate)
-            .asDriver(onErrorJustReturn: nil)
-            .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, date  in
-                vc.selectedPresnetDate(on: date)
+        reactor.pulse(\.$holidays)
+            .asDriver(onErrorJustReturn: [])
+            .drive(with: self, onNext: { vc, holidays in
+                vc.holidays = holidays
             })
             .disposed(by: disposeBag)
         
-        reactor.pulse(\.$changeScope)
-            .observe(on: MainScheduler.instance)
-            .compactMap({ $0 })
+        reactor.pulse(\.$completedLoad)
             .asDriver(onErrorJustReturn: nil)
             .drive(with: self, onNext: { vc, _ in
-                vc.switchScope(type: .buttonTap)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$changeMonthScope)
-            .observe(on: MainScheduler.instance)
-            .compactMap({ $0 })
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, _ in
-                vc.changeMonthScope(animated: false)
+                vc.calendar.reloadData()
             })
             .disposed(by: disposeBag)
     }
@@ -238,6 +272,7 @@ extension CalendarViewController {
 extension CalendarViewController: FSCalendarDataSource {
 
     func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
+        
         let cell = calendar.dequeueReusableCell(withIdentifier: CustomCalendarCell.reuseIdentifier, for: date, at: position) as! CustomCalendarCell
         cell.updateCell(isSelected: checkSelected(on: date),
                         isToday: DateManager.isSameDay(date, Date()))
@@ -257,28 +292,21 @@ extension CalendarViewController: FSCalendarDelegate {
     }
     
     func calendarCurrentPageDidChange(_ calendar: FSCalendar) {
-        setPreSelectedDateWhenMonth()
+        updateCurrentYear()
         syncCurrentPage()
+    }
+    
+    func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        return events.contains(where: { DateManager.isSameDay($0, date) })
     }
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        preSelectedDate = date
+        updateCell(on: date, isSelected: true)
         if calendar.scope == .month {
-            
-            guard events.contains(where: { DateManager.isSameDay($0, date) }) else { return }
-            print(#function, #line, "Path : # month event ")
-            preSelectedDate = date
             switchScope(type: .dateTap)
-            updateCell(on: date, isSelected: true)
         } else {
-            if events.contains(where: { DateManager.isSameDay($0, date) }) {
-                print(#function, #line, "Path : # week event ")
-                preSelectedDate = date
-                switchScope(type: .dateTap)
-                updateCell(on: date, isSelected: true)
-            } else {
-                print(#function, #line, "Path : # not event ")
-                changeMonthScope(animated: true)
-            }
+            sendSelectedDateToTable()
         }
     }
 
@@ -288,22 +316,55 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
-        let maxHeight = calendar.rowHeight * 6
         let currentScope: ScopeType = calendar.scope == .month ? .month : .week
-        currentHeight = calendar.scope == .month ? maxHeight : bounds.height
+        // month -> scope 변경 시 요일헤더 인셋 값 / 2으로 적용
+        let halfWeekDayVerticalPadding: CGFloat = weekDayVerticalPadding / 2
+        let calculateGrabberHeight = grabberHeight - lineHeight
         self.scopeObserver.accept(currentScope)
+        self.heightObserver.accept(bounds.height + halfWeekDayVerticalPadding + calculateGrabberHeight)
+        self.calendar.snp.updateConstraints { make in
+            make.height.equalTo(bounds.height)
+        }
+        self.view.layoutIfNeeded()
     }
 }
 
 extension CalendarViewController: FSCalendarDelegateAppearance {
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
-
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return .gray01
+            return isHoliday(date) ? .defaultRed : .gray01
         default :
-            return .gray07
+            return isHoliday(date) ? .defaultRed1 : .gray07
         }
+    }
+    
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
+        switch date {
+        case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
+            return isHoliday(date) ? .defaultRed : .gray01
+        default :
+            return isHoliday(date) ? .defaultRed1 : .gray07
+        }
+    }
+    
+    private func isEventDay(_ day: Date) -> Bool {
+        return events.contains(where: { DateManager.isSameDay($0, day) })
+    }
+    
+    private func isHoliday(_ day: Date) -> Bool {
+        return holidays.contains(where: { DateManager.isSameDay($0, day) }) || DateManager.isSunday(day)
+    }
+}
+
+// MARK: - UI Update
+extension CalendarViewController {
+    private func updateGrabberBackColor(_ scope: ScopeType) {
+        self.grabberBackView.backgroundColor = scope == .month ? .defaultWhite : .bgPrimary
+    }
+    
+    private func updateGrabberVisible(_ scope: ScopeType) {
+        self.grabberView.isHidden = scope == .month
     }
 }
 
@@ -314,17 +375,10 @@ extension CalendarViewController {
         case buttonTap
         case dateTap
     }
-    
-    /// 스코프에 맞춰서 캘린더 뷰 높이 조절
-    private func updateHeight(_ height: CGFloat) {
-        calendar.snp.updateConstraints { make in
-            make.height.equalTo(height)
-        }
-    }
 
     /// 스위치 방식에 따라서 처리
-    /// 포커싱 할 date ScheduleTableViewController에게 알리기
-    private func switchScope(type: ScopeChangeType) {
+    /// 포커싱 할 date PostListViewController에게 알리기
+    public func switchScope(type: ScopeChangeType) {
         handleSwitchType(type)
         scopeSync()
     }
@@ -343,12 +397,10 @@ extension CalendarViewController {
         }
     }
 
-    /// scope에 맞춰서 표시할 데이터 동기화
-    /// month : week에서 previous, current, next 날짜 클릭에 따라서 calenar가 맞는 날짜를 표시해줌
     private func scopeSync() {
         switch calendar.scope {
         case .month:
-            sendCurrentPageToHeader()
+            syncCurrentPage()
         case .week:
             sendSelectedDateToTable()
         @unknown default:
@@ -357,18 +409,7 @@ extension CalendarViewController {
     }
 
     private func syncCurrentPage() {
-        guard isSystemDragging == false else { return }
-        sendCurrentPageToHeader()
-        sendCurrrentPageToTable()
-    }
-    
-    // 확인
-    /// 주간에서 월간으로 변경할 때 DatePicker, MainHeaderLabel 반영을 위해서 monthObserver에 값 보내기
-    private func sendCurrentPageToHeader() {
-        monthObserver.accept(calendar.currentPage.toDateComponents())
-    }
-    
-    private func sendCurrrentPageToTable() {
+        guard !isSystemDragging else { return }
         pageObserver.accept(calendar.currentPage)
     }
 
@@ -376,7 +417,7 @@ extension CalendarViewController {
     /// 월간에서 주간으로 변경될 때 표시할 값 계산
     private func sendSelectedDateToTable() {
         guard let preSelectedDate else { return }
-        dateSelectionObserver.accept(preSelectedDate)
+        selectedDateObserver.accept(preSelectedDate)
     }
 
     // 확인
@@ -397,26 +438,16 @@ extension CalendarViewController {
         guard calendar.scope == .week else { return }
         calendar.setScope(.month, animated: animated)
     }
-
-    /// Home에서 더보기를 통해서 캘린더로 넘어온 경우
-    /// Home에서 표시한 마지막 Event 표시
-    private func presentDate(on date: Date) {
-        let delay: Int = calendar.scope == .month ? 200 : 0
-        changeWeekScope(animated: false)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay), execute: {
-            self.selectedPresnetDate(on: date)
-            self.dateSelectionObserver.accept(date)
-        })
-    }
 }
 
 // MARK: - 셀 업데이트
 extension CalendarViewController {
-    /// 이벤트 업데이트
-    /// - Parameter dateComponents: 서버로부터 받아온 DateComponents
-    private func updateEvents(with events: [Date]) {
-        self.events = events
-        calendar.reloadData()
+
+    /// 연도가 바뀔 때 공유
+    private func updateCurrentYear() {
+        let currentDate = calendar.currentPage
+        let currentYear = DateManager.weekBasedYear(currentDate)
+        yearObserver.accept(currentYear)
     }
 
     // 확인
@@ -445,7 +476,7 @@ extension CalendarViewController {
 extension CalendarViewController {
 
     /// 페이지 이동하기
-    private func moveToPage(on date: Date, animated: Bool = false) {
+    public func moveToPage(on date: Date, animated: Bool = false) {
         isSystemDragging = true
         calendar.setScope(.month, animated: false)
         self.calendar.setCurrentPage(date, animated: animated)
@@ -454,14 +485,16 @@ extension CalendarViewController {
 
     /// 선택할 날짜가 현재 캘린더의 날짜에 포함되어 있다면 reloadData
     /// 선택되어 있지 않다면 scrollToDate
-    private func selectedPresnetDate(on date: Date) {
+    public func selectedPresnetDate(on date: Date) {
+        isSystemDragging = true
         self.preSelectedDate = date
         self.calendar.select(date, scrollToDate: false)
         if DateManager.isSameWeek(date, calendar.currentPage) {
             self.calendar.reloadData()
         } else {
-            self.calendar.setCurrentPage(date, animated: false)
+            self.calendar.setCurrentPage(date, animated: true)
         }
+        isSystemDragging = false
     }
 }
 
@@ -476,52 +509,58 @@ extension CalendarViewController {
         case stay(offset: CGPoint)
         case move(to: Date)
     }
-    
-    /// scope에 따라서 다른 제스처 처리
-    private func handleGesture(_ gesture: UIPanGestureRecognizer) {
-        if case calendar.scope = .month {
-            handleGestureWhenMonth(gesture)
-        } else {
-            handleHorizontalGestrueWhenWeek(gesture)
-        }
-    }
 
     /// 제스처 핸들링
-    private func handleGestureWhenMonth(_ gesture: UIPanGestureRecognizer) {
-        let calendarCollectionView = self.calendar.collectionView!
+    private func handleGesture(_ gesture: UIPanGestureRecognizer) {
         let velocity = gesture.velocity(in: self.parent?.view)
         let isPanningVertically = abs(velocity.y) > abs(velocity.x)
+        
         if gestureDirection == nil {
             gestureDirection = isPanningVertically ? .vertical : .horizontal
         }
-
-        if gestureDirection == .vertical {
-            self.handleVerticalGestrueWhenMonth(gesture)
+        
+        if calendar.scope == .month {
+            handleGestureWhenMonth(gesture: gesture)
         } else {
-            self.handleHorizontalGestrueWhenMonth(gesture: gesture,
-                                                  calendarCollectionView: calendarCollectionView)
+            verticalGestrue(gesture)
         }
     }
 
+    private func handleGestureWhenMonth(gesture: UIPanGestureRecognizer) {
+        if gestureDirection == .vertical {
+            self.verticalGestrue(gesture)
+        } else {
+            self.handleHorizontalGestrue(gesture: gesture,
+                                         calendarCollectionView: self.calendar.collectionView!)
+        }
+    }
+    
     /// 세로 스크롤 핸들링
     /// 시작 지점에서 선택해놓지 않으면 애니메이션이 해당 주간으로 맞춰지지 않음
-    private func handleVerticalGestrueWhenMonth(_ gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .began:
-            self.setFoucsDate()
-        case .ended:
+    private func verticalGestrue(_ gesture: UIPanGestureRecognizer) {
+        startVerticalGesture(gesture)
+        calendar.handleScopeGesture(gesture)
+        endVerticalGesture(gesture)
+    }
+    
+    private func startVerticalGesture(_ gesture: UIPanGestureRecognizer) {
+        guard gesture.state == .began, calendar.scope == .month else { return }
+        self.setFoucsDate()
+    }
+    
+    private func endVerticalGesture(_ gesture: UIPanGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+        if calendar.scope == .month {
+            self.syncCurrentPage()
+        } else {
             self.sendSelectedDateToTable()
-            self.gestureDirection = nil
-        default:
-            break
         }
-
-        self.calendar.handleScopeGesture(gesture)
         self.handleEmptyMonthEvent()
+        self.gestureDirection = nil
     }
 
     /// 가로 스크롤 핸들링
-    private func handleHorizontalGestrueWhenMonth(gesture: UIPanGestureRecognizer,
+    private func handleHorizontalGestrue(gesture: UIPanGestureRecognizer,
                                                   calendarCollectionView: UICollectionView) {
         let currentOffset = calendarCollectionView.contentOffset
         let velocity = gesture.velocity(in: self.parent?.view)
@@ -609,27 +648,10 @@ extension CalendarViewController {
             calendar.setCurrentPage(pageDate, animated: false)
         }
     }
-
-    /// Week Scope에서 우측으로 제스처 시 뷰 전환하기
-    private func handleHorizontalGestrueWhenWeek(_ gesture: UIPanGestureRecognizer) {
-        guard gesture.state == .ended,
-              gesture.translation(in: self.parent?.view).x > 50.0 else { return }
-        self.changeScope()
-        self.sendCurrentPageToHeader()
-    }
 }
 // MARK: - Helper
 extension CalendarViewController {
-
-    /// 이번달의 선택된 날짜또는 첫번째 이벤트 PreSelected로 설정
-    private func setPreSelectedDateWhenMonth() {
-        guard calendar.scope == .month else { return }
-        preSelectedDate = selectedDateInCurrentMonth()
-        ?? findFirstEvent(on: calendar.currentPage)
-        ?? findSmallestNextMonth(on: calendar.currentPage)
-        ?? findLargestPreviousDate(on: calendar.currentPage)
-    }
-
+    
     /// 선택된 날짜가 있고, 그게 현재달이 아닐 시 scroll
     private func handleEmptyMonthEvent() {
         guard calendar.scope == .week,
@@ -640,20 +662,19 @@ extension CalendarViewController {
         })
     }
 
-    /// 이번달에 존재하는 날짜인지 체크
-    /// - Parameter date: 체크할 날짜
-    private func selectedDateInCurrentMonth() -> Date? {
-        guard let date = calendar.selectedDate,
-              DateManager.isSameMonth(calendar.currentPage, date) else { return nil }
-
-        return date
+    /// 이번달의 선택된 날짜또는 첫번째 이벤트 PreSelected로 설정
+    private func setPreSelectedDate() {
+        preSelectedDate = getSelectedDateInCurrentPage()
+        ?? getFirstEventInCurrentPage()
+        ?? findSmallestNextMonth(on: calendar.currentPage)
+        ?? findLargestPreviousDate(on: calendar.currentPage)
     }
 
     /// calendar.selectedDate가 nil이라면 preSelectedDate 선택
     /// calendar.selectedDate가 nil이 아니고 preSelectedDate와 다른 달이라면 preSelectedDate 선택
     private func setFoucsDate() {
-        guard calendar.scope == .month,
-              calendar.selectedDate != preSelectedDate else { return }
+        setPreSelectedDate()
+        guard calendar.selectedDate != preSelectedDate else { return }
         calendar.select(preSelectedDate, scrollToDate: false)
     }
 
@@ -661,7 +682,7 @@ extension CalendarViewController {
     private func setDefaulsePreDate() {
         guard calendar.scope == .month else { return }
         let currentDate = calendar.currentPage
-        preSelectedDate = findFirstEvent(on: currentDate)
+        preSelectedDate = getFirstEventInCurrentPage()
         ?? findSmallestNextMonth(on: currentDate)
         ?? findLargestPreviousDate(on: currentDate)
         deSelectedDate()
@@ -672,10 +693,18 @@ extension CalendarViewController {
         calendar.deselect(selectedDate)
     }
     
-    private func findFirstEvent(on date: Date) -> Date? {
-        let currentMonthDate = events.filter({ DateManager.isSameMonth($0, date) })
-        let activeEvent = currentMonthDate.filter { DateManager.isFutureOrToday(on: $0) }
-        return activeEvent.min() ?? currentMonthDate.max()
+    /// 이번달에 존재하는 날짜인지 체크
+    /// - Parameter date: 체크할 날짜
+    private func getSelectedDateInCurrentPage() -> Date? {
+        guard let date = calendar.selectedDate,
+              DateManager.isSameMonth(calendar.currentPage, date) else { return nil }
+        return date
+    }
+    
+    private func getFirstEventInCurrentPage() -> Date? {
+        let visibleEvents = events.filter({ DateManager.isSameMonth($0, calendar.currentPage) })
+        let activeEvents = visibleEvents.filter { DateManager.isFutureOrToday(on: $0) }
+        return activeEvents.min() ?? visibleEvents.max()
     }
     
     /// date보다 과거 이벤트 중 가장 큰 것
@@ -689,3 +718,27 @@ extension CalendarViewController {
     }
 }
 
+extension Reactive where Base: CalendarViewController {
+    var height: Observable<CGFloat> {
+        return base.heightObserver
+            .observe(on: MainScheduler.asyncInstance)
+            .asObservable()
+    }
+    
+    var scope: Observable<ScopeType> {
+        return base.scopeObserver
+            .observe(on: MainScheduler.asyncInstance)
+            .distinctUntilChanged()
+    }
+    
+    var month: Observable<Date> {
+        return base.pageObserver
+            .observe(on: MainScheduler.asyncInstance)
+    }
+    
+    var selectedDate: Observable<Date> {
+        return base.selectedDateObserver
+            .observe(on: MainScheduler.asyncInstance)
+            .asObservable()
+    }
+}

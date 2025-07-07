@@ -68,6 +68,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
         super.viewDidLoad()
         setupUI()
         setupDataSource()
+        setEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -102,6 +103,13 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
             make.top.equalTo(countView.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
+    }
+    
+    // MARK: - Gesture
+    private func setEdgeGesture() {
+        guard let currentNavi = self.findCurrentNavigation(),
+              let edgeGesture = currentNavi.interactivePopGestureRecognizer else { return }
+        tableView.panGestureRecognizer.require(toFail: edgeGesture)
     }
 }
 

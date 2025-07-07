@@ -35,6 +35,7 @@ final class YearMonthPickerViewController: BaseViewController {
     init(defaultDate: DateComponents) {
         self.selectedDate = defaultDate
         super.init()
+        initialSetup()
     }
     
     required init?(coder: NSCoder) {
@@ -44,6 +45,13 @@ final class YearMonthPickerViewController: BaseViewController {
     override func viewDidLoad() {
         setupUI()
         setupAction()
+    }
+    
+    private func initialSetup() {
+        modalPresentationStyle = .pageSheet
+        if let sheet = sheetPresentationController {
+            sheet.detents = [ .medium() ]
+        }
     }
     
     // MARK: - UI Setup
