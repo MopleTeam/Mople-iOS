@@ -26,11 +26,6 @@ extension LoadingReactor {
             .do(onDispose: {
                 isCompleted = true
             })
-            .flatMap({ [weak self] mutation -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let loadingStop = self.updateLoadingMutation(false)
-                return .of(mutation, loadingStop)
-            })
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return self.catchError(error)
@@ -46,17 +41,11 @@ extension LoadingReactor {
             }
         
         return .merge([loadingStart, newTask])
+            .concat(Observable.just(updateLoadingMutation(false)))
     }
     
     private func catchError(_ error: Error) -> Observable<Mutation> {
-        let loadingStop = updateLoadingMutation(false)
-        
-        if DataRequestError.isHandledError(err: error) {
-            return .just(loadingStop)
-        } else {
-            let catchError = catchErrorMutation(error)
-            return .of(loadingStop, catchError)
-        }
+        return DataRequestError.isHandledError(err: error) ? .empty() : .just(catchErrorMutation(error))
     }
 }
 
