@@ -30,9 +30,9 @@ extension ChildLoadingReactor {
         
         let newTask = task
             .do(onDispose: { [weak self] in
+                isCompleted = true
                 let index = self?.index ?? 0
                 self?.parent?.updateLoadingState(false, index: index)
-                isCompleted = true
             })
             .catch { [weak self] error -> Observable<Mutation> in
                 guard let self else { return .empty() }

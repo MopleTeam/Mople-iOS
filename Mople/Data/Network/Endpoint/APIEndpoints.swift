@@ -355,15 +355,23 @@ extension APIEndpoints {
 
 // MARK: - 댓글
 extension APIEndpoints {
-    static func fetchCommentList(id: Int) throws -> Endpoint<[CommentResponse]> {
+    static func fetchCommentList(id: Int,
+                                 nextCursor: String?) throws -> Endpoint<CommentPageResponse> {
+        var cursorQuery: [String: String] = .init()
+        
+        if let nextCursor, !nextCursor.isEmpty {
+            cursorQuery["cursor"] = nextCursor
+        }
+        
         return try Endpoint(path: "comment/\(id)",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: cursorQuery)
     }
     
     static func createComment(id: Int,
-                              comment: String) throws -> Endpoint<[CommentResponse]> {
+                              comment: String) throws -> Endpoint<[CommentPageResponse]> {
         return try Endpoint(path: "comment/\(id)",
                             authenticationType: .accessToken,
                             method: .post,
@@ -380,7 +388,7 @@ extension APIEndpoints {
     
     static func editComment(postId: Int,
                             commentId: Int,
-                            comment: String) throws -> Endpoint<[CommentResponse]> {
+                            comment: String) throws -> Endpoint<[CommentPageResponse]> {
         return try Endpoint(path: "comment/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,

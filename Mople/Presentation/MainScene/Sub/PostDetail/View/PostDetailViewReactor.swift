@@ -352,37 +352,34 @@ extension PostDetailViewReactor {
 // MARK: - Data Request
 extension PostDetailViewReactor {
     
+    // MARK: - Fetch
     /// 뷰 타입에 따라서 로딩과 함께 데이터 요청
     private func handlePostFetchWithLoading() -> Observable<Mutation> {
         switch type {
         case .plan:
-            return fetchPlanDetailWithLoading()
+            return fetchPlanDetail()
         case .review:
-            return fetchReviewDetailWithLoading()
+            return fetchReviewDetail()
         }
     }
-    
-    /// 일정 데이터 불러오기
+  
+    /// 일정 데이터 로딩과 함께 불러오기
     private func fetchPlanDetail() -> Observable<Mutation> {
-        return fetchPlanDetailUsecase.execute(planId: id)
+        
+        let fetchPlan = fetchPlanDetailUsecase.execute(planId: id)
             .do(onNext: { [weak self] in
                 self?.plan = $0
                 self?.fetchCommentList($0.id)
             })
             .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
-    }
-  
-    /// 일정 데이터 로딩과 함께 불러오기
-    private func fetchPlanDetailWithLoading() -> Observable<Mutation> {
-        
-        let fetchPlan = fetchPlanDetail()
 
         return requestWithLoading(task: fetchPlan)
     }
     
-    /// 후기 데이터 불러오기
+    /// 후기 데이터 로딩과 함께 불러오기
     private func fetchReviewDetail() -> Observable<Mutation> {
-        return fetchReviewDetailUseCase.execute(reviewId: id)
+
+        let fetchReview = fetchReviewDetailUseCase.execute(reviewId: id)
             .do(onNext: { [weak self] in
                 self?.review = $0
                 self?.fetchCommentList($0.postId)
@@ -391,31 +388,14 @@ extension PostDetailViewReactor {
                 guard let self else { return .empty() }
                 return fetchReviewImages(review)
             }
-    }
-    
-    /// 후기 데이터 로딩과 함께 불러오기
-    private func fetchReviewDetailWithLoading() -> Observable<Mutation> {
-
-        let fetchReview = fetchReviewDetail()
             
         return requestWithLoading(task: fetchReview)
     }
     
-    /// 뷰 타입에 따라서 데이터 리프레쉬
-    private func handleRefresh() -> Observable<Mutation> {
-        let loadMutation: Observable<Mutation>
-        
-        switch type {
-        case .plan:
-            loadMutation = fetchPlanDetail()
-        case .review:
-            loadMutation = fetchReviewDetail()
-        }
-        
-        return loadMutation
-            .do { [weak self] _ in
-                self?.commentListCommands?.completedRefreshed()
-            }
+    /// 로딩과 함께 후기 이미지 불러오기
+    private func fetchReveiwImagesWithLoading(_ review: Review) -> Observable<Mutation> {
+        let fetchReviewImage = fetchReviewImages(review)
+        return requestWithLoading(task: fetchReviewImage)
     }
     
     /// 후기 이미지 불러오기
@@ -437,13 +417,6 @@ extension PostDetailViewReactor {
             self.commentListCommands?.addPhotoList([])
             return .just(Mutation.updatePostSummary(ReviewPostSummary(review: review)))
         }
-    }
-    
-    /// 로딩과 함께 후기 이미지 불러오기
-    private func fetchReveiwImagesWithLoading(_ review: Review) -> Observable<Mutation> {
-        let fetchReviewImage = fetchReviewImages(review)
-        
-        return requestWithLoading(task: fetchReviewImage)
     }
     
     /// 포스트 삭제하기
@@ -498,6 +471,47 @@ extension PostDetailViewReactor {
         guard type == .plan,
               let planDate = plan?.date else { return false }
         return DateManager.isPastDay(on: planDate)
+    }
+    
+    // MARK: - Refresh
+    /// 뷰 타입에 따라서 데이터 리프레쉬
+    private func handleRefresh() -> Observable<Mutation> {
+        let loadMutation: Observable<Mutation>
+        
+        switch type {
+        case .plan:
+            loadMutation = refreshPlanDetail()
+        case .review:
+            loadMutation = refreshReviewDetail()
+        }
+        
+        return loadMutation
+            .do(onNext: { _ in
+                self.commentListCommands?.refreshComment()
+            })
+    }
+    
+    /// 일정 데이터 로딩과 함께 불러오기
+    private func refreshPlanDetail() -> Observable<Mutation> {
+        
+        return fetchPlanDetailUsecase.execute(planId: id)
+            .do(onNext: { [weak self] in
+                self?.plan = $0
+            })
+            .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
+    }
+    
+    /// 후기 데이터 로딩과 함께 불러오기
+    private func refreshReviewDetail() -> Observable<Mutation> {
+
+        return fetchReviewDetailUseCase.execute(reviewId: id)
+            .do(onNext: { [weak self] in
+                self?.review = $0
+            })
+            .flatMap { [weak self] review -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                return fetchReviewImages(review)
+            }
     }
 }
 
@@ -559,7 +573,7 @@ extension PostDetailViewReactor: CommentListDelegate  {
 extension PostDetailViewReactor {
     private func fetchCommentList(_ postId: Int?) {
         guard let postId else { return }
-        commentListCommands?.fetchComment(postId: postId)
+        commentListCommands?.loadComment(postId: postId)
     }
     
     private func writeComment(_ comment: String) -> Observable<Mutation> {

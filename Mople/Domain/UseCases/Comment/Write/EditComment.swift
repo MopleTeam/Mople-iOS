@@ -25,19 +25,20 @@ final class EditCommentUseCase: EditComment {
     func execute(postId: Int,
                  commentId: Int,
                  comment: String) -> Observable<[Comment]> {
-        return editCommentRepo
-            .editComment(postId: postId,
-                         commentId: commentId,
-                         comment: comment)
-            .map { $0.map { response in
-                response.toDomain() }
-            }
-            .map { $0.map { [weak self] review in
-                var verifyReview = review
-                verifyReview.verifyWriter(self?.userId)
-                return verifyReview }
-            }
-            .map({ $0.sorted(by: >) })
-            .asObservable()
+        return .just([])
+//        return editCommentRepo
+//            .editComment(postId: postId,
+//                         commentId: commentId,
+//                         comment: comment)
+//            .map { $0.map { response in
+//                response.toDomain() }
+//            }
+//            .map { $0.map { [weak self] review in
+//                var verifyReview = review
+//                verifyReview.verifyWriter(self?.userId)
+//                return verifyReview }
+//            }
+//            .map({ $0.sorted(by: >) })
+//            .asObservable()
     }
 }

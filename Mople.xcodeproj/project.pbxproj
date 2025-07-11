@@ -253,6 +253,10 @@
 		52A388622D688F8A001439C7 /* DeleteReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A388612D688F8A001439C7 /* DeleteReview.swift */; };
 		52A388642D68A341001439C7 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A388632D68A341001439C7 /* ToastManager.swift */; };
 		52A388662D68C960001439C7 /* UIView+Blur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A388652D68C960001439C7 /* UIView+Blur.swift */; };
+		52A3FBE72E20CE5500B77FBB /* PageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBE62E20CE5500B77FBB /* PageResponse.swift */; };
+		52A3FBE82E20CE5500B77FBB /* PageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBE62E20CE5500B77FBB /* PageResponse.swift */; };
+		52A3FBEB2E20D32300B77FBB /* PageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBEA2E20D32300B77FBB /* PageInfo.swift */; };
+		52A3FBEC2E20D32300B77FBB /* PageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBEA2E20D32300B77FBB /* PageInfo.swift */; };
 		52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */; };
 		52A6A04F2D42CC520041CDE9 /* PhotoViewTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */; };
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
@@ -502,7 +506,7 @@
 		52E95F052DF453050036CBCF /* SignOut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EA24D22DB2268B00879951 /* SignOut.swift */; };
 		52E95F062DF453050036CBCF /* UIView+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5211F9142C89D56D00403980 /* UIView+Identifier.swift */; };
 		52E95F072DF453050036CBCF /* SheetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2752C2DAFD997007D72CE /* SheetManager.swift */; };
-		52E95F082DF453050036CBCF /* CommentResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */; };
+		52E95F082DF453050036CBCF /* CommentPageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EE2D3E5C9100000C99 /* CommentPageResponse.swift */; };
 		52E95F092DF453050036CBCF /* DeleteMeet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3885B2D688E2F001439C7 /* DeleteMeet.swift */; };
 		52E95F0A2DF453050036CBCF /* UITableView+ResizeHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523A18042DD10DD10071BDBD /* UITableView+ResizeHeader.swift */; };
 		52E95F0B2DF453050036CBCF /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A388632D68A341001439C7 /* ToastManager.swift */; };
@@ -764,7 +768,7 @@
 		52EC04E02D3E2AB800000C99 /* FetchReviewDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */; };
 		52EC04E22D3E2BCC00000C99 /* FetchUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04E12D3E2BCC00000C99 /* FetchUserInfo.swift */; };
 		52EC04E92D3E5AEF00000C99 /* CreateComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04E82D3E5AEF00000C99 /* CreateComment.swift */; };
-		52EC04EF2D3E5C9100000C99 /* CommentResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */; };
+		52EC04EF2D3E5C9100000C99 /* CommentPageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04EE2D3E5C9100000C99 /* CommentPageResponse.swift */; };
 		52EC04FE2D3E811000000C99 /* CommentTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */; };
 		52ED23AB2DB791E400D6F474 /* ResetNotifyCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ED23AA2DB791E400D6F474 /* ResetNotifyCount.swift */; };
 		52ED23AF2DB90A0500D6F474 /* MainTabBarReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52ED23AE2DB90A0500D6F474 /* MainTabBarReactor.swift */; };
@@ -1040,6 +1044,8 @@
 		52A388612D688F8A001439C7 /* DeleteReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteReview.swift; sourceTree = "<group>"; };
 		52A388632D68A341001439C7 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		52A388652D68C960001439C7 /* UIView+Blur.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Blur.swift"; sourceTree = "<group>"; };
+		52A3FBE62E20CE5500B77FBB /* PageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageResponse.swift; sourceTree = "<group>"; };
+		52A3FBEA2E20D32300B77FBB /* PageInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageInfo.swift; sourceTree = "<group>"; };
 		52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableHeader.swift; sourceTree = "<group>"; };
 		52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewTableCell.swift; sourceTree = "<group>"; };
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
@@ -1166,7 +1172,7 @@
 		52EC04DF2D3E2AB800000C99 /* FetchReviewDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReviewDetail.swift; sourceTree = "<group>"; };
 		52EC04E12D3E2BCC00000C99 /* FetchUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUserInfo.swift; sourceTree = "<group>"; };
 		52EC04E82D3E5AEF00000C99 /* CreateComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateComment.swift; sourceTree = "<group>"; };
-		52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentResponse.swift; sourceTree = "<group>"; };
+		52EC04EE2D3E5C9100000C99 /* CommentPageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentPageResponse.swift; sourceTree = "<group>"; };
 		52EC04FD2D3E811000000C99 /* CommentTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableCellModel.swift; sourceTree = "<group>"; };
 		52ED23AA2DB791E400D6F474 /* ResetNotifyCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetNotifyCount.swift; sourceTree = "<group>"; };
 		52ED23AE2DB90A0500D6F474 /* MainTabBarReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarReactor.swift; sourceTree = "<group>"; };
@@ -2379,6 +2385,22 @@
 			path = TimePickerView;
 			sourceTree = "<group>";
 		};
+		52A3FBE52E20CE4100B77FBB /* Paging */ = {
+			isa = PBXGroup;
+			children = (
+				52A3FBE62E20CE5500B77FBB /* PageResponse.swift */,
+			);
+			path = Paging;
+			sourceTree = "<group>";
+		};
+		52A3FBE92E20D31E00B77FBB /* Page */ = {
+			isa = PBXGroup;
+			children = (
+				52A3FBEA2E20D32300B77FBB /* PageInfo.swift */,
+			);
+			path = Page;
+			sourceTree = "<group>";
+		};
 		52A6A0472D426B440041CDE9 /* PlanInfo */ = {
 			isa = PBXGroup;
 			children = (
@@ -2657,6 +2679,7 @@
 		52C857B72D0862CB00765FB3 /* Response */ = {
 			isa = PBXGroup;
 			children = (
+				52A3FBE52E20CE4100B77FBB /* Paging */,
 				52728C612DFACB1E00883FB1 /* VersionCheck */,
 				525E2A862DBCFEC10025EA90 /* Post */,
 				5201851C2DA79D2800C2B4FC /* Notify */,
@@ -3005,6 +3028,7 @@
 		52E238232C7454050066C9A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				52A3FBE92E20D31E00B77FBB /* Page */,
 				52728C7C2DFE794A00883FB1 /* Holiday */,
 				52728C692DFACC0500883FB1 /* VersionCheck */,
 				523A18012DD0CC1A0071BDBD /* Post */,
@@ -3327,7 +3351,7 @@
 		52EC04ED2D3E5B6A00000C99 /* Comment */ = {
 			isa = PBXGroup;
 			children = (
-				52EC04EE2D3E5C9100000C99 /* CommentResponse.swift */,
+				52EC04EE2D3E5C9100000C99 /* CommentPageResponse.swift */,
 			);
 			path = Comment;
 			sourceTree = "<group>";
@@ -3842,6 +3866,7 @@
 				52F83A612D354528003DD790 /* NavigationCloseable.swift in Sources */,
 				52E238482C7733320066C9A3 /* AppNetworkService.swift in Sources */,
 				5211F8F62C84234800403980 /* MainTabBarController.swift in Sources */,
+				52A3FBEB2E20D32300B77FBB /* PageInfo.swift in Sources */,
 				521091F12D10559600DD0407 /* Meet.swift in Sources */,
 				5268BA2B2D3EF892000C5F3A /* ChatingTextField.swift in Sources */,
 				52818C8D2D1C45EA0001E30B /* SearchResultViewController.swift in Sources */,
@@ -3908,7 +3933,7 @@
 				52EA24D32DB2268B00879951 /* SignOut.swift in Sources */,
 				5211F9152C89D56D00403980 /* UIView+Identifier.swift in Sources */,
 				52A2752D2DAFD997007D72CE /* SheetManager.swift in Sources */,
-				52EC04EF2D3E5C9100000C99 /* CommentResponse.swift in Sources */,
+				52EC04EF2D3E5C9100000C99 /* CommentPageResponse.swift in Sources */,
 				52A3885C2D688E2F001439C7 /* DeleteMeet.swift in Sources */,
 				523A18052DD10DD10071BDBD /* UITableView+ResizeHeader.swift in Sources */,
 				52A388642D68A341001439C7 /* ToastManager.swift in Sources */,
@@ -4107,6 +4132,7 @@
 				522958492D52080900AE4EC3 /* MemberListTableCell.swift in Sources */,
 				520185452DA907BB00C2B4FC /* NotifySubscribeRepo.swift in Sources */,
 				52B8E1212D5344B100F7FF59 /* MemberInfoResponse.swift in Sources */,
+				52A3FBE72E20CE5500B77FBB /* PageResponse.swift in Sources */,
 				52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */,
 				527A3E792C834A12007FE63B /* MainSceneCoordinator.swift in Sources */,
 				52EA6E1B2CF8C4B900EFD753 /* UploadFCMToken.swift in Sources */,
@@ -4202,6 +4228,7 @@
 				52E95EC52DF453050036CBCF /* NavigationCloseable.swift in Sources */,
 				52E95EC62DF453050036CBCF /* AppNetworkService.swift in Sources */,
 				52E95EC72DF453050036CBCF /* MainTabBarController.swift in Sources */,
+				52A3FBEC2E20D32300B77FBB /* PageInfo.swift in Sources */,
 				52E95EC82DF453050036CBCF /* Meet.swift in Sources */,
 				52E95EC92DF453050036CBCF /* ChatingTextField.swift in Sources */,
 				52E95ECA2DF453050036CBCF /* SearchResultViewController.swift in Sources */,
@@ -4268,7 +4295,7 @@
 				52E95F052DF453050036CBCF /* SignOut.swift in Sources */,
 				52E95F062DF453050036CBCF /* UIView+Identifier.swift in Sources */,
 				52E95F072DF453050036CBCF /* SheetManager.swift in Sources */,
-				52E95F082DF453050036CBCF /* CommentResponse.swift in Sources */,
+				52E95F082DF453050036CBCF /* CommentPageResponse.swift in Sources */,
 				52E95F092DF453050036CBCF /* DeleteMeet.swift in Sources */,
 				52E95F0A2DF453050036CBCF /* UITableView+ResizeHeader.swift in Sources */,
 				52E95F0B2DF453050036CBCF /* ToastManager.swift in Sources */,
@@ -4467,6 +4494,7 @@
 				52E95FC92DF453050036CBCF /* MemberListTableCell.swift in Sources */,
 				52E95FCA2DF453050036CBCF /* NotifySubscribeRepo.swift in Sources */,
 				52E95FCB2DF453050036CBCF /* MemberInfoResponse.swift in Sources */,
+				52A3FBE82E20CE5500B77FBB /* PageResponse.swift in Sources */,
 				52E95FCC2DF453050036CBCF /* CommentListSectionModel.swift in Sources */,
 				52E95FCD2DF453050036CBCF /* MainSceneCoordinator.swift in Sources */,
 				52E95FCE2DF453050036CBCF /* UploadFCMToken.swift in Sources */,
@@ -4748,7 +4776,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.1.0;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;
@@ -4796,7 +4824,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mopledev;
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.1.0;
 				OTHER_SWIFT_FLAGS = "-DDEV";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;

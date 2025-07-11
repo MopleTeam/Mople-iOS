@@ -18,6 +18,9 @@ final class CommentListViewController: BaseViewController, View {
     typealias Reactor = CommentListViewReactor
     var disposeBag = DisposeBag()
     
+    // MARK: - Variables
+    private var hasNextPage: Bool = false
+    
     // MARK: - Observable
     private let offset: PublishSubject<CGFloat> = .init()
     private let selectedPhoto: PublishSubject<Int> = .init()
@@ -26,6 +29,7 @@ final class CommentListViewController: BaseViewController, View {
     private let editComment: PublishSubject<Void> = .init()
     private let deleteComment: PublishSubject<Void> = .init()
     private let reportComment: PublishSubject<Void> = .init()
+    private let moreComment: PublishSubject<Void> = .init()
     
     // MARK: - DataSource
     private var dataSource: RxTableViewSectionedReloadDataSource<CommentTableSectionModel>?
@@ -118,7 +122,7 @@ extension CommentListViewController {
             .disposed(by: disposeBag)
         
         refreshControl.rx.controlEvent(.valueChanged)
-            .map { Reactor.Action.childEvent(.refresh) }
+            .map { Reactor.Action.childEvent(.refreshPost) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -158,12 +162,26 @@ extension CommentListViewController {
             .map { Reactor.Action.reportComment }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        moreComment
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .filter({ self.hasNextPage })
+            .map { _ in Reactor.Action.moreComment }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
         reactor.pulse(\.$sectionModels)
             .asDriver(onErrorJustReturn: [])
             .drive(tableView.rx.items(dataSource: dataSource!))
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$pageInfo)
+            .subscribe(with: self,
+                       onNext: { vc, pageInfo in
+                vc.hasNextPage = pageInfo?.hasNext ?? false
+            })
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$createdCompletion)
@@ -267,6 +285,12 @@ extension CommentListViewController: UITableViewDelegate {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         offset.onNext(scrollView.contentOffset.y)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.isBottom(threshold: 50) {
+            moreComment.onNext(())
+        }
     }
 }
 

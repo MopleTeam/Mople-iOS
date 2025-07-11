@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct CommentPage {
+    var content: [Comment] = []
+    var page: PageInfo?
+}
+
 struct Comment: Hashable, Comparable {
     var id: Int?
     var writerId: Int?

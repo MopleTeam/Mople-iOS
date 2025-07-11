@@ -22,18 +22,19 @@ final class CreateCommentUseCase: CreateComment {
     
     func execute(postId: Int,
                  comment: String) -> Observable<[Comment]> {
-        return createCommentRepo
-            .createComment(postId: postId, comment: comment)
-            .map { $0.map { reponse in
-                reponse.toDomain()}
-            }
-            .map { $0.map { [weak self] review in
-                var verifyReview = review
-                verifyReview.verifyWriter(self?.userId)
-                return verifyReview }
-            }
-            .map({ $0.sorted(by: >) })
-            .asObservable()
+        return .just([])
+//        return createCommentRepo
+//            .createComment(postId: postId, comment: comment)
+//            .map { $0.map { reponse in
+//                reponse.toDomain()}
+//            }
+//            .map { $0.map { [weak self] review in
+//                var verifyReview = review
+//                verifyReview.verifyWriter(self?.userId)
+//                return verifyReview }
+//            }
+//            .map({ $0.sorted(by: >) })
+//            .asObservable()
     }
 }
 

@@ -8,10 +8,11 @@
 import RxSwift
 
 protocol CommentRepo {
-    func fetchCommentList(postId: Int) -> Single<[CommentResponse]>
-    func createComment(postId: Int, comment: String) -> Single<[CommentResponse]>
+    func fetchCommentList(postId: Int,
+                          nextCursor: String?) -> Single<CommentPageResponse>
+    func createComment(postId: Int, comment: String) -> Single<[CommentPageResponse]>
     func deleteComment(commentId: Int) -> Single<Void>
     func editComment(postId: Int,
                      commentId: Int,
-                     comment: String) -> Single<[CommentResponse]>
+                     comment: String) -> Single<[CommentPageResponse]>
 }
