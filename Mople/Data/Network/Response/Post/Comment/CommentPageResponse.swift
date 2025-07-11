@@ -31,7 +31,6 @@ struct CommentResponse: Decodable {
     let replyCount: Int
     let likeCount: Int
     let likedByMe: Bool
-    let mentions: [Int]
     let time: String
     let writer: UserInfoResponse
 }

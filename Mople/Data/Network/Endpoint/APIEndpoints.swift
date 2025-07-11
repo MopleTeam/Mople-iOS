@@ -371,12 +371,14 @@ extension APIEndpoints {
     }
     
     static func createComment(id: Int,
-                              comment: String) throws -> Endpoint<[CommentPageResponse]> {
+                              comment: String,
+                              mentions: [Int]) throws -> Endpoint<CommentResponse> {
         return try Endpoint(path: "comment/\(id)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["contents": comment])
+                            bodyParameters: ["contents": comment,
+                                             "mensions": mentions])
     }
     
     static func deleteComment(commentId: Int) throws -> Endpoint<Void> {
@@ -386,14 +388,15 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveAllHeader())
     }
     
-    static func editComment(postId: Int,
-                            commentId: Int,
-                            comment: String) throws -> Endpoint<[CommentPageResponse]> {
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+    static func editComment(commentId: Int,
+                            comment: String,
+                            mentions: [Int]) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["contents": comment])
+                            bodyParameters: ["contents": comment,
+                                             "mensions": mentions])
     }
 }
 

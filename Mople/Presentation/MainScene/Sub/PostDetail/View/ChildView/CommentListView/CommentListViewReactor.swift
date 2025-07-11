@@ -139,7 +139,7 @@ extension CommentListViewReactor {
         case let .writeComment(comment):
             return handleWriteComment(comment: comment)
         case let .addPhotoList(photoList):
-            let addSection = addPhotoSectionModel(photoList)
+            let addSection = addPhotoSection(photoList)
             return .just(addSection)
         case .completedRefreshed:
             return .just(.completedRefreshed)
@@ -198,7 +198,7 @@ extension CommentListViewReactor {
         return fetchCommentListUseCase.execute(postId: postId, nextCursor: cursor)
             .flatMap({ [weak self] commentPage -> Observable<Mutation> in
                 guard let self else { return .empty() }
-                let addSection = addCommentSectionModel(commentPage.content, isRefresh: isRefresh)
+                let addSection = addCommentSection(commentPage.content, isRefresh: isRefresh)
                 let page = Mutation.fetchedPage(commentPage.page)
                 return .of(addSection, page)
             })
@@ -249,18 +249,21 @@ extension CommentListViewReactor {
     }
     
     // MARK: - 댓글 생성
-    private func createComment(comment: String) -> Observable<Mutation> {
+    private func createComment(comment: String,
+                               mentions: [Int] = []) -> Observable<Mutation> {
         
         guard let postId else { return .empty() }
         
         let createComment = createCommentUseCase
             .execute(postId: postId,
-                     comment: comment)
-            .flatMap({ [weak self] comments -> Observable<Mutation> in
+                     comment: comment,
+                     mentions: mentions)
+            .compactMap({ self.addCommentItem($0) })
+            .flatMap({ [weak self] mutation -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 self.selectedComment = nil
                 delegate?.editComment(nil)
-                return .just(addCommentSectionModel(comments))
+                return .just(mutation)
             })
 
         return requestWithLoading(task: createComment)
@@ -271,19 +274,17 @@ extension CommentListViewReactor {
     
     // MARK: - 댓글 편집
     private func editComment(commentId: Int,
-                                comment: String) -> Observable<Mutation> {
-        
-        guard let postId else { return .empty() }
-        
+                             comment: String,
+                             mentions: [Int] = []) -> Observable<Mutation> {
         let editComment = editCommentUseCase
-            .execute(postId: postId,
-                     commentId: commentId,
-                     comment: comment)
-            .flatMap({ [weak self] comments -> Observable<Mutation> in
+            .execute(commentId: commentId,
+                     comment: comment, mentions: mentions)
+            .compactMap({ self.editCommentItem($0) })
+            .flatMap({ [weak self] mutation -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 self.selectedComment = nil
                 delegate?.editComment(nil)
-                return .just(addCommentSectionModel(comments))
+                return .just(mutation)
             })
         
         return requestWithLoading(task: editComment)
@@ -296,11 +297,11 @@ extension CommentListViewReactor {
         
         let deleteComment = deleteCommentUseCase
             .execute(commentId: selectedCommentId)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self,
-                      let postId else { return .empty() }
+            .compactMap({ self.deleteCommentItem(selectedCommentId) })
+            .flatMap { [weak self] mutation -> Observable<Mutation> in
+                guard let self else { return .empty() }
                 selectedComment = nil
-                return fetchComment(postId: postId)
+                return .just(mutation)
             }
         
         return requestWithLoading(task: deleteComment)
@@ -328,8 +329,8 @@ extension CommentListViewReactor {
         return currentState.sectionModels.firstIndex { $0.type == type }
     }
     
-    // MARK: - Comment Section
-    private func addCommentSectionModel(_ comment: [Comment],
+    // MARK: - Comment List
+    private func addCommentSection(_ comment: [Comment],
                                         isRefresh: Bool = false) -> Mutation {
         var sectionModels = currentState.sectionModels
         let items = comment.map { SectionItem.comment($0) }
@@ -359,8 +360,43 @@ extension CommentListViewReactor {
         }
     }
     
-    // MARK: - Photo Section
-    private func addPhotoSectionModel(_ photos: [UIImage]) -> Mutation {
+    // MARK: - Comment
+    private func addCommentItem(_ comment: Comment) -> Mutation? {
+        var sectionModels = currentState.sectionModels
+        guard let commentSectionIndex = findSectionIndex(type: .commentList) else { return nil }
+        let item = SectionItem.comment(comment)
+        sectionModels[commentSectionIndex].items.insert(item, at: 0)
+        return .fetchedSectionModel(sectionModels)
+    }
+    
+    private func editCommentItem(_ comment: Comment) -> Mutation? {
+        var sectionModels = currentState.sectionModels
+        guard let commentId = comment.id,
+              let commentSectionIndex = findSectionIndex(type: .commentList),
+              let commentItemIndex = findCommentItemIndex(sectionIndex: commentSectionIndex, commentId: commentId) else { return nil }
+        let item = SectionItem.comment(comment)
+        sectionModels[commentSectionIndex].items[commentItemIndex] = item
+        return .fetchedSectionModel(sectionModels)
+    }
+    
+    private func deleteCommentItem(_ commentId: Int) -> Mutation? {
+        var sectionModels = currentState.sectionModels
+        guard let commentSectionIndex = findSectionIndex(type: .commentList),
+              let commentItemIndex = findCommentItemIndex(sectionIndex: commentSectionIndex, commentId: commentId) else { return nil }
+        sectionModels[commentSectionIndex].items.remove(at: commentItemIndex)
+        return .fetchedSectionModel(sectionModels)
+    }
+    
+    private func findCommentItemIndex(sectionIndex: Int, commentId: Int) -> Int? {
+        return currentState.sectionModels[sectionIndex].items.firstIndex {
+            guard case .comment(let comment) = $0,
+                  let itemId = comment.id else { return false }
+            return itemId == commentId
+        }
+    }
+    
+    // MARK: - Photo
+    private func addPhotoSection(_ photos: [UIImage]) -> Mutation {
         var sectionModels = currentState.sectionModels
 
         if photos.isEmpty {

@@ -8,9 +8,9 @@
 import RxSwift
 
 protocol EditComment {
-    func execute(postId: Int,
-                 commentId: Int,
-                 comment: String) -> Observable<[Comment]>
+    func execute(commentId: Int,
+                 comment: String,
+                 mentions: [Int]) -> Observable<Comment>
 }
 
 final class EditCommentUseCase: EditComment {
@@ -22,23 +22,19 @@ final class EditCommentUseCase: EditComment {
         self.editCommentRepo = repo
     }
     
-    func execute(postId: Int,
-                 commentId: Int,
-                 comment: String) -> Observable<[Comment]> {
-        return .just([])
-//        return editCommentRepo
-//            .editComment(postId: postId,
-//                         commentId: commentId,
-//                         comment: comment)
-//            .map { $0.map { response in
-//                response.toDomain() }
-//            }
-//            .map { $0.map { [weak self] review in
-//                var verifyReview = review
-//                verifyReview.verifyWriter(self?.userId)
-//                return verifyReview }
-//            }
-//            .map({ $0.sorted(by: >) })
-//            .asObservable()
+    func execute(commentId: Int,
+                 comment: String,
+                 mentions: [Int]) -> Observable<Comment> {
+        return editCommentRepo
+            .editComment(commentId: commentId,
+                         comment: comment,
+                         mentions: mentions)
+            .asObservable()
+            .map { $0.toDomain() }
+            .map {
+                var comment = $0
+                comment.verifyWriter(self.userId)
+                return comment
+            }
     }
 }

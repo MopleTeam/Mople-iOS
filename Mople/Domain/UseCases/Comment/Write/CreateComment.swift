@@ -8,7 +8,9 @@
 import RxSwift
 
 protocol CreateComment {
-    func execute(postId: Int, comment: String) -> Observable<[Comment]>
+    func execute(postId: Int,
+                 comment: String,
+                 mentions: [Int]) -> Observable<Comment>
 }
 
 final class CreateCommentUseCase: CreateComment {
@@ -21,20 +23,19 @@ final class CreateCommentUseCase: CreateComment {
     }
     
     func execute(postId: Int,
-                 comment: String) -> Observable<[Comment]> {
-        return .just([])
-//        return createCommentRepo
-//            .createComment(postId: postId, comment: comment)
-//            .map { $0.map { reponse in
-//                reponse.toDomain()}
-//            }
-//            .map { $0.map { [weak self] review in
-//                var verifyReview = review
-//                verifyReview.verifyWriter(self?.userId)
-//                return verifyReview }
-//            }
-//            .map({ $0.sorted(by: >) })
-//            .asObservable()
+                 comment: String,
+                 mentions: [Int]) -> Observable<Comment> {
+        return createCommentRepo
+            .createComment(postId: postId,
+                           comment: comment,
+                           mentions: mentions)
+            .asObservable()
+            .map { $0.toDomain() }
+            .map {
+                var comment = $0
+                comment.verifyWriter(self.userId)
+                return comment
+            }
     }
 }
 

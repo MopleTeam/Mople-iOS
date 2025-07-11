@@ -31,11 +31,12 @@ final class FetchCommentListUseCase: FetchCommentList {
     }
     
     private func checkWriter(with list: CommentPage) -> CommentPage {
-        let commentPage = list
-        commentPage.content.forEach {
+        var commentPage = list
+        commentPage.content = commentPage.content.map({
             var comment = $0
             comment.verifyWriter(userId)
-        }
+            return comment
+        })
         return commentPage
     }
 }
