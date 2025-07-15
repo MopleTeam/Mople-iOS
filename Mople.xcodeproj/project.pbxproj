@@ -257,6 +257,12 @@
 		52A3FBE82E20CE5500B77FBB /* PageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBE62E20CE5500B77FBB /* PageResponse.swift */; };
 		52A3FBEB2E20D32300B77FBB /* PageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBEA2E20D32300B77FBB /* PageInfo.swift */; };
 		52A3FBEC2E20D32300B77FBB /* PageInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBEA2E20D32300B77FBB /* PageInfo.swift */; };
+		52A3FBEE2E265BC400B77FBB /* LikeComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBED2E265BC400B77FBB /* LikeComment.swift */; };
+		52A3FBEF2E265BC400B77FBB /* LikeComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBED2E265BC400B77FBB /* LikeComment.swift */; };
+		52A3FBF12E265F5900B77FBB /* CreateReplyComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBF02E265F5900B77FBB /* CreateReplyComment.swift */; };
+		52A3FBF22E265F5900B77FBB /* CreateReplyComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBF02E265F5900B77FBB /* CreateReplyComment.swift */; };
+		52A3FBF72E265FCC00B77FBB /* FetchReplyComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBF62E265FCC00B77FBB /* FetchReplyComment.swift */; };
+		52A3FBF82E265FCC00B77FBB /* FetchReplyComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBF62E265FCC00B77FBB /* FetchReplyComment.swift */; };
 		52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */; };
 		52A6A04F2D42CC520041CDE9 /* PhotoViewTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */; };
 		52A6A0532D438BE60041CDE9 /* CommentListSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */; };
@@ -1046,6 +1052,9 @@
 		52A388652D68C960001439C7 /* UIView+Blur.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Blur.swift"; sourceTree = "<group>"; };
 		52A3FBE62E20CE5500B77FBB /* PageResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageResponse.swift; sourceTree = "<group>"; };
 		52A3FBEA2E20D32300B77FBB /* PageInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageInfo.swift; sourceTree = "<group>"; };
+		52A3FBED2E265BC400B77FBB /* LikeComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeComment.swift; sourceTree = "<group>"; };
+		52A3FBF02E265F5900B77FBB /* CreateReplyComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateReplyComment.swift; sourceTree = "<group>"; };
+		52A3FBF62E265FCC00B77FBB /* FetchReplyComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchReplyComment.swift; sourceTree = "<group>"; };
 		52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableHeader.swift; sourceTree = "<group>"; };
 		52A6A04E2D42CC520041CDE9 /* PhotoViewTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewTableCell.swift; sourceTree = "<group>"; };
 		52A6A0522D438BE60041CDE9 /* CommentListSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListSectionModel.swift; sourceTree = "<group>"; };
@@ -1909,24 +1918,6 @@
 			path = Post;
 			sourceTree = "<group>";
 		};
-		5268BA3B2D3F7572000C5F3A /* Read */ = {
-			isa = PBXGroup;
-			children = (
-				52EC04C42D391BA100000C99 /* FetchCommentList.swift */,
-			);
-			path = Read;
-			sourceTree = "<group>";
-		};
-		5268BA3C2D3F7576000C5F3A /* Write */ = {
-			isa = PBXGroup;
-			children = (
-				52EC04E82D3E5AEF00000C99 /* CreateComment.swift */,
-				5268BA3F2D3F758A000C5F3A /* EditComment.swift */,
-				5268BA3D2D3F7585000C5F3A /* DeleteComment.swift */,
-			);
-			path = Write;
-			sourceTree = "<group>";
-		};
 		526B985C2CEDBBF6002488C5 /* PlanCreate */ = {
 			isa = PBXGroup;
 			children = (
@@ -2399,6 +2390,34 @@
 				52A3FBEA2E20D32300B77FBB /* PageInfo.swift */,
 			);
 			path = Page;
+			sourceTree = "<group>";
+		};
+		52A3FBF32E265F7200B77FBB /* Parent */ = {
+			isa = PBXGroup;
+			children = (
+				52EC04C42D391BA100000C99 /* FetchCommentList.swift */,
+				52EC04E82D3E5AEF00000C99 /* CreateComment.swift */,
+			);
+			path = Parent;
+			sourceTree = "<group>";
+		};
+		52A3FBF42E265F7700B77FBB /* Child */ = {
+			isa = PBXGroup;
+			children = (
+				52A3FBF62E265FCC00B77FBB /* FetchReplyComment.swift */,
+				52A3FBF02E265F5900B77FBB /* CreateReplyComment.swift */,
+			);
+			path = Child;
+			sourceTree = "<group>";
+		};
+		52A3FBF52E265F9900B77FBB /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				5268BA3D2D3F7585000C5F3A /* DeleteComment.swift */,
+				5268BA3F2D3F758A000C5F3A /* EditComment.swift */,
+				52A3FBED2E265BC400B77FBB /* LikeComment.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		52A6A0472D426B440041CDE9 /* PlanInfo */ = {
@@ -3204,8 +3223,9 @@
 		52EC04C32D391B6B00000C99 /* Comment */ = {
 			isa = PBXGroup;
 			children = (
-				5268BA3B2D3F7572000C5F3A /* Read */,
-				5268BA3C2D3F7576000C5F3A /* Write */,
+				52A3FBF32E265F7200B77FBB /* Parent */,
+				52A3FBF42E265F7700B77FBB /* Child */,
+				52A3FBF52E265F9900B77FBB /* Common */,
 			);
 			path = Comment;
 			sourceTree = "<group>";
@@ -3873,6 +3893,7 @@
 				529CCD582D3240930041CBB7 /* PostDetailFlowCoordinator.swift in Sources */,
 				528E09F72D6B9C4000832BA7 /* MonthlyPost.swift in Sources */,
 				52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */,
+				52A3FBF22E265F5900B77FBB /* CreateReplyComment.swift in Sources */,
 				5201854B2DA9096D00C2B4FC /* SubscribeNotify.swift in Sources */,
 				523E76272D5EA4B800BD22CB /* PhotoBookViewController.swift in Sources */,
 				5231DF442D2F972B00D52529 /* PlanRepo.swift in Sources */,
@@ -3966,6 +3987,7 @@
 				52818C622D18217B0001E30B /* SearchNaviViewController.swift in Sources */,
 				524E33CF2C8028B3004B15FC /* Reactive+ViewLifeCycle.swift in Sources */,
 				5231DF342D2F2A1E00D52529 /* DefaultAlertViewController.swift in Sources */,
+				52A3FBEE2E265BC400B77FBB /* LikeComment.swift in Sources */,
 				5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */,
 				52C857C12D086CAB00765FB3 /* MeetSummary.swift in Sources */,
 				5229584B2D52099500AE4EC3 /* MemberListTableCellModel.swift in Sources */,
@@ -3985,6 +4007,7 @@
 				520185372DA8082800C2B4FC /* NotifyViewModel.swift in Sources */,
 				5201851E2DA79D3600C2B4FC /* NotifyResponse.swift in Sources */,
 				52741ECF2D14E00D00C249A6 /* TimePickerViewController.swift in Sources */,
+				52A3FBF72E265FCC00B77FBB /* FetchReplyComment.swift in Sources */,
 				5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */,
 				5208C1782CBE6E13006272E8 /* ProfileEditViewController.swift in Sources */,
 				5268BA3E2D3F7585000C5F3A /* DeleteComment.swift in Sources */,
@@ -4235,6 +4258,7 @@
 				52E95ECB2DF453050036CBCF /* PostDetailFlowCoordinator.swift in Sources */,
 				52E95ECC2DF453050036CBCF /* MonthlyPost.swift in Sources */,
 				52E95ECD2DF453050036CBCF /* CustomCalendarCell.swift in Sources */,
+				52A3FBF12E265F5900B77FBB /* CreateReplyComment.swift in Sources */,
 				52E95ECE2DF453050036CBCF /* SubscribeNotify.swift in Sources */,
 				52E95ECF2DF453050036CBCF /* PhotoBookViewController.swift in Sources */,
 				52E95ED02DF453050036CBCF /* PlanRepo.swift in Sources */,
@@ -4328,6 +4352,7 @@
 				52E95F262DF453050036CBCF /* SearchNaviViewController.swift in Sources */,
 				52E95F272DF453050036CBCF /* Reactive+ViewLifeCycle.swift in Sources */,
 				52E95F282DF453050036CBCF /* DefaultAlertViewController.swift in Sources */,
+				52A3FBEF2E265BC400B77FBB /* LikeComment.swift in Sources */,
 				52E95F292DF453050036CBCF /* TitleNaviBar.swift in Sources */,
 				52E95F2A2DF453050036CBCF /* MeetSummary.swift in Sources */,
 				52E95F2B2DF453050036CBCF /* MemberListTableCellModel.swift in Sources */,
@@ -4347,6 +4372,7 @@
 				52E95F382DF453050036CBCF /* NotifyViewModel.swift in Sources */,
 				52E95F392DF453050036CBCF /* NotifyResponse.swift in Sources */,
 				52E95F3A2DF453050036CBCF /* TimePickerViewController.swift in Sources */,
+				52A3FBF82E265FCC00B77FBB /* FetchReplyComment.swift in Sources */,
 				52E95F3B2DF453050036CBCF /* TransformKeyboardResponsive.swift in Sources */,
 				52E95F3C2DF453050036CBCF /* ProfileEditViewController.swift in Sources */,
 				52E95F3D2DF453050036CBCF /* DeleteComment.swift in Sources */,

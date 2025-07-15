@@ -355,7 +355,8 @@ extension APIEndpoints {
 
 // MARK: - 댓글
 extension APIEndpoints {
-    static func fetchCommentList(id: Int,
+    // MARK: - CRUD
+    static func fetchCommentList(postId: Int,
                                  nextCursor: String?) throws -> Endpoint<CommentPageResponse> {
         var cursorQuery: [String: String] = .init()
         
@@ -363,17 +364,17 @@ extension APIEndpoints {
             cursorQuery["cursor"] = nextCursor
         }
         
-        return try Endpoint(path: "comment/\(id)",
+        return try Endpoint(path: "comment/\(postId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
                             queryParameters: cursorQuery)
     }
     
-    static func createComment(id: Int,
+    static func createComment(postId: Int,
                               comment: String,
                               mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(id)",
+        return try Endpoint(path: "comment/\(postId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -397,6 +398,43 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParameters: ["contents": comment,
                                              "mensions": mentions])
+    }
+    
+    // MARK: - Reply
+    static func createReplyComment(postId: Int,
+                                   commentId: Int,
+                                   comment: String,
+                                   mentions: [Int]) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["contents": comment,
+                                             "mensions": mentions])
+    }
+    
+    static func fetchReplyCommentList(postId: Int,
+                                      commentId: Int,
+                                      nextCursor: String?) throws -> Endpoint<CommentPageResponse> {
+        var cursorQuery: [String: String] = .init()
+        
+        if let nextCursor, !nextCursor.isEmpty {
+            cursorQuery["cursor"] = nextCursor
+        }
+        
+        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: cursorQuery)
+    }
+    
+    // MARK: - Like
+    static func likeComment(commentId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "comment/\(commentId)/likes",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 }
 

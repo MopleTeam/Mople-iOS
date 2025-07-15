@@ -8,11 +8,12 @@
 import RxSwift
 
 final class DefaultCommentRepo:BaseRepositories, CommentRepo {
+    // MARK: - CRUD
     func createComment(postId: Int,
                        comment: String,
                        mentions: [Int]) -> Single<CommentResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.createComment(id: postId,
+            try APIEndpoints.createComment(postId: postId,
                                            comment: comment,
                                            mentions: mentions)
         }
@@ -21,7 +22,7 @@ final class DefaultCommentRepo:BaseRepositories, CommentRepo {
     func fetchCommentList(postId: Int,
                           nextCursor: String?) -> Single<CommentPageResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchCommentList(id: postId,
+            try APIEndpoints.fetchCommentList(postId: postId,
                                               nextCursor: nextCursor)
         }
     }
@@ -39,6 +40,31 @@ final class DefaultCommentRepo:BaseRepositories, CommentRepo {
     func deleteComment(commentId: Int) -> Single<Void> {
         return self.networkService.authenticatedRequest {
             try APIEndpoints.deleteComment(commentId: commentId)
+        }
+    }
+    
+    // MARK: - Reply
+    func createReplyComment(postId: Int, commentId: Int, comment: String, mentions: [Int]) -> Single<CommentResponse> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.createReplyComment(postId: postId,
+                                                commentId: commentId,
+                                                comment: comment,
+                                                mentions: mentions)
+        }
+    }
+    
+    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<CommentPageResponse> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.fetchReplyCommentList(postId: postId,
+                                                   commentId: commentId,
+                                                   nextCursor: nextCursor)
+        }
+    }
+    
+    // MARK: - Like
+    func likeComment(commentId: Int) -> Single<Void> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.likeComment(commentId: commentId)
         }
     }
 }

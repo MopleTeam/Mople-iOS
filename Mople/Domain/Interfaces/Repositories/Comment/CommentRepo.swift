@@ -8,6 +8,8 @@
 import RxSwift
 
 protocol CommentRepo {
+    
+    // MARK: - CRUD
     func createComment(postId: Int,
                        comment: String,
                        mentions: [Int]) -> Single<CommentResponse>
@@ -17,4 +19,11 @@ protocol CommentRepo {
                      comment: String,
                      mentions: [Int]) -> Single<CommentResponse>
     func deleteComment(commentId: Int) -> Single<Void>
+    
+    // MARK: - Reply
+    func createReplyComment(postId: Int, commentId: Int, comment: String, mentions: [Int]) -> Single<CommentResponse>
+    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<CommentPageResponse>
+    
+    // MARK: - Like
+    func likeComment(commentId:Int) -> Single<Void>
 }
