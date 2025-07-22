@@ -8,6 +8,7 @@
 import Foundation
 
 struct PlanPostSummary: PostSummary {
+    let postId: Int?
     let isCreator: Bool
     let name: String?
     let particiapantsCount: Int?
@@ -21,6 +22,7 @@ struct PlanPostSummary: PostSummary {
 
 extension PlanPostSummary {
     init(plan: Plan) {
+        self.postId = plan.id
         self.isCreator = plan.isCreator
         self.name = plan.title
         self.particiapantsCount = plan.participationCount

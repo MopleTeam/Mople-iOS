@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol DeleteReviewImage {
-    func execute(reviewId: Int, imageIds: [String]) -> Observable<Void>
+    func execute(reviewId: Int, imageIds: [Int]) -> Observable<Void>
 }
 
 final class DeleteReviewImageUseCase: DeleteReviewImage {
@@ -19,7 +19,7 @@ final class DeleteReviewImageUseCase: DeleteReviewImage {
         self.repo = repo
     }
     
-    func execute(reviewId: Int, imageIds: [String]) -> Observable<Void> {
+    func execute(reviewId: Int, imageIds: [Int]) -> Observable<Void> {
         return repo
             .deleteReviewImage(reviewId: reviewId,
                                imageIds: imageIds)

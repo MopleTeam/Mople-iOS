@@ -8,7 +8,24 @@
 import UIKit
 
 struct ImageWrapper {
-    let image: UIImage
-    let isNew: Bool
-    var id: String?
+    let path: String?
+    let id: Int?
+    let image: UIImage?
+    
+    var isNew: Bool { path == nil }
+    
+    init(path: String? = nil,
+         id: Int? = nil,
+         image: UIImage? = nil) {
+        self.path = path
+        self.id = id
+        self.image = image
+    }
+}
+
+extension ImageWrapper {
+    func toImageInfo() -> ImageInfo {
+        return .init(path: path,
+                     image: image)
+    }
 }

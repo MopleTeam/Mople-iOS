@@ -28,7 +28,7 @@ final class MeetReviewListViewController: BaseViewController, View {
         let view = CountView(title: L10n.Meetdetail.reviwelist)
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
-        view.setBottomInset(16)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.frame.size.height = 64
         return view
     }()

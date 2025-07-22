@@ -19,11 +19,12 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
     
     // MARK: - Variables
     private var isSearchHistory = false
+    private var countViewHeight: Constraint?
+    private let countViewDefaultHeight: CGFloat = 50
     
     // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: L10n.Searchplace.recent)
-        view.frame.size.height = 50
         return view
     }()
 
@@ -63,22 +64,30 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
         tableView.rx.delegate.setForwardToDelegate(self, retainDelegate: false)
         self.tableView.register(SearchPlaceTableCell.self, forCellReuseIdentifier: SearchPlaceTableCell.reuseIdentifier)
     }
-    
+        
     private func setLayout() {
         self.view.backgroundColor = .defaultWhite
+        view.addSubview(countView)
         view.addSubview(tableView)
         
+        countView.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
+            countViewHeight = make.height.equalTo(countViewDefaultHeight).constraint
+        }
+        
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(countView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
     }
     
     private func setCountView(_ count: Int) {
         if isSearchHistory {
-            tableView.tableHeaderView = countView
+            countViewHeight?.update(offset: countViewDefaultHeight)
             countView.countText = L10n.itemCount(count)
         } else {
-            tableView.tableHeaderView = nil
+            countViewHeight?.update(offset: 0)
         }
     }
     
@@ -134,12 +143,8 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
                 }
             }
             .disposed(by: disposeBag)
-        
-        let viewDidLayOut = self.rx.viewDidLayoutSubviews
-            .take(1)
-        
-        Observable.combineLatest(viewDidLayOut, fetchResult)
-            .map { $0.1 }
+
+        fetchResult
             .map({ $0.count })
             .asDriver(onErrorJustReturn: 0)
             .drive(with: self, onNext: { [weak self] vc, count in

@@ -8,19 +8,9 @@
 import UIKit
 import ReactorKit
 
-protocol CommentListDelegate: AnyObject, ChildLoadingDelegate {
-    func editComment(_ comment: String?)
-    func setCommentListTableOffsetY(_ offsetY: CGFloat)
-    func showReviewPhoto(index: Int)
-    func showUserImage(imagePath: String?)
-    func reportComment()
-    func refresh()
-}
-
 enum PlanDetailError: Error {
     case noResponse(ResponseError)
     case midnight
-    case failComment
     case unknown(Error)
 }
 
@@ -30,14 +20,9 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
         enum Post {
             case fetch
             case delete
-            case report
             case refresh
             case participation
-        }
-        
-        enum Comment {
-            case writeComment(_ comment: String)
-            case cancleEditing
+            case report
         }
 
         enum Flow {
@@ -46,34 +31,18 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
             case editPost
             case endFlow
         }
-        
-        enum ChildEvent {
-            case commentLoading(_ isLoading: Bool)
-            case editComment(_ comment: String?)
-            case changedOffsetY(_ offsetY: CGFloat)
-            case reportComment
-            case catchError(Error)
-        }
-        
+
         enum Update {
             case plan(Plan)
             case review(Review)
         }
         
         case post(Post)
-        case comment(Comment)
         case update(Update)
-        case childEvent(ChildEvent)
         case flow(Flow)
     }
     
     enum Mutation {
-        enum ChildEvent {
-            case editComment(_ text: String?)
-            case changedOffsetY(_ offsetY: CGFloat)
-        }
-        
-        case updateChildEvent(ChildEvent)
         case updatePostSummary(PostSummary)
         case completeReport
         case updateLoadingState(Bool)
@@ -82,11 +51,8 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     
     struct State {
         @Pulse var postSummary: PostSummary?
-        @Pulse var isLoading: Bool = false
-        @Pulse var editComment: String?
-        @Pulse var startOffsetY: CGFloat?
-        @Pulse var isParticipation: Bool?
         @Pulse var reported: Void?
+        @Pulse var isLoading: Bool = false
         @Pulse var error: PlanDetailError?
     }
     
@@ -111,9 +77,6 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Coordinator
     private weak var coordinator: PostDetailCoordination?
-    
-    // MARK: - Commands
-    public weak var commentListCommands: CommentListCommands?
     
     // MARK: - LifeCycle
     init(type: PostType,
@@ -152,10 +115,6 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case let .post(action):
             return handlePostAction(action)
-        case let .comment(action):
-            return handleCommentAction(action)
-        case let .childEvent(event):
-            return handleChildAction(event)
         case let .flow(action):
             return handleFlowAction(action)
         case let .update(action):
@@ -170,12 +129,10 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updatePostSummary(postSummary):
             newState.postSummary = postSummary
-        case let .updateLoadingState(isLoading):
-            newState.isLoading = isLoading
-        case let .updateChildEvent(event):
-            handleChildMutation(&newState, event)
         case .completeReport:
             newState.reported = ()
+        case let .updateLoadingState(isLoading):
+            newState.isLoading = isLoading
         case let .catchError(err):
             newState.error = err
         }
@@ -194,12 +151,12 @@ extension PostDetailViewReactor {
             return handlePostFetchWithLoading()
         case .delete:
             return deletePost()
-        case .report:
-            return reportPost()
         case .refresh:
             return handleRefresh()
         case .participation:
             return handleParticipation()
+        case .report:
+            return reportPost()
         }
     }
     
@@ -257,17 +214,7 @@ extension PostDetailViewReactor {
             return .just(.updatePostSummary(PlanPostSummary(plan: plan)))
         case let .review(review):
             self.review = review
-            return fetchReveiwImagesWithLoading(review)
-        }
-    }
-    
-    // MARK: - 댓글 액션 관리
-    private func handleCommentAction(_ command: Action.Comment) -> Observable<Mutation> {
-        switch command {
-        case let .writeComment(comment):
-            return writeComment(comment)
-        case .cancleEditing:
-            return cancleEditComment()
+            return .just(.updatePostSummary(ReviewPostSummary(review: review)))
         }
     }
     
@@ -318,35 +265,6 @@ extension PostDetailViewReactor {
             coordinator?.pushReviewEditView(review: review)
         }
     }
-    
-    // MARK: - 자식 리액터 액션 관리
-    private func handleChildAction(_ event: Action.ChildEvent) -> Observable<Mutation> {
-        switch event {
-        case let .commentLoading(isLoad):
-            return .just(.updateLoadingState(isLoad))
-        case let .editComment(comment):
-            return .just(.updateChildEvent(.editComment(comment)))
-        case let .changedOffsetY(offsetY):
-            return .just(.updateChildEvent(.changedOffsetY(offsetY)))
-        case .reportComment:
-            return .just(.completeReport)
-        case .catchError:
-            return .just(.catchError(.failComment))
-        }
-    }
-}
-
-// MARK: - Mutation Handling
-extension PostDetailViewReactor {
-    private func handleChildMutation(_ state: inout State,
-                                     _ event: Mutation.ChildEvent) {
-        switch event {
-        case let .editComment(text):
-            state.editComment = text
-        case let .changedOffsetY(offsetY):
-            state.startOffsetY = offsetY
-        }
-    }
 }
 
 // MARK: - Data Request
@@ -357,66 +275,28 @@ extension PostDetailViewReactor {
     private func handlePostFetchWithLoading() -> Observable<Mutation> {
         switch type {
         case .plan:
-            return fetchPlanDetail()
+            return requestWithLoading(task: fetchPlan())
         case .review:
-            return fetchReviewDetail()
+            return requestWithLoading(task: fetchReview())
         }
     }
-  
-    /// 일정 데이터 로딩과 함께 불러오기
-    private func fetchPlanDetail() -> Observable<Mutation> {
+    
+    private func fetchPlan(isRefresh: Bool = false) -> Observable<Mutation> {
         
-        let fetchPlan = fetchPlanDetailUsecase.execute(planId: id)
+        return fetchPlanDetailUsecase.execute(planId: id)
             .do(onNext: { [weak self] in
                 self?.plan = $0
-                self?.fetchCommentList($0.id)
             })
             .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
-
-        return requestWithLoading(task: fetchPlan)
     }
     
-    /// 후기 데이터 로딩과 함께 불러오기
-    private func fetchReviewDetail() -> Observable<Mutation> {
+    private func fetchReview(isRefresh: Bool = false) -> Observable<Mutation> {
 
-        let fetchReview = fetchReviewDetailUseCase.execute(reviewId: id)
+        return fetchReviewDetailUseCase.execute(reviewId: id)
             .do(onNext: { [weak self] in
                 self?.review = $0
-                self?.fetchCommentList($0.postId)
             })
-            .flatMap { [weak self] review -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return fetchReviewImages(review)
-            }
-            
-        return requestWithLoading(task: fetchReview)
-    }
-    
-    /// 로딩과 함께 후기 이미지 불러오기
-    private func fetchReveiwImagesWithLoading(_ review: Review) -> Observable<Mutation> {
-        let fetchReviewImage = fetchReviewImages(review)
-        return requestWithLoading(task: fetchReviewImage)
-    }
-    
-    /// 후기 이미지 불러오기
-    private func fetchReviewImages(_ review: Review) -> Observable<Mutation> {
-        let reviewImages = review.images
-        let imagePaths = reviewImages.compactMap { $0.path }
-        let imageUrls = imagePaths.compactMap { URL(string: $0) }
-        let imageObservers: [Observable<UIImage?>] = Observable.imagesTaskBuilder(imageUrls: imageUrls)
-        
-        if imageObservers.isEmpty == false {
-            return Observable.zip(imageObservers)
-                .flatMap { [weak self] images -> Observable<Mutation> in
-                    guard let self else { return .empty() }
-                    let images = images.compactMap { $0 }
-                    self.commentListCommands?.addPhotoList(images)
-                    return .just(Mutation.updatePostSummary(ReviewPostSummary(review: review)))
-                }
-        } else {
-            self.commentListCommands?.addPhotoList([])
-            return .just(Mutation.updatePostSummary(ReviewPostSummary(review: review)))
-        }
+            .map { Mutation.updatePostSummary(ReviewPostSummary(review: $0)) }
     }
     
     /// 포스트 삭제하기
@@ -480,38 +360,12 @@ extension PostDetailViewReactor {
         
         switch type {
         case .plan:
-            loadMutation = refreshPlanDetail()
+            loadMutation = fetchPlan(isRefresh: true)
         case .review:
-            loadMutation = refreshReviewDetail()
+            loadMutation = fetchReview(isRefresh: true)
         }
         
         return loadMutation
-            .do(onNext: { _ in
-                self.commentListCommands?.refreshComment()
-            })
-    }
-    
-    /// 일정 데이터 로딩과 함께 불러오기
-    private func refreshPlanDetail() -> Observable<Mutation> {
-        
-        return fetchPlanDetailUsecase.execute(planId: id)
-            .do(onNext: { [weak self] in
-                self?.plan = $0
-            })
-            .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
-    }
-    
-    /// 후기 데이터 로딩과 함께 불러오기
-    private func refreshReviewDetail() -> Observable<Mutation> {
-
-        return fetchReviewDetailUseCase.execute(reviewId: id)
-            .do(onNext: { [weak self] in
-                self?.review = $0
-            })
-            .flatMap { [weak self] review -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return fetchReviewImages(review)
-            }
     }
 }
 
@@ -530,64 +384,6 @@ extension PostDetailViewReactor {
     }
 }
 
-// MARK: - Delegate
-extension PostDetailViewReactor: CommentListDelegate  {
-
-    func editComment(_ comment: String?) {
-        action.onNext(.childEvent(.editComment(comment)))
-    }
-    
-    func setCommentListTableOffsetY(_ offsetY: CGFloat) {
-        action.onNext(.childEvent(.changedOffsetY(offsetY)))
-    }
-    
-    func showReviewPhoto(index: Int) {
-        guard let reviewImages = review?.images,
-              reviewImages.isEmpty == false else { return }
-        
-        let imagePaths = reviewImages.compactMap { $0.path }
-        coordinator?.presentPhotoView(title: L10n.Review.photoHeader,
-                                   index: index,
-                                   imagePaths: imagePaths,
-                                   defaultType: .history)
-    }
-    
-    func showUserImage(imagePath: String?) {
-        let imagePaths = [imagePath].compactMap { $0 }
-        coordinator?.presentPhotoView(title: nil,
-                                   index: 0,
-                                   imagePaths: imagePaths,
-                                   defaultType: .user)
-    }
-    
-    func reportComment() {
-        action.onNext(.childEvent(.reportComment))
-    }
-    
-    func refresh() {
-        action.onNext(.post(.refresh))
-    }
-}
-
-// MARK: - Command
-extension PostDetailViewReactor {
-    private func fetchCommentList(_ postId: Int?) {
-        guard let postId else { return }
-        commentListCommands?.loadComment(postId: postId)
-    }
-    
-    private func writeComment(_ comment: String) -> Observable<Mutation> {
-        self.commentListCommands?.writeComment(comment: comment)
-        return .empty()
-    }
-    
-    private func cancleEditComment() -> Observable<Mutation> {
-        guard currentState.editComment != nil else { return .empty() }
-        self.commentListCommands?.completeEditComment()
-        return .just(.updateChildEvent(.editComment(nil)))
-    }
-}
-
 // MARK: - Loading & Error
 extension PostDetailViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
@@ -596,13 +392,13 @@ extension PostDetailViewReactor: LoadingReactor {
     
     func catchErrorMutation(_ error: Error) -> Mutation {
         guard let dataError = error as? DataRequestError,
-              let responseError = handleDataRequestError(err: dataError) else {
+              let responseError = resolveDataRequestError(err: dataError) else {
             return .catchError(.unknown(error))
         }
         return .catchError(.noResponse(responseError))
     }
     
-    private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
+    private func resolveDataRequestError(err: DataRequestError) -> ResponseError? {
         let responseType = getResponseType()
         return DataRequestError.resolveNoResponseError(err: err,
                                                        responseType: responseType)
@@ -613,13 +409,3 @@ extension PostDetailViewReactor: LoadingReactor {
     }
 }
 
-// MARK: - Child Loading & Error
-extension PostDetailViewReactor: ChildLoadingDelegate {
-    func updateLoadingState(_ isLoading: Bool, index: Int) {
-        action.onNext(.childEvent(.commentLoading(isLoading)))
-    }
-    
-    func catchError(_ error: Error, index: Int) {
-        action.onNext(.childEvent(.catchError(error)))
-    }
-}

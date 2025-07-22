@@ -8,6 +8,7 @@
 import Foundation
 
 struct ReviewPostSummary: PostSummary {
+    let postId: Int?
     let isCreator: Bool
     let name: String?
     let particiapantsCount: Int?
@@ -17,11 +18,14 @@ struct ReviewPostSummary: PostSummary {
     let meet: MeetSummary?
     let location: Location
     let isReviewd: Bool
-    let hasImage: Bool
+    let images: [ReviewImage]
+    
+    var hasImage: Bool { !images.isEmpty }
 }
 
 extension ReviewPostSummary {
     init(review: Review) {
+        self.postId = review.postId
         self.isCreator = review.isCreator
         self.name = review.name
         self.particiapantsCount = review.participantsCount
@@ -31,7 +35,7 @@ extension ReviewPostSummary {
         self.meet = review.meet
         self.location = review.location ?? .defaultLocation
         self.isReviewd = review.isReviewd
-        self.hasImage = !review.images.isEmpty
+        self.images = review.images
     }
 }
 

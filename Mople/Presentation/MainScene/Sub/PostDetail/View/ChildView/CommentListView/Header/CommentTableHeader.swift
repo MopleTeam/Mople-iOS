@@ -13,7 +13,8 @@ final class CommentTableHeader: UITableViewHeaderFooterView {
     // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView()
-        view.setBottomInset(8)
+        view.titleText = L10n.comment
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 8, right: 20))
         view.backgroundColor = .defaultWhite
         return view
     }()
@@ -30,17 +31,12 @@ final class CommentTableHeader: UITableViewHeaderFooterView {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.contentView.backgroundColor = .bgSecondary
         self.contentView.addSubview(countView)
         
         countView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(8).priority(.high)
+            make.top.equalToSuperview().priority(.high)
             make.horizontalEdges.bottom.equalToSuperview().priority(.high)
         }
-    }
-    
-    public func setTitle(_ title: String) {
-        countView.titleText = title
     }
     
     public func setCount(_ count: Int?) {

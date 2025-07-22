@@ -9,17 +9,31 @@ import UIKit
 import RxSwift
 import RxRelay
 
+struct ImageInfo {
+    var path: String?
+    var image: UIImage?
+}
+
 final class PhotoCollectionView: UIView {
     
+    // MARK: - Variables
     private let lineSpacing: CGFloat = 4
     private let cellColumns: CGFloat = 3
-    private var images: [UIImage] = []
+    private var images: [ImageInfo] = []
     private var maxPhotoCount: Int = 5
     fileprivate var isEditMode: Bool
     
+    // MARK: - Observables
     fileprivate let cellSelectedRelay: PublishRelay<Int> = .init()
     fileprivate let addButtonRelay: PublishRelay<Void> = .init()
     fileprivate let deleteButtonRelay: PublishRelay<Int> = .init()
+    
+    // MARK: - UI Components
+    private let countView: CountView = {
+        let view = CountView(title: L10n.Review.photoHeader)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 0, right: 20))
+        return view
+    }()
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -30,6 +44,18 @@ final class PhotoCollectionView: UIView {
         return collectionView
     }()
     
+    private lazy var mainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [countView, collectionView])
+        sv.axis = .vertical
+        sv.spacing = 8
+        sv.alignment = .fill
+        sv.distribution = .fill
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.layoutMargins = .init(top: 28, left: 0, bottom: 0, right: 0)
+        return sv
+    }()
+    
+    // MARK: - Life Cycle
     init(isEditMode: Bool = false) {
         self.isEditMode = isEditMode
         super.init(frame: .zero)
@@ -56,15 +82,17 @@ final class PhotoCollectionView: UIView {
     }
     
     private func setLayout() {
-        self.addSubview(collectionView)
+        self.backgroundColor = .defaultWhite
+        self.addSubview(mainStackView)
         
-        collectionView.snp.makeConstraints { make in
+        mainStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
 
-    public func setImage(images: [UIImage]) {
+    public func setImage(images: [ImageInfo]) {
         self.images = images
+        self.countView.countText = L10n.itemCount(images.count)
         self.collectionView.reloadData()
     }
 }
@@ -78,7 +106,7 @@ extension PhotoCollectionView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: PhotoCollectionCell.reuseIdentifier,
             for: indexPath) as! PhotoCollectionCell
-        cell.configure(image: images[indexPath.item])
+        cell.configure(imageInfo: images[indexPath.item])
         
         if isEditMode {
             cell.setEditMode()

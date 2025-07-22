@@ -24,6 +24,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         let view = CountView(title: L10n.Notifylist.new)
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
+        view.setMargin(inset: .init(top: 28, left: 20, bottom: 16, right: 20))
         return view
     }()
     
@@ -77,7 +78,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         self.view.addSubview(tableView)
         
         self.countView.snp.makeConstraints { make in
-            make.top.equalTo(self.titleViewBottom).offset(28)
+            make.top.equalTo(self.titleViewBottom)
             make.horizontalEdges.equalToSuperview()
         }
         
@@ -87,7 +88,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         }
         
         self.tableView.snp.makeConstraints { make in
-            make.top.equalTo(countView.snp.bottom).offset(16)
+            make.top.equalTo(countView.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
     }

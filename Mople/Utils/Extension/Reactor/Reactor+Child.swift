@@ -7,7 +7,7 @@
 
 import RxSwift
 
-protocol ChildLoadingDelegate {
+protocol ChildLoadingDelegate: AnyObject {
     func updateLoadingState(_ isLoading: Bool, index: Int)
     func catchError(_ error: Error, index: Int)
 }

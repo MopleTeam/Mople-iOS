@@ -10,7 +10,7 @@ import RxSwift
 
 protocol PostDetailSceneDependencies {
     // MARK: - 기본 뷰
-    func makePlanDetailViewController(coordinator: PostDetailCoordination) -> PostDetailViewController
+    func makePlanDetailViewController(coordinator: PostCoordination) -> PostDetailViewController
     
     // MARK: - 이동 뷰
     func makePlaceDetailViewController(place: PlaceInfo,
@@ -18,8 +18,7 @@ protocol PostDetailSceneDependencies {
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     func makePhotoBookViewController(title: String?,
                                      imagePaths: [String],
-                                     defaultType: UIImageView.DefaultImageType,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController
+                                     defaultType: UIImageView.DefaultImageType) -> PhotoBookViewController
     
     func makeReviewEditViewController(review: Review,
                                       coordinator: ReviewEditViewCoordination) -> ReviewEditViewController
@@ -30,7 +29,6 @@ protocol PostDetailSceneDependencies {
 
 final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependencies {
     
-    private var mainReactor: PostDetailViewReactor?
     private let postType: PostType
     private let id: Int
     
@@ -54,7 +52,7 @@ final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependenci
 extension PostDetailSceneDIContainer {
     
     // MARK: - 포스트 상세
-    func makePlanDetailViewController(coordinator: PostDetailCoordination) -> PostDetailViewController {
+    func makePlanDetailViewController(coordinator: PostCoordination) -> PostDetailViewController {
         let screenName: ScreenName = postType == .plan ? .plan_detail : .review_detail
         let title = postType == .plan ? L10n.Postdetail.plan : L10n.Postdetail.review
         let reportUseCase = makeReportUseCase()
@@ -64,7 +62,8 @@ extension PostDetailSceneDIContainer {
                      reactor: makePostDetailViewReactor(type: postType,
                                                         coordinator: coordinator,
                                                         reportUseCase: reportUseCase),
-                     commentVC: makeCommentListViewController(reportUseCase: reportUseCase))
+                     commentVC: makeCommentListViewController(reportUseCase: reportUseCase,
+                                                              coordinator: coordinator))
     }
     
     private func makePostDetailViewReactor(type: PostType,
@@ -72,16 +71,15 @@ extension PostDetailSceneDIContainer {
                                            reportUseCase: ReportPost) -> PostDetailViewReactor {
         let planRepo = DefaultPlanRepo(networkService: appNetworkService)
         let reviewRepo = DefaultReviewRepo(networkService: appNetworkService)
-        mainReactor = PostDetailViewReactor(type: type,
-                                            id: id,
-                                            fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(repo: planRepo),
-                                            fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(repo: reviewRepo),
-                                            deletePlanUseCase: makeDeletePlanUseCase(repo: planRepo),
-                                            deleteReviewUseCase: makeDeleteReviewUseCase(repo: reviewRepo),
-                                            participationPlanUseCase: makeParticipationPlanUseCase(repo: planRepo),
-                                            reportUseCase: reportUseCase,
-                                            coordinator: coordinator)
-        return mainReactor!
+        return .init(type: type,
+                     id: id,
+                     fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(repo: planRepo),
+                     fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(repo: reviewRepo),
+                     deletePlanUseCase: makeDeletePlanUseCase(repo: planRepo),
+                     deleteReviewUseCase: makeDeleteReviewUseCase(repo: reviewRepo),
+                     participationPlanUseCase: makeParticipationPlanUseCase(repo: planRepo),
+                     reportUseCase: reportUseCase,
+                     coordinator: coordinator)
     }
     
     
@@ -106,21 +104,21 @@ extension PostDetailSceneDIContainer {
     }
 
     // MARK: - 댓글뷰
-    private func makeCommentListViewController(reportUseCase: ReportPost) -> CommentListViewController {
-        return .init(reactor: makeCommentListViewReactor(
-            reportUseCase: reportUseCase)
-        )
+    private func makeCommentListViewController(reportUseCase: ReportPost,
+                                               coordinator: CommentListCoordination) -> CommentListViewController {
+        let commentReactor = makeCommentListViewReactor(reportUseCase: reportUseCase,
+                                                        coordinator: coordinator)
+        return .init(reactor: commentReactor)
     }
     
-    private func makeCommentListViewReactor(reportUseCase: ReportPost) -> CommentListViewReactor {
-        let reactor = CommentListViewReactor(fetchCommentListUseCase: makeFetchCommentListUseCase(),
-                                             createCommentUseCase: makeCreateCommentUseCase(),
-                                             deleteCommentUseCase: makeDeleteCommentUseCase(),
-                                             editCommentUseCase: makeEditCommentUseCase(),
-                                             reportUseCase: reportUseCase,
-                                             delegate: mainReactor!)
-        mainReactor?.commentListCommands = reactor
-        return reactor
+    private func makeCommentListViewReactor(reportUseCase: ReportPost,
+                                            coordinator: CommentListCoordination) -> CommentListViewReactor {
+        return .init(fetchCommentListUseCase: makeFetchCommentListUseCase(),
+                     createCommentUseCase: makeCreateCommentUseCase(),
+                     deleteCommentUseCase: makeDeleteCommentUseCase(),
+                     editCommentUseCase: makeEditCommentUseCase(),
+                     reportUseCase: reportUseCase,
+                     coordinator: coordinator)
     }
     
     private func makeFetchCommentListUseCase() -> FetchCommentList {
@@ -219,12 +217,10 @@ extension PostDetailSceneDIContainer {
     // MARK: - 포토북
     func makePhotoBookViewController(title: String?,
                                      imagePaths: [String],
-                                     defaultType: UIImageView.DefaultImageType,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController {
+                                     defaultType: UIImageView.DefaultImageType) -> PhotoBookViewController {
         return commonViewFactory.makePhotoViewController(title: title,
                                                          imagePath: imagePaths,
-                                                         defaultImageType: defaultType,
-                                                         coordinator: coordinator)
+                                                         defaultImageType: defaultType)
     }
 }
 

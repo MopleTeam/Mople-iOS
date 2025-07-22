@@ -10,16 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-enum PostInfoType {
-    case basic
-    case plan
-    case review
-}
-
 final class PostInfoView: UIView {
-    
-    // MARK: - Variables
-    private let type: PostInfoType
 
     // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
@@ -71,27 +62,6 @@ final class PostInfoView: UIView {
         label.setTitleTopPadding(4)
         return label
     }()
-
-    private lazy var mapView: MapView = {
-        let view = MapView()
-        view.layer.cornerRadius = 8
-        view.layer.makeLine(width: 1)
-        view.backgroundColor = .bgInput
-        view.clipsToBounds = true
-        view.isUserInteractionEnabled = true
-        return view
-    }()
-    
-    fileprivate lazy var participationButton: BaseButton = {
-        let btn = BaseButton()
-        btn.setTitle(font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite,
-                     selectedColor: .gray03)
-        btn.setBgColor(normalColor: .appPrimary,
-                       selectedColor: .appTertiary)
-        btn.setRadius(8)
-        return btn
-    }()
     
     private lazy var headerStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [thumbnailView, titleLabel])
@@ -118,19 +88,13 @@ final class PostInfoView: UIView {
         sv.alignment = .fill
         sv.spacing = 16
         sv.isUserInteractionEnabled = true
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)
         sv.backgroundColor = .defaultWhite
         return sv
     }()
     
-    // MARK: - Gesture
-    fileprivate lazy var mapTapGesture = UITapGestureRecognizer()
-    
     // MARK: - LifeCycle
-    init(type: PostInfoType) {
-        self.type = type
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         initialSetup()
     }
     
@@ -141,7 +105,6 @@ final class PostInfoView: UIView {
     private func initialSetup() {
         setLayout()
         setInfoLabel()
-        handleViewType()
     }
     
     // MARK: - UI Setup
@@ -188,24 +151,7 @@ final class PostInfoView: UIView {
         }
     }
     
-    private func handleViewType() {
-        switch type {
-        case .plan:
-            addMapView()
-            addParticipationButton()
-        case .review:
-            addMapView()
-        default:
-            break
-        }
-    }
-    
     public func configure(with postSummary: PostSummary) {
-        setCommonPostInfo(with: postSummary)
-        handlePostType(with: postSummary)
-    }
-    
-    private func setCommonPostInfo(with postSummary: PostSummary) {
         thumbnailView.configure(with: .init(meetSummary: postSummary.meet))
         titleLabel.text = postSummary.name
         dateInfoLabel.text = postSummary.dateString
@@ -213,89 +159,15 @@ final class PostInfoView: UIView {
         placeInfoLabel.text = postSummary.fullAddress
     }
     
-    private func handlePostType(with postSummary: PostSummary) {
-        switch postSummary {
-        case let planSummary as PlanPostSummary:
-            setPlanPostType(with: planSummary)
-        case let reviewSummary as ReviewPostSummary:
-            setReviewPostType(with: reviewSummary)
-        default:
-            break
-        }
-    }
-    
-    private func setPlanPostType(with planSummary: PlanPostSummary) {
-        guard type == .plan else { return }
-        setMapView(location: planSummary.location)
-        setParticipationButton(planSummary: planSummary)
-    }
-    
-    private func setReviewPostType(with reviewSummary: ReviewPostSummary) {
-        guard type == .review else { return }
-        setMapView(location: reviewSummary.location)
+    public func setMargin(inset: UIEdgeInsets) {
+        mainStackView.isLayoutMarginsRelativeArrangement = true
+        mainStackView.layoutMargins = inset
     }
 }
 
-// MARK: - Setup MapView
-extension PostInfoView {
-    private func addMapView() {
-        mainStackView.addArrangedSubview(mapView)
-        mapView.addGestureRecognizer(mapTapGesture)
-        mapView.snp.makeConstraints { make in
-            make.height.equalTo(160)
-        }
-    }
-    
-    private func setMapView(location: Location) {
-        mapView.initializeMap(location: location)
-    }
-}
-
-// MARK: - Setup Participation Button
-extension PostInfoView {
-    private func addParticipationButton() {
-        mainStackView.addArrangedSubview(participationButton)
-        participationButton.snp.makeConstraints { make in
-            make.height.equalTo(52)
-        }
-    }
-    
-    private func setParticipationButton(planSummary: PlanPostSummary) {
-        guard !planSummary.isCreator,
-              let planDate = planSummary.date,
-              planDate > Date() else {
-            removeParticipationButton()
-            return
-        }
-        setParticipation(with: planSummary.isParticipation)
-    }
-    
-    private func setParticipation(with isParticipation: Bool) {
-        participationButton.title = isParticipation
-        ? L10n.Meetdetail.planJoined
-        : L10n.Meetdetail.planJoin
-        participationButton.updateSelectedBackColor(isSelected: isParticipation)
-        participationButton.updateSelectedTextColor(isSelected: isParticipation)
-    }
-    
-    private func removeParticipationButton() {
-        guard mainStackView.arrangedSubviews.contains(participationButton) else { return }
-        mainStackView.removeArrangedSubview(participationButton)
-        participationButton.removeFromSuperview()
-    }
-}
 
 extension Reactive where Base: PostInfoView {
     var memberTapped: ControlEvent<Void> {
         return base.membersButton.rx.controlEvent(.touchUpInside)
-    }
-    
-    var mapTapped: Observable<Void> {
-        return base.mapTapGesture.rx.event
-            .map { _ in }
-    }
-    
-    var participationTapped: ControlEvent<Void> {
-        return base.participationButton.rx.tap  
     }
 }

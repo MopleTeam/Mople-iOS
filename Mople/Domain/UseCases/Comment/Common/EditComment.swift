@@ -8,8 +8,8 @@
 import RxSwift
 
 protocol EditComment {
-    func execute(commentId: Int,
-                 comment: String,
+    func execute(id: Int,
+                 text: String,
                  mentions: [Int]) -> Observable<Comment>
 }
 
@@ -22,12 +22,12 @@ final class EditCommentUseCase: EditComment {
         self.editCommentRepo = repo
     }
     
-    func execute(commentId: Int,
-                 comment: String,
+    func execute(id: Int,
+                 text: String,
                  mentions: [Int]) -> Observable<Comment> {
         return editCommentRepo
-            .editComment(commentId: commentId,
-                         comment: comment,
+            .editComment(commentId: id,
+                         comment: text,
                          mentions: mentions)
             .asObservable()
             .map { $0.toDomain() }

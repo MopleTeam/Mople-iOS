@@ -36,6 +36,11 @@ final class MapView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        print(#function, #line, "Path : # 테스트 ")
+    }
+    
     private func setLayout() {
         self.addSubview(mapView)
         
@@ -70,10 +75,16 @@ extension MapView {
             guard let lat = location.latitude,
                   let lng = location.longitude else { return }
             let position = NMGLatLng(lat: lat, lng: lng)
+            self?.layoutIfMapViewEmpty()
             self?.addMarker(position: position)
             self?.moveMap(position: position)
             self?.centerMapWithUIOffset(adjustOffset)
         }
+    }
+    
+    private func layoutIfMapViewEmpty() {
+        guard mapView.frame.size == .zero else { return }
+        layoutIfNeeded()
     }
     
     private func moveMap(position: NMGLatLng) {

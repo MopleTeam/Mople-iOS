@@ -8,6 +8,7 @@
 import Foundation
 
 protocol PostSummary {
+    var postId: Int? { get }
     var isCreator: Bool { get }
     var name: String? { get }
     var particiapantsCount: Int? { get }
