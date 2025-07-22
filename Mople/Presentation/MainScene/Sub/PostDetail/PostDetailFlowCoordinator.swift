@@ -7,16 +7,24 @@
 
 import UIKit
 
+typealias PostCoordination = PostDetailCoordination & CommentListCoordination
+
 protocol PostDetailCoordination: AnyObject {
     func pushMemberListView(postId: Int)
     func pushPlaceDetailView(place: PlaceInfo)
     func pushReviewEditView(review: Review)
     func presentPhotoView(title: String?,
-                       index: Int,
-                       imagePaths: [String],
-                       defaultType: UIImageView.DefaultImageType)
+                          index: Int,
+                          imagePaths: [String],
+                          defaultType: UIImageView.DefaultImageType)
     func presentPlanEditFlow(plan: Plan)
     func endFlow()
+}
+
+protocol CommentListCoordination: AnyObject {
+    func presentWriterImageView(title: String?,
+                                imagePath: String,
+                                defaultType: UIImageView.DefaultImageType)
 }
 
 final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
@@ -69,16 +77,24 @@ extension PostDetailFlowCoordinator: ReviewEditViewCoordination {
 }
 
 // MARK: - Photo View
-extension PostDetailFlowCoordinator {
+extension PostDetailFlowCoordinator: CommentListCoordination {
     func presentPhotoView(title: String?,
                           index: Int,
                           imagePaths: [String],
                           defaultType: UIImageView.DefaultImageType) {
         let vc = dependencies.makePhotoBookViewController(title: title,
                                                           imagePaths: imagePaths,
-                                                          defaultType: defaultType,
-                                                          coordinator: self)
+                                                          defaultType: defaultType)
         vc.selectedIndex = index
+        self.presentWithTracking(vc)
+    }
+    
+    func presentWriterImageView(title: String?,
+                                imagePath: String,
+                                defaultType: UIImageView.DefaultImageType) {
+        let vc = dependencies.makePhotoBookViewController(title: title,
+                                                          imagePaths: [imagePath],
+                                                          defaultType: defaultType)
         self.presentWithTracking(vc)
     }
 }

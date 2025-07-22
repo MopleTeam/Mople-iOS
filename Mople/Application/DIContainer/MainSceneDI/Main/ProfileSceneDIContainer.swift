@@ -10,8 +10,7 @@ import UIKit
 protocol ProfileSceneDependencies {
     // MARK: - View
     func makeProfileViewController(coordinator: ProfileCoordination) -> ProfileViewController
-    func makeProfileImageViewController(imagePath: String?,
-                                        coordinator: NavigationCloseable) -> PhotoBookViewController
+    func makeProfileImageViewController(imagePath: String?) -> PhotoBookViewController
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        coordinator: ProfileEditViewCoordination) -> ProfileEditViewController
     func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController
@@ -61,13 +60,11 @@ extension ProfileSceneDIContainer {
 extension ProfileSceneDIContainer {
     
     // MARK: - 이미지 뷰
-    func makeProfileImageViewController(imagePath: String?,
-                                        coordinator: NavigationCloseable) -> PhotoBookViewController {
+    func makeProfileImageViewController(imagePath: String?) -> PhotoBookViewController {
         let imagePaths = [imagePath].compactMap { $0 }
         return commonViewFactory.makePhotoViewController(title: L10n.profile,
                                                          imagePath: imagePaths,
-                                                         defaultImageType: .user,
-                                                         coordinator: coordinator)
+                                                         defaultImageType: .user)
     }
     
     // MARK: - 프로필 수정

@@ -69,8 +69,7 @@ extension MeetDetailSceneCoordinator {
     func presentPhotoView(title: String?,
                           imagePath: String?) {
         let vc = dependencies.makeMeetImageViewController(imagePath: imagePath,
-                                                          title: title,
-                                                          coordinator: self)
+                                                          title: title)
         self.presentWithTracking(vc)
     }
 }

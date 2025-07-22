@@ -20,7 +20,7 @@ final class DefaultReviewRepo: BaseRepositories, ReviewRepo {
         }
     }
     
-    func deleteReviewImage(reviewId: Int, imageIds: [String]) -> Single<Void> {
+    func deleteReviewImage(reviewId: Int, imageIds: [Int]) -> Single<Void> {
         networkService.authenticatedRequest {
             try APIEndpoints.deleteReviewImage(reviewId: reviewId, imageIds: imageIds)
         }

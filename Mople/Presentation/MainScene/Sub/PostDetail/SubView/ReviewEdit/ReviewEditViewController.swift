@@ -42,25 +42,17 @@ final class ReviewEditViewController: TitleNaviViewController, View {
         label.font = FontStyle.Heading.bold
         return label
     }()
+        
+    private let photoView = PhotoCollectionView(isEditMode: true)
     
-    private let countView = CountView(title: L10n.Review.photoHeader)
-    
-    private let reviewImageView = PhotoCollectionView(isEditMode: true)
-    
-    private let planInfoView = PostInfoView(type: .basic)
-    
-    private lazy var subStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [countView, reviewImageView])
-        sv.axis = .vertical
-        sv.spacing = 8
-        sv.alignment = .fill
-        sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
-        return sv
+    private let planInfoView: PostInfoView = {
+        let view = PostInfoView()
+        view.setMargin(inset: .init(top: 20, left: 20, bottom: 20, right: 20))
+        return view
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [titleContainer, subStackView, planInfoView])
+        let sv = UIStackView(arrangedSubviews: [titleContainer, photoView, planInfoView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .fill
@@ -133,12 +125,8 @@ final class ReviewEditViewController: TitleNaviViewController, View {
             make.edges.equalToSuperview().inset(20)
         }
         
-        subStackView.snp.makeConstraints { make in
+        photoView.snp.makeConstraints { make in
             make.height.equalTo(207)
-        }
-        
-        reviewImageView.snp.makeConstraints { make in
-            make.height.equalTo(149)
         }
         
         completeButton.snp.makeConstraints { make in
@@ -196,12 +184,12 @@ extension ReviewEditViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reviewImageView.rx.appPhotos
+        photoView.rx.appPhotos
             .map { Reactor.Action.showImagePicker }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reviewImageView.rx.deletePhotos
+        photoView.rx.deletePhotos
             .map { Reactor.Action.deleteImage($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -227,14 +215,9 @@ extension ReviewEditViewController {
         
         reactor.pulse(\.$images)
             .asDriver(onErrorJustReturn: [])
-            .map({
-                $0.map { imageWrapper in
-                    imageWrapper.image
-                }
-            })
+            .map({ $0.map { $0.toImageInfo() } })
             .drive(with: self, onNext: { vc, images in
-                vc.reviewImageView.setImage(images: images)
-                vc.countView.countText = L10n.itemCount(images.count)
+                vc.photoView.setImage(images: images)
             })
             .disposed(by: disposeBag)
         

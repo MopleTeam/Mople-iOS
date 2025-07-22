@@ -33,7 +33,7 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     private let countView: CountView = {
         let view = CountView(title: L10n.memberList)
         view.frame.size.height = 64
-        view.setBottomInset(16)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
         return view

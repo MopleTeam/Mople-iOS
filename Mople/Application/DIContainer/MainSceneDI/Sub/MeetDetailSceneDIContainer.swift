@@ -18,8 +18,7 @@ protocol MeetDetailSceneDependencies {
                                     coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     func makeMeetImageViewController(imagePath: String?,
-                                     title: String?,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController
+                                     title: String?) -> PhotoBookViewController
     
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meet: MeetSummary,
@@ -166,13 +165,11 @@ extension MeetDetailSceneDIContainer {
     
     // MARK: - 포토뷰
     func makeMeetImageViewController(imagePath: String?,
-                                     title: String?,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController {
+                                     title: String?) -> PhotoBookViewController {
         let imagePaths = [imagePath].compactMap { $0 }
         return commonViewFactory.makePhotoViewController(title: title,
                                                          imagePath: imagePaths,
-                                                         defaultImageType: .meet,
-                                                         coordinator: coordinator)
+                                                         defaultImageType: .meet)
     }
 }
 

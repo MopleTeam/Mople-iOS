@@ -122,7 +122,7 @@ final class DefaultSheetViewController: UIViewController {
         
         tapGesture.rx.event
             .bind(with: self, onNext: { vc, _ in
-                vc.downModal()
+                vc.downModal(isCancle: true)
             })
             .disposed(by: disposeBag)
         
@@ -155,7 +155,7 @@ final class DefaultSheetViewController: UIViewController {
                                       opacity: CGFloat) {
         
         if translationY > modalHeight {
-            downModal()
+            downModal(isCancle: true)
         } else if translationY > 0 {
             changeOpacity(opacity: opacity)
             changeBottomOffset(offset: translationY)
@@ -167,14 +167,14 @@ final class DefaultSheetViewController: UIViewController {
                                     velocityY: CGFloat) {
         let modalHalfHeight = modalHeight / 2
         if translationY > modalHalfHeight || velocityY > 300 {
-            downModal()
+            downModal(isCancle: true)
         } else {
             resetModal()
         }
     }
     
     // 모달 dismiss
-    private func downModal(completion: (() -> Void)? = nil) {
+    private func downModal(isCancle: Bool = false) {
         UIView.animate(withDuration: 0.33,
                        animations: { [weak self] in
             guard let self else { return }
@@ -182,8 +182,10 @@ final class DefaultSheetViewController: UIViewController {
             changeOpacity(opacity: 0)
             self.view.layoutIfNeeded()
         }, completion: { [weak self] _ in
-            self?.dismiss(animated: true,
-                          completion: completion ?? self?.cancleAction)
+            self?.dismiss(animated: false) { [weak self] in
+                guard isCancle else { return }
+                self?.cancleAction?()
+            }
         })
     }
     
@@ -239,7 +241,8 @@ extension DefaultSheetViewController {
     
     private func makeAction(_ action: (() -> Void)?) -> UIAction {
         return .init { [weak self] _ in
-            self?.downModal(completion: action)
+            action?()
+            self?.downModal()
         }
     }
 }

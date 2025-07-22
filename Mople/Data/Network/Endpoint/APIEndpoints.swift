@@ -175,12 +175,14 @@ extension APIEndpoints {
     }
     
     static func deleteReviewImage(reviewId: Int,
-                                  imageIds: [String]) throws -> Endpoint<Void> {
+                                  imageIds: [Int]) throws -> Endpoint<Void> {
+        let ids = imageIds.map { "\($0)" }
+        
         return try Endpoint(path: "review/images/\(reviewId)",
                             authenticationType: .accessToken,
                             method: .delete,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["reviewImages": imageIds]
+                            bodyParameters: ["reviewImages": ids]
         )
     }
 }
@@ -358,7 +360,7 @@ extension APIEndpoints {
     // MARK: - CRUD
     static func fetchCommentList(postId: Int,
                                  nextCursor: String?) throws -> Endpoint<CommentPageResponse> {
-        var cursorQuery: [String: String] = .init()
+        var cursorQuery: [String: Any] = ["size": 30]
         
         if let nextCursor, !nextCursor.isEmpty {
             cursorQuery["cursor"] = nextCursor

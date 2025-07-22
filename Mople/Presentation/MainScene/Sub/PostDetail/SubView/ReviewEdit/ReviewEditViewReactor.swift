@@ -30,8 +30,7 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
         
         case deleteImage(Int)
         case showImagePicker
-        case fetchReview(Review)
-        case loadImage
+        case setReview(Review)
         case updateReview
         case flow(Flow)
     }
@@ -54,8 +53,7 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Variables
     var initialState: State = State()
-    private var review: Review
-    private var existingImageIds: [String] = []
+    var deleteImageIds: [Int] = .init()
     
     // MARK: - UseCase
     private let fetchReviewUseCase: FetchReviewDetail
@@ -75,13 +73,12 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
          imageUpload: ReviewImageUpload,
          photoService: PhotoService,
          coordinator: ReviewEditViewCoordination) {
-        self.review = review
         self.fetchReviewUseCase = fetchReview
         self.deleteReviewImage = deleteReviewImage
         self.imageUpload = imageUpload
         self.photoService = photoService
         self.coordiantor = coordinator
-        initialAction()
+        initialAction(with: review)
         logLifeCycle()
     }
     
@@ -90,18 +87,15 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
     }
     
     // MARK: - Intial Setup
-    private func initialAction() {
-        action.onNext(.fetchReview(review))
-        action.onNext(.loadImage)
+    private func initialAction(with review: Review) {
+        action.onNext(.setReview(review))
     }
     
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .fetchReview(review):
+        case let .setReview(review):
             return .just(.updateReviewInfo(review))
-        case .loadImage:
-            return loadImage()
         case let .deleteImage(index):
             return deleteImage(index: index)
         case let .flow(action):
@@ -120,6 +114,7 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateReviewInfo(review):
             newState.review = review
+            newState.images = convertImageToWrapper(with: review)
         case let .updateImage(images):
             newState.images = images
         case let .updateLoadingState(isLoading):
@@ -132,30 +127,19 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
         
         return newState
     }
+    
+    private func convertImageToWrapper(with review: Review) -> [ImageWrapper] {
+        return review.images.map { ImageWrapper(path: $0.path,
+                                                id: $0.id) }
+    }
 }
 
 // MARK: - Data Request
 extension ReviewEditViewReactor {
     
-    // MARK: - 이미지 불러오기
-    private func loadImage() -> Observable<Mutation> {
-        guard review.images.isEmpty == false else { return .empty() }
-        
-        let imageObservers: [Observable<ImageWrapper>] = Observable.reviewImagesTaskBuilder(review.images)
-        
-        let updateImage = Observable.zip(imageObservers)
-            .do(onNext: { [weak self] images in
-                let ids = images.compactMap { $0.id }
-                self?.existingImageIds = ids
-            })
-            .map { Mutation.updateImage($0) }
-        
-        return requestWithLoading(task: updateImage)
-    }
-    
     // MARK: - 이미지 편집하기
     private func updateReview() -> Observable<Mutation> {
-        guard let id = review.id else { return .empty() }
+        guard let id = currentState.review?.id else { return .empty() }
         let requestUpdate = requestAddImage(id: id)
             .flatMap({ [weak self] _ -> Observable<Void> in
                 guard let self else { return .empty() }
@@ -178,7 +162,7 @@ extension ReviewEditViewReactor {
     private func requestAddImage(id: Int) -> Observable<Void> {
         let addImages = currentState.images
             .filter { $0.isNew }
-            .map { $0.image }
+            .compactMap { $0.image }
         
         guard !addImages.isEmpty else {
             return .just(())
@@ -190,15 +174,10 @@ extension ReviewEditViewReactor {
     }
     
     private func requsetDeleteImage(id: Int) -> Observable<Void> {
-        let currentImageId: [String] = currentState.images.compactMap { $0.id }
-        let deleteImageId: [String] = existingImageIds.filter { !currentImageId.contains($0) }
-        
-        guard !deleteImageId.isEmpty else {
-            return .just(())
-        }
+        guard !deleteImageIds.isEmpty else { return .just(()) }
         
         return deleteReviewImage
-            .execute(reviewId: id, imageIds: deleteImageId)
+            .execute(reviewId: id, imageIds: deleteImageIds)
     }
 
     // MARK: - 이미지 업데이트
@@ -212,7 +191,7 @@ extension ReviewEditViewReactor {
             .asObservable()
             .map({ [weak self] selecteImages -> [ImageWrapper] in
                 guard let self else { return []}
-                let images = imageWrapping(selecteImages, isNew: true)
+                let images = imageWrapping(selecteImages)
                 var currentImage = currentState.images
                 currentImage.append(contentsOf: images)
                 return currentImage
@@ -224,9 +203,15 @@ extension ReviewEditViewReactor {
     }
     
     private func deleteImage(index: Int) -> Observable<Mutation> {
+        saveDeleteImageIdIfNeeded(index: index)
         var currentImage = currentState.images
         currentImage.remove(at: index)
         return updateImageState(currentImage)
+    }
+    
+    private func saveDeleteImageIdIfNeeded(index: Int) {
+        guard let deleteImageId = currentState.images[index].id else { return }
+        deleteImageIds.append(deleteImageId)
     }
  
     private func updateImageState(_ images: [ImageWrapper]) -> Observable<Mutation> {
@@ -240,14 +225,14 @@ extension ReviewEditViewReactor {
     /// - Parameter images: 편집된 사진
     /// - Returns: 기존의 사진이 삭제되었거나 새로운 사진이 추가되었다면 true
     private func checkNewImage(_ images: [ImageWrapper]) -> Bool {
-        let isDeleteExistingImage = images.count < existingImageIds.count
+        let isDeleteExistingImage = !deleteImageIds.isEmpty
         let isAddedImage = images.contains { $0.isNew == true }
         return isDeleteExistingImage || isAddedImage
     }
 
     // MARK: - 이미지 랩핑
-    private func imageWrapping(_ images: [UIImage], isNew: Bool) -> [ImageWrapper] {
-        return images.map { ImageWrapper(image: $0, isNew: isNew) }
+    private func imageWrapping(_ images: [UIImage]) -> [ImageWrapper] {
+        return images.map { ImageWrapper(image: $0) }
     }
 }
 
@@ -263,7 +248,7 @@ extension ReviewEditViewReactor {
     private func handleFlowAction(_ action: Action.Flow) -> Observable<Mutation> {
         switch action {
         case .showMemberList:
-            guard let id = review.id else { return .empty() }
+            guard let id = currentState.review?.id else { return .empty() }
             coordiantor?.pushMemberListView(postId: id)
         case .endView:
             coordiantor?.pop()
@@ -301,7 +286,7 @@ extension ReviewEditViewReactor: LoadingReactor {
     }
     
     private func handleDataRequestError(err: DataRequestError) -> ResponseError? {
-        guard let meetId = review.meet?.id else { return nil }
+        guard let meetId = currentState.review?.meet?.id else { return nil }
         return DataRequestError.resolveNoResponseError(err: err,
                                                        responseType: .meet(id: meetId))
     }
