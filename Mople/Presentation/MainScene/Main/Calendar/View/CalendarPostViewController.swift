@@ -37,7 +37,7 @@ final class CalendarPostViewController: TitleNaviViewController, View {
                                iconSize: .init(width: 24, height: 24))
         header.setTitle(font: FontStyle.Title3.semiBold,
                         color: .gray01)
-        header.setIconAligment(.right)
+        header.rightIconAligment()
         header.isUserInteractionEnabled = false
         return header
     }()

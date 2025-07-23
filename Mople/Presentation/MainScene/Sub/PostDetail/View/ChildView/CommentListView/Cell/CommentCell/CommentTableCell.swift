@@ -63,6 +63,24 @@ final class CommentTableCell: UITableViewCell {
         return view
     }()
     
+    private let likeView = LikeView()
+    
+    private let replyImageView: UIImageView = {
+        let view = UIImageView(image: .replyComment)
+        return view
+    }()
+    
+    private let moreReplyCommentLabel: IconLabel = {
+        let label = IconLabel(icon: .downArrow2,
+                              iconSize: .init(width: 20, height: 20))
+        label.setTitle(font: FontStyle.Body2.semiBold,
+                       color: .gray04)
+        label.rightIconAligment()
+        label.centerIconAligment()
+        label.text = "답글 1개 더 보기"
+        return label
+    }()
+
     private lazy var commentHeaderView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameLabel, timeLabel, menuButton])
         sv.axis = .horizontal
@@ -72,11 +90,20 @@ final class CommentTableCell: UITableViewCell {
         return sv
     }()
     
-    private lazy var commentView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentTextView])
-        sv.axis = .vertical
+    private lazy var commentStateView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [likeView, replyImageView])
+        sv.axis = .horizontal
         sv.spacing = 8
         sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
+    }()
+    
+    private lazy var commentView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentTextView, commentStateView, moreReplyCommentLabel])
+        sv.axis = .vertical
+        sv.spacing = 8
+        sv.alignment = .leading
         sv.distribution = .fill
         return sv
     }()
@@ -168,3 +195,62 @@ final class CommentTableCell: UITableViewCell {
         self.borderView.isHidden = viewModel.isLastComment
     }
 }
+
+
+final class LikeView: UIView {
+    
+    // MARK: - UI Components
+    fileprivate let likeImageView: UIImageView = {
+        let view = UIImageView(image: .likeOff)
+        return view
+    }()
+    
+    fileprivate let countLabel: UILabel = {
+        let label = UILabel()
+        label.font = FontStyle.Body2.medium
+        label.textColor = .gray04
+        return label
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [likeImageView, countLabel])
+        sv.axis = .horizontal
+        sv.distribution = .fill
+        sv.alignment = .center
+        return sv
+    }()
+    
+    // MARK: - Life Cycle
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
+        self.addSubview(mainStackView)
+        
+        mainStackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        likeImageView.snp.makeConstraints { make in
+            make.size.equalTo(28)
+        }
+        
+        countLabel.snp.makeConstraints { make in
+            make.width.greaterThanOrEqualTo(26)
+        }
+    }
+    
+    public func configureLike(isLike: Bool, likeCount: Int) {
+        likeImageView.image = isLike ? .likeOn : .likeOff
+        countLabel.text = likeCount.formatCompactNumber()
+    }
+}
+
+

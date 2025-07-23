@@ -227,7 +227,7 @@ extension PostDetailViewReactor {
         case .memberList:
             handlePushMemberList()
         case .editPost:
-            handlePushEditPost()
+            handleEditPost()
         case .placeDetailView:
             guard let post = currentState.postSummary else { break }
             coordinator?.pushPlaceDetailView(place: .init(post: post))
@@ -255,10 +255,11 @@ extension PostDetailViewReactor {
         }
     }
     
-    private func handlePushEditPost() {
+    private func handleEditPost() {
         switch type {
         case .plan:
             guard let plan else { return }
+            print(#function, #line, "Path : #1 이까지 됐는데? ")
             coordinator?.presentPlanEditFlow(plan: plan)
         case .review:
             guard let review else { return }

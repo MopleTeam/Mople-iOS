@@ -39,15 +39,8 @@ final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
     }
     
     override func start() {
-        let planDetailVC = makePlanDetailViewController()
+        let planDetailVC = dependencies.makePlanDetailViewController(coordinator: self)
         self.pushWithTracking(planDetailVC, animated: false)
-    }
-}
-
-// MARK: - Default View
-extension PostDetailFlowCoordinator {
-    private func makePlanDetailViewController() -> PostDetailViewController {
-        return dependencies.makePlanDetailViewController(coordinator: self)
     }
 }
 
@@ -113,6 +106,7 @@ extension PostDetailFlowCoordinator {
     
     // 일정 수정 플로우
     func presentPlanEditFlow(plan: Plan) {
+        print(#function, #line, "Path : #1 이까지 됐는데? ")
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
         self.start(coordinator: flow)
         self.present(flow.navigationController)
@@ -122,6 +116,7 @@ extension PostDetailFlowCoordinator {
 // MARK: - End Flow
 extension PostDetailFlowCoordinator {
     func endFlow() {
+        print(#function, #line, "Path : # endFlow ")
         self.navigationController.dismiss(animated: true) { [weak self] in
             guard let self else { return }
             self.clearUp()

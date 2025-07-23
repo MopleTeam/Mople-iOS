@@ -236,6 +236,10 @@ extension PostDetailViewController {
     
     private func setActionBind(_ reactor: Reactor) {
         editPost
+            .do(onNext: { _ in
+                print(#function, #line, "Path : #1 들어왔는데? ")
+            })
+            .observe(on: MainScheduler.instance)
             .map { Reactor.Action.flow(.editPost) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

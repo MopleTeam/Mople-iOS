@@ -266,6 +266,8 @@
 		52A3FC002E290AB400B77FBB /* DefaultTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FBFE2E290AB400B77FBB /* DefaultTextView.swift */; };
 		52A3FC022E290ABE00B77FBB /* ChatingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FC012E290ABE00B77FBB /* ChatingTextView.swift */; };
 		52A3FC032E290ABE00B77FBB /* ChatingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FC012E290ABE00B77FBB /* ChatingTextView.swift */; };
+		52A3FC052E3054FC00B77FBB /* Int+CompactNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FC042E3054FC00B77FBB /* Int+CompactNumber.swift */; };
+		52A3FC062E3054FC00B77FBB /* Int+CompactNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A3FC042E3054FC00B77FBB /* Int+CompactNumber.swift */; };
 		52A6A04D2D42A5EB0041CDE9 /* CommentTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */; };
 		52A787762D0348B400A633B3 /* DateSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A787752D0348B400A633B3 /* DateSelectViewController.swift */; };
 		52A7E35F2D686A57004782AF /* NSMutableAttributedString+Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */; };
@@ -1051,6 +1053,7 @@
 		52A3FBFA2E277F5B00B77FBB /* PostDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailView.swift; sourceTree = "<group>"; };
 		52A3FBFE2E290AB400B77FBB /* DefaultTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTextView.swift; sourceTree = "<group>"; };
 		52A3FC012E290ABE00B77FBB /* ChatingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatingTextView.swift; sourceTree = "<group>"; };
+		52A3FC042E3054FC00B77FBB /* Int+CompactNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+CompactNumber.swift"; sourceTree = "<group>"; };
 		52A6A04C2D42A5EB0041CDE9 /* CommentTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableHeader.swift; sourceTree = "<group>"; };
 		52A787752D0348B400A633B3 /* DateSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSelectViewController.swift; sourceTree = "<group>"; };
 		52A7E35E2D686A57004782AF /* NSMutableAttributedString+Highlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Highlight.swift"; sourceTree = "<group>"; };
@@ -2190,6 +2193,7 @@
 				5221B1312D5432DC004859C9 /* Reactor */,
 				5208C1722CBE2B03006272E8 /* Kingfisher */,
 				524E33CD2C8028A4004B15FC /* RxSwift */,
+				52A3FC042E3054FC00B77FBB /* Int+CompactNumber.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -3975,6 +3979,7 @@
 				52EA6E082CF7FE5D00EFD753 /* DefaultImageUploadRepo.swift in Sources */,
 				526B985E2CEDBC03002488C5 /* CreatePlanViewController.swift in Sources */,
 				522958462D5207CE00AE4EC3 /* MemberListViewReactor.swift in Sources */,
+				52A3FC052E3054FC00B77FBB /* Int+CompactNumber.swift in Sources */,
 				5285E6B12CD9F41300B855CB /* UserInfoResponse.swift in Sources */,
 				525DFCEB2CC8D47B00835312 /* DefaultAuthenticationRepo.swift in Sources */,
 				52EC04BB2D38C10800000C99 /* CommentTableCell.swift in Sources */,
@@ -4338,6 +4343,7 @@
 				52E95F192DF453050036CBCF /* DefaultImageUploadRepo.swift in Sources */,
 				52E95F1A2DF453050036CBCF /* CreatePlanViewController.swift in Sources */,
 				52E95F1B2DF453050036CBCF /* MemberListViewReactor.swift in Sources */,
+				52A3FC062E3054FC00B77FBB /* Int+CompactNumber.swift in Sources */,
 				52E95F1C2DF453050036CBCF /* UserInfoResponse.swift in Sources */,
 				52E95F1D2DF453050036CBCF /* DefaultAuthenticationRepo.swift in Sources */,
 				52E95F1E2DF453050036CBCF /* CommentTableCell.swift in Sources */,

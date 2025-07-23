@@ -78,7 +78,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         label.setTitle(font: FontStyle.Title3.medium,
                        color: .gray06)
         label.setSpacing(4)
-        label.setIconAligment(.right)
+        label.rightIconAligment()
         label.isUserInteractionEnabled = false
         return label
     }()

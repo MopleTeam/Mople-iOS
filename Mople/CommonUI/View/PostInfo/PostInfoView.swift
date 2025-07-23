@@ -38,7 +38,6 @@ final class PostInfoView: UIView {
     private let countInfoLabel: IconLabel = {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 24, height: 24))
-        label.setTitleTopPadding(4)
         label.isUserInteractionEnabled = false
         return label
     }()
@@ -52,14 +51,12 @@ final class PostInfoView: UIView {
     private let dateInfoLabel: IconLabel = {
         let label = IconLabel(icon: .date,
                               iconSize: .init(width: 24, height: 24))
-        label.setTitleTopPadding(4)
         return label
     }()
     
     private let placeInfoLabel: IconLabel = {
         let label = IconLabel(icon: .place,
                               iconSize: .init(width: 24, height: 24))
-        label.setTitleTopPadding(4)
         return label
     }()
     
