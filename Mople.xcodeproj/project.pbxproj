@@ -132,13 +132,9 @@
 		524E33D42C80508C004B15FC /* AlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33D32C80508C004B15FC /* AlertManager.swift */; };
 		524E33DB2C80C1F4004B15FC /* ErrorResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524E33DA2C80C1F4004B15FC /* ErrorResponse.swift */; };
 		5250C2C22D649A2000D89548 /* Reactor+Child.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5250C2C12D649A2000D89548 /* Reactor+Child.swift */; };
-		525456B32E39C91D006FC8A7 /* CommentListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456B12E39C91D006FC8A7 /* CommentListViewReactor.swift */; };
 		525456B42E39C91D006FC8A7 /* CommentTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456A92E39C91D006FC8A7 /* CommentTableCellModel.swift */; };
-		525456B52E39C91D006FC8A7 /* CommentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456B02E39C91D006FC8A7 /* CommentListViewController.swift */; };
 		525456B62E39C91D006FC8A7 /* CommentTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456A82E39C91D006FC8A7 /* CommentTableCell.swift */; };
-		525456B92E39C91D006FC8A7 /* CommentListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456B12E39C91D006FC8A7 /* CommentListViewReactor.swift */; };
 		525456BA2E39C91D006FC8A7 /* CommentTableCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456A92E39C91D006FC8A7 /* CommentTableCellModel.swift */; };
-		525456BB2E39C91D006FC8A7 /* CommentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456B02E39C91D006FC8A7 /* CommentListViewController.swift */; };
 		525456BC2E39C91D006FC8A7 /* CommentTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525456A82E39C91D006FC8A7 /* CommentTableCell.swift */; };
 		5259B0082C9C0E33006B2711 /* YearMonthPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */; };
 		5259B00A2C9C5C81006B2711 /* TitleNaviBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5259B0092C9C5C81006B2711 /* TitleNaviBar.swift */; };
@@ -314,6 +310,10 @@
 		52C013772DC107BD00B154F2 /* ScreenTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C013762DC107BD00B154F2 /* ScreenTracking.swift */; };
 		52C0F8BC2C9479C40080CA65 /* CustomCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */; };
 		52C0F8BF2C9489DB0080CA65 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */; };
+		52C3FAB52E4317BF00FF518B /* CommentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */; };
+		52C3FAB62E4317BF00FF518B /* CommentListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */; };
+		52C3FAB82E4317E200FF518B /* CommentListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C3FAB72E4317E200FF518B /* CommentListViewReactor.swift */; };
+		52C3FAB92E4317E200FF518B /* CommentListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C3FAB72E4317E200FF518B /* CommentListViewReactor.swift */; };
 		52C5200C2D0D6A550085F5F7 /* MeetSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C5200B2D0D6A550085F5F7 /* MeetSelectViewController.swift */; };
 		52C520122D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C520112D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift */; };
 		52C72E8A2C4FBD6400CFF329 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C72E892C4FBD6400CFF329 /* AppDelegate.swift */; };
@@ -956,8 +956,6 @@
 		5250C2C12D649A2000D89548 /* Reactor+Child.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reactor+Child.swift"; sourceTree = "<group>"; };
 		525456A82E39C91D006FC8A7 /* CommentTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableCell.swift; sourceTree = "<group>"; };
 		525456A92E39C91D006FC8A7 /* CommentTableCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentTableCellModel.swift; sourceTree = "<group>"; };
-		525456B02E39C91D006FC8A7 /* CommentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewController.swift; sourceTree = "<group>"; };
-		525456B12E39C91D006FC8A7 /* CommentListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewReactor.swift; sourceTree = "<group>"; };
 		5259B0072C9C0E33006B2711 /* YearMonthPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthPickerViewController.swift; sourceTree = "<group>"; };
 		5259B0092C9C5C81006B2711 /* TitleNaviBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleNaviBar.swift; sourceTree = "<group>"; };
 		5259B00C2C9FD316006B2711 /* PostListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostListViewController.swift; sourceTree = "<group>"; };
@@ -1107,6 +1105,8 @@
 		52C013762DC107BD00B154F2 /* ScreenTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTracking.swift; sourceTree = "<group>"; };
 		52C0F8BB2C9479C40080CA65 /* CustomCalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCalendarCell.swift; sourceTree = "<group>"; };
 		52C0F8BE2C9489DB0080CA65 /* CalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
+		52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewController.swift; sourceTree = "<group>"; };
+		52C3FAB72E4317E200FF518B /* CommentListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentListViewReactor.swift; sourceTree = "<group>"; };
 		52C5200B2D0D6A550085F5F7 /* MeetSelectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSelectViewController.swift; sourceTree = "<group>"; };
 		52C520112D0D99CC0085F5F7 /* MeetSelectTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSelectTableViewCell.swift; sourceTree = "<group>"; };
 		52C72E862C4FBD6400CFF329 /* Mople.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mople.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1922,8 +1922,8 @@
 		525456B22E39C91D006FC8A7 /* CommentListView   */ = {
 			isa = PBXGroup;
 			children = (
-				525456B12E39C91D006FC8A7 /* CommentListViewReactor.swift */,
-				525456B02E39C91D006FC8A7 /* CommentListViewController.swift */,
+				52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */,
+				52C3FAB72E4317E200FF518B /* CommentListViewReactor.swift */,
 				525456AF2E39C91D006FC8A7 /* Component */,
 			);
 			path = "CommentListView  ";
@@ -4028,6 +4028,7 @@
 				523A18052DD10DD10071BDBD /* UITableView+ResizeHeader.swift in Sources */,
 				52A388642D68A341001439C7 /* ToastManager.swift in Sources */,
 				527A3EA92C837B29007FE63B /* AppAppearance.swift in Sources */,
+				52C3FAB92E4317E200FF518B /* CommentListViewReactor.swift in Sources */,
 				520185322DA7BF9D00C2B4FC /* DefaultNotifyRepo.swift in Sources */,
 				520185192DA79C9D00C2B4FC /* NotifyListViewReactor.swift in Sources */,
 				52741EC32D11565B00C249A6 /* DefaultModalView.swift in Sources */,
@@ -4193,9 +4194,7 @@
 				5228A27F2CC10D22004956F7 /* DuplicateLabel.swift in Sources */,
 				5250C2C22D649A2000D89548 /* Reactor+Child.swift in Sources */,
 				52DF6DFF2DAE4FB700204297 /* DefaultSheetViewController.swift in Sources */,
-				525456B92E39C91D006FC8A7 /* CommentListViewReactor.swift in Sources */,
 				525456BA2E39C91D006FC8A7 /* CommentTableCellModel.swift in Sources */,
-				525456BB2E39C91D006FC8A7 /* CommentListViewController.swift in Sources */,
 				525456BC2E39C91D006FC8A7 /* CommentTableCell.swift in Sources */,
 				5285E6A62CD9A63C00B855CB /* Token.swift in Sources */,
 				52E2383C2C76E7DE0066C9A3 /* BaseCoordinator.swift in Sources */,
@@ -4204,6 +4203,7 @@
 				52D9651E2D23B7A5000610B2 /* KeyboardDismissable.swift in Sources */,
 				5214F87D2D2BA88600E8CE9C /* RecentPlanViewModel.swift in Sources */,
 				52CAC2E52E420C3900366129 /* DefaultMentionRepo.swift in Sources */,
+				52C3FAB52E4317BF00FF518B /* CommentListViewController.swift in Sources */,
 				528C19702E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52CC75D72D1E83A1000CC8B9 /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52B8E11C2D53421300F7FF59 /* DefaultMemberRepo.swift in Sources */,
@@ -4400,6 +4400,7 @@
 				52E95F0A2DF453050036CBCF /* UITableView+ResizeHeader.swift in Sources */,
 				52E95F0B2DF453050036CBCF /* ToastManager.swift in Sources */,
 				52E95F0C2DF453050036CBCF /* AppAppearance.swift in Sources */,
+				52C3FAB82E4317E200FF518B /* CommentListViewReactor.swift in Sources */,
 				52E95F0D2DF453050036CBCF /* DefaultNotifyRepo.swift in Sources */,
 				52E95F0E2DF453050036CBCF /* NotifyListViewReactor.swift in Sources */,
 				52E95F0F2DF453050036CBCF /* DefaultModalView.swift in Sources */,
@@ -4565,9 +4566,7 @@
 				52E95FA82DF453050036CBCF /* DuplicateLabel.swift in Sources */,
 				52E95FA92DF453050036CBCF /* Reactor+Child.swift in Sources */,
 				52E95FAB2DF453050036CBCF /* DefaultSheetViewController.swift in Sources */,
-				525456B32E39C91D006FC8A7 /* CommentListViewReactor.swift in Sources */,
 				525456B42E39C91D006FC8A7 /* CommentTableCellModel.swift in Sources */,
-				525456B52E39C91D006FC8A7 /* CommentListViewController.swift in Sources */,
 				525456B62E39C91D006FC8A7 /* CommentTableCell.swift in Sources */,
 				52E95FAC2DF453050036CBCF /* Token.swift in Sources */,
 				52E95FAD2DF453050036CBCF /* BaseCoordinator.swift in Sources */,
@@ -4576,6 +4575,7 @@
 				52E95FB02DF453050036CBCF /* KeyboardDismissable.swift in Sources */,
 				52E95FB12DF453050036CBCF /* RecentPlanViewModel.swift in Sources */,
 				52CAC2E42E420C3900366129 /* DefaultMentionRepo.swift in Sources */,
+				52C3FAB62E4317BF00FF518B /* CommentListViewController.swift in Sources */,
 				528C196F2E1686E600621C79 /* UIViewController+RootNavi.swift in Sources */,
 				52E95FB22DF453050036CBCF /* PlaceInfoEntity+Mapping.swift in Sources */,
 				52E95FB32DF453050036CBCF /* DefaultMemberRepo.swift in Sources */,
