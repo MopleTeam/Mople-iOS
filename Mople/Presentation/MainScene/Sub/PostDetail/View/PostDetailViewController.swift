@@ -50,29 +50,37 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
         return view
     }()
     
-    private(set) var commentContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = .defaultWhite
-        return view
-    }()
-    
     private let chatingTextFieldView: ChatingTextFieldView = {
         let chatingView = ChatingTextFieldView()
         chatingView.backgroundColor = .defaultWhite
         return chatingView
     }()
         
-    // MARK: - CHild VC
+    // MARK: - CHild VC - Comment List
     private let commentVC: CommentListViewController
+    private let commentContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .defaultWhite
+        return view
+    }()
+    
+    private let mentionVC: MentionListViewController
+    private let mentionContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .defaultWhite
+        return view
+    }()
 
     // MARK: - Life Cycle
     init(screenName: ScreenName,
          title: String?,
          postType: PostType,
          reactor: PostDetailViewReactor,
-         commentVC: CommentListViewController) {
+         commentVC: CommentListViewController,
+         mentionVC: MentionListViewController) {
         self.postType = postType
         self.commentVC = commentVC
+        self.mentionVC = mentionVC
         super.init(screenName: screenName,
                    title: title)
         self.reactor = reactor
@@ -103,6 +111,7 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     
     private func setLayout() {
         self.view.addSubview(commentContainer)
+//        self.view.addSubview(mentionContainer)
         self.view.addSubview(chatingTextFieldView)
         
         commentContainer.snp.makeConstraints { make in
@@ -116,11 +125,20 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
             floatingViewBottom = make.bottom.equalToSuperview()
                 .inset(UIScreen.getDefaultBottomPadding()).constraint
         }
+        
+//        mentionContainer.snp.makeConstraints { make in
+//            make.height.equalTo(180)
+//            make.horizontalEdges.equalToSuperview().inset(20)
+//            make.bottom.equalTo(chatingTextFieldView.snp.top).offset(-12)
+//        }
     }
     
     private func setChildVC() {
         self.add(child: commentVC,
                  container: commentContainer)
+        
+        self.add(child: mentionVC,
+                 container: mentionContainer)
     }
     
     private func setNavi() {
@@ -170,22 +188,13 @@ extension PostDetailViewController {
         chatingTextFieldView.rx.sendText
             .bind(with: self, onNext: { vc, text in
                 vc.commentVC.rx.writeComment.onNext(text)
-                vc.view.endEditing(true)
+                vc.resetWriteMode()
             })
             .disposed(by: disposeBag)
         
         commentVC.rx.editComment
             .bind(with: self, onNext: { vc, comment in
-                vc.setEditComment(comment)
-                vc.isEditMode = true
-            })
-            .disposed(by: disposeBag)
-        
-        commentVC.rx.uploadedComment
-            .observe(on: MainScheduler.instance)
-            .bind(with: self, onNext: { vc, _ in
-                vc.setEditComment(nil)
-                vc.isEditMode = false
+                vc.setEditText(text: comment)
             })
             .disposed(by: disposeBag)
         
@@ -200,10 +209,16 @@ extension PostDetailViewController {
             .disposed(by: disposeBag)
     }
     
-    private func setEditComment(_ comment: String?) {
-        let hasComment = comment != nil
-        chatingTextFieldView.textView.text = comment
-        chatingTextFieldView.textView.rx.isResign.onNext(!hasComment)
+    private func setEditText(text: String) {
+        isEditMode = true
+        chatingTextFieldView.textView.text = text
+        chatingTextFieldView.textView.rx.isResign.onNext(false)
+    }
+    
+    private func resetWriteMode() {
+        self.view.endEditing(true)
+        chatingTextFieldView.textView.text = nil
+        isEditMode = false
     }
     
     private func setStartOffsetY(_ offsetY: CGFloat) {
@@ -236,10 +251,6 @@ extension PostDetailViewController {
     
     private func setActionBind(_ reactor: Reactor) {
         editPost
-            .do(onNext: { _ in
-                print(#function, #line, "Path : #1 들어왔는데? ")
-            })
-            .observe(on: MainScheduler.instance)
             .map { Reactor.Action.flow(.editPost) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -319,7 +330,7 @@ extension PostDetailViewController {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, postSummary in
-                vc.commentVC.loadComment(with: postSummary.postId)
+                vc.commentVC.loadComment(with: postSummary.postId, totalCount: postSummary.commentCount)
                 vc.setPostInfoView(with: postSummary)
                 vc.showSuggestReviewAlert(with: postSummary)
             })
@@ -414,7 +425,7 @@ extension PostDetailViewController: KeyboardDismissable, UIGestureRecognizerDele
         guard isEditMode else { return }
         chatingTextFieldView.textView.text = nil
         isEditMode = false
-        commentVC.cancleEdit()
+        commentVC.changeWriteMode(.basic)
     }
 }
 
@@ -527,3 +538,4 @@ extension PostDetailViewController {
         self.scrollViewHeight = commentContainer.bounds.height
     }
 }
+

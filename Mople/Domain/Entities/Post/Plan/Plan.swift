@@ -20,6 +20,7 @@ struct Plan: Hashable, Equatable {
     let location: Location?
     let weather: Weather?
     var isCreator: Bool = false
+    var commentCount: Int = 0
     
     var startOfDate: Date? {
         guard let date = date else { return nil }

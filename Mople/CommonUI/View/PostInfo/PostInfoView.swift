@@ -39,6 +39,7 @@ final class PostInfoView: UIView {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 24, height: 24))
         label.isUserInteractionEnabled = false
+        label.setContentHuggingPriority(.required, for: .vertical)
         return label
     }()
     
@@ -111,22 +112,15 @@ final class PostInfoView: UIView {
         self.membersButton.addSubview(selectImage)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview().priority(.high)
-            make.bottom.equalToSuperview().priority(.high)
+            make.edges.equalToSuperview().priority(.high)
         }
         
         titleLabel.snp.makeConstraints { make in
             make.height.equalTo(31)
         }
         
-        [membersButton, dateInfoLabel].forEach {
-            $0.snp.makeConstraints { make in
-                make.height.equalTo(24)
-            }
-        }
-        
-        placeInfoLabel.snp.makeConstraints { make in
-            make.height.equalTo(40)
+        membersButton.snp.makeConstraints { make in
+            make.height.equalTo(24)
         }
         
         countInfoLabel.snp.makeConstraints { make in
@@ -154,6 +148,7 @@ final class PostInfoView: UIView {
         dateInfoLabel.text = postSummary.dateString
         countInfoLabel.text = postSummary.participantsCountText
         placeInfoLabel.text = postSummary.fullAddress
+        self.layoutIfNeeded()
     }
     
     public func setMargin(inset: UIEdgeInsets) {

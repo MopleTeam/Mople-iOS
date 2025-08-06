@@ -32,20 +32,21 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
             case endView
         }
         
-        case fetchPlanMemeber
+        case fetchPage
+        case fetchNextPage
         case invite
         case flow(Flow)
     }
     
     enum Mutation {
-        case updateMember([MembersSectionModel])
-        case updateInviteUrl(String)
+        case fetchedPage([MemberInfo])
+        case fetchedInviteUrl(String)
         case updateLoadingState(Bool)
         case catchError(MemberListError)
     }
     
     struct State {
-        @Pulse var members: [MembersSectionModel] = []
+        @Pulse var members: [MemberInfo] = []
         @Pulse var inviteUrl: String?
         @Pulse var isLoading: Bool = false
         @Pulse var error: MemberListError?
@@ -54,7 +55,8 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Variables
     var initialState: State = State()
     private let type: MemberListType
-    private var isLoading = false
+    private var isApiLoading = false
+    private var page: PageInfo?
     
     // MARK: - UseCase
     private let fetchMemberUseCase: FetchMemberList
@@ -82,13 +84,16 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initial Setup
     private func initialAction() {
-        action.onNext(.fetchPlanMemeber)
+        action.onNext(.fetchPage)
     }
     
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
+        guard shouldAction(action) else { return .empty() }
         switch action {
-        case .fetchPlanMemeber:
+        case .fetchPage:
+            return fetchPlanMember()
+        case .fetchNextPage:
             return fetchPlanMember()
         case .invite:
             return requestInviteUrl()
@@ -97,17 +102,30 @@ final class MemberListViewReactor: Reactor, LifeCycleLoggable {
         }
     }
     
+    private func shouldAction(_ action: Action) -> Bool {
+        switch action {
+        case .flow:
+            return true
+        default:
+            guard !isApiLoading else { return false }
+            return true
+        }
+    }
+    
     func reduce(state: State, mutation: Mutation) -> State {
         
         var newState = state
         
         switch mutation {
-        case let .updateMember(members):
-            newState.members = members
-        case let .updateInviteUrl(url):
+        case let .fetchedPage(members):
+            newState.members.append(contentsOf: members)
+        case let .fetchedInviteUrl(url):
             newState.inviteUrl = url
         case let .updateLoadingState(isLoading):
             newState.isLoading = isLoading
+            if isLoading == false {
+                isApiLoading = false
+            }
         case let .catchError(err):
             newState.error = err
         }
@@ -133,16 +151,21 @@ extension MemberListViewReactor {
 
 // MARK: - Data Request
 extension MemberListViewReactor {
-    private func fetchPlanMember() -> Observable<Mutation> {
-        let fetchMember = fetchMemberUseCase.execute(type: type)
-            .map({ [weak self] memberList -> [MemberInfo] in
-                guard let self else { return [] }
-                return sortMembersByPosition(memberList.membsers)
-            })
-            .map { [MembersSectionModel(items: $0)] }
-            .map { Mutation.updateMember($0) }
+    private func fetchPlanMember(cursor: String? = nil) -> Observable<Mutation> {
+        isApiLoading = true
+        let cursor = page?.nextCursor
+        let fetchMember = fetchMemberUseCase.execute(type: type, cursor: cursor)
+            .map { [weak self] result in
+                self?.page = result.page
+                return Mutation.fetchedPage(result.members)
+            }
         
         return requestWithLoading(task: fetchMember)
+    }
+    
+    private func fetchNextPage(cursor: String? = nil) -> Observable<Mutation> {
+        guard let cursor = page?.nextCursor else { return .empty() }
+        return fetchPlanMember(cursor: cursor)
     }
     
     private func makeResponseType() -> ResponseType? {
@@ -155,32 +178,13 @@ extension MemberListViewReactor {
     
     private func requestInviteUrl() -> Observable<Mutation> {
         guard case .meet(let id) = type,
-              let id,
-              !isLoading else { return .empty() }
+              let id else { return .empty() }
         
-        isLoading = true
+        isApiLoading = true
         let inviteMeet = inviteMeetUseCase.execute(id: id)
-            .map { Mutation.updateInviteUrl($0) }
+            .map { Mutation.fetchedInviteUrl($0) }
         
         return requestWithLoading(task: inviteMeet)
-            .do(onDispose: { [weak self] in
-                self?.isLoading = false
-            })
-    }
-}
-
-// MARK: - Helper
-extension MemberListViewReactor {
-    private func sortMembersByPosition(_ members: [MemberInfo]) -> [MemberInfo] {
-        let hostMember = members.filter {
-            $0.position == .host || $0.position == .owner
-        }
-        
-        let otherMembers = members.filter {
-            $0.position == .member
-        }.sorted(by: <)
-        
-        return hostMember + otherMembers
     }
 }
 

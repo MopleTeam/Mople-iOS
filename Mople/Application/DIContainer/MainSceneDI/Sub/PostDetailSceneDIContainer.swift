@@ -63,7 +63,8 @@ extension PostDetailSceneDIContainer {
                                                         coordinator: coordinator,
                                                         reportUseCase: reportUseCase),
                      commentVC: makeCommentListViewController(reportUseCase: reportUseCase,
-                                                              coordinator: coordinator))
+                                                              coordinator: coordinator),
+                     mentionVC: makeMentionListViewController())
     }
     
     private func makePostDetailViewReactor(type: PostType,
@@ -113,38 +114,72 @@ extension PostDetailSceneDIContainer {
     
     private func makeCommentListViewReactor(reportUseCase: ReportPost,
                                             coordinator: CommentListCoordination) -> CommentListViewReactor {
-        return .init(fetchCommentListUseCase: makeFetchCommentListUseCase(),
-                     createCommentUseCase: makeCreateCommentUseCase(),
-                     deleteCommentUseCase: makeDeleteCommentUseCase(),
-                     editCommentUseCase: makeEditCommentUseCase(),
+        let commentRepo = makeCommentRepo()
+        
+        return .init(fetchCommentListUseCase: makeFetchCommentListUseCase(repo: commentRepo),
+                     fetchReplyCommentListUseCase: makeFetchReplyCommentListUseCase(repo: commentRepo),
+                     createCommentUseCase: makeCreateCommentUseCase(repo: commentRepo),
+                     createReplyUseCase: makeCreateReplyUseCase(repo: commentRepo),
+                     deleteCommentUseCase: makeDeleteCommentUseCase(repo: commentRepo),
+                     editCommentUseCase: makeEditCommentUseCase(repo: commentRepo),
                      reportUseCase: reportUseCase,
+                     likeCommentUseCase: makeLikeCommentUseCase(repo: commentRepo),
                      coordinator: coordinator)
-    }
-    
-    private func makeFetchCommentListUseCase() -> FetchCommentList {
-        return FetchCommentListUseCase(repo: makeCommentRepo())
-    }
-    
-    private func makeCreateCommentUseCase() -> CreateComment {
-        return CreateCommentUseCase(repo: makeCommentRepo())
-    }
-    
-    private func makeDeleteCommentUseCase() -> DeleteComment {
-        return DeleteCommentUseCase(repo: makeCommentRepo())
-    }
-    
-    private func makeEditCommentUseCase() -> EditComment {
-        return EditCommentUseCase(repo: makeCommentRepo())
     }
     
     private func makeCommentRepo() -> CommentRepo {
         return DefaultCommentRepo(networkService: appNetworkService)
     }
     
+    // 댓글 UseCase
+    private func makeFetchCommentListUseCase(repo: CommentRepo) -> FetchCommentList {
+        return FetchCommentListUseCase(repo: repo)
+    }
+    
+    private func makeCreateCommentUseCase(repo: CommentRepo) -> CreateComment {
+        return CreateCommentUseCase(repo: repo)
+    }
+    
+    // 대댓글 UseCase
+    private func makeFetchReplyCommentListUseCase(repo: CommentRepo) -> FetchReplyCommentList {
+        return FetchReplyCommentListUseCase(repo: repo)
+    }
+    
+    private func makeCreateReplyUseCase(repo: CommentRepo) -> CreateReplyComment {
+        return CreateReplyCommentUseCase(repo: repo)
+    }
+    
+    // 공통
+    private func makeDeleteCommentUseCase(repo: CommentRepo) -> DeleteComment {
+        return DeleteCommentUseCase(repo: repo)
+    }
+    
+    private func makeEditCommentUseCase(repo: CommentRepo) -> EditComment {
+        return EditCommentUseCase(repo: repo)
+    }
+    
+    private func makeLikeCommentUseCase(repo: CommentRepo) -> LikeComment {
+        return LikeCommentUseCase(repo: repo)
+    }
+    
     // MARK: - 신고 유즈케이스
     private func makeReportUseCase() -> ReportPost {
         let repo = DefaultReportRepo(networkService: appNetworkService)
         return ReportPostUseCase(repo: repo)
+    }
+    
+    // MARK: - 멘션뷰
+    private func makeMentionListViewController() -> MentionListViewController {
+        return .init(reactor: makeMentionListReactor())
+    }
+    
+    private func makeMentionListReactor() -> MentionListViewReactor {
+        return .init(fetchMentionListUseCase: makeFetchMentionListUseCase())
+    }
+    
+    private func makeFetchMentionListUseCase() -> FetchMentionList {
+        return FetchMentionListUseCase(postId: id,
+                                       repo: DefaultMentionRepo(networkService: appNetworkService))
     }
 }
 

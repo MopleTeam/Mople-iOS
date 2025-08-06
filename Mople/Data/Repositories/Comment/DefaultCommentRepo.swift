@@ -62,7 +62,7 @@ final class DefaultCommentRepo:BaseRepositories, CommentRepo {
     }
     
     // MARK: - Like
-    func likeComment(commentId: Int) -> Single<Void> {
+    func likeComment(commentId: Int) -> Single<CommentResponse> {
         return self.networkService.authenticatedRequest {
             try APIEndpoints.likeComment(commentId: commentId)
         }

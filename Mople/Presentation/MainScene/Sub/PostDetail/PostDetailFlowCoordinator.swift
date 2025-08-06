@@ -106,7 +106,6 @@ extension PostDetailFlowCoordinator {
     
     // 일정 수정 플로우
     func presentPlanEditFlow(plan: Plan) {
-        print(#function, #line, "Path : #1 이까지 됐는데? ")
         let flow = dependencies.makePlanEditFlowCoordiantor(plan: plan)
         self.start(coordinator: flow)
         self.present(flow.navigationController)
@@ -116,7 +115,6 @@ extension PostDetailFlowCoordinator {
 // MARK: - End Flow
 extension PostDetailFlowCoordinator {
     func endFlow() {
-        print(#function, #line, "Path : # endFlow ")
         self.navigationController.dismiss(animated: true) { [weak self] in
             guard let self else { return }
             self.clearUp()
@@ -124,3 +122,5 @@ extension PostDetailFlowCoordinator {
         }
     }
 }
+
+

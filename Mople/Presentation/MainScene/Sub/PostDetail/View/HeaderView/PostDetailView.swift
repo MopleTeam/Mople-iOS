@@ -58,10 +58,13 @@ final class PostDetailView: UIView {
         sv.spacing = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .bgSecondary
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 0, left: 0, bottom: 8, right: 0)
         return sv
+    }()
+    
+    private let borderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .bgSecondary
+        return view
     }()
     
     // MARK: - Gesture
@@ -82,9 +85,16 @@ final class PostDetailView: UIView {
     // MARK: - UI Setup
     private func setupUI() {
         self.addSubview(mainStackView)
+        self.addSubview(borderView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().priority(.high)
+            make.top.horizontalEdges.equalToSuperview().priority(.high)
+        }
+        
+        borderView.snp.makeConstraints { make in
+            make.top.equalTo(mainStackView.snp.bottom)
+            make.bottom.horizontalEdges.equalToSuperview()
+            make.height.equalTo(8)
         }
         
         mapView.snp.makeConstraints { make in

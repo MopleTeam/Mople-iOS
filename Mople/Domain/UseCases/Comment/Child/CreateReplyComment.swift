@@ -9,7 +9,7 @@ import RxSwift
 
 protocol CreateReplyComment {
     func execute(postId: Int,
-                 commentId: Int,
+                 parentId: Int,
                  comment: String,
                  mentions: [Int]) -> Observable<Comment>
 }
@@ -24,12 +24,12 @@ final class CreateReplyCommentUseCase: CreateReplyComment {
     }
     
     func execute(postId: Int,
-                 commentId: Int,
+                 parentId: Int,
                  comment: String,
                  mentions: [Int]) -> Observable<Comment> {
         return repo
             .createReplyComment(postId: postId,
-                                commentId: commentId,
+                                commentId: parentId,
                                 comment: comment,
                                 mentions: mentions)
             .asObservable()

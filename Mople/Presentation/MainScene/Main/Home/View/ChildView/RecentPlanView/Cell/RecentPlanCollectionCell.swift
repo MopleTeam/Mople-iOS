@@ -46,11 +46,17 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
                               iconSize: .init(width: 18, height: 18))
         return label
     }()
+    
+    private let emptyView: UIView = {
+        let view = UIView()
+        view.setContentHuggingPriority(.defaultLow, for: .vertical)
+        return view
+    }()
 
     private let weatherView = WeatherView()
     
     private lazy var subStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [countInfoLabel, dateInfoLabel, placeInfoLabel])
+        let sv = UIStackView(arrangedSubviews: [countInfoLabel, dateInfoLabel, placeInfoLabel, emptyView])
         sv.axis = .vertical
         sv.spacing = 4
         sv.alignment = .fill
@@ -96,16 +102,6 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
         
         thumbnailView.snp.makeConstraints { make in
             make.height.equalTo(28)
-        }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.height.equalTo(28)
-        }
-        
-        [countInfoLabel, dateInfoLabel].forEach {
-            $0.snp.makeConstraints { make in
-                make.height.equalTo(18)
-            }
         }
         
         weatherView.snp.makeConstraints { make in

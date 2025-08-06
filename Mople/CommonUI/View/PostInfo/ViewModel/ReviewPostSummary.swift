@@ -19,7 +19,7 @@ struct ReviewPostSummary: PostSummary {
     let location: Location
     let isReviewd: Bool
     let images: [ReviewImage]
-    
+    var commentCount: Int
     var hasImage: Bool { !images.isEmpty }
 }
 
@@ -36,6 +36,7 @@ extension ReviewPostSummary {
         self.location = review.location ?? .defaultLocation
         self.isReviewd = review.isReviewd
         self.images = review.images
+        self.commentCount = review.commentCount
     }
 }
 

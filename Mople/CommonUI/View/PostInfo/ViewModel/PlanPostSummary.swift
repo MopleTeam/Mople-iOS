@@ -18,6 +18,7 @@ struct PlanPostSummary: PostSummary {
     let meet: MeetSummary?
     let location: Location
     var isParticipation: Bool
+    var commentCount: Int
 }
 
 extension PlanPostSummary {
@@ -32,5 +33,6 @@ extension PlanPostSummary {
         self.meet = plan.meet
         self.location = plan.location ?? .defaultLocation
         self.isParticipation = plan.isParticipation
+        self.commentCount = plan.commentCount
     }
 }

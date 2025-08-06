@@ -33,15 +33,10 @@ final class AppTransition: NSObject {
     
     // MARK: - LifeCycle
     init(type: TransitionType) {
-        print(#function, #line, "Path : #0412 \(type) 트랜지션 생성 ")
         self.type = type
         super.init()
     }
-    
-    deinit {
-        print(#function, #line, "Path : #0412 \(type) 트랜지션 해제 ")
-    }
-    
+
     public func setDismissGestureCompletion(completion: (() -> Void)?) {
         self.dismissCompletion = completion
     }

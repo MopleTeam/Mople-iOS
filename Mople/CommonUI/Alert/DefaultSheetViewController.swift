@@ -122,7 +122,7 @@ final class DefaultSheetViewController: UIViewController {
         
         tapGesture.rx.event
             .bind(with: self, onNext: { vc, _ in
-                vc.downModal(isCancle: true)
+                vc.downModal(completion: vc.cancleAction)
             })
             .disposed(by: disposeBag)
         
@@ -155,7 +155,7 @@ final class DefaultSheetViewController: UIViewController {
                                       opacity: CGFloat) {
         
         if translationY > modalHeight {
-            downModal(isCancle: true)
+            downModal(completion: cancleAction)
         } else if translationY > 0 {
             changeOpacity(opacity: opacity)
             changeBottomOffset(offset: translationY)
@@ -167,26 +167,32 @@ final class DefaultSheetViewController: UIViewController {
                                     velocityY: CGFloat) {
         let modalHalfHeight = modalHeight / 2
         if translationY > modalHalfHeight || velocityY > 300 {
-            downModal(isCancle: true)
+            downModal(completion: cancleAction)
         } else {
             resetModal()
         }
     }
     
     // 모달 dismiss
-    private func downModal(isCancle: Bool = false) {
-        UIView.animate(withDuration: 0.33,
+    private func downModal(duration: CGFloat = 0.33,
+                           completion: (() -> Void)? = nil) {
+        UIView.animate(withDuration: duration,
                        animations: { [weak self] in
             guard let self else { return }
             changeBottomOffset(offset: modalHeight)
             changeOpacity(opacity: 0)
             self.view.layoutIfNeeded()
         }, completion: { [weak self] _ in
-            self?.dismiss(animated: false) { [weak self] in
-                guard isCancle else { return }
-                self?.cancleAction?()
-            }
+            self?.dismiss(animated: false, completion: completion)
         })
+    }
+    
+    private func handleCompletionAction(isCancle: Bool) {
+        if isCancle {
+            cancleAction?()
+        } else {
+            
+        }
     }
     
     // 기본상태로 되돌리기
@@ -241,8 +247,8 @@ extension DefaultSheetViewController {
     
     private func makeAction(_ action: (() -> Void)?) -> UIAction {
         return .init { [weak self] _ in
-            action?()
-            self?.downModal()
+            self?.downModal(duration: 0.11,
+                            completion: action)
         }
     }
 }

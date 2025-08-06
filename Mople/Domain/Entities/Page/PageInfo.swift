@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PageInfo {
+struct PageInfo: Hashable {
     let nextCursor: String?
     let hasNext: Bool
     let size: Int

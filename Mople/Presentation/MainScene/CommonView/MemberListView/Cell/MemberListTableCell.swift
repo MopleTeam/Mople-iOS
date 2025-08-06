@@ -18,7 +18,7 @@ final class MemberListTableCell: UITableViewCell {
     var profileTapped: (() -> Void)?
         
     // MARK: - UI Components
-    private let memberView = MemberListView()
+    private let memberView = MemberView()
     
     // MARK: - LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -38,13 +38,13 @@ final class MemberListTableCell: UITableViewCell {
         
         memberView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(20)
-            make.top.equalToSuperview()
-            make.bottom.equalToSuperview().inset(4)
+            make.top.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(8)
         }
     }
 
-    public func configure(with viewModel: MemberListTableCellModel) {
-        memberView.configure(with: viewModel)
+    public func configure(with memberInfo: MemberInfo) {
+        memberView.configure(memberInfo: memberInfo)
     }
     
     // MARK: - Gesture
@@ -57,7 +57,7 @@ final class MemberListTableCell: UITableViewCell {
     }
 }
 
-final class MemberListView: UIView {
+final class MemberView: UIView {
     
     public let memberInfoView: MemberInfoView = {
         let view = MemberInfoView()
@@ -78,8 +78,6 @@ final class MemberListView: UIView {
         sv.spacing = 8
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.isLayoutMarginsRelativeArrangement = true
-        sv.layoutMargins = .init(top: 8, left: 0, bottom: 8, right: 0)
         return sv
     }()
     
@@ -107,9 +105,12 @@ final class MemberListView: UIView {
         }
     }
 
-    public func configure(with viewModel: MemberListTableCellModel) {
-        nameLabel.text = viewModel.nickName
-        memberInfoView.setConfigure(imagePath: viewModel.imagePath,
-                                    position: viewModel.position)
+    public func configure(memberInfo: MemberInfo) {
+        nameLabel.text = memberInfo.nickname
+        memberInfoView.setConfigure(memberInfo: memberInfo)
+    }
+    
+    public func setFont(font: UIFont) {
+        nameLabel.font = font
     }
 }

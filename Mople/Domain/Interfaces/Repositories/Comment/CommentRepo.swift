@@ -25,5 +25,5 @@ protocol CommentRepo {
     func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<CommentPageResponse>
     
     // MARK: - Like
-    func likeComment(commentId:Int) -> Single<Void>
+    func likeComment(commentId:Int) -> Single<CommentResponse>
 }

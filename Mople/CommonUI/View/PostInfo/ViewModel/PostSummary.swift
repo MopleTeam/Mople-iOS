@@ -17,6 +17,7 @@ protocol PostSummary {
     var addressTitle: String? { get }
     var meet: MeetSummary? { get }
     var location: Location { get }
+    var commentCount: Int { get }
 }
 
 extension PostSummary {

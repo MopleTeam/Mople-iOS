@@ -28,7 +28,7 @@ struct CommentResponse: Decodable {
     let content: String
     let postId: Int
     let parentId: Int?
-    let replyCount: Int
+    let replyCount: Int?
     let likeCount: Int
     let likedByMe: Bool
     let time: String
@@ -40,11 +40,15 @@ extension CommentResponse {
         let date = DateManager.parseServerFullDate(string: self.time)
         
         return .init(id: commentId,
+                     parentId: parentId,
                      writerId: writer.userId,
                      writerName: writer.nickname,
                      writerThumbnailPath: writer.image,
                      comment: content,
-                     createdDate: date)
+                     createdDate: date,
+                     isLiked: likedByMe,
+                     likeCount: likeCount,
+                     replyCount: replyCount ?? 0)
     }
 }
 

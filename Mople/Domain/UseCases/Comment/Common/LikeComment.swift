@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol LikeComment {
-    func execute(commentId: Int) -> Observable<Void>
+    func execute(commentId: Int) -> Observable<Comment>
 }
 
 final class LikeCommentUseCase: LikeComment {
@@ -19,8 +19,9 @@ final class LikeCommentUseCase: LikeComment {
         self.repo = repo
     }
     
-    func execute(commentId: Int) -> Observable<Void> {
+    func execute(commentId: Int) -> Observable<Comment> {
         return repo.likeComment(commentId: commentId)
             .asObservable()
+            .map { $0.toDomain() }
     }
 }
