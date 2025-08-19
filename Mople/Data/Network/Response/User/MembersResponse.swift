@@ -24,7 +24,7 @@ extension MembersResponse {
 // MARK: - 페이지 조회 값
 struct MemberPageResponse: Decodable {
     let content: [MemberResponse]
-    let cursorPage: PageResponse
+    let cursorPage: PageInfoResponse
 }
 
 extension MemberPageResponse {

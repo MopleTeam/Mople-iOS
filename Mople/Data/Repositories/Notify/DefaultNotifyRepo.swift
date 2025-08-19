@@ -8,9 +8,9 @@
 import RxSwift
 
 final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
-    func fetchNotifyList() -> Single<[NotifyResponse]> {
+    func fetchNotifyList(cursor: String?) -> Single<PageResponse<NotifyResponse>> {
         return networkService.authenticatedRequest {
-            try APIEndpoints.fetchNotify()
+            try APIEndpoints.fetchNotify(cursor: cursor)
         }
     }
     

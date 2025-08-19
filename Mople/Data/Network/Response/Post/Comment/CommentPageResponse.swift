@@ -7,21 +7,6 @@
 
 import Foundation
 
-// MARK: - Main Response Model
-struct CommentPageResponse: Decodable {
-    let content: [CommentResponse]
-    let cursorPage: PageResponse
-}
-
-extension CommentPageResponse {
-    func toDomain() -> CommentPage {
-        let content = content.map { $0.toDomain() }
-        let pageInfo = cursorPage.toDomain()
-        return .init(content: content,
-                     page: pageInfo)
-    }
-}
-
 // MARK: - Comment Model
 struct CommentResponse: Decodable {
     let commentId: Int

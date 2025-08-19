@@ -14,7 +14,7 @@ protocol CommentRepo {
                        comment: String,
                        mentions: [Int]) -> Single<CommentResponse>
     func fetchCommentList(postId: Int,
-                          nextCursor: String?) -> Single<CommentPageResponse>
+                          nextCursor: String?) -> Single<PageResponse<CommentResponse>>
     func editComment(commentId: Int,
                      comment: String,
                      mentions: [Int]) -> Single<CommentResponse>
@@ -22,7 +22,7 @@ protocol CommentRepo {
     
     // MARK: - Reply
     func createReplyComment(postId: Int, commentId: Int, comment: String, mentions: [Int]) -> Single<CommentResponse>
-    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<CommentPageResponse>
+    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<PageResponse<CommentResponse>>
     
     // MARK: - Like
     func likeComment(commentId:Int) -> Single<CommentResponse>

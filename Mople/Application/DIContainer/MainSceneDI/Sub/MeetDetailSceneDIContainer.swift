@@ -97,8 +97,8 @@ extension MeetDetailSceneDIContainer {
         return reactor
     }
     
-    private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchMeetPlanList {
-        return FetchMeetPlanListUsecase(repo: repo)
+    private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchPlanPage {
+        return FetchPlanPageUsecase(repo: repo)
     }
     
     private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {

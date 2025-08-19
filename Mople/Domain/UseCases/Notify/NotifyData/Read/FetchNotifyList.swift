@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchNotifyList {
-    func execute() -> Observable<[Notify]>
+    func execute(cursor: String?) -> Observable<Page<Notify>>
 }
 
 final class FetchNotifyListUseCase: FetchNotifyList {
@@ -19,34 +19,26 @@ final class FetchNotifyListUseCase: FetchNotifyList {
         self.repo = repo
     }
     
-    func execute() -> Observable<[Notify]> {
-        let newCount = getNewCount()
-        return repo.fetchNotifyList()
+    func execute(cursor: String?) -> Observable<Page<Notify>> {
+        return repo.fetchNotifyList(cursor: cursor)
             .asObservable()
-            .map { $0.map { $0.toDomain() } }
-            .flatMap { [weak self] notifyList -> Observable<[Notify]> in
+            .map { Page(totalCount: $0.totalCount ?? 0,
+                        content: $0.content.map({ $0.toDomain() }),
+                        info: $0.page?.toDomain()) }
+            .flatMap { [weak self] page -> Observable<Page<Notify>> in
                 guard let self else { return .empty() }
-                if newCount > 0 {
-                    let adjustReadState = updateReadStatus(list: notifyList,
-                                                           newCount: newCount)
-                    return .just(adjustReadState)
-                } else {
-                    return .just(notifyList)
-                }
+                var newPage = page
+                updateReadStatus(page: &newPage)
+                return .just(newPage)
             }
     }
     
-    private func getNewCount() -> Int {
-        return UserInfoStorage.shared.userInfo?.notifyCount ?? 0
-    }
-    
-    private func updateReadStatus(list: [Notify], newCount: Int) -> [Notify] {
-        var updateList = list
-        let newIndex = newCount - 1
+    private func updateReadStatus(page: inout Page<Notify>) {
+        guard page.totalCount > 0 else { return }
+        let newIndex = page.totalCount - 1
+        
         (0...newIndex).forEach {
-            guard let _ = updateList[safe: $0] else { return }
-            updateList[$0].isNew = true
+            page.content[$0].isNew = true
         }
-        return updateList
     }
 }

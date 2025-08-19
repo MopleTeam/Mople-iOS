@@ -44,7 +44,7 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Initial Setup
     private func initialAction() {
-        action.onNext(.fetchPage(keyword: nil))
+//        action.onNext(.fetchPage(keyword: nil))
     }
     
     // MARK: - State Mutation

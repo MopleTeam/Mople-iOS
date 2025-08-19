@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct Page<T> {
+    var totalCount: Int = 0
+    var content: [T]
+    var info: PageInfo?
+}
+
 struct PageInfo: Hashable {
     let nextCursor: String?
     let hasNext: Bool

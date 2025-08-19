@@ -17,6 +17,7 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         
         case flow(Flow)
         case fetchNotifyList
+        case fetchNextPage
         case refresh
     }
     
@@ -34,7 +35,10 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var error: Error?
     }
     
+    // MARK: - Varialbes
     var initialState: State = State()
+    private(set) var page: PageInfo?
+    private var isLoading = false
     
     // MARK: - UseCase
     private let fetchNotifyListUseCase: FetchNotifyList
@@ -68,6 +72,8 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchNotifyList:
             return fetchNotifyWithLoading()
+        case .fetchNextPage:
+            return fetchNextPage()
         case let .flow(action):
             return handleFlowAction(action)
         case .refresh:
@@ -96,14 +102,27 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Requset
 extension NotifyListViewReactor {
-    private func fetchNotify() -> Observable<Mutation> {
-        return fetchNotifyListUseCase.execute()
-            .map { Mutation.updateNotifyList($0) }
-            .concat(resetNotifyCount())
+    private func fetchNotify(cursor: String? = nil,
+                             isRefresh: Bool = false) -> Observable<Mutation> {
+        return fetchNotifyListUseCase.execute(cursor: cursor)
+            .map({ result in
+                self.page = result.info
+                return self.updateNotifyList(isRefresh: isRefresh, notify: result.content)
+            })
     }
     
-    private func fetchNotifyWithLoading() -> Observable<Mutation> {
-        return requestWithLoading(task: fetchNotify())
+    private func updateNotifyList(isRefresh: Bool, notify: [Notify]) -> Mutation {
+        var newNotify = currentState.notifyList
+        if isRefresh {
+            newNotify = notify
+        } else {
+            newNotify.append(contentsOf: notify)
+        }
+        return .updateNotifyList(newNotify)
+    }
+    
+    private func fetchNotifyWithLoading(cursor: String? = nil) -> Observable<Mutation> {
+        return requestWithLoading(task: fetchNotify(cursor: cursor))
             .concat(resetNotifyCount())
     }
     
@@ -113,9 +132,14 @@ extension NotifyListViewReactor {
                 return .empty()
             }
     }
+    
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let cursor = page?.nextCursor else { return .empty() }
+        return fetchNotifyWithLoading(cursor: cursor)
+    }
 
     private func refreshNotify() -> Observable<Mutation> {
-        return .concat([fetchNotify(),
+        return .concat([fetchNotify(isRefresh: true),
                         .just(Mutation.completedRefresh)])
     }
 }

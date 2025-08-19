@@ -8,9 +8,10 @@
 import RxSwift
 
 final class DefaultReviewRepo: BaseRepositories, ReviewRepo {
-    func fetchReviewList(_ meetId: Int) -> Single<[ReviewResponse]> {
+    func fetchReviewPage(meetId: Int,
+                         cursor: String?) -> Single<PageResponse<ReviewResponse>> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetReview(id: meetId)
+            try APIEndpoints.fetchReviewPage(id: meetId, cursor: cursor)
         }
     }
     

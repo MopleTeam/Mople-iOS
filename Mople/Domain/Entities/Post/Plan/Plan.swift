@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Plan: Hashable, Equatable {
+struct Plan: Hashable, Comparable {
     let id: Int?
     let creatorId: Int?
     let title: String?

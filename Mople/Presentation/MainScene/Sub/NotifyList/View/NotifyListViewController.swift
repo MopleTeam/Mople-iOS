@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class NotifyListViewController: TitleNaviViewController, View, UITableViewDelegate {
+final class NotifyListViewController: TitleNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = NotifyListViewReactor
@@ -18,6 +18,9 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     // MARK: - Transition
     var dismissTransition: AppTransition = .init(type: .dismiss)
+    
+    // MARK: - Observable
+    private let nextPage: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -141,6 +144,14 @@ extension NotifyListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchNextPage }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refreshControl.rx.controlEvent(.valueChanged)
             .map { Reactor.Action.refresh }
             .bind(to: reactor.action)
@@ -204,5 +215,13 @@ extension NotifyListViewController {
                 vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension NotifyListViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 200),
+              reactor?.page?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }

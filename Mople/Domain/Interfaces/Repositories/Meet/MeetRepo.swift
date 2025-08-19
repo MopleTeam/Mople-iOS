@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol MeetRepo {
-    func fetchMeetList() -> Single<[MeetResponse]>
+    func fetchMeetPage(cursor: String?) -> Single<PageResponse<MeetResponse>>
     func fetchMeetDetail(meetId: Int) -> Single<MeetResponse>
     func createMeet(reqeust: CreateMeetRequest) -> Single<MeetResponse>
     func editMeet(id: Int,

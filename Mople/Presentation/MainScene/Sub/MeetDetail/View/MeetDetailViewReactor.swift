@@ -227,7 +227,7 @@ extension MeetDetailViewReactor: MeetDetailDelegate {
         action.onNext(.refresh)
     }
     
-    func updateLoadingState(_ isLoading: Bool, index: Int) {
+    func updateLoadingMutation(_ isLoading: Bool, index: Int) {
         switch index {
         case 0:
             action.onNext(.loading(.planLoading(isLoading)))

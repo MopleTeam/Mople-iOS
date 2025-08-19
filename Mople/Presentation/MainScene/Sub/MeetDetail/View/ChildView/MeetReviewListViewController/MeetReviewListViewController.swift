@@ -19,6 +19,7 @@ final class MeetReviewListViewController: BaseViewController, View {
     
     // MARK: - Observable
     private let refresh: PublishSubject<Void> = .init()
+    private let nextPage: PublishSubject<Void> = .init()
     
     // MARK: - Variables
     private var hasAppeared: Bool = false
@@ -101,14 +102,10 @@ final class MeetReviewListViewController: BaseViewController, View {
         tableView.tableHeaderView = countView
     }
     
-    private func setReviewList(with reviewList: [Review]) {
-        emptyReviewView.isHidden = !reviewList.isEmpty
-        tableView.isHidden = reviewList.isEmpty
-        setReviewCountLabel(count: reviewList.count)
-    }
-    
-    private func setReviewCountLabel(count: Int) {
-        guard count > 0 else { return }
+    private func setReviewList(with count: Int) {
+        let hasPlan = count > 0
+        emptyReviewView.isHidden = hasPlan
+        tableView.isHidden = !hasPlan
         countView.countText = "\(count)개"
     }
 }
@@ -146,6 +143,12 @@ extension MeetReviewListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map({ Reactor.Action.fetchNextReview })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refresh
             .map({ Reactor.Action.refresh })
             .bind(to: reactor.action)
@@ -160,10 +163,11 @@ extension MeetReviewListViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$reviews)
-            .asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { vc, reviewList in
-                vc.setReviewList(with: reviewList)
+        reactor.pulse(\.$totolPlanCount)
+            .asDriver(onErrorJustReturn: 0)
+            .drive(with: self, onNext: { vc, count in
+                print(#function, #line, "Path : #1 \(count) ")
+                vc.setReviewList(with: count)
             })
             .disposed(by: disposeBag)
         
@@ -181,5 +185,11 @@ extension MeetReviewListViewController: UIScrollViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard scrollView.isRefresh() else { return }
         refresh.onNext(())
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 200),
+              reactor?.page?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }

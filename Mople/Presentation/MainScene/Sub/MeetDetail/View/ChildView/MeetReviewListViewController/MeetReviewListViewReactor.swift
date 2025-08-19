@@ -15,24 +15,29 @@ protocol MeetReviewListCommands: AnyObject {
 final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        case fetchReview
+        case fetchNextReview
         case selectedReview(index: Int)
-        case requestReviewList
         case updateReview(ReviewPayload)
         case refresh
     }
     
     enum Mutation {
         case fetchReviewList(reviews: [Review])
+        case updateTotalCount(Int)
     }
     
     struct State {
         @Pulse var reviews: [Review] = []
+        @Pulse var totolPlanCount: Int = 0
     }
     
     // MARK: - Variables
     var initialState: State = State()
     private let meetId: Int
     private let isJoin: Bool
+    private var isLoading = false
+    private(set) var page: PageInfo?
     
     // MARK: - UseCase
     private let fetchReviewUseCase: FetchMeetReviewList
@@ -59,14 +64,25 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case .requestReviewList:
-            return fetchReviewList()
+        case .fetchReview:
+            return fetchReview(isRefresh: true)
+        case .fetchNextReview:
+            return fetchNextPage()
         case let .selectedReview(index):
             return presentReviewDetailView(index: index)
         case let .updateReview(payload):
             return handleReviewPayload(payload)
         case .refresh:
             return refreshReviewList()
+        }
+    }
+    
+    private func shouldAction(_ action: Action) -> Bool {
+        switch action {
+        case .fetchReview, .fetchNextReview, .refresh:
+            return !isLoading
+        default:
+            return true
         }
     }
     
@@ -77,6 +93,8 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .fetchReviewList(reviews):
             newState.reviews = reviews.sorted(by: >)
+        case let .updateTotalCount(count):
+            newState.totolPlanCount = count
         }
         
         return newState
@@ -87,13 +105,35 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
 extension MeetReviewListViewReactor {
 
     /// 리뷰 리스트 불러오기
-    private func fetchReviewList() -> Observable<Mutation> {
-        
-        let fetchPlanList = fetchReviewUseCase.execute(meetId: meetId)
-            .catchAndReturn([])
-            .map({ Mutation.fetchReviewList(reviews: $0) })
-            
-        return requestWithLoading(task: fetchPlanList)
+    private func fetchReview(cursor: String? = nil,
+                             isRefresh: Bool = false) -> Observable<Mutation> {
+        var totalCount: Int = 0
+        let fetchReview = fetchReviewUseCase.execute(meetId: meetId, cursor: cursor)
+            .map({ result in
+                self.page = result.info
+                totalCount = result.totalCount
+                return self.updateReviewList(isRefresh: isRefresh, reviews: result.content)
+            })
+            .flatMap {
+                return Observable.of($0, .updateTotalCount(totalCount))
+            }
+        return requestWithLoading(task: fetchReview,
+                                  defferredLoadingDelay: .milliseconds(300))
+    }
+    
+    private func updateReviewList(isRefresh: Bool, reviews: [Review]) -> Mutation {
+        var newReviews = currentState.reviews
+        if isRefresh {
+            newReviews = reviews
+        } else {
+            newReviews.append(contentsOf: reviews)
+        }
+        return .fetchReviewList(reviews: newReviews)
+    }
+    
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let cursor = page?.nextCursor else { return .empty() }
+        return fetchReview(cursor: cursor, isRefresh: false)
     }
     
     private func refreshReviewList() -> Observable<Mutation> {
@@ -106,16 +146,20 @@ extension MeetReviewListViewReactor {
 extension MeetReviewListViewReactor {
     private func handleReviewPayload(_ payload: ReviewPayload) -> Observable<Mutation> {
         var reviewList = currentState.reviews
+        var totalCount = currentState.totolPlanCount
         
         switch payload {
         case let .updated(plan):
             self.updateReview(&reviewList, review: plan)
         case let .deleted(id):
             self.deleteReview(&reviewList, reviewId: id)
+            totalCount -= 1
         default:
             break
         }
-        return .just(.fetchReviewList(reviews: reviewList))
+        
+        return .of(.fetchReviewList(reviews: reviewList),
+                   .updateTotalCount(max(totalCount, 0)))
     }
     
     private func updateReview(_ reviewList: inout [Review], review: Review) {
@@ -146,12 +190,15 @@ extension MeetReviewListViewReactor {
 // MARK: - Command
 extension MeetReviewListViewReactor: MeetReviewListCommands {
     func fetchReview() {
-        action.onNext(.requestReviewList)
+        action.onNext(.fetchReview)
     }
 }
 
 // MARK: - Loading & Error
 extension MeetReviewListViewReactor: ChildLoadingReactor {
+    func updateLoadingState(isLoad: Bool) {
+        isLoading = isLoad
+    }
     var parent: ChildLoadingDelegate? { delegate }
     var index: Int { 1 }
 }

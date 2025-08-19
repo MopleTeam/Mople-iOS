@@ -12,20 +12,11 @@ enum CommentType {
     case child
 }
 
-struct CommentPage {
-    var content: [Comment] = []
-    var page: PageInfo?
-}
-
 struct Comment: Hashable, Comparable {
-    
-    // MARK: - UUID
-    let uuid = UUID()
-    
-    // MARK: - 임시 댓글
+
+    var uuid = UUID()
     var isMockup: Bool = false
-    
-    // MARK: - 댓글 속성
+    var isLoading: Bool = false
     var id: Int?
     var parentId: Int?
     var writerId: Int?
@@ -37,18 +28,11 @@ struct Comment: Hashable, Comparable {
     var isLiked: Bool = false
     var likeCount: Int = 0
     var replyCount: Int = 0
-    var loadReplyCount: Int = 0
-    var replyPage: PageInfo?
-    var hasCachingReply: Bool = false
     
     var type: CommentType {
-        return parentId == nil ? .parent : .child
+        return parentId != nil ? .parent : .child
     }
-    
-    var remainReplyCount: Int {
-        return replyCount - loadReplyCount
-    }
-    
+
     static func < (lhs: Comment, rhs: Comment) -> Bool {
         guard let lhsDate = lhs.createdDate,
               let rhsDate = rhs.createdDate else { return false }
@@ -74,7 +58,7 @@ extension Comment {
 }
 
 extension Comment {
-    static func mockComment(parentId: Int? = nil) -> Self {
-        return .init(isMockup: true, parentId: parentId)
+    static func mockComment() -> Self {
+        return .init(isMockup: true)
     }
 }

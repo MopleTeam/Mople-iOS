@@ -7,14 +7,20 @@
 
 import Foundation
 
+struct PageResponse<T: Decodable>: Decodable {
+    var totalCount: Int?
+    var content: [T]
+    var page: PageInfoResponse?
+}
+
 // MARK: - CursorPage Model
-struct PageResponse: Decodable {
+struct PageInfoResponse: Decodable {
     let nextCursor: String?
     let hasNext: Bool
     let size: Int
 }
 
-extension PageResponse {
+extension PageInfoResponse {
     func toDomain() -> PageInfo {
         return .init(nextCursor: nextCursor,
                      hasNext: hasNext,

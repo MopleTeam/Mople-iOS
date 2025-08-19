@@ -10,7 +10,7 @@ import RxSwift
 protocol FetchReplyCommentList {
     func execute(postId: Int,
                  commentId: Int,
-                 nextCursor: String?) -> Observable<CommentPage>
+                 nextCursor: String?) -> Observable<Page<Comment>>
 }
 
 final class FetchReplyCommentListUseCase: FetchReplyCommentList {
@@ -24,16 +24,18 @@ final class FetchReplyCommentListUseCase: FetchReplyCommentList {
     
     func execute(postId: Int,
                  commentId: Int,
-                 nextCursor: String?) -> Observable<CommentPage> {
+                 nextCursor: String?) -> Observable<Page<Comment>> {
         repo.fetchReplyComment(postId: postId,
                                commentId: commentId,
                                nextCursor: nextCursor)
             .asObservable()
-            .map { $0.toDomain() }
+            .map { Page(totalCount: $0.totalCount ?? 0,
+                        content: $0.content.map({ $0.toDomain() }),
+                        info: $0.page?.toDomain()) }
             .map({ self.checkWriter(with: $0)})
     }
     
-    private func checkWriter(with list: CommentPage) -> CommentPage {
+    private func checkWriter(with list: Page<Comment>) -> Page<Comment> {
         var commentPage = list
         commentPage.content = commentPage.content.map({
             var comment = $0

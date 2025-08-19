@@ -14,50 +14,52 @@ enum LoadMode {
     case none
 }
 
+enum CommentEdit {
+    case add(comments: [Comment])
+    case edit(comment: Comment)
+    case delete(id: Int)
+    case refresh(comments: [Comment])
+}
+
+enum CommentLoading {
+    case new(Comment)
+    case edit(id: Int)
+    case replace(Comment)
+}
+
 final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
         case fetchPage(postId: Int, isRefresh: Bool)
-        case fetchNextPage(nextCursor: String)
-        case fetchReplyComment(parentId: Int, cursor: String?)
+        case fetchNextPage
         case createComment(content: String, mentions: [Int])
-        case createReply(parentId: Int, content: String, mentions: [Int])
         case editComment(id: Int, content: String, mentions: [Int])
         case likeComment(id: Int)
         case deleteComment(id: Int)
         case reportComment(id: Int)
-        case cachingReply(parentId: Int, replyPage: CommentPage)
         case showWriterImage(name: String?, imagePath: String?)
     }
     
     enum Mutation {
-        case fetchedPage(CommentPage)
-        case fetchedReplyComment(parentId: Int, page: CommentPage)
-        case addedComment(Comment)
-        case editedComment(Comment)
-        case deleteComment(id: Int)
+        case updateComment([Comment])
         case reportedComment
         case updateLoadingState(Bool)
         case catchError(Error)
     }
     
     struct State {
-        @Pulse var fetchedPage: CommentPage?
-        @Pulse var fetchedReplyComment: (parentId: Int, page: CommentPage)?
-        @Pulse var addedComment: Comment?
-        @Pulse var editedComment: Comment?
-        @Pulse var deletedCommentId: Int?
+        @Pulse var comments: [Comment] = []
         @Pulse var reportedComment: Void?
-        @Pulse var isUiLoading: (isLoad: Bool, mode: LoadMode)?
+        @Pulse var loadState: (isLoad: Bool, mode: LoadMode) = (false, .none)
         @Pulse var error: Error?
     }
     
     // MARK: - Variables
     var initialState: State = State()
+//    var isLoading: Bool = false
     private var postId: Int?
-    private var loadingMode: LoadMode = .none
-    private var isApiLoading: Bool = false
-    private var cachedReply: [Int: CommentPage] = .init()
+    private var loadMode: LoadMode = .none
+    private(set) var page: PageInfo?
     
     // MARK: - UseCase - Parent
     private let fetchCommentListUseCase: FetchCommentList
@@ -107,20 +109,12 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         
         switch action {
         case let .fetchPage(postId, _):
-            return fetchPage(postId: postId)
-        case let .fetchNextPage(cursor):
-            return fetchNextPage(cursor: cursor)
-        case let .fetchReplyComment(parentId, cursor):
-            return loadReplyComment(parentId: parentId, cursor: cursor)
-        case let .cachingReply(parentId, page):
-            return cachedReplyPage(parentId: parentId, replyPage: page)
+            return fetchPage(postId: postId, isRefresh: true)
+        case .fetchNextPage:
+            return fetchNextPage()
         case let .createComment(content, mentions):
             return createComment(comment: content,
                                  mentions: mentions)
-        case let .createReply(parentId, content, mentions):
-            return createReply(parentId: parentId,
-                               comment: content,
-                               mentions: mentions)
         case let .editComment(id, text, mentions):
             return editComment(id: id,
                                text: text,
@@ -136,26 +130,25 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         }
     }
     
-    private func shouldAction(_ action: Action) -> Bool {
+    private func updateLoadingMode(_ action: Action) {
         switch action {
-        case .reportComment, .showWriterImage, .cachingReply:
-            return true
+        case let .fetchPage(_, isRefersh):
+            loadMode = isRefersh ? .refresh : .more
+        case .fetchNextPage:
+            loadMode = .more
         default:
-            guard !isApiLoading else { return false }
-            return true
+            loadMode = .none
         }
     }
     
-    private func updateLoadingMode(_ action: Action) {
+    private func shouldAction(_ action: Action) -> Bool {
+        let curruntLoading = currentState.loadState.isLoad
+        
         switch action {
-        case .createComment, .editComment, .deleteComment, .likeComment:
-            loadingMode = .edit
-        case let .fetchPage(_, isRefersh):
-            loadingMode = isRefersh ? .refresh : .more
-        case .fetchNextPage:
-            loadingMode = .more
+        case .showWriterImage:
+            return true
         default:
-            loadingMode = .none
+            return curruntLoading == false
         }
     }
     
@@ -163,23 +156,12 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         var newState = state
         
         switch mutation {
-        case let .fetchedPage(page):
-            newState.fetchedPage = page
-        case let .fetchedReplyComment(parentId, page):
-            newState.fetchedReplyComment = (parentId, page)
-        case let .addedComment(comment):
-            newState.addedComment = (comment)
-        case let .editedComment(Comment):
-            newState.editedComment = Comment
-        case let .deleteComment(id):
-            newState.deletedCommentId = id
+        case let .updateComment(comments):
+            newState.comments = comments
         case .reportedComment:
             newState.reportedComment = ()
-        case let .updateLoadingState(isUiLoad):
-            newState.isUiLoading = (isUiLoad, loadingMode)
-            if !isUiLoad {
-                isApiLoading = false
-            }
+        case let .updateLoadingState(isLoad):
+            newState.loadState = (isLoad, loadMode)
         case let .catchError(err):
             newState.error = err
         }
@@ -191,27 +173,18 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
 extension CommentListViewReactor {
     
     // MARK: - 댓글 불러오기
-    private func fetchPage(postId: Int) -> Observable<Mutation> {
-        isApiLoading = true
+    private func fetchPage(postId: Int,
+                           cursor: String? = nil,
+                           isRefresh: Bool = false) -> Observable<Mutation> {
         updatePostId(postId)
-        let fetchPaeg = fetchCommentListUseCase.execute(postId: postId, nextCursor: nil)
-            .map { Mutation.fetchedPage($0) }
+        let fetchPaeg = fetchCommentListUseCase.execute(postId: postId, nextCursor: cursor)
+            .map { result in
+                self.page = result.info
+                let comments = result.content
+                let editCase: CommentEdit = isRefresh ? .refresh(comments: comments) : .add(comments: comments)
+                return self.updateCommentList(editCase: editCase)
+            }
         return requestWithLoading(task: fetchPaeg, defferredLoadingDelay: .seconds(0))
-            .do(onNext: { [weak self] _ in
-                self?.cachedReply.removeAll()
-            })
-    }
-    
-    private func fetchNextPage(cursor: String) -> Observable<Mutation> {
-        isApiLoading = true
-        guard let postId else { return .empty()}
-        let fetchNextPage = fetchCommentListUseCase
-            .execute(postId: postId,
-                     nextCursor: cursor)
-            .delay(.milliseconds(500), scheduler: MainScheduler.instance)
-            .map { Mutation.fetchedPage($0) }
-        
-        return requestWithLoading(task: fetchNextPage, defferredLoadingDelay: .seconds(0))
     }
     
     private func updatePostId(_ postId: Int)  {
@@ -219,103 +192,71 @@ extension CommentListViewReactor {
         self.postId = postId
     }
     
+    // MARK: - 댓글 더 불러오기
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let postId,
+              let nextCursor = page?.nextCursor else { return .empty() }
+        return fetchPage(postId: postId, cursor: nextCursor)
+    }
+    
+    // MARK: - 댓글 리프레쉬
+    private func resetPage() -> Observable<Mutation> {
+        guard let postId else { return .empty() }
+        self.page = nil
+        return fetchPage(postId: postId, isRefresh: true)
+    }
+    
     // MARK: - 댓글 생성
     private func createComment(comment: String,
                                mentions: [Int] = []) -> Observable<Mutation> {
         guard let postId else { return .empty() }
-        isApiLoading = true
+        let mockComment = Comment.mockComment()
+        let addMock = updateLoadingComment(loadingCase: .new(mockComment))
+        
         let createComment = createCommentUseCase
             .execute(postId: postId,
                      comment: comment,
                      mentions: mentions)
-            .map { Mutation.addedComment($0) }
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .map({
+                var newComment = $0
+                newComment.uuid = mockComment.uuid
+                return newComment
+            })
+            .map { self.updateLoadingComment(loadingCase: .replace($0)) }
         
-        return requestWithLoading(task: createComment)
-    }
-}
-
-// MARK: - 대댓글
-extension CommentListViewReactor {
-    // MARK: - 대댓글 불러오기
-    private func loadReplyComment(parentId: Int, cursor: String?) -> Observable<Mutation> {
-        if let restoreReplyPage = restoreCachedReplyComment(parentId: parentId) {
-            return .just(.fetchedReplyComment(parentId: parentId, page: restoreReplyPage))
-        } else {
-            return fetchReplyComment(parentId: parentId, cursor: cursor)
-        }
+        return .just(addMock)
+            .concat(createComment)
     }
     
-    private func fetchReplyComment(parentId: Int, cursor: String?) -> Observable<Mutation> {
-        guard let postId else { return .empty() }
-        return fetchReplyCommentListUseCase
-            .execute(postId: postId,
-                     commentId: parentId,
-                     nextCursor: cursor)
-            .map { Mutation.fetchedReplyComment(parentId: parentId, page: $0) }
-    }
-
-    // MARK: - 대댓글 생성
-    private func createReply(parentId: Int,
-                             comment: String,
-                             mentions: [Int] = []) -> Observable<Mutation> {
-        guard let postId else { return .empty() }
-        isApiLoading = true
-        let createReply = createReplyUseCase
-            .execute(postId: postId,
-                     parentId: parentId,
-                     comment: comment,
-                     mentions: mentions)
-            .map { Mutation.addedComment($0) }
-        
-        return requestWithLoading(task: createReply)
-    }
-    
-    // MARK: - 대댓글 캐쉬 데이터 저장
-    private func cachedReplyPage(parentId: Int, replyPage: CommentPage) -> Observable<Mutation> {
-        cachedReply[parentId] = replyPage
-        return .empty()
-    }
-    
-    private func restoreCachedReplyComment(parentId: Int) -> CommentPage? {
-        guard let cachedReplyPage = cachedReply[parentId] else { return nil }
-        cachedReply.removeValue(forKey: parentId)
-        return cachedReplyPage
-    }
-}
-
-// MARK: - 댓글 공통
-extension CommentListViewReactor {
     // MARK: - 댓글 편집
     private func editComment(id: Int,
                              text: String,
                              mentions: [Int] = []) -> Observable<Mutation> {
-        isApiLoading = true
+        let loadingComment = updateLoadingComment(loadingCase: .edit(id: id))
         let editComment = editCommentUseCase
             .execute(id: id,
                      text: text,
                      mentions: mentions)
-            .map { Mutation.editedComment($0) }
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .map { self.updateCommentList(editCase: .edit(comment: $0)) }
         
-        return requestWithLoading(task: editComment)
+        return .just(loadingComment)
+            .concat(editComment)
     }
 
     // MARK: - 댓글 삭제
     private func deleteComment(id: Int) -> Observable<Mutation> {
-        isApiLoading = true
-        let deleteComment = deleteCommentUseCase
+        return deleteCommentUseCase
             .execute(commentId: id)
-            .map { Mutation.deleteComment(id: id) }
-        
-        return requestWithLoading(task: deleteComment)
+            .map { self.updateCommentList(editCase: .delete(id: id)) }
     }
     
     // MARK: - 댓글 좋아요
     private func likeComment(id: Int) -> Observable<Mutation> {
-        isApiLoading = true
-        let likeComment = likeCommentUseCase
+        return likeCommentUseCase
             .execute(commentId: id)
-            .map { Mutation.editedComment($0) }
-        return requestWithLoading(task: likeComment)
+            .map { self.updateCommentList(editCase: .edit(comment: $0)) }
     }
     
     // MARK: - 댓글 신고
@@ -324,8 +265,55 @@ extension CommentListViewReactor {
             .execute(type: .comment(id: id), reason: nil)
             .map { Mutation.reportedComment }
     }
+    
+    // MARK: - 댓글 리스트 편집
+    private func updateCommentList(editCase: CommentEdit) -> Mutation {
+        var comments = currentState.comments
+        switch editCase {
+        case .add(let commentList):
+            comments.append(contentsOf: commentList)
+        case .edit(let comment):
+            editComment(comments: &comments,
+                        comment: comment)
+        case .delete(let id):
+            comments.removeAll { $0.id == id }
+        case .refresh(let commentList):
+            comments = commentList
+        }
+        return .updateComment(comments)
+    }
+    
+    private func editComment(comments: inout [Comment], comment: Comment) {
+        guard let editIndex = comments.firstIndex(where: { $0.id == comment.id }) else { return }
+        comments[editIndex] = comment
+    }
+    
+    // MARK: - 댓글 로딩
+    private func updateLoadingComment(loadingCase: CommentLoading) -> Mutation {
+        var comments = currentState.comments
+        switch loadingCase {
+        case .new(let comment):
+            comments.insert(comment, at: 0)
+        case .edit(let id):
+            updateLoadingComment(comments: &comments, id: id)
+        case .replace(let comment):
+            replaceComment(comments: &comments,
+                           replceComment: comment)
+        }
+        return .updateComment(comments)
+    }
+    
+    private func updateLoadingComment(comments: inout [Comment], id: Int) {
+        guard let loadingIndex = comments.firstIndex(where: { $0.id == id }) else { return }
+        comments[loadingIndex].isLoading = true
+    }
+    
+    private func replaceComment(comments: inout [Comment],
+                                replceComment comment: Comment) {
+        guard let replceIndex = comments.firstIndex(where: { $0.uuid == comment.uuid }) else { return }
+        comments[replceIndex] = comment
+    }
 }
-
 // MARK: - Flow
 extension CommentListViewReactor {
     private func showWritterImage(name: String?, imagePath: String?) -> Observable<Mutation> {

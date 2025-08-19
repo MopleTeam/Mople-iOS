@@ -20,10 +20,10 @@ final class DefaultCommentRepo:BaseRepositories, CommentRepo {
     }
     
     func fetchCommentList(postId: Int,
-                          nextCursor: String?) -> Single<CommentPageResponse> {
+                          nextCursor: String?) -> Single<PageResponse<CommentResponse>> {
         return self.networkService.authenticatedRequest {
             try APIEndpoints.fetchCommentList(postId: postId,
-                                              nextCursor: nextCursor)
+                                              cursor: nextCursor)
         }
     }
     
@@ -53,7 +53,7 @@ final class DefaultCommentRepo:BaseRepositories, CommentRepo {
         }
     }
     
-    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<CommentPageResponse> {
+    func fetchReplyComment(postId: Int, commentId: Int, nextCursor: String?) -> Single<PageResponse<CommentResponse>> {
         return self.networkService.authenticatedRequest {
             try APIEndpoints.fetchReplyCommentList(postId: postId,
                                                    commentId: commentId,
