@@ -7,6 +7,11 @@
 import UIKit
 import ReactorKit
 
+enum CommentListType {
+    case parent
+    case child(parent: Comment)
+}
+
 enum LoadMode {
     case edit
     case refresh
@@ -36,8 +41,11 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         case editComment(id: Int, content: String, mentions: [Int])
         case likeComment(id: Int)
         case deleteComment(id: Int)
+        case deletedComment(id: Int)
         case reportComment(id: Int)
         case showWriterImage(name: String?, imagePath: String?)
+        case showReply(parentComment: Comment)
+        case endFlow
     }
     
     enum Mutation {
@@ -55,8 +63,9 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     // MARK: - Variables
+    let type: CommentListType
     var initialState: State = State()
-//    var isLoading: Bool = false
+    var isLoading: Bool = false
     private var postId: Int?
     private var loadMode: LoadMode = .none
     private(set) var page: PageInfo?
@@ -77,7 +86,8 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     private weak var coordinator: CommentListCoordination?
     
     // MARK: - LifeCycle
-    init(fetchCommentListUseCase: FetchCommentList,
+    init(type: CommentListType,
+         fetchCommentListUseCase: FetchCommentList,
          fetchReplyCommentListUseCase: FetchReplyCommentList,
          createCommentUseCase: CreateComment,
          createReplyUseCase: CreateReplyComment,
@@ -86,6 +96,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
          reportUseCase: ReportPost,
          likeCommentUseCase: LikeComment,
          coordinator: CommentListCoordination) {
+        self.type = type
         self.fetchCommentListUseCase = fetchCommentListUseCase
         self.fetchReplyCommentListUseCase = fetchReplyCommentListUseCase
         self.createCommentUseCase = createCommentUseCase
@@ -96,10 +107,17 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         self.likeCommentUseCase = likeCommentUseCase
         self.coordinator = coordinator
         logLifeCycle()
+        initialAction()
     }
     
     deinit {
         logLifeCycle()
+    }
+    
+    private func initialAction() {
+        if case .child(let parentComment) = type, let parentPostId = parentComment.postId {
+            action.onNext(.fetchPage(postId: parentPostId, isRefresh: true))
+        }
     }
     
     // MARK: - State Mutation
@@ -109,24 +127,30 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         
         switch action {
         case let .fetchPage(postId, _):
-            return fetchPage(postId: postId, isRefresh: true)
+            return handleFetch(postId: postId)
+        case let .createComment(content, mentions):
+            return handleCreateComment(text: content,
+                                       mentions: mentions)
         case .fetchNextPage:
             return fetchNextPage()
-        case let .createComment(content, mentions):
-            return createComment(comment: content,
-                                 mentions: mentions)
         case let .editComment(id, text, mentions):
             return editComment(id: id,
                                text: text,
                                mentions: mentions)
         case let .deleteComment(id):
             return deleteComment(id: id)
+        case let .deletedComment(id):
+            return deletedComment(id: id)
         case let .reportComment(id):
             return reportComment(id: id)
         case let .likeComment(id):
             return likeComment(id: id)
         case let .showWriterImage(name, imagePath):
             return showWritterImage(name: name, imagePath: imagePath)
+        case let .showReply(parentComment):
+            return showReply(parentComment: parentComment)
+        case .endFlow:
+            return popView()
         }
     }
     
@@ -142,13 +166,33 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     private func shouldAction(_ action: Action) -> Bool {
-        let curruntLoading = currentState.loadState.isLoad
-        
         switch action {
-        case .showWriterImage:
+        case .showWriterImage, .showReply:
             return true
         default:
-            return curruntLoading == false
+            return !isLoading
+        }
+    }
+    
+    private func handleFetch(postId: Int) -> Observable<Mutation> {
+        switch type {
+        case .parent:
+            return fetchPage(postId: postId, isRefresh: true)
+        case .child(let parent):
+            return fetchReplyPage(postId: postId,
+                                  parentComment: parent,
+                                  isRefresh: true)
+        }
+    }
+    
+    private func handleCreateComment(text: String, mentions: [Int]) -> Observable<Mutation> {
+        switch type {
+        case .parent:
+            return createComment(comment: text,
+                                 mentions: mentions)
+        case .child(let parent):
+            guard let id = parent.id else { return .empty() }
+            return createReply(parentId: id, comment: text, mentions: mentions)
         }
     }
     
@@ -172,11 +216,11 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - 댓글
 extension CommentListViewReactor {
     
-    // MARK: - 댓글 불러오기
+    // MARK: - 댓글
     private func fetchPage(postId: Int,
                            cursor: String? = nil,
                            isRefresh: Bool = false) -> Observable<Mutation> {
-        updatePostId(postId)
+        self.postId = postId
         let fetchPaeg = fetchCommentListUseCase.execute(postId: postId, nextCursor: cursor)
             .map { result in
                 self.page = result.info
@@ -187,26 +231,6 @@ extension CommentListViewReactor {
         return requestWithLoading(task: fetchPaeg, defferredLoadingDelay: .seconds(0))
     }
     
-    private func updatePostId(_ postId: Int)  {
-        guard self.postId == nil else { return }
-        self.postId = postId
-    }
-    
-    // MARK: - 댓글 더 불러오기
-    private func fetchNextPage() -> Observable<Mutation> {
-        guard let postId,
-              let nextCursor = page?.nextCursor else { return .empty() }
-        return fetchPage(postId: postId, cursor: nextCursor)
-    }
-    
-    // MARK: - 댓글 리프레쉬
-    private func resetPage() -> Observable<Mutation> {
-        guard let postId else { return .empty() }
-        self.page = nil
-        return fetchPage(postId: postId, isRefresh: true)
-    }
-    
-    // MARK: - 댓글 생성
     private func createComment(comment: String,
                                mentions: [Int] = []) -> Observable<Mutation> {
         guard let postId else { return .empty() }
@@ -229,6 +253,88 @@ extension CommentListViewReactor {
             .concat(createComment)
     }
     
+    // MARK: - 대댓글
+    private func fetchReplyPage(postId: Int,
+                                parentComment: Comment,
+                                cursor: String? = nil,
+                                isRefresh: Bool = false) -> Observable<Mutation> {
+        guard let commentId = parentComment.id else { return .empty() }
+        self.postId = postId
+        let fetchReply = fetchReplyCommentListUseCase.execute(postId: postId,
+                                                              commentId: commentId,
+                                                              nextCursor: cursor)
+            .map { result in
+                self.page = result.info
+                var comments = result.content
+                if isRefresh {
+                    comments.insert(parentComment, at: 0)
+                }
+                let editCase: CommentEdit = isRefresh ? .refresh(comments: comments) : .add(comments: comments)
+                return self.updateCommentList(editCase: editCase)
+            }
+        
+        return requestWithLoading(task: fetchReply, defferredLoadingDelay: .seconds(0))
+    }
+   
+    private func createReply(parentId: Int,
+                             comment: String,
+                             mentions: [Int] = []) -> Observable<Mutation> {
+        guard let postId else { return .empty() }
+        
+        let mockComment = Comment.mockComment()
+        let addMock = updateLoadingComment(loadingCase: .new(mockComment))
+        
+        let createComment = createReplyUseCase
+            .execute(postId: postId,
+                     parentId: parentId,
+                     comment: comment,
+                     mentions: mentions)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .map({
+                var newComment = $0
+                newComment.uuid = mockComment.uuid
+                return newComment
+            })
+            .map { self.updateLoadingComment(loadingCase: .replace($0)) }
+        
+        return .just(addMock)
+            .concat(createComment)
+    }
+    
+    // MARK: - 페이징
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let postId,
+              let nextCursor = page?.nextCursor else { return .empty() }
+        
+        switch type {
+        case .parent:
+            return fetchPage(postId: postId, cursor: nextCursor)
+        case .child(let parent):
+            return fetchReplyPage(postId: postId,
+                                  parentComment: parent,
+                                  cursor: nextCursor)
+        }
+    }
+    
+    // MARK: - 리프레쉬
+    private func resetPage() -> Observable<Mutation> {
+        guard let postId else { return .empty() }
+        self.page = nil
+        
+        switch type {
+        case .parent:
+            return fetchPage(postId: postId, isRefresh: true)
+        case .child(let parent):
+            return fetchReplyPage(postId: postId,
+                                  parentComment: parent,
+                                  isRefresh: true)
+        }
+    }
+}
+
+
+// MARK: - 댓글 공통
+extension CommentListViewReactor {
     // MARK: - 댓글 편집
     private func editComment(id: Int,
                              text: String,
@@ -244,26 +350,35 @@ extension CommentListViewReactor {
         return .just(loadingComment)
             .concat(editComment)
     }
-
+    
     // MARK: - 댓글 삭제
     private func deleteComment(id: Int) -> Observable<Mutation> {
-        return deleteCommentUseCase
+        let task = deleteCommentUseCase
             .execute(commentId: id)
+            .observe(on: MainScheduler.instance)
             .map { self.updateCommentList(editCase: .delete(id: id)) }
+        return requestWithLoading(task: task)
+    }
+    
+    private func deletedComment(id: Int) -> Observable<Mutation> {
+        let updateComment = self.updateCommentList(editCase: .delete(id: id))
+        return .just(updateComment)
     }
     
     // MARK: - 댓글 좋아요
     private func likeComment(id: Int) -> Observable<Mutation> {
-        return likeCommentUseCase
+        let task = likeCommentUseCase
             .execute(commentId: id)
             .map { self.updateCommentList(editCase: .edit(comment: $0)) }
+        return requestWithLoading(task: task)
     }
     
     // MARK: - 댓글 신고
     private func reportComment(id: Int) -> Observable<Mutation> {
-        return reportUseCase
+        let task = reportUseCase
             .execute(type: .comment(id: id), reason: nil)
             .map { Mutation.reportedComment }
+        return requestWithLoading(task: task)
     }
     
     // MARK: - 댓글 리스트 편집
@@ -271,16 +386,54 @@ extension CommentListViewReactor {
         var comments = currentState.comments
         switch editCase {
         case .add(let commentList):
-            comments.append(contentsOf: commentList)
+            setAddCommnetCommentList(comments: commentList, list: &comments)
         case .edit(let comment):
             editComment(comments: &comments,
                         comment: comment)
         case .delete(let id):
-            comments.removeAll { $0.id == id }
+            handleDeleteComment(comments: &comments, id: id)
         case .refresh(let commentList):
-            comments = commentList
+            setFirstCommentList(comments: commentList,
+                                list: &comments)
         }
         return .updateComment(comments)
+    }
+    
+    private func setAddCommnetCommentList(comments: [Comment], list: inout [Comment]) {
+        list.append(contentsOf: comments)
+        if case .child = type {
+            // id 기준으로 중복제거 (Set<Int> 사용)
+            var seen = Set<Int>()
+            list = list.filter { comment in
+                guard let id = comment.id else { return true }
+                return seen.insert(id).inserted  // insert가 성공하면 true, 이미 있으면 false
+            }
+            
+            list.sort {
+                // parent 타입이 무조건 앞에
+                if $0.type == .parent && $1.type == .child {
+                    return true
+                }
+                if $0.type == .child && $1.type == .parent {
+                    return false
+                }
+                
+                // 같은 타입끼리는 날짜순 정렬
+                guard let date1 = $0.createdDate,
+                      let date2 = $1.createdDate else { return true }
+                return date1 < date2
+            }
+        }
+    }
+    
+    private func setFirstCommentList(comments: [Comment], list: inout [Comment]) {
+        switch type {
+        case .parent:
+            list = comments
+        case .child:
+            list.removeAll { $0.type == .child }
+            list.append(contentsOf: comments)
+        }
     }
     
     private func editComment(comments: inout [Comment], comment: Comment) {
@@ -288,12 +441,22 @@ extension CommentListViewReactor {
         comments[editIndex] = comment
     }
     
-    // MARK: - 댓글 로딩
+    private func handleDeleteComment(comments: inout [Comment], id: Int) {
+        if case .child(let parent) = type, parent.id == id {
+            coordinator?.deleteParentComment(id: id)
+        } else {
+            comments.removeAll { $0.id == id }
+        }
+    }
+}
+
+// MARK: - 댓글 로딩
+extension CommentListViewReactor {
     private func updateLoadingComment(loadingCase: CommentLoading) -> Mutation {
         var comments = currentState.comments
         switch loadingCase {
         case .new(let comment):
-            comments.insert(comment, at: 0)
+            addLoadingComment(comment, list: &comments)
         case .edit(let id):
             updateLoadingComment(comments: &comments, id: id)
         case .replace(let comment):
@@ -301,6 +464,15 @@ extension CommentListViewReactor {
                            replceComment: comment)
         }
         return .updateComment(comments)
+    }
+    
+    private func addLoadingComment(_ comment: Comment, list: inout [Comment]) {
+        switch type {
+        case .parent:
+            list.insert(comment, at: 0)
+        case .child:
+            list.append(comment)
+        }
     }
     
     private func updateLoadingComment(comments: inout [Comment], id: Int) {
@@ -317,16 +489,30 @@ extension CommentListViewReactor {
 // MARK: - Flow
 extension CommentListViewReactor {
     private func showWritterImage(name: String?, imagePath: String?) -> Observable<Mutation> {
-        //        coordinator?.presentWriterImageView(title: name,
-        //                                            imagePath: [],
-        //                                            defaultType: .user)
+        coordinator?.presentWriterImageView(title: name,
+                                            imagePath: imagePath,
+                                            defaultType: .user)
         
+        return .empty()
+    }
+    
+    private func showReply(parentComment: Comment) -> Observable<Mutation> {
+        coordinator?.pushReplyPage(parentComment: parentComment)
+        return .empty()
+    }
+    
+    private func popView() -> Observable<Mutation> {
+        coordinator?.pop()
         return .empty()
     }
 }
 
 // MARK: - Loading & Error
 extension CommentListViewReactor: LoadingReactor {
+    func updateLoadingState(isLoad: Bool) {
+        isLoading = isLoad
+    }
+    
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }

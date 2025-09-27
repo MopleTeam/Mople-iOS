@@ -9,7 +9,7 @@ import RxSwift
 
 protocol ReviewRepo {
     func fetchReviewPage(meetId: Int, cursor: String?) -> Single<PageResponse<ReviewResponse>>
-    func fetchReviewDetail(_ reviewId: Int) -> Single<ReviewResponse>
+    func fetchReviewDetail(id: Int, isOldPlan: Bool) -> Single<ReviewResponse>
     func deleteReviewImage(reviewId: Int, imageIds: [Int]) -> Single<Void>
     func deleteReview(id: Int) -> Single<Void>
 }

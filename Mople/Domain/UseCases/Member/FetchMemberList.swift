@@ -8,7 +8,7 @@
 import RxSwift
 
 protocol FetchMemberList {
-    func execute(type: MemberListType, cursor: String?) -> Observable<MemberPage>
+    func execute(type: MemberListType, cursor: String?) -> Observable<Page<MemberInfo>>
 }
 
 final class FetchMemberUseCase: FetchMemberList {
@@ -19,10 +19,12 @@ final class FetchMemberUseCase: FetchMemberList {
         self.memberListRepo = memberListRepo
     }
     
-    func execute(type: MemberListType, cursor: String?) -> Observable<MemberPage> {
+    func execute(type: MemberListType, cursor: String?) -> Observable<Page<MemberInfo>> {
         return memberListRepo.execute(type: type, nextCursor: cursor)
             .asObservable()
-            .map { $0.members.toDomain() }
+            .map { Page(totalCount: $0.totalCount ?? 0,
+                        content: $0.content.map({ $0.toDomain() }),
+                        info: $0.page?.toDomain()) }
     }
 }
 

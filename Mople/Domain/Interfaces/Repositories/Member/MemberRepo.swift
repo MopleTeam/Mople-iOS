@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol MemberRepo {
-    func execute(type: MemberListType, nextCursor: String?) -> Single<MembersResponse>
+    func execute(type: MemberListType, nextCursor: String?) -> Single<PageResponse<MemberInfoResponse>>
 }

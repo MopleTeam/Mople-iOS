@@ -8,27 +8,27 @@
 import RxSwift
 
 protocol FetchMentionList {
-    func execute(cursor: String?, keyword: String?) -> Observable<MemberPage>
+    func execute(meetId: Int, cursor: String?, keyword: String?) -> Observable<Page<MemberInfo>>
 }
 
 final class FetchMentionListUseCase: FetchMentionList {
     
-    private let postId: Int
     private let repo: MentionRepo
     
-    init(postId: Int,
-         repo: MentionRepo) {
-        self.postId = postId
+    init(repo: MentionRepo) {
         self.repo = repo
     }
-    func execute(cursor: String?,
-                 keyword: String?) -> Observable<MemberPage> {
+    func execute(meetId: Int,
+                 cursor: String?,
+                 keyword: String?) -> Observable<Page<MemberInfo>> {
         
-        return repo.execute(postId: postId,
+        return repo.execute(meetId: meetId,
                             cursor: cursor,
                             keyword: keyword)
         .asObservable()
-        .map { $0.toDomain() }
+        .map { Page(totalCount: $0.totalCount ?? 0,
+                    content: $0.content.map({ $0.toDomain() }),
+                    info: $0.page?.toDomain()) }
         
     }
 }

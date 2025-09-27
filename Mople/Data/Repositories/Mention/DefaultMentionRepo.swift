@@ -8,9 +8,9 @@
 import RxSwift
 
 final class DefaultMentionRepo: BaseRepositories, MentionRepo {
-    func execute(postId: Int, cursor: String?, keyword: String?) -> Single<MemberPageResponse> {
+    func execute(meetId: Int, cursor: String?, keyword: String?) -> Single<PageResponse<MemberInfoResponse>> {
         return networkService.authenticatedRequest {
-            try APIEndpoints.fetchMentionList(postId: postId,
+            try APIEndpoints.fetchMentionList(postId: meetId,
                                               nextCursor: cursor,
                                               keyword: keyword)
         }

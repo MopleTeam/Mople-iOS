@@ -147,7 +147,7 @@ extension ReviewEditViewReactor {
             })
             .flatMap({ [weak self] _ -> Observable<Review> in
                 guard let self else { return .empty() }
-                return fetchReviewUseCase.execute(reviewId: id)
+                return fetchReviewUseCase.execute(id: id, isOldPlan: false)
             })
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] review -> Observable<Mutation> in

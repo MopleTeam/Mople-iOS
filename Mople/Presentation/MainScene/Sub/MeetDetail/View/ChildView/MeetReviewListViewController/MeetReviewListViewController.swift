@@ -23,6 +23,7 @@ final class MeetReviewListViewController: BaseViewController, View {
     
     // MARK: - Variables
     private var hasAppeared: Bool = false
+    private var isSetEdgeGesture: Bool = false
     
     // MARK: - UI Components
     private lazy var countView: CountView = {
@@ -112,7 +113,9 @@ final class MeetReviewListViewController: BaseViewController, View {
 
 extension MeetReviewListViewController: EdgeGestureConfigurable {
     func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        guard !isSetEdgeGesture else { return }
         tableView.panGestureRecognizer.require(toFail: edgeGesture)
+        isSetEdgeGesture = true
     }
 }
 
@@ -188,7 +191,7 @@ extension MeetReviewListViewController: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard scrollView.isBottom(threshold: 200),
+        guard scrollView.isBottom(threshold: 50),
               reactor?.page?.hasNext == true else { return }
         nextPage.onNext(())
     }

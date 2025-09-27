@@ -76,6 +76,7 @@ final class NotifyTableCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
+        print(#function, #line, "Path : # 하이라이트 ")
         let color = highlighted ? .bgPrimary : defaultColor
         contentView.backgroundColor = color
     }
@@ -98,10 +99,7 @@ final class NotifyTableCell: UITableViewCell {
                                         defaultImageType: .meet)
         titleLabel.text = viewModel.title
         subTitleLabel.text = viewModel.subTitle
-    }
-    
-    public func setReadStatus(isNew: Bool) {
-        defaultColor = isNew ? .bgInput : .clear
+        defaultColor = viewModel.isRead ? .clear : .bgInput
         contentView.backgroundColor = defaultColor
     }
 }

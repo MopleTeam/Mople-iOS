@@ -96,8 +96,8 @@
 		523314412E30B1720040D776 /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5233143F2E30B1720040D776 /* CommentView.swift */; };
 		523314432E30B17B0040D776 /* CommentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314422E30B17B0040D776 /* CommentViewModel.swift */; };
 		523314442E30B17B0040D776 /* CommentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314422E30B17B0040D776 /* CommentViewModel.swift */; };
-		523314462E30B1BE0040D776 /* LikeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314452E30B1BE0040D776 /* LikeView.swift */; };
-		523314472E30B1BE0040D776 /* LikeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314452E30B1BE0040D776 /* LikeView.swift */; };
+		523314462E30B1BE0040D776 /* ButtonCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314452E30B1BE0040D776 /* ButtonCountView.swift */; };
+		523314472E30B1BE0040D776 /* ButtonCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314452E30B1BE0040D776 /* ButtonCountView.swift */; };
 		5233144A2E3202990040D776 /* LoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314492E3202990040D776 /* LoadingButton.swift */; };
 		5233144B2E3202990040D776 /* LoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523314492E3202990040D776 /* LoadingButton.swift */; };
 		5235B7152D2E6744006BEAF3 /* MeetSetupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */; };
@@ -245,6 +245,8 @@
 		529A26062C96A781009F4CFA /* RecentPlanFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */; };
 		529A260A2C96AE3E009F4CFA /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 529A26092C96AE3E009F4CFA /* Differentiator */; };
 		529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 529A260B2C96AE3E009F4CFA /* RxDataSources */; };
+		529AAF732E60385900923457 /* UITextView+Mention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529AAF722E60385900923457 /* UITextView+Mention.swift */; };
+		529AAF742E60385900923457 /* UITextView+Mention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529AAF722E60385900923457 /* UITextView+Mention.swift */; };
 		529CCD462D3232020041CBB7 /* FetchPlanDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */; };
 		529CCD4A2D3232C70041CBB7 /* PostDetailSceneDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD492D3232C70041CBB7 /* PostDetailSceneDIContainer.swift */; };
 		529CCD4D2D3237120041CBB7 /* BaseViewContoller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */; };
@@ -922,7 +924,7 @@
 		5231DF7E2D2FE78700D52529 /* DefaultSearchPlaceRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSearchPlaceRepo.swift; sourceTree = "<group>"; };
 		5233143F2E30B1720040D776 /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
 		523314422E30B17B0040D776 /* CommentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentViewModel.swift; sourceTree = "<group>"; };
-		523314452E30B1BE0040D776 /* LikeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeView.swift; sourceTree = "<group>"; };
+		523314452E30B1BE0040D776 /* ButtonCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCountView.swift; sourceTree = "<group>"; };
 		523314492E3202990040D776 /* LoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingButton.swift; sourceTree = "<group>"; };
 		5235B7142D2E6744006BEAF3 /* MeetSetupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewController.swift; sourceTree = "<group>"; };
 		5235B7162D2E7303006BEAF3 /* MeetSetupViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetSetupViewReactor.swift; sourceTree = "<group>"; };
@@ -1050,6 +1052,7 @@
 		529629202D5F4FA100003F66 /* DefaultReportRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultReportRepo.swift; sourceTree = "<group>"; };
 		529629232D5F501D00003F66 /* ReportPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPost.swift; sourceTree = "<group>"; };
 		529A26052C96A781009F4CFA /* RecentPlanFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPlanFooterView.swift; sourceTree = "<group>"; };
+		529AAF722E60385900923457 /* UITextView+Mention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Mention.swift"; sourceTree = "<group>"; };
 		529CCD452D3232020041CBB7 /* FetchPlanDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPlanDetail.swift; sourceTree = "<group>"; };
 		529CCD492D3232C70041CBB7 /* PostDetailSceneDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailSceneDIContainer.swift; sourceTree = "<group>"; };
 		529CCD4C2D3237120041CBB7 /* BaseViewContoller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewContoller.swift; sourceTree = "<group>"; };
@@ -1841,7 +1844,7 @@
 				52DF6DF82DAE3EDD00204297 /* DefaultSwitchView.swift */,
 				5236452F2C8EE518009E0784 /* DefaultEmptyView.swift */,
 				52EC04BF2D38CCC800000C99 /* CountView.swift */,
-				523314452E30B1BE0040D776 /* LikeView.swift */,
+				523314452E30B1BE0040D776 /* ButtonCountView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1925,8 +1928,8 @@
 		525456B22E39C91D006FC8A7 /* CommentListView   */ = {
 			isa = PBXGroup;
 			children = (
-				52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */,
 				52C3FAB72E4317E200FF518B /* CommentListViewReactor.swift */,
+				52C3FAB42E4317BF00FF518B /* CommentListViewController.swift */,
 				525456AF2E39C91D006FC8A7 /* Component */,
 			);
 			path = "CommentListView  ";
@@ -2010,6 +2013,7 @@
 		526F45022C96001A00C347C7 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				529AAF722E60385900923457 /* UITextView+Mention.swift */,
 				5208C1792CBE72A8006272E8 /* UIApplication+RootView.swift */,
 				5211F90A2C87039F00403980 /* UIViewController+AddChild.swift */,
 				528C196E2E1686E600621C79 /* UIViewController+RootNavi.swift */,
@@ -3951,6 +3955,7 @@
 				52EC04C02D38CCC800000C99 /* CountView.swift in Sources */,
 				5268BA3A2D3F7321000C5F3A /* DefaultCommentRepo.swift in Sources */,
 				52CD8BDF2DB9A1B40037E8BF /* InviteMeet.swift in Sources */,
+				529AAF732E60385900923457 /* UITextView+Mention.swift in Sources */,
 				52E238372C76530D0066C9A3 /* SignInViewReactor.swift in Sources */,
 				520185352DA7CEEE00C2B4FC /* NotifyTableCell.swift in Sources */,
 				527A3E7F2C834BEE007FE63B /* ProfileFlowCoordinator.swift in Sources */,
@@ -4174,7 +4179,7 @@
 				52EA24D12DB20FDB00879951 /* MapInfoViewModel.swift in Sources */,
 				523E76152D5D2E0D00BD22CB /* ImageWrapper.swift in Sources */,
 				523A17FB2DD0A0730071BDBD /* PostSummary.swift in Sources */,
-				523314462E30B1BE0040D776 /* LikeView.swift in Sources */,
+				523314462E30B1BE0040D776 /* ButtonCountView.swift in Sources */,
 				52A8B70B2DF33577001AF847 /* MemberTableHeader.swift in Sources */,
 				528484162C6B86F600D50C6A /* BaseButton.swift in Sources */,
 				5208C1742CBE2B24006272E8 /* UIImageView+Kingfisher.swift in Sources */,
@@ -4324,6 +4329,7 @@
 				52E95EBC2DF453050036CBCF /* CountView.swift in Sources */,
 				52E95EBD2DF453050036CBCF /* DefaultCommentRepo.swift in Sources */,
 				52E95EBE2DF453050036CBCF /* InviteMeet.swift in Sources */,
+				529AAF742E60385900923457 /* UITextView+Mention.swift in Sources */,
 				52E95EBF2DF453050036CBCF /* SignInViewReactor.swift in Sources */,
 				52E95EC02DF453050036CBCF /* NotifyTableCell.swift in Sources */,
 				52E95EC12DF453050036CBCF /* ProfileFlowCoordinator.swift in Sources */,
@@ -4547,7 +4553,7 @@
 				52E95F8F2DF453050036CBCF /* MapInfoViewModel.swift in Sources */,
 				52E95F902DF453050036CBCF /* ImageWrapper.swift in Sources */,
 				52E95F922DF453050036CBCF /* PostSummary.swift in Sources */,
-				523314472E30B1BE0040D776 /* LikeView.swift in Sources */,
+				523314472E30B1BE0040D776 /* ButtonCountView.swift in Sources */,
 				52E95F932DF453050036CBCF /* MemberTableHeader.swift in Sources */,
 				52E95F942DF453050036CBCF /* BaseButton.swift in Sources */,
 				52E95F962DF453050036CBCF /* UIImageView+Kingfisher.swift in Sources */,
@@ -4767,7 +4773,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 52A2752E2DB1C038007D72CE /* Secrets.xcconfig */;
 			buildSettings = {
-				API_BASE_URL = "https://group-api.store";
+				API_BASE_URL = "https://prod.zerod.store";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
@@ -4794,7 +4800,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.1.3;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4815,7 +4821,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 52A2752E2DB1C038007D72CE /* Secrets.xcconfig */;
 			buildSettings = {
-				API_BASE_URL = "https://group-api.store";
+				API_BASE_URL = "https://prod.zerod.store";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
@@ -4842,7 +4848,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.1.3;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;

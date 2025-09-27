@@ -14,6 +14,7 @@ protocol LikeComment {
 final class LikeCommentUseCase: LikeComment {
     
     private let repo: CommentRepo
+    private let userId = UserInfoStorage.shared.userInfo?.id
     
     init(repo: CommentRepo) {
         self.repo = repo
@@ -23,5 +24,10 @@ final class LikeCommentUseCase: LikeComment {
         return repo.likeComment(commentId: commentId)
             .asObservable()
             .map { $0.toDomain() }
+            .map {
+                var comment = $0
+                comment.verifyWriter(self.userId)
+                return comment
+            }
     }
 }

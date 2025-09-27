@@ -12,7 +12,7 @@ import SnapKit
 
 final class CommentTableCell: UITableViewCell {
     
-    // MARK: - Variablesㅂ
+    // MARK: - Variables
     private var disposeBag = DisposeBag()
     
     // MARK: - Closure
@@ -20,6 +20,9 @@ final class CommentTableCell: UITableViewCell {
     var profileTapped: (() -> Void)?
     var likeTapped: (() -> Void)?
     var replyTapped: (() -> Void)?
+    
+    // MARK: - Constraints
+    private var leftPadding: Constraint?
     
     // MARK: - UI Components
     private let commentView = CommentView(frame: .zero)
@@ -87,7 +90,8 @@ final class CommentTableCell: UITableViewCell {
         self.contentView.backgroundColor = .defaultWhite
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(20)
+            leftPadding = make.leading.equalToSuperview().inset(20).constraint
+            make.verticalEdges.trailing.equalToSuperview().inset(20)
         }
         
         commentView.snp.makeConstraints { make in
@@ -134,7 +138,7 @@ final class CommentTableCell: UITableViewCell {
         
         commentView.rx.replyTapped
             .subscribe(with: self, onNext: { cell, _ in
-                
+                cell.replyTapped?()
             })
             .disposed(by: disposeBag)
         
@@ -145,16 +149,29 @@ final class CommentTableCell: UITableViewCell {
     }
     
     // MARK: - Configure
-    public func configure(with comment: Comment, isLastCell: Bool) {
+    public func parentCommentConfigure(with comment: Comment, isLastCell: Bool) {
         commentView.configure(.init(comment))
         setClearIndicator(isLoad: comment.isLoading)
         setBorderLine(hasBorder: !isLastCell)
     }
     
-    public func mockConfigure() {
+    public func mockParentConfigure(isLastCell: Bool) {
         setIndicator(isLoad: true)
+        setBorderLine(hasBorder: !isLastCell)
     }
-
+    
+    public func childCommentConfigure(with comment: Comment) {
+        commentView.configure(.init(comment), showReply: false)
+        setClearIndicator(isLoad: comment.isLoading)
+        setBorderLine(hasBorder: false)
+        leftPadding?.update(offset: comment.type == .parent ? 20 : 60)
+    }
+    
+    public func mockChildConfigure() {
+        setIndicator(isLoad: true)
+        setBorderLine(hasBorder: false)
+    }
+    
     // MARK: - Border Line
     public func setBorderLine(hasBorder: Bool) {
         borderView.isHidden = !hasBorder
@@ -167,6 +184,7 @@ final class CommentTableCell: UITableViewCell {
     }
     
     private func setLoading(isLoad: Bool) {
+        print(#function, #line, "Path : #  ")
         indicatorContainer.isHidden = !isLoad
         isLoad ? indicator.startAnimating() : indicator.stopAnimating()
     }
@@ -176,4 +194,5 @@ final class CommentTableCell: UITableViewCell {
         setLoading(isLoad: isLoad)
     }
 }
+
 

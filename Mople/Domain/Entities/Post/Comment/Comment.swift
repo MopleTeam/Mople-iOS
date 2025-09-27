@@ -18,6 +18,7 @@ struct Comment: Hashable, Comparable {
     var isMockup: Bool = false
     var isLoading: Bool = false
     var id: Int?
+    var postId: Int?
     var parentId: Int?
     var writerId: Int?
     var writerName: String?
@@ -28,9 +29,10 @@ struct Comment: Hashable, Comparable {
     var isLiked: Bool = false
     var likeCount: Int = 0
     var replyCount: Int = 0
+    var mentions: [UserInfo] = []
     
     var type: CommentType {
-        return parentId != nil ? .parent : .child
+        return parentId == nil ? .parent : .child
     }
 
     static func < (lhs: Comment, rhs: Comment) -> Bool {
@@ -54,6 +56,10 @@ extension Comment {
         self.likeCount = comment.likeCount
         self.isLiked = comment.isLiked
         self.replyCount = comment.replyCount
+    }
+    
+    mutating func updatePostId(postId: Int) {
+        self.postId = postId
     }
 }
 

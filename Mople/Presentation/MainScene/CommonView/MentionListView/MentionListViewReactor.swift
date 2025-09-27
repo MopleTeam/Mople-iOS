@@ -11,7 +11,7 @@ import ReactorKit
 final class MentionListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
-        case fetchPage(keyword: String?)
+        case fetchPage(postId: Int, keyword: String?)
         case fetchNextPage
     }
     
@@ -27,6 +27,8 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
     var initialState: State = State()
     private var cachedResult: [String: [MemberInfo]] = [:]
     private var page: PageInfo?
+    private var postId: Int?
+    private var currentKeyword: String?
     
     // MARK: - UseCase
     private let fetchMentionListUseCase: FetchMentionList
@@ -34,7 +36,6 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - LifeCycle
     init(fetchMentionListUseCase: FetchMentionList) {
         self.fetchMentionListUseCase = fetchMentionListUseCase
-        initialAction()
         logLifeCycle()
     }
     
@@ -42,18 +43,18 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
-    // MARK: - Initial Setup
-    private func initialAction() {
-//        action.onNext(.fetchPage(keyword: nil))
-    }
-    
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-        case let .fetchPage(keyword):
-            return fetchMentionList(keyword: keyword)
+        case let .fetchPage(meetId, keyword):
+            return fetchMentionList(meetId: meetId,
+                                    keyword: keyword,
+                                    isFirst: true)
         case .fetchNextPage:
-            return fetchMentionList()
+            guard let postId, let currentKeyword else { return .empty() }
+            return fetchMentionList(meetId: postId,
+                                    keyword: currentKeyword,
+                                    isFirst: false)
         }
     }
     
@@ -63,7 +64,7 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .fetchedPage(list):
-            newState.members.append(contentsOf: list)
+            newState.members = list
         }
         
         return newState
@@ -71,14 +72,29 @@ final class MentionListViewReactor: Reactor, LifeCycleLoggable {
 }
 
 extension MentionListViewReactor {
-    private func fetchMentionList(keyword: String? = nil) -> Observable<Mutation> {
-        let cursor = page?.nextCursor
-        return fetchMentionListUseCase.execute(cursor: cursor,
-                                               keyword: keyword)
-        .map { [weak self] in
-            self?.page = $0.page
-            self?.cachedResult[keyword ?? ""]?.append(contentsOf: $0.members)
-            return Mutation.fetchedPage($0.members)
+    private func fetchMentionList(meetId: Int,
+                                  keyword: String? = nil,
+                                  isFirst: Bool) -> Observable<Mutation> {
+        if let cachedResult = cachedResult[keyword ?? ""] {
+            return .just(Mutation.fetchedPage(cachedResult))
+        } else {
+            return fetchMentionListUseCase.execute(meetId: meetId,
+                                                   cursor: page?.nextCursor,
+                                                   keyword: keyword ?? "")
+            .compactMap { [weak self] in
+                guard let self else { return nil }
+                self.page = $0.info
+                self.cachedResult[keyword ?? ""]?.append(contentsOf: $0.content)
+                
+                let members = isFirst ? $0.content : self.appendMember(member: $0.content)
+                return Mutation.fetchedPage(members)
+            }
         }
+    }
+    
+    private func appendMember(member: [MemberInfo]) -> [MemberInfo] {
+        var member = currentState.members
+        member.append(contentsOf: member)
+        return member
     }
 }

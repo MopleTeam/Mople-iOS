@@ -346,8 +346,10 @@ extension APIEndpoints {
                             queryParameters: query)
     }
     
-    static func fetchReviewDetail(id: Int) throws -> Endpoint<ReviewResponse> {
-        return try Endpoint(path: "review/\(id)",
+    static func fetchReviewDetail(id: Int, isOldPlan: Bool) throws -> Endpoint<ReviewResponse> {
+        let path: String = isOldPlan ? "review/post/\(id)" : "review/\(id)"
+        
+        return try Endpoint(path: path,
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
@@ -398,7 +400,7 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParameters: ["contents": comment,
-                                             "mensions": mentions])
+                                             "mentions": mentions])
     }
     
     static func deleteComment(commentId: Int) throws -> Endpoint<Void> {
@@ -459,7 +461,7 @@ extension APIEndpoints {
 
 // MARK: - 멤버 리스트
 extension APIEndpoints {
-    static func fetchMember(type: MemberListType, nextCursor: String?) throws -> Endpoint<MembersResponse> { // 모델 변경
+    static func fetchMember(type: MemberListType, nextCursor: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> { 
         var cursorQuery: [String: Any] = [:]
         
         if let nextCursor, !nextCursor.isEmpty {
@@ -480,11 +482,11 @@ extension APIEndpoints {
         case let .plan(id):
             return "plan/participants/\(id ?? 0)"
         case let .review(id):
-            return "review/participant/\(id ?? 0)"
+            return "review/participants/\(id ?? 0)"
         }
     }
     
-    static func fetchMentionList(postId: Int, nextCursor: String?, keyword: String?) throws -> Endpoint<MemberPageResponse> {
+    static func fetchMentionList(postId: Int, nextCursor: String?, keyword: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> {
         var cursorQuery: [String: Any] = ["keyword": ""]
         
         if let nextCursor, !nextCursor.isEmpty {

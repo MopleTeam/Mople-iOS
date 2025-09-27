@@ -25,20 +25,5 @@ final class FetchNotifyListUseCase: FetchNotifyList {
             .map { Page(totalCount: $0.totalCount ?? 0,
                         content: $0.content.map({ $0.toDomain() }),
                         info: $0.page?.toDomain()) }
-            .flatMap { [weak self] page -> Observable<Page<Notify>> in
-                guard let self else { return .empty() }
-                var newPage = page
-                updateReadStatus(page: &newPage)
-                return .just(newPage)
-            }
-    }
-    
-    private func updateReadStatus(page: inout Page<Notify>) {
-        guard page.totalCount > 0 else { return }
-        let newIndex = page.totalCount - 1
-        
-        (0...newIndex).forEach {
-            page.content[$0].isNew = true
-        }
     }
 }

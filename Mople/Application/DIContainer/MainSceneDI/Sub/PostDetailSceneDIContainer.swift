@@ -23,6 +23,8 @@ protocol PostDetailSceneDependencies {
     func makeReviewEditViewController(review: Review,
                                       coordinator: ReviewEditViewCoordination) -> ReviewEditViewController
 
+    func makeCommentListViewController(type: CommentListType,
+                                       coordinator: CommentListCoordination) -> CommentListViewController
     // MARK: - 이동 플로우
     func makePlanEditFlowCoordiantor(plan: Plan) -> BaseCoordinator
 }
@@ -30,14 +32,14 @@ protocol PostDetailSceneDependencies {
 final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependencies {
     
     private let postType: PostType
-    private let id: Int
+    private let postId: Int
     
     init(appNetworkService: AppNetworkService,
          commonFactory: ViewDependencies,
          type: PostType,
-         id: Int) {
+         postId: Int) {
         self.postType = type
-        self.id = id
+        self.postId = postId
         super.init(appNetworkService: appNetworkService,
                    commonFactory: commonFactory)
     }
@@ -55,31 +57,27 @@ extension PostDetailSceneDIContainer {
     func makePlanDetailViewController(coordinator: PostCoordination) -> PostDetailViewController {
         let screenName: ScreenName = postType == .plan ? .plan_detail : .review_detail
         let title = postType == .plan ? L10n.Postdetail.plan : L10n.Postdetail.review
-        let reportUseCase = makeReportUseCase()
         return .init(screenName: screenName,
                      title: title,
                      postType: postType,
                      reactor: makePostDetailViewReactor(type: postType,
-                                                        coordinator: coordinator,
-                                                        reportUseCase: reportUseCase),
-                     commentVC: makeCommentListViewController(reportUseCase: reportUseCase,
-                                                              coordinator: coordinator),
-                     mentionVC: makeMentionListViewController())
+                                                        coordinator: coordinator),
+                     commentVC: makeCommentListViewController(type: .parent,
+                                                              coordinator: coordinator))
     }
     
     private func makePostDetailViewReactor(type: PostType,
-                                           coordinator: PostDetailCoordination,
-                                           reportUseCase: ReportPost) -> PostDetailViewReactor {
+                                           coordinator: PostDetailCoordination) -> PostDetailViewReactor {
         let planRepo = DefaultPlanRepo(networkService: appNetworkService)
         let reviewRepo = DefaultReviewRepo(networkService: appNetworkService)
         return .init(type: type,
-                     id: id,
+                     id: postId,
                      fetchPlanDetailUseCase: makeFetchPlanDetailUsecase(repo: planRepo),
                      fetchReviewDetailUseCase: makeFetchReviewDetailUseCase(repo: reviewRepo),
                      deletePlanUseCase: makeDeletePlanUseCase(repo: planRepo),
                      deleteReviewUseCase: makeDeleteReviewUseCase(repo: reviewRepo),
                      participationPlanUseCase: makeParticipationPlanUseCase(repo: planRepo),
-                     reportUseCase: reportUseCase,
+                     reportUseCase: makeReportUseCase(),
                      coordinator: coordinator)
     }
     
@@ -105,18 +103,22 @@ extension PostDetailSceneDIContainer {
     }
 
     // MARK: - 댓글뷰
-    private func makeCommentListViewController(reportUseCase: ReportPost,
-                                               coordinator: CommentListCoordination) -> CommentListViewController {
-        let commentReactor = makeCommentListViewReactor(reportUseCase: reportUseCase,
+    func makeCommentListViewController(type: CommentListType,
+                                       coordinator: CommentListCoordination) -> CommentListViewController {
+        let commentReactor = makeCommentListViewReactor(type: type,
+                                                        reportUseCase: makeReportUseCase(),
                                                         coordinator: coordinator)
-        return .init(reactor: commentReactor)
+        return .init(reactor: commentReactor,
+                     mentionVC: makeMentionListViewController())
     }
     
-    private func makeCommentListViewReactor(reportUseCase: ReportPost,
+    private func makeCommentListViewReactor(type: CommentListType,
+                                            reportUseCase: ReportPost,
                                             coordinator: CommentListCoordination) -> CommentListViewReactor {
         let commentRepo = makeCommentRepo()
         
-        return .init(fetchCommentListUseCase: makeFetchCommentListUseCase(repo: commentRepo),
+        return .init(type: type,
+                     fetchCommentListUseCase: makeFetchCommentListUseCase(repo: commentRepo),
                      fetchReplyCommentListUseCase: makeFetchReplyCommentListUseCase(repo: commentRepo),
                      createCommentUseCase: makeCreateCommentUseCase(repo: commentRepo),
                      createReplyUseCase: makeCreateReplyUseCase(repo: commentRepo),
@@ -178,8 +180,7 @@ extension PostDetailSceneDIContainer {
     }
     
     private func makeFetchMentionListUseCase() -> FetchMentionList {
-        return FetchMentionListUseCase(postId: id,
-                                       repo: DefaultMentionRepo(networkService: appNetworkService))
+        return FetchMentionListUseCase(repo: DefaultMentionRepo(networkService: appNetworkService))
     }
 }
 
@@ -209,9 +210,9 @@ extension PostDetailSceneDIContainer {
     
     private func getMemberListType() -> MemberListType {
         if case .plan = postType {
-            return .plan(id: id)
+            return .plan(id: postId)
         } else {
-            return .review(id: id)
+            return .review(id: postId)
         }
     }
     

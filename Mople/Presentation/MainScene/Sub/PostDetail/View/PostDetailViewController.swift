@@ -14,22 +14,14 @@ import ReactorKit
 enum PostType {
     case plan
     case review
+    case oldPlan
 }
 
-final class PostDetailViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
+final class PostDetailViewController: TitleNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = PostDetailViewReactor
     var disposeBag = DisposeBag()
-    
-    // MARK: - Handle KeyboardEvent
-    var keyboardHeight: CGFloat?
-    var keyboardHeightDiff: CGFloat?
-    var scrollView: UIScrollView? { commentVC.tableView }
-    var scrollViewHeight: CGFloat?
-    var floatingView: UIView { chatingTextFieldView }
-    var floatingViewBottom: Constraint?
-    var startOffsetY: CGFloat = .zero
     
     // MARK: - Observable
     private let endFlow: PublishSubject<Void> = .init()
@@ -37,35 +29,20 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     private let editPost: PublishSubject<Void> = .init()
     private let deletePost: PublishSubject<Void> = .init()
     private let reportPost: PublishSubject<Void> = .init()
-    private let refreshPost: PublishSubject<Void> = .init()
     
     // MARK: - Variables
     private let postType: PostType
     private var postSummary: PostSummary?
-    private var isEditMode: Bool = false
     
     // MARK: - UI Components
     private lazy var postInfoView: PostDetailView = {
         let view = PostDetailView(postType: postType)
         return view
     }()
-    
-    private let chatingTextFieldView: ChatingTextFieldView = {
-        let chatingView = ChatingTextFieldView()
-        chatingView.backgroundColor = .defaultWhite
-        return chatingView
-    }()
         
     // MARK: - CHild VC - Comment List
-    private let commentVC: CommentListViewController
+    public let commentVC: CommentListViewController
     private let commentContainer: UIView = {
-        let view = UIView()
-        view.backgroundColor = .defaultWhite
-        return view
-    }()
-    
-    private let mentionVC: MentionListViewController
-    private let mentionContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .defaultWhite
         return view
@@ -76,11 +53,9 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
          title: String?,
          postType: PostType,
          reactor: PostDetailViewReactor,
-         commentVC: CommentListViewController,
-         mentionVC: MentionListViewController) {
+         commentVC: CommentListViewController) {
         self.postType = postType
         self.commentVC = commentVC
-        self.mentionVC = mentionVC
         super.init(screenName: screenName,
                    title: title)
         self.reactor = reactor
@@ -94,12 +69,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
         super.viewDidLoad()
         setupUI()
         setAction()
-        setKeyboardControl()
-    }
-        
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateScrollViewHeight()
     }
 
     // MARK: - UI Setup
@@ -111,34 +80,16 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     
     private func setLayout() {
         self.view.addSubview(commentContainer)
-//        self.view.addSubview(mentionContainer)
-        self.view.addSubview(chatingTextFieldView)
         
         commentContainer.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
-            make.horizontalEdges.equalToSuperview()
+            make.bottom.horizontalEdges.equalToSuperview()
         }
-
-        chatingTextFieldView.snp.makeConstraints { make in
-            make.top.equalTo(commentContainer.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
-            floatingViewBottom = make.bottom.equalToSuperview()
-                .inset(UIScreen.getDefaultBottomPadding()).constraint
-        }
-        
-//        mentionContainer.snp.makeConstraints { make in
-//            make.height.equalTo(180)
-//            make.horizontalEdges.equalToSuperview().inset(20)
-//            make.bottom.equalTo(chatingTextFieldView.snp.top).offset(-12)
-//        }
     }
     
     private func setChildVC() {
         self.add(child: commentVC,
                  container: commentContainer)
-        
-        self.add(child: mentionVC,
-                 container: mentionContainer)
     }
     
     private func setNavi() {
@@ -156,7 +107,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     private func setAction() {
         setMenuAction()
         setParticipationAction()
-        setCommentAction()
     }
 }
 
@@ -181,49 +131,6 @@ extension PostDetailViewController {
                 vc.handleParticipationPlan()
             })
             .disposed(by: disposeBag)
-    }
-    
-    // MARK: - Comment Action
-    private func setCommentAction() {
-        chatingTextFieldView.rx.sendText
-            .bind(with: self, onNext: { vc, text in
-                vc.commentVC.rx.writeComment.onNext(text)
-                vc.resetWriteMode()
-            })
-            .disposed(by: disposeBag)
-        
-        commentVC.rx.editComment
-            .bind(with: self, onNext: { vc, comment in
-                vc.setEditText(text: comment)
-            })
-            .disposed(by: disposeBag)
-        
-        commentVC.rx.offset
-            .subscribe(with: self, onNext: { vc, offset in
-                vc.setStartOffsetY(offset)
-            })
-            .disposed(by: disposeBag)
-        
-        commentVC.rx.refresh
-            .bind(to: self.refreshPost)
-            .disposed(by: disposeBag)
-    }
-    
-    private func setEditText(text: String) {
-        isEditMode = true
-        chatingTextFieldView.textView.text = text
-        chatingTextFieldView.textView.rx.isResign.onNext(false)
-    }
-    
-    private func resetWriteMode() {
-        self.view.endEditing(true)
-        chatingTextFieldView.textView.text = nil
-        isEditMode = false
-    }
-    
-    private func setStartOffsetY(_ offsetY: CGFloat) {
-        guard let keyboardHeight else { return }
-        self.startOffsetY = offsetY - keyboardHeight + UIScreen.getDefaultBottomPadding()
     }
 }
 
@@ -270,7 +177,7 @@ extension PostDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        refreshPost
+        commentVC.rx.refresh
             .map { Reactor.Action.post(.refresh) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -294,6 +201,11 @@ extension PostDetailViewController {
         
         postInfoView.rx.mapTapped
             .map { Reactor.Action.flow(.placeDetailView) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        postInfoView.rx.photoTapped
+            .map { Reactor.Action.flow(.photoView(index: $0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -404,31 +316,6 @@ extension PostDetailViewController {
     }
 }
 
-// MARK: - 키보드 컨트롤
-extension PostDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
-    
-    private func setKeyboardControl() {
-        setupKeyboardEvent()
-        setupTapKeyboardDismiss()
-    }
-        
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        let touchPoint = touch.location(in: self.view)
-        return !chatingTextFieldView.frame.contains(touchPoint)
-    }
-    
-    func gestureCompletion() {
-        cancleEditMode()
-    }
-    
-    private func cancleEditMode() {
-        guard isEditMode else { return }
-        chatingTextFieldView.textView.text = nil
-        isEditMode = false
-        commentVC.changeWriteMode(.basic)
-    }
-}
-
 // MARK: - Alert
 extension PostDetailViewController {
     private func showSuggestReviewAlert(with postSummary: PostSummary) {
@@ -464,7 +351,7 @@ extension PostDetailViewController {
 // MARK: - Sheet
 extension PostDetailViewController {
     
-    // MARK: - 댓글 메뉴버튼 액션
+    // MARK: - 게시글 메뉴 액션
     private func handlePostMenuAction() {
         let isCreator = postSummary?.isCreator ?? false
         if isCreator {
@@ -496,7 +383,7 @@ extension PostDetailViewController {
         switch postType {
         case .plan:
             return L10n.editPlan
-        case .review:
+        case .review, .oldPlan:
             let hasImage = (postSummary as? ReviewPostSummary)?.hasImage ?? false
             return hasImage ? L10n.Review.edit : L10n.Review.create
         }
@@ -528,14 +415,6 @@ extension PostDetailViewController {
                      completion: { [weak self] in
             self?.reportPost.onNext(())
         })
-    }
-}
-
-// MARK: - Helper
-extension PostDetailViewController {
-    private func updateScrollViewHeight() {
-        guard scrollViewHeight == nil else { return }
-        self.scrollViewHeight = commentContainer.bounds.height
     }
 }
 

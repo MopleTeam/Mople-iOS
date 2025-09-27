@@ -191,7 +191,7 @@ extension MeetDetailSceneDIContainer {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
                                                       type: type,
-                                                      id: postId)
+                                                      postId: postId)
         return planDetailDI.makePostDetailCoordinator()
     }
 }

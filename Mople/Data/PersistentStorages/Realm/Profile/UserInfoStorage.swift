@@ -73,45 +73,19 @@ final class UserInfoStorage {
         self.userInfo?.updateProfile(profile)
     }
     
-    func updateNotifyCount(_ count: Int) {
+    func updateNotifyStatus(hasNotify: Bool) {
         guard let userInfo = userInfoData.first else { return }
     
         try! realmDB.write({
-            userInfo.notifyCount = count
+            userInfo.hasNotify = hasNotify
         })
     
-        self.userInfo?.notifyCount = count
+        self.userInfo?.hasNotify = hasNotify
         postNotifyCountChanged()
     }
-    
-    func adjustNotifyCount(isIncreasing: Bool) {
-        let adjustCount = isIncreasing ? 1 : -1
-        
-        guard let userInfo = userInfoData.first else { return }
-        
-        try! realmDB.write({
-            userInfo.notifyCount += adjustCount
-        })
-        
-        self.userInfo?.notifyCount += adjustCount
-        postNotifyCountChanged()
-    }
-    
-    func resetNotifyCount() {
-        UIApplication.shared.applicationIconBadgeNumber = 0
 
-        guard let userInfo = userInfoData.first else { return }
-    
-        try! realmDB.write({
-            userInfo.notifyCount = 0
-        })
-    
-        self.userInfo?.notifyCount = 0
-        postNotifyCountChanged()
-    }
-    
     private func postNotifyCountChanged() {
-        NotificationManager.shared.post(name: .changedNotifyCount)
+        NotificationManager.shared.post(name: .changedNotifyStatus)
     }
 }
 

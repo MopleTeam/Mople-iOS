@@ -7,17 +7,6 @@
 
 import UIKit
 
-struct Members {
-    let creatorId: Int?
-    var page: MemberPage
-}
-
-// MARK: - Page
-struct MemberPage {
-    var members: [MemberInfo]
-    let page: PageInfo
-}
-
 // MARK: - Memebr
 enum MemberPositionType {
     case owner
@@ -36,7 +25,7 @@ enum MemberPositionType {
     }
 }
 
-struct MemberInfo: Equatable {
+struct MemberInfo: Hashable {
     let memberId: Int?
     let nickname: String?
     let imagePath: String?

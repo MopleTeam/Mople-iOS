@@ -9,12 +9,13 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class LikeView: UIView {
+final class ButtonCountView: UIView {
     
     private var disposeBag = DisposeBag()
+    private var isHaptic: Bool = false
     
     // MARK: - UI Components
-    fileprivate let likeButton: UIButton = {
+    fileprivate let button: UIButton = {
         let btn = UIButton()
         btn.setImage(.likeOff, for: .normal)
         return btn
@@ -28,7 +29,7 @@ final class LikeView: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [likeButton, countLabel])
+        let sv = UIStackView(arrangedSubviews: [button, countLabel])
         sv.axis = .horizontal
         sv.distribution = .fill
         sv.alignment = .center
@@ -54,7 +55,7 @@ final class LikeView: UIView {
             make.edges.equalToSuperview()
         }
         
-        likeButton.snp.makeConstraints { make in
+        button.snp.makeConstraints { make in
             make.size.equalTo(28)
         }
         
@@ -64,13 +65,15 @@ final class LikeView: UIView {
     }
     
     // MARK: - Configure
-    public func configure(isLike: Bool, likeCount: Int) {
-        likeButton.setImage(isLike ? .likeOn : .likeOff, for: .normal)
-        countLabel.text = likeCount > 0 ? likeCount.formatCompactNumber() : nil
+    public func configure(image: UIImage, count: Int, isHaptic: Bool = false) {
+        button.setImage(image, for: .normal)
+        countLabel.text = count > 0 ? count.formatCompactNumber() : nil
+        self.isHaptic = isHaptic
     }
     
     private func bind() {
-        likeButton.rx.tap
+        button.rx.tap
+            .filter({ self.isHaptic })
             .subscribe(onNext: { _ in
                 HapticManager.shared.playHaptics()
             })
@@ -78,9 +81,9 @@ final class LikeView: UIView {
     }
 }
 
-extension Reactive where Base: LikeView {
+extension Reactive where Base: ButtonCountView {
     var tap: ControlEvent<Void> {
-        return base.likeButton.rx.controlEvent(.touchUpInside)
+        return base.button.rx.controlEvent(.touchUpInside)
     }
 }
 

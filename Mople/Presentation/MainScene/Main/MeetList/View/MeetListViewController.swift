@@ -233,7 +233,7 @@ extension MeetListViewController {
 
 extension MeetListViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard scrollView.isBottom(threshold: 200),
+        guard scrollView.isBottom(threshold: 50),
               reactor?.page?.hasNext == true else { return }
         nextPage.onNext(())
     }

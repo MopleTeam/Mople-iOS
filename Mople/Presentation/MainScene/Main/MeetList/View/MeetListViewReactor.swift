@@ -135,7 +135,11 @@ extension MeetListViewReactor {
     }
     
     private func refresh() -> Observable<Mutation> {
+        isLoading = true
         return fetchMeetList(isRefresh: true)
+            .do(onDispose: {
+                self.isLoading = false
+            })
             .concat(Observable.just(.completedRefresh))
     }
     

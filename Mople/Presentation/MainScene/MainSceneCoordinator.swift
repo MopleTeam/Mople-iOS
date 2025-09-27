@@ -115,6 +115,7 @@ extension MainSceneCoordinator {
 // MARK: - Handle Notification Tap
 extension MainSceneCoordinator {
     func handleNotification(destination: NotificationDestination) {
+        print(#function, #line, "Path : # ")
         tabBarController?.resetNotify()
         let destination = dependencies.makeNotificationDestination(type: destination)
         self.start(coordinator: destination)

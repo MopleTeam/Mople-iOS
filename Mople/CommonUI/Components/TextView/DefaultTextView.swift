@@ -10,6 +10,11 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+struct MessageInfo {
+    var text: String
+    var mentionList: [Int] = []
+}
+
 final class DefaultTextView: UIView {
     
     // MARK: - Variables
@@ -22,6 +27,14 @@ final class DefaultTextView: UIView {
         }
     }
     
+    public var cursorLocation: NSRange { textView.selectedRange }
+    
+    public var messageInfo: MessageInfo? {
+        let info = textView.getServerTextWithMentions()
+        guard !info.text.isEmpty else { return nil }
+        return .init(text: info.text, mentionList: info.mentionIds)
+    }
+    
     private var maxHeight: CGFloat {
         let lineHeight = textView.font?.lineHeight ?? 0
         return lineHeight * CGFloat(maxTextLine)
@@ -30,15 +43,16 @@ final class DefaultTextView: UIView {
     private var minHeight: CGFloat { 20 }
     public var maxTextLine: Int = 4
     private var textViewHeightConstraint: Constraint?
-    
+    private var selectionChangeWorkItem: DispatchWorkItem?
     
     // MARK: - Observable
     fileprivate let editingObservable: BehaviorRelay<Bool> = .init(value: false)
-
+    fileprivate let cursor: PublishSubject<Void> = .init()
+    
     // MARK: - UI Components
     fileprivate let textView: UITextView = {
         let textView = UITextView()
-        textView.font = FontStyle.Body1.regular
+        textView.font = FontStyle.Body1.medium
         textView.textColor = .gray02
         textView.tintColor = .gray02
         textView.isScrollEnabled = false
@@ -88,8 +102,20 @@ final class DefaultTextView: UIView {
     }
 }
 
-// MARK: - PlaceHolder
+// MARK: - Configure
 extension DefaultTextView {
+    public func addMention(text: String, id: Int) {
+        self.textView.addMention(text: text, id: id)
+        hidePlaceHolder()
+        updateTextViewHeight()
+    }
+    
+    public func setMessage(text: String, mentions: [UserInfo]) {
+        self.textView.setTextFromServer(text: text, mentions: mentions)
+        hidePlaceHolder()
+        updateTextViewHeight()
+    }
+    
     public func setPlaceholderText(text: String) {
         self.placeHolder.text = text
     }
@@ -110,8 +136,32 @@ extension DefaultTextView: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        hidePlaceHolder()
         updateTextViewHeight()
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        textView.resetTypingAttributes()
+        if text.isEmpty && range.length == 1 {
+            let deleteLocation = range.location
+            if let mentionRange = textView.getMentionRange(at: deleteLocation) {
+                DispatchQueue.main.async {
+                    textView.deleteMentionRange(mentionRange)
+                }
+                return false
+            }
+        }
+        return true
+    }
+    
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        hidePlaceHolder()
+        cursor.onNext(())
+        selectionChangeWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.textView.handleSelectionConfirmed()
+        }
+        selectionChangeWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: workItem)
     }
 }
 
@@ -129,18 +179,51 @@ extension DefaultTextView {
         
         let roundedCurrent = round(textView.frame.height * 100) / 100
         let roundedExpected = round(clampedExpectedHeight * 100) / 100
-
+        
         // 현재 텍스트뷰 높이와 조정할 높이가 같지 않다면?
         if roundedCurrent != roundedExpected {
             textView.isScrollEnabled = expectedSize.height > maxHeight
             textViewHeightConstraint?.update(offset: clampedExpectedHeight)
         }
     }
+    
+    func filterMention() -> String? {
+        guard let attributedText = textView.attributedText,
+              !attributedText.string.isEmpty else { return nil }
+        
+        let cursorLocation = textView.selectedRange.location
+        guard cursorLocation > 0 else { return nil }
+        
+        // 커서 바로 앞 문자가 멘션 어트리뷰트인지 체크
+        if cursorLocation <= attributedText.length {
+            let checkLocation = cursorLocation - 1
+            let attributes = attributedText.attributes(at: checkLocation, effectiveRange: nil)
+            if attributes[NSAttributedString.Key(rawValue: "MentionTag")] != nil {
+                return nil
+            }
+        }
+        
+        // ✅ 수정: NSString 사용하여 UTF-16 기준으로 처리
+        let text = attributedText.string as NSString
+        let beforeCursorRange = NSRange(location: 0, length: cursorLocation)
+        let beforeCursorText = text.substring(with: beforeCursorRange)
+        
+        let words = beforeCursorText.components(separatedBy: " ")
+        guard let lastWord = words.last, lastWord.hasPrefix("@") else { return nil }
+        
+        return String(lastWord.dropFirst())
+    }
 }
 
 extension Reactive where Base: DefaultTextView {
     var text: Observable<String?> {
         return base.textView.rx.text
+            .asObservable()
+    }
+    
+    var mention: Observable<String?> {
+        return base.cursor
+            .map({ _ in base.filterMention() })
             .asObservable()
     }
     
@@ -152,3 +235,6 @@ extension Reactive where Base: DefaultTextView {
         return base.editingObservable.asObservable()
     }
 }
+
+
+

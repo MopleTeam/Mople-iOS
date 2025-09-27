@@ -27,7 +27,13 @@ final class PostDetailView: UIView {
         return view
     }()
     
-    private lazy var photoView = PhotoCollectionView()
+    fileprivate lazy var photoView = PhotoCollectionView()
+    
+    private lazy var photoBorderView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .bgSecondary
+        return view
+    }()
     
     fileprivate lazy var participationButton: BaseButton = {
         let btn = BaseButton()
@@ -168,8 +174,10 @@ extension PostDetailView {
         let imagePaths = reviewSummary.images.map({ $0.path })
         
         if imagePaths.isEmpty {
+            removePhotoBorder()
             removePhotoView()
         } else {
+            addPhotoBorder()
             addPhotoView(imagePaths: imagePaths)
         }
     }
@@ -184,10 +192,24 @@ extension PostDetailView {
         }
     }
     
+    private func addPhotoBorder() {
+        guard !mainStackView.arrangedSubviews.contains(photoBorderView) else { return }
+        mainStackView.addArrangedSubview(photoBorderView)
+        photoBorderView.snp.makeConstraints { make in
+            make.height.equalTo(8)
+        }
+    }
+    
     private func removePhotoView() {
         guard mainStackView.arrangedSubviews.contains(photoView) else { return }
         mainStackView.removeArrangedSubview(photoView)
         photoView.removeFromSuperview()
+    }
+    
+    private func removePhotoBorder() {
+        guard mainStackView.arrangedSubviews.contains(photoBorderView) else { return }
+        mainStackView.removeArrangedSubview(photoBorderView)
+        photoBorderView.removeFromSuperview()
     }
 }
 
@@ -203,5 +225,9 @@ extension Reactive where Base: PostDetailView {
     
     var participationTapped: ControlEvent<Void> {
         return base.participationButton.rx.tap
+    }
+    
+    var photoTapped: Observable<Int> {
+        return base.photoView.rx.selectPhoto
     }
 }

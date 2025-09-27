@@ -23,6 +23,19 @@ final class ChatingTextFieldView: UIView {
         return btn
     }()
     
+    private let editLabel: UILabel = {
+        let label = UILabel()
+        label.text = "댓글 수정중"
+        label.font = FontStyle.Body2.medium
+        label.textColor = UIColor.gray04
+        label.layer.cornerRadius = 4
+        label.layer.masksToBounds = true
+        label.backgroundColor = UIColor.bgPrimary
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
+    }()
+    
     private let sendImageView: UIImageView = {
         let view = UIImageView(image: .sendArrowCircleDisable)
         view.backgroundColor = .clear
@@ -31,15 +44,24 @@ final class ChatingTextFieldView: UIView {
     
     public let textView: DefaultTextView = {
         let view = DefaultTextView()
-        view.setPlaceholderText(text: L10n.Comment.input)
+        view.setPlaceholderText(text: "@으로 멘션할 수 있어요!")
         return view
     }()
     
-    private lazy var mainStackView: UIStackView = {
+    private lazy var chatingStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [textView, sendButton])
         sv.axis = .horizontal
         sv.alignment = .fill
         sv.distribution = .fill
+        return sv
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [editLabel, chatingStackView])
+        sv.axis = .vertical
+        sv.alignment = .leading
+        sv.distribution = .fill
+        sv.spacing = 8
         return sv
     }()
     
@@ -60,6 +82,15 @@ final class ChatingTextFieldView: UIView {
             make.top.equalToSuperview().inset(16).priority(.high)
             make.horizontalEdges.equalToSuperview().inset(20).priority(.high)
             make.bottom.equalToSuperview()
+        }
+        
+        chatingStackView.snp.makeConstraints { make in
+            make.width.equalTo(mainStackView.snp.width)
+        }
+        
+        editLabel.snp.makeConstraints { make in
+            make.height.equalTo(25)
+            make.width.equalTo(70)
         }
         
         sendButton.snp.makeConstraints { make in
@@ -91,13 +122,16 @@ final class ChatingTextFieldView: UIView {
             })
             .disposed(by: disposeBag)
     }
+    
+    public func hideEditLabel(isHide: Bool) {
+        editLabel.isHidden = isHide
+    }
 }
 
 extension Reactive where Base: ChatingTextFieldView {
-    var sendText: Observable<String> {
+    var sendMessage: Observable<MessageInfo> {
         return base.sendButton.rx.controlEvent(.touchUpInside)
-            .map { _ in base.textView.text }
+            .map { _ in base.textView.messageInfo }
             .compactMap { $0 }
-            .filter { $0.count > 0 }
     }
 }

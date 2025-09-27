@@ -12,7 +12,7 @@ final class HapticManager {
     
     private init() { }
     
-    public func playHaptics(style: UIImpactFeedbackGenerator.FeedbackStyle = .heavy) {
+    public func playHaptics(style: UIImpactFeedbackGenerator.FeedbackStyle = .soft) {
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.impactOccurred()
     }

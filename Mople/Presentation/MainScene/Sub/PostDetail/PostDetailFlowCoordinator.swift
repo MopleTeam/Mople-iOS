@@ -21,15 +21,19 @@ protocol PostDetailCoordination: AnyObject {
     func endFlow()
 }
 
-protocol CommentListCoordination: AnyObject {
+protocol CommentListCoordination: NavigationCloseable {
     func presentWriterImageView(title: String?,
-                                imagePath: String,
+                                imagePath: String?,
                                 defaultType: UIImageView.DefaultImageType)
+    
+    func pushReplyPage(parentComment: Comment)
+    func deleteParentComment(id: Int)
 }
 
 final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
 
     private let dependencies: PostDetailSceneDependencies
+    private var postVC: PostDetailViewController?
     
     init(dependencies: PostDetailSceneDependencies,
          navigationController: AppNaviViewController) {
@@ -39,8 +43,8 @@ final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
     }
     
     override func start() {
-        let planDetailVC = dependencies.makePlanDetailViewController(coordinator: self)
-        self.pushWithTracking(planDetailVC, animated: false)
+        postVC = dependencies.makePlanDetailViewController(coordinator: self)
+        self.pushWithTracking(postVC!, animated: false)
     }
 }
 
@@ -69,8 +73,19 @@ extension PostDetailFlowCoordinator: ReviewEditViewCoordination {
     }
 }
 
-// MARK: - Photo View
+// MARK: - Comment View
 extension PostDetailFlowCoordinator: CommentListCoordination {
+    func pushReplyPage(parentComment: Comment) {
+        let vc = dependencies.makeCommentListViewController(type: .child(parent: parentComment),
+                                                            coordinator: self)
+        self.push(vc, animated: true)
+    }
+    
+    func deleteParentComment(id: Int) {
+        postVC?.commentVC.deletedComment(id: id)
+        self.pop()
+    }
+    
     func presentPhotoView(title: String?,
                           index: Int,
                           imagePaths: [String],
@@ -83,11 +98,14 @@ extension PostDetailFlowCoordinator: CommentListCoordination {
     }
     
     func presentWriterImageView(title: String?,
-                                imagePath: String,
+                                imagePath: String?,
                                 defaultType: UIImageView.DefaultImageType) {
+        let imagePaths = [imagePath].compactMap { $0 }
+        
         let vc = dependencies.makePhotoBookViewController(title: title,
-                                                          imagePaths: [imagePath],
+                                                          imagePaths: imagePaths,
                                                           defaultType: defaultType)
+        
         self.presentWithTracking(vc)
     }
 }

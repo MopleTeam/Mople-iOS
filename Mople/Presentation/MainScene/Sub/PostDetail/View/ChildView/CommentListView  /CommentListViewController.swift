@@ -13,15 +13,27 @@ import ReactorKit
 import RxDataSources
 
 enum WriteMode {
-    case edit(commentId: Int)
+    case edit(comment: Comment)
     case basic
 }
 
-final class CommentListViewController: DefaultViewController, View {
+final class CommentListViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
     
     // MARK: - Reactor
     typealias Reactor = CommentListViewReactor
     var disposeBag = DisposeBag()
+    
+    // MARK: - Handle KeyboardEvent
+    var keyboardHeight: CGFloat?
+    var keyboardHeightDiff: CGFloat?
+    var scrollView: UIScrollView? { tableView }
+    var floatingView: UIView { chatingTextFieldView }
+    var floatingViewBottom: Constraint?
+    var startOffsetY: CGFloat = .zero
+    
+    // MARK: - Constraints
+    private var mentionHeight: Constraint?
+    private var cachedHeight: CGFloat?
     
     // MARK: - Variables
     private var postId: Int?
@@ -34,16 +46,16 @@ final class CommentListViewController: DefaultViewController, View {
     }
     
     // MARK: - Observable
-    fileprivate let offset: PublishSubject<CGFloat> = .init()
     fileprivate let selectedPhoto: PublishSubject<Int> = .init()
     fileprivate let userProfileTap: PublishSubject<(name: String?, imagePath: String?)> = .init()
-    fileprivate let writeComment: PublishSubject<String> = .init()
-    fileprivate let editingComment: PublishSubject<String> = .init()
+    fileprivate let writeComment: PublishSubject<(text: String, mentionIds: [Int])> = .init()
     private let likeComment: PublishSubject<Int> = .init()
     private let deleteComment: PublishSubject<Int> = .init()
+    private let deletedComment: PublishSubject<Int> = .init()
     private let reportComment: PublishSubject<Int> = .init()
     private let fetchComment: PublishSubject<Int> = .init()
     private let fetchNextPage: PublishSubject<Void> = .init()
+    private let reply: PublishSubject<Comment> = .init()
 
     
     // MARK: - UI Components
@@ -64,12 +76,36 @@ final class CommentListViewController: DefaultViewController, View {
         return view
     }()
     
+    private let chatingTextFieldView: ChatingTextFieldView = {
+        let chatingView = ChatingTextFieldView()
+        chatingView.backgroundColor = .defaultWhite
+        return chatingView
+    }()
+    
+    // MARK: - Child VC
+    private let mentionVC: MentionListViewController
+    private let mentionContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .defaultWhite
+        view.layer.makeLine(width: 1)
+        view.layer.makeShadow(opactity: 0.1,           // Color의 10%
+                              radius: 12,               // Blur 값
+                              offset: CGSize(width: 0, height: 2),  // Position X: 0, Y: 2
+                              color: UIColor.defaultBlue)
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    
     // MARK: - Refresh Control
     fileprivate let refreshControl = UIRefreshControl()
     
     // MARK: - LifeCycle
-    init(reactor: CommentListViewReactor) {
-        super.init()
+    init(reactor: CommentListViewReactor,
+         mentionVC: MentionListViewController) {
+        self.mentionVC = mentionVC
+        super.init(title: "답글")
         self.reactor = reactor
     }
     
@@ -80,10 +116,25 @@ final class CommentListViewController: DefaultViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setChildVC()
         setEdgeGesture()
+        setKeyboardControl()
+        setMentionBind()
+        setNavi()
+        setNaviItem()
     }
 
     // MARK: - UI Setup
+    private func setNavi() {
+        guard case .parent = reactor?.type else { return }
+        self.hideTop(isHide: true)
+    }
+    
+    private func setNaviItem() {
+        guard case .child = reactor?.type else { return }
+        self.setBarItem(type: .left)
+    }
+    
     private func setupUI() {
         setTableView()
         setLayout()
@@ -98,9 +149,30 @@ final class CommentListViewController: DefaultViewController, View {
     
     private func setLayout() {
         self.view.addSubview(tableView)
+        self.view.addSubview(chatingTextFieldView)
+        self.view.addSubview(mentionContainer)
         
+
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            if case .parent = reactor?.type {
+                make.top.equalToSuperview()
+            } else {
+                make.top.equalTo(self.titleViewBottom)
+            }
+            make.horizontalEdges.equalToSuperview()
+        }
+        
+        chatingTextFieldView.snp.makeConstraints { make in
+            make.top.equalTo(tableView.snp.bottom)
+            make.horizontalEdges.equalToSuperview()
+            floatingViewBottom = make.bottom.equalToSuperview()
+                .inset(UIScreen.getDefaultBottomPadding()).constraint
+        }
+        
+        mentionContainer.snp.makeConstraints { make in
+            mentionHeight = make.height.equalTo(0).constraint
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalTo(chatingTextFieldView.snp.top).offset(-12)
         }
     }
     
@@ -112,11 +184,70 @@ final class CommentListViewController: DefaultViewController, View {
         }
     }
     
+    // MARK: - Set ChildVC
+    private func setChildVC() {
+        self.add(child: mentionVC,
+                 container: mentionContainer)
+    }
+    
     // MARK: - Gesture
     private func setEdgeGesture() {
         guard let currentNavi = self.findCurrentNavigation(),
-              let appNavi = currentNavi as? AppNaviViewController else { return }
+              let appNavi = currentNavi as? AppNaviViewController,
+              case .parent = reactor?.type else { return }
         tableView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
+    }
+    
+    private func setMentionBind() {
+        chatingTextFieldView.rx.sendMessage
+            .bind(with: self, onNext: { vc, info in
+                vc.writeComment.onNext((info.text, info.mentionList))
+            })
+            .disposed(by: disposeBag)
+        
+        chatingTextFieldView.textView.rx.mention
+            .bind(with: self, onNext: { vc, keyword in
+                if let keyword {
+                    vc.showMentionVC(keyword: keyword)
+                } else {
+                    vc.hideMentionVC()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        mentionVC.rx.selectedMention
+            .bind(with: self, onNext: { vc, memberInfo in
+                guard let name = memberInfo.nickname,
+                      let id = memberInfo.memberId else { return }
+                vc.chatingTextFieldView.textView.addMention(text: name,
+                                                            id: id)
+            })
+            .disposed(by: disposeBag)
+        
+        mentionVC.rx.height
+            .asDriver(onErrorJustReturn: 0)
+            .drive(with: self, onNext: { vc, height in
+                vc.mentionHeight?.update(offset: height)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func showMentionVC(keyword: String) {
+        let id: Int
+        guard let reactor else { return }
+        switch reactor.type {
+        case .parent:
+            guard let postId else { return }
+            id = postId
+        case .child(let parent):
+            guard let postId = parent.postId else { return }
+            id = postId
+        }
+        mentionVC.searchMention(postId: id, keyword: keyword)
+    }
+    
+    private func hideMentionVC() {
+        mentionHeight?.update(offset: 0)
     }
 }
 
@@ -133,6 +264,24 @@ extension CommentListViewController {
     
     public func changeWriteMode(_ mode: WriteMode) {
         writeMode = mode
+        switch mode {
+        case .edit(let comment):
+            setEditComment(comment)
+        case .basic:
+            setStartMessage()
+        }
+    }
+    
+    private func setStartMessage() {
+        chatingTextFieldView.textView.text = nil
+        chatingTextFieldView.hideEditLabel(isHide: true)
+    }
+    
+    private func setEditComment(_ comment: Comment) {
+        guard let text = comment.comment else { return }
+        chatingTextFieldView.hideEditLabel(isHide: false)
+        chatingTextFieldView.textView.setMessage(text: text, mentions: comment.mentions)
+        chatingTextFieldView.textView.rx.isResign.onNext(false)
     }
 }
 
@@ -157,6 +306,11 @@ extension CommentListViewController {
     }
 
     private func setActionBind(_ reactor: Reactor) {
+        self.naviBar.leftItemEvent
+            .map { Reactor.Action.endFlow }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         fetchComment
             .map { [weak self] in
                 let isRefresh = self?.refreshControl.isRefreshing == true
@@ -176,12 +330,21 @@ extension CommentListViewController {
         
         writeComment
             .observe(on: MainScheduler.asyncInstance)
-            .compactMap({ [weak self] in self?.handleWriteComment($0) })
+            .compactMap({ self.handleWriteComment(text: $0.text,
+                                        mentionIds: $0.mentionIds) })
+            .do(onNext: { _ in
+                self.changeWriteMode(.basic)
+            })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         deleteComment
             .map { Reactor.Action.deleteComment(id: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        deletedComment
+            .map { Reactor.Action.deletedComment(id: $0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -200,6 +363,37 @@ extension CommentListViewController {
             .map { Reactor.Action.showWriterImage(name: $0.name, imagePath: $0.imagePath) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+        
+        reply
+            .map { Reactor.Action.showReply(parentComment: $0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+    }
+    
+    private func setParentCommentCell(comment: Comment,
+                                      index: Int,
+                                      cell: CommentTableCell) {
+        let isLast = isLastCell(at: index)
+        if comment.isMockup {
+            cell.mockParentConfigure(isLastCell: isLast)
+        } else {
+            cell.parentCommentConfigure(with: comment, isLastCell: isLast)
+        }
+        
+        cell.replyTapped = { [weak self] in
+            guard let postId = self?.postId else { return }
+            var newItem = comment
+            newItem.updatePostId(postId: postId)
+            self?.reply.onNext(newItem)
+        }
+    }
+    
+    private func setChildCommentCell(comment: Comment, cell: CommentTableCell) {
+        if comment.isMockup {
+            cell.mockChildConfigure()
+        } else {
+            cell.childCommentConfigure(with: comment)
+        }
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
@@ -208,12 +402,17 @@ extension CommentListViewController {
             .do(onNext: { self.comments = $0 })
             .drive(self.tableView.rx.items(cellIdentifier: CommentTableCell.reuseIdentifier,
                                            cellType: CommentTableCell.self)) { [weak self] index, item, cell in
-                guard let self, let commentId = item.id else { return }
-                let isLast = isLastCell(at: index)
-                if item.isMockup {
-                    cell.mockConfigure()
-                } else {
-                    cell.configure(with: item, isLastCell: isLast)
+                guard let self else { return }
+                switch reactor.type {
+                case .parent:
+                    setParentCommentCell(comment: item, index: index, cell: cell)
+                case .child:
+                    setChildCommentCell(comment: item, cell: cell)
+                }
+                
+                cell.profileTapped = { [weak self] in
+                    self?.userProfileTap.onNext((item.writerName,
+                                                 item.writerThumbnailPath))
                 }
                 
                 cell.menuTapped = { [weak self] in
@@ -221,7 +420,8 @@ extension CommentListViewController {
                 }
                 
                 cell.likeTapped = { [weak self] in
-                    self?.likeComment.onNext(commentId)
+                    guard let id = item.id else { return }
+                    self?.likeComment.onNext(id)
                 }
             }
             .disposed(by: disposeBag)
@@ -251,13 +451,14 @@ extension CommentListViewController {
             .disposed(by: disposeBag)
     }
     
-    private func handleWriteComment(_ text: String) -> Reactor.Action {
+    private func handleWriteComment(text: String, mentionIds: [Int]) -> Reactor.Action? {
         switch writeMode {
         case .basic:
             return .createComment(content: text,
-                                  mentions: [])
-        case let .edit(id):
-            return .editComment(id: id, content: text, mentions: [])
+                                  mentions: mentionIds)
+        case let .edit(comment):
+            guard let id = comment.id else { return nil }
+            return .editComment(id: id, content: text, mentions: mentionIds)
         }
     }
 }
@@ -269,10 +470,15 @@ extension CommentListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 58
+        guard let reactor else { return 0 }
+        switch reactor.type {
+        case .parent: return 58
+        case .child: return 28
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard case .parent = reactor?.type else { return nil }
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: CommentSectionHeader.reuseIdentifier) as! CommentSectionHeader
         return view
     }
@@ -284,15 +490,20 @@ extension CommentListViewController: UITableViewDelegate {
 
     // MARK: - ScrollView Deleagte
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        offset.onNext(scrollView.contentOffset.y)
+        setStartOffsetY(scrollView.contentOffset.y)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        offset.onNext(scrollView.contentOffset.y)
+        setStartOffsetY(scrollView.contentOffset.y)
+    }
+    
+    private func setStartOffsetY(_ offsetY: CGFloat) {
+        guard let keyboardHeight else { return }
+        self.startOffsetY = offsetY - keyboardHeight + UIScreen.getDefaultBottomPadding()
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.isBottom(threshold: 200),
+        if scrollView.isBottom(threshold: 50),
            self.reactor?.page?.hasNext == true {
             fetchNextPage.onNext(())
         }
@@ -316,20 +527,14 @@ extension CommentListViewController {
         let editComment = editCommentAction(with: comment)
         let deleteComment = deleteCommentAction(with: comment)
         sheetManager.showSheet(actions: [editComment,
-                                         deleteComment],
-                               cancleAction: { [weak self] in
-            self?.changeWriteMode(.basic)
-        })
+                                         deleteComment])
     }
     
     private func editCommentAction(with comment: Comment) -> DefaultSheetAction {
         return .init(text: L10n.Comment.edit,
                      image: .editComment,
                      completion: { [weak self] in
-            guard let id = comment.id,
-                  let text = comment.comment else { return }
-            self?.changeWriteMode(.edit(commentId: id))
-            self?.editingComment.onNext(text)
+            self?.changeWriteMode(.edit(comment: comment))
         })
     }
     
@@ -364,6 +569,10 @@ extension CommentListViewController {
         guard let commentsCount = reactor?.currentState.comments.count else { return false }
         return commentsCount == (index + 1)
     }
+    
+    public func deletedComment(id: Int) {
+        deletedComment.onNext(id)
+    }
 }
 
 // MARK: - Handle Loading
@@ -383,20 +592,40 @@ extension CommentListViewController {
     }
 }
 
+extension CommentListViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
+    var tapGestureShouldCancelTouchesInView: Bool { false }
+
+    private func setKeyboardControl() {
+        setupKeyboardEvent(showCompletion: { [weak self] in
+            guard let self,
+                  let cachedHeight else { return }
+            mentionHeight?.update(offset: cachedHeight)
+        }, hideCompletion: { [weak self] in
+            guard let self else { return }
+            cachedHeight = mentionContainer.frame.height
+            mentionHeight?.update(offset: 0)
+        })
+        setupTapKeyboardDismiss()
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        let touchPoint = touch.location(in: self.view)
+        let isTextViewTouch = chatingTextFieldView.frame.contains(touchPoint)
+        let isMentionTouch = mentionContainer.frame.contains(touchPoint)
+        return !isTextViewTouch && !isMentionTouch
+    }
+
+    func gestureCompletion() {
+        cancleEditMode()
+    }
+
+    private func cancleEditMode() {
+        guard case .edit = writeMode else { return }
+        changeWriteMode(.basic)
+    }
+}
+
 extension Reactive where Base: CommentListViewController {
-    var writeComment: AnyObserver<String> {
-        return base.writeComment
-            .asObserver()
-    }
-    
-    var editComment: Observable<String> {
-        return base.editingComment
-    }
-    
-    var offset: Observable<CGFloat> {
-        return base.offset
-    }
-    
     var refresh: Observable<Void> {
         return base.refreshControl.rx.controlEvent(.valueChanged)
             .filter { base.refreshControl.isRefreshing }

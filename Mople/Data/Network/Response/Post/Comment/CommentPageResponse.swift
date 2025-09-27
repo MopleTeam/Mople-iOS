@@ -16,6 +16,7 @@ struct CommentResponse: Decodable {
     let replyCount: Int?
     let likeCount: Int
     let likedByMe: Bool
+    let mentions: [UserInfoResponse]
     let time: String
     let writer: UserInfoResponse
 }
@@ -23,7 +24,7 @@ struct CommentResponse: Decodable {
 extension CommentResponse {
     func toDomain() -> Comment {
         let date = DateManager.parseServerFullDate(string: self.time)
-        
+        let domainMentions = mentions.map { $0.toDomain() }
         return .init(id: commentId,
                      parentId: parentId,
                      writerId: writer.userId,
@@ -33,7 +34,8 @@ extension CommentResponse {
                      createdDate: date,
                      isLiked: likedByMe,
                      likeCount: likeCount,
-                     replyCount: replyCount ?? 0)
+                     replyCount: replyCount ?? 0,
+                     mentions: domainMentions)
     }
 }
 

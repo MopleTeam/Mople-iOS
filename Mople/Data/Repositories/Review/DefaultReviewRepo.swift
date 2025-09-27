@@ -15,9 +15,9 @@ final class DefaultReviewRepo: BaseRepositories, ReviewRepo {
         }
     }
     
-    func fetchReviewDetail(_ reviewId: Int) -> Single<ReviewResponse> {
+    func fetchReviewDetail(id: Int, isOldPlan: Bool) -> Single<ReviewResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchReviewDetail(id: reviewId)
+            try APIEndpoints.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
         }
     }
     

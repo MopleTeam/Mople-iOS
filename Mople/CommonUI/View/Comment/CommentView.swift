@@ -72,13 +72,9 @@ final class CommentView: UIView {
         return view
     }()
     
-    public let likeButton = LikeView()
+    fileprivate let likeButton = ButtonCountView()
     
-    fileprivate let replyButton: UIButton = {
-        let view = UIButton()
-        view.setImage(.replyComment, for: .normal)
-        return view
-    }()
+    fileprivate let replyButton = ButtonCountView()
 
     private lazy var commentHeaderView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [nameLabel, timeLabel, menuButton])
@@ -147,18 +143,29 @@ final class CommentView: UIView {
     }
     
     // MARK: - Configure
-    public func configure(_ viewModel: CommentViewModel) {
+    public func configure(_ viewModel: CommentViewModel, showReply: Bool = true) {
         setProfileView(with: viewModel)
         self.nameLabel.text = viewModel.writerName
-        self.commentTextView.text = viewModel.text
+        self.commentTextView.setTextFromServer(text: viewModel.text, mentions: viewModel.mentions)
         self.timeLabel.text = viewModel.commentDate
-        self.likeButton.configure(isLike: viewModel.isLiked,
-                                      likeCount: viewModel.likeCount)
+        self.likeButton.configure(image: viewModel.isLiked ? .likeOn : .likeOff,
+                                  count: viewModel.likeCount,
+                                  isHaptic: true)
+        if showReply {
+            setReplyButton(with: viewModel)
+        } else {
+            replyButton.isHidden = true
+        }
     }
     
     private func setProfileView(with viewModel: CommentViewModel) {
         self.profileView.setImage(viewModel.writerThumbnailPath)
         self.imageSize?.update(offset: getImageSize(type: viewModel.type))
+    }
+    
+    private func setReplyButton(with viewModel: CommentViewModel) {
+        self.replyButton.configure(image: viewModel.replyCount > 0 ? .replyCommentOn : .replyComment,
+                                  count: viewModel.replyCount)
     }
     
     // MARK: - Control
@@ -184,9 +191,8 @@ extension Reactive where Base: CommentView {
         return base.menuButton.rx.controlEvent(.touchUpInside)
     }
     
-    var imageTapped: Observable<String> {
+    var imageTapped: Observable<String?> {
         return base.profileView.rx.tap
-            .compactMap { $0 }
     }
     
     var likeTapped: ControlEvent<Void> {

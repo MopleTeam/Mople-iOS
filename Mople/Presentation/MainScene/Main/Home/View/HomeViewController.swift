@@ -247,7 +247,7 @@ extension HomeViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        NotificationManager.shared.addObservable(name: .changedNotifyCount)
+        NotificationManager.shared.addObservable(name: .changedNotifyStatus)
             .map { Reactor.Action.fetchNotifyStatus }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

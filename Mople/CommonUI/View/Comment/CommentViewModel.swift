@@ -11,11 +11,12 @@ struct CommentViewModel {
     var type: CommentType
     var writerName: String?
     var writerThumbnailPath: String?
-    var text: String?
+    var text: String
+    var mentions: [UserInfo] = []
     var writedDate: Date?
     var isLiked: Bool = false
     var likeCount: Int = 0
-    
+    var replyCount: Int = 0
     var commentDate: String? {
         guard let writedDate else { return nil }
         return writedDate.timeAgoDescription()
@@ -27,9 +28,11 @@ extension CommentViewModel {
         self.type = comment.type
         self.writerName = comment.writerName ?? L10n.nonName
         self.writerThumbnailPath = comment.writerThumbnailPath
-        self.text = comment.comment
+        self.text = comment.comment ?? ""
+        self.mentions = comment.mentions
         self.writedDate = comment.createdDate
         self.isLiked = comment.isLiked
         self.likeCount = comment.likeCount
+        self.replyCount = comment.replyCount
     }
 }

@@ -215,7 +215,6 @@ final class PhotoBookViewController: TitleNaviViewController {
                 self.changeOpacity(opacity: 0)
                 self.view.layoutIfNeeded()
             }, completion: { [weak self] _ in
-//                self?.coordinator?.dismiss(completion: nil)
                 self?.dismiss(animated: true)
             })
     }

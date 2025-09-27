@@ -19,12 +19,13 @@ final class MentionListViewController: BaseViewController, View {
     
     // MARK: - Variables
     private let cellHeight: CGFloat = 60
+    private var memberList: [MemberInfo] = []
     
     // MARK: - Observer
+    private let fetchtPage: PublishSubject<(postId: Int, keyword: String?)> = .init()
     private let fetchNextPage: PublishSubject<Void> = .init()
-    
-    // MARK: - Constraints
-    private var height: Constraint?
+    fileprivate let height: PublishSubject<CGFloat> = .init()
+    fileprivate let selectedMember: PublishSubject<MemberInfo> = .init()
     
     // MARK: - UI Components
     private let tableView: UITableView = {
@@ -34,7 +35,7 @@ final class MentionListViewController: BaseViewController, View {
         table.tableFooterView = .init(frame: .init(origin: .zero, size: .init(width: table.bounds.width,
                                                                               height: 0.1)))
         table.sectionFooterHeight = 0
-        table.backgroundColor = .defaultRed
+        table.backgroundColor = .clear
         table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
         table.clipsToBounds = true
@@ -67,10 +68,14 @@ final class MentionListViewController: BaseViewController, View {
     
     private func setupUI() {
         view.addSubview(tableView)
-        self.view.backgroundColor = .systemMint
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    // MARK: - Search Keyword
+    public func searchMention(postId: Int, keyword: String?) {
+        fetchtPage.onNext((postId, keyword))
     }
 }
 
@@ -95,6 +100,14 @@ extension MentionListViewController {
     }
     
     private func setActionBind(_ reactor: Reactor) {
+        fetchtPage
+            .map { Reactor.Action.fetchPage(postId: $0.postId,
+                                            keyword: $0.keyword) }
+            .compactMap({ $0 })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
         fetchNextPage
             .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .map { Reactor.Action.fetchNextPage }
@@ -116,16 +129,15 @@ extension MentionListViewController {
             .observe(on: MainScheduler.asyncInstance)
             .asDriver(onErrorJustReturn: [])
             .drive(with: self, onNext: { vc, list in
+                vc.memberList = list
+                vc.updateHeight(listCount: list.count)
             })
             .disposed(by: disposeBag)
     }
     
     private func updateHeight(listCount: Int) {
-        let maxHeight = cellHeight * 4
-        let calculateHeight = cellHeight * CGFloat(listCount)
-        let height = min(maxHeight, calculateHeight)
-        self.height?.update(offset: height)
-        self.view.layoutIfNeeded()
+        let height = cellHeight * CGFloat(min(4, listCount))
+        self.height.onNext(height)
     }
 }
 
@@ -134,9 +146,19 @@ extension MentionListViewController: UITableViewDelegate {
         return cellHeight
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let height = cell.frame.size.height
-        print(#function, #line, "Path : # cell height \(height) ")
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let member = memberList[indexPath.row]
+        selectedMember.onNext(member)
+    }
+}
+
+extension Reactive where Base: MentionListViewController {
+    var selectedMention: Observable<MemberInfo> {
+        return base.selectedMember
+    }
+    
+    var height: Observable<CGFloat> {
+        return base.height
     }
 }
 
@@ -146,7 +168,7 @@ final class MentionListCell: UITableViewCell {
     private let memberView: MemberView = {
         let view = MemberView()
         view.setFont(font: FontStyle.Body1.regular)
-        view.backgroundColor = .systemPink
+        view.isUserInteractionEnabled = false
         return view
     }()
     
@@ -160,9 +182,14 @@ final class MentionListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Highlight
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+        super.setHighlighted(highlighted, animated: animated)
+        self.contentView.backgroundColor = highlighted ? .bgPrimary : .defaultWhite
+    }
+    
     // MARK: - UI Setup
     private func setupUI() {
-        self.backgroundColor = .systemMint
         self.contentView.addSubview(memberView)
         
         memberView.snp.makeConstraints { make in
@@ -176,3 +203,5 @@ final class MentionListCell: UITableViewCell {
         memberView.configure(memberInfo: memberInfo)
     }
 }
+
+

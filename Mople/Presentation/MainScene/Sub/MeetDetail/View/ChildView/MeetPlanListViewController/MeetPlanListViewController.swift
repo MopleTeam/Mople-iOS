@@ -26,6 +26,7 @@ final class MeetPlanListViewController: BaseViewController, View {
     // MARK: - Variables
     private var hasAppeared: Bool = false
     private var isVisibleView: Bool = false
+    private var isSetEdgeGesture: Bool = false
     
     // MARK: - UI Components
     private let countView: CountView = {
@@ -237,7 +238,9 @@ extension MeetPlanListViewController {
 
 extension MeetPlanListViewController: EdgeGestureConfigurable {
     func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        guard !isSetEdgeGesture else { return }
         tableView.panGestureRecognizer.require(toFail: edgeGesture)
+        isSetEdgeGesture = true
     }
 }
 
@@ -278,7 +281,7 @@ extension MeetPlanListViewController: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard scrollView.isBottom(threshold: 200),
+        guard scrollView.isBottom(threshold: 50),
               reactor?.page?.hasNext == true else { return }
         nextPage.onNext(())
     }

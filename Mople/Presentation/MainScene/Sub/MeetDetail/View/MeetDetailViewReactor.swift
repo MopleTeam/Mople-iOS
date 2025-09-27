@@ -28,6 +28,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             case createPlan
             case endFlow
             case showMeetImage
+            case memberList
         }
 
         enum Loading {
@@ -37,7 +38,6 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         
         case fetchMeetInfo
         case refresh
-        case invite
         case flow(Flow)
         case loading(Loading)
         case editMeet(MeetPayload)
@@ -105,8 +105,6 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchMeetInfo:
             return fetchMeetInfo()
-        case .invite:
-            return requestInviteUrl()
         case let .editMeet(payload):
             return handleMeetPayload(with: payload)
         case .refresh:
@@ -155,18 +153,6 @@ extension MeetDetailViewReactor {
         
         return requestWithLoading(task: fetchMeet)
     }
-    
-    private func requestInviteUrl() -> Observable<Mutation> {
-        guard let meetId = currentState.meet?.meetSummary?.id, !isLoading else { return .empty() }
-        isLoading = true
-        let inviteMeet = inviteMeetUseCase.execute(id: meetId)
-            .map { Mutation.updateInviteUrl($0) }
-        
-        return requestWithLoading(task: inviteMeet)
-            .do(onDispose: { [weak self] in
-                self?.isLoading = false
-            })
-    }
 }
 
 // MARK: - Coordinator
@@ -189,6 +175,8 @@ extension MeetDetailViewReactor {
             let imagePath = meetSummary?.imagePath
             coordinator?.presentPhotoView(title: title,
                                           imagePath: imagePath)
+        case .memberList:
+            coordinator?.pushMemberListView()
         }
         
         return .empty()

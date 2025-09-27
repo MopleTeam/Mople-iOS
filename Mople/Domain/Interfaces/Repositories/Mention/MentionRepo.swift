@@ -8,5 +8,5 @@
 import RxSwift
 
 protocol MentionRepo {
-    func execute(postId: Int, cursor: String?, keyword: String?) -> Single<MemberPageResponse>
+    func execute(meetId: Int, cursor: String?, keyword: String?) -> Single<PageResponse<MemberInfoResponse>>
 }

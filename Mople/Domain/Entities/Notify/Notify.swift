@@ -9,7 +9,7 @@ import Foundation
 
 enum NotifyType {
     case meet(id: Int)
-    case plan(id: Int)
+    case plan(id: Int, date: Date?)
     case review(id: Int)
 }
 
@@ -17,8 +17,8 @@ struct Notify {
     let id: Int?
     let meetImgPath: String?
     let meetTitle: String? 
-    let postDate: Date?
+    let receiveDate: Date?
     let type: NotifyType?
     let payload: NotifyPayload?
-    var isNew: Bool = false
+    var isRead: Bool = false
 }

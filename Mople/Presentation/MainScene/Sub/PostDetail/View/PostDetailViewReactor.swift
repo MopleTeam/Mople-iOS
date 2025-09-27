@@ -30,6 +30,7 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
             case placeDetailView
             case editPost
             case endFlow
+            case photoView(index: Int)
         }
 
         enum Update {
@@ -59,6 +60,7 @@ final class PostDetailViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Variable
     var initialState: State = State()
     private let id: Int
+    private(set) var meetId: Int?
     private let type: PostType
     private var plan: Plan?
     private var review: Review?
@@ -231,6 +233,14 @@ extension PostDetailViewReactor {
         case .placeDetailView:
             guard let post = currentState.postSummary else { break }
             coordinator?.pushPlaceDetailView(place: .init(post: post))
+        case .photoView(let index):
+            print(#function, #line, "Path : # ")
+            guard let imagePath = review?.images,
+                  imagePath.count > index else { return .empty() }
+            coordinator?.presentPhotoView(title: "함께한 순간",
+                                          index: index,
+                                          imagePaths: imagePath.compactMap({ $0.path }),
+                                          defaultType: .history)
         case .endFlow:
             coordinator?.endFlow()
         }
@@ -240,8 +250,10 @@ extension PostDetailViewReactor {
     /// 타입이 일정인 경우, 일정을 수정 또는 멤버리스트로 접근 시 과거의 일정인지 체크
     ///  - 과거 일정이라면 수정이 불가, 멤버리스트는 전환된 리뷰 Id로 진입해야하기 때문에 새로고침 필요
     private func isFlowPastSchedule(with flow: Action.Flow) -> Bool {
-        guard flow == .editPost || flow == .memberList else { return false }
-        return isPastPostWhenPlanType()
+        switch flow {
+        case .editPost, .memberList: return isPastPostWhenPlanType()
+        default: return false
+        }
     }
     
     private func handlePushMemberList() {
@@ -249,7 +261,7 @@ extension PostDetailViewReactor {
         case .plan:
             guard let planId = plan?.id else { return }
             coordinator?.pushMemberListView(postId: planId)
-        case .review:
+        default:
             guard let reviewPostId = review?.postId else { return }
             coordinator?.pushMemberListView(postId: reviewPostId)
         }
@@ -259,9 +271,8 @@ extension PostDetailViewReactor {
         switch type {
         case .plan:
             guard let plan else { return }
-            print(#function, #line, "Path : #1 이까지 됐는데? ")
             coordinator?.presentPlanEditFlow(plan: plan)
-        case .review:
+        default:
             guard let review else { return }
             coordinator?.pushReviewEditView(review: review)
         }
@@ -279,6 +290,8 @@ extension PostDetailViewReactor {
             return requestWithLoading(task: fetchPlan())
         case .review:
             return requestWithLoading(task: fetchReview())
+        case .oldPlan:
+            return requestWithLoading(task: fetchReview(isOldPlan: true))
         }
     }
     
@@ -287,15 +300,17 @@ extension PostDetailViewReactor {
         return fetchPlanDetailUsecase.execute(planId: id)
             .do(onNext: { [weak self] in
                 self?.plan = $0
+                self?.meetId = $0.meet?.id
             })
             .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
     }
     
-    private func fetchReview(isRefresh: Bool = false) -> Observable<Mutation> {
+    private func fetchReview(isRefresh: Bool = false, isOldPlan: Bool = false) -> Observable<Mutation> {
 
-        return fetchReviewDetailUseCase.execute(reviewId: id)
+        return fetchReviewDetailUseCase.execute(id: id, isOldPlan: isOldPlan)
             .do(onNext: { [weak self] in
                 self?.review = $0
+                self?.meetId = $0.meet?.id
             })
             .map { Mutation.updatePostSummary(ReviewPostSummary(review: $0)) }
     }
@@ -310,9 +325,11 @@ extension PostDetailViewReactor {
                 guard let self else { return .empty() }
                 switch type {
                 case .plan:
-                    return deletePlanUseCase.execute(id: id)
-                case .review:
-                    return deleteReviewUseCase.exectue(id: id)
+                    guard let planId = plan?.id else { return .empty() }
+                    return deletePlanUseCase.execute(id: planId)
+                default:
+                    guard let reviewId = review?.id else { return .empty() }
+                    return deleteReviewUseCase.exectue(id: reviewId)
                 }
             }
             .observe(on: MainScheduler.instance)
@@ -327,24 +344,26 @@ extension PostDetailViewReactor {
     
     /// 포스트 신고하기
     private func reportPost() -> Observable<Mutation> {
-        guard isPastPostWhenPlanType() == false else {
+        guard isPastPostWhenPlanType() == false, let type = getReportType() else {
             return .just(.catchError(.midnight))
         }
-        let reportPost = Observable.just(type)
-            .flatMap { [weak self] type -> Observable<Void> in
-                guard let self else { return .empty() }
-                let reportType = getReportType()
-                return reportUseCase.execute(type: reportType,
-                                             reason: nil)
-            }
+        let reportPost = reportUseCase.execute(type: type,
+                                               reason: nil)
             .map { Mutation.completeReport }
         
         return requestWithLoading(task: reportPost)
     }
     
     /// 신고 타입 핸들링
-    private func getReportType() -> ReportType {
-        return type == .plan ? .plan(id: id) : .review(id: id)
+    private func getReportType() -> ReportType? {
+        switch type {
+        case .plan:
+            guard let planId = plan?.id else { return nil }
+            return .plan(id: planId)
+        default:
+            guard let reviewId = review?.id else { return nil }
+            return .review(id: reviewId)
+        }
     }
     
     /// 일정인 경우 삭제, 수정 요청하기 전 리뷰로 전환되지는 않았는지 체크
@@ -362,7 +381,7 @@ extension PostDetailViewReactor {
         switch type {
         case .plan:
             loadMutation = fetchPlan(isRefresh: true)
-        case .review:
+        default:
             loadMutation = fetchReview(isRefresh: true)
         }
         
@@ -376,10 +395,12 @@ extension PostDetailViewReactor {
     private func postDeletePlan() {
         switch type {
         case .plan:
+            guard let planId = plan?.id else { return }
             NotificationManager.shared.postItem(PlanPayload.deleted(id: id),
                                          from: self)
-        case .review:
-            NotificationManager.shared.postItem(ReviewPayload.deleted(id: id),
+        default:
+            guard let reviewId = review?.id else { return }
+            NotificationManager.shared.postItem(ReviewPayload.deleted(id: reviewId),
                                          from: self)
         }
     }

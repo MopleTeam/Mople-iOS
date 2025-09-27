@@ -237,7 +237,7 @@ extension MemberListViewController: UITableViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.isBottom(threshold: 200) {
+        if scrollView.isBottom(threshold: 50) {
             fetchNextPage.onNext(())
         }
     }
