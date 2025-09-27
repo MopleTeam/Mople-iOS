@@ -12,6 +12,9 @@ import SnapKit
 
 final class CommentView: UIView {
     
+    // MARK: - Closure
+    var urlPreview: ((URL) -> Void)?
+    
     // MARK: - Variables
     public let spacing: CGFloat = 12
     
@@ -94,8 +97,17 @@ final class CommentView: UIView {
         return sv
     }()
     
+    private lazy var commentStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [commentTextView])
+        sv.axis = .vertical
+        sv.spacing = 8
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
+    }()
+    
     private lazy var bodyStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentTextView, commentStateView])
+        let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentStackView, commentStateView])
         sv.axis = .vertical
         sv.spacing = 8
         sv.alignment = .leading
@@ -156,6 +168,8 @@ final class CommentView: UIView {
         } else {
             replyButton.isHidden = true
         }
+        
+        extractURLs()
     }
     
     private func setProfileView(with viewModel: CommentViewModel) {
@@ -182,6 +196,19 @@ final class CommentView: UIView {
         self.commentTextView.text = nil
         self.timeLabel.text = nil
         self.profileView.resetImage()
+    }
+}
+
+extension CommentView {
+    private func extractURLs() {
+        guard let text = commentTextView.text,
+              let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return }
+        
+        let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+        
+        if let previewUrl = matches.last?.url {
+            urlPreview?(previewUrl)
+        }
     }
 }
 
