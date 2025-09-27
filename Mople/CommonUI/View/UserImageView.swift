@@ -12,7 +12,6 @@ import Kingfisher
 final class UserImageView: UIImageView {
     
     // MARK: - Variables
-    private var isSetRadius: Bool = false
     private var task: DownloadTask?
     fileprivate var imagePath: String?
     
@@ -42,10 +41,8 @@ final class UserImageView: UIImageView {
     
     // MARK: - UI Setup
     private func setRadius() {
-        guard !isSetRadius else { return }
         self.layer.cornerRadius = self.frame.height / 2
         self.clipsToBounds = true
-        isSetRadius = true
     }
     
     private func defaultImage() {
@@ -72,12 +69,18 @@ extension UserImageView {
     public func setLayer() {
         self.layer.makeLine(width: 1)
     }
+    
+    public func resetImage() {
+        self.image = nil
+    }
 }
 
 extension Reactive where Base: UserImageView {
-    var tap: Observable<Void> {
+    var tap: Observable<String?> {
         return base.tapGesture.rx.event
-            .map { _ in }
+            .map { [weak base] _ in
+                base?.imagePath
+            }
     }
 }
 

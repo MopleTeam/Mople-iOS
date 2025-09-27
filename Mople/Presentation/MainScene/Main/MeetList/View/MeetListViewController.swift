@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
+class MeetListViewController: TitleNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = MeetListViewReactor
@@ -19,6 +19,7 @@ class MeetListViewController: TitleNaviViewController, View, UIScrollViewDelegat
     
     // MARK: - Observable
     private let joinMeet: PublishSubject<Meet> = .init()
+    private let nextPage: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let borderView: UIView = {
@@ -159,6 +160,14 @@ extension MeetListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchNextMeet }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refreshControl.rx.controlEvent(.valueChanged)
             .map { Reactor.Action.refresh }
             .bind(to: reactor.action)
@@ -172,7 +181,7 @@ extension MeetListViewController {
             .disposed(by: disposeBag)
         
         NotificationManager.shared.addPlanObservable()
-            .map { _ in Reactor.Action.fetchMeetList }
+            .map { _ in Reactor.Action.fetchMeet }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -219,5 +228,13 @@ extension MeetListViewController {
 extension MeetListViewController {
     public func presentJoinMeet(with meet: Meet) {
         joinMeet.onNext(meet)
+    }
+}
+
+extension MeetListViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 50),
+              reactor?.page?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }

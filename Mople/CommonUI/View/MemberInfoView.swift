@@ -47,9 +47,9 @@ final class MemberInfoView: UIView {
         }
     }
     
-    public func setConfigure(imagePath: String?, position: MemberPositionType?) {
-        profileView.setImage(imagePath)
-        positionTypeView.image = position?.image
+    public func setConfigure(memberInfo: MemberInfo) {
+        profileView.setImage(memberInfo.imagePath)
+        positionTypeView.image = memberInfo.position.image
     }
     
     public func cancleImageLoad() {

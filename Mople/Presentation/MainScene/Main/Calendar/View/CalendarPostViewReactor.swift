@@ -196,7 +196,7 @@ extension CalendarPostViewReactor {
 
 // MARK: - Loading & Error
 extension CalendarPostViewReactor: ChildLoadingDelegate {
-    func updateLoadingState(_ isLoading: Bool, index: Int) {
+    func updateLoadingMutation(_ isLoading: Bool, index: Int) {
         action.onNext(.changeLoadingState(isLoading))
     }
     

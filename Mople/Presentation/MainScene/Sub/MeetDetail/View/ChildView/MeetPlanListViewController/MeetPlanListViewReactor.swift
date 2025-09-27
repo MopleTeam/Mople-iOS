@@ -15,8 +15,9 @@ protocol MeetPlanListCommands: AnyObject {
 final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Action {
+        case fetchPlan
+        case fetchNextPlan
         case selectedPlan(index: Int)
-        case requestPlanList
         case requsetParticipation(id: Int, isJoin: Bool)
         case switchParticipation(id: Int)
         case updatePlan(_ planPayload: PlanPayload)
@@ -25,29 +26,31 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case fetchPlanList([Plan])
+        case updateTotalCount(Int)
         case closePlan(id: Int)
     }
     
     struct State {
         @Pulse var plans: [Plan] = []
-        @Pulse var completedJoin: Void?
+        @Pulse var totolPlanCount: Int = 0
         @Pulse var closingPlanIndex: Int?
     }
     
     // MARK: - Variables
     var initialState: State = State()
+    private var isLoading = false
     private let meetId: Int
-    private var selectedPlanId: Int?
+    private(set) var page: PageInfo?
     
     // MARK: - UseCase
-    private let fetchPlanUseCase: FetchMeetPlanList
+    private let fetchPlanUseCase: FetchPlanPage
     private let participationPlanUseCase: ParticipationPlan
     
     // MARK: - Delegate
     private weak var delegate: MeetDetailDelegate?
     
     // MARK: - LifeCycle
-    init(fetchPlanUseCase: FetchMeetPlanList,
+    init(fetchPlanUseCase: FetchPlanPage,
          participationPlanUseCase: ParticipationPlan,
          delegate: MeetDetailDelegate,
          meetId: Int) {
@@ -62,11 +65,18 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         logLifeCycle()
     }
     
+    private func initalAction() {
+        action.onNext(.fetchPlan)
+    }
+
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
+        guard !isLoading else { return .empty() }
         switch action {
-        case .requestPlanList:
-            return fetchPlanList()
+        case .fetchPlan:
+            return fetchPlan(isRefresh: true)
+        case .fetchNextPlan:
+            return fetchNextPage()
         case let .requsetParticipation(id, isJoin):
             return handleParticipation(planId: id, isJoin: isJoin)
         case let .selectedPlan(index):
@@ -76,7 +86,16 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         case let .switchParticipation(id):
             return switchParticipation(planId: id)
         case .refresh:
-            return refreshPlanList()
+            return refresh()
+        }
+    }
+    
+    private func shouldAction(_ action: Action) -> Bool {
+        switch action {
+        case .fetchPlan, .fetchNextPlan, .requsetParticipation, .refresh:
+            return !isLoading
+        default:
+            return true
         }
     }
     
@@ -86,7 +105,9 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
         
         switch mutation {
         case let .fetchPlanList(plans):
-            newState.plans = plans.sorted(by: <)
+            newState.plans = plans
+        case let .updateTotalCount(count):
+            newState.totolPlanCount = count
         case let .closePlan(id):
             closePlan(state: &newState, id: id)
         }
@@ -104,22 +125,45 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension MeetPlanListViewReactor {
     
-    // MARK: - 일정 리스트 받아오기
-
-    /// 일정 리스트  불러오기
-    private func fetchPlanList() -> Observable<Mutation> {
-        let fetchPlanList = fetchPlanUseCase.execute(meetId: meetId)
-            .catchAndReturn([])
-            .map({ Mutation.fetchPlanList($0) })
-        return requestWithLoading(task: fetchPlanList)
+    /// 일정 리스트 불러오기
+    private func fetchPlan(cursor: String? = nil,
+                           isRefresh: Bool = false) -> Observable<Mutation> {
+        var totalCount: Int = 0
+        let fetchPlan = fetchPlanUseCase.execute(meetId: meetId, cursor: cursor)
+            .map({ result in
+                self.page = result.info
+                totalCount = result.totalCount
+                return self.updatePlanList(isRefresh: isRefresh, plans: result.content)
+            })
+            .flatMap {
+                return Observable.of($0, .updateTotalCount(totalCount))
+            }
+        return requestWithLoading(task: fetchPlan,
+                                  defferredLoadingDelay: .milliseconds(300))
     }
     
-    /// 일정 리스트 리프레쉬
-    private func refreshPlanList() -> Observable<Mutation> {
+    private func updatePlanList(isRefresh: Bool, plans: [Plan]) -> Mutation {
+        var newPlans = currentState.plans
+        if isRefresh {
+            newPlans = plans
+        } else {
+            newPlans.append(contentsOf: plans)
+            newPlans.uniqueSorted()
+        }
+        return .fetchPlanList(newPlans)
+    }
+    
+    /// 일정 다음 페이지 불러오기
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let cursor = page?.nextCursor else { return .empty() }
+        return fetchPlan(cursor: cursor)
+    }
+    
+    private func refresh() -> Observable<Mutation> {
         delegate?.refresh()
         return .empty()
     }
-
+    
     // MARK: - 참여 핸들링
     // 일정이 과거인 경우 : reload post
     // 일정이 사라진 경우 : delete post
@@ -145,20 +189,19 @@ extension MeetPlanListViewReactor {
     private func requestParticipation(id: Int,
                                       planIndex: Int,
                                       isJoin: Bool) -> Observable<Mutation> {
-        let requestParticipation = participationPlanUseCase
+        let participation = participationPlanUseCase
             .execute(planId: id,
                      isJoin: isJoin)
-            .catch({ [weak self] in
-                let err = self?.resolveParticipationError(err: $0,
-                                                          planId: id)
-                return .error(err ?? $0)
-                
-            })
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self else { return .empty() }
                 return updateParticipation(planIndex: planIndex)
             }
-        return requestWithLoading(task: requestParticipation)
+            .catch({ [weak self] err -> Observable<Mutation> in
+                guard let self else { return .empty() }
+                let resolveErr = resolveParticipationError(err: err, planId: id)
+                return .error(resolveErr ?? err)
+            })
+        return requestWithLoading(task: participation, defferredLoadingDelay: .milliseconds(300))
     }
     
     private func updateParticipation(planIndex: Int) -> Observable<Mutation> {
@@ -191,25 +234,15 @@ extension MeetPlanListViewReactor {
     
     private func presentPlanDetailView(index: Int) -> Observable<Mutation> {
         guard let selectedPlan = currentState.plans[safe: index],
-              let planId = selectedPlan.id else { return .empty() }
+              let planId = selectedPlan.id,
+              let planDate = selectedPlan.date else { return .empty() }
         
-        handlePlanDate(id: planId,
-                       with: selectedPlan)
-        
-        return .empty()
-    }
-    
-    private func handlePlanDate(id: Int,
-                               with plan: Plan) {
-        guard let date = plan.date else { return }
-        
-        if DateManager.isPastDay(on: date) == false {
-            selectedPlanId = id
-            delegate?.selectedPlan(id: id,
-                                   type: .plan)
+        if DateManager.isPastDay(on: planDate) == false {
+            delegate?.selectedPlan(id: planId, type: .plan)
         } else {
-            parent?.catchError(DateTransitionError.midnightReset, index: 1)
+            delegate?.catchError(DateTransitionError.midnightReset, index: 1)
         }
+        return .empty()
     }
 }
 
@@ -219,16 +252,20 @@ extension MeetPlanListViewReactor {
     // MARK: - Plan Payload
     private func handlePlanPayload(_ payload: PlanPayload) -> Observable<Mutation> {
         var planList = currentState.plans
+        var totalCount = currentState.totolPlanCount
         
         switch payload {
         case let .created(plan):
             self.addPlan(&planList, plan: plan)
+            totalCount += 1
         case let .updated(plan):
             self.updatePlan(&planList, plan: plan)
         case let .deleted(id):
             self.deletePlan(&planList, planId: id)
+            totalCount -= 1
         }
-        return .just(.fetchPlanList(planList))
+        
+        return .of(.fetchPlanList(planList), .updateTotalCount(max(totalCount, 0)))
     }
     
     private func addPlan(_ planList: inout [Plan], plan: Plan) {
@@ -263,12 +300,15 @@ extension MeetPlanListViewReactor {
 // MARK: - Commands
 extension MeetPlanListViewReactor: MeetPlanListCommands {
     func fetchPlan() {
-        action.onNext(.requestPlanList)
+        action.onNext(.fetchPlan)
     }
 }
 
 // MARK: - Loading & Error
 extension MeetPlanListViewReactor: ChildLoadingReactor {
+    func updateLoadingState(isLoad: Bool) {
+        isLoading = isLoad
+    }
     var parent: ChildLoadingDelegate? { delegate }
     var index: Int { 0 }
 }

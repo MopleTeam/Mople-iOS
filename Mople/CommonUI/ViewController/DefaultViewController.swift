@@ -36,7 +36,7 @@ class DefaultViewController: BaseViewController {
         self.view.addSubview(indicator)
         
         indicator.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.center.equalToSuperview()
         }
     }
 }

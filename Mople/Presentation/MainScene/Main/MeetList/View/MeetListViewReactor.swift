@@ -18,7 +18,8 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
         
         case flow(Flow)
         case updateMeet(_ meetPayload: MeetPayload)
-        case fetchMeetList
+        case fetchMeet
+        case fetchNextMeet
         case refresh
     }
     
@@ -38,15 +39,17 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - Variables
     var initialState: State = State()
+    private(set) var page: PageInfo?
+    private var isLoading: Bool = false
     
     // MARK: - UseCase
-    private let fetchUseCase: FetchMeetList
+    private let fetchUseCase: FetchMeetPage
     
     // MARK: - Coordinator
     private weak var coordinator: MeetListFlowCoordination?
     
     // MARK: - LifeCycle
-    init(fetchUseCase: FetchMeetList,
+    init(fetchUseCase: FetchMeetPage,
          coordinator: MeetListFlowCoordination) {
         self.fetchUseCase = fetchUseCase
         self.coordinator = coordinator
@@ -60,20 +63,32 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     
     // MARK: - InitialSetup
     private func initialAction() {
-        action.onNext(.fetchMeetList)
+        action.onNext(.fetchMeet)
     }
     
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
+        guard shouldAction(action) else { return .empty() }
         switch action {
-        case .fetchMeetList:
+        case .fetchMeet:
             return fetchMeetListWithLoading()
+        case .fetchNextMeet:
+            return fetchNextPage()
         case .refresh:
-            return refreshMeetList()
+            return refresh()
         case let .flow(action):
             return handleFlowAction(action)
         case let .updateMeet(meet):
             return self.handleMeetPayload(meet)
+        }
+    }
+    
+    private func shouldAction(_ action: Action) -> Bool {
+        switch action {
+        case .fetchMeet, .fetchNextMeet, .refresh:
+            return !isLoading
+        default:
+            return true
         }
     }
     
@@ -99,21 +114,43 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
 extension MeetListViewReactor {
     
     /// 모임 리스트 불러오기
-    private func fetchMeetList() -> Observable<Mutation> {
-        return fetchUseCase.execute()
-            .map { Mutation.fetchMeetList($0) }
+    private func fetchMeetList(cursor: String? = nil,
+                               isRefresh: Bool = false) -> Observable<Mutation> {
+        return fetchUseCase.execute(cursor: cursor)
+            .map({ result in
+                self.page = result.info
+                return self.updateMeetList(isRefresh: isRefresh, meets: result.content)
+            })
     }
     
     /// 모임 리스트 로딩과 함께 불러오기
-    private func fetchMeetListWithLoading() -> Observable<Mutation> {
-        let fetchData = fetchMeetList()
+    private func fetchMeetListWithLoading(cursor: String? = nil) -> Observable<Mutation> {
+        let fetchData = fetchMeetList(cursor: cursor)
         return requestWithLoading(task: fetchData)
     }
     
-    /// 모임 리스트 리프레쉬
-    private func refreshMeetList() -> Observable<Mutation> {
-        return .concat([fetchMeetList(),
-                        .just(Mutation.completedRefresh)])
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let cursor = page?.nextCursor else { return .empty() }
+        return fetchMeetListWithLoading(cursor: cursor)
+    }
+    
+    private func refresh() -> Observable<Mutation> {
+        isLoading = true
+        return fetchMeetList(isRefresh: true)
+            .do(onDispose: {
+                self.isLoading = false
+            })
+            .concat(Observable.just(.completedRefresh))
+    }
+    
+    private func updateMeetList(isRefresh: Bool, meets: [Meet]) -> Mutation {
+        var newMeets = currentState.meetList
+        if isRefresh {
+            newMeets = meets
+        } else {
+            newMeets.append(contentsOf: meets)
+        }
+        return .fetchMeetList(newMeets)
     }
 }
 
@@ -181,6 +218,10 @@ extension MeetListViewReactor {
 
 // MARK: - Loading & Error
 extension MeetListViewReactor: LoadingReactor {
+    func updateLoadingState(isLoad: Bool) {
+        isLoading = isLoad
+    }
+    
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }

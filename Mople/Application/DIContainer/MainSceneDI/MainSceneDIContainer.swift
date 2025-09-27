@@ -127,11 +127,11 @@ extension MainSceneDIContainer {
     
     /// 일정 상세 플로우
     private func makePlanDetailFlowCoordinator(postId: Int,
-                                       type: PostType) -> BaseCoordinator {
+                                               type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
                                                       type: type,
-                                                      id: postId)
+                                                      postId: postId)
         return planDetailDI.makePostDetailCoordinator()
     }
 }

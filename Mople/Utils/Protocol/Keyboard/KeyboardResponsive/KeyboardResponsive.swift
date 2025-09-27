@@ -19,16 +19,19 @@ extension KeyboardResponsive where Self: UIViewController {
     var containerView: UIView { self.view }
     var threshold: CGFloat { 10 }
     
-    func setupKeyboardEvent() {
+    func setupKeyboardEvent(showCompletion: (() -> Void)? = nil,
+                            hideCompletion: (() -> Void)? = nil) {
         NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
             .subscribe(onNext: {[weak self] notification in
                 self?.handleKeyboardShow(notification)
+                showCompletion?()
             })
             .disposed(by: disposeBag)
         
         NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
             .subscribe(onNext: {[weak self] notification in
                 self?.handleKeyboardHide(notification)
+                hideCompletion?()
             })
             .disposed(by: disposeBag)
     }

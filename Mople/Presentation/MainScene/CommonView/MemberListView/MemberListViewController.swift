@@ -8,7 +8,6 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import RxDataSources
 import ReactorKit
 
 final class MemberListViewController: TitleNaviViewController, View, UIScrollViewDelegate {
@@ -25,15 +24,13 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     private let endFlow: PublishSubject<Void> = .init()
     private let userProfileTap: PublishSubject<String?> = .init()
     private let invite: PublishSubject<Void> = .init()
-    
-    // MARK: - DataSource
-    private var dataSource: RxTableViewSectionedReloadDataSource<MembersSectionModel>?
+    private let fetchNextPage: PublishSubject<Void> = .init()
     
     // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: L10n.memberList)
         view.frame.size.height = 64
-        view.setBottomInset(16)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
         return view
@@ -67,7 +64,6 @@ final class MemberListViewController: TitleNaviViewController, View, UIScrollVie
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupDataSource()
         setEdgeGesture()
     }
     
@@ -134,6 +130,13 @@ extension MemberListViewController {
     }
     
     private func setActionBind(_ reactor: Reactor) {
+        fetchNextPage
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchNextPage }
+            .compactMap({ $0 })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         userProfileTap
             .map { Reactor.Action.flow(.showUserImage(imagePath: $0)) }
             .bind(to: reactor.action)
@@ -153,8 +156,6 @@ extension MemberListViewController {
             .map { Reactor.Action.flow(.endFlow) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-        
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
@@ -169,15 +170,21 @@ extension MemberListViewController {
                 vc.showActivityViewController(items: [url])
             })
             .disposed(by: disposeBag)
+            
+        reactor.pulse(\.$members)
+            .asDriver(onErrorJustReturn: [])
+            .drive(self.tableView.rx.items(cellIdentifier: MemberListTableCell.reuseIdentifier,
+                                           cellType: MemberListTableCell.self)) ({ [weak self] index, item, cell in
+                cell.profileTapped = { [weak self] in
+                    self?.userProfileTap.onNext(item.imagePath)
+                }
+                cell.configure(with: item)
+                cell.selectionStyle = .none
+            }).disposed(by: disposeBag)
         
         reactor.pulse(\.$members)
             .asDriver(onErrorJustReturn: [])
-            .drive(tableView.rx.items(dataSource: dataSource!))
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$members)
-            .asDriver(onErrorJustReturn: [])
-            .map({ $0.reduce(0, { $0 + $1.items.count}) })
+            .map({ $0.count })
             .drive(with: self, onNext: { vc, count in
                 vc.countView.countText = L10n.peopleCount(count)
             })
@@ -196,23 +203,6 @@ extension MemberListViewController {
             })
             .disposed(by: disposeBag)
     }
-    
-    private func setupDataSource() {
-        
-        dataSource = RxTableViewSectionedReloadDataSource<MembersSectionModel>(
-            configureCell: { [weak self] dataSource, tableView, indexPath, item in
-                guard let self else { return UITableViewCell() }
-                let cell = tableView.dequeueReusableCell(withIdentifier: MemberListTableCell.reuseIdentifier) as! MemberListTableCell
-                cell.profileTapped = { [weak self] in
-                    self?.userProfileTap.onNext(item.imagePath)
-                }
-                cell.configure(with: .init(memberInfo: item))
-                cell.selectionStyle = .none
-                return cell
-            }
-        )
-    }
-
     
     // MARK: - 에러 핸들링
     private func handleError(_ err: MemberListError) {
@@ -244,6 +234,12 @@ extension MemberListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         guard case .meet = viewType else { return 0 }
         return sectionHeight
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.isBottom(threshold: 50) {
+            fetchNextPage.onNext(())
+        }
     }
 }
 

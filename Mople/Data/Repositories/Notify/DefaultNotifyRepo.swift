@@ -4,13 +4,13 @@
 //
 //  Created by CatSlave on 4/10/25.
 //
-
+import UIKit
 import RxSwift
 
 final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
-    func fetchNotifyList() -> Single<[NotifyResponse]> {
+    func fetchNotifyList(cursor: String?) -> Single<PageResponse<NotifyResponse>> {
         return networkService.authenticatedRequest {
-            try APIEndpoints.fetchNotify()
+            try APIEndpoints.fetchNotify(cursor: cursor)
         }
     }
     
@@ -22,7 +22,8 @@ final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
         return resetCount
             .observe(on: MainScheduler.instance)
             .flatMap({
-                UserInfoStorage.shared.resetNotifyCount()
+                UserInfoStorage.shared.updateNotifyStatus(hasNotify: false)
+                UIApplication.shared.applicationIconBadgeNumber = 0
                 return .just(())
             })
     }

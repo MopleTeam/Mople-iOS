@@ -10,7 +10,6 @@ import RxSwift
 
 protocol ScrollKeyboardResponsive: KeyboardResponsive {
     var scrollView: UIScrollView? { get }
-    var scrollViewHeight: CGFloat? { get set }
     var startOffsetY: CGFloat { get set }
 }
 
@@ -62,15 +61,13 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
 
 extension ScrollKeyboardResponsive where Self: UIViewController {
     private var isScroll: Bool {
-        guard let scrollView,
-              let scrollViewHeight else { return false }
-        return scrollViewHeight < scrollView.contentSize.height
+        guard let scrollView else { return false }
+        return scrollView.frame.height < scrollView.contentSize.height
     }
     
     private func handleContentOffsetY(_ height: CGFloat) {
         guard isScroll,
               let scrollView else { return }
-        
         if keyboardHeight == nil {
             startOffsetY = scrollView.contentOffset.y
             scrollView.contentOffset.y += height - UIScreen.getDefaultBottomPadding()

@@ -11,13 +11,13 @@ struct UserInfoResponse: Decodable {
     let userId: Int?
     let nickname: String?
     let image: String?
-    let badgeCount: Int?
+    let isExistBadgeCount: Bool?
 }
 
 extension UserInfoResponse {
     func toDomain() -> UserInfo {
         return .init(id: userId,
-                     notifyCount: badgeCount ?? 0,
+                     hasNotify: isExistBadgeCount ?? false,
                      name: nickname,
                      imagePath: image)
     }

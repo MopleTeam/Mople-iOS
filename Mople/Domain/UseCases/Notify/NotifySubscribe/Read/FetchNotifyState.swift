@@ -24,9 +24,13 @@ final class FetchNotifyStateUseCase: FetchNotifyState {
             .map { $0.compactMap { typeString in
                 switch typeString {
                 case "MEET":
-                    return SubscribeType.meet
+                    return .meet
                 case "PLAN":
-                    return SubscribeType.plan
+                    return .plan
+                case "REPLY":
+                    return .reply
+                case "MENTION":
+                    return .mention
                 default:
                     return nil
                 }

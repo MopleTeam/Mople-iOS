@@ -21,6 +21,7 @@ protocol MeetDetailCoordination: AnyObject {
     func presentPlanCreateView(meet: MeetSummary)
     func presentPlanDetailView(postId: Int,
                                type: PostType)
+    func pushMemberListView()
     func endFlow()
 }
 
@@ -48,6 +49,7 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
         planListVC = dependencies.makeMeetPlanListViewController()
         reviewListVC = dependencies.makeMeetReviewListViewController()
         detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
+        detailMeetVC?.configureEdgeGesture()
     }
 }
 
@@ -61,6 +63,7 @@ extension MeetDetailSceneCoordinator {
         let direction: UIPageViewController.NavigationDirection = isFuture ? .reverse : .forward
         
         detailMeetVC?.pageController.setViewControllers([vc], direction: direction, animated: true)
+        detailMeetVC?.configureEdgeGesture()
     }
 }
 
@@ -69,8 +72,7 @@ extension MeetDetailSceneCoordinator {
     func presentPhotoView(title: String?,
                           imagePath: String?) {
         let vc = dependencies.makeMeetImageViewController(imagePath: imagePath,
-                                                          title: title,
-                                                          coordinator: self)
+                                                          title: title)
         self.presentWithTracking(vc)
     }
 }

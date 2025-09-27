@@ -14,32 +14,18 @@ import ReactorKit
 enum PostType {
     case plan
     case review
+    case oldPlan
 }
 
-final class PostDetailViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
+final class PostDetailViewController: TitleNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = PostDetailViewReactor
     var disposeBag = DisposeBag()
     
-    // MARK: - Handle KeyboardEvent
-    var keyboardHeight: CGFloat?
-    var keyboardHeightDiff: CGFloat?
-    var scrollView: UIScrollView? { commentVC.tableView }
-    var scrollViewHeight: CGFloat?
-    var floatingView: UIView { chatingTextFieldView }
-    var floatingViewBottom: Constraint?
-    var startOffsetY: CGFloat = .zero
-    
-    // MARK: - Manager
-    private let toastManager = ToastManager.shared
-    
     // MARK: - Observable
     private let endFlow: PublishSubject<Void> = .init()
-    private let memberListTapped: PublishRelay<Void> = .init()
-    private let mapTapped: PublishRelay<Void> = .init()
-    private let participation: PublishRelay<Void> = .init()
-    private let cancleComment: PublishRelay<Void> = .init()
+    private let participation: PublishSubject<Void> = .init()
     private let editPost: PublishSubject<Void> = .init()
     private let deletePost: PublishSubject<Void> = .init()
     private let reportPost: PublishSubject<Void> = .init()
@@ -49,26 +35,18 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     private var postSummary: PostSummary?
     
     // MARK: - UI Components
-    private lazy var postInfoView: PostInfoView = {
-        let type: PostInfoType = postType == .plan ? .plan : .review
-        let view = PostInfoView(type: type)
+    private lazy var postInfoView: PostDetailView = {
+        let view = PostDetailView(postType: postType)
         return view
     }()
-    
-    private(set) var commentContainer: UIView = {
+        
+    // MARK: - CHild VC - Comment List
+    public let commentVC: CommentListViewController
+    private let commentContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .defaultWhite
         return view
     }()
-    
-    private let chatingTextFieldView: ChatingTextFieldView = {
-        let chatingView = ChatingTextFieldView()
-        chatingView.backgroundColor = .defaultWhite
-        return chatingView
-    }()
-        
-    // MARK: - CHild VC
-    private let commentVC: CommentListViewController
 
     // MARK: - Life Cycle
     init(screenName: ScreenName,
@@ -91,35 +69,21 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
         super.viewDidLoad()
         setupUI()
         setAction()
-        setKeyboardControl()
-    }
-        
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateScrollViewHeight()
     }
 
     // MARK: - UI Setup
     private func setupUI() {
         setNavi()
-        setLayout()
         setChildVC()
+        setLayout()
     }
     
     private func setLayout() {
         self.view.addSubview(commentContainer)
-        self.view.addSubview(chatingTextFieldView)
         
         commentContainer.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
-            make.horizontalEdges.equalToSuperview()
-        }
-
-        chatingTextFieldView.snp.makeConstraints { make in
-            make.top.equalTo(commentContainer.snp.bottom)
-            make.horizontalEdges.equalToSuperview()
-            floatingViewBottom = make.bottom.equalToSuperview()
-                .inset(UIScreen.getDefaultBottomPadding()).constraint
+            make.bottom.horizontalEdges.equalToSuperview()
         }
     }
     
@@ -142,10 +106,13 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     // MARK: - Action
     private func setAction() {
         setMenuAction()
-        setFlowAction()
-        setPostAction()
+        setParticipationAction()
     }
-    
+}
+
+// MARK: - Action
+extension PostDetailViewController {
+    // MARK: - Menu
     private func setMenuAction() {
         self.naviBar.rightItemEvent
             .asDriver()
@@ -156,40 +123,6 @@ final class PostDetailViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     // MARK: - PlanInfo Action
-    private func setPostAction() {
-        setCancleCommentAction()
-        setParticipationAction()
-    }
-    
-    private func setCancleCommentAction() {
-        let memberTapped = postInfoView.rx.memberTapped
-            .asObservable()
-        
-        let mapTapped = postInfoView.rx.mapTapped
-        
-        [memberTapped, mapTapped].forEach {
-            $0.filter({ [weak self] _ in
-                guard let self else { return false }
-                return self.isEditing
-            })
-            .do(onNext: { [weak self] in
-                self?.view.endEditing(true)
-            })
-            .bind(to: cancleComment)
-            .disposed(by: disposeBag)
-        }
-    }
-    
-    private func setFlowAction() {
-        postInfoView.rx.memberTapped
-            .bind(to: memberListTapped)
-            .disposed(by: disposeBag)
-        
-        postInfoView.rx.mapTapped
-            .bind(to: mapTapped)
-            .disposed(by: disposeBag)
-    }
-    
     private func setParticipationAction() {
         guard postType == .plan else { return }
         
@@ -239,18 +172,13 @@ extension PostDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        cancleComment
-            .map { Reactor.Action.comment(.cancleEditing) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         participation
             .map { Reactor.Action.post(.participation) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        chatingTextFieldView.rx.sendText
-            .map({ Reactor.Action.comment(.writeComment($0)) })
+        commentVC.rx.refresh
+            .map { Reactor.Action.post(.refresh) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -266,13 +194,18 @@ extension PostDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        memberListTapped
+        postInfoView.rx.memberTapped
             .map { Reactor.Action.flow(.memberList) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        mapTapped
+        postInfoView.rx.mapTapped
             .map { Reactor.Action.flow(.placeDetailView) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        postInfoView.rx.photoTapped
+            .map { Reactor.Action.flow(.photoView(index: $0)) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
@@ -309,16 +242,9 @@ extension PostDetailViewController {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, postSummary in
+                vc.commentVC.loadComment(with: postSummary.postId, totalCount: postSummary.commentCount)
                 vc.setPostInfoView(with: postSummary)
                 vc.showSuggestReviewAlert(with: postSummary)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$startOffsetY)
-            .asDriver(onErrorJustReturn: .zero)
-            .compactMap({ $0 })
-            .drive(with: self, onNext: { vc, offsetY in
-                vc.setStartOffsetY(offsetY)
             })
             .disposed(by: disposeBag)
         
@@ -327,14 +253,6 @@ extension PostDetailViewController {
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, _ in
                 vc.toastManager.presentToast(text: L10n.Report.completed)
-            })
-            .disposed(by: disposeBag)
-        
-        reactor.pulse(\.$editComment)
-            .skip(1)
-            .asDriver(onErrorJustReturn: nil)
-            .drive(with: self, onNext: { vc, comment in
-                vc.setEditComment(comment)
             })
             .disposed(by: disposeBag)
         
@@ -365,7 +283,7 @@ extension PostDetailViewController {
                                               completion: { [weak self] in
                 self?.endFlow.onNext(())
             })
-        case .unknown, .failComment:
+        default:
             alertManager.showDefatulErrorMessage()
         }
     }
@@ -377,7 +295,7 @@ extension PostDetailViewController {
         guard let planSummary = postSummary as? PlanPostSummary else { return }
         
         if !planSummary.isParticipation {
-            participation.accept(())
+            participation.onNext(())
         } else {
             showLeavePlanAlert()
         }
@@ -387,7 +305,7 @@ extension PostDetailViewController {
         let createAction: DefaultAlertAction = .init(text: L10n.yes,
                                                      bgColor: .appSecondary,
                                                      completion: { [weak self] in
-            self?.participation.accept(())
+            self?.participation.onNext(())
         })
         
         alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
@@ -395,42 +313,6 @@ extension PostDetailViewController {
                                                            textColor: .gray01,
                                                            bgColor: .appTertiary),
                                       addAction: [createAction])
-    }
-}
-
-// MARK: - Helper
-extension PostDetailViewController {
-    private func setEditComment(_ comment: String?) {
-        let hasComment = comment != nil
-        chatingTextFieldView.textView.text = comment
-        chatingTextFieldView.textView.rx.isResign.onNext(!hasComment)
-    }
-    
-    private func setStartOffsetY(_ offsetY: CGFloat) {
-        guard let keyboardHeight else { return }
-        self.startOffsetY = offsetY - keyboardHeight + UIScreen.getDefaultBottomPadding()
-    }
-}
-
-// MARK: - 키보드 컨트롤
-extension PostDetailViewController: KeyboardDismissable, UIGestureRecognizerDelegate {
-    
-    var tapGestureShouldCancelTouchesInView: Bool { false }
-
-    private func setKeyboardControl() {
-        setupKeyboardEvent()
-        setupTapKeyboardDismiss()
-    }
-        
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view is UIButton {
-            return false
-        }
-        return true
-    }
-    
-    func dismissCompletion() {
-        self.cancleComment.accept(())
     }
 }
 
@@ -469,7 +351,7 @@ extension PostDetailViewController {
 // MARK: - Sheet
 extension PostDetailViewController {
     
-    // MARK: - 댓글 메뉴버튼 액션
+    // MARK: - 게시글 메뉴 액션
     private func handlePostMenuAction() {
         let isCreator = postSummary?.isCreator ?? false
         if isCreator {
@@ -501,7 +383,7 @@ extension PostDetailViewController {
         switch postType {
         case .plan:
             return L10n.editPlan
-        case .review:
+        case .review, .oldPlan:
             let hasImage = (postSummary as? ReviewPostSummary)?.hasImage ?? false
             return hasImage ? L10n.Review.edit : L10n.Review.create
         }
@@ -536,10 +418,3 @@ extension PostDetailViewController {
     }
 }
 
-// MARK: - Helper
-extension PostDetailViewController {
-    private func updateScrollViewHeight() {
-        guard scrollViewHeight == nil else { return }
-        self.scrollViewHeight = commentContainer.bounds.height
-    }
-}

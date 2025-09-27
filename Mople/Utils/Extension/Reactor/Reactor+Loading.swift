@@ -9,12 +9,17 @@ import RxSwift
 
 protocol LoadingReactor: AnyObject {
     associatedtype Mutation
+    func updateLoadingState(isLoad: Bool)
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation
     func catchErrorMutation(_ error: Error) -> Mutation
 }
 
 extension LoadingReactor {
-
+    
+    func updateLoadingState(isLoad: Bool) {
+        
+    }
+    
     func requestWithLoading(task: Observable<Mutation>,
                             defferredLoadingDelay: RxTimeInterval = .milliseconds(300)
     ) -> Observable<Mutation> {
@@ -32,6 +37,9 @@ extension LoadingReactor {
             }
 
         let loadingStart = Observable.just(())
+            .do(onSubscribe: {
+                self.updateLoadingState(isLoad: true)
+            })
             .delay(defferredLoadingDelay, scheduler: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
                 guard let self else { return .empty() }
@@ -42,6 +50,10 @@ extension LoadingReactor {
         
         return .merge([loadingStart, newTask])
             .concat(Observable.just(updateLoadingMutation(false)))
+            .do(onDispose: {
+                self.updateLoadingState(isLoad: false)
+            })
+            
     }
     
     private func catchError(_ error: Error) -> Observable<Mutation> {

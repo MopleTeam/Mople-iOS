@@ -8,7 +8,8 @@
 import RxSwift
 
 protocol FetchMeetReviewList {
-    func execute(meetId: Int) -> Observable<[Review]>
+    func execute(meetId: Int,
+                 cursor: String?) -> Observable<Page<Review>>
 }
 
 final class FetchMeetReviewListUseCase: FetchMeetReviewList {
@@ -20,16 +21,27 @@ final class FetchMeetReviewListUseCase: FetchMeetReviewList {
         self.repo = repo
     }
     
-    func execute(meetId: Int) -> Observable<[Review]> {
-        return repo.fetchReviewList(meetId)
-            .map { $0.map { response in
-                response.toDomain() }
-            }
-            .map { $0.map { [weak self] review in
-                var verifyPlan = review
-                verifyPlan.verifyCreator(self?.userID)
-                return verifyPlan }
-            }
+    func execute(meetId: Int,
+                 cursor: String?) -> Observable<Page<Review>> {
+        return repo.fetchReviewPage(meetId: meetId,
+                                    cursor: cursor)
+        .map { Page(totalCount: $0.totalCount ?? 0,
+                    content: $0.content.map({ $0.toDomain() }),
+                    info: $0.page?.toDomain()) }
+            .map({
+                var page = $0
+                self.verifyCreator(with: &page.content)
+                return page
+            })
             .asObservable()
+    }
+    
+    private func verifyCreator(with planList: inout [Review]) {
+        guard let userID else { return }
+        planList.enumerated().forEach { index, plan in
+            guard let createId = plan.creatorId,
+                  userID == createId else { return }
+            planList[index].isCreator = true
+        }
     }
 }

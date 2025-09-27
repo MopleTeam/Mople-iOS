@@ -18,8 +18,7 @@ protocol MeetDetailSceneDependencies {
                                     coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
     func makeMeetImageViewController(imagePath: String?,
-                                     title: String?,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController
+                                     title: String?) -> PhotoBookViewController
     
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meet: MeetSummary,
@@ -98,8 +97,8 @@ extension MeetDetailSceneDIContainer {
         return reactor
     }
     
-    private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchMeetPlanList {
-        return FetchMeetPlanListUsecase(repo: repo)
+    private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchPlanPage {
+        return FetchPlanPageUsecase(repo: repo)
     }
     
     private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {
@@ -166,13 +165,11 @@ extension MeetDetailSceneDIContainer {
     
     // MARK: - 포토뷰
     func makeMeetImageViewController(imagePath: String?,
-                                     title: String?,
-                                     coordinator: NavigationCloseable) -> PhotoBookViewController {
+                                     title: String?) -> PhotoBookViewController {
         let imagePaths = [imagePath].compactMap { $0 }
         return commonViewFactory.makePhotoViewController(title: title,
                                                          imagePath: imagePaths,
-                                                         defaultImageType: .meet,
-                                                         coordinator: coordinator)
+                                                         defaultImageType: .meet)
     }
 }
 
@@ -194,7 +191,7 @@ extension MeetDetailSceneDIContainer {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
                                                       type: type,
-                                                      id: postId)
+                                                      postId: postId)
         return planDetailDI.makePostDetailCoordinator()
     }
 }

@@ -8,19 +8,20 @@
 import RxSwift
 
 final class DefaultReviewRepo: BaseRepositories, ReviewRepo {
-    func fetchReviewList(_ meetId: Int) -> Single<[ReviewResponse]> {
+    func fetchReviewPage(meetId: Int,
+                         cursor: String?) -> Single<PageResponse<ReviewResponse>> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetReview(id: meetId)
+            try APIEndpoints.fetchReviewPage(id: meetId, cursor: cursor)
         }
     }
     
-    func fetchReviewDetail(_ reviewId: Int) -> Single<ReviewResponse> {
+    func fetchReviewDetail(id: Int, isOldPlan: Bool) -> Single<ReviewResponse> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchReviewDetail(id: reviewId)
+            try APIEndpoints.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
         }
     }
     
-    func deleteReviewImage(reviewId: Int, imageIds: [String]) -> Single<Void> {
+    func deleteReviewImage(reviewId: Int, imageIds: [Int]) -> Single<Void> {
         networkService.authenticatedRequest {
             try APIEndpoints.deleteReviewImage(reviewId: reviewId, imageIds: imageIds)
         }

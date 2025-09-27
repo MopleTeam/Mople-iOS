@@ -8,18 +8,17 @@
 import UIKit
 import SnapKit
 
-enum IconAlignment {
-    case left
-    case right
-}
-
 final class IconLabel: UIView {
     
+    // MARK: - Variables
     var text: String? {
         get { infoLabel.text }
         set { infoLabel.text = newValue}
     }
+    
+    let iconSize: CGSize
         
+    // MARK: - UI Components
     private let imageContainerView: UIView = {
         let view = UIView()
         return view
@@ -43,18 +42,19 @@ final class IconLabel: UIView {
     }()
     
     private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [imageContainerView, labelContainerView])
+        let sv = UIStackView(arrangedSubviews: [imageContainerView, infoLabel])
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.alignment = .top
+        sv.alignment = .fill
         return sv
     }()
     
     init(icon: UIImage?,
          iconSize: CGSize,
          frame: CGRect = .zero) {
+        self.iconSize = iconSize
         super.init(frame: frame)
-        setupUI(iconSize: iconSize)
+        setupUI()
         setupIcon(icon)
     }
     
@@ -66,9 +66,8 @@ final class IconLabel: UIView {
         self.imageView.image = icon
     }
     
-    private func setupUI(iconSize: CGSize) {
+    private func setupUI() {
         self.addSubview(mainStackView)
-        self.labelContainerView.addSubview(infoLabel)
         self.imageContainerView.addSubview(imageView)
         
         mainStackView.snp.makeConstraints { make in
@@ -84,12 +83,6 @@ final class IconLabel: UIView {
             make.size.equalTo(iconSize)
             make.top.centerX.equalToSuperview()
         }
-        
-        infoLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview()
-            make.top.equalToSuperview().inset(2)
-            make.bottom.lessThanOrEqualToSuperview()
-        }
     }
 }
 
@@ -102,19 +95,18 @@ extension IconLabel {
         infoLabel.textColor = color
     }
     
-    public func setTitleTopPadding(_ padding: CGFloat) {
-        infoLabel.snp.updateConstraints { make in
-            make.top.equalToSuperview().inset(padding)
-        }
-    }
-    
     public func setSpacing(_ spacing: CGFloat) {
         mainStackView.spacing = spacing
     }
     
-    public func setIconAligment(_ iconAligment: IconAlignment) {
-        if iconAligment == .right {
-            mainStackView.reverseSubviewsZIndex()
+    public func rightIconAligment() {
+        mainStackView.reverseSubviewsZIndex()
+    }
+    
+    public func centerIconAligment() {
+        imageView.snp.remakeConstraints { make in
+            make.size.equalTo(iconSize)
+            make.center.equalToSuperview()
         }
     }
     

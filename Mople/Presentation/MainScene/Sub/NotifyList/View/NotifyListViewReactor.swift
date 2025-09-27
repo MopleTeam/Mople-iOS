@@ -17,11 +17,13 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         
         case flow(Flow)
         case fetchNotifyList
+        case fetchNextPage
         case refresh
     }
     
     enum Mutation {
         case updateNotifyList([Notify])
+        case updatePage(PageInfo?)
         case completedRefresh
         case updateLoadingState(Bool)
         case catchError(Error)
@@ -29,12 +31,15 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
     
     struct State {
         @Pulse var notifyList: [Notify] = []
+        @Pulse var pageInfo: PageInfo?
         @Pulse var isRefreshed: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
     }
     
+    // MARK: - Varialbes
     var initialState: State = State()
+    private var isLoading = false
     
     // MARK: - UseCase
     private let fetchNotifyListUseCase: FetchNotifyList
@@ -68,6 +73,8 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         switch action {
         case .fetchNotifyList:
             return fetchNotifyWithLoading()
+        case .fetchNextPage:
+            return fetchNextPage()
         case let .flow(action):
             return handleFlowAction(action)
         case .refresh:
@@ -82,6 +89,8 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateNotifyList(notifyList):
             newState.notifyList = notifyList
+        case let .updatePage(page):
+            newState.pageInfo = page
         case .completedRefresh:
             newState.isRefreshed = ()
         case let .updateLoadingState(isLoad):
@@ -96,14 +105,36 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Requset
 extension NotifyListViewReactor {
-    private func fetchNotify() -> Observable<Mutation> {
-        return fetchNotifyListUseCase.execute()
-            .map { Mutation.updateNotifyList($0) }
-            .concat(resetNotifyCount())
+    private func fetchNotify(cursor: String? = nil,
+                             isRefresh: Bool = false) -> Observable<Mutation> {
+        return fetchNotifyListUseCase.execute(cursor: cursor)
+            .flatMap({ result -> Observable<Mutation> in
+                let updateNotify = self.updateNotifyList(isRefresh: isRefresh, notify: result.content)
+                let updatePage = Mutation.updatePage(result.info)
+                return .of(updateNotify, updatePage)
+            })
     }
     
-    private func fetchNotifyWithLoading() -> Observable<Mutation> {
-        return requestWithLoading(task: fetchNotify())
+    private func updateNotifyList(isRefresh: Bool, notify: [Notify]) -> Mutation {
+        var newNotify = currentState.notifyList
+        var filterNotify = notify
+        filterNotify.removeAll {
+            if case .plan(_, let date) = $0.type {
+                return date == nil
+            } else {
+                return false
+            }
+        }
+        if isRefresh {
+            newNotify = filterNotify
+        } else {
+            newNotify.append(contentsOf: filterNotify)
+        }
+        return .updateNotifyList(newNotify)
+    }
+    
+    private func fetchNotifyWithLoading(cursor: String? = nil) -> Observable<Mutation> {
+        return requestWithLoading(task: fetchNotify(cursor: cursor))
             .concat(resetNotifyCount())
     }
     
@@ -113,10 +144,19 @@ extension NotifyListViewReactor {
                 return .empty()
             }
     }
+    
+    private func fetchNextPage() -> Observable<Mutation> {
+        guard let cursor = currentState.pageInfo?.nextCursor else { return .empty() }
+        return fetchNotifyWithLoading(cursor: cursor)
+    }
 
     private func refreshNotify() -> Observable<Mutation> {
-        return .concat([fetchNotify(),
-                        .just(Mutation.completedRefresh)])
+        isLoading = true
+        return fetchNotify(isRefresh: true)
+            .do(onDispose: {
+                self.isLoading = false
+            })
+            .concat(Observable.just(.completedRefresh))
     }
 }
 
@@ -150,9 +190,16 @@ extension NotifyListViewReactor {
         switch type {
         case let .meet(id):
             coordinator?.presentMeetDetailView(meetId: id)
-        case let .plan(id):
-            coordinator?.presentPlanDetailView(postId: id,
-                                               type: .plan)
+        case let .plan(id, date):
+            guard let date else { return .empty() }
+            if !DateManager.isPastDay(on: date) {
+                coordinator?.presentPlanDetailView(postId: id,
+                                                   type: .plan)
+            } else {
+                coordinator?.presentPlanDetailView(postId: id,
+                                                   type: .oldPlan)
+            }
+            
         case let .review(id):
             coordinator?.presentPlanDetailView(postId: id,
                                                type: .review)

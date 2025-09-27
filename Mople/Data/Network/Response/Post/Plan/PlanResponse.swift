@@ -25,6 +25,7 @@ struct PlanResponse: Decodable {
     let temperature: Double?
     let pop: Double?
     let participant: Bool?
+    let commentCount: Int?
 }
 
 extension PlanResponse {
@@ -47,6 +48,7 @@ extension PlanResponse {
                      weather: .init(address: weatherAddress,
                                     imagePath: weatherIcon,
                                     temperature: temperature,
-                                    pop: pop))
+                                    pop: pop),
+                     commentCount: commentCount ?? 0)
     }
 }

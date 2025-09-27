@@ -21,17 +21,19 @@ final class MeetPlanListViewController: BaseViewController, View {
     private let participation: PublishSubject<(id: Int,
                                                isJoin: Bool)> = .init()
     private let refresh: PublishSubject<Void> = .init()
-            
+    private let nextPage: PublishSubject<Void> = .init()
+    
     // MARK: - Variables
     private var hasAppeared: Bool = false
     private var isVisibleView: Bool = false
+    private var isSetEdgeGesture: Bool = false
     
     // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: L10n.Meetdetail.planlist)
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
-        view.setBottomInset(16)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.frame.size.height = 64
         return view
     }()
@@ -113,14 +115,10 @@ final class MeetPlanListViewController: BaseViewController, View {
         tableView.tableHeaderView = countView
     }
     
-    private func setPlanList(with planList: [Plan]) {
-        emptyPlanView.isHidden = !planList.isEmpty
-        tableView.isHidden = planList.isEmpty
-        setPlanCountLabel(count: planList.count)
-    }
-    
-    private func setPlanCountLabel(count: Int) {
-        guard count > 0 else { return }
+    private func setPlanList(with count: Int) {
+        let hasPlan = count > 0
+        emptyPlanView.isHidden = hasPlan
+        tableView.isHidden = !hasPlan
         countView.countText = "\(count)개"
     }
     
@@ -162,6 +160,12 @@ extension MeetPlanListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map({ Reactor.Action.fetchNextPlan })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refresh
             .map({ Reactor.Action.refresh })
             .bind(to: reactor.action)
@@ -199,10 +203,10 @@ extension MeetPlanListViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$plans)
-            .asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { vc, planList in
-                vc.setPlanList(with: planList)
+        reactor.pulse(\.$totolPlanCount)
+            .asDriver(onErrorJustReturn: 0)
+            .drive(with: self, onNext: { vc, count in
+                vc.setPlanList(with: count)
             })
             .disposed(by: disposeBag)
         
@@ -234,7 +238,9 @@ extension MeetPlanListViewController {
 
 extension MeetPlanListViewController: EdgeGestureConfigurable {
     func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        guard !isSetEdgeGesture else { return }
         tableView.panGestureRecognizer.require(toFail: edgeGesture)
+        isSetEdgeGesture = true
     }
 }
 
@@ -272,5 +278,11 @@ extension MeetPlanListViewController: UIScrollViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard scrollView.isRefresh() else { return }
         refresh.onNext(())
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 50),
+              reactor?.page?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }

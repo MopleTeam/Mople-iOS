@@ -51,8 +51,7 @@ extension ProfileFlowCoordinator {
 // MARK: - Profile Image View
 extension ProfileFlowCoordinator {
     func presentProfileImageView(imagePath: String?) {
-        let vc = dependencies.makeProfileImageViewController(imagePath: imagePath,
-                                                             coordinator: self)
+        let vc = dependencies.makeProfileImageViewController(imagePath: imagePath)
         self.presentWithTracking(vc)
     }
 }

@@ -11,7 +11,7 @@ import RxSwift
 protocol PlanRepo {
     func fetchHomeData() -> Single<HomeDataResponse>
     func fetchPlanDetail(planId: Int) -> Single<PlanResponse>
-    func fetchMeetPlanList(_ meetId: Int) -> Single<[PlanResponse]>
+    func fetchPlanPage(meetId: Int, cursor: String?) -> Single<PageResponse<PlanResponse>>
     func createPlan(request: PlanRequest) -> Single<PlanResponse>
     func participationPlan(planId: Int,
                                   isJoin: Bool) -> Single<Void>

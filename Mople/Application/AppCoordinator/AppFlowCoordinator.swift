@@ -40,7 +40,6 @@ extension AppFlowCoordinator: LaunchCoordination {
         let mainSceneDIContainer = appDIContainer.makeMainSceneDIContainer(isLoign: isLogin)
         let flow = mainSceneDIContainer.makeMainFlowCoordinator(navigationController: navigationController)
         start(coordinator: flow)
-        setBadgeCount()
         mainReadySubject.onNext(())
     }
     
@@ -84,11 +83,6 @@ extension AppFlowCoordinator: SignOutListener {
 extension AppFlowCoordinator {
     private func resetBadgeCount() {
         UIApplication.shared.applicationIconBadgeNumber = 0
-    }
-    
-    private func setBadgeCount() {
-        guard let userInfo = UserInfoStorage.shared.userInfo else { return }
-        UIApplication.shared.applicationIconBadgeNumber = userInfo.notifyCount
     }
 }
 

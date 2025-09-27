@@ -36,6 +36,7 @@ extension UIScrollView {
 
     func scrollToBottom(animated: Bool) {
         let calculateOffsetY = contentSize.height - bounds.size.height + contentInset.bottom
+        print(#function, #line, "Path : #A \(calculateOffsetY) \(contentInset.bottom)")
         guard calculateOffsetY > 0 else { return }
         setContentOffset(.init(x: 0,
                                y: calculateOffsetY),

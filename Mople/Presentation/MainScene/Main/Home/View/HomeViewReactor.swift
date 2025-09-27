@@ -144,10 +144,7 @@ extension HomeViewReactor {
     
     /// 알림 카운트 불러오기
     private func fetchNoticationStatus() -> Observable<Mutation> {
-        guard let notifyCount = UserInfoStorage.shared.userInfo?.notifyCount else {
-            return .empty()
-        }
-        let hasNotify = notifyCount > 0
+        let hasNotify = UserInfoStorage.shared.userInfo?.hasNotify ?? false
         return .just(.updateNotifyStatus(hasNotify))
     }
     

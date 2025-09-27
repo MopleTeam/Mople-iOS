@@ -77,7 +77,7 @@ final class DefaultSwitchView: UIView {
         
         mainStackView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.verticalEdges.equalToSuperview().inset(6.5)
+            make.verticalEdges.equalToSuperview().inset(20)
         }
         
         checkButton.snp.makeConstraints { make in

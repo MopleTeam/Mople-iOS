@@ -8,6 +8,6 @@
 import RxSwift
 
 protocol NotifyRepo {
-    func fetchNotifyList() -> Single<[NotifyResponse]>
+    func fetchNotifyList(cursor: String?) -> Single<PageResponse<NotifyResponse>>
     func resetNotifyCount() -> Single<Void>
 }

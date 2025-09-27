@@ -38,7 +38,6 @@ final class MeetReviewTableCell: UITableViewCell {
         let label = IconLabel(icon: .member, iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium, color: .gray04)
         label.setSpacing(4)
-        label.setTitleTopPadding(3)
         return label
     }()
     

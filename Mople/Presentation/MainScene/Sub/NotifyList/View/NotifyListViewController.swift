@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class NotifyListViewController: TitleNaviViewController, View, UITableViewDelegate {
+final class NotifyListViewController: TitleNaviViewController, View {
     
     // MARK: - Reactor
     typealias Reactor = NotifyListViewReactor
@@ -19,11 +19,15 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     // MARK: - Transition
     var dismissTransition: AppTransition = .init(type: .dismiss)
     
+    // MARK: - Observable
+    private let nextPage: PublishSubject<Void> = .init()
+    
     // MARK: - UI Components
     private let countView: CountView = {
         let view = CountView(title: L10n.Notifylist.new)
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
+        view.setMargin(inset: .init(top: 28, left: 20, bottom: 16, right: 20))
         return view
     }()
     
@@ -77,7 +81,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         self.view.addSubview(tableView)
         
         self.countView.snp.makeConstraints { make in
-            make.top.equalTo(self.titleViewBottom).offset(28)
+            make.top.equalTo(self.titleViewBottom)
             make.horizontalEdges.equalToSuperview()
         }
         
@@ -87,7 +91,7 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
         }
         
         self.tableView.snp.makeConstraints { make in
-            make.top.equalTo(countView.snp.bottom).offset(16)
+            make.top.equalTo(countView.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
     }
@@ -104,6 +108,21 @@ final class NotifyListViewController: TitleNaviViewController, View, UITableView
     
     private func setCount(_ count: Int) {
         countView.countText = L10n.itemCount(count)
+    }
+    
+    private func setFooterView(with page: PageInfo) {
+        if page.hasNext {
+            tableView.tableFooterView = .init(frame: .init(origin: .zero, size: .init(width: 0, height: 0.1)))
+        } else {
+            let label = UILabel(frame: .init(origin: .zero, size: .init(width: tableView.frame.width,
+                                                                        height: 68)))
+            #warning("언어 지원 필요")
+            label.text = "최근 30일 이내 알림 내역만 확인할 수 있어요"
+            label.font = FontStyle.Body1.regular
+            label.textColor = .gray04
+            label.textAlignment = .center
+            tableView.tableFooterView = label
+        }
     }
     
     // MARK: - Gesture
@@ -140,6 +159,14 @@ extension NotifyListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
+            .map { Reactor.Action.fetchNextPage }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refreshControl.rx.controlEvent(.valueChanged)
             .map { Reactor.Action.refresh }
             .bind(to: reactor.action)
@@ -159,16 +186,14 @@ extension NotifyListViewController {
                 cellType: NotifyTableCell.self)
             ) { index, item, cell in
                 cell.configure(viewModel: .init(notify: item))
-                cell.setReadStatus(isNew: item.isNew)
                 cell.selectionStyle = .none
             }
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$notifyList)
             .asDriver(onErrorJustReturn: [])
-            .map { $0
-                .filter { $0.isNew }
-                .count
+            .map {
+                $0.filter { !$0.isRead }.count
             }
             .drive(with: self, onNext: { vc, newCount in
                 vc.setCount(newCount)
@@ -191,6 +216,14 @@ extension NotifyListViewController {
             .drive(refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$pageInfo)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, page in
+                vc.setFooterView(with: page)
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isLoading)
             .asDriver(onErrorJustReturn: false)
             .drive(self.rx.isLoading)
@@ -203,5 +236,13 @@ extension NotifyListViewController {
                 vc.alertManager.showDefatulErrorMessage()
             })
             .disposed(by: disposeBag)
+    }
+}
+
+extension NotifyListViewController: UITableViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 50),
+              reactor?.currentState.pageInfo?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }
