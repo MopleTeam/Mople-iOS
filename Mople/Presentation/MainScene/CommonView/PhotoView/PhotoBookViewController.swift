@@ -11,9 +11,6 @@ import RxCocoa
 
 final class PhotoBookViewController: TitleNaviViewController {
     
-    // MARK: - Coordinator
-    private weak var coordinator: NavigationCloseable?
-    
     // MARK: - Variables
     private var disposeBag = DisposeBag()
     private let imagePaths: [String]
@@ -50,14 +47,12 @@ final class PhotoBookViewController: TitleNaviViewController {
     init(screenName: ScreenName,
          title: String?,
          imagePaths: [String],
-         defaultImageType: UIImageView.DefaultImageType,
-         coordinator: NavigationCloseable) {
+         defaultImageType: UIImageView.DefaultImageType) {
         self.imagePaths = imagePaths
         self.defaultImageType = defaultImageType
         super.init(screenName: screenName,
                    initiallyNavigationBar: false,
                    title: title)
-        self.coordinator = coordinator
         initialSetup()
     }
     
@@ -220,7 +215,7 @@ final class PhotoBookViewController: TitleNaviViewController {
                 self.changeOpacity(opacity: 0)
                 self.view.layoutIfNeeded()
             }, completion: { [weak self] _ in
-                self?.coordinator?.dismiss(completion: nil)
+                self?.dismiss(animated: true)
             })
     }
     
@@ -272,7 +267,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         self.naviBar.leftItemEvent
             .asDriver()
             .drive(with: self, onNext: { vc, _ in
-                vc.coordinator?.dismiss(completion: nil)
+                vc.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }

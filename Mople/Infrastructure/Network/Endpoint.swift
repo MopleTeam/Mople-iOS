@@ -211,22 +211,38 @@ struct MultipartBodyEncoder: BodyEncoder {
         return form.bodyData
     }
     
+    private func getImageInfo(from data: Data) -> (extension: String, mimeType: String) {
+        guard data.count > 4 else { return ("jpg", "image/jpeg") }
+        
+        let bytes = data.prefix(4)
+        if bytes.starts(with: [0xFF, 0xD8, 0xFF]) {
+            return ("jpg", "image/jpeg")
+        } else if bytes.starts(with: [0x89, 0x50, 0x4E, 0x47]) {
+            return ("png", "image/png")
+        } else if bytes.starts(with: [0x47, 0x49, 0x46]) {
+            return ("gif", "image/gif")
+        }
+        return ("jpg", "image/jpeg") // 기본값
+    }
+
     private func makeDataArrayPart(_ parameter: (key: String, value: [Data])) -> [MultipartForm.Part] {
         parameter.value.map {
-            MultipartForm.Part(name: parameter.key,
-                               data: $0,
-                               filename: "Review",
-                               contentType: "image/jpeg")
+            let imageInfo = getImageInfo(from: $0)
+            return MultipartForm.Part(name: parameter.key,
+                                      data: $0,
+                                      filename: "Photo.\(imageInfo.extension)",
+                                      contentType: imageInfo.mimeType)
         }
     }
-    
+
     private func makeSinglePart(_ parameter: (key: String, value: Any)) -> MultipartForm.Part? {
         switch parameter.value {
         case let value as Data:
+            let imageInfo = getImageInfo(from: value)
             return .init(name: parameter.key,
                          data: value,
-                         filename: "Profile",
-                         contentType: "image/jpeg")
+                         filename: "Photo.\(imageInfo.extension)",
+                         contentType: imageInfo.mimeType)
         case let value as String:
             return .init(name: parameter.key,
                          value: value)

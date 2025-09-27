@@ -8,9 +8,9 @@
 import RxSwift
 
 final class DefaultMemberRepo: BaseRepositories, MemberRepo {
-    func execute(type: MemberListType) -> Single<MemberListResponse> {
+    func execute(type: MemberListType, nextCursor: String?) -> Single<PageResponse<MemberInfoResponse>> {
         return networkService.authenticatedRequest {
-            try APIEndpoints.fetchMember(type: type)
+            try APIEndpoints.fetchMember(type: type, nextCursor: nextCursor)
         }
     }
 }

@@ -14,6 +14,7 @@ class BaseViewController: UIViewController, LifeCycleLoggable, ScreenTrackable {
     // MARK: - Alert
     public let alertManager = AlertManager.shared
     public let sheetManager = SheetManager.shared
+    public let toastManager = ToastManager.shared
     
     // MARK: - Properties
     private let className: String

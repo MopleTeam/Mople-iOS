@@ -10,10 +10,10 @@ import RxSwift
 
 final class DefaultMeetRepo: BaseRepositories, MeetRepo {
     
-    func fetchMeetList() -> Single<[MeetResponse]> {
-        return self.networkService.authenticatedRequest(endpointClosure:
-                                                            APIEndpoints.fetchMeetList
-        )
+    func fetchMeetPage(cursor: String?) -> Single<PageResponse<MeetResponse>> {
+        return self.networkService.authenticatedRequest {
+            try APIEndpoints.fetchMeetPage(cursor: cursor)
+        }
     }
     
     func fetchMeetDetail(meetId: Int) -> Single<MeetResponse> {

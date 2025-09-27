@@ -175,12 +175,14 @@ extension APIEndpoints {
     }
     
     static func deleteReviewImage(reviewId: Int,
-                                  imageIds: [String]) throws -> Endpoint<Void> {
+                                  imageIds: [Int]) throws -> Endpoint<Void> {
+        let ids = imageIds.map { "\($0)" }
+        
         return try Endpoint(path: "review/images/\(reviewId)",
                             authenticationType: .accessToken,
                             method: .delete,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["reviewImages": imageIds]
+                            bodyParameters: ["reviewImages": ids]
         )
     }
 }
@@ -215,12 +217,17 @@ extension APIEndpoints {
                             bodyParametersEncodable: request)
     }
     
-    static func fetchMeetList() throws -> Endpoint<[MeetResponse]> {
+    static func fetchMeetPage(cursor: String?) throws -> Endpoint<PageResponse<MeetResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
         return try Endpoint(path: "meet/list",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
-        
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
     }
     
     static func fetchMeetDetail(id: Int) throws -> Endpoint<MeetResponse> {
@@ -271,11 +278,17 @@ extension APIEndpoints {
         
     }
     
-    static func fetchMeetPlan(id: Int) throws -> Endpoint<[PlanResponse]> {
-        return try Endpoint(path: "plan/list/\(id)",
+    static func fetchPlanPage(meetId: Int, cursor: String?) throws -> Endpoint<PageResponse<PlanResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
+        return try Endpoint(path: "plan/list/\(meetId)",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
         
     }
     
@@ -320,15 +333,23 @@ extension APIEndpoints {
 
 // MARK: - Review
 extension APIEndpoints {
-    static func fetchMeetReview(id: Int) throws -> Endpoint<[ReviewResponse]> {
+    static func fetchReviewPage(id: Int, cursor: String?) throws -> Endpoint<PageResponse<ReviewResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
         return try Endpoint(path: "review/list/\(id)",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
     }
     
-    static func fetchReviewDetail(id: Int) throws -> Endpoint<ReviewResponse> {
-        return try Endpoint(path: "review/\(id)",
+    static func fetchReviewDetail(id: Int, isOldPlan: Bool) throws -> Endpoint<ReviewResponse> {
+        let path: String = isOldPlan ? "review/post/\(id)" : "review/\(id)"
+        
+        return try Endpoint(path: path,
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
@@ -355,20 +376,31 @@ extension APIEndpoints {
 
 // MARK: - 댓글
 extension APIEndpoints {
-    static func fetchCommentList(id: Int) throws -> Endpoint<[CommentResponse]> {
-        return try Endpoint(path: "comment/\(id)",
+    // MARK: - CRUD
+    static func fetchCommentList(postId: Int,
+                                 cursor: String?) throws -> Endpoint<PageResponse<CommentResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
+        
+        return try Endpoint(path: "comment/\(postId)",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
     }
     
-    static func createComment(id: Int,
-                              comment: String) throws -> Endpoint<[CommentResponse]> {
-        return try Endpoint(path: "comment/\(id)",
+    static func createComment(postId: Int,
+                              comment: String,
+                              mentions: [Int]) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(postId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["contents": comment])
+                            bodyParameters: ["contents": comment,
+                                             "mentions": mentions])
     }
     
     static func deleteComment(commentId: Int) throws -> Endpoint<Void> {
@@ -378,24 +410,69 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveAllHeader())
     }
     
-    static func editComment(postId: Int,
-                            commentId: Int,
-                            comment: String) throws -> Endpoint<[CommentResponse]> {
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+    static func editComment(commentId: Int,
+                            comment: String,
+                            mentions: [Int]) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
-                            bodyParameters: ["contents": comment])
+                            bodyParameters: ["contents": comment,
+                                             "mensions": mentions])
+    }
+    
+    // MARK: - Reply
+    static func createReplyComment(postId: Int,
+                                   commentId: Int,
+                                   comment: String,
+                                   mentions: [Int]) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["contents": comment,
+                                             "mensions": mentions])
+    }
+    
+    static func fetchReplyCommentList(postId: Int,
+                                      commentId: Int,
+                                      nextCursor: String?) throws -> Endpoint<PageResponse<CommentResponse>> {
+        var cursorQuery: [String: Any] = [:]
+        
+        if let nextCursor, !nextCursor.isEmpty {
+            cursorQuery["cursor"] = nextCursor
+        }
+        
+        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: cursorQuery)
+    }
+    
+    // MARK: - Like
+    static func likeComment(commentId: Int) throws -> Endpoint<CommentResponse> {
+        return try Endpoint(path: "comment/\(commentId)/likes",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 }
 
 // MARK: - 멤버 리스트
 extension APIEndpoints {
-    static func fetchMember(type: MemberListType) throws -> Endpoint<MemberListResponse> { // 모델 변경
+    static func fetchMember(type: MemberListType, nextCursor: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> { 
+        var cursorQuery: [String: Any] = [:]
+        
+        if let nextCursor, !nextCursor.isEmpty {
+            cursorQuery["cursor"] = nextCursor
+        }
+        
         return try Endpoint(path: getFetchMemberPath(type: type),
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: cursorQuery)
     }
     
     private static func getFetchMemberPath(type: MemberListType) -> String {
@@ -405,8 +482,26 @@ extension APIEndpoints {
         case let .plan(id):
             return "plan/participants/\(id ?? 0)"
         case let .review(id):
-            return "review/participant/\(id ?? 0)"
+            return "review/participants/\(id ?? 0)"
         }
+    }
+    
+    static func fetchMentionList(postId: Int, nextCursor: String?, keyword: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> {
+        var cursorQuery: [String: Any] = ["keyword": ""]
+        
+        if let nextCursor, !nextCursor.isEmpty {
+            cursorQuery["cursor"] = nextCursor
+        }
+        
+        if let keyword, !keyword.isEmpty {
+            cursorQuery["keyword"] = keyword
+        }
+        
+        return try Endpoint(path: "comment/\(postId)/mention",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: cursorQuery)
     }
 }
 
@@ -460,11 +555,17 @@ extension APIEndpoints {
 
 // MARK: - 알림
 extension APIEndpoints {
-    static func fetchNotify() throws -> Endpoint<[NotifyResponse]> {
+    static func fetchNotify(cursor: String?) throws -> Endpoint<PageResponse<NotifyResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
         return try Endpoint(path: "notification/list",
                             authenticationType: .accessToken,
                             method: .get,
-                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
     }
     
     static func resetNotifyCount() throws -> Endpoint<Void> {

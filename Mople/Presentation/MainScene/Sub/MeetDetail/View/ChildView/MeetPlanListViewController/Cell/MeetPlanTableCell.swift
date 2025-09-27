@@ -48,7 +48,6 @@ final class MeetPlanTableCell: UITableViewCell {
         label.setTitle(font: FontStyle.Body2.medium,
                        color: .gray04)
         label.setSpacing(4)
-        label.setTitleTopPadding(3)
         return label
     }()
 

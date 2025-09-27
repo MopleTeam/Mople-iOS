@@ -40,8 +40,22 @@ final class NotifySubcribeViewController: TitleNaviViewController, View {
         return view
     }()
     
+    private let replyNotiButton: DefaultSwitchView = {
+        let view = DefaultSwitchView()
+        view.setTitle("댓글 알림")
+        view.setSubTitle("나의 댓글에 답글이 달리면 알림")
+        return view
+    }()
+    
+    private let mentionNotiButton: DefaultSwitchView = {
+        let view = DefaultSwitchView()
+        view.setTitle("멘션 알림")
+        view.setSubTitle("나를 멘션시 알림")
+        return view
+    }()
+    
     private lazy var checkStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [meetNotiButton, planNotiButton])
+        let sv = UIStackView(arrangedSubviews: [meetNotiButton, planNotiButton, replyNotiButton, mentionNotiButton])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill
@@ -132,6 +146,16 @@ extension NotifySubcribeViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        replyNotiButton.rx.changeValue
+            .map({ Reactor.Action.subscribe(type: .reply, isSubscribe: $0) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        mentionNotiButton.rx.changeValue
+            .map({ Reactor.Action.subscribe(type: .mention, isSubscribe: $0) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         notifyActiveButton.rx.controlEvent(.touchUpInside)
             .subscribe(onNext: {
                 AppSettingOpener.openAppSettings()
@@ -209,7 +233,7 @@ extension NotifySubcribeViewController {
     }
     
     private func setSubscribeEnalbe(isAllow: Bool) {
-        [meetNotiButton, planNotiButton].forEach {
+        [meetNotiButton, planNotiButton, replyNotiButton, mentionNotiButton].forEach {
             $0.rx.isEnabled.onNext(isAllow)
         }
     }
@@ -218,9 +242,13 @@ extension NotifySubcribeViewController {
     private func setSubscribe(with subscribe: Set<SubscribeType>) {
         let meetSubscribe = subscribe.contains { $0 == .meet }
         let planSubscribe = subscribe.contains { $0 == .plan }
+        let replySubscribe = subscribe.contains { $0 == .reply }
+        let mentionSubscribe = subscribe.contains { $0 == .mention }
         
         meetNotiButton.setSubscribe(isSubscribe: meetSubscribe)
         planNotiButton.setSubscribe(isSubscribe: planSubscribe)
+        replyNotiButton.setSubscribe(isSubscribe: replySubscribe)
+        mentionNotiButton.setSubscribe(isSubscribe: mentionSubscribe)
     }
 }
 

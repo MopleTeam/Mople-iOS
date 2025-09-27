@@ -14,8 +14,8 @@ final class MemberTableHeader: UITableViewHeaderFooterView {
     
     fileprivate let inviteButton = UIButton()
     
-    private let inviteView: MemberListView = {
-        let view = MemberListView()
+    private let inviteView: MemberView = {
+        let view = MemberView()
         view.isUserInteractionEnabled = false
         return view
     }()

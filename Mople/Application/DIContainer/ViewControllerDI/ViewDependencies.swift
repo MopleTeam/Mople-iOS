@@ -17,8 +17,7 @@ protocol ViewDependencies {
                                       coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makePhotoViewController(title: String?,
                                  imagePath: [String],
-                                 defaultImageType: UIImageView.DefaultImageType,
-                                 coordinator: NavigationCloseable) -> PhotoBookViewController
+                                 defaultImageType: UIImageView.DefaultImageType) -> PhotoBookViewController
 }
 
 final class ViewDIContainer: ViewDependencies {
@@ -110,12 +109,10 @@ extension ViewDIContainer {
     // MARK: - 포토뷰
     func makePhotoViewController(title: String?,
                                  imagePath: [String],
-                                 defaultImageType: UIImageView.DefaultImageType,
-                                 coordinator: NavigationCloseable) -> PhotoBookViewController {
+                                 defaultImageType: UIImageView.DefaultImageType) -> PhotoBookViewController {
         return .init(screenName: .photo,
                      title: title,
                      imagePaths: imagePath,
-                     defaultImageType: defaultImageType,
-                     coordinator: coordinator)
+                     defaultImageType: defaultImageType)
     }
 }

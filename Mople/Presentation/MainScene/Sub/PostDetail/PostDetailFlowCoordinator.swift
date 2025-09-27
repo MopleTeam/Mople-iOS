@@ -7,21 +7,33 @@
 
 import UIKit
 
+typealias PostCoordination = PostDetailCoordination & CommentListCoordination
+
 protocol PostDetailCoordination: AnyObject {
     func pushMemberListView(postId: Int)
     func pushPlaceDetailView(place: PlaceInfo)
     func pushReviewEditView(review: Review)
     func presentPhotoView(title: String?,
-                       index: Int,
-                       imagePaths: [String],
-                       defaultType: UIImageView.DefaultImageType)
+                          index: Int,
+                          imagePaths: [String],
+                          defaultType: UIImageView.DefaultImageType)
     func presentPlanEditFlow(plan: Plan)
     func endFlow()
+}
+
+protocol CommentListCoordination: NavigationCloseable {
+    func presentWriterImageView(title: String?,
+                                imagePath: String?,
+                                defaultType: UIImageView.DefaultImageType)
+    
+    func pushReplyPage(parentComment: Comment)
+    func deleteParentComment(id: Int)
 }
 
 final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
 
     private let dependencies: PostDetailSceneDependencies
+    private var postVC: PostDetailViewController?
     
     init(dependencies: PostDetailSceneDependencies,
          navigationController: AppNaviViewController) {
@@ -31,15 +43,8 @@ final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
     }
     
     override func start() {
-        let planDetailVC = makePlanDetailViewController()
-        self.pushWithTracking(planDetailVC, animated: false)
-    }
-}
-
-// MARK: - Default View
-extension PostDetailFlowCoordinator {
-    private func makePlanDetailViewController() -> PostDetailViewController {
-        return dependencies.makePlanDetailViewController(coordinator: self)
+        postVC = dependencies.makePlanDetailViewController(coordinator: self)
+        self.pushWithTracking(postVC!, animated: false)
     }
 }
 
@@ -68,17 +73,39 @@ extension PostDetailFlowCoordinator: ReviewEditViewCoordination {
     }
 }
 
-// MARK: - Photo View
-extension PostDetailFlowCoordinator {
+// MARK: - Comment View
+extension PostDetailFlowCoordinator: CommentListCoordination {
+    func pushReplyPage(parentComment: Comment) {
+        let vc = dependencies.makeCommentListViewController(type: .child(parent: parentComment),
+                                                            coordinator: self)
+        self.push(vc, animated: true)
+    }
+    
+    func deleteParentComment(id: Int) {
+        postVC?.commentVC.deletedComment(id: id)
+        self.pop()
+    }
+    
     func presentPhotoView(title: String?,
                           index: Int,
                           imagePaths: [String],
                           defaultType: UIImageView.DefaultImageType) {
         let vc = dependencies.makePhotoBookViewController(title: title,
                                                           imagePaths: imagePaths,
-                                                          defaultType: defaultType,
-                                                          coordinator: self)
+                                                          defaultType: defaultType)
         vc.selectedIndex = index
+        self.presentWithTracking(vc)
+    }
+    
+    func presentWriterImageView(title: String?,
+                                imagePath: String?,
+                                defaultType: UIImageView.DefaultImageType) {
+        let imagePaths = [imagePath].compactMap { $0 }
+        
+        let vc = dependencies.makePhotoBookViewController(title: title,
+                                                          imagePaths: imagePaths,
+                                                          defaultType: defaultType)
+        
         self.presentWithTracking(vc)
     }
 }
@@ -113,3 +140,5 @@ extension PostDetailFlowCoordinator {
         }
     }
 }
+
+

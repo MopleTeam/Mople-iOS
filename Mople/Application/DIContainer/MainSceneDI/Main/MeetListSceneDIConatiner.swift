@@ -42,9 +42,9 @@ extension MeetListSceneDIConatiner {
                                     coordinator: coordinator)
     }
     
-    private func makeMeetListUseCase() -> FetchMeetList {
+    private func makeMeetListUseCase() -> FetchMeetPage {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
-        return FetchMeetListUseCase(repo: repo)
+        return FetchMeetPageUseCase(repo: repo)
     }
 }
 

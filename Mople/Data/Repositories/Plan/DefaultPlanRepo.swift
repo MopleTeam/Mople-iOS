@@ -19,9 +19,9 @@ final class DefaultPlanRepo: BaseRepositories, PlanRepo {
         }
     }
     
-    func fetchMeetPlanList(_ meetId: Int) -> Single<[PlanResponse]> {
+    func fetchPlanPage(meetId: Int, cursor: String?) -> Single<PageResponse<PlanResponse>> {
         return self.networkService.authenticatedRequest {
-            try APIEndpoints.fetchMeetPlan(id: meetId)
+            try APIEndpoints.fetchPlanPage(meetId: meetId, cursor: cursor)
         }
     }
     

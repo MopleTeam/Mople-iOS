@@ -139,7 +139,7 @@ extension Notification.Name {
     static let editProfile = Notification.Name("editProfile")
     
     /// 알림 카운트 업데이트
-    static let changedNotifyCount = Notification.Name("changedNotifyCount")
+    static let changedNotifyStatus = Notification.Name("changedNotifyStatus")
     
     /// FCM 토큰
     static let updateFCMToken = Notification.Name("updateFCMToken")

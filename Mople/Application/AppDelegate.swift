@@ -69,7 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         guard wasInBackground else { return }
         checkNotifyPermission()
-        updateNotifyCount()
+        updateNotifyStatus()
     }
 }
 
@@ -121,33 +121,38 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        addNotifyCount()
         completionHandler([.sound, .banner, .badge])
+        updateNotifyStatus()
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let url = response.notification.request.content.userInfo
+        let userInfo = response.notification.request.content.userInfo
+
+        // JSON 형태로 예쁘게 출력
+        if let jsonData = try? JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("APNS JSON:")
+            print(jsonString)
+        }
+        
         guard let destination: NotificationDestination = .init(userInfo: url) else {
             return
         }
         appFlowCoordinator?.handleNotificationTap(destination: destination)
     }
+    
+    private func updateNotifyStatus() {
+        let hasNotify = UIApplication.shared.applicationIconBadgeNumber > 0
+        print(#function, #line, "Path : # hasNotify \(hasNotify) ")
+        UserInfoStorage.shared.updateNotifyStatus(hasNotify: hasNotify)
+    }
 }
 
 // MARK: - Notify Handle
 extension AppDelegate {
-    
-    /// badgeCount와 유저 캐시정보 동기화
-    private func updateNotifyCount() {
-        let badgeCount = UIApplication.shared.applicationIconBadgeNumber
-        UserInfoStorage.shared.updateNotifyCount(badgeCount)
-    }
-    
-    private func addNotifyCount() {
-        UserInfoStorage.shared.adjustNotifyCount(isIncreasing: true)
-    }
     
     /// 백그라운드에서 포그라운드로 진입 시 알림상태가 허용인 경우에만 토큰 업데이트
     private func checkNotifyPermission() {
@@ -173,12 +178,12 @@ extension AppDelegate {
     /// Realm 마이그레이션
     func configureRealmMigration() {
         
-        let newSchemaVersion: UInt64 = 2
+        let newSchemaVersion: UInt64 = 3
         
         let config = Realm.Configuration(
             schemaVersion: newSchemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
-                self.migrateToV2(migration: migration, from: oldSchemaVersion)
+                self.migrateToV3(migration: migration, from: oldSchemaVersion)
             })
         Realm.Configuration.defaultConfiguration = config
         
@@ -186,10 +191,10 @@ extension AppDelegate {
     }
     
     /// Realm 마이그레이션 버전 2
-    private func migrateToV2(migration: Migration, from oldSchemaVersion: UInt64) {
-        guard oldSchemaVersion < 2 else { return }
+    private func migrateToV3(migration: Migration, from oldSchemaVersion: UInt64) {
+        guard oldSchemaVersion < 3 else { return }
         migration.enumerateObjects(ofType: UserInfoEntity.className()) { oldObject, newObject in
-            newObject?["notifyCount"] = 0
+            newObject?["hasNotify"] = false
         }
     }
 }

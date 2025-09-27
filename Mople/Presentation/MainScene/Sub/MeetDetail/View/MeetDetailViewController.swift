@@ -96,7 +96,6 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        configureEdgeGesture()
     }
     
     // MARK: - UI Setup
@@ -151,7 +150,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     }
     
     // MARK: - Gesture
-    private func configureEdgeGesture() {
+    public func configureEdgeGesture() {
         guard let currentNavi = self.findCurrentNavigation(),
               let appNavi = currentNavi as? AppNaviViewController else { return }
         
@@ -219,7 +218,7 @@ extension MeetDetailViewController {
             .disposed(by: disposeBag)
         
         self.thumbnailView.inviteButton.rx.tap
-            .map { Reactor.Action.invite }
+            .map { Reactor.Action.flow(.memberList) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

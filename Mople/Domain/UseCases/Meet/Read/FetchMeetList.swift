@@ -8,11 +8,11 @@
 import Foundation
 import RxSwift
 
-protocol FetchMeetList {
-    func execute() -> Observable<[Meet]>
+protocol FetchMeetPage {
+    func execute(cursor: String?) -> Observable<Page<Meet>>
 }
 
-final class FetchMeetListUseCase: FetchMeetList {
+final class FetchMeetPageUseCase: FetchMeetPage {
   
     private let repo: MeetRepo
     
@@ -20,11 +20,11 @@ final class FetchMeetListUseCase: FetchMeetList {
         self.repo = repo
     }
     
-    func execute() -> Observable<[Meet]> {
-        return repo.fetchMeetList()
-            .map { $0.map { response in
-                response.toDomain() }
-            }
+    func execute(cursor: String?) -> Observable<Page<Meet>> {
+        return repo.fetchMeetPage(cursor: cursor)
+            .map { .init(totalCount: $0.totalCount ?? 0,
+                         content: $0.content.map({ $0.toDomain() }),
+                         info: $0.page?.toDomain()) }
             .asObservable()
     }
 }

@@ -19,7 +19,6 @@ final class PhotoCollectionCell: UICollectionViewCell {
     
     private var isEditMode: Bool = false
     
-    #warning("뷰에 버튼 추가 시 동작하지 않는 문제 해결")
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -75,8 +74,12 @@ final class PhotoCollectionCell: UICollectionViewCell {
 }
 
 extension PhotoCollectionCell {
-    public func configure(image: UIImage) {
-        imageView.image = image
+    public func configure(imageInfo: ImageInfo) {
+        if let image = imageInfo.image {
+            imageView.image = image
+        } else {
+            imageView.kfSetimage(imageInfo.path, defaultImageType: .history)
+        }
     }
     
     public func setEditMode() {

@@ -23,6 +23,7 @@ struct ReviewResponse: Decodable {
     let participantsCount: Int?
     let images: [ReviewImageResponse]?
     let register: Bool?
+    let commentCount: Int?
 }
 
 extension ReviewResponse {
@@ -44,6 +45,7 @@ extension ReviewResponse {
                                  imagePath: meetImg),
                      location: .init(longitude: lot,
                                      latitude: lat),
-                     isReviewd: register ?? false)
+                     isReviewd: register ?? false,
+                     commentCount: commentCount ?? 0)
     }
 }

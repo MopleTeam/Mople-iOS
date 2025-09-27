@@ -19,16 +19,18 @@ final class MeetReviewListViewController: BaseViewController, View {
     
     // MARK: - Observable
     private let refresh: PublishSubject<Void> = .init()
+    private let nextPage: PublishSubject<Void> = .init()
     
     // MARK: - Variables
     private var hasAppeared: Bool = false
+    private var isSetEdgeGesture: Bool = false
     
     // MARK: - UI Components
     private lazy var countView: CountView = {
         let view = CountView(title: L10n.Meetdetail.reviwelist)
         view.setFont(font: FontStyle.Body1.medium,
                      textColor: .gray04)
-        view.setBottomInset(16)
+        view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.frame.size.height = 64
         return view
     }()
@@ -101,21 +103,19 @@ final class MeetReviewListViewController: BaseViewController, View {
         tableView.tableHeaderView = countView
     }
     
-    private func setReviewList(with reviewList: [Review]) {
-        emptyReviewView.isHidden = !reviewList.isEmpty
-        tableView.isHidden = reviewList.isEmpty
-        setReviewCountLabel(count: reviewList.count)
-    }
-    
-    private func setReviewCountLabel(count: Int) {
-        guard count > 0 else { return }
+    private func setReviewList(with count: Int) {
+        let hasPlan = count > 0
+        emptyReviewView.isHidden = hasPlan
+        tableView.isHidden = !hasPlan
         countView.countText = "\(count)개"
     }
 }
 
 extension MeetReviewListViewController: EdgeGestureConfigurable {
     func configureEdgeGesture(_ edgeGesture: UIGestureRecognizer) {
+        guard !isSetEdgeGesture else { return }
         tableView.panGestureRecognizer.require(toFail: edgeGesture)
+        isSetEdgeGesture = true
     }
 }
 
@@ -146,6 +146,12 @@ extension MeetReviewListViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        nextPage
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
+            .map({ Reactor.Action.fetchNextReview })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         refresh
             .map({ Reactor.Action.refresh })
             .bind(to: reactor.action)
@@ -160,10 +166,11 @@ extension MeetReviewListViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$reviews)
-            .asDriver(onErrorJustReturn: [])
-            .drive(with: self, onNext: { vc, reviewList in
-                vc.setReviewList(with: reviewList)
+        reactor.pulse(\.$totolPlanCount)
+            .asDriver(onErrorJustReturn: 0)
+            .drive(with: self, onNext: { vc, count in
+                print(#function, #line, "Path : #1 \(count) ")
+                vc.setReviewList(with: count)
             })
             .disposed(by: disposeBag)
         
@@ -181,5 +188,11 @@ extension MeetReviewListViewController: UIScrollViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard scrollView.isRefresh() else { return }
         refresh.onNext(())
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.isBottom(threshold: 50),
+              reactor?.page?.hasNext == true else { return }
+        nextPage.onNext(())
     }
 }
