@@ -418,7 +418,7 @@ extension APIEndpoints {
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParameters: ["contents": comment,
-                                             "mensions": mentions])
+                                             "mentions": mentions])
     }
     
     // MARK: - Reply
@@ -431,7 +431,7 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
                             bodyParameters: ["contents": comment,
-                                             "mensions": mentions])
+                                             "mentions": mentions])
     }
     
     static func fetchReplyCommentList(postId: Int,
