@@ -13,15 +13,10 @@ import SnapKit
 final class CommentView: UIView {
     
     // MARK: - Closure
-    var urlPreview: ((URL) -> Void)?
+    var onAppearPreview: (() -> Void)?
     
     // MARK: - Variables
-    public let spacing: CGFloat = 12
-    
-    var text: String {
-        get { commentTextView.text }
-        set { commentTextView.text = newValue }
-    }
+    private var metadataProvider: LPMetadataProvider?
     
     // MARK: - Constraints
     private var imageSize: Constraint?
@@ -75,6 +70,8 @@ final class CommentView: UIView {
         return view
     }()
     
+    private lazy var linkPreviewView = CustomPreviewView()
+    
     fileprivate let likeButton = ButtonCountView()
     
     fileprivate let replyButton = ButtonCountView()
@@ -89,7 +86,7 @@ final class CommentView: UIView {
     }()
     
     private lazy var commentStateView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [likeButton, replyButton])
+        let sv = UIStackView(arrangedSubviews: [likeButton, replyButton, UIView()])
         sv.axis = .horizontal
         sv.spacing = 8
         sv.alignment = .fill
@@ -110,7 +107,7 @@ final class CommentView: UIView {
         let sv = UIStackView(arrangedSubviews: [commentHeaderView, commentStackView, commentStateView])
         sv.axis = .vertical
         sv.spacing = 8
-        sv.alignment = .leading
+        sv.alignment = .fill
         sv.distribution = .fill
         return sv
     }()
@@ -118,7 +115,7 @@ final class CommentView: UIView {
     private lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [profileView, bodyStackView])
         sv.axis = .horizontal
-        sv.spacing = spacing
+        sv.spacing = 12
         sv.alignment = .top
         sv.distribution = .fill
         return sv
@@ -138,7 +135,7 @@ final class CommentView: UIView {
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().priority(.high)
+            make.edges.equalToSuperview()
         }
         
         commentHeaderView.snp.makeConstraints { make in
@@ -156,9 +153,10 @@ final class CommentView: UIView {
     
     // MARK: - Configure
     public func configure(_ viewModel: CommentViewModel, showReply: Bool = true) {
+        resetCommentView()
         setProfileView(with: viewModel)
         self.nameLabel.text = viewModel.writerName
-        self.commentTextView.setTextFromServer(text: viewModel.text, mentions: viewModel.mentions)
+        self.setCommentTextView(with: viewModel)
         self.timeLabel.text = viewModel.commentDate
         self.likeButton.configure(image: viewModel.isLiked ? .likeOn : .likeOff,
                                   count: viewModel.likeCount,
@@ -168,8 +166,6 @@ final class CommentView: UIView {
         } else {
             replyButton.isHidden = true
         }
-        
-        extractURLs()
     }
     
     private func setProfileView(with viewModel: CommentViewModel) {
@@ -185,6 +181,14 @@ final class CommentView: UIView {
     // MARK: - Control
     public func cancleImageLoad() {
         profileView.cancleImageLoad()
+        cancleMetadataFetch()
+    }
+    
+    private func cancleMetadataFetch() {
+        metadataProvider?.cancel()
+        DispatchQueue.main.async { [weak self] in
+            self?.metadataProvider = nil
+        }
     }
     
     public func getImageSize(type: CommentType) -> CGFloat {
@@ -197,18 +201,82 @@ final class CommentView: UIView {
         self.timeLabel.text = nil
         self.profileView.resetImage()
     }
+    
+    private func resetCommentView() {
+        commentTextView.isHidden = false
+        removeUrlPreview()
+    }
 }
 
 extension CommentView {
-    private func extractURLs() {
-        guard let text = commentTextView.text,
-              let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return }
-        
-        let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
-        
-        if let previewUrl = matches.last?.url {
-            urlPreview?(previewUrl)
+    private func setCommentTextView(with viewModel: CommentViewModel) {
+        if let lastMatch = findLastMatch(with: viewModel.text),
+           let range = Range(lastMatch.range, in: viewModel.text),
+           let previewUrl = lastMatch.url {
+     
+            print(#function, #line, "Path : # \(viewModel.text) ")
+            makeUrlPreview(with: previewUrl,
+                           urlRange: range,
+                           viewModel: viewModel)
+        } else {
+            commentTextView.setTextFromServer(text: viewModel.text, mentions: viewModel.mentions)
+            removeUrlPreview()
         }
+    }
+    
+    private func findLastMatch(with text: String) -> NSTextCheckingResult? {
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+            return nil
+        }
+        let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+        return matches.last
+    }
+    
+    private func makeUrlPreview(with url: URL,
+                                urlRange: Range<String.Index>,
+                                viewModel: CommentViewModel) {
+        self.addUrlPreview()
+        self.metadataProvider = LPMetadataProvider()
+        metadataProvider?.startFetchingMetadata(for: url) { [weak self] metadata, error in
+            DispatchQueue.main.async { [weak self] in
+                if let metadata = metadata,
+                   error == nil {
+                    self?.setUrlText(urlRange: urlRange, viewModel: viewModel)
+                    
+                    self?.linkPreviewView.configure(with: metadata)
+                    self?.onAppearPreview?()
+                } else {
+                    self?.commentTextView.setTextFromServer(text: viewModel.text, mentions: viewModel.mentions)
+                    self?.removeUrlPreview()
+                    self?.onAppearPreview?()
+                }
+            }
+        }
+    }
+    
+    private func setUrlText(urlRange: Range<String.Index>, viewModel: CommentViewModel) {
+        var newText = viewModel.text
+        newText.removeSubrange(urlRange)
+        let trimmed = newText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            commentTextView.isHidden = true
+        } else {
+            commentTextView.setTextFromServer(text: trimmed, mentions: viewModel.mentions)
+        }
+    }
+    
+    private func addUrlPreview() {
+        guard !commentStackView.contains(linkPreviewView) else { return }
+        commentStackView.addArrangedSubview(linkPreviewView)
+        linkPreviewView.snp.makeConstraints { make in
+            make.height.equalTo(191).priority(.high)
+        }
+    }
+    
+    private func removeUrlPreview() {
+        guard commentStackView.contains(linkPreviewView) else { return }
+        commentStackView.removeArrangedSubview(linkPreviewView)
+        linkPreviewView.removeFromSuperview()
     }
 }
 
@@ -228,5 +296,111 @@ extension Reactive where Base: CommentView {
     
     var replyTapped: ControlEvent<Void> {
         return base.replyButton.rx.tap
+    }
+}
+
+import LinkPresentation
+
+final class CustomPreviewView: UIView {
+    
+    private var linkURL: URL?
+
+    
+    private let thumbnailView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        return iv
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .defaultBlack
+        label.font = FontStyle.Body2.bold
+        label.numberOfLines = 2
+        return label
+    }()
+    
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .defaultBlack
+        label.font = FontStyle.Body2.regular
+        label.numberOfLines = 2
+        return label
+    }()
+    
+    private lazy var labelSV: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
+        sv.axis = .vertical
+        sv.spacing = 4
+        sv.alignment = .fill
+        sv.distribution = .fill
+        sv.backgroundColor = .appTertiary
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.layoutMargins = .init(top: 8, left: 8, bottom: 8, right: 8)
+        return sv
+    }()
+    
+    private lazy var mainSV: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [thumbnailView, labelSV])
+        sv.axis = .vertical
+        sv.alignment = .fill
+        sv.distribution = .fill
+        sv.layer.cornerRadius = 12
+        sv.clipsToBounds = true
+        return sv
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.clipsToBounds = true
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var intrinsicContentSize: CGSize { .zero }
+    
+    private func setupUI() {
+        self.addSubview(mainSV)
+        
+        mainSV.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+
+    func configure(with metadata: LPLinkMetadata) {
+        self.thumbnailView.image = nil
+        let description = (metadata.value(forKey: "summary") as? String) ?? "설명 없음"
+        let title = metadata.title
+        descriptionLabel.text = description
+        titleLabel.text = title
+        self.layoutIfNeeded()
+
+        // URL 저장
+        linkURL = metadata.originalURL ?? metadata.url
+
+        // 이미지 로드
+        if let provider = metadata.imageProvider {
+            provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
+                DispatchQueue.main.async {
+                    self?.thumbnailView.image = image as? UIImage
+                }
+            }
+        }
+
+        // 제스처 추가 (중복 방지)
+        if gestureRecognizers?.isEmpty ?? true {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+            addGestureRecognizer(tap)
+            isUserInteractionEnabled = true
+        }
+    }
+
+    @objc private func handleTap() {
+        guard let url = linkURL else { return }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 }

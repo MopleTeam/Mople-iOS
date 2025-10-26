@@ -125,6 +125,7 @@ extension UITextView {
     }
     
     func setTextFromServer(text: String, mentions: [UserInfo]) {
+        print(#function, #line, "Path : # 댓글 \(text) ")
         var resultText = text
         var mentionRanges: [(range: NSRange, id: Int, nickname: String)] = []
         
@@ -182,7 +183,6 @@ extension UITextView {
                 NSAttributedString.Key(rawValue: "MentionTag"): mentionInfo.id
             ], range: mentionInfo.range)
         }
-        
         self.attributedText = mutableAttributedString
         resetTypingAttributes()
     }

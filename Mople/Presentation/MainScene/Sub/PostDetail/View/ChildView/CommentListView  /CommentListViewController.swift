@@ -423,6 +423,13 @@ extension CommentListViewController {
                     guard let id = item.id else { return }
                     self?.likeComment.onNext(id)
                 }
+                
+                cell.onAppearPreview = { [weak self] in
+                    UIView.performWithoutAnimation {
+                        self?.tableView.beginUpdates()
+                        self?.tableView.endUpdates()
+                    }
+                }
             }
             .disposed(by: disposeBag)
         

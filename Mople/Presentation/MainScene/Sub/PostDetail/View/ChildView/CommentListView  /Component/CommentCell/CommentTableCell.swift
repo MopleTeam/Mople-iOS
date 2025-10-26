@@ -20,6 +20,7 @@ final class CommentTableCell: UITableViewCell {
     var profileTapped: (() -> Void)?
     var likeTapped: (() -> Void)?
     var replyTapped: (() -> Void)?
+    var onAppearPreview: (() -> Void)?
     
     // MARK: - Constraints
     private var leftPadding: Constraint?
@@ -151,6 +152,10 @@ final class CommentTableCell: UITableViewCell {
     // MARK: - Configure
     public func parentCommentConfigure(with comment: Comment, isLastCell: Bool) {
         commentView.configure(.init(comment))
+        commentView.onAppearPreview = { [weak self] in
+            self?.onAppearPreview?()
+        }
+        
         setClearIndicator(isLoad: comment.isLoading)
         setBorderLine(hasBorder: !isLastCell)
     }
