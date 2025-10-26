@@ -108,7 +108,7 @@
 "postdetail.plan" = "일정 상세";
 "postdetail.review" = "후기 상세";
 "postdetail.delete_plan" = "일정 삭제";
-"postdetail.delete_review" = "후기 상세";
+"postdetail.delete_review" = "후기 삭세";
 
 // MARK: - Comment
 "comment" = "댓글";
