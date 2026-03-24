@@ -12,7 +12,7 @@ struct MeetResponse: Decodable {
     let meetName: String?
     let meetImage: String?
     let sinceDays: Int?
-    let creatorId: Int?
+    let hostId: Int?
     let memberCount: Int?
     let lastPlanDay: String?
 }
@@ -25,7 +25,7 @@ extension MeetResponse {
                                         name: meetName,
                                         imagePath: meetImage),
                      sinceDays: sinceDays,
-                     creatorId: creatorId,
+                     creatorId: hostId,
                      memberCount: memberCount,
                      firstPlanDate: date)
     }

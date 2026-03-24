@@ -93,7 +93,7 @@ final class SearchPlaceTableCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.contentView.backgroundColor = highlighted ? .bgPrimary : .defaultWhite
+        self.contentView.backgroundColor = highlighted ? .bgSecondary : .defaultWhite
     }
 
     // MARK: - UI Setup

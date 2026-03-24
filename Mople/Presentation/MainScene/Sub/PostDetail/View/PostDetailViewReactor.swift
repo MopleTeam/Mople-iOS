@@ -234,7 +234,6 @@ extension PostDetailViewReactor {
             guard let post = currentState.postSummary else { break }
             coordinator?.pushPlaceDetailView(place: .init(post: post))
         case .photoView(let index):
-            print(#function, #line, "Path : # ")
             guard let imagePath = review?.images,
                   imagePath.count > index else { return .empty() }
             coordinator?.presentPhotoView(title: "함께한 순간",

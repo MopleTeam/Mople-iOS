@@ -65,11 +65,19 @@ extension CalendarSceneDIContainer {
     }
     
     private func makeFetchCalendarDatesUseCase(repo: CalendarRepo) -> FetchAllPlanDate {
+        #if DEV
+        return MockDataManager.resolve(FetchAllPlanDateUseCase(repo: repo) as FetchAllPlanDate, mock: MockFetchAllPlanDateUseCase())
+        #else
         return FetchAllPlanDateUseCase(repo: repo)
+        #endif
     }
     
     private func makeFetchHolidaysUseCase(repo: CalendarRepo) -> FetchHolidays {
+        #if DEV
+        return MockDataManager.resolve(FetchHolidaysUseCase(repo: repo) as FetchHolidays, mock: MockFetchHolidaysUseCase())
+        #else
         return FetchHolidaysUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 일정 리스트
@@ -87,9 +95,15 @@ extension CalendarSceneDIContainer {
     }
     
     private func makeFetchMonthlyPlanUseCase() -> FetchMonthlyPost {
+        #if DEV
+        return MockDataManager.resolve(FetchMonthlyPostUseCase(
+            repo: DefaultCalendarRepo(networkService: appNetworkService)
+        ) as FetchMonthlyPost, mock: MockFetchMonthlyPostUseCase())
+        #else
         return FetchMonthlyPostUseCase(
             repo: DefaultCalendarRepo(networkService: appNetworkService)
         )
+        #endif
     }
 }
 

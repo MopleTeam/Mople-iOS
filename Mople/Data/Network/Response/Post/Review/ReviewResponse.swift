@@ -24,6 +24,11 @@ struct ReviewResponse: Decodable {
     let images: [ReviewImageResponse]?
     let register: Bool?
     let commentCount: Int?
+    let description: String?
+    
+    var hasLocation: Bool {
+        return lat != nil || lot != nil
+    }
 }
 
 extension ReviewResponse {
@@ -43,9 +48,10 @@ extension ReviewResponse {
                      meet: .init(id: meetId,
                                  name: meetName,
                                  imagePath: meetImg),
-                     location: .init(longitude: lot,
-                                     latitude: lat),
+                     location: hasLocation ? .init(longitude: lot, latitude: lat) : nil,
                      isReviewd: register ?? false,
-                     commentCount: commentCount ?? 0)
+                     commentCount: commentCount ?? 0,
+                     description: description)
     }
 }
+

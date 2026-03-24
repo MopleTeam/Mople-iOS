@@ -8,7 +8,8 @@
 import UIKit
 
 protocol HomeFlowCoordination: AnyObject {
-    func presentPlanCreateView(meetList: [MeetSummary])
+    func presentPlanCreateView()
+    func presentPlanEditView(plan: Plan)
     func presentMeetCreateView()
     func presentPlanDetailView(planId: Int, type: PostType)
     func pushCalendarView(lastRecentDate: Date)
@@ -50,16 +51,23 @@ extension HomeFlowCoordinator: MeetCreateViewCoordination  {
 extension HomeFlowCoordinator {
     
     // MARK: - 일정생성
-    func presentPlanCreateView(meetList: [MeetSummary]) {
+    func presentPlanCreateView() {
         let planCreateFlowCoordinator = dependencies
-            .makePlanCreateFlowCoordinator(meetList: meetList,
-                                           completionHandler: { [weak self] plan in
+            .makePlanCreateFlowCoordinator(completionHandler: { [weak self] plan in
                 guard let self,
                       let planId = plan.id else { return }
                 self.presentPlanDetailView(planId: planId, type: .plan)
             })
         self.start(coordinator: planCreateFlowCoordinator)
         self.present(planCreateFlowCoordinator.navigationController)
+    }
+    
+    // MARK: - 장소 추가
+    func presentPlanEditView(plan: Plan) {
+        let planEditFlowCoordinator = dependencies
+            .makePlanEditFlowCoorinator(plan: plan)
+        self.start(coordinator: planEditFlowCoordinator)
+        self.present(planEditFlowCoordinator.navigationController)
     }
     
     // MARK: - 일정상세

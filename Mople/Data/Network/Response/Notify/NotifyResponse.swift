@@ -14,7 +14,7 @@ struct NotifyResponse: Decodable {
     let reviewId: Int?
     let meetName: String?
     let meetImg: String?
-    let payload: NotifyPayloadResponse?
+    let message: String?
     let sendAt: String?
     let planDate: String?
     let isRead: Bool
@@ -30,7 +30,7 @@ extension NotifyResponse {
                      meetTitle: meetName,
                      receiveDate: notifyDate,
                      type: notifyType,
-                     payload: payload?.toDomain(),
+                     message: message,
                      isRead: isRead)
     }
     

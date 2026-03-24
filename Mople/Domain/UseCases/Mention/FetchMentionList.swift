@@ -21,7 +21,7 @@ final class FetchMentionListUseCase: FetchMentionList {
     func execute(meetId: Int,
                  cursor: String?,
                  keyword: String?) -> Observable<Page<MemberInfo>> {
-        
+
         return repo.execute(meetId: meetId,
                             cursor: cursor,
                             keyword: keyword)
@@ -29,6 +29,48 @@ final class FetchMentionListUseCase: FetchMentionList {
         .map { Page(totalCount: $0.totalCount ?? 0,
                     content: $0.content.map({ $0.toDomain() }),
                     info: $0.page?.toDomain()) }
-        
+
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockFetchMentionListUseCase: FetchMentionList {
+
+    private let mockMembers: [MemberInfo] = [
+        MemberInfo(memberId: 1, nickname: "김철수", imagePath: nil, position: .owner),
+        MemberInfo(memberId: 2, nickname: "이영희", imagePath: nil, position: .host),
+        MemberInfo(memberId: 3, nickname: "박민수", imagePath: nil, position: .member),
+        MemberInfo(memberId: 4, nickname: "정수진", imagePath: nil, position: .member),
+        MemberInfo(memberId: 5, nickname: "최동현", imagePath: nil, position: .member),
+        MemberInfo(memberId: 6, nickname: "한지은", imagePath: nil, position: .member),
+        MemberInfo(memberId: 7, nickname: "오승우", imagePath: nil, position: .member)
+    ]
+
+    func execute(meetId: Int, cursor: String?, keyword: String?) -> Observable<Page<MemberInfo>> {
+        print("✅ [Mock] 멘션 멤버 목록 조회 - meetId: \(meetId), cursor: \(cursor ?? "nil"), keyword: \(keyword ?? "nil")")
+
+        var filtered = mockMembers
+        if let keyword, !keyword.isEmpty {
+            filtered = mockMembers.filter { $0.nickname?.contains(keyword) == true }
+        }
+
+        let startIndex = cursor.flatMap { Int($0) } ?? 0
+        let pageSize = 5
+        let endIndex = min(startIndex + pageSize, filtered.count)
+        let hasNext = endIndex < filtered.count
+        let content = Array(filtered[startIndex..<endIndex])
+
+        let page = Page<MemberInfo>(
+            totalCount: filtered.count,
+            content: content,
+            info: PageInfo(nextCursor: hasNext ? "\(endIndex)" : nil,
+                           hasNext: hasNext,
+                           size: pageSize)
+        )
+
+        return Observable.just(page)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

@@ -44,11 +44,32 @@ final class MainTabBarController: UITabBarController, View {
         view.isUserInteractionEnabled = false
         return view
     }()
+
+    #if DEV
+    // MARK: - Mock Toggle Button (Dev Only)
+    private let mockToggleButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = .systemFont(ofSize: 11, weight: .bold)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 24
+        button.layer.zPosition = 100
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowRadius = 4
+        return button
+    }()
+
+    private var mockButtonInitialCenter: CGPoint = .zero
+    #endif
     
     // MARK: - LifeCycle
     init(reactor: Reactor) {
         super.init(nibName: nil, bundle: nil)
         self.reactor = reactor
+//        self.traitOverrides.horizontalSizeClass = .compact
+//        self.traitOverrides.horizontalSizeClass = .compact
+        
     }
     
     required init?(coder: NSCoder) {
@@ -80,16 +101,20 @@ final class MainTabBarController: UITabBarController, View {
         self.view.addSubview(indicator)
         self.tabBar.backgroundColor = .defaultWhite
         self.tabBar.addSubview(borderView)
-        
+
         indicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
-        
+
         borderView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tabBar.snp.horizontalEdges)
             make.bottom.equalTo(tabBar.snp.bottom)
             make.top.equalTo(tabBar.snp.top).offset(-1)
         }
+
+        #if DEV
+        setupMockToggleButton()
+        #endif
     }
     
     private func setTabBar() {
@@ -209,8 +234,95 @@ extension MainTabBarController {
     func joinMeet(code: String) {
         joinMeetSubject.onNext(code)
     }
-    
+
     func resetNotify() {
         resetNotifySubject.onNext(())
     }
 }
+
+// MARK: - Mock Toggle (Dev Only)
+#if DEV
+extension MainTabBarController {
+
+    func setupMockToggleButton() {
+        self.view.addSubview(mockToggleButton)
+
+        mockToggleButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(16)
+            make.bottom.equalTo(tabBar.snp.top).offset(-16)
+            make.width.height.equalTo(48)
+        }
+
+        updateMockButtonAppearance(isMock: MockDataManager.shared.useMockData)
+
+        mockToggleButton.addTarget(self,
+                                   action: #selector(didTapMockToggle),
+                                   for: .touchUpInside)
+
+        // 드래그로 위치 이동 가능
+        let panGesture = UIPanGestureRecognizer(target: self,
+                                                action: #selector(handleMockButtonDrag(_:)))
+        mockToggleButton.addGestureRecognizer(panGesture)
+
+        // 상태 변경 구독
+        MockDataManager.shared.isMockMode
+            .observe(on: MainScheduler.instance)
+            .subscribe(with: self, onNext: { vc, isMock in
+                vc.updateMockButtonAppearance(isMock: isMock)
+            })
+            .disposed(by: disposeBag)
+    }
+
+    @objc private func didTapMockToggle() {
+        MockDataManager.shared.toggle()
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+
+        let isMock = MockDataManager.shared.useMockData
+        let mode = isMock ? "Mock" : "Live"
+        let alert = UIAlertController(
+            title: "\(mode) 모드 전환",
+            message: "새로 진입하는 화면부터 \(mode) 데이터가 적용됩니다.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
+    }
+
+    private func updateMockButtonAppearance(isMock: Bool) {
+        let title = isMock ? "Mock" : "Live"
+        let color: UIColor = isMock ? .systemOrange : .systemBlue
+        mockToggleButton.setTitle(title, for: .normal)
+        mockToggleButton.backgroundColor = color
+    }
+
+    @objc private func handleMockButtonDrag(_ gesture: UIPanGestureRecognizer) {
+        guard let button = gesture.view else { return }
+        let translation = gesture.translation(in: view)
+
+        switch gesture.state {
+        case .began:
+            mockButtonInitialCenter = button.center
+        case .changed:
+            button.center = CGPoint(x: mockButtonInitialCenter.x + translation.x,
+                                    y: mockButtonInitialCenter.y + translation.y)
+        case .ended, .cancelled:
+            // 화면 밖으로 나가지 않도록 보정
+            let safeArea = view.safeAreaLayoutGuide.layoutFrame
+            var finalCenter = button.center
+            let halfSize = button.bounds.width / 2
+            finalCenter.x = max(safeArea.minX + halfSize, min(safeArea.maxX - halfSize, finalCenter.x))
+            finalCenter.y = max(safeArea.minY + halfSize, min(tabBar.frame.minY - halfSize, finalCenter.y))
+
+            // SnapKit 제약조건 해제 후 frame 기반으로 전환
+            button.snp.removeConstraints()
+
+            UIView.animate(withDuration: 0.2) {
+                button.center = finalCenter
+            }
+        default:
+            break
+        }
+    }
+}
+#endif

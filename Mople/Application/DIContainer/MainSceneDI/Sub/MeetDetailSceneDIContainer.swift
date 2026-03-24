@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 protocol MeetDetailSceneDependencies {
     // MARK: - View
@@ -14,6 +15,7 @@ protocol MeetDetailSceneDependencies {
     func makeMeetReviewListViewController() -> MeetReviewListViewController
     func makeMeetSetupViewController(meet: Meet,
                                      coordinator: MeetSetupCoordination) -> MeetSetupViewController
+    func makeTransferMeetViewController(meet: Meet) -> UIViewController
     func makeEditMeetViewController(previousMeet: Meet,
                                     coordinator: MeetCreateViewCoordination) -> CreateMeetViewController
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController
@@ -72,11 +74,19 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
+        #if DEV
+        return MockDataManager.resolve(FetchMeetDetailUseCase(repo: repo) as FetchMeetDetail, mock: MockFetchMeetDetailUseCase())
+        #else
         return FetchMeetDetailUseCase(repo: repo)
+        #endif
     }
     
     private func makeInviteMeetUseCase(repo: MeetRepo) -> InviteMeet {
+        #if DEV
+        return MockDataManager.resolve(InviteMeetUseCase(repo: repo) as InviteMeet, mock: MockInviteMeetUseCase())
+        #else
         return InviteMeetUseCase(repo: repo)
+        #endif
     }
     
     
@@ -98,13 +108,21 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchPlanPage {
+        #if DEV
+        return MockDataManager.resolve(FetchPlanPageUsecase(repo: repo) as FetchPlanPage, mock: MockFetchPlanPageUseCase())
+        #else
         return FetchPlanPageUsecase(repo: repo)
+        #endif
     }
     
     private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {
+        #if DEV
+        return MockDataManager.resolve(ParticipationPlanUseCase(participationRepo: repo) as ParticipationPlan, mock: MockParticipationPlanUseCase())
+        #else
         return ParticipationPlanUseCase(participationRepo: repo)
+        #endif
     }
-    
+
     // MARK: - 리뷰 리스트
     func makeMeetReviewListViewController() -> MeetReviewListViewController {
         return MeetReviewListViewController(
@@ -122,7 +140,11 @@ extension MeetDetailSceneDIContainer {
     
     private func makeFetchReviewListUsecase() -> FetchMeetReviewList {
         let repo = DefaultReviewRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchMeetReviewListUseCase(repo: repo) as FetchMeetReviewList, mock: MockFetchMeetReviewListUseCase())
+        #else
         return FetchMeetReviewListUseCase(repo: repo)
+        #endif
     }
 }
 
@@ -146,7 +168,11 @@ extension MeetDetailSceneDIContainer {
     }
     
     private func makeDeleteMeetUseCase(repo: MeetRepo) -> DeleteMeet {
+        #if DEV
+        return MockDataManager.resolve(DeleteMeetUseCase(repo: repo) as DeleteMeet, mock: MockDeleteMeetUseCase())
+        #else
         return DeleteMeetUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 모임 수정 뷰
@@ -157,6 +183,41 @@ extension MeetDetailSceneDIContainer {
                                                           coordinator: coordinator)
     }
     
+    // MARK: - 모임 양도하기 뷰 (SwiftUI + Combine + RxCombine)
+    @MainActor func makeTransferMeetViewController(meet: Meet) -> UIViewController {
+        let viewModel = makeTransferMeetViewModel(meet: meet)
+        let swiftUIView = TransferMeetView(viewModel: viewModel)
+        return UIHostingController(rootView: swiftUIView)
+    }
+    
+    @MainActor private func makeTransferMeetViewModel(meet: Meet) -> TransferMeetViewModel {
+        let fetchMemberListUseCase = makeFetchMemberListUseCase()
+        let transferUseCase = makeTransferMeetUseCase()
+        return TransferMeetViewModel(
+            meet: meet,
+            fetchMemberListUseCase: fetchMemberListUseCase,
+            transferUseCase: transferUseCase
+        )
+    }
+    
+    private func makeFetchMemberListUseCase() -> FetchMemberList {
+        let memberRepo = DefaultMemberRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchMemberUseCase(memberListRepo: memberRepo) as FetchMemberList, mock: MockFetchMemberUseCase())
+        #else
+        return FetchMemberUseCase(memberListRepo: memberRepo)
+        #endif
+    }
+
+    private func makeTransferMeetUseCase() -> TransferMeet {
+        let repo = DefaultMeetRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(TransferMeetUseCase(repo: repo) as TransferMeet, mock: MockTransferMeetUseCase())
+        #else
+        return TransferMeetUseCase(repo: repo)
+        #endif
+    }
+
     // MARK: - 멤버 리스트 뷰
     func makeMemberListViewController(coordinator: MemberListViewCoordination) -> MemberListViewController {
         return commonViewFactory.makeMemberListViewController(type: .meet(id: meetId),

@@ -26,3 +26,45 @@ final class FetchMonthlyPostUseCase: FetchMonthlyPost {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockFetchMonthlyPostUseCase: FetchMonthlyPost {
+    func execute(month: String) -> Observable<[MonthlyPost]> {
+        print("✅ [Mock] \(month) 월별 게시글 조회")
+
+        let calendar = Calendar.current
+        let today = Date()
+
+        let mockPosts: [MonthlyPost] = [
+            MonthlyPost(id: 1,
+                        title: "강남역 모임",
+                        date: today,
+                        memberCount: 5,
+                        meet: MeetSummary(id: 1, name: "테니스 동호회", imagePath: nil),
+                        weather: Weather(address: "서울 강남구", imagePath: nil, temperature: 22.5, pop: 0.1),
+                        type: .plan,
+                        isCreator: true),
+            MonthlyPost(id: 2,
+                        title: "홍대 카페 투어",
+                        date: calendar.date(byAdding: .day, value: 3, to: today),
+                        memberCount: 3,
+                        meet: MeetSummary(id: 2, name: "맛집 탐방", imagePath: nil),
+                        weather: nil,
+                        type: .plan,
+                        isCreator: false),
+            MonthlyPost(id: 3,
+                        title: "북한산 등산 후기",
+                        date: calendar.date(byAdding: .day, value: -2, to: today),
+                        memberCount: 8,
+                        meet: MeetSummary(id: 3, name: "등산 클럽", imagePath: nil),
+                        weather: Weather(address: "서울 은평구", imagePath: nil, temperature: 18.0, pop: 0.3),
+                        type: .review,
+                        isCreator: false)
+        ]
+
+        return Observable.just(mockPosts)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

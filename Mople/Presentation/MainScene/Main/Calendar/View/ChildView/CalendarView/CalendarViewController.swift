@@ -76,7 +76,7 @@ final class CalendarViewController: BaseViewController, View {
     
     private let grabberBackView: UIView = {
         let view = UIView()
-        view.backgroundColor = .bgPrimary
+        view.backgroundColor = .defaultWhite
         return view
     }()
 
@@ -333,7 +333,7 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return isHoliday(date) ? .defaultRed : .gray01
+            return isHoliday(date) ? .appRed : .gray01
         default :
             return isHoliday(date) ? .defaultRed1 : .gray07
         }
@@ -342,7 +342,7 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return isHoliday(date) ? .defaultRed : .gray01
+            return isHoliday(date) ? .appRed : .gray01
         default :
             return isHoliday(date) ? .defaultRed1 : .gray07
         }
@@ -360,7 +360,7 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
 // MARK: - UI Update
 extension CalendarViewController {
     private func updateGrabberBackColor(_ scope: ScopeType) {
-        self.grabberBackView.backgroundColor = scope == .month ? .defaultWhite : .bgPrimary
+        self.grabberBackView.backgroundColor = scope == .month ? .defaultWhite : .bgSecondary
     }
     
     private func updateGrabberVisible(_ scope: ScopeType) {

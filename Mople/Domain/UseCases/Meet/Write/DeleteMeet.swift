@@ -25,3 +25,15 @@ final class DeleteMeetUseCase: DeleteMeet {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockDeleteMeetUseCase: DeleteMeet {
+    func execute(id: Int) -> Observable<Void> {
+        print("✅ [Mock] 모임 삭제 - meetId: \(id)")
+
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

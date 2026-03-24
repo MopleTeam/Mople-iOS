@@ -25,6 +25,7 @@ enum ScreenName: String {
     case meet_write
     case meet_detail
     case meet_setting
+    case meet_transfer
 
     // MARK: - Plan
     case plan_write

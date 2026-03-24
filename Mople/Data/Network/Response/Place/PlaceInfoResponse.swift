@@ -29,7 +29,7 @@ extension PlaceInfoResponse {
         guard let x,
               let y,
               let longitude = Double(x)?.roundedTo8DecimalPlaces(),
-              let latitude = Double(y)?.roundedTo8DecimalPlaces() else { return .defaultLocation }
+              let latitude = Double(y)?.roundedTo8DecimalPlaces() else { return nil }
         
         return .init(longitude: longitude,
                      latitude: latitude)

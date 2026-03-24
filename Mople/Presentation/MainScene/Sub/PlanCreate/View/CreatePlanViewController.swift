@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import ReactorKit
 
-final class CreatePlanViewController: TitleNaviViewController, View {
+final class CreatePlanViewController: TitleNaviViewController, View, ScrollKeyboardResponsive {
     
     // MARK: - Reactor
     typealias Reactor = CreatePlanViewReactor
@@ -19,6 +19,17 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     // MARK: - Variables
     private let createType: PlanCreationType
+    private var foucsText: UIView?
+    private weak var meetPickerVC: MeetSelectViewController?
+    
+    // MARK: - Handle KeyboardEvent
+    var keyboardHeight: CGFloat?
+    var keyboardHeightDiff: CGFloat?
+    var scrollView: UIScrollView? { mainScrollView }
+    var floatingView: UIView { completeButton }
+    var floatingViewBottom: Constraint?
+    var startOffsetY: CGFloat = .zero
+    var shouldScroll: Bool { descriptionView.textView.textView.isFirstResponder }
     
     // MARK: - Observables
     private let endFlow: PublishSubject<Void> = .init()
@@ -27,7 +38,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     private let selectTime: PublishSubject<DateComponents?> = .init()
     
     // MARK: - UI Components
-    private let scrollView: UIScrollView = {
+    private let mainScrollView: UIScrollView = {
         let view = UIScrollView()
         view.showsVerticalScrollIndicator = false
         return view
@@ -43,7 +54,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     private let planTitleView: LabeledTextField = {
         let view = LabeledTextField(title: L10n.Createplan.nameInput,
-                                    placeholder: L10n.Createplan.namePlaceholder,
+                                placeholder: L10n.Createplan.namePlaceholder,
                                     maxTextCount: 30)
         return view
     }()
@@ -66,13 +77,24 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         let btn = LabeledButton(title: L10n.Createplan.placeInput,
                                 inputText: L10n.Createplan.placePlaceholder,
                                 icon: .location)
+        btn.setOptionLabel()
         return btn
     }()
+    
+    private let descriptionView: LabeledTextView = {
+        let view = LabeledTextView(title: "모임 정보",
+                                   placeholder: "모임 정보를 입력해주세요",
+                                   maxTextCount: 100)
+        view.setOptionLabel()
+        return view
+    }()
+    
+    
     
     private let completeButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(8)
@@ -83,7 +105,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
             meetSelectView, planTitleView, dateSelectView,
-            timeSelectView, placeSelectView])
+            timeSelectView, placeSelectView, descriptionView])
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.distribution = .fill
@@ -112,6 +134,8 @@ final class CreatePlanViewController: TitleNaviViewController, View {
         setupTapKeyboardDismiss()
         setAction()
         setEdgeGesture()
+        setupKeyboardEvent(showCompletion: nil,
+                           hideCompletion: nil)
     }
     
     // MARK: - UI Setup
@@ -123,20 +147,20 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     
     private func setLayout() {
         self.view.backgroundColor = .defaultWhite
-        self.view.addSubview(scrollView)
-        self.scrollView.addSubview(contentView)
+        self.view.addSubview(mainScrollView)
+        self.mainScrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)
         self.contentView.addSubview(completeButton)
         
-        scrollView.snp.makeConstraints { make in
+        mainScrollView.snp.makeConstraints { make in
             make.top.equalTo(titleViewBottom)
             make.bottom.horizontalEdges.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
-            make.edges.equalTo(scrollView.contentLayoutGuide)
-            make.width.equalTo(scrollView.frameLayoutGuide.snp.width)
-            make.height.greaterThanOrEqualTo(scrollView.frameLayoutGuide.snp.height)
+            make.edges.equalTo(mainScrollView.contentLayoutGuide)
+            make.width.equalTo(mainScrollView.frameLayoutGuide.snp.width)
+            make.height.greaterThanOrEqualTo(mainScrollView.frameLayoutGuide.snp.height)
         }
         
         mainStackView.snp.makeConstraints { make in
@@ -148,7 +172,9 @@ final class CreatePlanViewController: TitleNaviViewController, View {
             make.top.greaterThanOrEqualTo(mainStackView.snp.bottom).offset(24)
             make.horizontalEdges.equalTo(mainStackView)
             make.height.equalTo(56)
-            make.bottom.equalToSuperview().inset(UIScreen.getDefaultBottomPadding())
+            floatingViewBottom = make.bottom.equalToSuperview()
+                .inset(UIScreen.getDefaultBottomPadding())
+                .constraint
         }
     }
     
@@ -201,7 +227,7 @@ final class CreatePlanViewController: TitleNaviViewController, View {
     private func setEdgeGesture() {
         guard let currentNavi = self.findCurrentNavigation(),
               let appNavi = currentNavi as? AppNaviViewController else { return }
-        scrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
+        mainScrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
     }
 }
 
@@ -210,12 +236,17 @@ extension CreatePlanViewController {
     
     // MARK: - 모임 선택
     private func presentMeetPickerVC(meetList: [MeetSummary]) {
-        let meetPickerVC = MeetSelectViewController(meetList: meetList,
-                                                    completion: { [weak self] selectedIndex in
+        let pickerVC = MeetSelectViewController(meetList: meetList,
+                                                completion: { [weak self] selectedIndex in
             self?.selectedMeet.onNext(selectedIndex)
         })
         
-        self.present(meetPickerVC, animated: true)
+        pickerVC.onNextPage = { [weak self] in
+            self?.reactor?.action.onNext(.fetchNextMeetList)
+        }
+        
+        self.meetPickerVC = pickerVC
+        self.present(pickerVC, animated: true)
     }
     
     // MARK: - 날짜 선택
@@ -266,6 +297,13 @@ extension CreatePlanViewController {
             .skip(1)
             .compactMap { $0 }
             .map({ Reactor.Action.setValue(.name($0)) })
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        descriptionView.textView.rx.text
+            .skip(1)
+            .compactMap { $0 }
+            .map({ Reactor.Action.setValue(.description($0)) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -356,6 +394,26 @@ extension CreatePlanViewController {
             .drive(placeSelectView.rx.selectedText)
             .disposed(by: disposeBag)
         
+        reactor.pulse(\.$description)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(descriptionView.rx.text)
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$meets)
+            .asDriver(onErrorJustReturn: [])
+            .drive(with: self, onNext: { vc, meets in
+                vc.meetPickerVC?.updateMeetList(meets)
+            })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$hasNextMeetPage)
+            .asDriver(onErrorJustReturn: true)
+            .drive(with: self, onNext: { vc, hasNext in
+                vc.meetPickerVC?.updateHasNextPage(hasNext)
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$isSelectMeetAvaliable)
             .asDriver(onErrorJustReturn: false)
             .drive(meetSelectView.rx.isEnabled)
@@ -404,7 +462,7 @@ extension CreatePlanViewController: KeyboardDismissable, UIGestureRecognizerDele
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
+        return false
     }
 }
 

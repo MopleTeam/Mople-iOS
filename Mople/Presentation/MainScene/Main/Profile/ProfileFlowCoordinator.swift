@@ -12,6 +12,7 @@ protocol ProfileCoordination: AnyObject {
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
     func pushPolicyView()
+    func showTransferMeetList()
     func endMainFlow()
 }
 
@@ -63,6 +64,18 @@ extension ProfileFlowCoordinator: ProfileEditViewCoordination {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          coordinator: self)
         self.slidePresentWithTracking(profileEditView)
+    }
+}
+
+
+// MARK: - Transfer Meet Flow (Modal)
+extension ProfileFlowCoordinator {
+    
+    func showTransferMeetList() {
+        // TransferMeet 전용 DIContainer 생성
+        let transferMeetCoordinator = dependencies.makeTransferMeetFlow()
+        self.start(coordinator: transferMeetCoordinator)
+        self.present(transferMeetCoordinator.navigationController)
     }
 }
 

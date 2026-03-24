@@ -14,8 +14,8 @@ protocol HomeSceneDependencies {
     
     // MARK: - Flow
     func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
-                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makePlanEditFlowCoorinator(plan: Plan) -> BaseCoordinator
     func makePlanDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator
     func makeNotifyListFlowCoordinator() -> BaseCoordinator
@@ -50,7 +50,11 @@ extension HomeSceneDIContainer {
     
     private func makeRecentPlanUseCase() -> FetchHomeData {
         let repo = DefaultPlanRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchHomeDataUseCase(repo: repo) as FetchHomeData, mock: MockFetchHomeDataUseCase())
+        #else
         return FetchHomeDataUseCase(repo: repo)
+        #endif
     }
     
     private func makeRecentPlanViewController(reactor: HomeViewReactor) -> RecentPlanViewController {
@@ -74,13 +78,21 @@ extension HomeSceneDIContainer {
 extension HomeSceneDIContainer {
     
     // MARK: - 일정생성
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
-                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
+    func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
-            type: .newFromMeetList(meetList))
+            type: .newFromMeetList)
         return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completionHandler)
+    }
+    
+    // MARK: - 장소 추가
+    func makePlanEditFlowCoorinator(plan: Plan) -> BaseCoordinator {
+        let planCreateDI = PlanCreateSceneDIContainer(
+            appNetworkService: appNetworkService,
+            commonViewFactory: commonViewFactory,
+            type: .edit(plan))
+        return planCreateDI.makePlanCreateFlowCoordinator()
     }
     
     // MARK: - 모임 상세 

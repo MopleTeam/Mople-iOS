@@ -35,7 +35,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
-        collectionView.backgroundColor = .defaultBlack
+        collectionView.backgroundColor = .appBlack
         return collectionView
     }()
     
@@ -117,9 +117,9 @@ final class PhotoBookViewController: TitleNaviViewController {
     }
     
     private func setBackgroundColor() {
-        self.view.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
-        notchView.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
-        naviBar.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
+        self.view.backgroundColor = .appBlack.withAlphaComponent(opacity)
+        notchView.backgroundColor = .appBlack.withAlphaComponent(opacity)
+        naviBar.backgroundColor = .appBlack.withAlphaComponent(opacity)
         naviBar.setTitleColor(.defaultWhite)
     }
     
@@ -242,7 +242,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     
     // 배경 투명도 조정
     private func changeOpacity(opacity: CGFloat) {
-        let backColor: UIColor = .defaultBlack
+        let backColor: UIColor = .appBlack
         self.view.backgroundColor = backColor.withAlphaComponent(opacity)
     }
     

@@ -225,13 +225,6 @@ final class ProfileViewController: TitleNaviViewController, View {
                 vc.showSignOutAlert()
             })
             .disposed(by: disposeBag)
-            
-        resignButton.rx.tap
-            .asDriver()
-            .drive(with: self, onNext: { vc, _ in
-                vc.showDeleteAccountAlert()
-            })
-            .disposed(by: disposeBag)
     }
 }
 
@@ -287,6 +280,11 @@ extension ProfileViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        resignButton.rx.tap
+            .map { Reactor.Action.checkMeetsBeforeDelete }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         deleteAccount
             .map { Reactor.Action.deleteAccount }
             .bind(to: reactor.action)
@@ -306,6 +304,14 @@ extension ProfileViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
+        reactor.pulse(\.$deleteAccountAlert)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap { $0 }
+            .drive(with: self, onNext: { vc, _ in
+                vc.showDeleteAccountAlert()
+            })
+            .disposed(by: disposeBag)
+        
         reactor.pulse(\.$userProfile)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
@@ -328,7 +334,7 @@ extension ProfileViewController {
 
     private func showSignOutAlert() {
         let signOutAction: DefaultAlertAction = .init(text: L10n.yes,
-                                                      textColor: .defaultWhite,
+                                                      textColor: .primaryText,
                                                       bgColor: .appPrimary,
                                                completion: { [weak self] in
             self?.signOut.onNext(())
@@ -341,7 +347,7 @@ extension ProfileViewController {
     
     private func showDeleteAccountAlert() {
         let deleteAccountAction: DefaultAlertAction = .init(text: L10n.Profile.resign,
-                                                            textColor: .defaultWhite,
+                                                            textColor: .primaryText,
                                                             bgColor: .appSecondary,
                                                             completion: { [weak self] in
             self?.deleteAccount.onNext(())
@@ -363,6 +369,12 @@ extension ProfileViewController {
 extension ProfileViewController {
     public func fetchProfile() {
         reloadProfile.onNext(())
+    }
+    
+    /// 회원 탈퇴 실행 (TransferMeetFlow에서 모든 양도 완료 후 호출)
+    public func executeDeleteAccount() {
+        // Reactor의 deleteAccount Action 실행
+        reactor?.action.onNext(.deleteAccount)
     }
 }
 

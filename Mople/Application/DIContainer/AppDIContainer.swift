@@ -64,12 +64,22 @@ extension AppDIContainer {
     }
     
     private func makeFetchUserInfoUseCase(repo: UserInfoRepo) -> FetchUserInfo {
-        return FetchUserInfoUseCase(userInfoRepo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(FetchUserInfoUseCase(userInfoRepo: repo) as FetchUserInfo, mock: MockFetchUserInfoUseCase())
+        #else
+        let useCase = FetchUserInfoUseCase(userInfoRepo: repo)
+        #endif
+        return useCase
     }
     
     private func makeCheckAppVersionUseCase() -> CheckVersion {
         let repo = DefaultAppVersionRepo(networkService: appNetworkService)
-        return CheckVersionUseCase(repo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(CheckVersionUseCase(repo: repo) as CheckVersion, mock: MockCheckVersionUseCase())
+        #else
+        let useCase = CheckVersionUseCase(repo: repo)
+        #endif
+        return useCase
     }
 
     // MARK: - 로그인 플로우

@@ -84,6 +84,11 @@ extension MeetDetailSceneCoordinator: MeetSetupCoordination {
                                                           coordinator: self)
         self.pushWithTracking(vc, animated: true)
     }
+    
+    func pushTransferMeetView(meet: Meet) {
+        let vc = dependencies.makeTransferMeetViewController(meet: meet)
+        self.pushWithTracking(vc, animated: true)
+    }
 }
 
 // MARK: - Meet Edit View

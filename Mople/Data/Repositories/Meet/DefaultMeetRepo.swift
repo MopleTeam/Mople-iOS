@@ -42,6 +42,18 @@ final class DefaultMeetRepo: BaseRepositories, MeetRepo {
         }
     }
     
+    func transferMeet(meetId: Int, newHostId: Int) -> Single<Void> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.transferMeet(meetId: meetId, newHostId: newHostId)
+        }
+    }
+    
+    func fetchMyHostMeets(cursor: String?) -> Single<PageResponse<MeetResponse>> {
+        return networkService.authenticatedRequest {
+            try APIEndpoints.fetchMyHostMeets(cursor: cursor)
+        }
+    }
+    
     func inviteMeet(id: Int) -> Single<String> {
         return networkService.authenticatedRequest {
             try APIEndpoints.inviteMeet(id: id)

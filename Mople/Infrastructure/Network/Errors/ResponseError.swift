@@ -14,8 +14,7 @@ enum ResponseType {
 }
 
 enum ResponseError: Error {
-
-    case noResponse(ResponseType)
+   case noResponse(ResponseType)
     
     var info: String {
         switch self {

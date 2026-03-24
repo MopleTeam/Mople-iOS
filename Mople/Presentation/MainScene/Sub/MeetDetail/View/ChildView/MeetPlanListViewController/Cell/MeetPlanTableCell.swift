@@ -56,7 +56,7 @@ final class MeetPlanTableCell: UITableViewCell {
     private lazy var participationButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite,
+                     normalColor: .primaryText,
                      selectedColor: .gray03)
         btn.setBgColor(normalColor: .appPrimary,
                        selectedColor: .appTertiary)
@@ -153,7 +153,8 @@ final class MeetPlanTableCell: UITableViewCell {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
-        self.weatherView.configure(with: .init(weather: viewModel.weather))
+        self.weatherView.configure(with: .init(weather: viewModel.weather),
+                                   isCreator: viewModel.isCreator)
         self.handleViewType(isCreator: viewModel.isCreator,
                              isParticipant: viewModel.isParticipant,
                              planDate: viewModel.date)

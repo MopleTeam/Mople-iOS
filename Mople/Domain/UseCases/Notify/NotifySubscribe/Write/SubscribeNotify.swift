@@ -26,3 +26,14 @@ final class SubscribeNotifyUseCase: SubscribeNotify {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockSubscribeNotifyUseCase: SubscribeNotify {
+    func execute(type: SubscribeType, isSubscribe: Bool) -> Observable<Void> {
+        print("✅ [Mock] 알림 구독 변경 - type: \(type.rawValue), isSubscribe: \(isSubscribe)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

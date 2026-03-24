@@ -44,7 +44,11 @@ extension MeetListSceneDIConatiner {
     
     private func makeMeetListUseCase() -> FetchMeetPage {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
+        #else
         return FetchMeetPageUseCase(repo: repo)
+        #endif
     }
 }
 

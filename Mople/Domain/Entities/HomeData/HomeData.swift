@@ -8,6 +8,6 @@
 import Foundation
 
 struct HomeData {
-    let plans: [Plan]
-    let meets: [MeetSummary]
+    var plans: [Plan]
+    var hasMeet: Bool
 }

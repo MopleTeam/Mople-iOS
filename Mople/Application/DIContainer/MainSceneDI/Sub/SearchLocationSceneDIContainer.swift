@@ -64,7 +64,11 @@ extension SearchLocationSceneDIContainer {
     }
     
     private func makeSearchLocationUseCase() -> SearchPlace {
+        #if DEV
+        return MockDataManager.resolve(SearchPlaceUseCase(searchPlaceRepo: makeSearchLocationRepo()) as SearchPlace, mock: MockSearchPlaceUseCase())
+        #else
         return SearchPlaceUseCase(searchPlaceRepo: makeSearchLocationRepo())
+        #endif
     }
     
     private func makeSearchLocationRepo() -> SearchPlaceRepo {

@@ -26,7 +26,7 @@ protocol CommentListCoordination: NavigationCloseable {
                                 imagePath: String?,
                                 defaultType: UIImageView.DefaultImageType)
     
-    func pushReplyPage(parentComment: Comment)
+    func pushReplyPage(parentComment: Comment, meetId: Int)
     func deleteParentComment(id: Int)
 }
 
@@ -75,8 +75,9 @@ extension PostDetailFlowCoordinator: ReviewEditViewCoordination {
 
 // MARK: - Comment View
 extension PostDetailFlowCoordinator: CommentListCoordination {
-    func pushReplyPage(parentComment: Comment) {
-        let vc = dependencies.makeCommentListViewController(type: .child(parent: parentComment),
+    func pushReplyPage(parentComment: Comment, meetId: Int) {
+        let vc = dependencies.makeCommentListViewController(type: .child(parent: parentComment,
+                                                                         meetId: meetId),
                                                             coordinator: self)
         self.push(vc, animated: true)
     }

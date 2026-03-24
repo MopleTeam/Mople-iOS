@@ -135,6 +135,7 @@ class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
         switch code {
         case 400: .badRequest
         case 401: .expiredToken
+        case 403: .noResponse
         case 404: .noResponse
         default : .unknownError(err)
         }

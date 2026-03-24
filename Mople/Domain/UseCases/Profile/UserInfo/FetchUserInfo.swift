@@ -24,3 +24,16 @@ final class FetchUserInfoUseCase: FetchUserInfo {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockFetchUserInfoUseCase: FetchUserInfo {
+
+    func execute() -> Observable<Void> {
+        print("✅ [Mock] 유저 정보 조회 요청")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 유저 정보 조회 성공") })
+    }
+}
+#endif

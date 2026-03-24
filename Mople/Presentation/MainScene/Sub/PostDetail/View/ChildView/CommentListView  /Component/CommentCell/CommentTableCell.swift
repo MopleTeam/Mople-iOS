@@ -80,6 +80,12 @@ final class CommentTableCell: UITableViewCell {
         print(#function, #line, "Path : # ")
         commentView.resetContent()
         commentView.cancleImageLoad()
+        
+        // bind는 1회만 하므로 필요 없음
+          // 하지만 안전하게 할거면 아래 방식 추천
+          disposeBag = DisposeBag()
+          setMenuAction()
+          bind()
     }
     
     // MARK: - UI Setup

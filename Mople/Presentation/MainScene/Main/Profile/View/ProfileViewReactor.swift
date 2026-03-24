@@ -16,23 +16,27 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             case editProfile
             case setNotify
             case policy
+            case showTransferMeetList(meets: [Meet])  // 양도할 모임 리스트 전달
             case endMainFlow
         }
         
         case flow(Flow)
         case fetchUserInfo
         case signOut
-        case deleteAccount
+        case checkMeetsBeforeDelete  // 탈퇴 전 모임 체크
+        case deleteAccount  // 실제 탈퇴 실행
     }
     
     enum Mutation {
         case fetchUserInfo(_ userInfo: UserInfo)
+        case checkDeleteAccount
         case updateLoadingState(Bool)
         case catchError(Error)
     }
     
     struct State {
         @Pulse var userProfile: UserInfo?
+        @Pulse var deleteAccountAlert: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
     }
@@ -45,6 +49,7 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - UseCase
     private let signOutUseCase: SignOut
     private let deleteAccountUseCase: DeleteAccount
+    private let fetchMyHostMeetsUseCase: FetchMyHostMeets
     
     // MARK: - Coordinator
     private weak var coordinator: ProfileCoordination?
@@ -52,9 +57,11 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - LifeCycle
     init(signOutUseCase: SignOut,
          deleteAccountUseCase: DeleteAccount,
+         fetchMyHostMeetsUseCase: FetchMyHostMeets,
          coordinator: ProfileCoordination) {
         self.signOutUseCase = signOutUseCase
         self.deleteAccountUseCase = deleteAccountUseCase
+        self.fetchMyHostMeetsUseCase = fetchMyHostMeetsUseCase
         self.coordinator = coordinator
         action.onNext(.fetchUserInfo)
         logLifeCycle()
@@ -73,6 +80,8 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             return handleFlowAction(action)
         case .signOut:
             return signOut()
+        case .checkMeetsBeforeDelete:
+            return checkMeetsBeforeDelete()
         case .deleteAccount:
             return deleteAccount()
         }
@@ -84,6 +93,8 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case .fetchUserInfo(let profile):
             newState.userProfile = profile
+        case .checkDeleteAccount:
+            newState.deleteAccountAlert = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -119,6 +130,42 @@ extension ProfileViewReactor {
             }
         
         return requestWithLoading(task: signOut)
+            .do(onDispose: { [weak self] in
+                self?.isRequesting = false
+            })
+    }
+    
+    private func checkMeetsBeforeDelete() -> Observable<Mutation> {
+        guard !isRequesting else { return .empty() }
+        
+        isRequesting = true
+        
+        // 내가 호스트인 모임 리스트 조회
+        let checkMeets = fetchMyHostMeetsUseCase.execute(cursor: nil)
+            .observe(on: MainScheduler.instance)
+            .flatMap { [weak self] page -> Observable<Mutation> in
+                guard let self = self else { return .empty() }
+                                
+                // 멤버가 2명 이상인 모임만 필터링 (양도 필요한 모임)
+                let transferableMeets = page.content.filter { meet in
+                    guard let memberCount = meet.memberCount else { return false }
+                    return memberCount >= 2
+                }
+                
+                if transferableMeets.isEmpty {
+                    // 양도할 모임 없음 → 바로 탈퇴 진행
+                    print("✅ 양도할 모임 없음 → 탈퇴 진행")
+//                    return Observable.just(.checkDeleteAccount)
+                    return .empty()
+                } else {
+                    // 양도할 모임 있음 → 양도 화면으로 이동
+                    print("📋 양도할 모임 \(transferableMeets.count)개 → 양도 화면 이동")
+                    self.coordinator?.showTransferMeetList()
+                    return .empty()
+                }
+            }
+        
+        return requestWithLoading(task: checkMeets)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
@@ -164,6 +211,8 @@ extension ProfileViewReactor {
             coordinator?.pushNotifyView()
         case .policy:
             coordinator?.pushPolicyView()
+        case .showTransferMeetList:
+            coordinator?.showTransferMeetList()
         case .endMainFlow:
             resetUserData()
             coordinator?.endMainFlow()

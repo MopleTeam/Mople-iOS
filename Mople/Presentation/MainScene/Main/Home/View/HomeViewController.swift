@@ -24,6 +24,7 @@ final class HomeViewController: DefaultViewController, View {
         let view = UIImageView()
         view.image = .logo
         view.contentMode = .scaleAspectFit
+        view.isUserInteractionEnabled = true
         return view
     }()
     
@@ -128,10 +129,13 @@ final class HomeViewController: DefaultViewController, View {
         setLayout()
         setChildVC()
         setScrollView()
+        #if DEV
+        setupTokenGesture()
+        #endif
     }
     
     private func setLayout() {
-        self.view.backgroundColor = .bgPrimary
+        self.view.backgroundColor = .bgSecondary
         self.view.addSubview(topStackView)
         self.view.addSubview(scrollView)
         self.scrollView.addSubview(contentView)
@@ -285,8 +289,6 @@ extension HomeViewController {
     // MARK: - Error Handling
     private func handleError(_ err: HomeError) {
         switch err {
-        case .emptyMeet:
-            self.showEmptyMeetAlert()
         case let .midnight(err):
             alertManager.showDateErrorMessage(err: err)
         case .unknown:
@@ -295,18 +297,45 @@ extension HomeViewController {
     }
 }
 
+// MARK: - Token Copy (Dev Only)
+#if DEV
 extension HomeViewController {
-    private func showEmptyMeetAlert() {
-        let createAction: DefaultAlertAction = .init(text: L10n.createMeet,
-                                                     completion: { [weak self] in
-            self?.reactor?.action.onNext(.flow(.createGroup))
+
+    func setupTokenGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self,
+                                                action: #selector(handleLogoTap(_:)))
+        tapGesture.numberOfTapsRequired = 3
+        logoView.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func handleLogoTap(_ gesture: UITapGestureRecognizer) {
+        let token = KeychainStorage.shared.getToken()
+
+        let alert = UIAlertController(title: "Token 복사",
+                                      message: nil,
+                                      preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Access Token", style: .default) { _ in
+            UIPasteboard.general.string = token?.accessToken
+            self.showCopiedToast("Access Token 복사 완료")
         })
-        
-        alertManager.showDefaultAlert(title: L10n.Home.emptyMeetInfo,
-                                      subTitle: L10n.Home.emptyMeetSubinfo,
-                                      defaultAction: .init(text: L10n.cancle,
-                                                           textColor: .gray01,
-                                                           bgColor: .appTertiary),
-                                      addAction: [createAction])
+
+        alert.addAction(UIAlertAction(title: "Refresh Token", style: .default) { _ in
+            UIPasteboard.general.string = token?.refreshToken
+            self.showCopiedToast("Refresh Token 복사 완료")
+        })
+
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+
+        present(alert, animated: true)
+    }
+
+    private func showCopiedToast(_ message: String) {
+        let toast = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        present(toast, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            toast.dismiss(animated: true)
+        }
     }
 }
+#endif

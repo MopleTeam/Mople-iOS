@@ -14,6 +14,12 @@ struct Location: Hashable {
 }
 
 extension Location {
+    init?(lat: Double?, lot: Double?) {
+        guard let lat, let lot else { return nil }
+        longitude = lot
+        latitude = lat
+    }
+    
     static var defaultLocation: Self {
         return .init(longitude: 126.976894, latitude: 37.575968)
     }

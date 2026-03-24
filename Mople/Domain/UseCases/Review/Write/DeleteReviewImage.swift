@@ -26,3 +26,15 @@ final class DeleteReviewImageUseCase: DeleteReviewImage {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockDeleteReviewImageUseCase: DeleteReviewImage {
+
+    func execute(reviewId: Int, imageIds: [Int]) -> Observable<Void> {
+        print("✅ [Mock] DeleteReviewImage - reviewId: \(reviewId), imageIds: \(imageIds)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

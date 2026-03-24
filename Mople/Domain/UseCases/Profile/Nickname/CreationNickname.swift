@@ -30,3 +30,16 @@ final class CreationNicknameUseCase: CreationNickname {
             })
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockCreationNicknameUseCase: CreationNickname {
+
+    func executue() -> Observable<String> {
+        print("✅ [Mock] 닉네임 생성 요청")
+        return Observable.just("MockUser")
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 닉네임 생성 성공 - nickname: \($0)") })
+    }
+}
+#endif

@@ -9,7 +9,7 @@ import ReactorKit
 
 enum CommentListType {
     case parent
-    case child(parent: Comment)
+    case child(parent: Comment, meetId: Int)
 }
 
 enum LoadMode {
@@ -44,7 +44,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         case deletedComment(id: Int)
         case reportComment(id: Int)
         case showWriterImage(name: String?, imagePath: String?)
-        case showReply(parentComment: Comment)
+        case showReply(parentComment: Comment, meetId: Int)
         case endFlow
     }
     
@@ -115,7 +115,8 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     }
     
     private func initialAction() {
-        if case .child(let parentComment) = type, let parentPostId = parentComment.postId {
+        if case .child(let parentComment, _) = type,
+           let parentPostId = parentComment.postId {
             action.onNext(.fetchPage(postId: parentPostId, isRefresh: true))
         }
     }
@@ -147,8 +148,8 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
             return likeComment(id: id)
         case let .showWriterImage(name, imagePath):
             return showWritterImage(name: name, imagePath: imagePath)
-        case let .showReply(parentComment):
-            return showReply(parentComment: parentComment)
+        case let .showReply(parentComment, meetId):
+            return showReply(parentComment: parentComment, meetId: meetId)
         case .endFlow:
             return popView()
         }
@@ -178,7 +179,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         switch type {
         case .parent:
             return fetchPage(postId: postId, isRefresh: true)
-        case .child(let parent):
+        case let .child(parent, _):
             return fetchReplyPage(postId: postId,
                                   parentComment: parent,
                                   isRefresh: true)
@@ -190,7 +191,7 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         case .parent:
             return createComment(comment: text,
                                  mentions: mentions)
-        case .child(let parent):
+        case let .child(parent, _):
             guard let id = parent.id else { return .empty() }
             return createReply(parentId: id, comment: text, mentions: mentions)
         }
@@ -309,7 +310,7 @@ extension CommentListViewReactor {
         switch type {
         case .parent:
             return fetchPage(postId: postId, cursor: nextCursor)
-        case .child(let parent):
+        case let .child(parent, _):
             return fetchReplyPage(postId: postId,
                                   parentComment: parent,
                                   cursor: nextCursor)
@@ -324,7 +325,7 @@ extension CommentListViewReactor {
         switch type {
         case .parent:
             return fetchPage(postId: postId, isRefresh: true)
-        case .child(let parent):
+        case let .child(parent, _):
             return fetchReplyPage(postId: postId,
                                   parentComment: parent,
                                   isRefresh: true)
@@ -442,7 +443,7 @@ extension CommentListViewReactor {
     }
     
     private func handleDeleteComment(comments: inout [Comment], id: Int) {
-        if case .child(let parent) = type, parent.id == id {
+        if case .child(let parent, _) = type, parent.id == id {
             coordinator?.deleteParentComment(id: id)
         } else {
             comments.removeAll { $0.id == id }
@@ -496,8 +497,8 @@ extension CommentListViewReactor {
         return .empty()
     }
     
-    private func showReply(parentComment: Comment) -> Observable<Mutation> {
-        coordinator?.pushReplyPage(parentComment: parentComment)
+    private func showReply(parentComment: Comment, meetId: Int) -> Observable<Mutation> {
+        coordinator?.pushReplyPage(parentComment: parentComment, meetId: meetId)
         return .empty()
     }
     

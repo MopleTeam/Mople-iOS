@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 
 final class RecentPlanCollectionCell: UICollectionViewCell {
+    
+    var weatherTapped: (() -> Void)?
 
     // MARK: - UI Components
     private let thumbnailView: ThumbnailView = {
@@ -123,7 +125,9 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
         self.dateInfoLabel.text = viewModel.dateString
         self.placeInfoLabel.text = viewModel.fullAddress
         self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))
-        self.weatherView.configure(with: .init(weather: viewModel.weather))
+        self.weatherView.configure(with: .init(weather: viewModel.weather),
+                                   isCreator: viewModel.isCreator,
+                                   weatherTap: weatherTapped)
     }
 }
 

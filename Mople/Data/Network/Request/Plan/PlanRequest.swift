@@ -16,14 +16,11 @@ struct PlanRequest: Encodable {
     let type: PlanRequestType
     let name: String
     let date: String
-    let title: String
-    let planAddress: String
-    let lat: Double
-    let lot: Double
-    let weatherAddress: String
+    var description: String?
+    var place: UploadPlace?
     
     enum CodingKeys: String, CodingKey {
-        case name, title, planAddress, lat, lot, weatherAddress, planId, meetId
+        case name, title, planAddress, lat, lot, weatherAddress, planId, meetId, description
         case date = "planTime"
     }
     
@@ -31,12 +28,13 @@ struct PlanRequest: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encode(name, forKey: .name)
-        try container.encode(title, forKey: .title)
-        try container.encode(planAddress, forKey: .planAddress)
         try container.encode(date, forKey: .date)
-        try container.encode(lat, forKey: .lat)
-        try container.encode(lot, forKey: .lot)
-        try container.encode(weatherAddress, forKey: .weatherAddress)
+        try container.encodeIfPresent(place?.title, forKey: .title)
+        try container.encodeIfPresent(place?.planAddress, forKey: .planAddress)
+        try container.encodeIfPresent(place?.lat, forKey: .lat)
+        try container.encodeIfPresent(place?.lot, forKey: .lot)
+        try container.encodeIfPresent(place?.weatherAddress, forKey: .weatherAddress)
+        try container.encodeIfPresent(description, forKey: .description)
         
         switch type {
         case let .create(meetId):
@@ -44,22 +42,5 @@ struct PlanRequest: Encodable {
         case let .edit(planId):
             try container.encode(planId, forKey: .planId)
         }   
-    }
-}
-
-extension PlanRequest {
-    init(type: PlanRequestType,
-         name: String,
-         date: String,
-         place: UploadPlace) {
-        
-        self.type = type
-        self.name = name
-        self.date = date
-        self.title = place.title
-        self.planAddress = place.planAddress
-        self.lat = place.lat
-        self.lot = place.lot
-        self.weatherAddress = place.weatherAddress
     }
 }

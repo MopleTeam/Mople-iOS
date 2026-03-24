@@ -15,6 +15,7 @@ struct RecentPlanViewModel {
     let addressTitle: String?
     let participantCount: Int
     let weather: Weather?
+    let isCreator: Bool
     
     var participantCountString: String {
         return L10n.participantCount(participantCount)
@@ -25,7 +26,12 @@ struct RecentPlanViewModel {
     }
     
     var fullAddress: String? {
-        [address, addressTitle].compactMap { $0 }.joined(separator: " ")
+        let addressArray = [address, addressTitle].compactMap { $0 }
+        if addressArray.isEmpty {
+            return "장소가 없어요"
+        } else {
+            return addressArray.joined(separator: " ")
+        }
     }
 }
 
@@ -38,6 +44,7 @@ extension RecentPlanViewModel {
         self.addressTitle = plan.addressTitle
         self.participantCount = plan.participationCount
         self.weather = plan.weather
+        self.isCreator = plan.isCreator
     }
 }
 

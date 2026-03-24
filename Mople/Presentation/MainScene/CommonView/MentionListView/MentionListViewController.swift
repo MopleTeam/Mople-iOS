@@ -74,8 +74,8 @@ final class MentionListViewController: BaseViewController, View {
     }
     
     // MARK: - Search Keyword
-    public func searchMention(postId: Int, keyword: String?) {
-        fetchtPage.onNext((postId, keyword))
+    public func searchMention(meetId: Int, keyword: String?) {
+        fetchtPage.onNext((meetId, keyword))
     }
 }
 
@@ -185,7 +185,7 @@ final class MentionListCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.contentView.backgroundColor = highlighted ? .bgPrimary : .defaultWhite
+        self.contentView.backgroundColor = highlighted ? .bgSecondary : .defaultWhite
     }
     
     // MARK: - UI Setup

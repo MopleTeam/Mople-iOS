@@ -27,3 +27,16 @@ final class ParticipationPlanUseCase: ParticipationPlan {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockParticipationPlanUseCase: ParticipationPlan {
+    func execute(planId: Int,
+                 isJoin: Bool) -> Observable<Void> {
+        print("✅ [Mock] 일정 참여 변경 - planId: \(planId), isJoin: \(isJoin)")
+
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

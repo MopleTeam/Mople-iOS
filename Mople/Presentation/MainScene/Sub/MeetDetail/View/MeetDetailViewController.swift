@@ -23,7 +23,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     // MARK: - UI Components
     private let contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = .bgPrimary
+        view.backgroundColor = .bgSecondary
         return view
     }()
     

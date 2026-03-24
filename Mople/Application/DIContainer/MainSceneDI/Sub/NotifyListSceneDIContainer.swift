@@ -41,12 +41,20 @@ extension NotifyListSceneDIContainer {
     
     private func makeFetchNotifyListUseCase() -> FetchNotifyList {
         let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchNotifyListUseCase(repo: repo) as FetchNotifyList, mock: MockFetchNotifyListUseCase())
+        #else
         return FetchNotifyListUseCase(repo: repo)
+        #endif
     }
-    
+
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
         let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(ResetNotifyCountUseCase(repo: repo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
+        #else
         return ResetNotifyCountUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - Flow

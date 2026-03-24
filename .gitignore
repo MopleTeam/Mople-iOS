@@ -48,3 +48,4 @@ Secrets.xcconfig
 
 # SwiftGen generated files
 Mople/Generated/L10n.swift
+.claude/

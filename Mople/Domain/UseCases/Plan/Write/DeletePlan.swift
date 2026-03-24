@@ -25,3 +25,15 @@ final class DeletePlanUseCase: DeletePlan {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockDeletePlanUseCase: DeletePlan {
+    func execute(id: Int) -> Observable<Void> {
+        print("✅ [Mock] 일정 삭제 - planId: \(id)")
+
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

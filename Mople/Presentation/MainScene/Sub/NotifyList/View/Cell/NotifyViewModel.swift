@@ -17,7 +17,7 @@ struct NotifyViewModel {
 extension NotifyViewModel {
     init(notify: Notify) {
         self.thumbnailPath = notify.meetImgPath
-        self.title = notify.payload?.message
+        self.title = notify.message
         self.isRead = notify.isRead
         setSubTitle(with: notify)
     }

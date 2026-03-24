@@ -27,3 +27,25 @@ final class FetchAllPlanDateUseCase: FetchAllPlanDate {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockFetchAllPlanDateUseCase: FetchAllPlanDate {
+    func execute() -> Observable<[Date]> {
+        print("✅ [Mock] 전체 일정 날짜 목록 조회")
+
+        let calendar = Calendar.current
+        let today = Date()
+        let mockDates: [Date] = [
+            today,
+            calendar.date(byAdding: .day, value: 1, to: today)!,
+            calendar.date(byAdding: .day, value: 3, to: today)!,
+            calendar.date(byAdding: .day, value: 7, to: today)!,
+            calendar.date(byAdding: .day, value: 14, to: today)!
+        ]
+
+        return Observable.just(mockDates)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

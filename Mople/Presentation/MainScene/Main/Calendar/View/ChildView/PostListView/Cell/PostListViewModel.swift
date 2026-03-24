@@ -12,6 +12,7 @@ struct PostListViewModel {
     let meet: MeetSummary?
     let participantCount: Int
     let weather: Weather?
+    let isCreator: Bool
     
     var participantCountString: String {        
         return L10n.participantCount(participantCount)
@@ -24,5 +25,6 @@ extension PostListViewModel {
         self.meet = post.meet
         self.participantCount = post.memberCount
         self.weather = post.weather
+        self.isCreator = post.isCreator
     }
 }

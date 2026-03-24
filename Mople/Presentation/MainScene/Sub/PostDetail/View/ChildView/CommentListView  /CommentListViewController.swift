@@ -36,7 +36,9 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private var cachedHeight: CGFloat?
     
     // MARK: - Variables
+    private let type: CommentListType
     private var postId: Int?
+    private var meetId: Int?
     private var writeMode: WriteMode = .basic
     private var comments: [Comment] = []
     private var totalCount: Int = 0 {
@@ -102,9 +104,11 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     fileprivate let refreshControl = UIRefreshControl()
     
     // MARK: - LifeCycle
-    init(reactor: CommentListViewReactor,
+    init(type: CommentListType,
+         reactor: CommentListViewReactor,
          mentionVC: MentionListViewController) {
         self.mentionVC = mentionVC
+        self.type = type
         super.init(title: "답글")
         self.reactor = reactor
     }
@@ -233,17 +237,13 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     }
     
     private func showMentionVC(keyword: String) {
-        let id: Int
-        guard let reactor else { return }
-        switch reactor.type {
+        switch type {
         case .parent:
-            guard let postId else { return }
-            id = postId
-        case .child(let parent):
-            guard let postId = parent.postId else { return }
-            id = postId
+            guard let meetId else { return }
+            mentionVC.searchMention(meetId: meetId, keyword: keyword)
+        case let .child(_, meetId):
+            mentionVC.searchMention(meetId: meetId, keyword: keyword)
         }
-        mentionVC.searchMention(postId: id, keyword: keyword)
     }
     
     private func hideMentionVC() {
@@ -254,11 +254,13 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
 // MARK: - Handle Comment
 extension CommentListViewController {
     public func loadComment(with postId: Int?,
+                            meetId: Int?,
                             totalCount: Int) {
-        guard let postId else { return }
+        self.meetId = meetId
         self.postId = postId
         self.totalCount = totalCount
         changeWriteMode(.basic)
+        guard let postId else { return }
         fetchComment.onNext(postId)
     }
     
@@ -365,7 +367,10 @@ extension CommentListViewController {
             .disposed(by: disposeBag)
         
         reply
-            .map { Reactor.Action.showReply(parentComment: $0) }
+            .compactMap({
+                guard let meetId = self.meetId else { return nil }
+                return Reactor.Action.showReply(parentComment: $0, meetId: meetId)
+            })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

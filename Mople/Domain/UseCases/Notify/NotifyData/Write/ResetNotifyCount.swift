@@ -23,3 +23,14 @@ final class ResetNotifyCountUseCase: ResetNotifyCount {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockResetNotifyCountUseCase: ResetNotifyCount {
+    func execute() -> Observable<Void> {
+        print("✅ [Mock] 알림 카운트 초기화")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

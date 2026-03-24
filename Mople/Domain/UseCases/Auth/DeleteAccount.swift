@@ -29,3 +29,16 @@ final class DeleteAccountUseCase: DeleteAccount, LifeCycleLoggable {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockDeleteAccountUseCase: DeleteAccount {
+
+    func execute() -> Observable<Void> {
+        print("✅ [Mock] 계정 삭제 요청")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 계정 삭제 성공") })
+    }
+}
+#endif

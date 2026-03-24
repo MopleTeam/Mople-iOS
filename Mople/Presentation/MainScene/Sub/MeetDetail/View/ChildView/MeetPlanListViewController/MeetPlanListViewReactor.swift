@@ -238,6 +238,7 @@ extension MeetPlanListViewReactor {
               let planDate = selectedPlan.date else { return .empty() }
         
         if DateManager.isPastDay(on: planDate) == false {
+            let isVaildPlan = planDate > Date()
             delegate?.selectedPlan(id: planId, type: .plan)
         } else {
             delegate?.catchError(DateTransitionError.midnightReset, index: 1)

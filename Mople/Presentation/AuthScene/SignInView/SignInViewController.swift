@@ -65,12 +65,12 @@ final class SignInViewController: BaseViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Login.apple,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText)
         
         btn.setImage(image: .apple,
                      imagePlacement: .leading,
                      contentPadding: 8)
-        btn.setBgColor(normalColor: .defaultBlack)
+        btn.setBgColor(normalColor: .appBlack)
         btn.setRadius(8)
         return btn
     }()

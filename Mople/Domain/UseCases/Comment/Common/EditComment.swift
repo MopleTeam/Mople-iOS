@@ -6,6 +6,7 @@
 //
 
 import RxSwift
+import Foundation
 
 protocol EditComment {
     func execute(id: Int,
@@ -38,3 +39,28 @@ final class EditCommentUseCase: EditComment {
             }
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockEditCommentUseCase: EditComment {
+
+    func execute(id: Int,
+                 text: String,
+                 mentions: [Int]) -> Observable<Comment> {
+        print("✅ [Mock] EditComment - id: \(id), text: \(text), mentions: \(mentions)")
+
+        var mockComment = Comment()
+        mockComment.isMockup = true
+        mockComment.id = id
+        mockComment.postId = 1
+        mockComment.writerId = 1
+        mockComment.writerName = "Mock 사용자"
+        mockComment.comment = text
+        mockComment.createdDate = Date()
+        mockComment.isWriter = true
+
+        return Observable.just(mockComment)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

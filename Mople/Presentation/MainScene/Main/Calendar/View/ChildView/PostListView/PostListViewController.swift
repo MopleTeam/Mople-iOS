@@ -104,8 +104,17 @@ final class PostListViewController: BaseViewController, View {
         dataSource = RxTableViewSectionedReloadDataSource<PostListSectionModel>(
             configureCell: { dataSource, tableView, indexPath, item in
                 
+                let isValidPlan: Bool
+                
                 let cell = tableView.dequeueReusableCell(withIdentifier: PostListTableCell.reuseIdentifier) as! PostListTableCell
-                cell.configure(viewModel: .init(post: item))
+                
+                if let date = item.date {
+                    isValidPlan = date > Date()
+                } else {
+                    isValidPlan = false
+                }
+                
+                cell.configure(viewModel: .init(post: item), isPlan: isValidPlan)
                 cell.selectionStyle = .none
                 return cell
             }

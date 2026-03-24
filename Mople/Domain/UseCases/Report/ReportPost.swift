@@ -28,3 +28,15 @@ final class ReportPostUseCase: ReportPost {
     }
 }
 
+// MARK: - Mock
+#if DEV
+final class MockReportPostUseCase: ReportPost {
+    func execute(type: ReportType,
+                 reason: String?) -> Observable<Void> {
+        print("✅ [Mock] 게시글 신고 - type: \(type), reason: \(reason ?? "없음")")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif
+

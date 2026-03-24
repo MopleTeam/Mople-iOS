@@ -98,9 +98,10 @@
 "meetdetail.setup" = "모임 설정";
 "meetdetail.since_count" = "우리가 추억을 쌓은지 %d 일째";
 "meetdetail.delete" = "모임 삭제";
-"meetdetail.delete_info" = "모임을 삭제하시겠어요?";
-"meetdetail.delete_subinfo" = "해당 모임에 대한 모든 기록을 복구할 수 없어요";
+"meetdetail.delete_info" = "내가 모임장인 모임이에요";
+"meetdetail.delete_subinfo" = "모임을 나가면 모임이 삭제됩니다";
 "meetdetail.leave" = "모임 나가기";
+"meetdetail.transfer" = "모임 양도하기";
 "meetdetail.leave_info" = "모임을 나가시겠어요?";
 "meetdetail.inviteMessage" = "모플에서 초대된 모임을 확인해보세요!";
 

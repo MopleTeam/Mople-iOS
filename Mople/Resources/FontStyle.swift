@@ -19,7 +19,6 @@ enum FontStyle {
     }
 
     enum App {
-        static let title = FontFamily.Pretendard.black.font(size: Size.heading)
         static let tabbar = FontFamily.Pretendard.semiBold.font(size: Size.tabbar)
     }
 

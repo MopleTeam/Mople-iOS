@@ -6,6 +6,7 @@
 //
 
 import RxSwift
+import Foundation
 
 protocol LikeComment {
     func execute(commentId: Int) -> Observable<Comment>
@@ -31,3 +32,28 @@ final class LikeCommentUseCase: LikeComment {
             }
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockLikeCommentUseCase: LikeComment {
+
+    func execute(commentId: Int) -> Observable<Comment> {
+        print("✅ [Mock] LikeComment - commentId: \(commentId)")
+
+        var mockComment = Comment()
+        mockComment.isMockup = true
+        mockComment.id = commentId
+        mockComment.postId = 1
+        mockComment.writerId = 1
+        mockComment.writerName = "Mock 사용자"
+        mockComment.comment = "좋아요한 댓글"
+        mockComment.createdDate = Date()
+        mockComment.isWriter = true
+        mockComment.isLiked = true
+        mockComment.likeCount = 1
+
+        return Observable.just(mockComment)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

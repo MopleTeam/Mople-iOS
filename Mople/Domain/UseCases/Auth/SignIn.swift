@@ -106,3 +106,16 @@ final class SignInUseCase: SignIn {
         }
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockSignInUseCase: SignIn {
+
+    func execute(platform: LoginPlatform) -> Observable<Void> {
+        print("✅ [Mock] 로그인 요청 - platform: \(platform.rawValue)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 로그인 성공") })
+    }
+}
+#endif

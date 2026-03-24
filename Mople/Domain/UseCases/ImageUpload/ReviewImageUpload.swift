@@ -72,3 +72,14 @@ final class ReviewImageUploadUseCase: ReviewImageUpload {
         }
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockReviewImageUploadUseCase: ReviewImageUpload {
+    func execute(id: Int, images: [UIImage]) -> Observable<Void> {
+        print("✅ [Mock] 후기 이미지 업로드 - reviewId: \(id), imageCount: \(images.count)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

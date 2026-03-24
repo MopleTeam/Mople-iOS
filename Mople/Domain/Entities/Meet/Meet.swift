@@ -8,9 +8,10 @@
 import Foundation
 
 struct Meet {
+    var isCreator: Bool = false
     let meetSummary: MeetSummary?
     let sinceDays: Int?
-    let creatorId: Int?
+    var creatorId: Int?
     let memberCount: Int?
     let firstPlanDate: Date?
 }

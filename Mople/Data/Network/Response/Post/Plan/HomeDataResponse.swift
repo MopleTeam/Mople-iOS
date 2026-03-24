@@ -9,13 +9,13 @@ import Foundation
 
 struct HomeDataResponse: Decodable {
     let plans: [PlanResponse]
-    let meets: [MeetSummaryResponse]
-
+    let hasJoinedMeet: Bool?
 }
 
 extension HomeDataResponse {
     func toDomain() -> HomeData {
         return .init(plans: plans.map({ $0.toDomain() }),
-                     meets: meets.map({ $0.toDomain() }))
+                     hasMeet: hasJoinedMeet ?? true)
+        // ⚠️ 향후 서버 작업 완료 시 false로 변경
     }
 }

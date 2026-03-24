@@ -200,7 +200,12 @@ extension PostDetailViewController {
             .disposed(by: disposeBag)
         
         postInfoView.rx.mapTapped
-            .map { Reactor.Action.flow(.placeDetailView) }
+            .map {
+                switch $0 {
+                case .none: Reactor.Action.flow(.editPost)
+                case .some: Reactor.Action.flow(.placeDetailView)
+                }
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -242,7 +247,9 @@ extension PostDetailViewController {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, postSummary in
-                vc.commentVC.loadComment(with: postSummary.postId, totalCount: postSummary.commentCount)
+                vc.commentVC.loadComment(with: postSummary.postId,
+                                         meetId: postSummary.meet?.id,
+                                         totalCount: postSummary.commentCount)
                 vc.setPostInfoView(with: postSummary)
                 vc.showSuggestReviewAlert(with: postSummary)
             })
@@ -335,7 +342,7 @@ extension PostDetailViewController {
     private func writeReview() -> DefaultAlertAction {
         return .init(text: L10n.Review.create,
                      textColor: .defaultWhite,
-                     bgColor: .appPrimary,
+                     bgColor: .primaryText,
                      completion: { [weak self] in
             self?.editPost.onNext(())
         })

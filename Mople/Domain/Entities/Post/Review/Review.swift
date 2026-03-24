@@ -22,6 +22,7 @@ struct Review: Comparable {
     var isCreator: Bool = false
     var isReviewd: Bool
     var commentCount: Int = 0
+    let description: String?
     
     static func < (lhs: Review, rhs: Review) -> Bool {
         guard let lhsDate = lhs.date,

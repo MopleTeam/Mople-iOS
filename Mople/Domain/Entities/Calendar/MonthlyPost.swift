@@ -20,6 +20,7 @@ struct MonthlyPost: Equatable  {
     var meet: MeetSummary?
     var weather: Weather?
     let type: MonthlyPostType
+    var isCreator: Bool = false
 }
 
 extension MonthlyPost {
@@ -31,5 +32,11 @@ extension MonthlyPost {
         self.meet = plan.meet
         self.weather = plan.weather
         self.type = .plan
+    }
+    
+    mutating func verifyCreator(_ userId: Int?) {
+//        guard let creatorId,
+//              let userId else { return }
+//        isCreator = creatorId == userId
     }
 }

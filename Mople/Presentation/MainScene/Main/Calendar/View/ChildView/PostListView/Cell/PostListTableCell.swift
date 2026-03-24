@@ -103,10 +103,12 @@ final class PostListTableCell: UITableViewCell {
     }
 
     // MARK: - Configure
-    public func configure(viewModel: PostListViewModel) {
+    public func configure(viewModel: PostListViewModel, isPlan: Bool) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))
-        self.weatherView.configure(with: .init(weather: viewModel.weather))
+        self.weatherView.configure(with: .init(weather: viewModel.weather),
+                                   isCreator: viewModel.isCreator,
+                                   isValidPlan: isPlan)
     }
 }

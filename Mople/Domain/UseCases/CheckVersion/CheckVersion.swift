@@ -25,3 +25,17 @@ final class CheckVersionUseCase: CheckVersion {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockCheckVersionUseCase: CheckVersion {
+    func executue() -> Observable<UpdateStatus> {
+        print("✅ [Mock] 앱 버전 체크")
+        let mockStatus = UpdateStatus(forceUpdate: false,
+                                      minVersion: "1.0.0",
+                                      message: "")
+        return Observable.just(mockStatus)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

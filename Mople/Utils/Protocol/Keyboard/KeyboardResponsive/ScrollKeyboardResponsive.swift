@@ -11,14 +11,19 @@ import RxSwift
 protocol ScrollKeyboardResponsive: KeyboardResponsive {
     var scrollView: UIScrollView? { get }
     var startOffsetY: CGFloat { get set }
+    var shouldScroll: Bool { get }
 }
 
 extension ScrollKeyboardResponsive where Self: UIViewController {
+    
+    var shouldScroll: Bool { true }
 
     func handleKeyboardShow(_ sender: Notification) {
-        guard let height = getKeyboardHeight(from: sender),
+        guard shouldScroll,
+              let height = getKeyboardHeight(from: sender),
               let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender) else { return }
+        print(#function, #line, "Path : # 키보드 나타남 ")
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in
             self?.floatingViewBottom?.update(inset: height)
@@ -29,10 +34,11 @@ extension ScrollKeyboardResponsive where Self: UIViewController {
     }
 
     func handleKeyboardHide(_ sender: Notification) {
-        guard let duration = getKeyboardDuration(from: sender),
+        guard shouldScroll,
+              let duration = getKeyboardDuration(from: sender),
               let animation = getKeyboardAnimation(from: sender),
               let scrollView else { return }
-        
+        print(#function, #line, "Path : # 키보드 숨김 ")
         keyboardHeight = nil
         handleKeyboard(duration: duration,
                        option: animation) { [weak self] in

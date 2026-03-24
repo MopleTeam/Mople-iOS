@@ -66,15 +66,27 @@ extension ViewDIContainer {
     }
     
     private func makeImageUploadUseCase(repo: ImageUploadRepo) -> ImageUpload {
+        #if DEV
+        return MockDataManager.resolve(ImageUploadUseCase(imageUploadRepo: repo) as ImageUpload, mock: MockImageUploadUseCase())
+        #else
         return ImageUploadUseCase(imageUploadRepo: repo)
+        #endif
     }
-    
+
     private func makeCreateMeetUseCase(repo: MeetRepo) -> CreateMeet {
+        #if DEV
+        return MockDataManager.resolve(CreateMeetUseCase(createMeetRepo: repo) as CreateMeet, mock: MockCreateMeetUseCase())
+        #else
         return CreateMeetUseCase(createMeetRepo: repo)
+        #endif
     }
-    
+
     private func makeEditMeetUseCase(repo: MeetRepo) -> EditMeet {
+        #if DEV
+        return MockDataManager.resolve(EditMeetUseCase(repo: repo) as EditMeet, mock: MockEditMeetUseCase())
+        #else
         return EditMeetUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 멤버 리스트 화면
@@ -98,12 +110,20 @@ extension ViewDIContainer {
     
     private func makeFetchMemberUseCase() -> FetchMemberList {
         let repo = DefaultMemberRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchMemberUseCase(memberListRepo: repo) as FetchMemberList, mock: MockFetchMemberUseCase())
+        #else
         return FetchMemberUseCase(memberListRepo: repo)
+        #endif
     }
-    
+
     private func makeInviteMeetUseCase() -> InviteMeet {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(InviteMeetUseCase(repo: repo) as InviteMeet, mock: MockInviteMeetUseCase())
+        #else
         return InviteMeetUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 포토뷰

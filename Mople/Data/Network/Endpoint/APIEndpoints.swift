@@ -257,6 +257,28 @@ extension APIEndpoints {
                             method: .post,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
+    
+    static func transferMeet(meetId: Int, newHostId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "meet/host/\(meetId)",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            bodyParameters: ["newHostId": newHostId])
+    }
+    
+    static func fetchMyHostMeets(cursor: String?) throws -> Endpoint<PageResponse<MeetResponse>> {
+        var query: [String: Any] = [:]
+        
+        if let cursor, !cursor.isEmpty {
+            query["cursor"] = cursor
+        }
+        
+        return try Endpoint(path: "meet/host/list",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getSendAndReceiveAllHeader(),
+                            queryParameters: query)
+    }
 }
 
 // MARK: - Plan
@@ -486,7 +508,7 @@ extension APIEndpoints {
         }
     }
     
-    static func fetchMentionList(postId: Int, nextCursor: String?, keyword: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> {
+    static func fetchMentionList(meetId: Int, nextCursor: String?, keyword: String?) throws -> Endpoint<PageResponse<MemberInfoResponse>> {
         var cursorQuery: [String: Any] = ["keyword": ""]
         
         if let nextCursor, !nextCursor.isEmpty {
@@ -497,7 +519,7 @@ extension APIEndpoints {
             cursorQuery["keyword"] = keyword
         }
         
-        return try Endpoint(path: "comment/\(postId)/mention",
+        return try Endpoint(path: "meet/members/search/\(meetId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),

@@ -33,3 +33,16 @@ final class CheckDuplicateNicknameUseCase: CheckDuplicateNickname {
         }
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockCheckDuplicateNicknameUseCase: CheckDuplicateNickname {
+
+    func execute(_ nickname: String) -> Observable<Bool> {
+        print("✅ [Mock] 닉네임 중복 확인 요청 - nickname: \(nickname)")
+        return Observable.just(false)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 닉네임 중복 확인 완료 - isDuplicate: \($0)") })
+    }
+}
+#endif

@@ -19,6 +19,6 @@ struct Notify {
     let meetTitle: String? 
     let receiveDate: Date?
     let type: NotifyType?
-    let payload: NotifyPayload?
+    let message: String?
     var isRead: Bool = false
 }

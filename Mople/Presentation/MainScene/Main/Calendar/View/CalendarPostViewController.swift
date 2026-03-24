@@ -28,7 +28,7 @@ final class CalendarPostViewController: TitleNaviViewController, View {
         let view = UIButton()
         view.clipsToBounds = true
         view.layer.cornerRadius = 10
-        view.backgroundColor = .bgPrimary
+        view.backgroundColor = .bgSecondary
         return view
     }()
     
@@ -324,7 +324,7 @@ extension CalendarPostViewController {
     }
     
     private func updateBackgroundColor(scope: ScopeType) {
-        self.postListContainer.backgroundColor = scope == .month ? .defaultWhite : .bgPrimary
+        self.postListContainer.backgroundColor = scope == .month ? .defaultWhite : .bgSecondary
     }
     
     private func naviItemChange(scope: ScopeType) {

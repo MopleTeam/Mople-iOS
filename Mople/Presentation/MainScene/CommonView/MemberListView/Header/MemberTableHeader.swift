@@ -49,7 +49,7 @@ final class MemberTableHeader: UITableViewHeaderFooterView {
     private func setInviteUI() {
         inviteView.memberInfoView.profileView.image = .invitePlus
         inviteView.memberInfoView.profileView.contentMode = .center
-        inviteView.memberInfoView.backgroundColor = .bgPrimary
+        inviteView.memberInfoView.backgroundColor = .bgSecondary
         inviteView.nameLabel.text = L10n.Meetdetail.invite
         inviteView.nameLabel.textColor = .appPrimary
     }

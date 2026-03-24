@@ -14,6 +14,8 @@ protocol MeetRepo {
     func editMeet(id: Int,
                   reqeust: CreateMeetRequest) -> Single<MeetResponse>
     func deleteMeet(id: Int) -> Single<Void>
+    func transferMeet(meetId: Int, newHostId: Int) -> Single<Void>
+    func fetchMyHostMeets(cursor: String?) -> Single<PageResponse<MeetResponse>>
     func inviteMeet(id: Int) -> Single<String>
     func joinMeet(code: String) -> Single<MeetResponse>
 }

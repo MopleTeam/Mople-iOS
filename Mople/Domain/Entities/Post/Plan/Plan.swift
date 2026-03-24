@@ -21,6 +21,7 @@ struct Plan: Hashable, Comparable {
     let weather: Weather?
     var isCreator: Bool = false
     var commentCount: Int = 0
+    var description: String?
     
     var startOfDate: Date? {
         guard let date = date else { return nil }

@@ -19,6 +19,10 @@ struct CalendarPlanResponse: Decodable {
     let weatherAddress: String?
     let temperature: Double?
     let pop: Double?
+    
+    var hasLocation: Bool {
+        return weatherAddress != nil
+    }
 }
 
 extension CalendarPlanResponse {
@@ -31,10 +35,10 @@ extension CalendarPlanResponse {
             meet: .init(id: meetId,
                         name: meetName,
                         imagePath: meetImage),
-            weather: .init(address: weatherAddress,
-                           imagePath: weatherIcon,
-                           temperature: temperature,
-                           pop: pop),
+            weather: hasLocation ? .init(address: weatherAddress,
+                                         imagePath: weatherIcon,
+                                         temperature: temperature,
+                                         pop: pop) : nil,
             type: .plan
         )
     }

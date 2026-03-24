@@ -25,3 +25,15 @@ final class DeleteCommentUseCase: DeleteComment {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockDeleteCommentUseCase: DeleteComment {
+
+    func execute(commentId: Int) -> Observable<Void> {
+        print("✅ [Mock] DeleteComment - commentId: \(commentId)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

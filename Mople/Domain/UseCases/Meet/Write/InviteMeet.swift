@@ -26,3 +26,17 @@ final class InviteMeetUseCase: InviteMeet {
     }
 }
 
+// MARK: - Mock UseCase
+#if DEV
+final class MockInviteMeetUseCase: InviteMeet {
+    func execute(id: Int) -> Observable<String> {
+        print("✅ [Mock] 모임 초대 코드 생성 - meetId: \(id)")
+
+        let mockCode = "MOCK-\(id)-\(String(format: "%04d", Int.random(in: 1000...9999)))"
+
+        return Observable.just(mockCode)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif
+

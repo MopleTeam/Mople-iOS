@@ -59,17 +59,32 @@ extension MainSceneDIContainer: MainSceneDependencies {
     
     private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
         let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
-        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
+        #else
+        let useCase = UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        #endif
+        return useCase
     }
     
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
         let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService)
-        return ResetNotifyCountUseCase(repo: notifyRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(ResetNotifyCountUseCase(repo: notifyRepo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
+        #else
+        let useCase = ResetNotifyCountUseCase(repo: notifyRepo)
+        #endif
+        return useCase
     }
     
     private func makeJoinMeetUseCase() -> JoinMeet {
         let meetRepo = DefaultMeetRepo(networkService: appNetworkService)
-        return JoinMeetUseCase(repo: meetRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(JoinMeetUseCase(repo: meetRepo) as JoinMeet, mock: MockJoinMeetUseCase())
+        #else
+        let useCase = JoinMeetUseCase(repo: meetRepo)
+        #endif
+        return useCase
     }
 }
 

@@ -30,3 +30,16 @@ final class SignUpUseCase: SignUp, LifeCycleLoggable {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockSignUpUseCase: SignUp {
+
+    func execute(request: SignUpRequest) -> Observable<Void> {
+        print("✅ [Mock] 회원가입 요청")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 회원가입 성공") })
+    }
+}
+#endif

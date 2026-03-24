@@ -8,27 +8,27 @@
 import Foundation
 
 struct UploadPlace: Encodable, Equatable {
-    let title: String
-    let planAddress: String
-    let lat: Double
-    let lot: Double
-    let weatherAddress: String
+    let title: String?
+    let planAddress: String?
+    let lat: Double?
+    let lot: Double?
+    let weatherAddress: String?
 }
 
 extension UploadPlace {
     init(place: PlaceInfo) {
-        self.title = place.title ?? ""
-        self.planAddress = place.roadAddress ?? ""
-        self.lat = place.location?.latitude ?? 37.575968
-        self.lot = place.location?.longitude ?? 126.976894
-        self.weatherAddress = place.address ?? ""
+        self.title = place.title
+        self.planAddress = place.roadAddress
+        self.lat = place.location?.latitude
+        self.lot = place.location?.longitude
+        self.weatherAddress = place.address
     }
     
     init(plan: Plan) {
-        self.title = plan.addressTitle ?? ""
-        self.planAddress = plan.address ?? ""
-        self.lat = plan.location?.latitude ?? 37.575968
-        self.lot = plan.location?.longitude ?? 126.976894
-        self.weatherAddress = plan.weather?.address ?? ""
+        self.title = plan.addressTitle
+        self.planAddress = plan.address
+        self.lat = plan.location?.latitude
+        self.lot = plan.location?.longitude
+        self.weatherAddress = plan.weather?.address
     }
 }

@@ -14,7 +14,7 @@ struct PlanResponse: Decodable {
     let meetImg: String?
     let planName: String?
     let planAddress: String?
-    let title: String? 
+    let title: String?
     let creatorId: Int?
     let planTime: String?
     let planMemberCount: Int?
@@ -26,6 +26,11 @@ struct PlanResponse: Decodable {
     let pop: Double?
     let participant: Bool?
     let commentCount: Int?
+    let description: String?
+    
+    var hasLocation: Bool {
+        return lat != nil || lot != nil
+    }
 }
 
 extension PlanResponse {
@@ -43,12 +48,12 @@ extension PlanResponse {
                      meet: .init(id: meetId,
                                  name: meetName,
                                  imagePath: meetImg),
-                     location: .init(longitude: lot,
-                                     latitude: lat),
-                     weather: .init(address: weatherAddress,
-                                    imagePath: weatherIcon,
-                                    temperature: temperature,
-                                    pop: pop),
-                     commentCount: commentCount ?? 0)
+                     location: hasLocation ? .init(longitude: lot, latitude: lat) : nil,
+                     weather: hasLocation ? .init(address: weatherAddress,
+                                                  imagePath: weatherIcon,
+                                                  temperature: temperature,
+                                                  pop: pop) : nil,
+                     commentCount: commentCount ?? 0,
+                     description: description)
     }
 }

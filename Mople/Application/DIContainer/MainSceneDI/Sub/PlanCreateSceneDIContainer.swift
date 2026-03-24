@@ -44,17 +44,35 @@ extension PlanCreateSceneDIContainer {
     
     private func makeCreatePlanViewReactor(coordinator: PlanCreateCoordination) -> CreatePlanViewReactor {
         return .init(createPlanUseCase: makeCreatePlanUseCase(),
-                              editPlanUseCase: makeEditPlanUseCase(),
-                              type: type,
-                              coordinator: coordinator)
+                     editPlanUseCase: makeEditPlanUseCase(),
+                     fetchMeetPageUseCase: makeFetchMeetPageUseCase(),
+                     type: type,
+                     coordinator: coordinator)
     }
     
     private func makeCreatePlanUseCase() -> CreatePlan {
+        #if DEV
+        return MockDataManager.resolve(CreatePlanUseCase(createPlanRepo: makeCreatePlanRepo()) as CreatePlan, mock: MockCreatePlanUseCase())
+        #else
         return CreatePlanUseCase(createPlanRepo: makeCreatePlanRepo())
+        #endif
     }
-    
+
     private func makeEditPlanUseCase() -> EditPlan {
+        #if DEV
+        return MockDataManager.resolve(EditPlanUseCase(editPlanRepo: makeCreatePlanRepo()) as EditPlan, mock: MockEditPlanUseCase())
+        #else
         return EditPlanUseCase(editPlanRepo: makeCreatePlanRepo())
+        #endif
+    }
+
+    private func makeFetchMeetPageUseCase() -> FetchMeetPage {
+        let repo = DefaultMeetRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
+        #else
+        return FetchMeetPageUseCase(repo: repo)
+        #endif
     }
     
     private func makeCreatePlanRepo() -> PlanRepo {

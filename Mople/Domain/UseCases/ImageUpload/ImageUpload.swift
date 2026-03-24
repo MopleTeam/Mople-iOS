@@ -23,7 +23,7 @@ final class ImageUploadUseCase: ImageUpload {
     func execute(_ image: UIImage) -> Observable<String> {
         return Observable.deferred { [weak self] in
             guard let self else { return .empty() }
-            
+
             do {
                 let imageData = try Data.imageDataCompressed(uiImage: image)
                 return self.imageUploadRepo.uploadImage(data: imageData, path: .profile)
@@ -34,3 +34,15 @@ final class ImageUploadUseCase: ImageUpload {
         }
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockImageUploadUseCase: ImageUpload {
+    func execute(_ image: UIImage) -> Observable<String> {
+        print("✅ [Mock] 이미지 업로드 - size: \(image.size)")
+        let mockImageUrl = "https://mock-cdn.mople.com/images/profile_\(UUID().uuidString).jpg"
+        return Observable.just(mockImageUrl)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

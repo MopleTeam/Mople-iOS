@@ -29,3 +29,16 @@ final class SignOutUseCase: SignOut, LifeCycleLoggable {
             .asObservable()
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockSignOutUseCase: SignOut {
+
+    func execute(userId: Int) -> Observable<Void> {
+        print("✅ [Mock] 로그아웃 요청 - userId: \(userId)")
+        return Observable.just(())
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+            .do(onNext: { print("✅ [Mock] 로그아웃 성공") })
+    }
+}
+#endif

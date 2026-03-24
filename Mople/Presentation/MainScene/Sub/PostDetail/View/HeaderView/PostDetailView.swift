@@ -9,10 +9,16 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+enum PostDetailMapType {
+    case none
+    case some
+}
+
 final class PostDetailView: UIView {
     
     // MARK: - Variables
     private let postType: PostType
+    fileprivate var mapType: PostDetailMapType?
     
     // MARK: - UI Components
     fileprivate let postInfoView = PostInfoView()
@@ -110,8 +116,21 @@ final class PostDetailView: UIView {
     
     public func configure(with postSummary: PostSummary) {
         postInfoView.configure(with: postSummary)
-        mapView.initializeMap(location: postSummary.location)
+        
         handlePostTypeView(with: postSummary)
+        
+        if let location = postSummary.location {
+            mapView.initializeMap(location: location)
+            mapType = PostDetailMapType.some
+        } else if let date = postSummary.date,
+                  date > Date(),
+                  postSummary.isCreator {
+            mapView.setAddMapView()
+            mapType = PostDetailMapType.none
+        } else {
+            mapType = nil
+            mapView.isHidden = true
+        }
     }
     
     private func handlePostTypeView(with postSummary: PostSummary) {
@@ -218,9 +237,10 @@ extension Reactive where Base: PostDetailView {
         return base.postInfoView.rx.memberTapped
     }
     
-    var mapTapped: Observable<Void> {
+    var mapTapped: Observable<PostDetailMapType> {
         return base.mapTapGesture.rx.event
-            .map { _ in }
+            .map { [weak base] _ in base?.mapType }
+            .compactMap { $0 }
     }
     
     var participationTapped: ControlEvent<Void> {

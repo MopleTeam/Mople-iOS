@@ -38,3 +38,15 @@ final class FetchNotifyStateUseCase: FetchNotifyState {
             .asObservable()
     }
 }
+
+// MARK: - Mock
+#if DEV
+final class MockFetchNotifyStateUseCase: FetchNotifyState {
+    func execute() -> Observable<[SubscribeType]> {
+        print("✅ [Mock] 알림 구독 상태 조회")
+        let mockState: [SubscribeType] = [.meet, .plan, .mention, .reply]
+        return Observable.just(mockState)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif

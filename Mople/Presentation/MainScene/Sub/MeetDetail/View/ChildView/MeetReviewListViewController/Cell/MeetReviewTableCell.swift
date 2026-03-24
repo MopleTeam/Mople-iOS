@@ -58,7 +58,7 @@ final class MeetReviewTableCell: UITableViewCell {
         label.font = FontStyle.Body2.semiBold
         label.textColor = .appPrimary
         label.backgroundColor = .defaultBlueGray
-        label.layer.makeLine(width: 1, color: .defaultWhite)
+        label.layer.makeLine(width: 1, color: .bgPrimary)
         label.textAlignment = .center
         label.clipsToBounds = true
         label.isHidden = true

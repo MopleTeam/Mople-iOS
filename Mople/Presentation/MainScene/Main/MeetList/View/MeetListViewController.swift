@@ -86,7 +86,7 @@ class MeetListViewController: TitleNaviViewController, View {
     }
 
     private func setLayout() {
-        self.view.backgroundColor = .bgPrimary
+        self.view.backgroundColor = .bgSecondary
         self.view.addSubview(borderView)
         self.view.addSubview(tableView)
         self.view.addSubview(emptyView)

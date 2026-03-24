@@ -16,6 +16,7 @@ final class MeetListTableCell: UITableViewCell {
                                       thumbnailRadius: 12)
         view.addArrowImageView()
         view.addMemberCountLabel()
+        view.addOwnerMark()
         view.setTitleLabel(font: FontStyle.Title3.semiBold,
                            color: .gray01)
         view.setSpacing(12)

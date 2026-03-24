@@ -6,6 +6,7 @@
 //
 
 import RxSwift
+import Foundation
 
 protocol FetchReplyCommentList {
     func execute(postId: Int,
@@ -45,3 +46,38 @@ final class FetchReplyCommentListUseCase: FetchReplyCommentList {
         return commentPage
     }
 }
+
+// MARK: - Mock UseCase
+#if DEV
+final class MockFetchReplyCommentListUseCase: FetchReplyCommentList {
+
+    func execute(postId: Int,
+                 commentId: Int,
+                 nextCursor: String?) -> Observable<Page<Comment>> {
+        print("✅ [Mock] FetchReplyCommentList - postId: \(postId), commentId: \(commentId), nextCursor: \(nextCursor ?? "nil")")
+
+        let mockReplies: [Comment] = (1...3).map { index in
+            var reply = Comment()
+            reply.isMockup = true
+            reply.id = 100 + index
+            reply.postId = postId
+            reply.parentId = commentId
+            reply.writerId = index
+            reply.writerName = "Mock 답글 사용자 \(index)"
+            reply.comment = "Mock 답글 내용 \(index)"
+            reply.createdDate = Date().addingTimeInterval(Double(-index) * 1800)
+            reply.isWriter = index == 1
+            return reply
+        }
+
+        let page = Page(
+            totalCount: mockReplies.count,
+            content: mockReplies,
+            info: PageInfo(nextCursor: nil, hasNext: false, size: 20)
+        )
+
+        return Observable.just(page)
+            .delay(.seconds(1), scheduler: MainScheduler.instance)
+    }
+}
+#endif
