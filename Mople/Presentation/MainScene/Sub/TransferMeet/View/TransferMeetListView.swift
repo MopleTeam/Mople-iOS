@@ -143,7 +143,7 @@ struct TransferMeetListView: View {
     private var deleteAccountButton: some View {
         Text("탈퇴하기")
             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-            .foregroundColor(.primaryText)
+            .foregroundColor(.secondaryText)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(Color(uiColor: .appSecondary))
