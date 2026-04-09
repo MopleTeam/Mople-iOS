@@ -11,6 +11,7 @@ protocol ProfileCoordination: AnyObject {
     func presentProfileImageView(imagePath: String?)
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
+    func presentThemeView()
     func pushPolicyView()
     func showTransferMeetList()
     func endMainFlow()
@@ -57,6 +58,14 @@ extension ProfileFlowCoordinator {
     }
 }
 
+
+// MARK: - Theme Setting View
+extension ProfileFlowCoordinator {
+    func presentThemeView() {
+        let themeView = dependencies.makeThemeSettingViewController()
+        self.slidePresentWithTracking(themeView)
+    }
+}
 
 // MARK: - Profile Edit Flow
 extension ProfileFlowCoordinator: ProfileEditViewCoordination {

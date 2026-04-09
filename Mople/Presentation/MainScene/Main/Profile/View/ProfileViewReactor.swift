@@ -9,51 +9,52 @@ import UIKit
 import ReactorKit
 
 final class ProfileViewReactor: Reactor, LifeCycleLoggable {
-    
+
     enum Action {
         enum Flow {
             case showProfileImage
             case editProfile
             case setNotify
+            case setTheme
             case policy
             case showTransferMeetList(meets: [Meet])  // 양도할 모임 리스트 전달
             case endMainFlow
         }
-        
+
         case flow(Flow)
         case fetchUserInfo
         case signOut
         case checkMeetsBeforeDelete  // 탈퇴 전 모임 체크
         case deleteAccount  // 실제 탈퇴 실행
     }
-    
+
     enum Mutation {
         case fetchUserInfo(_ userInfo: UserInfo)
         case checkDeleteAccount
         case updateLoadingState(Bool)
         case catchError(Error)
     }
-    
+
     struct State {
         @Pulse var userProfile: UserInfo?
         @Pulse var deleteAccountAlert: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
     }
-    
+
     // MARK: - Variables
     var initialState = State()
     private var userId: Int?
     private var isRequesting: Bool = false
-    
+
     // MARK: - UseCase
     private let signOutUseCase: SignOut
     private let deleteAccountUseCase: DeleteAccount
     private let fetchMyHostMeetsUseCase: FetchMyHostMeets
-    
+
     // MARK: - Coordinator
     private weak var coordinator: ProfileCoordination?
-    
+
     // MARK: - LifeCycle
     init(signOutUseCase: SignOut,
          deleteAccountUseCase: DeleteAccount,
@@ -66,11 +67,11 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         action.onNext(.fetchUserInfo)
         logLifeCycle()
     }
-    
+
     deinit {
         logLifeCycle()
     }
-    
+
     // MARK: - State Mutation
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
@@ -86,10 +87,10 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             return deleteAccount()
         }
     }
-    
+
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-        
+
         switch mutation {
         case .fetchUserInfo(let profile):
             newState.userProfile = profile
@@ -100,27 +101,27 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         case let .catchError(err):
             newState.error = err
         }
-        
+
         return newState
     }
-    
+
 }
 
 // MARK: - Data Request
 extension ProfileViewReactor {
-    
+
     private func fetchProfile() -> Observable<Mutation> {
         guard let userInfo = UserInfoStorage.shared.userInfo else { return .empty() }
         userId = userInfo.id
         return .just(.fetchUserInfo(userInfo))
     }
-    
+
     private func signOut() -> Observable<Mutation> {
         guard let userId = UserInfoStorage.shared.userInfo?.id,
               !isRequesting else { return .empty() }
-        
+
         isRequesting = true
-        
+
         let signOut = signOutUseCase.execute(userId: userId)
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
@@ -128,30 +129,30 @@ extension ProfileViewReactor {
                 self?.coordinator?.endMainFlow()
                 return .empty()
             }
-        
+
         return requestWithLoading(task: signOut)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
     }
-    
+
     private func checkMeetsBeforeDelete() -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
-        
+
         isRequesting = true
-        
+
         // 내가 호스트인 모임 리스트 조회
         let checkMeets = fetchMyHostMeetsUseCase.execute(cursor: nil)
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] page -> Observable<Mutation> in
                 guard let self = self else { return .empty() }
-                                
+
                 // 멤버가 2명 이상인 모임만 필터링 (양도 필요한 모임)
                 let transferableMeets = page.content.filter { meet in
                     guard let memberCount = meet.memberCount else { return false }
                     return memberCount >= 2
                 }
-                
+
                 if transferableMeets.isEmpty {
                     // 양도할 모임 없음 → 바로 탈퇴 진행
                     print("✅ 양도할 모임 없음 → 탈퇴 진행")
@@ -164,18 +165,18 @@ extension ProfileViewReactor {
                     return .empty()
                 }
             }
-        
+
         return requestWithLoading(task: checkMeets)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
     }
-    
+
     private func deleteAccount() -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
-        
+
         isRequesting = true
-        
+
         let deleteAccount = deleteAccountUseCase.execute()
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] _ -> Observable<Mutation> in
@@ -183,13 +184,13 @@ extension ProfileViewReactor {
                 self?.coordinator?.endMainFlow()
                 return .empty()
             }
-        
+
         return requestWithLoading(task: deleteAccount)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
     }
-    
+
     private func resetUserData() {
         KeychainStorage.shared.deleteToken()
         UserInfoStorage.shared.deleteEnitity()
@@ -209,6 +210,8 @@ extension ProfileViewReactor {
             coordinator?.presentEditView(previousProfile: previousProfile)
         case .setNotify:
             coordinator?.pushNotifyView()
+        case .setTheme:
+            coordinator?.presentThemeView()
         case .policy:
             coordinator?.pushPolicyView()
         case .showTransferMeetList:
@@ -225,7 +228,7 @@ extension ProfileViewReactor: LoadingReactor {
     func updateLoadingMutation(_ isLoading: Bool) -> Mutation {
         return .updateLoadingState(isLoading)
     }
-    
+
     func catchErrorMutation(_ error: Error) -> Mutation {
         return .catchError(error)
     }

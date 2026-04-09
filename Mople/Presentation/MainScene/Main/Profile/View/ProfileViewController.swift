@@ -53,6 +53,18 @@ final class ProfileViewController: TitleNaviViewController, View {
         return btn
     }()
     
+    // 화면 테마 설정 버튼
+    private let themeButton: BaseButton = {
+        let btn = BaseButton()
+        btn.setTitle(text: "화면 테마",
+                     font: FontStyle.Title3.medium,
+                     normalColor: .text01)
+        btn.setImage(image: .listArrow)
+        btn.setButtonAlignment(.fill)
+        btn.setLayoutMargins(inset: .zero)
+        return btn
+    }()
+
     private let policyButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Profile.policy,
@@ -114,7 +126,7 @@ final class ProfileViewController: TitleNaviViewController, View {
     }()
 
     private lazy var menuStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [notifyButton, policyButton, versionLabel])
+        let sv = UIStackView(arrangedSubviews: [notifyButton, themeButton, policyButton, versionLabel])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fillEqually
@@ -205,7 +217,7 @@ final class ProfileViewController: TitleNaviViewController, View {
             make.trailing.equalToSuperview()
         }
         
-        [notifyButton, policyButton, versionLabel, signOutButton, resignButton].forEach {
+        [notifyButton, themeButton, policyButton, versionLabel, signOutButton, resignButton].forEach {
             $0.snp.makeConstraints { make in
                 make.height.equalTo(56)
             }
@@ -269,7 +281,12 @@ extension ProfileViewController {
             .map { Reactor.Action.flow(.setNotify) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
+        themeButton.rx.controlEvent(.touchUpInside)
+            .map { Reactor.Action.flow(.setTheme) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
         policyButton.rx.controlEvent(.touchUpInside)
             .map { Reactor.Action.flow(.policy) }
             .bind(to: reactor.action)
@@ -284,7 +301,7 @@ extension ProfileViewController {
             .map { Reactor.Action.checkMeetsBeforeDelete }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         deleteAccount
             .map { Reactor.Action.deleteAccount }
             .bind(to: reactor.action)
@@ -311,13 +328,18 @@ extension ProfileViewController {
                 vc.showDeleteAccountAlert()
             })
             .disposed(by: disposeBag)
-        
+
         reactor.pulse(\.$userProfile)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, profile in
                 vc.setProfile(profile)
             })
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$isLoading)
+            .asDriver(onErrorJustReturn: false)
+            .drive(self.rx.isLoading)
             .disposed(by: disposeBag)
         
         reactor.pulse(\.$error)

@@ -15,8 +15,9 @@ protocol ProfileSceneDependencies {
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        coordinator: ProfileEditViewCoordination) -> ProfileEditViewController
     func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController
+    func makeThemeSettingViewController() -> UIViewController
     func makePolicyViewController() -> PolicyViewController
-    
+
     // MARK: - SwiftUI (Transfer Meet)
     func makeTransferMeetFlow() -> BaseCoordinator
 }
@@ -186,6 +187,13 @@ extension ProfileSceneDIContainer {
         return DefaultNotificationService()
     }
     
+    // MARK: - 테마 설정 View (SwiftUI)
+    func makeThemeSettingViewController() -> UIViewController {
+        let view = ThemeSettingView()
+        let hostingController = DismissableHostingController(rootView: view)
+        return hostingController
+    }
+
     // MARK: - 개인정보 처리방침 View
     func makePolicyViewController() -> PolicyViewController {
         return .init(screenName: .privacy_policy,
