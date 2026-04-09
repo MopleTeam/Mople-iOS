@@ -44,7 +44,7 @@ final class PostDetailViewController: TitleNaviViewController, View {
     public let commentVC: CommentListViewController
     private let commentContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
 
@@ -317,7 +317,7 @@ extension PostDetailViewController {
         
         alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
                                       defaultAction: .init(text: L10n.cancle,
-                                                           textColor: .gray01,
+                                                           textColor: .tertiaryText,
                                                            bgColor: .appTertiary),
                                       addAction: [createAction])
     }
@@ -341,8 +341,8 @@ extension PostDetailViewController {
     
     private func writeReview() -> DefaultAlertAction {
         return .init(text: L10n.Review.create,
-                     textColor: .defaultWhite,
-                     bgColor: .primaryText,
+                     textColor: .primaryText,
+                     bgColor: .appPrimary,
                      completion: { [weak self] in
             self?.editPost.onNext(())
         })
@@ -350,7 +350,7 @@ extension PostDetailViewController {
     
     private func cancleWriteReview() -> DefaultAlertAction {
         return .init(text: L10n.cancle,
-                     textColor: .gray01,
+                     textColor: .tertiaryText,
                      bgColor: .appTertiary)
     }
 }

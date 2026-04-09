@@ -42,8 +42,8 @@ final class DefaultTextField: UIView {
     public let inputTextField: UITextField = {
         let textField = UITextField()
         textField.font = FontStyle.Body1.regular
-        textField.textColor = .gray01
-        textField.tintColor = .gray02
+        textField.textColor = .text01
+        textField.tintColor = .text02
         return textField
     }()
     
@@ -60,6 +60,7 @@ final class DefaultTextField: UIView {
     
     // MARK: - UI Setup
     private func setupUI() {
+        self.backgroundColor = .bgInput
         self.addSubview(textFieldContainer)
         self.textFieldContainer.addSubview(inputTextField)
 
@@ -107,7 +108,7 @@ extension DefaultTextField {
         guard let text else { return }
         inputTextField.attributedPlaceholder = NSAttributedString(
             string:text,
-            attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray05])
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.text04])
     }
     
     public func setInputTextField(view: UIView, mode: ViewMode) {

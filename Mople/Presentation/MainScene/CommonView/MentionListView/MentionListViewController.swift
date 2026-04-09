@@ -185,7 +185,7 @@ final class MentionListCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.contentView.backgroundColor = highlighted ? .bgSecondary : .defaultWhite
+        self.contentView.backgroundColor = highlighted ? .bgSecondary : .bgPrimary
     }
     
     // MARK: - UI Setup

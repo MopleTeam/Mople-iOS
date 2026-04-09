@@ -27,7 +27,7 @@ final class LabeledTextField: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
@@ -39,6 +39,8 @@ final class LabeledTextField: UIView {
         sv.spacing = 8
         sv.alignment = .fill
         sv.distribution = .fill
+        sv.layer.cornerRadius = 8
+        sv.clipsToBounds = true
         return sv
     }()
     
@@ -120,7 +122,7 @@ final class LabeledTextView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray01
+        label.textColor = .text01
         label.setContentHuggingPriority(.required, for: .horizontal)
         return label
     }()
@@ -128,7 +130,7 @@ final class LabeledTextView: UIView {
     private lazy var optionLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         label.text = "(선택)"
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
@@ -153,7 +155,7 @@ final class LabeledTextView: UIView {
     private let countView : UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         label.text = "0/100"
         label.textAlignment = .right
         return label

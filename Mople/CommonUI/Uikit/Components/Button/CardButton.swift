@@ -47,9 +47,9 @@ final class CardButton: UIButton {
     
     private func initialSetup() {
         setRadius(radius: 12)
-        backgroundColor = .defaultWhite
+        backgroundColor = .bgPrimary
         buttonTitle.font = FontStyle.Title3.semiBold
-        buttonTitle.textColor = .gray01
+        buttonTitle.textColor = .text01
     }
 
     private func setupUI() {

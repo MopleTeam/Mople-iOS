@@ -27,7 +27,7 @@ final class ChatingTextFieldView: UIView {
         let label = UILabel()
         label.text = "댓글 수정중"
         label.font = FontStyle.Body2.medium
-        label.textColor = UIColor.gray04
+        label.textColor = UIColor.text03
         label.layer.cornerRadius = 4
         label.layer.masksToBounds = true
         label.backgroundColor = UIColor.bgSecondary

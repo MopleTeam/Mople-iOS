@@ -38,7 +38,7 @@ final class RecentPlanViewController: BaseViewController, View {
         let emptyView = DefaultEmptyView(imageSize: .init(width: 100, height: 100))
         emptyView.setTitle(text: L10n.Home.emptyPlan)
         emptyView.setImage(image: .emptyHomePlan)
-        emptyView.backgroundColor = .defaultWhite
+        emptyView.backgroundColor = .bgPrimary
         emptyView.layer.cornerRadius = 12
         return emptyView
     }()

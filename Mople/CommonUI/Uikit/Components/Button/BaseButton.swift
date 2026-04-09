@@ -18,7 +18,8 @@ class BaseButton: UIButton {
     
     override var isEnabled: Bool {
         didSet {
-            setEnabledColor(isEnabled)
+            setEnabledBackColor(isEnabled)
+            setEnabledTextColor(isEnabled)
         }
     }
     
@@ -33,6 +34,7 @@ class BaseButton: UIButton {
     
     // MARK: - TextColor Save
     private var normalTextColor: UIColor?
+    private var disabledTextColor: UIColor?
     private var selectedTextColor: UIColor?
     
     // MARK: - BackColor
@@ -71,10 +73,17 @@ class BaseButton: UIButton {
         configuration?.titleTextAttributesTransformer = transformer
     }
     
-    private func setEnabledColor(_ isEnabled: Bool) {
-        guard let normalBackColor, let disabledBackColor else { return }
-        let color = isEnabled ? normalBackColor : disabledBackColor
-        setBackgoundColor(color)
+    private func setEnabledBackColor(_ isEnabled: Bool) {
+        guard let normalBackColor,
+              let disabledBackColor else { return }
+        setBackgoundColor(isEnabled ? normalBackColor : disabledBackColor)
+    }
+    
+    private func setEnabledTextColor(_ isEnabled: Bool) {
+        guard let normalTextColor,
+              let disabledTextColor,
+              let defaultFont else { return }
+        setFont(defaultFont, isEnabled ? normalTextColor : disabledTextColor)
     }
     
     private func setHighlightedColor(_ isHighlighted: Bool) {
@@ -116,11 +125,13 @@ extension BaseButton {
     public func setTitle(text: String? = nil,
                          font: UIFont? = nil,
                          normalColor: UIColor? = nil,
+                         disabledColor: UIColor? = nil,
                          selectedColor: UIColor? = nil) {
         configuration?.title = text
         setFont(font, normalColor)
         self.defaultFont = font
         self.normalTextColor = normalColor
+        self.disabledTextColor = disabledColor
         self.selectedTextColor = selectedColor
     }
     

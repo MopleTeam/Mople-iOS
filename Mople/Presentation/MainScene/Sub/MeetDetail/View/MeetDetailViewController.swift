@@ -38,7 +38,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         let view = MeetDetailThumbnail(thumbnailSize: 56,
                                        thumbnailRadius: 12)
         view.setTitleLabel(font: FontStyle.Title2.semiBold,
-                           color: .gray01)
+                           color: .text01)
         view.setSpacing(12)
         return view
     }()
@@ -55,7 +55,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         stackView.distribution = .fill
         stackView.alignment = .fill
         stackView.spacing = 24
-        stackView.backgroundColor = .defaultWhite
+        stackView.backgroundColor = .bgPrimary
         stackView.layer.makeShadow(opactity: 0.02, radius: 12, offset: .init(width: 0, height: 0))
         stackView.layer.makeCornes(radius: 16, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
         stackView.isLayoutMarginsRelativeArrangement = true

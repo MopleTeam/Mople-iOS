@@ -59,11 +59,11 @@ final class DefaultPhotoService: NSObject, PhotoService, UIAdaptivePresentationC
     private func showAppSettingAlert() {
         
         let defaultAction: DefaultAlertAction = .init(text: L10n.cancle,
-                                                      textColor: .gray01,
+                                                      textColor: .tertiaryText,
                                                       bgColor: .appTertiary)
         
         let appSettingAction: DefaultAlertAction = .init(text: L10n.setup,
-                                                         textColor: .defaultWhite,
+                                                         textColor: .primaryText,
                                                          bgColor: .appPrimary,
                                                          completion: {
             AppSettingOpener.openAppSettings()

@@ -70,7 +70,7 @@ extension UITextView {
     
     func resetTypingAttributes() {
         let defaultAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.gray03,
+            .foregroundColor: UIColor.text02,
             .font: FontStyle.Body1.medium
         ]
         typingAttributes = defaultAttributes
@@ -168,7 +168,7 @@ extension UITextView {
         
         let fullRange = NSRange(location: 0, length: resultText.utf16.count)
         mutableAttributedString.addAttributes([
-            .foregroundColor: UIColor.gray02,
+            .foregroundColor: UIColor.text02,
             .font: FontStyle.Body1.regular
         ], range: fullRange)
         

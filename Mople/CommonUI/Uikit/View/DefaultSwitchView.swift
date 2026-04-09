@@ -22,14 +22,14 @@ final class DefaultSwitchView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.medium
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
     private let subTitle: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         return label
     }()
     

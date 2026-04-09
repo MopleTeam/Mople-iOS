@@ -28,7 +28,7 @@ final class NotifyTableCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.regular
-        label.textColor = .gray02
+        label.textColor = .text01
         label.numberOfLines = 2
         return label
     }()
@@ -36,7 +36,7 @@ final class NotifyTableCell: UITableViewCell {
     private let subTitleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         return label
     }()
     

@@ -18,7 +18,7 @@ final class MeetListTableCell: UITableViewCell {
         view.addMemberCountLabel()
         view.addOwnerMark()
         view.setTitleLabel(font: FontStyle.Title3.semiBold,
-                           color: .gray01)
+                           color: .text01)
         view.setSpacing(12)
         view.isUserInteractionEnabled = false
         return view
@@ -27,7 +27,7 @@ final class MeetListTableCell: UITableViewCell {
     private let scheduleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         label.backgroundColor = .bgInput
         label.clipsToBounds = true
         label.layer.cornerRadius = 10
@@ -41,7 +41,7 @@ final class MeetListTableCell: UITableViewCell {
         sv.spacing = 12
         sv.distribution = .fill
         sv.alignment = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)

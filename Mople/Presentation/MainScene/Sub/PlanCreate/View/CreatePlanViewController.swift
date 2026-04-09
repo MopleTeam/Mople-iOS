@@ -146,7 +146,7 @@ final class CreatePlanViewController: TitleNaviViewController, View, ScrollKeybo
     }
     
     private func setLayout() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainScrollView)
         self.mainScrollView.addSubview(contentView)
         self.contentView.addSubview(mainStackView)

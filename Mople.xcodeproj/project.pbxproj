@@ -4914,7 +4914,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4962,7 +4962,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5009,7 +5009,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5057,7 +5057,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5182,8 +5182,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-swift.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 20.0.0;
 			};
 		};
 		52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
@@ -5192,94 +5192,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.2.0;
-			};
-		};
-		52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.7.1;
-			};
-		};
-		52E95E5F2DF453050036CBCF /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
-		52E95E612DF453050036CBCF /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactorKit/ReactorKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.2.0;
-			};
-		};
-		52E95E632DF453050036CBCF /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.12.0;
-			};
-		};
-		52E95E652DF453050036CBCF /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/WenchaoD/FSCalendar.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.8.4;
-			};
-		};
-		52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
-			};
-		};
-		52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.23.0;
-			};
-		};
-		52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.5.0;
-			};
-		};
-		52E95E712DF453050036CBCF /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davbeck/MultipartForm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
-			};
-		};
-		52E95E732DF453050036CBCF /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		52E95E752DF453050036CBCF /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/navermaps/SPM-NMapsMap";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.20.0;
 			};
 		};
 		52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -5386,91 +5298,92 @@
 		};
 		52E95E5A2DF453050036CBCF /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxCocoa;
 		};
 		52E95E5C2DF453050036CBCF /* RxRelay */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxRelay;
 		};
 		52E95E5D2DF453050036CBCF /* RxSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
 		};
 		52E95E5E2DF453050036CBCF /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5F2DF453050036CBCF /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 52C72EA42C4FBE5900CFF329 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		52E95E602DF453050036CBCF /* ReactorKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E612DF453050036CBCF /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			package = 52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */;
 			productName = ReactorKit;
 		};
 		52E95E622DF453050036CBCF /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E632DF453050036CBCF /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			package = 5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
 		52E95E642DF453050036CBCF /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E652DF453050036CBCF /* XCRemoteSwiftPackageReference "FSCalendar" */;
+			package = 525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
 		};
 		52E95E662DF453050036CBCF /* Differentiator */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			package = 529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = Differentiator;
 		};
 		52E95E682DF453050036CBCF /* RxDataSources */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			package = 529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = RxDataSources;
 		};
 		52E95E692DF453050036CBCF /* KakaoSDKAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKAuth;
 		};
 		52E95E6B2DF453050036CBCF /* KakaoSDKCommon */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKCommon;
 		};
 		52E95E6C2DF453050036CBCF /* KakaoSDKUser */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKUser;
 		};
 		52E95E6D2DF453050036CBCF /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
 		};
 		52E95E6F2DF453050036CBCF /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
 		52E95E702DF453050036CBCF /* MultipartForm */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E712DF453050036CBCF /* XCRemoteSwiftPackageReference "MultipartForm" */;
+			package = 52EA6DFC2CF79D0600EFD753 /* XCRemoteSwiftPackageReference "MultipartForm" */;
 			productName = MultipartForm;
 		};
 		52E95E722DF453050036CBCF /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E732DF453050036CBCF /* XCRemoteSwiftPackageReference "realm-swift" */;
+			package = 52D965182D201756000610B2 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
 		};
 		52E95E742DF453050036CBCF /* NMapsMap */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E752DF453050036CBCF /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
+			package = 529291E22DF45EE2005A9453 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
 			productName = NMapsMap;
 		};
 		52E95E762DF453050036CBCF /* FirebaseAnalyticsWithoutAdIdSupport */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalyticsWithoutAdIdSupport;
 		};
 		52EA6DF52CF75A6600EFD753 /* FirebaseCore */ = {

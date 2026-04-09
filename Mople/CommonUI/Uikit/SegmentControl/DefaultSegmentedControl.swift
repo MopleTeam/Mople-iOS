@@ -75,8 +75,8 @@ final class DefaultSegmentedControl: UIView {
             let button = BaseButton()
             button.setTitle(text: title,
                             font: FontStyle.Body1.semiBold,
-                            normalColor: .gray04,
-                            selectedColor: .defaultWhite)
+                            normalColor: .text03,
+                            selectedColor: .primaryText)
             button.clipsToBounds = true
             button.layer.cornerRadius = 6
             button.layer.zPosition = 2

@@ -81,8 +81,8 @@ struct TransferMeetView: View {
             
             TextField("닉네임을 검색해주세요", text: $viewModel.searchText)
                 .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .gray01))
-                .tint(.gray04)
+                .foregroundColor(Color(uiColor: .text01))
+                .tint(.text03)
                 .focused($isSearchFieldFocused)  // 🔥 포커스 바인딩
                 .submitLabel(.search)  // 🔥 키보드 리턴 버튼을 "검색"으로 변경
                 .onSubmit {
@@ -95,7 +95,7 @@ struct TransferMeetView: View {
                     viewModel.searchText = ""
                 } label: {
                     Image(.whiteClose)
-                        .foregroundColor(Color(uiColor: .gray03))
+                        .foregroundColor(Color(uiColor: .appSecondary))
                 }
             }
         }
@@ -105,7 +105,7 @@ struct TransferMeetView: View {
         .cornerRadius(8)
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
     }
     
     // MARK: - Empty State View
@@ -118,10 +118,10 @@ struct TransferMeetView: View {
             
             Text("검색 결과가 없어요")
                 .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .gray05))
+                .foregroundColor(Color(uiColor: .text04))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
         .onTapGesture {
             // 🔥 빈 화면 탭 시에도 키보드 내리기
             isSearchFieldFocused = false
@@ -138,7 +138,7 @@ struct TransferMeetView: View {
                 )
                 .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
                 .listRowSeparator(.hidden)
-                .listRowBackground(Color(uiColor: .defaultWhite))
+                .listRowBackground(Color(uiColor: .bgPrimary))
                 .onTapGesture {
                     // 🔥 멤버 탭 시 키보드 먼저 내리기
                     isSearchFieldFocused = false
@@ -168,12 +168,12 @@ struct TransferMeetView: View {
                 }
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
-                .listRowBackground(Color(uiColor: .defaultWhite))
+                .listRowBackground(Color(uiColor: .bgPrimary))
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
         .scrollDismissesKeyboard(.immediately)  // 🔥 스크롤 시 키보드 즉시 내리기
     }
     
@@ -193,7 +193,7 @@ struct TransferMeetView: View {
         .disabled(selectedMember == nil)
         .padding(.horizontal, 20)
         .padding(.bottom, isSearchFieldFocused ? 8 : 0)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
     }
 }
 
@@ -223,7 +223,7 @@ struct MemberRowView: View {
             // Name
             Text(member.nickname ?? "")
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(Color(uiColor: .gray01))
+                .foregroundColor(Color(uiColor: .text01))
                 .lineLimit(1)
             
             Spacer()
@@ -233,14 +233,14 @@ struct MemberRowView: View {
                 // Background Circle (선택 시 배경색)
                 if isSelected {
                     Circle()
-                        .fill(Color(uiColor: .defaultBlueGray))
+                        .fill(Color(uiColor: .appBlueGray))
                         .frame(width: 32, height: 32)
                 }
                 
                 // Border
                 Circle()
                     .strokeBorder(
-                        Color(uiColor: isSelected ? .appPrimary : .defaultBlueGray),
+                        Color(uiColor: isSelected ? .appPrimary : .appBlueGray),
                         lineWidth: 2
                     )
                     .frame(width: 32, height: 32)
@@ -257,7 +257,7 @@ struct MemberRowView: View {
             }
         }
         .frame(height: 68)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
     }
 }
 
@@ -281,7 +281,7 @@ struct TransferConfirmationAlert: View {
                 // 상단: 질문 텍스트
                 Text("해당 모임원으로\n모임장을 양도하시겠습니까?")
                     .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                    .foregroundColor(Color(uiColor: .gray01))
+                    .foregroundColor(Color(uiColor: .text01))
                     .multilineTextAlignment(.center)
                 
                 // 중단: 유저 정보
@@ -305,7 +305,7 @@ struct TransferConfirmationAlert: View {
                     // Nickname
                     Text(member.nickname ?? "")
                         .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.body1))
-                        .foregroundColor(Color(uiColor: .gray01))
+                        .foregroundColor(Color(uiColor: .text01))
                         .lineLimit(1)
                 }
                 .padding(.all, 12)
@@ -320,7 +320,7 @@ struct TransferConfirmationAlert: View {
                     } label: {
                         Text("아니요")
                             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                            .foregroundColor(Color(uiColor: .gray01))
+                            .foregroundColor(Color(uiColor: .tertiaryText))
                             .frame(maxWidth: .infinity)
                             .frame(height: 48)
                             .background(Color(uiColor: .appTertiary))
@@ -333,7 +333,7 @@ struct TransferConfirmationAlert: View {
                     } label: {
                         Text("네")
                             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                            .foregroundColor(.white)
+                            .foregroundColor(.secondaryText)
                             .frame(maxWidth: .infinity)
                             .frame(height: 48)
                             .background(Color(uiColor: .appPrimary))
@@ -343,7 +343,7 @@ struct TransferConfirmationAlert: View {
             }
             .padding(.vertical, 24)
             .padding(.horizontal, 16)
-            .background(.defaultWhite)
+            .background(.bgPrimary)
             .cornerRadius(12)
             .padding(.horizontal, 27.5)
         }

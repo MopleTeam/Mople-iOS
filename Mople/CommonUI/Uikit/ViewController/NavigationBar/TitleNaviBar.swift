@@ -30,7 +30,7 @@ final class TitleNaviBar: UIView {
     private let titleLable: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title2.bold
-        label.textColor = .gray01
+        label.textColor = .text01
         label.textAlignment = .center
         return label
     }()

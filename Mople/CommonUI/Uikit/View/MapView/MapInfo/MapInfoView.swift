@@ -19,21 +19,21 @@ final class MapInfoView: UIView {
     private let titleLable: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray02
+        label.textColor = .text01
         return label
     }()
     
     private let distanceLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.semiBold
-        label.textColor = .gray02
+        label.textColor = .text01
         return label
     }()
     
     private let addressLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
         return label
@@ -74,7 +74,7 @@ final class MapInfoView: UIView {
                                  left: 20,
                                  bottom: UIScreen.getSafeBottomHeight(),
                                  right: 20)
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         sv.layer.makeShadow(opactity: 0.1,
                             radius: 8)

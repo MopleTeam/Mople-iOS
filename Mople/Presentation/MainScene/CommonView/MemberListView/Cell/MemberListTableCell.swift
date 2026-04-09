@@ -68,7 +68,7 @@ final class MemberView: UIView {
     public let nameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.medium
-        label.textColor = .gray02
+        label.textColor = .text01
         return label
     }()
     

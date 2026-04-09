@@ -32,7 +32,7 @@ final class SignInViewController: BaseViewController, View {
         let label = UILabel()
         label.text = L10n.appSubTitle
         label.font = FontStyle.Title3.medium
-        label.textColor = .gray03
+        label.textColor = .text02
         label.textAlignment = .center
         return label
     }()
@@ -51,7 +51,7 @@ final class SignInViewController: BaseViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Login.kakao,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .gray01)
+                     normalColor: .text06)
         
         btn.setImage(image: .kakao,
                      imagePlacement: .leading,
@@ -65,12 +65,12 @@ final class SignInViewController: BaseViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Login.apple,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .primaryText)
+                     normalColor: .text06)
         
         btn.setImage(image: .apple,
                      imagePlacement: .leading,
                      contentPadding: 8)
-        btn.setBgColor(normalColor: .appBlack)
+        btn.setBgColor(normalColor: .defaultBlack)
         btn.setRadius(8)
         return btn
     }()
@@ -111,7 +111,7 @@ final class SignInViewController: BaseViewController, View {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainStackView)
         self.titleContainerView.addSubview(titleStackView)
         

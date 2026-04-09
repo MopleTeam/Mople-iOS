@@ -24,7 +24,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     private let indicatorLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray04
+        label.textColor = .text03
         label.layer.zPosition = 2
         return label
     }()
@@ -95,7 +95,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     
     private func setNavi() {
         self.naviBar.setBarItem(type: .left,
-                                image: .backArrow.withTintColor(.defaultWhite))
+                                image: .backArrow.withTintColor(.bgPrimary))
     }
     
     private func setLayout() {
@@ -120,7 +120,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         self.view.backgroundColor = .appBlack.withAlphaComponent(opacity)
         notchView.backgroundColor = .appBlack.withAlphaComponent(opacity)
         naviBar.backgroundColor = .appBlack.withAlphaComponent(opacity)
-        naviBar.setTitleColor(.defaultWhite)
+        naviBar.setTitleColor(.bgPrimary)
     }
     
     private func scrollToSelectedIndex() {

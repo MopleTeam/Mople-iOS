@@ -15,7 +15,7 @@ final class CommentTableHeader: UITableViewHeaderFooterView {
         let view = CountView()
         view.titleText = L10n.comment
         view.setMargin(inset: .init(top: 0, left: 20, bottom: 8, right: 20))
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
 

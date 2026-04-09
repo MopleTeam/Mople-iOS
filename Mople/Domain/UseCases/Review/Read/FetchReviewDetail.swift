@@ -40,8 +40,8 @@ final class MockFetchReviewDetailUseCase: FetchReviewDetail {
     func execute(id: Int, isOldPlan: Bool) -> Observable<Review> {
         print("✅ [Mock] FetchReviewDetail - id: \(id), isOldPlan: \(isOldPlan)")
 
-        var mockReview = Review(images: [ReviewImage(id: 1, path: nil),
-                                         ReviewImage(id: 2, path: nil)],
+        var mockReview = Review(images: [ReviewImage(id: 1, path: "https://harme.s3.ap-northeast-2.amazonaws.com/profile/dbb4032d-5907-4404-971e-6183a7e69242.null"),
+                                         ReviewImage(id: 2, path: "https://harme.s3.ap-northeast-2.amazonaws.com/profile/dbb4032d-5907-4404-971e-6183a7e69242.null")],
                                 isReviewd: true,
                                 description: "Mock 후기 상세 내용입니다.")
         mockReview.id = id

@@ -20,8 +20,8 @@ final class RecentPlanFooterView: UICollectionReusableView {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Home.morePlan,
                      font: FontStyle.Title3.bold,
-                     normalColor: .gray03)
-        btn.setBgColor(normalColor: .defaultWhite)
+                     normalColor: .text02)
+        btn.setBgColor(normalColor: .bgPrimary)
         btn.setRadius(12)
         return btn
     }()

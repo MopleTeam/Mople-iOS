@@ -16,7 +16,7 @@ struct CustomNavigationBar: View {
     var body: some View {
         VStack(spacing: 0) {
             // Status Bar 영역 (notchView)
-            Color(uiColor: .defaultWhite)
+            Color(uiColor: .bgPrimary)
                 .frame(height: UIScreen.getTopNotchSize())
             
             // Navigation Bar (TitleNaviBar 스타일, 56pt 높이)
@@ -25,7 +25,7 @@ struct CustomNavigationBar: View {
                 Button(action: onBackTapped) {
                     Image(uiImage: .backArrow)  // UIKit과 동일한 이미지
                         .renderingMode(.template)
-                        .foregroundColor(Color(uiColor: .gray01))
+                        .foregroundColor(Color(uiColor: .appSecondary))
                 }
                 .frame(width: 40, height: 40)
                 .padding(.leading, 20)  // mainStackView horizontalEdges inset 20
@@ -34,7 +34,7 @@ struct CustomNavigationBar: View {
                 Spacer()
                 Text(title)
                     .font(.custom(FontFamily.Pretendard.bold.name, size: FontStyle.Size.title2))
-                    .foregroundColor(Color(uiColor: .gray01))
+                    .foregroundColor(Color(uiColor: .text01))
                 
                 Spacer()
                 
@@ -44,7 +44,7 @@ struct CustomNavigationBar: View {
                     .padding(.trailing, 20)  // mainStackView horizontalEdges inset 20
             }
             .frame(height: 56)  // TitleNaviBar 높이
-            .background(Color(uiColor: .defaultWhite))
+            .background(Color(uiColor: .bgPrimary))
         }
         .ignoresSafeArea(edges: .top)
     }

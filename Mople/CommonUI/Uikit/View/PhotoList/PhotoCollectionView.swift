@@ -40,7 +40,7 @@ final class PhotoCollectionView: UIView {
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .defaultWhite
+        collectionView.backgroundColor = .bgPrimary
         return collectionView
     }()
     
@@ -82,7 +82,7 @@ final class PhotoCollectionView: UIView {
     }
     
     private func setLayout() {
-        self.backgroundColor = .defaultWhite
+        self.backgroundColor = .bgPrimary
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in

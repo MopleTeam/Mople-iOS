@@ -41,11 +41,7 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private var meetId: Int?
     private var writeMode: WriteMode = .basic
     private var comments: [Comment] = []
-    private var totalCount: Int = 0 {
-        didSet {
-            self.updateCommentCount(totalCount)
-        }
-    }
+    private var totalCount: Int = 0
     
     // MARK: - Observable
     fileprivate let selectedPhoto: PublishSubject<Int> = .init()
@@ -63,7 +59,7 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     // MARK: - UI Components
     private(set) var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
-        table.backgroundColor = .defaultWhite
+        table.backgroundColor = .bgPrimary
         table.sectionFooterHeight = 0
         table.showsVerticalScrollIndicator = false
         table.separatorStyle = .none
@@ -80,7 +76,7 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     
     private let chatingTextFieldView: ChatingTextFieldView = {
         let chatingView = ChatingTextFieldView()
-        chatingView.backgroundColor = .defaultWhite
+        chatingView.backgroundColor = .bgPrimary
         return chatingView
     }()
     
@@ -88,14 +84,14 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private let mentionVC: MentionListViewController
     private let mentionContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         view.layer.makeLine(width: 1)
         view.layer.makeShadow(opactity: 0.1,           // Color의 10%
                               radius: 12,               // Blur 값
                               offset: CGSize(width: 0, height: 2),  // Position X: 0, Y: 2
-                              color: UIColor.defaultBlue)
+                              color: UIColor.black)
         view.layer.cornerRadius = 12
-        view.clipsToBounds = true
+        view.clipsToBounds = false
         return view
     }()
     
@@ -192,6 +188,8 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private func setChildVC() {
         self.add(child: mentionVC,
                  container: mentionContainer)
+        mentionVC.view.layer.cornerRadius = 12
+        mentionVC.view.clipsToBounds = true
     }
     
     // MARK: - Gesture
@@ -438,6 +436,15 @@ extension CommentListViewController {
             }
             .disposed(by: disposeBag)
         
+        // 댓글 추가/삭제 시 총 댓글 수 업데이트
+        reactor.pulse(\.$adjustCommentCount)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, increment in
+                vc.totalCount += increment ? 1 : -1
+            })
+            .disposed(by: disposeBag)
+
         reactor.pulse(\.$reportedComment)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
@@ -492,12 +499,9 @@ extension CommentListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard case .parent = reactor?.type else { return nil }
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: CommentSectionHeader.reuseIdentifier) as! CommentSectionHeader
+        view.updateCount(totalCount)
+        print(#function, #line, "Path : # 헤더 업데이트 ")
         return view
-    }
-    
-    private func updateCommentCount(_ count: Int) {
-        let sectionHeader = tableView.headerView(forSection: 0) as? CommentSectionHeader
-        sectionHeader?.updateCount(count)
     }
 
     // MARK: - ScrollView Deleagte

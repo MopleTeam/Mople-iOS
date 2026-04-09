@@ -42,7 +42,7 @@ final class ProfileSetupView: UIView {
         let btn = BaseButton()
         btn.setTitle(text: L10n.CreateProfile.nameCheck,
                      font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .secondaryText)
         btn.setBgColor(normalColor: .appSecondary,
                        disabledColor: .disableSecondary)
         btn.setRadius(6)
@@ -61,7 +61,8 @@ final class ProfileSetupView: UIView {
     fileprivate let completeButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText,
+                     disabledColor: .disableText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(8)
@@ -118,7 +119,7 @@ final class ProfileSetupView: UIView {
     }
     
     private func setupLayout() {
-        self.backgroundColor = .white
+        self.backgroundColor = .bgPrimary
         self.addSubview(mainStackView)
         self.imageContainerView.addSubview(profileImageView)
         self.imageContainerView.addSubview(profileEditIcon)

@@ -20,7 +20,7 @@ final class EmptyDataViewController: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray01
+        label.textColor = .text01
         label.font = FontStyle.Title2.semiBold
         label.textAlignment = .center
         label.text = "연결 실패"
@@ -29,7 +29,7 @@ final class EmptyDataViewController: UIViewController {
     
     private let subTitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray02
+        label.textColor = .text03
         label.font = FontStyle.Body1.regular
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -41,7 +41,7 @@ final class EmptyDataViewController: UIViewController {
         let btn = BaseButton()
         btn.setTitle(text: "새로고침",
                      font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .bgPrimary)
         btn.setBgColor(normalColor: .appPrimary)
         btn.setRadius(6)
         return btn
@@ -66,7 +66,7 @@ final class EmptyDataViewController: UIViewController {
     }
         
     private func setLayout() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainSV)
         
         mainSV.snp.makeConstraints { make in

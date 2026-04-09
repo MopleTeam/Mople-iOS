@@ -26,7 +26,7 @@ final class NotifyListViewController: TitleNaviViewController, View {
     private let countView: CountView = {
         let view = CountView(title: L10n.Notifylist.new)
         view.setFont(font: FontStyle.Body1.medium,
-                     textColor: .gray04)
+                     textColor: .text03)
         view.setMargin(inset: .init(top: 28, left: 20, bottom: 16, right: 20))
         return view
     }()
@@ -119,7 +119,7 @@ final class NotifyListViewController: TitleNaviViewController, View {
             #warning("언어 지원 필요")
             label.text = "최근 30일 이내 알림 내역만 확인할 수 있어요"
             label.font = FontStyle.Body1.regular
-            label.textColor = .gray04
+            label.textColor = .text03
             label.textAlignment = .center
             tableView.tableFooterView = label
         }

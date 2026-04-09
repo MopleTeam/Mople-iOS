@@ -54,9 +54,9 @@ final class DefaultTextView: UIView {
     // MARK: - UI Components
     public let textView: UITextView = {
         let textView = UITextView()
-        textView.font = FontStyle.Body1.medium
-        textView.textColor = .gray02
-        textView.tintColor = .gray02
+        textView.font = FontStyle.Body1.regular
+        textView.textColor = .text01
+        textView.tintColor = .text02
         textView.isScrollEnabled = false
         textView.backgroundColor = .clear
         textView.textContainerInset = .zero
@@ -68,7 +68,7 @@ final class DefaultTextView: UIView {
     private let placeHolder: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         return label
     }()
     

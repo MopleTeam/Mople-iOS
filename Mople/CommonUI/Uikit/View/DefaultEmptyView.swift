@@ -19,7 +19,7 @@ class DefaultEmptyView: UIView {
     private let label: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
-        label.textColor = .gray06
+        label.textColor = .text04
         label.textAlignment = .center
         label.numberOfLines = 2
         return label
