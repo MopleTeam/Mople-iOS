@@ -73,6 +73,28 @@ Dataview가 체크박스를 자동 집계하므로 수동 갱신은 최소화됨
 - Clean Architecture 레이어 구분 준수 (Domain은 외부 의존성 없이 유지)
 - 신규 코드는 로드맵 방향에 맞춰 작성 (가능하면 async/await, SwiftUI 우선)
 
+## 배포 규칙
+
+### TestFlight 배포 (테스트)
+- 사용자가 "테스트플라이트 올려줘" 요청 시:
+  1. 대화에서 변경사항을 파악해 changelog 초안 작성
+  2. 사용자에게 "이 내용이면 될까?" 확인
+  3. 확인 후 `fastlane beta changelog:"내용"` 실행
+- 실행 전 반드시 `export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8` 설정
+
+### App Store 릴리즈 (출시)
+- 사용자가 "릴리즈 해줘" / "배포해줘" / "앱스토어 올려줘" 요청 시:
+  1. **반드시 먼저 확인**: "업로드만 할까, 심사 제출까지 할까?"
+  2. changelog 초안 작성 → 사용자 확인
+  3. 선택에 따라 실행:
+     - 업로드만: `fastlane deploy_release changelog:"내용"`
+     - 심사 제출까지: `fastlane deploy_release submit:true changelog:"내용"`
+- `deploy_release`가 자동으로 처리하는 것:
+  - develop → release/v{버전} 브랜치 머지
+  - 버전 태그 생성 + push
+  - 빌드 + App Store 업로드
+  - develop 브랜치로 복귀
+
 ## Git 커밋 시 주의사항
 - **`git add -A` 사용 전 반드시 `.gitignore` 확인** — 추적하면 안 되는 파일이 포함되지 않는지 점검
 - **대용량 파일/폴더 경계 대상**:
