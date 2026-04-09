@@ -45,7 +45,7 @@ final class MainTabBarController: UITabBarController, View {
         return view
     }()
 
-    #if DEV
+    #if DEV && DEBUG
     // MARK: - Mock Toggle Button (Dev Only)
     private let mockToggleButton: UIButton = {
         let button = UIButton(type: .system)
@@ -112,7 +112,7 @@ final class MainTabBarController: UITabBarController, View {
             make.top.equalTo(tabBar.snp.top).offset(-1)
         }
 
-        #if DEV
+        #if DEV && DEBUG
         setupMockToggleButton()
         #endif
     }
@@ -241,7 +241,7 @@ extension MainTabBarController {
 }
 
 // MARK: - Mock Toggle (Dev Only)
-#if DEV
+#if DEV && DEBUG
 extension MainTabBarController {
 
     func setupMockToggleButton() {
