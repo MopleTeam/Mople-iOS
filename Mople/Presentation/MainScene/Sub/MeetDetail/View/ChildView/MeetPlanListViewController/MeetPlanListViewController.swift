@@ -261,6 +261,7 @@ extension MeetPlanListViewController {
     /// - Parameter id: 일정 ID
     private func showLeavePlanAlert(id: Int) {
         let createAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                     textColor: .secondaryText,
                                                      bgColor: .appSecondary,
                                                      completion: { [weak self] in
             self?.participation.onNext((id, false))

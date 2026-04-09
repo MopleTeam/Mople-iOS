@@ -310,6 +310,7 @@ extension PostDetailViewController {
     
     private func showLeavePlanAlert() {
         let createAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                     textColor: .secondaryText,
                                                      bgColor: .appSecondary,
                                                      completion: { [weak self] in
             self?.participation.onNext(())

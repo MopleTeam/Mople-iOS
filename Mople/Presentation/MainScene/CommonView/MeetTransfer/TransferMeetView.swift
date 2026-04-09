@@ -332,7 +332,7 @@ struct TransferConfirmationAlert: View {
                     } label: {
                         Text("네")
                             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                            .foregroundColor(.secondaryText)
+                            .foregroundColor(.primaryText)
                             .frame(maxWidth: .infinity)
                             .frame(height: 48)
                             .background(Color(uiColor: .appPrimary))
