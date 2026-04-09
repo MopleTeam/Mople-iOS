@@ -23,7 +23,7 @@ final class PhotoCollectionCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.makeLine(width: 1)
+        imageView.setDynamicBorder(width: 1)
         imageView.layer.cornerRadius = 8
         imageView.isUserInteractionEnabled = true
         return imageView

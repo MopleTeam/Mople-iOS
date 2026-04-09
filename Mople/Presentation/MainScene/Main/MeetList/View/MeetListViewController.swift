@@ -24,7 +24,7 @@ class MeetListViewController: TitleNaviViewController, View {
     // MARK: - UI Components
     private let borderView: UIView = {
         let view = UIView()
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         return view
     }()
     

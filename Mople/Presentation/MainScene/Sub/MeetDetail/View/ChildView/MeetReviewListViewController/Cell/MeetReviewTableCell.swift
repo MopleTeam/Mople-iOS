@@ -48,7 +48,7 @@ final class MeetReviewTableCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
-        imageView.layer.makeLine(width: 1)
+        imageView.setDynamicBorder(width: 1)
         imageView.image = .defaultMeet
         return imageView
     }()
@@ -58,7 +58,7 @@ final class MeetReviewTableCell: UITableViewCell {
         label.font = FontStyle.Body2.semiBold
         label.textColor = .appPrimary
         label.backgroundColor = .appBlueGray
-        label.layer.makeLine(width: 1, color: .bgPrimary)
+        label.setDynamicBorder(width: 1, color: .bgPrimary)
         label.textAlignment = .center
         label.clipsToBounds = true
         label.isHidden = true

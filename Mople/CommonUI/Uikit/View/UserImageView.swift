@@ -67,7 +67,7 @@ extension UserImageView {
     }
     
     public func setLayer() {
-        self.layer.makeLine(width: 1)
+        self.setDynamicBorder(width: 1)
     }
     
     public func resetImage() {

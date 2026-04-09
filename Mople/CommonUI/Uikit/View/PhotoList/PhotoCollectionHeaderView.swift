@@ -19,7 +19,7 @@ final class PhotoCollectionHeaderView: UICollectionReusableView {
         let btn = UIButton()
         btn.setImage(.largePlus, for: .normal)
         btn.backgroundColor = .bgSecondary
-        btn.layer.makeLine(width: 1)
+        btn.setDynamicBorder(width: 1)
         btn.layer.cornerRadius = 8
         return btn
     }()
