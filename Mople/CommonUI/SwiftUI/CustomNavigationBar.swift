@@ -71,6 +71,7 @@ struct LoadingView: View {
 }
 
 // MARK: - Custom Navigation Bar Modifier
+//onBack 클로저 추가: 커스텀 뒤로가기 동작 지원 (coordinator dismiss 등)
 struct CustomNavigationBarModifier: ViewModifier {
     let title: String
     let isLoading: Bool
@@ -79,7 +80,7 @@ struct CustomNavigationBarModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         ZStack {
-            VStack(spacing: 0) {  // spacing: 0 확인
+            VStack(spacing: 0) {
                 CustomNavigationBar(title: title, isLoading: isLoading) {
                     if let onBack {
                         onBack()
@@ -87,7 +88,7 @@ struct CustomNavigationBarModifier: ViewModifier {
                         dismiss()
                     }
                 }
-                
+
                 content
                     .allowsHitTesting(!isLoading)  // 로딩 중 콘텐츠 터치 차단
             }

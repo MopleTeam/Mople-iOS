@@ -11,6 +11,7 @@ protocol TransferMeetFlowCoordination: AnyObject {
     func showTransferMeet(meet: Meet)
     func completeAllTransfers()  // 모든 양도 완료
     func endFlow()  // 플로우 종료 (뒤로가기 등)
+    func endMainFlow()
 }
 
 final class TransferMeetFlowCoordinator: BaseCoordinator, TransferMeetFlowCoordination {
@@ -45,6 +46,15 @@ final class TransferMeetFlowCoordinator: BaseCoordinator, TransferMeetFlowCoordi
         onComplete()
     }
     
+    // MARK: - Delete Account
+  
+    func endMainFlow() {
+        navigationController.dismiss(animated: true) { [weak self] in
+            guard let self else { return }
+            (self.parentCoordinator as? ProfileCoordination)?.endMainFlow()
+        }
+    }
+
     // MARK: - End Flow (MeetDetailSceneCoordinator 참고)
     func endFlow() {
         navigationController.dismiss(animated: true) { [weak self] in

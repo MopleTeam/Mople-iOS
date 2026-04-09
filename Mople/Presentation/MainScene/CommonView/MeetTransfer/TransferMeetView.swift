@@ -38,8 +38,7 @@ struct TransferMeetView: View {
                 .onTapGesture {
                     isSearchFieldFocused = false
                 }
-                
-                // Transfer Button (항상 표시)
+
                 transferButton
             }
             .customNavigationBar(title: "모임 양도하기", isLoading: viewModel.isLoading)
@@ -179,21 +178,21 @@ struct TransferMeetView: View {
     
     // MARK: - Transfer Button
     private var transferButton: some View {
-        Button {
-            showTransferAlert = true
-        } label: {
-            Text("모임 양도")
-                .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color(uiColor: selectedMember != nil ? .appPrimary : .disablePrimary))
-                .cornerRadius(8)
-        }
-        .disabled(selectedMember == nil)
-        .padding(.horizontal, 20)
-        .padding(.bottom, isSearchFieldFocused ? 8 : 0)
-        .background(Color(uiColor: .bgPrimary))
+        Text("모임 양도")
+            .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
+            .foregroundColor(selectedMember == nil ? .disableText : .primaryText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(Color(uiColor: selectedMember != nil ? .appPrimary : .disablePrimary))
+            .cornerRadius(8)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard selectedMember != nil else { return }
+                showTransferAlert = true
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, isSearchFieldFocused ? 8 : 0)
+            .background(Color(uiColor: .bgPrimary))
     }
 }
 

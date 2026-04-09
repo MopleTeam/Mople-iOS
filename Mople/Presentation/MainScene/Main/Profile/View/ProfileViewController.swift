@@ -297,8 +297,9 @@ extension ProfileViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+      
         resignButton.rx.tap
-            .map { Reactor.Action.checkMeetsBeforeDelete }
+            .map { Reactor.Action.checkTransferMeet }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -321,7 +322,8 @@ extension ProfileViewController {
     }
     
     private func setReactorStateBind(_ reactor: Reactor) {
-        reactor.pulse(\.$deleteAccountAlert)
+      
+        reactor.pulse(\.$shouldShowDeleteConfirm)
             .asDriver(onErrorJustReturn: nil)
             .compactMap { $0 }
             .drive(with: self, onNext: { vc, _ in

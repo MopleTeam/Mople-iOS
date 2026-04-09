@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct TransferMeetListView: View {
-    
+
     @StateObject private var viewModel: TransferMeetListViewModel
-    @Environment(\.dismiss) private var dismiss
-    
+    @State private var showDeleteConfirm = false
+
     init(viewModel: TransferMeetListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -39,7 +39,22 @@ struct TransferMeetListView: View {
             // Delete Account Button (하단 고정)
             deleteAccountButton
         }
-        .customNavigationBar(title: "모임 양도", isLoading: viewModel.isLoading)
+      
+        .customNavigationBar(title: "모임 양도", isLoading: viewModel.isLoading, onBack: {
+            viewModel.dismissFlow()
+        })
+      
+        .overlay {
+            if showDeleteConfirm {
+                DeleteAccountConfirmAlert(
+                    onCancel: { showDeleteConfirm = false },
+                    onConfirm: {
+                        showDeleteConfirm = false
+                        viewModel.proceedToDeleteAccount()
+                    }
+                )
+            }
+        }
         .alert("오류", isPresented: $viewModel.showError) {
             Button("확인", role: .cancel) { }
         } message: {
@@ -124,21 +139,22 @@ struct TransferMeetListView: View {
     }
     
     // MARK: - Delete Account Button
+  
     private var deleteAccountButton: some View {
-        Button {
-            viewModel.proceedToDeleteAccount()
-        } label: {
-            Text("탈퇴하기")
-                .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                .foregroundColor(.appSecondary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color(uiColor: .appSecondary))
-                .cornerRadius(8)
-        }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 8)
-        .background(Color(uiColor: .bgPrimary))
+        Text("탈퇴하기")
+            .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
+            .foregroundColor(.primaryText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(Color(uiColor: .appSecondary))
+            .cornerRadius(8)
+            .contentShape(Rectangle())  // 탭 영역 확보
+            .onTapGesture {
+                showDeleteConfirm = true
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 8)
+            .background(Color(uiColor: .bgSecondary))
     }
 }
 
@@ -237,27 +253,89 @@ struct TransferMeetListCell: View {
     
     // MARK: - Transfer Button
     private var transferButton: some View {
-        Button {
-            if !isTransferred {
-                onTransferTap()
+        Text("모임 양도하기")
+            .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.body1))
+            .foregroundColor(Color(uiColor: .text02))
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
+            .background(Color(uiColor: .appTertiary))
+            .cornerRadius(10)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if !isTransferred {
+                    onTransferTap()
+                }
             }
-        } label: {
-            Text("모임 양도하기")
-                .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .text02))
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(Color(uiColor: .appTertiary))
-                .cornerRadius(10)
+    }
+}
+
+// MARK: - 탈퇴 확인 커스텀 알림 (UIKit DefaultAlertViewController 디자인 차용)
+struct DeleteAccountConfirmAlert: View {
+    let onCancel: () -> Void
+    let onConfirm: () -> Void
+
+    var body: some View {
+        ZStack {
+            // 딤 배경 (60% opacity, 탭하면 닫힘)
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+                .onTapGesture { onCancel() }
+
+            // 알림 콘텐츠
+            VStack(spacing: 24) {
+                // 타이틀 + 서브타이틀
+                VStack(spacing: 8) {
+                    Text(L10n.Profile.resignInfo)
+                        .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
+                        .foregroundColor(Color(uiColor: .text01))
+                        .multilineTextAlignment(.center)
+
+                    Text(L10n.Profile.resignSubInfo)
+                        .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
+                        .foregroundColor(Color(uiColor: .text03))
+                        .multilineTextAlignment(.center)
+                }
+
+                // 버튼 (취소 + 탈퇴)
+                HStack(spacing: 8) {
+                    Button { onCancel() } label: {
+                        Text(L10n.no)
+                            .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
+                            .foregroundColor(Color(uiColor: .tertiaryText))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(Color(uiColor: .appTertiary))
+                            .cornerRadius(8)
+                    }
+
+                    Button { onConfirm() } label: {
+                        Text(L10n.Profile.resign)
+                            .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
+                            .foregroundColor(Color(uiColor: .primaryText))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48)
+                            .background(Color(uiColor: .appSecondary))
+                            .cornerRadius(8)
+                    }
+                }
+            }
+            .padding(.vertical, 24)
+            .padding(.horizontal, 16)
+            .background(Color(uiColor: .bgPrimary))
+            .cornerRadius(12)
+            .padding(.horizontal, 27.5)
         }
-        .disabled(isTransferred)
     }
 }
 
 // MARK: - Preview
 #Preview {
-    let mockUseCase = MockFetchMyHostMeetsUseCase()
-    let viewModel = TransferMeetListViewModel(fetchMyHostMeetsUseCase: mockUseCase)
-    
+    let mockFetchUseCase = MockFetchMyHostMeetsUseCase()
+    let mockDeleteUseCase = MockDeleteAccountUseCase()
+    let viewModel = TransferMeetListViewModel(
+        fetchMyHostMeetsUseCase: mockFetchUseCase,
+        deleteAccountUseCase: mockDeleteUseCase
+    )
+
     return TransferMeetListView(viewModel: viewModel)
 }
