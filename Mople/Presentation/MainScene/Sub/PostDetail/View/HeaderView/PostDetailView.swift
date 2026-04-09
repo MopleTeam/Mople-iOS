@@ -26,7 +26,7 @@ final class PostDetailView: UIView {
     fileprivate let mapView: MapView = {
         let view = MapView()
         view.layer.cornerRadius = 8
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         view.backgroundColor = .bgInput
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true

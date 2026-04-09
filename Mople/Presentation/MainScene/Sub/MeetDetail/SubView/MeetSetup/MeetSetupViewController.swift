@@ -29,7 +29,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     private let thumbnailImage: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         view.layer.cornerRadius = 10
         view.clipsToBounds = true
         view.setContentCompressionResistancePriority(.init(999), for: .horizontal)

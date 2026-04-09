@@ -85,7 +85,7 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private let mentionContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .bgPrimary
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         view.layer.makeShadow(opactity: 0.1,           // Color의 10%
                               radius: 12,               // Blur 값
                               offset: CGSize(width: 0, height: 2),  // Position X: 0, Y: 2

@@ -20,7 +20,7 @@ final class NotifyTableCell: UITableViewCell {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         view.layer.cornerRadius = 10
         return view
     }()
