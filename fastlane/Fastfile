@@ -1,9 +1,12 @@
 # Fastfile — Mople iOS 빌드/배포 자동화
 #
 # 사용법:
-#   fastlane beta          → Mople Dev를 TestFlight에 업로드 (테스트 배포)
-#   fastlane release       → Mople을 App Store에 업로드 (출시)
-#   fastlane build_only    → 빌드만 (업로드 X, 빌드 검증용)
+#   fastlane beta                              → Mople Dev를 TestFlight에 업로드 (테스트 배포)
+#   fastlane release                           → Mople을 App Store에 업로드 (출시)
+#   fastlane deploy_release                    → develop → release 머지 + 태그 + App Store 업로드
+#   fastlane deploy_release submit:true        → 위 + 심사 자동 제출
+#   fastlane deploy_release changelog:"내용"   → 릴리즈 노트 포함
+#   fastlane build_only                        → 빌드만 (업로드 X, 빌드 검증용)
 #
 # 필요 조건:
 #   - App Store Connect API Key (p8 파일)
@@ -93,6 +96,7 @@ platform :ios do
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
+      xcargs: "ENABLE_USER_SCRIPT_SANDBOXING=NO",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
@@ -113,6 +117,96 @@ platform :ios do
   end
 
   # ──────────────────────────────────────────
+  # deploy_release: 릴리즈 전체 자동화
+  #   develop → release 머지 → 태그 → App Store 업로드
+  # ──────────────────────────────────────────
+  desc "develop → release 머지 + 태그 + App Store 업로드 (옵션: 심사 제출)"
+  lane :deploy_release do |options|
+    # 프로젝트에서 현재 마케팅 버전 가져오기
+    version = get_version_number(
+      xcodeproj: "Mople.xcodeproj",
+      target: "Mople"
+    )
+    release_branch = "release/v#{version}"
+
+    UI.message("🚀 릴리즈 시작: v#{version}")
+
+    # 1) develop 브랜치 최신화
+    sh("git checkout develop")
+    sh("git pull origin develop")
+
+    # 2) release 브랜치 생성 또는 업데이트
+    #    이미 존재하면 develop을 머지, 없으면 새로 생성
+    begin
+      sh("git checkout #{release_branch}")
+      sh("git merge develop --no-edit")
+      UI.message("기존 #{release_branch} 브랜치에 develop 머지 완료")
+    rescue
+      sh("git checkout -b #{release_branch}")
+      UI.message("#{release_branch} 브랜치 새로 생성")
+    end
+
+    # 3) 태그 생성 (이미 있으면 건너뜀)
+    begin
+      sh("git tag #{version}")
+      UI.message("태그 v#{version} 생성")
+    rescue
+      UI.message("태그 #{version}이 이미 존재합니다. 건너뜁니다.")
+    end
+
+    # 4) release 브랜치 + 태그 push
+    sh("git push origin #{release_branch}")
+    sh("git push origin #{version} || true")
+
+    # 5) 빌드번호 자동 증가
+    increment_build_number(
+      build_number: app_store_build_number(
+        api_key: API_KEY,
+        app_identifier: "com.moim.moimtable"
+      ) + 1
+    )
+
+    # 6) Mople 프로덕션 빌드
+    build_app(
+      project: "Mople.xcodeproj",
+      scheme: "Mople",
+      configuration: "Release",
+      clean: true,
+      export_method: "app-store",
+      cloned_source_packages_path: "SourcePackages",
+      xcargs: "ENABLE_USER_SCRIPT_SANDBOXING=NO",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          "com.moim.moimtable" => "Mople Distribution"
+        }
+      }
+    )
+
+    # 7) App Store 업로드
+    submit = options[:submit] == true || options[:submit] == "true"
+    changelog = options[:changelog] || "버그 수정 및 기능 개선"
+
+    upload_to_app_store(
+      api_key: API_KEY,
+      skip_metadata: !submit,              # 심사 제출 시에만 메타데이터 포함
+      skip_screenshots: true,
+      submit_for_review: submit,            # submit:true 시 심사 자동 제출
+      precheck_include_in_app_purchases: false,
+      release_notes: submit ? { "ko" => changelog } : nil
+    )
+
+    if submit
+      UI.success("App Store 업로드 + 심사 제출 완료! (v#{version})")
+    else
+      UI.success("App Store 업로드 완료! 심사 제출은 App Store Connect에서 수동으로. (v#{version})")
+    end
+
+    # 8) develop으로 복귀
+    sh("git checkout develop")
+  end
+
+  # ──────────────────────────────────────────
   # build_only: 빌드 검증만 (업로드 X)
   # ──────────────────────────────────────────
   desc "빌드만 수행 (업로드 없음, PR 검증용)"
@@ -124,6 +218,7 @@ platform :ios do
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
+      xcargs: "ENABLE_USER_SCRIPT_SANDBOXING=NO",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
