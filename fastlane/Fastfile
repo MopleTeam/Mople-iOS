@@ -72,6 +72,12 @@ platform :ios do
       changelog: options[:changelog] || "버그 수정 및 기능 개선"
     )
 
+    # 4) macOS 알림
+    notification(
+      title: "🚀 TestFlight 업로드 완료",
+      message: "Mople Dev #{get_version_number(xcodeproj: 'Mople.xcodeproj', target: 'Mople')} 업로드 성공!"
+    )
+
     UI.success("TestFlight 업로드 완료! (Mople Dev)")
   end
 
@@ -111,6 +117,11 @@ platform :ios do
       skip_metadata: true,
       skip_screenshots: true,
       precheck_include_in_app_purchases: false
+    )
+
+    notification(
+      title: "🚀 App Store 업로드 완료",
+      message: "Mople #{get_version_number(xcodeproj: 'Mople.xcodeproj', target: 'Mople')} 업로드 성공!"
     )
 
     UI.success("App Store 업로드 완료! (Mople)")
@@ -196,9 +207,12 @@ platform :ios do
       release_notes: submit ? { "ko" => changelog } : nil
     )
 
+    # 8) macOS 알림
     if submit
+      notification(title: "🚀 릴리즈 완료", message: "Mople v#{version} App Store 업로드 + 심사 제출 완료!")
       UI.success("App Store 업로드 + 심사 제출 완료! (v#{version})")
     else
+      notification(title: "🚀 릴리즈 완료", message: "Mople v#{version} App Store 업로드 완료!")
       UI.success("App Store 업로드 완료! 심사 제출은 App Store Connect에서 수동으로. (v#{version})")
     end
 
