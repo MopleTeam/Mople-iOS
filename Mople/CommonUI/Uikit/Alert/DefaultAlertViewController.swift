@@ -20,7 +20,7 @@ final class DefaultAlertViewController: UIViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray01
+        label.textColor = .text01
         label.font = FontStyle.Title2.semiBold
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -29,7 +29,7 @@ final class DefaultAlertViewController: UIViewController {
     
     private lazy var subTitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray02
+        label.textColor = .text02
         label.font = FontStyle.Body1.regular
         label.textAlignment = .center
         label.numberOfLines = 3

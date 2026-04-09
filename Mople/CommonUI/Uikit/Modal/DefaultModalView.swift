@@ -18,7 +18,7 @@ final class DefaultModalView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title2.semiBold
-        label.textColor = .gray02
+        label.textColor = .text01
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
     }()
@@ -33,7 +33,7 @@ final class DefaultModalView: UIView {
         let btn = BaseButton()
         btn.setTitle(text: L10n.complete,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText)
         btn.setBgColor(normalColor: .appPrimary)
         btn.setRadius(8)
         return btn
@@ -77,7 +77,7 @@ final class DefaultModalView: UIView {
     }
     
     private func setLayout() {
-        self.backgroundColor = .defaultWhite
+        self.backgroundColor = .bgPrimary
         self.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in

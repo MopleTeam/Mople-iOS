@@ -54,7 +54,7 @@ final class MockFetchCommentListUseCase: FetchCommentList {
 
         let mockComments: [Comment] = (1...5).map { index in
             var comment = Comment()
-            comment.isMockup = true
+            comment.isMockup = false
             comment.id = index
             comment.postId = postId
             comment.writerId = index

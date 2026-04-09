@@ -16,7 +16,7 @@ struct CustomNavigationBar: View {
     var body: some View {
         VStack(spacing: 0) {
             // Status Bar 영역 (notchView)
-            Color(uiColor: .defaultWhite)
+            Color(uiColor: .bgPrimary)
                 .frame(height: UIScreen.getTopNotchSize())
             
             // Navigation Bar (TitleNaviBar 스타일, 56pt 높이)
@@ -25,7 +25,7 @@ struct CustomNavigationBar: View {
                 Button(action: onBackTapped) {
                     Image(uiImage: .backArrow)  // UIKit과 동일한 이미지
                         .renderingMode(.template)
-                        .foregroundColor(Color(uiColor: .gray01))
+                        .foregroundColor(Color(uiColor: .appSecondary))
                 }
                 .frame(width: 40, height: 40)
                 .padding(.leading, 20)  // mainStackView horizontalEdges inset 20
@@ -33,8 +33,8 @@ struct CustomNavigationBar: View {
                 
                 Spacer()
                 Text(title)
-                    .font(.custom(FontFamily.Pretendard.bold.name, size: FontStyle.Size.title2))
-                    .foregroundColor(Color(uiColor: .gray01))
+                    .font(.custom(FontFamily.Pretendard.bold, size: FontStyle.Size.title2))
+                    .foregroundColor(Color(uiColor: .text01))
                 
                 Spacer()
                 
@@ -44,7 +44,7 @@ struct CustomNavigationBar: View {
                     .padding(.trailing, 20)  // mainStackView horizontalEdges inset 20
             }
             .frame(height: 56)  // TitleNaviBar 높이
-            .background(Color(uiColor: .defaultWhite))
+            .background(Color(uiColor: .bgPrimary))
         }
         .ignoresSafeArea(edges: .top)
     }
@@ -52,15 +52,20 @@ struct CustomNavigationBar: View {
 
 
 // MARK: - Loading View
+/// UIKit DefaultViewController의 indicator와 동일한 스타일
+/// - 딤 배경 없이 인디케이터만 중앙 표시
+/// - .large 사이즈(37pt) 매칭: scaleEffect(1.85)
+/// - 로딩 중 터치 차단은 CustomNavigationBarModifier에서 처리
 struct LoadingView: View {
     var body: some View {
         ZStack {
-            Color.black.opacity(0.3)
+            // 터치 차단용 투명 레이어
+            Color.clear
+                .contentShape(Rectangle())
                 .ignoresSafeArea()
-            
+
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                .scaleEffect(1.5)
+                .scaleEffect(1.85)
         }
     }
 }
@@ -69,21 +74,27 @@ struct LoadingView: View {
 struct CustomNavigationBarModifier: ViewModifier {
     let title: String
     let isLoading: Bool
+    let onBack: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
-    
+
     func body(content: Content) -> some View {
         ZStack {
             VStack(spacing: 0) {  // spacing: 0 확인
                 CustomNavigationBar(title: title, isLoading: isLoading) {
-                    dismiss()
+                    if let onBack {
+                        onBack()
+                    } else {
+                        dismiss()
+                    }
                 }
                 
-                content  // ← 여기에 List가 들어옴
+                content
+                    .allowsHitTesting(!isLoading)  // 로딩 중 콘텐츠 터치 차단
             }
             .navigationBarHidden(true)
-            .ignoresSafeArea(edges: .top)  // 🔥 modifier 레벨에서 ignoresSafeArea
-            
-            // 로딩 오버레이 (전체 화면을 덮음)
+            .ignoresSafeArea(edges: .top)
+
+            // 로딩 인디케이터 (UIKit DefaultViewController와 동일 스타일)
             if isLoading {
                 LoadingView()
             }
@@ -94,8 +105,8 @@ struct CustomNavigationBarModifier: ViewModifier {
 
 
 extension View {
-    func customNavigationBar(title: String, isLoading: Bool = false) -> some View {
-        modifier(CustomNavigationBarModifier(title: title, isLoading: isLoading))
+    func customNavigationBar(title: String, isLoading: Bool = false, onBack: (() -> Void)? = nil) -> some View {
+        modifier(CustomNavigationBarModifier(title: title, isLoading: isLoading, onBack: onBack))
     }
 }
 // MARK: - Preview

@@ -73,6 +73,14 @@ Dataview가 체크박스를 자동 집계하므로 수동 갱신은 최소화됨
 - Clean Architecture 레이어 구분 준수 (Domain은 외부 의존성 없이 유지)
 - 신규 코드는 로드맵 방향에 맞춰 작성 (가능하면 async/await, SwiftUI 우선)
 
+## Git 커밋 시 주의사항
+- **`git add -A` 사용 전 반드시 `.gitignore` 확인** — 추적하면 안 되는 파일이 포함되지 않는지 점검
+- **대용량 파일/폴더 경계 대상**:
+  - `.spm-packages/` — SPM 캐시 (firebase 226MB, realm 136MB 등 100MB 초과 파일 포함)
+  - `DerivedData/`, `build/`, `Pods/`
+- GitHub 파일 크기 제한: **100MB** (초과 시 push 거부)
+- 새로운 폴더가 staged에 처음 등장하면 `.gitignore` 대상인지 반드시 확인할 것
+
 ## 옵시디언 정리 규칙
 - "정리해줘" 요청 시 대화 내용을 옵시디언에 마크다운으로 정리
 - 저장 경로: `/Users/test/Desktop/Task/Develop/Swift/`

@@ -32,7 +32,7 @@ final class MapView: UIView {
     
     private let addPlaceLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .gray05
+        label.textColor = .text04
         label.font = FontStyle.Body1.medium
         label.text = "장소를 추가해주세요"
         

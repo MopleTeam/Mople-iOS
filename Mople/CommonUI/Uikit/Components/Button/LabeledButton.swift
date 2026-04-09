@@ -21,7 +21,7 @@ final class LabeledButton: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray01
+        label.textColor = .text01
         label.setContentHuggingPriority(.required, for: .horizontal)
         return label
     }()
@@ -29,7 +29,7 @@ final class LabeledButton: UIView {
     private lazy var optionLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         label.text = "(선택)"
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
@@ -107,13 +107,13 @@ extension LabeledButton {
     fileprivate func setText(_ text: String?) {
         button.setTitle(text: text,
                         font: FontStyle.Body1.regular,
-                        normalColor: .gray05)
+                        normalColor: .text04)
     }
     
     fileprivate func setSelectedTextText(_ text: String?) {
         button.setTitle(text: text,
                         font: FontStyle.Body1.regular,
-                        normalColor: .gray02)
+                        normalColor: .text01)
     }
     
     private func setIconImage(_ image: UIImage?) {

@@ -15,7 +15,7 @@ final class MeetSelectTableCell: UITableViewCell {
         let view = ThumbnailView(thumbnailSize: 28,
                                       thumbnailRadius: 6)
         view.setTitleLabel(font: FontStyle.Body1.medium,
-                           color: .gray02)
+                           color: .text01)
         view.setSpacing(8)
         return view
     }()
@@ -33,12 +33,12 @@ final class MeetSelectTableCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.contentView.backgroundColor = highlighted ? .bgInput : .defaultWhite
+        self.contentView.backgroundColor = highlighted ? .bgInput : .bgPrimary
     }
 
     // MARK: - UI Setup
     private func setupUI() {
-        self.backgroundColor = .defaultWhite
+        self.backgroundColor = .bgPrimary
         self.contentView.addSubview(thumbnailView)
         
         thumbnailView.snp.makeConstraints { make in

@@ -39,7 +39,7 @@ class ThumbnailView: UIView {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,
-                       color: .gray04)
+                       color: .text03)
         label.setSpacing(4)
         return label
     }()

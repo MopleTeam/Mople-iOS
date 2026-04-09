@@ -21,10 +21,10 @@ struct TransferMeetListView: View {
             // 안내 문구
             Text("모임장을 양도하지 않고\n탈퇴하면 모임이 사라져요")
                 .font(.custom(FontFamily.Pretendard.bold, size: FontStyle.Size.heading))
-                .foregroundColor(Color(uiColor: .gray01))
+                .foregroundColor(Color(uiColor: .text01))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(20)
-                .background(Color(uiColor: .defaultWhite))
+                .background(Color(uiColor: .bgPrimary))
             
             // Meet List
             ZStack {
@@ -57,7 +57,7 @@ struct TransferMeetListView: View {
             
             Text("양도할 모임이 없어요")
                 .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .gray03))
+                .foregroundColor(Color(uiColor: .text02))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(uiColor: .bgSecondary))
@@ -70,13 +70,13 @@ struct TransferMeetListView: View {
             HStack {
                 Text("양도 가능한 모임")
                     .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
-                    .foregroundColor(Color(uiColor: .gray04))
+                    .foregroundColor(Color(uiColor: .text03))
                 
                 Spacer()
                 
                 Text("\(viewModel.transferableMeets.count)개")
                     .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
-                    .foregroundColor(Color(uiColor: .gray04))
+                    .foregroundColor(Color(uiColor: .text03))
             }
             .padding(.horizontal, 20)
             .padding(.top, 28)
@@ -130,7 +130,7 @@ struct TransferMeetListView: View {
         } label: {
             Text("탈퇴하기")
                 .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                .foregroundColor(.white)
+                .foregroundColor(.appSecondary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background(Color(uiColor: .appSecondary))
@@ -138,7 +138,7 @@ struct TransferMeetListView: View {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
     }
 }
 
@@ -174,7 +174,7 @@ struct TransferMeetListCell: View {
                         // 모임 이름
                         Text(meet.meetSummary?.name ?? "")
                             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                            .foregroundColor(Color(uiColor: .gray01))
+                            .foregroundColor(Color(uiColor: .text01))
                             .lineLimit(1)
                         
                         Image(.owner)
@@ -188,11 +188,11 @@ struct TransferMeetListCell: View {
                         Image("member")
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(Color(uiColor: .gray04))
+                            .foregroundColor(Color(uiColor: .text03))
                         
                         Text("\(meet.memberCount ?? 0)명")
                             .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body2))
-                            .foregroundColor(Color(uiColor: .gray04))
+                            .foregroundColor(Color(uiColor: .text03))
                     }
                 }
                 
@@ -201,7 +201,7 @@ struct TransferMeetListCell: View {
             transferButton
         }
         .padding(16)
-        .background(Color(uiColor: .defaultWhite))
+        .background(Color(uiColor: .bgPrimary))
         .cornerRadius(12)
     }
     
@@ -209,7 +209,7 @@ struct TransferMeetListCell: View {
     private var scheduleLabel: some View {
         Text(scheduleText)
             .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
-            .foregroundColor(Color(uiColor: .gray04))
+            .foregroundColor(Color(uiColor: .text03))
             .frame(height: 44)
             .frame(maxWidth: .infinity)
             .background(Color(uiColor: .bgInput))
@@ -244,7 +244,7 @@ struct TransferMeetListCell: View {
         } label: {
             Text("모임 양도하기")
                 .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .gray03))
+                .foregroundColor(Color(uiColor: .text02))
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
                 .background(Color(uiColor: .appTertiary))

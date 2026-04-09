@@ -18,21 +18,21 @@ final class PostInfoView: UIView {
                                  thumbnailRadius: 6)
         view.setSpacing(8)
         view.setTitleLabel(font: FontStyle.Body2.semiBold,
-                           color: .gray04)
+                           color: .text03)
         return view
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Heading.bold
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray03
+        label.textColor = .text02
         label.numberOfLines = 3
         return label
     }()
@@ -103,7 +103,7 @@ final class PostInfoView: UIView {
         sv.alignment = .fill
         sv.spacing = 20
         sv.isUserInteractionEnabled = true
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         return sv
     }()
     
@@ -168,7 +168,7 @@ final class PostInfoView: UIView {
     
     private func setInfoLabel() {
         [countInfoLabel, dateInfoLabel, placeInfoLabel].forEach {
-            $0.setTitle(font: FontStyle.Body1.medium, color: .gray03)
+            $0.setTitle(font: FontStyle.Body1.medium, color: .text02)
             $0.setSpacing(4)
         }
     }

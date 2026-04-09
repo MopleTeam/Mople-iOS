@@ -32,7 +32,7 @@ class DefaultViewController: BaseViewController {
     }
     
     private func setupUI() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(indicator)
         
         indicator.snp.makeConstraints { make in

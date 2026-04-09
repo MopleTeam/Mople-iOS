@@ -36,7 +36,7 @@ class SearchNaviViewController: DefaultViewController {
     }
     
     private func setupUI() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(searchBar)
 
         searchBar.snp.makeConstraints { make in

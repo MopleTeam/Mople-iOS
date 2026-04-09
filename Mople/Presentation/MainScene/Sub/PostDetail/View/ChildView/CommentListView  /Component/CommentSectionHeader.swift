@@ -15,7 +15,7 @@ final class CommentSectionHeader: UITableViewHeaderFooterView {
         let view = CountView()
         view.titleText = L10n.comment
         view.countText = L10n.itemCount(0)
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -32,7 +32,7 @@ final class CommentSectionHeader: UITableViewHeaderFooterView {
     // MARK: - Setup UI
     private func setupUI() {
         self.contentView.addSubview(countView)
-        self.contentView.backgroundColor = .defaultWhite
+        self.contentView.backgroundColor = .bgPrimary
         
         countView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(28)

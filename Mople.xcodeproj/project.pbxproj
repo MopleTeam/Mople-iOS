@@ -90,6 +90,10 @@
 		522958442D5207C300AE4EC3 /* MemberListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958432D5207C300AE4EC3 /* MemberListViewController.swift */; };
 		522958462D5207CE00AE4EC3 /* MemberListViewReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */; };
 		522958492D52080900AE4EC3 /* MemberListTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522958482D52080900AE4EC3 /* MemberListTableCell.swift */; };
+		522C4C9C2F875691008B67C8 /* ThemeSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */; };
+		522C4C9D2F875691008B67C8 /* ThemeSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */; };
+		522C4C9F2F875DE8008B67C8 /* DismissableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */; };
+		522C4CA02F875DE8008B67C8 /* DismissableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */; };
 		5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6802D41508A0028AF62 /* TransformKeyboardResponsive.swift */; };
 		5231B6832D4150C50028AF62 /* ScrollKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6822D4150C50028AF62 /* ScrollKeyboardResponsive.swift */; };
 		5231DF342D2F2A1E00D52529 /* DefaultAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertViewController.swift */; };
@@ -935,6 +939,8 @@
 		522958432D5207C300AE4EC3 /* MemberListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListViewController.swift; sourceTree = "<group>"; };
 		522958452D5207CE00AE4EC3 /* MemberListViewReactor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListViewReactor.swift; sourceTree = "<group>"; };
 		522958482D52080900AE4EC3 /* MemberListTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberListTableCell.swift; sourceTree = "<group>"; };
+		522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSettingView.swift; sourceTree = "<group>"; };
+		522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissableHostingController.swift; sourceTree = "<group>"; };
 		5231B6802D41508A0028AF62 /* TransformKeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformKeyboardResponsive.swift; sourceTree = "<group>"; };
 		5231B6822D4150C50028AF62 /* ScrollKeyboardResponsive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollKeyboardResponsive.swift; sourceTree = "<group>"; };
 		5231DF332D2F2A1E00D52529 /* DefaultAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAlertViewController.swift; sourceTree = "<group>"; };
@@ -1475,6 +1481,7 @@
 			isa = PBXGroup;
 			children = (
 				5209D9942F4AC244007757D4 /* CustomNavigationBar.swift */,
+				522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -1733,6 +1740,14 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
+		522C4C9B2F875691008B67C8 /* ThemeSettingView */ = {
+			isa = PBXGroup;
+			children = (
+				522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */,
+			);
+			path = ThemeSettingView;
+			sourceTree = "<group>";
+		};
 		5231B67F2D41506B0028AF62 /* KeyboardResponsive */ = {
 			isa = PBXGroup;
 			children = (
@@ -1894,7 +1909,6 @@
 		5235B7132D2E672D006BEAF3 /* SubView */ = {
 			isa = PBXGroup;
 			children = (
-				5209D9862F4AB97E007757D4 /* MeetTransfer */,
 				5209D9852F4AB972007757D4 /* MeetSetup */,
 			);
 			path = SubView;
@@ -2189,6 +2203,7 @@
 		527DBE2D2CE89360008BB20E /* CommonView */ = {
 			isa = PBXGroup;
 			children = (
+				5209D9862F4AB97E007757D4 /* MeetTransfer */,
 				52CAC2D32E41EEDF00366129 /* MentionListView */,
 				523E76252D5EA41B00BD22CB /* PhotoView */,
 				522958422D5207B300AE4EC3 /* MemberListView */,
@@ -3055,6 +3070,7 @@
 				520C9E642CE5DF3A00778558 /* ProfileEditView */,
 				525DFCFC2CCA136400835312 /* PolicyView */,
 				525DFCFB2CCA135500835312 /* NotifyView */,
+				522C4C9B2F875691008B67C8 /* ThemeSettingView */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -4042,6 +4058,7 @@
 				5211F9032C86E41900403980 /* RecentPlanViewController.swift in Sources */,
 				526F45012C96000100C347C7 /* UIView+BounceAnimate.swift in Sources */,
 				52E0E8082D30B95D002213FF /* NotificationService.swift in Sources */,
+				522C4CA02F875DE8008B67C8 /* DismissableHostingController.swift in Sources */,
 				52D864322D27E5F3000F8378 /* MapInfoView.swift in Sources */,
 				524E33DB2C80C1F4004B15FC /* ErrorResponse.swift in Sources */,
 				52C857BD2D086C9200765FB3 /* Location.swift in Sources */,
@@ -4265,6 +4282,7 @@
 				5259B00D2C9FD316006B2711 /* PostListViewController.swift in Sources */,
 				5259B0142C9FF32F006B2711 /* ThumbnailView.swift in Sources */,
 				52ED23AB2DB791E400D6F474 /* ResetNotifyCount.swift in Sources */,
+				522C4C9C2F875691008B67C8 /* ThemeSettingView.swift in Sources */,
 				52818C602D181CBB0001E30B /* SearchNaviBar.swift in Sources */,
 				52473D6C2CEF5D60009D045A /* DefaultPickerView.swift in Sources */,
 				52D864652D2A2994000F8378 /* SignUpRequest.swift in Sources */,
@@ -4426,6 +4444,7 @@
 				52E95EAC2DF453050036CBCF /* RecentPlanViewController.swift in Sources */,
 				52E95EAD2DF453050036CBCF /* UIView+BounceAnimate.swift in Sources */,
 				52E95EAE2DF453050036CBCF /* NotificationService.swift in Sources */,
+				522C4C9F2F875DE8008B67C8 /* DismissableHostingController.swift in Sources */,
 				52E95EAF2DF453050036CBCF /* MapInfoView.swift in Sources */,
 				52E95EB02DF453050036CBCF /* ErrorResponse.swift in Sources */,
 				52E95EB12DF453050036CBCF /* Location.swift in Sources */,
@@ -4649,6 +4668,7 @@
 				52E95F762DF453050036CBCF /* PostListViewController.swift in Sources */,
 				52E95F772DF453050036CBCF /* ThumbnailView.swift in Sources */,
 				52E95F782DF453050036CBCF /* ResetNotifyCount.swift in Sources */,
+				522C4C9D2F875691008B67C8 /* ThemeSettingView.swift in Sources */,
 				52E95F792DF453050036CBCF /* SearchNaviBar.swift in Sources */,
 				52E95F7A2DF453050036CBCF /* DefaultPickerView.swift in Sources */,
 				52E95F7B2DF453050036CBCF /* SignUpRequest.swift in Sources */,
@@ -4913,8 +4933,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4961,8 +4980,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5009,7 +5027,6 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5057,7 +5074,6 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5182,8 +5198,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-swift.git";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 20.0.0;
 			};
 		};
 		52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
@@ -5192,94 +5208,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.2.0;
-			};
-		};
-		52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.7.1;
-			};
-		};
-		52E95E5F2DF453050036CBCF /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
-		52E95E612DF453050036CBCF /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactorKit/ReactorKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.2.0;
-			};
-		};
-		52E95E632DF453050036CBCF /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.12.0;
-			};
-		};
-		52E95E652DF453050036CBCF /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/WenchaoD/FSCalendar.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.8.4;
-			};
-		};
-		52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
-			};
-		};
-		52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.23.0;
-			};
-		};
-		52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.5.0;
-			};
-		};
-		52E95E712DF453050036CBCF /* XCRemoteSwiftPackageReference "MultipartForm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/davbeck/MultipartForm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
-			};
-		};
-		52E95E732DF453050036CBCF /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		52E95E752DF453050036CBCF /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/navermaps/SPM-NMapsMap";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.20.0;
 			};
 		};
 		52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -5386,91 +5314,92 @@
 		};
 		52E95E5A2DF453050036CBCF /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxCocoa;
 		};
 		52E95E5C2DF453050036CBCF /* RxRelay */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxRelay;
 		};
 		52E95E5D2DF453050036CBCF /* RxSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5B2DF453050036CBCF /* XCRemoteSwiftPackageReference "RxSwift" */;
+			package = 52C72E9D2C4FBE4100CFF329 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
 		};
 		52E95E5E2DF453050036CBCF /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E5F2DF453050036CBCF /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = 52C72EA42C4FBE5900CFF329 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		52E95E602DF453050036CBCF /* ReactorKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E612DF453050036CBCF /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			package = 52E238382C765A2D0066C9A3 /* XCRemoteSwiftPackageReference "ReactorKit" */;
 			productName = ReactorKit;
 		};
 		52E95E622DF453050036CBCF /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E632DF453050036CBCF /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			package = 5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
 		52E95E642DF453050036CBCF /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E652DF453050036CBCF /* XCRemoteSwiftPackageReference "FSCalendar" */;
+			package = 525AA90A2C915C6D0087913F /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
 		};
 		52E95E662DF453050036CBCF /* Differentiator */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			package = 529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = Differentiator;
 		};
 		52E95E682DF453050036CBCF /* RxDataSources */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E672DF453050036CBCF /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			package = 529A26082C96AE3E009F4CFA /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = RxDataSources;
 		};
 		52E95E692DF453050036CBCF /* KakaoSDKAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKAuth;
 		};
 		52E95E6B2DF453050036CBCF /* KakaoSDKCommon */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKCommon;
 		};
 		52E95E6C2DF453050036CBCF /* KakaoSDKUser */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6A2DF453050036CBCF /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			package = 525DFD012CCB640000835312 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKUser;
 		};
 		52E95E6D2DF453050036CBCF /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
 		};
 		52E95E6F2DF453050036CBCF /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E6E2DF453050036CBCF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
 		52E95E702DF453050036CBCF /* MultipartForm */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E712DF453050036CBCF /* XCRemoteSwiftPackageReference "MultipartForm" */;
+			package = 52EA6DFC2CF79D0600EFD753 /* XCRemoteSwiftPackageReference "MultipartForm" */;
 			productName = MultipartForm;
 		};
 		52E95E722DF453050036CBCF /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E732DF453050036CBCF /* XCRemoteSwiftPackageReference "realm-swift" */;
+			package = 52D965182D201756000610B2 /* XCRemoteSwiftPackageReference "realm-swift" */;
 			productName = RealmSwift;
 		};
 		52E95E742DF453050036CBCF /* NMapsMap */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 52E95E752DF453050036CBCF /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
+			package = 529291E22DF45EE2005A9453 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
 			productName = NMapsMap;
 		};
 		52E95E762DF453050036CBCF /* FirebaseAnalyticsWithoutAdIdSupport */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 52EA6DF42CF75A6600EFD753 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalyticsWithoutAdIdSupport;
 		};
 		52EA6DF52CF75A6600EFD753 /* FirebaseCore */ = {

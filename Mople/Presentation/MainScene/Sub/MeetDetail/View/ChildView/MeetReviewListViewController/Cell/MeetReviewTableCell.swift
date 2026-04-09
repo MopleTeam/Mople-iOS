@@ -14,7 +14,7 @@ final class MeetReviewTableCell: UITableViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
     }()
@@ -29,14 +29,14 @@ final class MeetReviewTableCell: UITableViewCell {
         let label = IconLabel(icon: .circlePan,
                               iconSize: .init(width: 20, height: 22))
         label.setTitle(font: FontStyle.Title3.semiBold,
-                       color: .gray01)
+                       color: .text01)
         label.setSpacing(4)
         return label
     }()
 
     private let countInfoLabel: IconLabel = {
         let label = IconLabel(icon: .member, iconSize: .init(width: 20, height: 20))
-        label.setTitle(font: FontStyle.Body2.medium, color: .gray04)
+        label.setTitle(font: FontStyle.Body2.medium, color: .text03)
         label.setSpacing(4)
         return label
     }()
@@ -57,7 +57,7 @@ final class MeetReviewTableCell: UITableViewCell {
         let label = UILabel()
         label.font = FontStyle.Body2.semiBold
         label.textColor = .appPrimary
-        label.backgroundColor = .defaultBlueGray
+        label.backgroundColor = .appBlueGray
         label.layer.makeLine(width: 1, color: .bgPrimary)
         label.textAlignment = .center
         label.clipsToBounds = true
@@ -99,7 +99,7 @@ final class MeetReviewTableCell: UITableViewCell {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)

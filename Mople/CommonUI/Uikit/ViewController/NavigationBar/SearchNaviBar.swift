@@ -37,7 +37,7 @@ final class SearchNaviBar: UIView {
         let btn = BaseButton()
         btn.setTitle(text: L10n.search,
                      font: FontStyle.Body2.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(4)

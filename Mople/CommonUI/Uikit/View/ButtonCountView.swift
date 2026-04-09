@@ -24,7 +24,7 @@ final class ButtonCountView: UIView {
     fileprivate let countLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         return label
     }()
     

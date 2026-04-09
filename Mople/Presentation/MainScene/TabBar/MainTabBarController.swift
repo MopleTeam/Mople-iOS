@@ -99,7 +99,7 @@ final class MainTabBarController: UITabBarController, View {
     // MARK: - Setup UI
     private func setupUI() {
         self.view.addSubview(indicator)
-        self.tabBar.backgroundColor = .defaultWhite
+        self.tabBar.backgroundColor = .bgPrimary
         self.tabBar.addSubview(borderView)
 
         indicator.snp.makeConstraints { make in

@@ -30,14 +30,14 @@ final class SearchPlaceTableCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.medium
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
     private let addressLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.regular
-        label.textColor = .gray05
+        label.textColor = .text04
         label.numberOfLines = 2
         return label
     }()
@@ -93,7 +93,7 @@ final class SearchPlaceTableCell: UITableViewCell {
     // MARK: - Highlight
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         super.setHighlighted(highlighted, animated: animated)
-        self.contentView.backgroundColor = highlighted ? .bgSecondary : .defaultWhite
+        self.contentView.backgroundColor = highlighted ? .bgSecondary : .bgPrimary
     }
 
     // MARK: - UI Setup

@@ -32,7 +32,7 @@ final class MeetPlanListViewController: BaseViewController, View {
     private let countView: CountView = {
         let view = CountView(title: L10n.Meetdetail.planlist)
         view.setFont(font: FontStyle.Body1.medium,
-                     textColor: .gray04)
+                     textColor: .text03)
         view.setMargin(inset: .init(top: 0, left: 20, bottom: 16, right: 20))
         view.frame.size.height = 64
         return view
@@ -268,7 +268,7 @@ extension MeetPlanListViewController {
         
         alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
                                       defaultAction: .init(text: L10n.cancle,
-                                                           textColor: .gray01,
+                                                           textColor: .tertiaryText,
                                                            bgColor: .appTertiary),
                                       addAction: [createAction])
     }

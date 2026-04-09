@@ -39,7 +39,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
     private let meetNameButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: .gray01)
+                     normalColor: .text01)
         btn.setLayoutMargins(inset: .zero)
         btn.isEnabled = false
         return btn
@@ -65,10 +65,10 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.memberList,
                      font: FontStyle.Title3.medium,
-                     normalColor: .gray01)
+                     normalColor: .text01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
-        btn.setBgColor(normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .bgPrimary)
         btn.setLayoutMargins(inset: .init(top: 0, leading: 20, bottom: 0, trailing: 20))
         return btn
     }()
@@ -77,7 +77,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let label = IconLabel(icon: .listArrow,
                               iconSize: .init(width: 24, height: 24))
         label.setTitle(font: FontStyle.Title3.medium,
-                       color: .gray06)
+                       color: .text04)
         label.setSpacing(4)
         label.rightIconAligment()
         label.isUserInteractionEnabled = false
@@ -88,10 +88,10 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: "모임 양도하기",
                      font: FontStyle.Title3.medium,
-                     normalColor: .gray01)
+                     normalColor: .text01)
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
-        btn.setBgColor(normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .bgPrimary)
         btn.setLayoutMargins(inset: .init(top: 0, leading: 20, bottom: 0, trailing: 20))
         btn.isHidden = true  // 기본적으로 숨김 (호스트일 때만 표시)
         return btn
@@ -101,7 +101,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setButtonAlignment(.left)
         btn.setLayoutMargins(inset: .zero)
-        btn.setBgColor(normalColor: .defaultWhite)
+        btn.setBgColor(normalColor: .bgPrimary)
         btn.setLayoutMargins(inset: .init(top: 0, leading: 20, bottom: 0, trailing: 20))
         return btn
     }()
@@ -121,7 +121,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         sv.spacing = 24
         sv.alignment = .leading
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 20, left: 20, bottom: 20, right: 20)
         return sv
@@ -132,8 +132,8 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill
+//        sv.backgroundColor = .bgSecondary
 //        sv.isLayoutMarginsRelativeArrangement = true
-//        sv.backgroundColor = .defaultWhite
 //        sv.layoutMargins = .init(top: 8, left: 0, bottom: 8, right: 0)
         return sv
     }()
@@ -144,7 +144,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
         sv.spacing  = 8
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .bgPrimary
+        sv.backgroundColor = .bgSecondary
         return sv
     }()
     
@@ -222,7 +222,7 @@ final class MeetSetupViewController: TitleNaviViewController, View {
                               font: FontStyle.Title3.medium,
                               normalColor: isHost
                               ? .appRed
-                              : .gray01)
+                              : .text01)
     }
     
     private func setNameButtonImage() {

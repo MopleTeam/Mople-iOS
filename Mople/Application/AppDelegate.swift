@@ -35,8 +35,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = navigationController
         appFlowCoordinator?.start()
         
+        // 저장된 테마 설정 복원
+        let savedTheme = UserDefaults.standard.integer(forKey: "appThemeMode")
+        window?.overrideUserInterfaceStyle = (ThemeMode(rawValue: savedTheme) ?? .system).userInterfaceStyle
+
         self.window?.makeKeyAndVisible()
-        
+
         return true
     }
     

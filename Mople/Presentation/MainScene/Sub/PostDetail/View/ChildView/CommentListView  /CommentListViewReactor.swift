@@ -50,13 +50,15 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
     
     enum Mutation {
         case updateComment([Comment])
+        case adjustCommentCount(increment: Bool)
         case reportedComment
         case updateLoadingState(Bool)
         case catchError(Error)
     }
-    
+
     struct State {
         @Pulse var comments: [Comment] = []
+        @Pulse var adjustCommentCount: Bool?
         @Pulse var reportedComment: Void?
         @Pulse var loadState: (isLoad: Bool, mode: LoadMode) = (false, .none)
         @Pulse var error: Error?
@@ -203,6 +205,8 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case let .updateComment(comments):
             newState.comments = comments
+        case let .adjustCommentCount(increment):
+            newState.adjustCommentCount = increment
         case .reportedComment:
             newState.reportedComment = ()
         case let .updateLoadingState(isLoad):
@@ -249,11 +253,14 @@ extension CommentListViewReactor {
                 return newComment
             })
             .map { self.updateLoadingComment(loadingCase: .replace($0)) }
-        
+            .flatMap { replaceMutation -> Observable<Mutation> in
+                return .of(.adjustCommentCount(increment: true), replaceMutation)
+            }
+
         return .just(addMock)
             .concat(createComment)
     }
-    
+
     // MARK: - 대댓글
     private func fetchReplyPage(postId: Int,
                                 parentComment: Comment,
@@ -357,13 +364,16 @@ extension CommentListViewReactor {
         let task = deleteCommentUseCase
             .execute(commentId: id)
             .observe(on: MainScheduler.instance)
-            .map { self.updateCommentList(editCase: .delete(id: id)) }
+            .flatMap { _ -> Observable<Mutation> in
+                let deleteUpdate = self.updateCommentList(editCase: .delete(id: id))
+                return .of(.adjustCommentCount(increment: false), deleteUpdate)
+            }
         return requestWithLoading(task: task)
     }
-    
+
     private func deletedComment(id: Int) -> Observable<Mutation> {
         let updateComment = self.updateCommentList(editCase: .delete(id: id))
-        return .just(updateComment)
+        return .of(.adjustCommentCount(increment: false), updateComment)
     }
     
     // MARK: - 댓글 좋아요

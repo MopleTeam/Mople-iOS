@@ -34,14 +34,14 @@ class TitleNaviViewController: DefaultViewController {
     // MARK: - UI Components
     public let notchView: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         view.layer.zPosition = 2
         return view
     }()
     
     public var naviBar: TitleNaviBar = {
         let navi = TitleNaviBar()
-        navi.backgroundColor = .defaultWhite
+        navi.backgroundColor = .bgPrimary
         navi.layer.zPosition = 1
         return navi
     }()
@@ -71,7 +71,7 @@ class TitleNaviViewController: DefaultViewController {
     }
     
     private func setLayer() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(notchView)        
         notchView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()

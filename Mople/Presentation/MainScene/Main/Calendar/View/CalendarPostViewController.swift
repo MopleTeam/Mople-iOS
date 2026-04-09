@@ -36,7 +36,7 @@ final class CalendarPostViewController: TitleNaviViewController, View {
         let header = IconLabel(icon: .downArrow,
                                iconSize: .init(width: 24, height: 24))
         header.setTitle(font: FontStyle.Title3.semiBold,
-                        color: .gray01)
+                        color: .text01)
         header.rightIconAligment()
         header.isUserInteractionEnabled = false
         return header
@@ -324,7 +324,7 @@ extension CalendarPostViewController {
     }
     
     private func updateBackgroundColor(scope: ScopeType) {
-        self.postListContainer.backgroundColor = scope == .month ? .defaultWhite : .bgSecondary
+        self.postListContainer.backgroundColor = scope == .month ? .bgPrimary : .bgSecondary
     }
     
     private func naviItemChange(scope: ScopeType) {

@@ -25,7 +25,7 @@ final class WeatherView: UIView {
         view.contentMode = .scaleAspectFill
         view.clipsToBounds = true
         view.layer.cornerRadius = 8
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -39,7 +39,7 @@ final class WeatherView: UIView {
     private let temperatureLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.semiBold
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
@@ -53,7 +53,7 @@ final class WeatherView: UIView {
         let label = IconLabel(icon: .pop,
                               iconSize: .init(width: 18, height: 18))
         label.layer.cornerRadius = 6
-        label.backgroundColor = .defaultBlueGray
+        label.backgroundColor = .appBlueGray
         label.setTitle(font: FontStyle.Body2.bold,
                        color: .defaultBlue)
         label.setMargin(.init(top: 4, left: 4, bottom: 4, right: 4))
@@ -63,7 +63,7 @@ final class WeatherView: UIView {
     private let cityLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         label.textAlignment = .right
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         label.setContentCompressionResistancePriority(.init(1), for: .horizontal)
@@ -73,7 +73,7 @@ final class WeatherView: UIView {
     private let nonWeatherLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.medium
-        label.textColor = .gray04
+        label.textColor = .text03
         label.textAlignment = .center
         label.text = "아직 날씨를 알 수 없어요"
         label.isUserInteractionEnabled = true

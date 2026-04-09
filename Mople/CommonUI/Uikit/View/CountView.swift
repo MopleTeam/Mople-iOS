@@ -24,7 +24,7 @@ final class CountView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray01
+        label.textColor = .text01
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
@@ -33,7 +33,7 @@ final class CountView: UIView {
     private let countLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray04
+        label.textColor = .text03
         label.textAlignment = .right
         return label
     }()

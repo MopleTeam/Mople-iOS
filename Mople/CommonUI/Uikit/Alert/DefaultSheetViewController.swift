@@ -27,7 +27,7 @@ final class DefaultSheetViewController: UIViewController {
     
     private let sheetView: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         view.layer.makeCornes(radius: 20, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
         view.layer.makeShadow(opactity: 0.1,
                               radius: 16)
@@ -43,7 +43,7 @@ final class DefaultSheetViewController: UIViewController {
     
     private let scrollView: UIScrollView = {
         let view = UIScrollView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -233,12 +233,12 @@ extension DefaultSheetViewController {
         btn.setButtonAlignment(.leading)
         btn.setTitle(text: action.text,
                      font: FontStyle.Body1.medium,
-                     normalColor: .gray02)
+                     normalColor: .text01)
         btn.setLayoutMargins(inset: .init(top: 16, leading: 20, bottom: 16, trailing: 20))
         btn.setImage(image: action.image,
                      imagePlacement: .leading,
                      contentPadding: 8)
-        btn.setBgColor(normalColor: .defaultWhite,
+        btn.setBgColor(normalColor: .bgPrimary,
                        highlightColor: .bgSecondary)
         btn.addAction(makeAction(action.completion),
                       for: .touchUpInside)

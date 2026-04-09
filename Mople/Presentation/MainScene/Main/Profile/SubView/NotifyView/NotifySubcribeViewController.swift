@@ -20,7 +20,7 @@ final class NotifySubcribeViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Notify.active,
                      font: FontStyle.Body1.regular,
-                     normalColor: .gray04)
+                     normalColor: .text03)
         btn.setRadius(8)
         btn.setBgColor(normalColor: .bgInput)
         return btn

@@ -17,7 +17,7 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
         let view = ThumbnailView(thumbnailSize: 28,
                                       thumbnailRadius: 6)
         view.setTitleLabel(font: FontStyle.Body2.semiBold,
-                           color: .gray04)
+                           color: .text03)
         view.setSpacing(8)
         view.addArrowImageView()
         view.isUserInteractionEnabled = false
@@ -27,7 +27,7 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title.bold
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
@@ -72,7 +72,7 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
@@ -113,7 +113,7 @@ final class RecentPlanCollectionCell: UICollectionViewCell {
     
     private func setInfoLabel() {
         [countInfoLabel, dateInfoLabel, placeInfoLabel].forEach {
-            $0.setTitle(font: FontStyle.Body2.medium, color: .gray04)
+            $0.setTitle(font: FontStyle.Body2.medium, color: .text03)
             $0.setSpacing(4)
         }
     }

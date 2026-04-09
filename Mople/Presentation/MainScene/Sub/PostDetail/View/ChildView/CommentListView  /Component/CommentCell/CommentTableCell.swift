@@ -28,25 +28,6 @@ final class CommentTableCell: UITableViewCell {
     // MARK: - UI Components
     private let commentView = CommentView(frame: .zero)
     
-    private lazy var bottomButton: LoadingButtonView = {
-        let view = LoadingButtonView()
-        view.isUserInteractionEnabled = true
-        view.button.setTitle(font: FontStyle.Body2.semiBold,
-                             normalColor: .gray04)
-        view.button.setImage(image: .downArrow2)
-        view.isHidden = true
-        return view
-    }()
-    
-    private lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [commentView, bottomButton])
-        sv.axis = .vertical
-        sv.spacing = 8
-        sv.alignment = .leading
-        sv.distribution = .fill
-        return sv
-    }()
-    
     private let borderView = {
         let view = UIView()
         view.backgroundColor = .appStroke
@@ -56,7 +37,7 @@ final class CommentTableCell: UITableViewCell {
     
     private let indicatorContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -90,19 +71,15 @@ final class CommentTableCell: UITableViewCell {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.contentView.addSubview(mainStackView)
+        self.contentView.addSubview(commentView)
         self.contentView.addSubview(borderView)
         self.contentView.addSubview(indicatorContainer)
         self.indicatorContainer.addSubview(indicator)
-        self.contentView.backgroundColor = .defaultWhite
-        
-        mainStackView.snp.makeConstraints { make in
-            leftPadding = make.leading.equalToSuperview().inset(20).constraint
-            make.verticalEdges.trailing.equalToSuperview().inset(20)
-        }
+        self.contentView.backgroundColor = .bgPrimary
         
         commentView.snp.makeConstraints { make in
-            make.width.equalTo(mainStackView.snp.width)
+            leftPadding = make.leading.equalToSuperview().inset(20).constraint
+            make.verticalEdges.trailing.equalToSuperview().inset(20)
         }
         
         borderView.snp.makeConstraints { make in
@@ -148,11 +125,6 @@ final class CommentTableCell: UITableViewCell {
                 cell.replyTapped?()
             })
             .disposed(by: disposeBag)
-        
-        bottomButton.rx.tap
-            .subscribe(with: self, onNext: { cell, _ in
-            })
-            .disposed(by: disposeBag)
     }
     
     // MARK: - Configure
@@ -190,7 +162,7 @@ final class CommentTableCell: UITableViewCell {
 
     // MARK: - Set Loading
     private func setIndicator(isLoad: Bool) {
-        indicatorContainer.backgroundColor = .defaultWhite
+        indicatorContainer.backgroundColor = .bgPrimary
         setLoading(isLoad: isLoad)
     }
     

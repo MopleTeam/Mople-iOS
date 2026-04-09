@@ -36,7 +36,7 @@ final class CommentView: UIView {
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.semiBold
-        label.textColor = .gray02
+        label.textColor = .text01
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return label
@@ -45,7 +45,7 @@ final class CommentView: UIView {
     private let timeLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.regular
-        label.textColor = .gray04
+        label.textColor = .text03
         label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
@@ -62,7 +62,7 @@ final class CommentView: UIView {
     private let commentTextView: UITextView = {
         let view = UITextView()
         view.font = FontStyle.Body1.medium
-        view.textColor = .gray03
+        view.textColor = .text02
         view.dataDetectorTypes = .link
         view.isUserInteractionEnabled = true
         view.isSelectable = true
@@ -71,6 +71,7 @@ final class CommentView: UIView {
         view.textContainer.lineFragmentPadding = 0
         view.textContainerInset = .zero
         view.clipsToBounds = true
+        view.backgroundColor = .clear
         return view
     }()
     

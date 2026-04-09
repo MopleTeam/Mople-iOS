@@ -44,8 +44,8 @@ final class PostDetailView: UIView {
     fileprivate lazy var participationButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite,
-                     selectedColor: .gray03)
+                     normalColor: .primaryText,
+                     selectedColor: .tertiaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        selectedColor: .appTertiary)
         btn.setRadius(8)
@@ -58,7 +58,7 @@ final class PostDetailView: UIView {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)
         return sv
