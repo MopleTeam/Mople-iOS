@@ -81,6 +81,7 @@ Dataview가 체크박스를 자동 집계하므로 수동 갱신은 최소화됨
   2. 사용자에게 "이 내용이면 될까?" 확인
   3. 확인 후 `fastlane beta changelog:"내용"` 실행
 - 실행 전 반드시 `export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8` 설정
+- 배포 완료 후 `Mople.xcodeproj/project.pbxproj` 빌드번호 변경분을 커밋 & 푸쉬
 
 ### App Store 릴리즈 (출시)
 - 사용자가 "릴리즈 해줘" / "배포해줘" / "앱스토어 올려줘" 요청 시:
