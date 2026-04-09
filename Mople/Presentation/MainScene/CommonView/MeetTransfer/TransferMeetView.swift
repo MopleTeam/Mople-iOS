@@ -350,6 +350,7 @@ struct TransferConfirmationAlert: View {
 }
 
 // MARK: - Preview
+#if DEV
 #Preview {
     let mockMeet = Meet(
         meetSummary: MeetSummary(id: 1, name: "테스트 모임"),
@@ -358,18 +359,19 @@ struct TransferConfirmationAlert: View {
         memberCount: 5,
         firstPlanDate: nil
     )
-    
+
     let mockFetchMemberUseCase = MockFetchMemberUseCase()
     let mockTransferUseCase = MockTransferMeetUseCase()
-    
+
     let viewModel = TransferMeetViewModel(
         meet: mockMeet,
-        fetchMemberListUseCase: mockFetchMemberUseCase,  // ✅ Mock 주입
+        fetchMemberListUseCase: mockFetchMemberUseCase,
         transferUseCase: mockTransferUseCase
     )
-    
+
     NavigationStack {
         TransferMeetView(viewModel: viewModel)
     }
 }
+#endif
 

@@ -94,6 +94,7 @@
 		522C4C9D2F875691008B67C8 /* ThemeSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */; };
 		522C4C9F2F875DE8008B67C8 /* DismissableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */; };
 		522C4CA02F875DE8008B67C8 /* DismissableHostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522C4C9E2F875DE8008B67C8 /* DismissableHostingController.swift */; };
+		522C4CA32F878C63008B67C8 /* RxCombine in Frameworks */ = {isa = PBXBuildFile; productRef = 522C4CA22F878C63008B67C8 /* RxCombine */; };
 		5231B6812D41508A0028AF62 /* TransformKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6802D41508A0028AF62 /* TransformKeyboardResponsive.swift */; };
 		5231B6832D4150C50028AF62 /* ScrollKeyboardResponsive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231B6822D4150C50028AF62 /* ScrollKeyboardResponsive.swift */; };
 		5231DF342D2F2A1E00D52529 /* DefaultAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5231DF332D2F2A1E00D52529 /* DefaultAlertViewController.swift */; };
@@ -1274,6 +1275,7 @@
 				52C72EA62C4FBE5900CFF329 /* SnapKit in Frameworks */,
 				52EA6DF82CF75A6600EFD753 /* FirebaseMessaging in Frameworks */,
 				5211F91A2C89E39600403980 /* Kingfisher in Frameworks */,
+				522C4CA32F878C63008B67C8 /* RxCombine in Frameworks */,
 				529A260C2C96AE3E009F4CFA /* RxDataSources in Frameworks */,
 				525DFD052CCB640000835312 /* KakaoSDKCommon in Frameworks */,
 				52C72EA12C4FBE4100CFF329 /* RxRelay in Frameworks */,
@@ -1746,6 +1748,13 @@
 				522C4C9A2F875691008B67C8 /* ThemeSettingView.swift */,
 			);
 			path = ThemeSettingView;
+			sourceTree = "<group>";
+		};
+		522C4CA12F878C63008B67C8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		5231B67F2D41506B0028AF62 /* KeyboardResponsive */ = {
@@ -2810,6 +2819,7 @@
 			isa = PBXGroup;
 			children = (
 				52C72E882C4FBD6400CFF329 /* Mople */,
+				522C4CA12F878C63008B67C8 /* Frameworks */,
 				52C72E872C4FBD6400CFF329 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -3782,6 +3792,7 @@
 				52C013732DC0FFDB00B154F2 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				529291E32DF45EE2005A9453 /* NMapsMap */,
 				52DCFFE52DF5BDC600D0A7E5 /* FirebaseCrashlytics */,
+				522C4CA22F878C63008B67C8 /* RxCombine */,
 			);
 			productName = Mople;
 			productReference = 52C72E862C4FBD6400CFF329 /* Mople.app */;
@@ -4920,7 +4931,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4939,7 +4950,7 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
@@ -4964,10 +4975,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4986,13 +4997,13 @@
 					"@executable_path/Frameworks",
 				);
 				MAIN_SCHEME = mople;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = "";
 				POLICY_URL = "https://unexpected-buckaroo-42a.notion.site/1bc90068602b80788c47c34d1bc3025f?pvs=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Mople;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Mople Distribution";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -5014,7 +5025,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5058,10 +5069,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Dev";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5086,7 +5097,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.moim.moimtable.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = MopleDev;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MopleDev Distribution";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -5238,6 +5249,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5211F9182C89E39600403980 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		522C4CA22F878C63008B67C8 /* RxCombine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5209D9912F4AC010007757D4 /* XCRemoteSwiftPackageReference "RxCombine" */;
+			productName = RxCombine;
 		};
 		525AA90B2C915C6D0087913F /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;

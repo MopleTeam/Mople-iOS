@@ -329,6 +329,7 @@ struct DeleteAccountConfirmAlert: View {
 }
 
 // MARK: - Preview
+#if DEV
 #Preview {
     let mockFetchUseCase = MockFetchMyHostMeetsUseCase()
     let mockDeleteUseCase = MockDeleteAccountUseCase()
@@ -339,3 +340,4 @@ struct DeleteAccountConfirmAlert: View {
 
     return TransferMeetListView(viewModel: viewModel)
 }
+#endif
