@@ -38,6 +38,7 @@ final class TransferMeetSceneDIContainer: BaseContainer, TransferMeetSceneDepend
     private func makeTransferMeetListViewModel(coordinator: TransferMeetFlowCoordination) -> TransferMeetListViewModel {
         return TransferMeetListViewModel(
             fetchMyHostMeetsUseCase: makeFetchMyHostMeetsUseCase(),
+            deleteAccountUseCase: makeDeleteAccountUseCase(),
             coordinator: coordinator
         )
     }
@@ -88,6 +89,16 @@ final class TransferMeetSceneDIContainer: BaseContainer, TransferMeetSceneDepend
     
     private func makeMeetRepo() -> MeetRepo {
         return DefaultMeetRepo(networkService: appNetworkService)
+    }
+
+  
+    private func makeDeleteAccountUseCase() -> DeleteAccount {
+        let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(DeleteAccountUseCase(repo: authRepo) as DeleteAccount, mock: MockDeleteAccountUseCase())
+        #else
+        return DeleteAccountUseCase(repo: authRepo)
+        #endif
     }
 }
 // MARK: - Edge Pop 지원 UIHostingController

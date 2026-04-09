@@ -17,27 +17,26 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             case setNotify
             case setTheme
             case policy
-            case showTransferMeetList(meets: [Meet])  // 양도할 모임 리스트 전달
             case endMainFlow
         }
 
         case flow(Flow)
         case fetchUserInfo
         case signOut
-        case checkMeetsBeforeDelete  // 탈퇴 전 모임 체크
-        case deleteAccount  // 실제 탈퇴 실행
+        case checkTransferMeet
+        case deleteAccount   
     }
 
     enum Mutation {
         case fetchUserInfo(_ userInfo: UserInfo)
-        case checkDeleteAccount
+        case showDeleteConfirm
         case updateLoadingState(Bool)
         case catchError(Error)
     }
 
     struct State {
         @Pulse var userProfile: UserInfo?
-        @Pulse var deleteAccountAlert: Void?
+        @Pulse var shouldShowDeleteConfirm: Void?
         @Pulse var isLoading: Bool = false
         @Pulse var error: Error?
     }
@@ -81,8 +80,8 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
             return handleFlowAction(action)
         case .signOut:
             return signOut()
-        case .checkMeetsBeforeDelete:
-            return checkMeetsBeforeDelete()
+        case .checkTransferMeet:
+            return checkTransferMeet()
         case .deleteAccount:
             return deleteAccount()
         }
@@ -94,8 +93,8 @@ final class ProfileViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case .fetchUserInfo(let profile):
             newState.userProfile = profile
-        case .checkDeleteAccount:
-            newState.deleteAccountAlert = ()
+        case .showDeleteConfirm:
+            newState.shouldShowDeleteConfirm = ()
         case let .updateLoadingState(isLoad):
             newState.isLoading = isLoad
         case let .catchError(err):
@@ -136,13 +135,13 @@ extension ProfileViewReactor {
             })
     }
 
-    private func checkMeetsBeforeDelete() -> Observable<Mutation> {
+  
+    private func checkTransferMeet() -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
 
         isRequesting = true
 
-        // 내가 호스트인 모임 리스트 조회
-        let checkMeets = fetchMyHostMeetsUseCase.execute(cursor: nil)
+        let task = fetchMyHostMeetsUseCase.execute(cursor: nil)
             .observe(on: MainScheduler.instance)
             .flatMap { [weak self] page -> Observable<Mutation> in
                 guard let self = self else { return .empty() }
@@ -154,19 +153,16 @@ extension ProfileViewReactor {
                 }
 
                 if transferableMeets.isEmpty {
-                    // 양도할 모임 없음 → 바로 탈퇴 진행
-                    print("✅ 양도할 모임 없음 → 탈퇴 진행")
-//                    return Observable.just(.checkDeleteAccount)
-                    return .empty()
+                    // 양도할 모임 없음 → 탈퇴 확인 알림 표시
+                    return .just(.showDeleteConfirm)
                 } else {
                     // 양도할 모임 있음 → 양도 화면으로 이동
-                    print("📋 양도할 모임 \(transferableMeets.count)개 → 양도 화면 이동")
                     self.coordinator?.showTransferMeetList()
                     return .empty()
                 }
             }
 
-        return requestWithLoading(task: checkMeets)
+        return requestWithLoading(task: task)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })
@@ -214,8 +210,6 @@ extension ProfileViewReactor {
             coordinator?.presentThemeView()
         case .policy:
             coordinator?.pushPolicyView()
-        case .showTransferMeetList:
-            coordinator?.showTransferMeetList()
         case .endMainFlow:
             resetUserData()
             coordinator?.endMainFlow()

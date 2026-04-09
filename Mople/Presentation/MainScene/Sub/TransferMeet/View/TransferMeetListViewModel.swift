@@ -32,17 +32,20 @@ final class TransferMeetListViewModel: ObservableObject {
     
     // MARK: - Private Properties
     private let fetchMyHostMeetsUseCase: FetchMyHostMeets
+    private let deleteAccountUseCase: DeleteAccount
     private weak var coordinator: TransferMeetFlowCoordination?
     private var cancellables = Set<AnyCancellable>()
-    
+
     // 페이징 정보
     private var pageInfo: PageInfo?
     private var isFetching = false
-    
+
     // MARK: - Initialization
-    init(fetchMyHostMeetsUseCase: FetchMyHostMeets, 
+    init(fetchMyHostMeetsUseCase: FetchMyHostMeets,
+         deleteAccountUseCase: DeleteAccount,
          coordinator: TransferMeetFlowCoordination? = nil) {
         self.fetchMyHostMeetsUseCase = fetchMyHostMeetsUseCase
+        self.deleteAccountUseCase = deleteAccountUseCase
         self.coordinator = coordinator
 
         fetchMeets()
@@ -166,9 +169,34 @@ final class TransferMeetListViewModel: ObservableObject {
         coordinator?.showTransferMeet(meet: meet)
     }
     
-    /// 회원 탈퇴 진행 (모든 양도 완료)
+  
     func proceedToDeleteAccount() {
-        coordinator?.completeAllTransfers()
+        guard !isLoading else { return }
+        isLoading = true
+
+        deleteAccountUseCase.execute()
+            .publisher
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    guard let self else { return }
+                    self.isLoading = false
+                    if case .failure(let error) = completion {
+                        self.errorMessage = error.localizedDescription
+                        self.showError = true
+                    }
+                },
+                receiveValue: { [weak self] _ in
+                    guard let self else { return }
+                    // 유저 데이터 초기화
+                    KeychainStorage.shared.deleteToken()
+                    UserInfoStorage.shared.deleteEnitity()
+                    UserDefaults.deleteFCMToken()
+                    // 메인플로우 종료 → 로그인 화면
+                    self.coordinator?.endMainFlow()
+                }
+            )
+            .store(in: &cancellables)
     }
     
     /// 플로우 종료 (뒤로가기)
