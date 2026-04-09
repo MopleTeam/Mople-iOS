@@ -4931,7 +4931,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -4978,7 +4978,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -5024,7 +5024,7 @@
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Mople/Dev-Info.plist";
@@ -5068,7 +5068,7 @@
 				CODE_SIGN_ENTITLEMENTS = Mople/Mople.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = LNXWGGBBH6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Mople/Dev-Info.plist";
