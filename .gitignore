@@ -27,12 +27,22 @@ playground.xcworkspace
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
+fastlane/test_output/
+fastlane/README.md
+
+# Fastlane 빌드 결과물
+*.ipa
+*.dSYM.zip
+
+# SPM 패키지 캐시 (Fastlane 빌드용)
+SourcePackages/
 
 # 개인 설정
 *.xcworkspace
 !default.xcworkspace
 
 # 인증서, 키
+*.p8
 *.p12
 *.mobileprovision
 

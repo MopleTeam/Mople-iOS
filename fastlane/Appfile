@@ -1,0 +1,9 @@
+# App Store Connect API Key 인증 방식
+# Apple ID/패스워드 대신 API Key로 인증 (2FA 문제 없음, CI/CD에 적합)
+
+# 기본 앱: Mople Dev (TestFlight 테스트용)
+app_identifier("com.moim.moimtable.dev")
+team_id("LNXWGGBBH6")
+
+# release lane에서는 프로덕션 번들 ID를 직접 지정
+# beta lane에서는 dev 번들 ID를 직접 지정
