@@ -311,7 +311,7 @@ struct DeleteAccountConfirmAlert: View {
                     Button { onConfirm() } label: {
                         Text(L10n.Profile.resign)
                             .font(.custom(FontFamily.Pretendard.semiBold, size: FontStyle.Size.title3))
-                            .foregroundColor(Color(uiColor: .primaryText))
+                            .foregroundColor(Color(uiColor: .secondaryText))
                             .frame(maxWidth: .infinity)
                             .frame(height: 48)
                             .background(Color(uiColor: .appSecondary))

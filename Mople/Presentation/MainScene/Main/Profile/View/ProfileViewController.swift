@@ -371,7 +371,7 @@ extension ProfileViewController {
     
     private func showDeleteAccountAlert() {
         let deleteAccountAction: DefaultAlertAction = .init(text: L10n.Profile.resign,
-                                                            textColor: .primaryText,
+                                                            textColor: .secondaryText,
                                                             bgColor: .appSecondary,
                                                             completion: { [weak self] in
             self?.deleteAccount.onNext(())
