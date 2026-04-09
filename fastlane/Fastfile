@@ -40,13 +40,17 @@ platform :ios do
       ) + 1
     )
 
-    # 2) Mople Dev 스킴으로 빌드
+    # 2) Mople Dev 스킴으로 빌드 (Release 설정)
+    #    빌드는 Automatic signing으로 진행, export 시 Distribution 프로파일 적용
+    #    ENABLE_USER_SCRIPT_SANDBOXING=NO: SwiftGen 등 빌드 스크립트가 파일 접근 가능하도록
     build_app(
       project: "Mople.xcodeproj",
       scheme: "Mople Dev",
+      configuration: "Release",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
+      xcargs: "ENABLE_USER_SCRIPT_SANDBOXING=NO",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
@@ -81,10 +85,11 @@ platform :ios do
       ) + 1
     )
 
-    # 2) Mople 프로덕션 스킴으로 빌드
+    # 2) Mople 프로덕션 스킴으로 빌드 (Release 설정)
     build_app(
       project: "Mople.xcodeproj",
       scheme: "Mople",
+      configuration: "Release",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
@@ -115,6 +120,7 @@ platform :ios do
     build_app(
       project: "Mople.xcodeproj",
       scheme: "Mople Dev",
+      configuration: "Release",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
