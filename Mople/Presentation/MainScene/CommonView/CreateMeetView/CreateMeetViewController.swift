@@ -72,7 +72,8 @@ final class CreateMeetViewController: TitleNaviViewController,
     private let completionButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: .primaryText)
+                     normalColor: .primaryText,
+                     disabledColor: .disableText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(8)
