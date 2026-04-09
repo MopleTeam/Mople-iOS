@@ -54,15 +54,23 @@ final class MapView: UIView {
         setLayout()
         setMapView(isScroll: isScroll,
                    isZoom: isZoom)
+        updateNightMode()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        print(#function, #line, "Path : # 테스트 ")
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateNightMode()
+        }
+    }
+
+    // 다크모드 시 네이버 지도 나이트 모드 자동 적용
+    private func updateNightMode() {
+        mapView.isNightModeEnabled = (traitCollection.userInterfaceStyle == .dark)
     }
     
     private func setLayout() {
@@ -129,9 +137,12 @@ extension MapView {
         mapView.moveCamera(cameraUpdate)
     }
     
+    // 네이버 지도 마커는 UIKit 트레이트 시스템 밖에서 렌더링되므로
+    // 현재 모드에 맞는 이미지를 명시적으로 resolve해서 적용
     private func addMarker(position: NMGLatLng) {
         let marker = NMFMarker(position: position)
-        marker.iconImage = .init(image: .selectedLocation)
+        let resolvedImage = UIImage.selectedLocation.imageAsset?.image(with: traitCollection) ?? .selectedLocation
+        marker.iconImage = .init(image: resolvedImage)
         marker.mapView = mapView
     }
     
