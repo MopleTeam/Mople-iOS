@@ -6,9 +6,10 @@
 //
 
 final class DefaultSearchPlaceRepo: BaseRepositories, SearchPlaceRepo {
-    func search(request: SearchLocationRequest) async throws -> SearchPlaceResultResponse {
-        return try await self.networkService.authenticatedRequest {
+    func search(request: SearchLocationRequest) async throws -> SearchPlaceResult {
+        let response: SearchPlaceResultResponse = try await self.networkService.authenticatedRequest {
             try APIEndpoints.searchPlace(request: request)
         }
+        return response.toDomain()
     }
 }

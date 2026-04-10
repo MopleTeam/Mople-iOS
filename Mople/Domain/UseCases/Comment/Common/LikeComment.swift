@@ -22,10 +22,9 @@ final class LikeCommentUseCase: LikeComment {
     }
 
     func execute(commentId: Int) async throws -> Comment {
-        let response = try await repo.likeComment(commentId: commentId)
-        var domainComment = response.toDomain()
-        domainComment.verifyWriter(self.session.currentUserId)
-        return domainComment
+        var comment = try await repo.likeComment(commentId: commentId)
+        comment.verifyWriter(self.session.currentUserId)
+        return comment
     }
 }
 

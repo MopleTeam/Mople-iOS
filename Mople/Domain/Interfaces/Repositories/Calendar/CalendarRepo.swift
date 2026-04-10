@@ -6,8 +6,8 @@
 //
 
 protocol CalendarRepo {
-    func fetchAllDates() async throws -> AllPlanDateResponse
-    func fetchHolidays(for year: Int) async throws -> [HolidayResponse]
-    func fetchMonthlyPost(month: String) async throws -> MonthlyPostResponse
+    func fetchAllDates() async throws -> [Date]
+    func fetchHolidays(for year: Int) async throws -> [Holiday]
+    func fetchMonthlyPost(month: String) async throws -> [MonthlyPost]
 }
 

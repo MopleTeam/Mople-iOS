@@ -20,10 +20,9 @@ final class FetchHomeDataUseCase: FetchHomeData {
     }
 
     func execute() async throws -> HomeData {
-        let response = try await repo.fetchHomeData()
-        var newHomeData = response.toDomain()
-        verifyCreator(with: &newHomeData.plans)
-        return newHomeData
+        var homeData = try await repo.fetchHomeData()
+        verifyCreator(with: &homeData.plans)
+        return homeData
     }
 
     private func verifyCreator(with planList: inout [Plan]) {

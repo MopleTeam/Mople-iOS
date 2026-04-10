@@ -6,10 +6,13 @@
 //
 
 final class DefaultMemberRepo: BaseRepositories, MemberRepo {
-    func execute(type: MemberListType, nextCursor: String?) async throws -> PageResponse<MemberInfoResponse> {
-        return try await networkService.authenticatedRequest {
+    func execute(type: MemberListType, nextCursor: String?) async throws -> Page<MemberInfo> {
+        let response: PageResponse<MemberInfoResponse> = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchMember(type: type, nextCursor: nextCursor)
         }
+        return Page(totalCount: response.totalCount ?? 0,
+                    content: response.content.map { $0.toDomain() },
+                    info: response.page?.toDomain())
     }
 }
 

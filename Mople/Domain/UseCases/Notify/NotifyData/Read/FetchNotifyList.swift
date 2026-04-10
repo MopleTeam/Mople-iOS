@@ -20,10 +20,7 @@ final class FetchNotifyListUseCase: FetchNotifyList {
     }
 
     func execute(cursor: String?) async throws -> Page<Notify> {
-        let response = try await repo.fetchNotifyList(cursor: cursor)
-        return Page(totalCount: response.totalCount ?? 0,
-                    content: response.content.map({ $0.toDomain() }),
-                    info: response.page?.toDomain())
+        return try await repo.fetchNotifyList(cursor: cursor)
     }
 }
 

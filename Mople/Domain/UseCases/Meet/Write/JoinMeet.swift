@@ -19,8 +19,7 @@ final class JoinMeetUseCase: JoinMeet {
     }
 
     func execute(code: String) async throws -> Meet {
-        let response = try await repo.joinMeet(code: code)
-        return response.toDomain()
+        return try await repo.joinMeet(code: code)
     }
 }
 

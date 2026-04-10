@@ -7,10 +7,13 @@
 import UIKit
 
 final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
-    func fetchNotifyList(cursor: String?) async throws -> PageResponse<NotifyResponse> {
-        return try await networkService.authenticatedRequest {
+    func fetchNotifyList(cursor: String?) async throws -> Page<Notify> {
+        let response: PageResponse<NotifyResponse> = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchNotify(cursor: cursor)
         }
+        return Page(totalCount: response.totalCount ?? 0,
+                    content: response.content.map { $0.toDomain() },
+                    info: response.page?.toDomain())
     }
 
     @MainActor

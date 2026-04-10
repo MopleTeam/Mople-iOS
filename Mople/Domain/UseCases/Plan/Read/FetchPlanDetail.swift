@@ -21,10 +21,9 @@ final class FetchPlanDetailUseCase: FetchPlanDetail {
     }
 
     func execute(planId: Int) async throws -> Plan {
-        let response = try await repo.fetchPlanDetail(planId: planId)
-        var verifyPlan = response.toDomain()
-        verifyPlan.verifyCreator(self.session.currentUserId)
-        return verifyPlan
+        var plan = try await repo.fetchPlanDetail(planId: planId)
+        plan.verifyCreator(self.session.currentUserId)
+        return plan
     }
 }
 

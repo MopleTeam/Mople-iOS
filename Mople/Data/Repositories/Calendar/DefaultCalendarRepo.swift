@@ -6,21 +6,24 @@
 //
 
 final class DefaultCalendarRepo: BaseRepositories, CalendarRepo {
-    func fetchAllDates() async throws -> AllPlanDateResponse {
-        return try await networkService.authenticatedRequest {
+    func fetchAllDates() async throws -> [Date] {
+        let response: AllPlanDateResponse = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarDates()
         }
+        return response.toDomain().dates
     }
 
-    func fetchHolidays(for year: Int) async throws -> [HolidayResponse] {
-        return try await networkService.authenticatedRequest {
+    func fetchHolidays(for year: Int) async throws -> [Holiday] {
+        let response: [HolidayResponse] = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchHolidays(for: year)
         }
+        return response.map { $0.toDomain() }
     }
 
-    func fetchMonthlyPost(month: String) async throws -> MonthlyPostResponse {
-        return try await networkService.authenticatedRequest {
+    func fetchMonthlyPost(month: String) async throws -> [MonthlyPost] {
+        let response: MonthlyPostResponse = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarPagingData(month: month)
         }
+        return response.toDomain()
     }
 }

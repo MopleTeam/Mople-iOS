@@ -8,5 +8,5 @@
 import Foundation
 
 protocol AppVersionRepo {
-    func checkForceUpdate() async throws -> UpdateStatusResponse
+    func checkForceUpdate() async throws -> UpdateStatus
 }

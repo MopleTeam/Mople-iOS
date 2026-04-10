@@ -26,11 +26,10 @@ final class CreateCommentUseCase: CreateComment {
     func execute(postId: Int,
                  comment: String,
                  mentions: [Int]) async throws -> Comment {
-        let response = try await createCommentRepo
+        var domainComment = try await createCommentRepo
             .createComment(postId: postId,
                            comment: comment,
                            mentions: mentions)
-        var domainComment = response.toDomain()
         domainComment.verifyWriter(self.session.currentUserId)
         return domainComment
     }

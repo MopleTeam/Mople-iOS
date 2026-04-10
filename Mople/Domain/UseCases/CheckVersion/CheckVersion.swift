@@ -18,8 +18,7 @@ final class CheckVersionUseCase: CheckVersion {
     }
 
     func executue() async throws -> UpdateStatus {
-        let response = try await repo.checkForceUpdate()
-        return response.toDomain()
+        return try await repo.checkForceUpdate()
     }
 }
 

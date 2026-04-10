@@ -20,8 +20,7 @@ final class FetchMonthlyPostUseCase: FetchMonthlyPost {
     }
 
     func execute(month: String) async throws -> [MonthlyPost] {
-        let response = try await repo.fetchMonthlyPost(month: month)
-        return response.toDomain()
+        return try await repo.fetchMonthlyPost(month: month)
     }
 }
 

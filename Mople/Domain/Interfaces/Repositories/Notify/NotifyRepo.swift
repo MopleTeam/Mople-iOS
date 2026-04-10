@@ -6,6 +6,6 @@
 //
 
 protocol NotifyRepo {
-    func fetchNotifyList(cursor: String?) async throws -> PageResponse<NotifyResponse>
+    func fetchNotifyList(cursor: String?) async throws -> Page<Notify>
     func resetNotifyCount() async throws
 }

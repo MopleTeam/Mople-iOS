@@ -6,5 +6,5 @@
 //
 
 protocol MemberRepo {
-    func execute(type: MemberListType, nextCursor: String?) async throws -> PageResponse<MemberInfoResponse>
+    func execute(type: MemberListType, nextCursor: String?) async throws -> Page<MemberInfo>
 }

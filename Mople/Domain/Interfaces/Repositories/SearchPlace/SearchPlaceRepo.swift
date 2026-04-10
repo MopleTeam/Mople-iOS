@@ -6,5 +6,5 @@
 //
 
 protocol SearchPlaceRepo {
-    func search(request: SearchLocationRequest) async throws -> SearchPlaceResultResponse
+    func search(request: SearchLocationRequest) async throws -> SearchPlaceResult
 }

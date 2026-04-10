@@ -8,12 +8,11 @@
 import Foundation
 
 protocol PlanRepo {
-    func fetchHomeData() async throws -> HomeDataResponse
-    func fetchPlanDetail(planId: Int) async throws -> PlanResponse
-    func fetchPlanPage(meetId: Int, cursor: String?) async throws -> PageResponse<PlanResponse>
-    func createPlan(request: PlanRequest) async throws -> PlanResponse
-    func participationPlan(planId: Int,
-                                  isJoin: Bool) async throws
-    func editPlan(request: PlanRequest) async throws -> PlanResponse
+    func fetchHomeData() async throws -> HomeData
+    func fetchPlanDetail(planId: Int) async throws -> Plan
+    func fetchPlanPage(meetId: Int, cursor: String?) async throws -> Page<Plan>
+    func createPlan(request: PlanRequest) async throws -> Plan
+    func participationPlan(planId: Int, isJoin: Bool) async throws
+    func editPlan(request: PlanRequest) async throws -> Plan
     func deletePlan(id: Int) async throws
 }

@@ -24,10 +24,8 @@ final class SearchPlaceUseCase: SearchPlace {
     func execute(query: String,
                  x: Double?,
                  y: Double?) async throws -> SearchPlaceResult {
-
-        let response = try await searchPlaceRepo
+        return try await searchPlaceRepo
             .search(request: .init(query: query, x: x, y: y))
-        return response.toDomain()
     }
 }
 

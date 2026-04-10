@@ -28,12 +28,11 @@ final class CreateReplyCommentUseCase: CreateReplyComment {
                  parentId: Int,
                  comment: String,
                  mentions: [Int]) async throws -> Comment {
-        let response = try await repo
+        var domainComment = try await repo
             .createReplyComment(postId: postId,
                                 commentId: parentId,
                                 comment: comment,
                                 mentions: mentions)
-        var domainComment = response.toDomain()
         domainComment.verifyWriter(self.session.currentUserId)
         return domainComment
     }

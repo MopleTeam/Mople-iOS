@@ -21,11 +21,7 @@ final class FetchPlanPageUsecase: FetchPlanPage {
     }
 
     func execute(meetId: Int, cursor: String?) async throws -> Page<Plan> {
-        let response = try await repo.fetchPlanPage(meetId: meetId,
-                                                     cursor: cursor)
-        var page = Page(totalCount: response.totalCount ?? 0,
-                        content: response.content.map({ $0.toDomain() }),
-                        info: response.page?.toDomain())
+        var page = try await repo.fetchPlanPage(meetId: meetId, cursor: cursor)
         verifyCreator(with: &page.content)
         return page
     }

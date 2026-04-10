@@ -20,8 +20,7 @@ final class FetchAllPlanDateUseCase: FetchAllPlanDate {
     }
 
     func execute() async throws -> [Date] {
-        let response = try await repo.fetchAllDates()
-        return response.toDomain().dates
+        return try await repo.fetchAllDates()
     }
 }
 

@@ -19,13 +19,9 @@ final class FetchMentionListUseCase: FetchMentionList {
     func execute(meetId: Int,
                  cursor: String?,
                  keyword: String?) async throws -> Page<MemberInfo> {
-
-        let response = try await repo.execute(meetId: meetId,
-                                               cursor: cursor,
-                                               keyword: keyword)
-        return Page(totalCount: response.totalCount ?? 0,
-                    content: response.content.map({ $0.toDomain() }),
-                    info: response.page?.toDomain())
+        return try await repo.execute(meetId: meetId,
+                                       cursor: cursor,
+                                       keyword: keyword)
     }
 }
 

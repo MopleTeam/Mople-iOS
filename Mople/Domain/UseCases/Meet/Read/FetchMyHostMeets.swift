@@ -21,12 +21,7 @@ final class FetchMyHostMeetsUseCase: FetchMyHostMeets {
     }
 
     func execute(cursor: String?) async throws -> Page<Meet> {
-        let response = try await repo.fetchMyHostMeets(cursor: cursor)
-        let page = Page<Meet>(totalCount: response.totalCount ?? 0,
-                              content: response.content.map({ $0.toDomain() }),
-                              info: response.page?.toDomain())
-        print(#function, #line, "Path : #1 데이터 들어옴 ")
-        return page
+        return try await repo.fetchMyHostMeets(cursor: cursor)
     }
 }
 

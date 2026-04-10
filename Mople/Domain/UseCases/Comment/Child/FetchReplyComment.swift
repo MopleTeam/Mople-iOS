@@ -26,12 +26,9 @@ final class FetchReplyCommentListUseCase: FetchReplyCommentList {
     func execute(postId: Int,
                  commentId: Int,
                  nextCursor: String?) async throws -> Page<Comment> {
-        let response = try await repo.fetchReplyComment(postId: postId,
-                                                         commentId: commentId,
-                                                         nextCursor: nextCursor)
-        let page = Page(totalCount: response.totalCount ?? 0,
-                        content: response.content.map({ $0.toDomain() }),
-                        info: response.page?.toDomain())
+        let page = try await repo.fetchReplyComment(postId: postId,
+                                                     commentId: commentId,
+                                                     nextCursor: nextCursor)
         return checkWriter(with: page)
     }
 

@@ -6,8 +6,8 @@
 //
 
 protocol ReviewRepo {
-    func fetchReviewPage(meetId: Int, cursor: String?) async throws -> PageResponse<ReviewResponse>
-    func fetchReviewDetail(id: Int, isOldPlan: Bool) async throws -> ReviewResponse
+    func fetchReviewPage(meetId: Int, cursor: String?) async throws -> Page<Review>
+    func fetchReviewDetail(id: Int, isOldPlan: Bool) async throws -> Review
     func deleteReviewImage(reviewId: Int, imageIds: [Int]) async throws
     func deleteReview(id: Int) async throws
 }

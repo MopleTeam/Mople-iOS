@@ -20,9 +20,7 @@ final class CreateMeetUseCase: CreateMeet {
     }
 
     func execute(requset: CreateMeetRequest) async throws -> Meet {
-        let response = try await self.createMeetRepo
-            .createMeet(reqeust: requset)
-        return response.toDomain()
+        return try await self.createMeetRepo.createMeet(reqeust: requset)
     }
 }
 

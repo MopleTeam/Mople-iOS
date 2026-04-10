@@ -22,10 +22,9 @@ final class FetchReviewDetailUseCase: FetchReviewDetail {
     }
 
     func execute(id: Int, isOldPlan: Bool) async throws -> Review {
-        let response = try await repo.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
-        var verifyReview = response.toDomain()
-        verifyReview.verifyCreator(self.session.currentUserId)
-        return verifyReview
+        var review = try await repo.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
+        review.verifyCreator(self.session.currentUserId)
+        return review
     }
 }
 

@@ -18,10 +18,7 @@ final class FetchMemberUseCase: FetchMemberList {
     }
 
     func execute(type: MemberListType, cursor: String?) async throws -> Page<MemberInfo> {
-        let response = try await memberListRepo.execute(type: type, nextCursor: cursor)
-        return Page(totalCount: response.totalCount ?? 0,
-                    content: response.content.map({ $0.toDomain() }),
-                    info: response.page?.toDomain())
+        return try await memberListRepo.execute(type: type, nextCursor: cursor)
     }
 }
 

@@ -20,8 +20,7 @@ final class FetchHolidaysUseCase: FetchHolidays {
     }
 
     func execute(for year: Int) async throws -> [Holiday] {
-        let response = try await repo.fetchHolidays(for: year)
-        return response.map { $0.toDomain() }
+        return try await repo.fetchHolidays(for: year)
     }
 }
 

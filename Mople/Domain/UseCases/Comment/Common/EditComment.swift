@@ -26,13 +26,12 @@ final class EditCommentUseCase: EditComment {
     func execute(id: Int,
                  text: String,
                  mentions: [Int]) async throws -> Comment {
-        let response = try await editCommentRepo
+        var comment = try await editCommentRepo
             .editComment(commentId: id,
                          comment: text,
                          mentions: mentions)
-        var domainComment = response.toDomain()
-        domainComment.verifyWriter(self.session.currentUserId)
-        return domainComment
+        comment.verifyWriter(self.session.currentUserId)
+        return comment
     }
 }
 

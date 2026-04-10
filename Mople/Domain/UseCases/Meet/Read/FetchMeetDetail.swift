@@ -20,8 +20,7 @@ final class FetchMeetDetailUseCase: FetchMeetDetail {
     }
 
     func execute(meetId: Int) async throws -> Meet {
-        let response = try await repo.fetchMeetDetail(meetId: meetId)
-        return response.toDomain()
+        return try await repo.fetchMeetDetail(meetId: meetId)
     }
 }
 

@@ -6,5 +6,5 @@
 //
 
 protocol MentionRepo {
-    func execute(meetId: Int, cursor: String?, keyword: String?) async throws -> PageResponse<MemberInfoResponse>
+    func execute(meetId: Int, cursor: String?, keyword: String?) async throws -> Page<MemberInfo>
 }

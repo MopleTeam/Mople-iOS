@@ -19,8 +19,7 @@ final class EditPlanUseCase: EditPlan {
     }
 
     func execute(request: PlanRequest) async throws -> Plan {
-        let response = try await editPlanRepo.editPlan(request: request)
-        var plan = response.toDomain()
+        var plan = try await editPlanRepo.editPlan(request: request)
         plan.isCreator = true
         return plan
     }

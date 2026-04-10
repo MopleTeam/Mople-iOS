@@ -22,10 +22,7 @@ final class EditMeetUseCase: EditMeet {
 
     func execute(id: Int,
                  request: CreateMeetRequest) async throws -> Meet {
-        let response = try await repo.editMeet(
-            id: id,
-            reqeust: request)
-        return response.toDomain()
+        return try await repo.editMeet(id: id, reqeust: request)
     }
 }
 

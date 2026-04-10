@@ -6,8 +6,10 @@
 //
 
 final class DefaultAppVersionRepo: BaseRepositories, AppVersionRepo {
-    func checkForceUpdate() async throws -> UpdateStatusResponse {
-        let endpoint = APIEndpoints.checkAppVersionUpdate()
-        return try await networkService.basicRequest(endpoint: endpoint)
+    func checkForceUpdate() async throws -> UpdateStatus {
+        let response: UpdateStatusResponse = try await networkService.basicRequest(
+            endpoint: APIEndpoints.checkAppVersionUpdate()
+        )
+        return response.toDomain()
     }
 }

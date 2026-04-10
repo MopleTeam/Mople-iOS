@@ -19,8 +19,7 @@ final class CreatePlanUseCase: CreatePlan {
     }
 
     func execute(request: PlanRequest) async throws -> Plan {
-        let response = try await createPlanRepo.createPlan(request: request)
-        var plan = response.toDomain()
+        var plan = try await createPlanRepo.createPlan(request: request)
         plan.isCreator = true
         return plan
     }

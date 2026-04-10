@@ -24,11 +24,7 @@ final class FetchMeetReviewListUseCase: FetchMeetReviewList {
 
     func execute(meetId: Int,
                  cursor: String?) async throws -> Page<Review> {
-        let response = try await repo.fetchReviewPage(meetId: meetId,
-                                                       cursor: cursor)
-        var page = Page(totalCount: response.totalCount ?? 0,
-                        content: response.content.map({ $0.toDomain() }),
-                        info: response.page?.toDomain())
+        var page = try await repo.fetchReviewPage(meetId: meetId, cursor: cursor)
         verifyCreator(with: &page.content)
         return page
     }

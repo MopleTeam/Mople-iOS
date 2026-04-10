@@ -22,16 +22,13 @@ final class FetchMeetPageUseCase: FetchMeetPage {
     }
 
     func execute(cursor: String?) async throws -> Page<Meet> {
-        let response = try await repo.fetchMeetPage(cursor: cursor)
-        return .init(
-            totalCount: response.totalCount ?? 0,
-            content: response.content
-                .map({
-                    var meet = $0.toDomain()
-                    self.verifyCreator(with: &meet)
-                    return meet
-                }),
-            info: response.page?.toDomain())
+        var page = try await repo.fetchMeetPage(cursor: cursor)
+        page.content = page.content.map { meet in
+            var mutableMeet = meet
+            self.verifyCreator(with: &mutableMeet)
+            return mutableMeet
+        }
+        return page
     }
 
     private func verifyCreator(with meet: inout Meet) {
