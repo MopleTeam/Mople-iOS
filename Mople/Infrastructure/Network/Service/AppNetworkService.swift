@@ -113,8 +113,8 @@ final class DefaultAppNetWorkService: AppNetworkService {
             defer { ongoingRefreshTask = nil }
             do {
                 let refreshEndpoint = try APIEndpoints.reissueToken()
-                let token: TokenResponse = try await dataTransferService.request(with: refreshEndpoint)
-                KeychainStorage.shared.saveToken(token)
+                let tokenData: Data = try await dataTransferService.request(with: refreshEndpoint)
+                KeychainStorage.shared.saveToken(tokenData)
             } catch {
                 await MainActor.run {
                     errorHandlingService.handleError(.expiredToken)

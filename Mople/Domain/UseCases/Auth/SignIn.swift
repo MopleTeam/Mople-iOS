@@ -5,6 +5,8 @@
 //  Created by CatSlave on 1/20/25.
 //
 
+import RxSwift
+
 protocol SignIn {
     func execute(platform: LoginPlatform) async throws
 }
@@ -67,12 +69,44 @@ final class SignInUseCase: SignIn {
         }
     }
 
+    /// 플랫폼별 소셜 로그인을 실행하고 결과를 반환한다
+    /// - Note: 로그인 서비스가 RxSwift(Single/Observable) 기반이므로 withCheckedThrowingContinuation으로 브릿지
     private func handleLogin(_ platform: LoginPlatform) async throws -> SocialInfo {
         switch platform {
         case .apple:
-            try await appleLoginService.startAppleLogin()
+            return try await bridgeAppleLogin()
         case .kakao:
-            try await kakaoLoginService.startKakaoLogin()
+            return try await bridgeKakaoLogin()
+        }
+    }
+
+    /// Apple 로그인 Single<SocialInfo>를 async throws로 변환
+    private func bridgeAppleLogin() async throws -> SocialInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            _ = appleLoginService.startAppleLogin()
+                .subscribe(onSuccess: { socialInfo in
+                    continuation.resume(returning: socialInfo)
+                }, onFailure: { error in
+                    continuation.resume(throwing: error)
+                })
+        }
+    }
+
+    /// 카카오 로그인 Observable<SocialInfo>를 async throws로 변환
+    private func bridgeKakaoLogin() async throws -> SocialInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            var resumed = false
+            _ = kakaoLoginService.startKakaoLogin()
+                .take(1)
+                .subscribe(onNext: { socialInfo in
+                    guard !resumed else { return }
+                    resumed = true
+                    continuation.resume(returning: socialInfo)
+                }, onError: { error in
+                    guard !resumed else { return }
+                    resumed = true
+                    continuation.resume(throwing: error)
+                })
         }
     }
 

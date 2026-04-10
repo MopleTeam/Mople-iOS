@@ -216,14 +216,23 @@ extension CreateMeetViewReactor {
     
     // MARK: - 미팅 생성
     private func requestCreateMeet() -> Observable<Mutation> {
-        
+
         let createMeet = handleImageUpload()
             .delay(.seconds(1), scheduler: MainScheduler.instance)
             .flatMap { [weak self] imagePath -> Observable<Meet> in
                 guard let self,
                       var request = createRequest else { return .empty() }
                 request.image = imagePath
-                return createMeetUseCase.execute(requset: request)
+                return Observable.create { [weak self] observer in
+                    let task = Task { [weak self] in
+                        do {
+                            let meet = try await self?.createMeetUseCase.execute(requset: request)
+                            if let meet { observer.onNext(meet) }
+                            observer.onCompleted()
+                        } catch { observer.onError(error) }
+                    }
+                    return Disposables.create { task.cancel() }
+                }
             }
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
@@ -232,13 +241,13 @@ extension CreateMeetViewReactor {
                 handleCompletedTask(with: meet)
                 return .empty()
             })
-            
+
         return requestWithLoading(task: createMeet)
     }
     
     // MARK: - 미팅 편집
     private func requestEditMeet(_ meet: Meet) -> Observable<Mutation> {
-        
+
         let editMeet = handleImageUpload()
             .delay(.seconds(1), scheduler: MainScheduler.instance)
             .flatMap { [weak self] imagePath -> Observable<Meet> in
@@ -246,8 +255,16 @@ extension CreateMeetViewReactor {
                       let id = meet.meetSummary?.id,
                       var request = createRequest else { return .empty() }
                 request.image = imagePath ?? createRequest?.image
-                return editMeetUseCase.execute(id: id,
-                                               request: request)
+                return Observable.create { [weak self] observer in
+                    let task = Task { [weak self] in
+                        do {
+                            let result = try await self?.editMeetUseCase.execute(id: id, request: request)
+                            if let result { observer.onNext(result) }
+                            observer.onCompleted()
+                        } catch { observer.onError(error) }
+                    }
+                    return Disposables.create { task.cancel() }
+                }
             }
             .observe(on: MainScheduler.instance)
             .flatMap({ [weak self] meet -> Observable<Mutation> in
@@ -256,7 +273,7 @@ extension CreateMeetViewReactor {
                 handleCompletedTask(with: meet)
                 return .empty()
             })
-        
+
         return requestWithLoading(task: editMeet)
     }
     
@@ -265,9 +282,17 @@ extension CreateMeetViewReactor {
         guard let image = currentState.image else {
             return .just(nil)
         }
-        
-        return imageUploadUseCase.execute(image)
-            .map { $0 }
+
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let path = try await self?.imageUploadUseCase.execute(image)
+                    observer.onNext(path)
+                    observer.onCompleted()
+                } catch { observer.onError(error) }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
 
     

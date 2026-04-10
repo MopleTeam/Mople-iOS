@@ -5,6 +5,8 @@
 //  Created by CatSlave on 1/20/25.
 //
 
+import Foundation
+
 protocol CreationNickname {
     func executue() async throws -> String
 }

@@ -98,24 +98,43 @@ final class CalendarViewReactor: Reactor {
 // MARK: - Data Request
 extension CalendarViewReactor {
     
+    /// 전체 일정 날짜 목록 조회 (실패 시 빈 배열 반환)
     private func fetchEvent() -> Observable<Mutation> {
-        return fetchCalendarDatesUseCase.execute()
-            .catchAndReturn([])
-            .do(onNext: { [weak self] in
-                self?.updatePlanMonthList(from: $0)
-            })
-            .map { Mutation.updateEvents($0) }
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let dates = try await self?.fetchCalendarDatesUseCase.execute() ?? []
+                    self?.updatePlanMonthList(from: dates)
+                    observer.onNext(.updateEvents(dates))
+                    observer.onCompleted()
+                } catch {
+                    self?.updatePlanMonthList(from: [])
+                    observer.onNext(.updateEvents([]))
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
+    /// 지정 연도의 공휴일 목록 조회
     private func fetchHolidays(for year: Int?) -> Observable<Mutation> {
         guard let year else { return .empty() }
-        
-        return fetchHolidaysUseCase.execute(for: year)
-            .do(onNext: { [weak self] _ in
-                self?.markHolidayYearAsLoaded(year)
-            })
-            .map { $0.compactMap { $0.date } }
-            .map { Mutation.updateHolidays($0) }
+
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let holidays = try await self?.fetchHolidaysUseCase.execute(for: year) ?? []
+                    self?.markHolidayYearAsLoaded(year)
+                    let dates = holidays.compactMap { $0.date }
+                    observer.onNext(.updateHolidays(dates))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     private func needsToFetchHolidays(for year: Int) -> Bool {

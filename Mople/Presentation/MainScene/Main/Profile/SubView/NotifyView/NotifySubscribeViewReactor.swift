@@ -145,25 +145,46 @@ extension NotifySubscribeViewReactor {
             }
     }
     
+    // FCM 토큰 업로드 후 알림 구독 상태 조회 (async throws UseCase → Observable 브릿지)
     private func updateNotifyState() -> Observable<Mutation> {
-        let uploadFCMToken = uploadFCMTokenUseCase.execute()
-            .flatMap { [weak self] _ -> Observable<[SubscribeType]> in
-                guard let self else { return .empty() }
-                return fetchNotifyStateUseCase.execute()
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    try await self.uploadFCMTokenUseCase.execute()
+                    let subscribes = try await self.fetchNotifyStateUseCase.execute()
+                    observer.onNext(.updateSubscribes(Set(subscribes)))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-            .map { Mutation.updateSubscribes(Set($0)) }
-        
-        return requestWithLoading(task: uploadFCMToken)
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: task)
     }
 }
 
 // MARK: - Data Request
 extension NotifySubscribeViewReactor {
+    // 알림 구독 상태 조회 (async throws UseCase → Observable 브릿지)
     private func fetchNotifyState() -> Observable<Mutation> {
-        let fetchState = fetchNotifyStateUseCase.execute()
-            .map { Mutation.updateSubscribes(Set($0)) }
-        
-        return requestWithLoading(task: fetchState)
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let subscribes = try await self.fetchNotifyStateUseCase.execute()
+                    observer.onNext(.updateSubscribes(Set(subscribes)))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: task)
     }
     
     private func requestSubscribe(type: SubscribeType,
@@ -172,16 +193,25 @@ extension NotifySubscribeViewReactor {
         
         isRequesting = true
         
-        let requsetSubscribe = subscribeNotifyUseCase.execute(type: type,
-                                                              isSubscribe: isSubscribe)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let changeSubscribe = changeSubscribe(type: type,
-                                                      isSubscribe: isSubscribe)
-                return .just(.updateSubscribes(changeSubscribe))
+        // 알림 구독 변경 요청 (async throws UseCase → Observable 브릿지)
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    try await self.subscribeNotifyUseCase.execute(type: type,
+                                                                  isSubscribe: isSubscribe)
+                    let updatedSubscribes = self.changeSubscribe(type: type,
+                                                                  isSubscribe: isSubscribe)
+                    observer.onNext(.updateSubscribes(updatedSubscribes))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
-        return requestWithLoading(task: requsetSubscribe)
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: task)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
             })

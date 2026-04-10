@@ -143,14 +143,23 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Request
 extension MeetDetailViewReactor {
+    /// 모임 정보 불러오기 (async UseCase를 Observable로 래핑)
     private func fetchMeetInfo() -> Observable<Mutation> {
-        
-        let fetchMeet = fetchMeetUseCase.execute(meetId: meetId)
-            .map { [weak self] in
-                self?.fetchPost()
-                return Mutation.setMeetInfo(meet: $0)
+        let fetchMeet = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let meet = try await self.fetchMeetUseCase.execute(meetId: self.meetId)
+                    self.fetchPost()
+                    observer.onNext(.setMeetInfo(meet: meet))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: fetchMeet)
     }
 }

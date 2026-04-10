@@ -125,19 +125,25 @@ final class MeetPlanListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension MeetPlanListViewReactor {
     
-    /// 일정 리스트 불러오기
+    /// 일정 리스트 불러오기 (async UseCase를 Observable로 래핑)
     private func fetchPlan(cursor: String? = nil,
                            isRefresh: Bool = false) -> Observable<Mutation> {
-        var totalCount: Int = 0
-        let fetchPlan = fetchPlanUseCase.execute(meetId: meetId, cursor: cursor)
-            .map({ result in
-                self.page = result.info
-                totalCount = result.totalCount
-                return self.updatePlanList(isRefresh: isRefresh, plans: result.content)
-            })
-            .flatMap {
-                return Observable.of($0, .updateTotalCount(totalCount))
+        let fetchPlan = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let result = try await self.fetchPlanUseCase.execute(meetId: self.meetId, cursor: cursor)
+                    self.page = result.info
+                    let listMutation = self.updatePlanList(isRefresh: isRefresh, plans: result.content)
+                    observer.onNext(listMutation)
+                    observer.onNext(.updateTotalCount(result.totalCount))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
         return requestWithLoading(task: fetchPlan,
                                   defferredLoadingDelay: .milliseconds(300))
     }
@@ -186,21 +192,31 @@ extension MeetPlanListViewReactor {
         }
     }
     
+    /// 참여 요청 (async UseCase를 Observable로 래핑)
     private func requestParticipation(id: Int,
                                       planIndex: Int,
                                       isJoin: Bool) -> Observable<Mutation> {
-        let participation = participationPlanUseCase
-            .execute(planId: id,
-                     isJoin: isJoin)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return updateParticipation(planIndex: planIndex)
+        let participation = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.participationPlanUseCase.execute(planId: id, isJoin: isJoin)
+                    guard let self else { return }
+                    var currentPlans = self.currentState.plans
+                    let changePlan = currentPlans[planIndex].updateParticipants()
+                    self.postParticipants(with: changePlan)
+                    observer.onNext(.fetchPlanList(currentPlans))
+                    observer.onCompleted()
+                } catch {
+                    guard let self else {
+                        observer.onError(error)
+                        return
+                    }
+                    let resolveErr = self.resolveParticipationError(err: error, planId: id)
+                    observer.onError(resolveErr ?? error)
+                }
             }
-            .catch({ [weak self] err -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let resolveErr = resolveParticipationError(err: err, planId: id)
-                return .error(resolveErr ?? err)
-            })
+            return Disposables.create { task.cancel() }
+        }
         return requestWithLoading(task: participation, defferredLoadingDelay: .milliseconds(300))
     }
     

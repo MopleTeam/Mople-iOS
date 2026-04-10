@@ -134,13 +134,21 @@ extension MeetSetupViewReactor {
     private func requestDeleteMeet() -> Observable<Mutation> {
         guard let meetId = currentState.meet?.meetSummary?.id else { return .empty() }
         isLoading = true
-        let deleteMeet = deleteMeetUseCase.execute(id: meetId)
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.postDeleteMeet()
-                self?.coordinator?.endFlow()
-                return .empty()
+        let deleteMeet = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.deleteMeetUseCase.execute(id: meetId)
+                    await MainActor.run {
+                        self?.postDeleteMeet()
+                        self?.coordinator?.endFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
         
         return requestWithLoading(task: deleteMeet)
             .do(onDispose: { [weak self] in

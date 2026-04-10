@@ -103,10 +103,17 @@ extension MainTabBarReactor {
     }
     
     private func uploadFCMToken() -> Observable<Mutation> {
-        let uploadToken = uploadFCMTokenUseCase.execute()
-            .flatMap { _ -> Observable<Mutation> in
-                return .empty()
+        let uploadToken = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.uploadFCMTokenUseCase.execute()
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
         return requestWithLoading(task: uploadToken)
     }
 }
@@ -116,16 +123,24 @@ extension MainTabBarReactor {
     private func requestJoinMeet(code: String) -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
         isRequesting = true
-        
-        let joinMeet = joinMeetUseCae.execute(code: code)
-            .observe(on: MainScheduler.asyncInstance)
-            .flatMap { [weak self] meet -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                postAddMeet(with: meet)
-                coordinator?.showJoinedMeet(with: meet)
-                return .empty()
+
+        let joinMeet = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let meet = try await self?.joinMeetUseCae.execute(code: code)
+                    await MainActor.run {
+                        guard let self, let meet else { return }
+                        self.postAddMeet(with: meet)
+                        self.coordinator?.showJoinedMeet(with: meet)
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: joinMeet)
             .do(onDispose: { [weak self] in
                 self?.isRequesting = false
@@ -140,10 +155,17 @@ extension MainTabBarReactor {
 // MARK: - Reset Notify Count
 extension MainTabBarReactor {
     private func requestResetNotify() -> Observable<Mutation> {
-        return resetNotifyCountUseCase.execute()
-            .flatMap { _ -> Observable<Mutation> in
-                return .empty()
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.resetNotifyCountUseCase.execute()
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
     }
 }
 

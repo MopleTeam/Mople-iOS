@@ -104,19 +104,29 @@ final class MeetReviewListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Requset
 extension MeetReviewListViewReactor {
 
-    /// 리뷰 리스트 불러오기
+    /// 리뷰 리스트 불러오기 (async → Observable 브릿지)
     private func fetchReview(cursor: String? = nil,
                              isRefresh: Bool = false) -> Observable<Mutation> {
-        var totalCount: Int = 0
-        let fetchReview = fetchReviewUseCase.execute(meetId: meetId, cursor: cursor)
-            .map({ result in
-                self.page = result.info
-                totalCount = result.totalCount
-                return self.updateReviewList(isRefresh: isRefresh, reviews: result.content)
-            })
-            .flatMap {
-                return Observable.of($0, .updateTotalCount(totalCount))
+        let meetId = self.meetId
+        let fetchReview = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchReviewUseCase.execute(meetId: meetId, cursor: cursor)
+                    guard let self, let result else {
+                        observer.onCompleted()
+                        return
+                    }
+                    self.page = result.info
+                    let listMutation = self.updateReviewList(isRefresh: isRefresh, reviews: result.content)
+                    observer.onNext(listMutation)
+                    observer.onNext(.updateTotalCount(result.totalCount))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
         return requestWithLoading(task: fetchReview,
                                   defferredLoadingDelay: .milliseconds(300))
     }

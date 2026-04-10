@@ -137,17 +137,22 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
         case .fetchNextPage:
             return fetchNextPage()
         case let .editComment(id, text, mentions):
-            return editComment(id: id,
+            guard let comment = currentState.comments.first(where: { $0.id == id }) else { return .empty() }
+            return editComment(comment: comment,
                                text: text,
                                mentions: mentions)
         case let .deleteComment(id):
-            return deleteComment(id: id)
+            guard let comment = currentState.comments.first(where: { $0.id == id }) else { return .empty() }
+            return deleteComment(comment: comment)
         case let .deletedComment(id):
-            return deletedComment(id: id)
+            let updated = currentState.comments.filter { $0.id != id }
+            return .just(.updateComment(updated))
         case let .reportComment(id):
-            return reportComment(id: id)
+            guard let comment = currentState.comments.first(where: { $0.id == id }) else { return .empty() }
+            return reportComment(comment: comment)
         case let .likeComment(id):
-            return likeComment(id: id)
+            guard let comment = currentState.comments.first(where: { $0.id == id }) else { return .empty() }
+            return likeComment(comment: comment)
         case let .showWriterImage(name, imagePath):
             return showWritterImage(name: name, imagePath: imagePath)
         case let .showReply(parentComment, meetId):
@@ -221,10 +226,52 @@ final class CommentListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - 댓글
 extension CommentListViewReactor {
     
-    // MARK: - 댓글
-    private func fetchPage(postId: Int,
-                           cursor: String? = nil,
-                           isRefresh: Bool = false) -> Observable<Mutation> {
+    // MARK: - 댓글 불러오기
+    /// 댓글 목록을 페이지 단위로 불러온다
+    private func fetchComment(postId: Int,
+                              cursor: String? = nil) -> Observable<Mutation> {
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let commentPage = try await self.fetchCommentListUseCase.execute(postId: postId, nextCursor: cursor)
+                    let addSection = self.addComment(commentPage.content, isFirst: cursor == nil)
+                    let page = Mutation.fetchedPage(commentPage.info)
+                    observer.onNext(addSection)
+                    observer.onNext(page)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+        .do(onDispose: { [weak self] in
+            self?.lastCurosr = cursor
+        })
+    }
+    
+    private func fetchCommentWithLoading(postId: Int) -> Observable<Mutation> {
+        updatePostId(postId)
+        let fetch = fetchComment(postId: postId)
+        return requestWithLoading(task: fetch, defferredLoadingDelay: .seconds(0))
+    }
+    
+    private func moreComment() -> Observable<Mutation> {
+        guard let postId,
+              let cursor = currentState.pageInfo?.nextCursor,
+              lastCurosr != cursor else { return .empty() }
+        
+        let fetch = fetchComment(postId: postId, cursor: cursor)
+        
+        return requestWithLoading(task: fetch)
+    }
+    
+    private func updatePostId(_ postId: Int)  {
+        guard self.postId == nil else { return }
         self.postId = postId
         let fetchPaeg = fetchCommentListUseCase.execute(postId: postId, nextCursor: cursor)
             .map { result in
@@ -236,77 +283,36 @@ extension CommentListViewReactor {
         return requestWithLoading(task: fetchPaeg, defferredLoadingDelay: .seconds(0))
     }
     
+    // MARK: - 댓글 생성
+    /// 새 댓글을 생성한다
     private func createComment(comment: String,
                                mentions: [Int] = []) -> Observable<Mutation> {
         guard let postId else { return .empty() }
-        let mockComment = Comment.mockComment()
-        let addMock = updateLoadingComment(loadingCase: .new(mockComment))
-        
-        let createComment = createCommentUseCase
-            .execute(postId: postId,
-                     comment: comment,
-                     mentions: mentions)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .map({
-                var newComment = $0
-                newComment.uuid = mockComment.uuid
-                return newComment
-            })
-            .map { self.updateLoadingComment(loadingCase: .replace($0)) }
-            .flatMap { replaceMutation -> Observable<Mutation> in
-                return .of(.adjustCommentCount(increment: true), replaceMutation)
-            }
 
-        return .just(addMock)
-            .concat(createComment)
-    }
-
-    // MARK: - 대댓글
-    private func fetchReplyPage(postId: Int,
-                                parentComment: Comment,
-                                cursor: String? = nil,
-                                isRefresh: Bool = false) -> Observable<Mutation> {
-        guard let commentId = parentComment.id else { return .empty() }
-        self.postId = postId
-        let fetchReply = fetchReplyCommentListUseCase.execute(postId: postId,
-                                                              commentId: commentId,
-                                                              nextCursor: cursor)
-            .map { result in
-                self.page = result.info
-                var comments = result.content
-                if isRefresh {
-                    comments.insert(parentComment, at: 0)
+        let createComment = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let newComment = try await self.createCommentUseCase
+                        .execute(postId: postId,
+                                 comment: comment,
+                                 mentions: mentions)
+                    if let mutation = self.addCommentItem(newComment) {
+                        observer.onNext(mutation)
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
                 }
-                let editCase: CommentEdit = isRefresh ? .refresh(comments: comments) : .add(comments: comments)
-                return self.updateCommentList(editCase: editCase)
             }
-        
-        return requestWithLoading(task: fetchReply, defferredLoadingDelay: .seconds(0))
-    }
-   
-    private func createReply(parentId: Int,
-                             comment: String,
-                             mentions: [Int] = []) -> Observable<Mutation> {
-        guard let postId else { return .empty() }
-        
-        let mockComment = Comment.mockComment()
-        let addMock = updateLoadingComment(loadingCase: .new(mockComment))
-        
-        let createComment = createReplyUseCase
-            .execute(postId: postId,
-                     parentId: parentId,
-                     comment: comment,
-                     mentions: mentions)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .map({
-                var newComment = $0
-                newComment.uuid = mockComment.uuid
-                return newComment
-            })
-            .map { self.updateLoadingComment(loadingCase: .replace($0)) }
-        
-        return .just(addMock)
-            .concat(createComment)
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: createComment)
+            .concat(Observable.just(.writedComment))
     }
     
     // MARK: - 페이징
@@ -344,54 +350,105 @@ extension CommentListViewReactor {
 // MARK: - 댓글 공통
 extension CommentListViewReactor {
     // MARK: - 댓글 편집
-    private func editComment(id: Int,
+    /// 기존 댓글을 수정한다
+    private func editComment(comment: Comment,
                              text: String,
                              mentions: [Int] = []) -> Observable<Mutation> {
-        let loadingComment = updateLoadingComment(loadingCase: .edit(id: id))
-        let editComment = editCommentUseCase
-            .execute(id: id,
-                     text: text,
-                     mentions: mentions)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .map { self.updateCommentList(editCase: .edit(comment: $0)) }
-        
-        return .just(loadingComment)
-            .concat(editComment)
-    }
-    
-    // MARK: - 댓글 삭제
-    private func deleteComment(id: Int) -> Observable<Mutation> {
-        let task = deleteCommentUseCase
-            .execute(commentId: id)
-            .observe(on: MainScheduler.instance)
-            .flatMap { _ -> Observable<Mutation> in
-                let deleteUpdate = self.updateCommentList(editCase: .delete(id: id))
-                return .of(.adjustCommentCount(increment: false), deleteUpdate)
+        guard let id = comment.id else { return .empty() }
+
+        let editComment = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let edited = try await self.editCommentUseCase
+                        .execute(id: id,
+                                 text: text,
+                                 mentions: mentions)
+                    if let mutation = self.editCommentItem(edited) {
+                        observer.onNext(mutation)
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        return requestWithLoading(task: task)
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: editComment)
+            .concat(Observable.just(.editedComment))
     }
 
-    private func deletedComment(id: Int) -> Observable<Mutation> {
-        let updateComment = self.updateCommentList(editCase: .delete(id: id))
-        return .of(.adjustCommentCount(increment: false), updateComment)
-    }
-    
-    // MARK: - 댓글 좋아요
-    private func likeComment(id: Int) -> Observable<Mutation> {
-        let task = likeCommentUseCase
-            .execute(commentId: id)
-            .map { self.updateCommentList(editCase: .edit(comment: $0)) }
-        return requestWithLoading(task: task)
+    // MARK: - 댓글 삭제
+    /// 댓글을 삭제한다
+    private func deleteComment(comment: Comment) -> Observable<Mutation> {
+        guard let selectedCommentId = comment.id else { return .empty() }
+
+        let deleteComment = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.deleteCommentUseCase
+                        .execute(commentId: selectedCommentId)
+                    if let mutation = self?.deleteCommentItem(selectedCommentId) {
+                        observer.onNext(mutation)
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: deleteComment)
+            .concat(Observable.just(.editedComment))
     }
     
     // MARK: - 댓글 신고
-    private func reportComment(id: Int) -> Observable<Mutation> {
-        let task = reportUseCase
-            .execute(type: .comment(id: id), reason: nil)
-            .map { Mutation.reportedComment }
-        return requestWithLoading(task: task)
+    /// 댓글을 신고한다
+    private func reportComment(comment: Comment) -> Observable<Mutation> {
+        guard let id = comment.id else { return .empty() }
+
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.reportUseCase
+                        .execute(type: .comment(id: id), reason: nil)
+                    observer.onNext(.reportedComment)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
+    // MARK: - 댓글 좋아요
+    private func likeComment(comment: Comment) -> Observable<Mutation> {
+        guard let id = comment.id else { return .empty() }
+
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let updatedComment = try await self?.likeCommentUseCase.execute(commentId: id)
+                    if let updatedComment {
+                        observer.onNext(.updateComment(
+                            self?.currentState.comments.map { $0.id == id ? updatedComment : $0 } ?? []
+                        ))
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+    }
+
     // MARK: - 댓글 리스트 편집
     private func updateCommentList(editCase: CommentEdit) -> Mutation {
         var comments = currentState.comments

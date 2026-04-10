@@ -308,19 +308,31 @@ extension CreatePlanViewReactor {
 // MARK: - Meet Paging
 extension CreatePlanViewReactor {
     
-    /// 모임 리스트 초기 로드
+    /// 모임 리스트 초기 로드 (async → Observable 브릿지)
     private func fetchMeetList() -> Observable<Mutation> {
-        return fetchMeetPageUseCase.execute(cursor: nil)
-            .flatMap { [weak self] result -> Observable<Mutation> in
-                self?.page = result.info
-                let meets = result.content.compactMap { $0.meetSummary }
-                let hasNext = result.info?.hasNext ?? false
-                return .of(.updateMeetList(meets),
-                           .updateHasNextMeetPage(hasNext))
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchMeetPageUseCase.execute(cursor: nil)
+                    guard let self, let result else {
+                        observer.onCompleted()
+                        return
+                    }
+                    self.page = result.info
+                    let meets = result.content.compactMap { $0.meetSummary }
+                    let hasNext = result.info?.hasNext ?? false
+                    observer.onNext(.updateMeetList(meets))
+                    observer.onNext(.updateHasNextMeetPage(hasNext))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
     }
-    
-    /// 모임 리스트 다음 페이지 로드
+
+    /// 모임 리스트 다음 페이지 로드 (async → Observable 브릿지)
     private func fetchNextMeetList() -> Observable<Mutation> {
         guard !isLoadingMeetPage,
               let cursor = page?.nextCursor,
@@ -328,18 +340,30 @@ extension CreatePlanViewReactor {
             return .empty()
         }
         isLoadingMeetPage = true
-        return fetchMeetPageUseCase.execute(cursor: cursor)
-            .flatMap { [weak self] result -> Observable<Mutation> in
-                self?.page = result.info
-                let newMeets = result.content.compactMap { $0.meetSummary }
-                let currentMeets = self?.currentState.meets ?? []
-                let hasNext = result.info?.hasNext ?? false
-                return .of(.updateMeetList(currentMeets + newMeets),
-                           .updateHasNextMeetPage(hasNext))
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchMeetPageUseCase.execute(cursor: cursor)
+                    guard let self, let result else {
+                        observer.onCompleted()
+                        return
+                    }
+                    self.page = result.info
+                    let newMeets = result.content.compactMap { $0.meetSummary }
+                    let currentMeets = self.currentState.meets
+                    let hasNext = result.info?.hasNext ?? false
+                    observer.onNext(.updateMeetList(currentMeets + newMeets))
+                    observer.onNext(.updateHasNextMeetPage(hasNext))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-            .do(onDispose: { [weak self] in
-                self?.isLoadingMeetPage = false
-            })
+            return Disposables.create { task.cancel() }
+        }
+        .do(onDispose: { [weak self] in
+            self?.isLoadingMeetPage = false
+        })
     }
 }
 
@@ -360,35 +384,57 @@ extension CreatePlanViewReactor {
         }
     }
     
+    /// 일정 생성 (async → Observable 브릿지)
     private func createPlan(request: PlanRequest) -> Observable<Mutation> {
-        let uploadPlan = createPlanUseCase.execute(request: request)
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] plan -> Observable<Mutation> in
-                self?.postNewPlan(plan)
-                self?.coordinator?.completed(with: plan)
-                return .empty()
-            })
-        
+        let uploadPlan = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let plan = try await self?.createPlanUseCase.execute(request: request)
+                    await MainActor.run {
+                        if let plan {
+                            self?.postNewPlan(plan)
+                            self?.coordinator?.completed(with: plan)
+                        }
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: uploadPlan)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false
             })
     }
-    
+
+    /// 일정 수정 (async → Observable 브릿지)
     private func editPlan(request: PlanRequest) -> Observable<Mutation> {
         guard let date = currentState.previousPlan?.date,
               DateManager.isPastDay(on: date) == false else {
             return .just(.catchError(.midnight(.midnightReset)))
         }
-        
-        let editPlan = editPlanUseCase.execute(request: request)
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] plan -> Observable<Mutation> in
-                self?.postNewPlan(plan)
-                self?.coordinator?.endFlow()
-                return .empty()
-            })
-        
+
+        let editPlan = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let plan = try await self?.editPlanUseCase.execute(request: request)
+                    await MainActor.run {
+                        if let plan {
+                            self?.postNewPlan(plan)
+                            self?.coordinator?.endFlow()
+                        }
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: editPlan)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false

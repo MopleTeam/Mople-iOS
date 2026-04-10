@@ -78,16 +78,25 @@ extension MentionListViewReactor {
         if let cachedResult = cachedResult[keyword ?? ""] {
             return .just(Mutation.fetchedPage(cachedResult))
         } else {
-            return fetchMentionListUseCase.execute(meetId: meetId,
-                                                   cursor: page?.nextCursor,
-                                                   keyword: keyword ?? "")
-            .compactMap { [weak self] in
-                guard let self else { return nil }
-                self.page = $0.info
-                self.cachedResult[keyword ?? ""]?.append(contentsOf: $0.content)
-                
-                let members = isFirst ? $0.content : self.appendMember(member: $0.content)
-                return Mutation.fetchedPage(members)
+            return Observable.create { [weak self] observer in
+                let task = Task { [weak self] in
+                    do {
+                        let result = try await self?.fetchMentionListUseCase.execute(
+                            meetId: meetId,
+                            cursor: self?.page?.nextCursor,
+                            keyword: keyword ?? ""
+                        )
+                        guard let self, let result else { return }
+                        self.page = result.info
+                        self.cachedResult[keyword ?? ""]?.append(contentsOf: result.content)
+                        let members = isFirst ? result.content : self.appendMember(member: result.content)
+                        observer.onNext(.fetchedPage(members))
+                        observer.onCompleted()
+                    } catch {
+                        observer.onError(error)
+                    }
+                }
+                return Disposables.create { task.cancel() }
             }
         }
     }

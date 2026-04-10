@@ -115,19 +115,28 @@ extension ProfileViewReactor {
         return .just(.fetchUserInfo(userInfo))
     }
 
+    /// 로그아웃 처리 (async → Observable 브릿지)
     private func signOut() -> Observable<Mutation> {
         guard let userId = UserInfoStorage.shared.userInfo?.id,
               !isRequesting else { return .empty() }
 
         isRequesting = true
 
-        let signOut = signOutUseCase.execute(userId: userId)
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.resetUserData()
-                self?.coordinator?.endMainFlow()
-                return .empty()
+        let signOut = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.signOutUseCase.execute(userId: userId)
+                    await MainActor.run {
+                        self?.resetUserData()
+                        self?.coordinator?.endMainFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
 
         return requestWithLoading(task: signOut)
             .do(onDispose: { [weak self] in
@@ -136,31 +145,43 @@ extension ProfileViewReactor {
     }
 
   
+    /// 양도 필요 모임 확인 (async → Observable 브릿지)
     private func checkTransferMeet() -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
 
         isRequesting = true
 
-        let task = fetchMyHostMeetsUseCase.execute(cursor: nil)
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] page -> Observable<Mutation> in
-                guard let self = self else { return .empty() }
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let page = try await self?.fetchMyHostMeetsUseCase.execute(cursor: nil)
+                    await MainActor.run {
+                        guard let self, let page else {
+                            observer.onCompleted()
+                            return
+                        }
 
-                // 멤버가 2명 이상인 모임만 필터링 (양도 필요한 모임)
-                let transferableMeets = page.content.filter { meet in
-                    guard let memberCount = meet.memberCount else { return false }
-                    return memberCount >= 2
-                }
+                        // 멤버가 2명 이상인 모임만 필터링 (양도 필요한 모임)
+                        let transferableMeets = page.content.filter { meet in
+                            guard let memberCount = meet.memberCount else { return false }
+                            return memberCount >= 2
+                        }
 
-                if transferableMeets.isEmpty {
-                    // 양도할 모임 없음 → 탈퇴 확인 알림 표시
-                    return .just(.showDeleteConfirm)
-                } else {
-                    // 양도할 모임 있음 → 양도 화면으로 이동
-                    self.coordinator?.showTransferMeetList()
-                    return .empty()
+                        if transferableMeets.isEmpty {
+                            // 양도할 모임 없음 → 탈퇴 확인 알림 표시
+                            observer.onNext(.showDeleteConfirm)
+                        } else {
+                            // 양도할 모임 있음 → 양도 화면으로 이동
+                            self.coordinator?.showTransferMeetList()
+                        }
+                        observer.onCompleted()
+                    }
+                } catch {
+                    observer.onError(error)
                 }
             }
+            return Disposables.create { task.cancel() }
+        }
 
         return requestWithLoading(task: task)
             .do(onDispose: { [weak self] in
@@ -168,18 +189,27 @@ extension ProfileViewReactor {
             })
     }
 
+    /// 계정 삭제 처리 (async → Observable 브릿지)
     private func deleteAccount() -> Observable<Mutation> {
         guard !isRequesting else { return .empty() }
 
         isRequesting = true
 
-        let deleteAccount = deleteAccountUseCase.execute()
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.resetUserData()
-                self?.coordinator?.endMainFlow()
-                return .empty()
+        let deleteAccount = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.deleteAccountUseCase.execute()
+                    await MainActor.run {
+                        self?.resetUserData()
+                        self?.coordinator?.endMainFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
 
         return requestWithLoading(task: deleteAccount)
             .do(onDispose: { [weak self] in

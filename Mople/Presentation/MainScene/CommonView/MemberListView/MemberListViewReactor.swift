@@ -147,15 +147,27 @@ extension MemberListViewReactor {
 
 // MARK: - Data Request
 extension MemberListViewReactor {
+    /// 멤버 목록을 페이지 단위로 불러온다
     private func fetchPlanMember(cursor: String? = nil) -> Observable<Mutation> {
         isLoading = true
         let cursor = page?.nextCursor
-        let fetchMember = fetchMemberUseCase.execute(type: type, cursor: cursor)
-            .map { [weak self] result in
-                self?.page = result.info
-                return Mutation.fetchedPage(result.content)
+        let type = self.type
+        let fetchMember = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchMemberUseCase.execute(type: type, cursor: cursor)
+                    if let result {
+                        self?.page = result.info
+                        observer.onNext(.fetchedPage(result.content))
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: fetchMember)
     }
     
@@ -164,14 +176,28 @@ extension MemberListViewReactor {
         return fetchPlanMember(cursor: cursor)
     }
     
+    /// 모임 초대 URL을 요청한다
     private func requestInviteUrl() -> Observable<Mutation> {
         guard case .meet(let id) = type,
               let id else { return .empty() }
-        
+
         isLoading = true
-        let inviteMeet = inviteMeetUseCase.execute(id: id)
-            .map { Mutation.fetchedInviteUrl($0) }
-        
+        let inviteMeet = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let url = try await self?.inviteMeetUseCase.execute(id: id) else {
+                        observer.onCompleted()
+                        return
+                    }
+                    observer.onNext(.fetchedInviteUrl(url))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: inviteMeet)
     }
 }
