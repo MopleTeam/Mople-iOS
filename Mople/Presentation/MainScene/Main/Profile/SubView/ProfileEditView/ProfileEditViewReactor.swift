@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Core
 import ReactorKit
 
 protocol ProfileEditViewCoordination: NavigationCloseable { }

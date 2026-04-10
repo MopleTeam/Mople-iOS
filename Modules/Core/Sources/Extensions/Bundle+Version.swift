@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension Bundle {
-    
+public extension Bundle {
+
     /// 버전 정보
     var releaseVersionNumber: String? {
         return infoDictionary?["CFBundleShortVersionString"] as? String

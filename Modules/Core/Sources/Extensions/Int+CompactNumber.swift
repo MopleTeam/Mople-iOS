@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Int {
+public extension Int {
     func formatCompactNumber() -> String {
         switch self {
         case 1001...:

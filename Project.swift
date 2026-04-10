@@ -156,9 +156,7 @@ let coreTarget: Target = .target(
     bundleId: "com.moim.moimtable.core",
     deploymentTargets: deploymentTarget,
     sources: ["Modules/Core/Sources/**"],
-    dependencies: [
-        .external(name: "RxSwift"),
-    ],
+    dependencies: [],
     settings: .settings(
         base: [
             "SWIFT_VERSION": "5.0",
