@@ -5,23 +5,21 @@
 //  Created by CatSlave on 2/24/25.
 //
 
-import RxSwift
-
 final class DefaultCalendarRepo: BaseRepositories, CalendarRepo {
-    func fetchAllDates() -> Single<AllPlanDateResponse> {
-        return networkService.authenticatedRequest {
+    func fetchAllDates() async throws -> AllPlanDateResponse {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarDates()
         }
     }
-    
-    func fetchHolidays(for year: Int) -> Single<[HolidayResponse]> {
-        return networkService.authenticatedRequest {
+
+    func fetchHolidays(for year: Int) async throws -> [HolidayResponse] {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.fetchHolidays(for: year)
         }
     }
-    
-    func fetchMonthlyPost(month: String) -> Single<MonthlyPostResponse> {
-        return networkService.authenticatedRequest {
+
+    func fetchMonthlyPost(month: String) async throws -> MonthlyPostResponse {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.fetchCalendarPagingData(month: month)
         }
     }

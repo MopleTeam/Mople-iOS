@@ -5,35 +5,30 @@
 //  Created by CatSlave on 1/6/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchPlanPage {
-    func execute(meetId: Int, cursor: String?) -> Observable<Page<Plan>>
+    func execute(meetId: Int, cursor: String?) async throws -> Page<Plan>
 }
 
 final class FetchPlanPageUsecase: FetchPlanPage {
     private let repo: PlanRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
-    
+
     init(repo: PlanRepo) {
         self.repo = repo
     }
-    
-    func execute(meetId: Int, cursor: String?) -> Observable<Page<Plan>> {
-        return repo.fetchPlanPage(meetId: meetId,
-                                  cursor: cursor)
-        .asObservable()
-        .map { Page(totalCount: $0.totalCount ?? 0,
-                    content: $0.content.map({ $0.toDomain() }),
-                    info: $0.page?.toDomain()) }
-        .map({
-            var planPage = $0
-            self.verifyCreator(with: &planPage.content)
-            return planPage
-        })
+
+    func execute(meetId: Int, cursor: String?) async throws -> Page<Plan> {
+        let response = try await repo.fetchPlanPage(meetId: meetId,
+                                                     cursor: cursor)
+        var page = Page(totalCount: response.totalCount ?? 0,
+                        content: response.content.map({ $0.toDomain() }),
+                        info: response.page?.toDomain())
+        verifyCreator(with: &page.content)
+        return page
     }
-    
+
     private func verifyCreator(with planList: inout [Plan]) {
         guard let userID else { return }
         planList.enumerated().forEach { index, plan in
@@ -54,7 +49,7 @@ final class MockFetchPlanPageUseCase: FetchPlanPage {
         "축구 경기", "배드민턴 대회", "자전거 라이딩", "러닝 모임", "수영 강습"
     ]
 
-    func execute(meetId: Int, cursor: String?) -> Observable<Page<Plan>> {
+    func execute(meetId: Int, cursor: String?) async throws -> Page<Plan> {
         print("✅ [Mock] 모임 일정 목록 조회 - meetId: \(meetId), cursor: \(cursor ?? "nil")")
 
         let calendar = Calendar.current
@@ -92,9 +87,8 @@ final class MockFetchPlanPageUseCase: FetchPlanPage {
             info: PageInfo(nextCursor: nextCursor, hasNext: hasNext, size: pageSize)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif
-

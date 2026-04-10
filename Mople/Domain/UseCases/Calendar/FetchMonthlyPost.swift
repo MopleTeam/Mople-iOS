@@ -6,31 +6,29 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol FetchMonthlyPost {
-    func execute(month: String) -> Observable<[MonthlyPost]>
+    func execute(month: String) async throws -> [MonthlyPost]
 }
 
 final class FetchMonthlyPostUseCase: FetchMonthlyPost {
-    
+
     private let repo: CalendarRepo
-    
+
     init(repo: CalendarRepo) {
         self.repo = repo
     }
-    
-    func execute(month: String) -> Observable<[MonthlyPost]> {
-        return repo.fetchMonthlyPost(month: month)
-            .map { $0.toDomain() }
-            .asObservable()
+
+    func execute(month: String) async throws -> [MonthlyPost] {
+        let response = try await repo.fetchMonthlyPost(month: month)
+        return response.toDomain()
     }
 }
 
 // MARK: - Mock
 #if DEV
 final class MockFetchMonthlyPostUseCase: FetchMonthlyPost {
-    func execute(month: String) -> Observable<[MonthlyPost]> {
+    func execute(month: String) async throws -> [MonthlyPost] {
         print("✅ [Mock] \(month) 월별 게시글 조회")
 
         let calendar = Calendar.current
@@ -63,8 +61,8 @@ final class MockFetchMonthlyPostUseCase: FetchMonthlyPost {
                         isCreator: false)
         ]
 
-        return Observable.just(mockPosts)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockPosts
     }
 }
 #endif

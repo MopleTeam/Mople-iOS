@@ -5,10 +5,9 @@
 //  Created by CatSlave on 1/6/25.
 //
 import Foundation
-import RxSwift
 
 protocol UserInfoRepo {
-    func updateUserInfo() -> Single<Void>
-    func editProfile(requestModel: ProfileEditRequest) -> Single<Void>
+    func updateUserInfo() async throws
+    func editProfile(requestModel: ProfileEditRequest) async throws
 }
 

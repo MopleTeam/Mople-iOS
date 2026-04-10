@@ -6,36 +6,34 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol FetchMeetPage {
-    func execute(cursor: String?) -> Observable<Page<Meet>>
+    func execute(cursor: String?) async throws -> Page<Meet>
 }
 
 final class FetchMeetPageUseCase: FetchMeetPage {
-  
+
     private let repo: MeetRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
 
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
-        return repo.fetchMeetPage(cursor: cursor)
-            .map { .init(
-                totalCount: $0.totalCount ?? 0,
-                content: $0.content
-                    .map({
-                        var meet = $0.toDomain()
-                        self.verifyCreator(with: &meet)
-                        return meet
-                    }),
-                info: $0.page?.toDomain()) }
-            .asObservable()
+
+    func execute(cursor: String?) async throws -> Page<Meet> {
+        let response = try await repo.fetchMeetPage(cursor: cursor)
+        return .init(
+            totalCount: response.totalCount ?? 0,
+            content: response.content
+                .map({
+                    var meet = $0.toDomain()
+                    self.verifyCreator(with: &meet)
+                    return meet
+                }),
+            info: response.page?.toDomain())
     }
-    
+
     private func verifyCreator(with meet: inout Meet) {
         guard let userID else { return }
         guard let ownerId = meet.creatorId,
@@ -71,7 +69,7 @@ final class MockFetchMeetPageUseCase: FetchMeetPage {
         }
     }()
 
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
+    func execute(cursor: String?) async throws -> Page<Meet> {
         print("✅ [Mock] 모임 목록 조회 - cursor: \(cursor ?? "nil")")
 
         let startIndex = cursor.flatMap { Int($0) } ?? 0
@@ -88,9 +86,8 @@ final class MockFetchMeetPageUseCase: FetchMeetPage {
             info: PageInfo(nextCursor: nextCursor, hasNext: hasNext, size: pageSize)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif
-

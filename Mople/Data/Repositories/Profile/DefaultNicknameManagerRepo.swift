@@ -6,18 +6,17 @@
 //
 
 import Foundation
-import RxSwift
 
 final class DefaultNicknameManagerRepo: BaseRepositories, NicknameRepo {
-    func creationNickname() -> Single<Data> {
+    func creationNickname() async throws -> Data {
         let endpoint = APIEndpoints.getRandomNickname()
-        return networkService.basicRequest(endpoint: endpoint)
+        return try await networkService.basicRequest(endpoint: endpoint)
     }
-    
-    func isNicknameExists(_ name: String) -> Single<Data> {
+
+    func isNicknameExists(_ name: String) async throws -> Data {
         let endpoint = APIEndpoints.checkNickname(name)
-        
-        return networkService.basicRequest(endpoint: endpoint)
+
+        return try await networkService.basicRequest(endpoint: endpoint)
     }
 }
 

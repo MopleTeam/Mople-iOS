@@ -6,32 +6,29 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol FetchAllPlanDate {
-    func execute() -> Observable<[Date]>
+    func execute() async throws -> [Date]
 }
 
 final class FetchAllPlanDateUseCase: FetchAllPlanDate {
-    
+
     private let repo: CalendarRepo
-    
+
     init(repo: CalendarRepo) {
         self.repo = repo
     }
-    
-    func execute() -> Observable<[Date]> {
-        return repo.fetchAllDates()
-            .map { $0.toDomain() }
-            .map { $0.dates }
-            .asObservable()
+
+    func execute() async throws -> [Date] {
+        let response = try await repo.fetchAllDates()
+        return response.toDomain().dates
     }
 }
 
 // MARK: - Mock
 #if DEV
 final class MockFetchAllPlanDateUseCase: FetchAllPlanDate {
-    func execute() -> Observable<[Date]> {
+    func execute() async throws -> [Date] {
         print("✅ [Mock] 전체 일정 날짜 목록 조회")
 
         let calendar = Calendar.current
@@ -44,8 +41,8 @@ final class MockFetchAllPlanDateUseCase: FetchAllPlanDate {
             calendar.date(byAdding: .day, value: 14, to: today)!
         ]
 
-        return Observable.just(mockDates)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockDates
     }
 }
 #endif

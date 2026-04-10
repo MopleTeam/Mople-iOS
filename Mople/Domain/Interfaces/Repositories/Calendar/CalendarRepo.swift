@@ -5,11 +5,9 @@
 //  Created by CatSlave on 2/24/25.
 //
 
-import RxSwift
-
 protocol CalendarRepo {
-    func fetchAllDates() -> Single<AllPlanDateResponse>
-    func fetchHolidays(for year: Int) -> Single<[HolidayResponse]>
-    func fetchMonthlyPost(month: String) -> Single<MonthlyPostResponse>
+    func fetchAllDates() async throws -> AllPlanDateResponse
+    func fetchHolidays(for year: Int) async throws -> [HolidayResponse]
+    func fetchMonthlyPost(month: String) async throws -> MonthlyPostResponse
 }
 

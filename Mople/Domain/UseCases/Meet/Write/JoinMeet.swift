@@ -5,31 +5,29 @@
 //  Created by CatSlave on 4/24/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol JoinMeet {
-    func execute(code: String) -> Observable<Meet>
+    func execute(code: String) async throws -> Meet
 }
 
 final class JoinMeetUseCase: JoinMeet {
     private let repo: MeetRepo
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
-    func execute(code: String) -> Observable<Meet> {
-        return repo.joinMeet(code: code)
-            .map { $0.toDomain() }
-            .asObservable()
+
+    func execute(code: String) async throws -> Meet {
+        let response = try await repo.joinMeet(code: code)
+        return response.toDomain()
     }
 }
 
 // MARK: - Mock UseCase
 #if DEV
 final class MockJoinMeetUseCase: JoinMeet {
-    func execute(code: String) -> Observable<Meet> {
+    func execute(code: String) async throws -> Meet {
         print("✅ [Mock] 모임 참여 - code: \(code)")
 
         let mockMeet = Meet(
@@ -40,9 +38,8 @@ final class MockJoinMeetUseCase: JoinMeet {
             firstPlanDate: Calendar.current.date(byAdding: .day, value: 7, to: Date())
         )
 
-        return Observable.just(mockMeet)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockMeet
     }
 }
 #endif
-

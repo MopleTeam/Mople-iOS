@@ -6,37 +6,34 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol InviteMeet {
-    func execute(id: Int) -> Observable<String>
+    func execute(id: Int) async throws -> String
 }
 
 final class InviteMeetUseCase: InviteMeet {
-    
+
     private let repo: MeetRepo
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
-    func execute(id: Int) -> Observable<String> {
-        return repo.inviteMeet(id: id)
-            .asObservable()
+
+    func execute(id: Int) async throws -> String {
+        return try await repo.inviteMeet(id: id)
     }
 }
 
 // MARK: - Mock UseCase
 #if DEV
 final class MockInviteMeetUseCase: InviteMeet {
-    func execute(id: Int) -> Observable<String> {
+    func execute(id: Int) async throws -> String {
         print("✅ [Mock] 모임 초대 코드 생성 - meetId: \(id)")
 
         let mockCode = "MOCK-\(id)-\(String(format: "%04d", Int.random(in: 1000...9999)))"
 
-        return Observable.just(mockCode)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockCode
     }
 }
 #endif
-

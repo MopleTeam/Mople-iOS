@@ -5,31 +5,26 @@
 //  Created by CatSlave on 8/31/24.
 
 import Foundation
-import RxSwift
 
 protocol FetchHomeData {
-    func execute() -> Observable<HomeData>
+    func execute() async throws -> HomeData
 }
 
 final class FetchHomeDataUseCase: FetchHomeData {
     private let repo: PlanRepo
     private let userID = UserInfoStorage.shared.userInfo?.id
-    
+
     init(repo: PlanRepo) {
         self.repo = repo
     }
-    
-    func execute() -> Observable<HomeData> {
-        return repo.fetchHomeData()
-            .map { $0.toDomain() }
-            .map({
-                var newHomeData = $0
-                self.verifyCreator(with: &newHomeData.plans)
-                return newHomeData
-            })
-            .asObservable()
+
+    func execute() async throws -> HomeData {
+        let response = try await repo.fetchHomeData()
+        var newHomeData = response.toDomain()
+        verifyCreator(with: &newHomeData.plans)
+        return newHomeData
     }
-    
+
     private func verifyCreator(with planList: inout [Plan]) {
         guard let userID else { return }
         planList.enumerated().forEach { index, plan in
@@ -41,7 +36,7 @@ final class FetchHomeDataUseCase: FetchHomeData {
 // MARK: - Mock UseCase
 #if DEV
 final class MockFetchHomeDataUseCase: FetchHomeData {
-    func execute() -> Observable<HomeData> {
+    func execute() async throws -> HomeData {
         print("✅ [Mock] 홈 데이터 조회")
 
         let calendar = Calendar.current
@@ -68,9 +63,8 @@ final class MockFetchHomeDataUseCase: FetchHomeData {
 
         let homeData = HomeData(plans: mockPlans, hasMeet: true)
 
-        return Observable.just(homeData)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return homeData
     }
 }
 #endif
-

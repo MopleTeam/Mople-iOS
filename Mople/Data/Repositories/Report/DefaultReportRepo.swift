@@ -5,11 +5,9 @@
 //  Created by CatSlave on 2/14/25.
 //
 
-import RxSwift
-
 final class DefaultReportRepo: BaseRepositories, ReportRepo {
-    func reportPost(request: ReportRequest) -> Single<Void> {
-        networkService.authenticatedRequest {
+    func reportPost(request: ReportRequest) async throws {
+        try await networkService.authenticatedRequest {
             return try APIEndpoints.report(request: request)
         }
     }

@@ -6,17 +6,14 @@
 //
 
 import Foundation
-import RxSwift
 
 final class DefaultFCMTokenRepo: BaseRepositories, FCMTokenUploadRepo {
-        
-    func uploadFCMToken(_ token: String) -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func uploadFCMToken(_ token: String) async throws {
+        try await networkService.authenticatedRequest {
             try APIEndpoints.uploadFCMToken(token)
         }
-        .do(onSuccess: {
-            UserDefaults.saveFCMToken(token)
-        })
+        UserDefaults.saveFCMToken(token)
     }
 }
 

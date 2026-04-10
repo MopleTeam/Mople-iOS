@@ -5,37 +5,34 @@
 //  Created by CatSlave on 6/12/25.
 //
 
-import RxSwift
-
 protocol CheckVersion {
-    func executue() -> Observable<UpdateStatus>
+    func executue() async throws -> UpdateStatus
 }
 
 final class CheckVersionUseCase: CheckVersion {
 
     private let repo: AppVersionRepo
-    
+
     init(repo: AppVersionRepo) {
         self.repo = repo
     }
-    
-    func executue() -> Observable<UpdateStatus> {
-        self.repo.checkForceUpdate()
-            .map { $0.toDomain() }
-            .asObservable()
+
+    func executue() async throws -> UpdateStatus {
+        let response = try await repo.checkForceUpdate()
+        return response.toDomain()
     }
 }
 
 // MARK: - Mock
 #if DEV
 final class MockCheckVersionUseCase: CheckVersion {
-    func executue() -> Observable<UpdateStatus> {
+    func executue() async throws -> UpdateStatus {
         print("✅ [Mock] 앱 버전 체크")
         let mockStatus = UpdateStatus(forceUpdate: false,
                                       minVersion: "1.0.0",
                                       message: "")
-        return Observable.just(mockStatus)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockStatus
     }
 }
 #endif

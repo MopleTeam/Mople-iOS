@@ -5,17 +5,15 @@
 //  Created by CatSlave on 4/14/25.
 //
 
-import RxSwift
-
 final class DefaultNotifySubscribeRepo: BaseRepositories, NotifySubscribeRepo {
-    func fetchNotifyState() -> Single<[String]> {
-        return networkService.authenticatedRequest {
+    func fetchNotifyState() async throws -> [String] {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.fetchNotifyState()
         }
     }
-    
-    func subscribeNotify(type: SubscribeType, isSubscribe: Bool) -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func subscribeNotify(type: SubscribeType, isSubscribe: Bool) async throws {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.subscribeMeetNotify(type: type,
                                                  isSubscribe: isSubscribe)
         }

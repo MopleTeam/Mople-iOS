@@ -5,9 +5,7 @@
 //  Created by CatSlave on 4/10/25.
 //
 
-import RxSwift
-
 protocol NotifyRepo {
-    func fetchNotifyList(cursor: String?) -> Single<PageResponse<NotifyResponse>>
-    func resetNotifyCount() -> Single<Void>
+    func fetchNotifyList(cursor: String?) async throws -> PageResponse<NotifyResponse>
+    func resetNotifyCount() async throws
 }

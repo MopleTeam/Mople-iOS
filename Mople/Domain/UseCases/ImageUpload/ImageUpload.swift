@@ -6,43 +6,33 @@
 //
 
 import UIKit
-import RxSwift
 
 protocol ImageUpload {
-    func execute(_ image: UIImage) -> Observable<String>
+    func execute(_ image: UIImage) async throws -> String
 }
 
 final class ImageUploadUseCase: ImageUpload {
-    
+
     private let imageUploadRepo: ImageUploadRepo
-    
+
     init(imageUploadRepo: ImageUploadRepo) {
         self.imageUploadRepo = imageUploadRepo
     }
-    
-    func execute(_ image: UIImage) -> Observable<String> {
-        return Observable.deferred { [weak self] in
-            guard let self else { return .empty() }
 
-            do {
-                let imageData = try Data.imageDataCompressed(uiImage: image)
-                return self.imageUploadRepo.uploadImage(data: imageData, path: .profile)
-                    .asObservable()
-            } catch {
-                return .error(error)
-            }
-        }
+    func execute(_ image: UIImage) async throws -> String {
+        let imageData = try Data.imageDataCompressed(uiImage: image)
+        return try await imageUploadRepo.uploadImage(data: imageData, path: .profile)
     }
 }
 
 // MARK: - Mock
 #if DEV
 final class MockImageUploadUseCase: ImageUpload {
-    func execute(_ image: UIImage) -> Observable<String> {
+    func execute(_ image: UIImage) async throws -> String {
         print("✅ [Mock] 이미지 업로드 - size: \(image.size)")
         let mockImageUrl = "https://mock-cdn.mople.com/images/profile_\(UUID().uuidString).jpg"
-        return Observable.just(mockImageUrl)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockImageUrl
     }
 }
 #endif

@@ -5,29 +5,26 @@
 //  Created by CatSlave on 8/20/24.
 //
 
-import RxSwift
-
 protocol SignUp {
-    func execute(request: SignUpRequest) -> Observable<Void>
+    func execute(request: SignUpRequest) async throws
 }
 
 final class SignUpUseCase: SignUp, LifeCycleLoggable {
 
     private let repo: AuthenticationRepo
-    
+
     init(repo: AuthenticationRepo) {
         self.repo = repo
         logLifeCycle()
     }
-    
+
     deinit {
         logLifeCycle()
     }
-    
+
     // MARK: - SignUp
-    func execute(request: SignUpRequest) -> Observable<Void> {
-        return repo.signUp(requestModel: request)
-            .asObservable()
+    func execute(request: SignUpRequest) async throws {
+        try await repo.signUp(requestModel: request)
     }
 }
 
@@ -35,11 +32,10 @@ final class SignUpUseCase: SignUp, LifeCycleLoggable {
 #if DEV
 final class MockSignUpUseCase: SignUp {
 
-    func execute(request: SignUpRequest) -> Observable<Void> {
+    func execute(request: SignUpRequest) async throws {
         print("✅ [Mock] 회원가입 요청")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 회원가입 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 회원가입 성공")
     }
 }
 #endif

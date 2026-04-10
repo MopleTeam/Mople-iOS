@@ -5,10 +5,8 @@
 //  Created by CatSlave on 4/11/25.
 //
 
-import RxSwift
-
 protocol NotifySubscribeRepo {
-    func fetchNotifyState() -> Single<[String]>
+    func fetchNotifyState() async throws -> [String]
     func subscribeNotify(type: SubscribeType,
-                         isSubscribe: Bool) -> Single<Void>
+                         isSubscribe: Bool) async throws
 }

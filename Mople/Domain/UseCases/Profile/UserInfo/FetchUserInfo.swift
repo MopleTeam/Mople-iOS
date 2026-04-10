@@ -5,23 +5,21 @@
 //  Created by CatSlave on 1/20/25.
 //
 import UIKit
-import RxSwift
 
 protocol FetchUserInfo {
-    func execute() -> Observable<Void>
+    func execute() async throws
 }
 
 final class FetchUserInfoUseCase: FetchUserInfo {
-    
+
     private let userInfoRepo: UserInfoRepo
-    
+
     init(userInfoRepo: UserInfoRepo) {
         self.userInfoRepo = userInfoRepo
     }
-    
-    func execute() -> Observable<Void> {
-        return self.userInfoRepo.updateUserInfo()
-            .asObservable()
+
+    func execute() async throws {
+        try await self.userInfoRepo.updateUserInfo()
     }
 }
 
@@ -29,11 +27,10 @@ final class FetchUserInfoUseCase: FetchUserInfo {
 #if DEV
 final class MockFetchUserInfoUseCase: FetchUserInfo {
 
-    func execute() -> Observable<Void> {
+    func execute() async throws {
         print("✅ [Mock] 유저 정보 조회 요청")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 유저 정보 조회 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 유저 정보 조회 성공")
     }
 }
 #endif

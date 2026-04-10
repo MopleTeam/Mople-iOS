@@ -5,28 +5,25 @@
 //  Created by CatSlave on 4/18/25.
 //
 
-import RxSwift
-
 protocol DeleteAccount {
-    func execute() -> Observable<Void>
+    func execute() async throws
 }
 
 final class DeleteAccountUseCase: DeleteAccount, LifeCycleLoggable {
-    
+
     private let repo: AuthenticationRepo
-    
+
     init(repo: AuthenticationRepo) {
         self.repo = repo
         logLifeCycle()
     }
-    
+
     deinit {
         logLifeCycle()
     }
-    
-    func execute() -> Observable<Void> {
-        return repo.deleteAccount()
-            .asObservable()
+
+    func execute() async throws {
+        try await repo.deleteAccount()
     }
 }
 
@@ -34,11 +31,10 @@ final class DeleteAccountUseCase: DeleteAccount, LifeCycleLoggable {
 #if DEV
 final class MockDeleteAccountUseCase: DeleteAccount {
 
-    func execute() -> Observable<Void> {
+    func execute() async throws {
         print("✅ [Mock] 계정 삭제 요청")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 계정 삭제 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 계정 삭제 성공")
     }
 }
 #endif

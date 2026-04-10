@@ -4,33 +4,21 @@
 //
 //  Created by CatSlave on 1/6/25.
 //
-import RxSwift
-
 final class DefaultUserInfoRepo: BaseRepositories, UserInfoRepo {
-    func updateUserInfo() -> Single<Void> {
-        let getUserInfo = networkService.authenticatedRequest {
+    @MainActor
+    func updateUserInfo() async throws {
+        let userInfo = try await networkService.authenticatedRequest {
             try APIEndpoints.getUserInfo()
         }
-        
-        return getUserInfo
-            .observe(on: MainScheduler.instance)
-            .flatMap({
-                UserInfoStorage.shared.addEntity($0.toDomain())
-                return .just(())
-            })
+        UserInfoStorage.shared.addEntity(userInfo.toDomain())
     }
-    
-    func editProfile(requestModel: ProfileEditRequest) -> Single<Void> {
-        let editProfile = networkService.authenticatedRequest {
+
+    @MainActor
+    func editProfile(requestModel: ProfileEditRequest) async throws {
+        let profile = try await networkService.authenticatedRequest {
             try APIEndpoints.setupProfile(request: requestModel)
         }
-        
-        return editProfile
-            .observe(on: MainScheduler.instance)
-            .flatMap {
-                UserInfoStorage.shared.updateProfile($0.toDomain())
-                return .just(())
-            }
+        UserInfoStorage.shared.updateProfile(profile.toDomain())
     }
 }
 

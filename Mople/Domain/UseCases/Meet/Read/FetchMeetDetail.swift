@@ -5,34 +5,32 @@
 //  Created by CatSlave on 1/5/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchMeetDetail {
-    func execute(meetId: Int) -> Observable<Meet>
+    func execute(meetId: Int) async throws -> Meet
 }
 
 final class FetchMeetDetailUseCase: FetchMeetDetail {
-   
+
     private let repo: MeetRepo
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
-    func execute(meetId: Int) -> Observable<Meet> {
-        return repo.fetchMeetDetail(meetId: meetId)
-            .map { $0.toDomain()  }
-            .asObservable()
+
+    func execute(meetId: Int) async throws -> Meet {
+        let response = try await repo.fetchMeetDetail(meetId: meetId)
+        return response.toDomain()
     }
 }
 
 // MARK: - Mock UseCase
 #if DEV
 final class MockFetchMeetDetailUseCase: FetchMeetDetail {
-    func execute(meetId: Int) -> Observable<Meet> {
+    func execute(meetId: Int) async throws -> Meet {
         print("✅ [Mock] 모임 상세 조회 - meetId: \(meetId)")
-        
+
         let userID = UserInfoStorage.shared.userInfo?.id
 
         let mockMeet = Meet(
@@ -44,8 +42,8 @@ final class MockFetchMeetDetailUseCase: FetchMeetDetail {
             firstPlanDate: Calendar.current.date(byAdding: .day, value: 3, to: Date())
         )
 
-        return Observable.just(mockMeet)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockMeet
     }
 }
 #endif

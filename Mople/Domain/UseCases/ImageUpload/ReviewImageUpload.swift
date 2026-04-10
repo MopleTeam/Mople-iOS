@@ -6,16 +6,15 @@
 //
 
 import UIKit
-import RxSwift
 
 protocol ReviewImageUpload {
     func execute(id: Int,
-                 images: [UIImage]) -> Observable<Void>
+                 images: [UIImage]) async throws
 }
 
 enum CompressionPhotosError: Error {
     case compressionFailed(indexs: [Int])
-    
+
     var info: String {
         return L10n.Error.Photo.upload
     }
@@ -29,36 +28,31 @@ enum CompressionPhotosError: Error {
 }
 
 final class ReviewImageUploadUseCase: ReviewImageUpload {
-    
+
     private let repo: ImageUploadRepo
-    
+
     init(repo: ImageUploadRepo) {
         self.repo = repo
     }
-    
+
     func execute(id: Int,
-                 images: [UIImage]) -> Observable<Void> {
-        
-        return Observable.deferred { [weak self] in
-            guard let self else { return .empty() }
-            
-            var compressImageDatas: [Data] = .init()
-            var failIndexs: [Int] = .init()
-            handleCompressImage(images: images,
-                                datas: &compressImageDatas,
-                                failIndexs: &failIndexs)
-            
-            if failIndexs.isEmpty {
-                return repo
-                    .uploadReviewImages(id: id,
-                                        images: compressImageDatas)
-                    .asObservable()
-            } else {
-                return .error(CompressionPhotosError.compressionFailed(indexs: failIndexs))
-            }
+                 images: [UIImage]) async throws {
+
+        var compressImageDatas: [Data] = .init()
+        var failIndexs: [Int] = .init()
+        handleCompressImage(images: images,
+                            datas: &compressImageDatas,
+                            failIndexs: &failIndexs)
+
+        if failIndexs.isEmpty {
+            try await repo
+                .uploadReviewImages(id: id,
+                                    images: compressImageDatas)
+        } else {
+            throw CompressionPhotosError.compressionFailed(indexs: failIndexs)
         }
     }
-    
+
     private func handleCompressImage(images: [UIImage],
                                      datas: inout [Data],
                                      failIndexs: inout [Int]) {
@@ -76,10 +70,9 @@ final class ReviewImageUploadUseCase: ReviewImageUpload {
 // MARK: - Mock
 #if DEV
 final class MockReviewImageUploadUseCase: ReviewImageUpload {
-    func execute(id: Int, images: [UIImage]) -> Observable<Void> {
+    func execute(id: Int, images: [UIImage]) async throws {
         print("✅ [Mock] 후기 이미지 업로드 - reviewId: \(id), imageCount: \(images.count)")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
     }
 }
 #endif

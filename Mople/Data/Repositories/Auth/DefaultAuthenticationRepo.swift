@@ -5,39 +5,31 @@
 //  Created by CatSlave on 10/23/24.
 //
 
-import RxSwift
-
 final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
-    func signIn(social: SocialInfo) -> Single<Void> {
+    func signIn(social: SocialInfo) async throws {
         let endpoint = APIEndpoints.signIn(platform: social.provider,
                                                   identityToken: social.token,
                                                   email: social.email)
-        
-        return self.networkService.basicRequest(endpoint: endpoint)
-            .flatMap {
-                KeychainStorage.shared.saveToken($0)
-                return .just(())
-            }
+
+        let token = try await networkService.basicRequest(endpoint: endpoint)
+        KeychainStorage.shared.saveToken(token)
     }
-    
-    func signUp(requestModel: SignUpRequest) -> Single<Void> {
+
+    func signUp(requestModel: SignUpRequest) async throws {
         let endpoint = APIEndpoints.signUp(request: requestModel)
-        
-        return networkService.basicRequest(endpoint: endpoint)
-            .flatMap {
-                KeychainStorage.shared.saveToken($0)
-                return .just(())
-            }
+
+        let token = try await networkService.basicRequest(endpoint: endpoint)
+        KeychainStorage.shared.saveToken(token)
     }
-    
-    func signOut(userId: Int) -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func signOut(userId: Int) async throws {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.signOut(userId: userId)
         }
     }
-    
-    func deleteAccount() -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func deleteAccount() async throws {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.deleteAccount()
         }
     }

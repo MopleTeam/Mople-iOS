@@ -5,32 +5,30 @@
 //  Created by CatSlave on 6/15/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchHolidays {
-    func execute(for year: Int) -> Observable<[Holiday]>
+    func execute(for year: Int) async throws -> [Holiday]
 }
 
 final class FetchHolidaysUseCase: FetchHolidays {
-    
+
     private let repo: CalendarRepo
-    
+
     init(repo: CalendarRepo) {
         self.repo = repo
     }
-    
-    func execute(for year: Int) -> Observable<[Holiday]> {
-        return repo.fetchHolidays(for: year)
-            .map { $0.map { $0.toDomain() } }
-            .asObservable()
+
+    func execute(for year: Int) async throws -> [Holiday] {
+        let response = try await repo.fetchHolidays(for: year)
+        return response.map { $0.toDomain() }
     }
 }
 
 // MARK: - Mock
 #if DEV
 final class MockFetchHolidaysUseCase: FetchHolidays {
-    func execute(for year: Int) -> Observable<[Holiday]> {
+    func execute(for year: Int) async throws -> [Holiday] {
         print("✅ [Mock] \(year)년 공휴일 목록 조회")
 
         let formatter = DateFormatter()
@@ -47,8 +45,8 @@ final class MockFetchHolidaysUseCase: FetchHolidays {
             Holiday(title: "크리스마스", date: formatter.date(from: "\(year)-12-25"))
         ]
 
-        return Observable.just(mockHolidays)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockHolidays
     }
 }
 #endif
