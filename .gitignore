@@ -19,6 +19,11 @@ Carthage/Build/
 .spm-packages/
 Package.resolved
 
+# Tuist
+# .xcodeproj와 .xcworkspace는 tuist generate로 생성되므로 Git에서 제외
+Derived/
+Tuist/.build/
+
 # Playgrounds
 timeline.xctimeline
 playground.xcworkspace
@@ -37,9 +42,9 @@ fastlane/README.md
 # SPM 패키지 캐시 (Fastlane 빌드용)
 SourcePackages/
 
-# 개인 설정
+# 개인 설정 (Tuist가 .xcworkspace/.xcodeproj를 매번 생성하므로 Git에서 제외)
+*.xcodeproj
 *.xcworkspace
-!default.xcworkspace
 
 # 인증서, 키
 *.p8

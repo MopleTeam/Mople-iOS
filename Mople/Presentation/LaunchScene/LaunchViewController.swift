@@ -7,7 +7,6 @@
 
 import UIKit
 import RxSwift
-import FirebaseAnalytics
 
 
 final class LaunchViewController: DefaultViewController {
