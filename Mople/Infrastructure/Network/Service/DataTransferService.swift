@@ -1,13 +1,14 @@
 //
 //  DataTransferService.swift
-//  Group
+//  Mople
 //
 //  Created by CatSlave on 8/19/24.
+//  Refactored: RxSwift → async/await (Phase 3)
 //
 
 import Foundation
-import RxSwift
 
+// MARK: - 에러 정의
 enum DataTransferError: Error {
     case parsing(Error)
     case networkFailure(NetworkError)
@@ -17,18 +18,17 @@ enum DataTransferError: Error {
     case badRequest
 }
 
+// MARK: - 프로토콜 정의
+// Before: func request(with:) -> Single<T>
+// After:  func request(with:) async throws -> T
 protocol DataTransferService {
-    typealias CompletionHandler<T> = (Result<T, DataTransferError>) -> Void
-
-    @discardableResult
     func request<T: Decodable, E: ResponseRequestable>(
         with endpoint: E
-    ) -> Single<T> where E.Response == T
+    ) async throws -> T where E.Response == T
 
-    @discardableResult
     func request<E: ResponseRequestable>(
         with endpoint: E
-    ) -> Single<Void> where E.Response == Void
+    ) async throws where E.Response == Void
 }
 
 protocol DataTransferErrorResolver {
@@ -43,15 +43,13 @@ protocol DataTransferErrorLogger {
     func log(error: Error)
 }
 
+// MARK: - 구현체
 final class DefaultDataTransferService {
-    
-    // config, session, error를 처리한 서비스
+
     private let networkService: NetworkService
-    
     private let errorResolver: DataTransferErrorResolver
-    
     private let errorLogger: DataTransferErrorLogger
-    
+
     init(
         with networkService: NetworkService,
         errorResolver: DataTransferErrorResolver = DefaultDataTransferErrorResolver(),
@@ -68,42 +66,40 @@ extension DefaultDataTransferService: DataTransferService {
     /// 리턴값이 있는 요청
     func request<E: ResponseRequestable>(
         with endpoint: E
-    ) -> Single<E.Response> where E.Response: Decodable {
-        return performBaseRequest(endpoint: endpoint) { data in
-            try self.decode(data: data, decoder: endpoint.responseDecoder)
+    ) async throws -> E.Response where E.Response: Decodable {
+        do {
+            let data = try await networkService.request(endpoint: endpoint)
+            return try decode(data: data, decoder: endpoint.responseDecoder)
+        } catch let error as NetworkError {
+            throw errorResolver.resolve(error: error)
+        } catch {
+            throw error
         }
     }
 
     /// 응답만 있는 요청
     func request<E: ResponseRequestable>(
         with endpoint: E
-    ) -> Single<Void> where E.Response == Void {
-        return performBaseRequest(endpoint: endpoint) { _ in }
+    ) async throws where E.Response == Void {
+        do {
+            _ = try await networkService.request(endpoint: endpoint)
+        } catch let error as NetworkError {
+            throw errorResolver.resolve(error: error)
+        } catch {
+            throw error
+        }
     }
-    
-    private func performBaseRequest<E: ResponseRequestable, T>(endpoint: E,
-                                                               transform: @escaping (Data?) throws -> T) -> Single<T> {
-        self.networkService.request(endpoint: endpoint)
-            .map(transform)
-            .catch { err in
-                if let err = err as? NetworkError {
-                    throw self.errorResolver.resolve(error: err)
-                } else {
-                    throw err
-                }
-            }
-    }
-    
+
     private func decode<T: Decodable>(data: Data?, decoder: ResponseDecoder) throws -> T {
         guard let data = data, !data.isEmpty else {
             throw DataTransferError.noResponse
         }
-        
+
         do {
             let result: T = try decoder.decode(data)
             return result
         } catch {
-            self.errorLogger.log(error: error)
+            errorLogger.log(error: error)
             throw DataTransferError.parsing(error)
         }
     }
@@ -112,7 +108,7 @@ extension DefaultDataTransferService: DataTransferService {
 // MARK: - Logger
 final class DefaultDataTransferErrorLogger: DataTransferErrorLogger {
     init() { }
-    
+
     func log(error: Error) {
         printIfDebug("-------------")
         printIfDebug("\(error)")
@@ -124,13 +120,13 @@ class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     func resolve(error: NetworkError) -> DataTransferError {
         switch error {
         case let .error(statusCode, data):
-            _ = try? JSONDecoder().decode(ErrorResponse.self, from: data) // 서버에서 전달하는 메세지 (현재 사용 X)
+            _ = try? JSONDecoder().decode(ErrorResponse.self, from: data)
             return handleErrorStatus(code: statusCode, err: error)
         default:
             return .networkFailure(error)
         }
     }
-    
+
     private func handleErrorStatus(code: Int, err: Error) -> DataTransferError {
         switch code {
         case 400: .badRequest
@@ -142,22 +138,21 @@ class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
     }
 }
 
-// MARK: - Response Decoders
+// MARK: - Response Decoders (변경 없음)
 class JSONResponseDecoder: ResponseDecoder {
     private let jsonDecoder = JSONDecoder()
-    
+
     init() { }
- 
+
     func decode<T: Decodable>(_ data: Data) throws -> T {
-        
         return try jsonDecoder.decode(T.self, from: data)
     }
 }
 
 class RawDataResponseDecoder: ResponseDecoder {
-   
+
     init() { }
-    
+
     enum CodingKeys: String, CodingKey {
         case `default` = ""
     }
@@ -173,9 +168,3 @@ class RawDataResponseDecoder: ResponseDecoder {
         }
     }
 }
-
-
-
-
-
-
