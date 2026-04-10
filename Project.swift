@@ -146,7 +146,31 @@ let crashlyticsScript: TargetScript = .post(
     ]
 )
 
-// MARK: - 타겟 정의 (1개 타겟, Debug/Release로 Dev/Prod 분리)
+// MARK: - Core 모듈 (프로젝트 공통 유틸리티, 순수 Extension, Protocol)
+// Domain/Data/Presentation에 의존하지 않는 순수 코드만 포함
+
+let coreTarget: Target = .target(
+    name: "Core",
+    destinations: .iOS,
+    product: .framework,
+    bundleId: "com.moim.moimtable.core",
+    deploymentTargets: deploymentTarget,
+    sources: ["Modules/Core/Sources/**"],
+    dependencies: [
+        .external(name: "RxSwift"),
+    ],
+    settings: .settings(
+        base: [
+            "SWIFT_VERSION": "5.0",
+        ],
+        configurations: [
+            .debug(name: "Debug"),
+            .release(name: "Release"),
+        ]
+    )
+)
+
+// MARK: - 앱 타겟 (Debug/Release로 Dev/Prod 분리)
 
 let mopleTarget: Target = .target(
     name: "Mople",
@@ -159,7 +183,7 @@ let mopleTarget: Target = .target(
     resources: resources,
     entitlements: "Mople/Mople.entitlements",
     scripts: [swiftgenScript, crashlyticsScript],
-    dependencies: dependencies,
+    dependencies: dependencies + [.target(name: "Core")],
     settings: .settings(
         base: [
             "MARKETING_VERSION": "\(marketingVersion)",
@@ -214,6 +238,7 @@ let project = Project(
         ]
     ),
     targets: [
+        coreTarget,
         mopleTarget,
     ]
 )
