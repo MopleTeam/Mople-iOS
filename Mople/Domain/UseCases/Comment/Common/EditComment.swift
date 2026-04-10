@@ -16,10 +16,11 @@ protocol EditComment {
 final class EditCommentUseCase: EditComment {
 
     private let editCommentRepo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: CommentRepo) {
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.editCommentRepo = repo
+        self.session = session
     }
 
     func execute(id: Int,
@@ -30,7 +31,7 @@ final class EditCommentUseCase: EditComment {
                          comment: text,
                          mentions: mentions)
         var domainComment = response.toDomain()
-        domainComment.verifyWriter(self.userId)
+        domainComment.verifyWriter(self.session.currentUserId)
         return domainComment
     }
 }

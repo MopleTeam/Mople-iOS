@@ -13,16 +13,17 @@ protocol FetchPlanDetail {
 final class FetchPlanDetailUseCase: FetchPlanDetail {
 
     private let repo: PlanRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: PlanRepo) {
+    init(repo: PlanRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(planId: Int) async throws -> Plan {
         let response = try await repo.fetchPlanDetail(planId: planId)
         var verifyPlan = response.toDomain()
-        verifyPlan.verifyCreator(self.userID)
+        verifyPlan.verifyCreator(self.session.currentUserId)
         return verifyPlan
     }
 }

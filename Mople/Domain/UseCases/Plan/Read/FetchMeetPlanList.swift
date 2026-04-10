@@ -13,10 +13,11 @@ protocol FetchPlanPage {
 
 final class FetchPlanPageUsecase: FetchPlanPage {
     private let repo: PlanRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: PlanRepo) {
+    init(repo: PlanRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(meetId: Int, cursor: String?) async throws -> Page<Plan> {
@@ -30,10 +31,9 @@ final class FetchPlanPageUsecase: FetchPlanPage {
     }
 
     private func verifyCreator(with planList: inout [Plan]) {
-        guard let userID else { return }
         planList.enumerated().forEach { index, plan in
             guard let createId = plan.creatorId,
-                  userID == createId else { return }
+                  session.currentUserId == createId else { return }
             planList[index].isCreator = true
         }
     }

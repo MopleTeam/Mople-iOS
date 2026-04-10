@@ -31,13 +31,11 @@ final class MockFetchMeetDetailUseCase: FetchMeetDetail {
     func execute(meetId: Int) async throws -> Meet {
         print("✅ [Mock] 모임 상세 조회 - meetId: \(meetId)")
 
-        let userID = UserInfoStorage.shared.userInfo?.id
-
         let mockMeet = Meet(
             isCreator: true,
             meetSummary: MeetSummary(id: meetId, name: "테니스 동호회"),
             sinceDays: 120,
-            creatorId: userID ?? 1,
+            creatorId: 1,
             memberCount: 8,
             firstPlanDate: Calendar.current.date(byAdding: .day, value: 3, to: Date())
         )

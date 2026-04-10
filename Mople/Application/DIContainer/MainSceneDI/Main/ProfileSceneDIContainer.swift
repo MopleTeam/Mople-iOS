@@ -205,7 +205,7 @@ extension ProfileSceneDIContainer {
 extension ProfileSceneDIContainer {
     
     func makeTransferMeetFlow() -> BaseCoordinator {
-        let di = TransferMeetSceneDIContainer(appNetworkService: appNetworkService, commonFactory: commonViewFactory)
+        let di = TransferMeetSceneDIContainer(appNetworkService: appNetworkService, commonFactory: commonViewFactory, userSession: userSession)
         return di.makeFlowCoordinator(onComplete: {
             
         })

@@ -14,16 +14,17 @@ protocol FetchReviewDetail {
 final class FetchReviewDetailUseCase: FetchReviewDetail {
 
     private let repo: ReviewRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: ReviewRepo) {
+    init(repo: ReviewRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(id: Int, isOldPlan: Bool) async throws -> Review {
         let response = try await repo.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
         var verifyReview = response.toDomain()
-        verifyReview.verifyCreator(self.userID)
+        verifyReview.verifyCreator(self.session.currentUserId)
         return verifyReview
     }
 }

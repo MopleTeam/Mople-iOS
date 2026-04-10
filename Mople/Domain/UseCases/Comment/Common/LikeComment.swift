@@ -14,16 +14,17 @@ protocol LikeComment {
 final class LikeCommentUseCase: LikeComment {
 
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: CommentRepo) {
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(commentId: Int) async throws -> Comment {
         let response = try await repo.likeComment(commentId: commentId)
         var domainComment = response.toDomain()
-        domainComment.verifyWriter(self.userId)
+        domainComment.verifyWriter(self.session.currentUserId)
         return domainComment
     }
 }

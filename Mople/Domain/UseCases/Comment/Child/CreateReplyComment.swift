@@ -17,10 +17,11 @@ protocol CreateReplyComment {
 final class CreateReplyCommentUseCase: CreateReplyComment {
 
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: CommentRepo) {
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(postId: Int,
@@ -33,7 +34,7 @@ final class CreateReplyCommentUseCase: CreateReplyComment {
                                 comment: comment,
                                 mentions: mentions)
         var domainComment = response.toDomain()
-        domainComment.verifyWriter(self.userId)
+        domainComment.verifyWriter(self.session.currentUserId)
         return domainComment
     }
 }

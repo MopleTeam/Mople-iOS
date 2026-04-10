@@ -51,9 +51,9 @@ extension HomeSceneDIContainer {
     private func makeRecentPlanUseCase() -> FetchHomeData {
         let repo = DefaultPlanRepo(networkService: appNetworkService)
         #if DEV
-        return MockDataManager.resolve(FetchHomeDataUseCase(repo: repo) as FetchHomeData, mock: MockFetchHomeDataUseCase())
+        return MockDataManager.resolve(FetchHomeDataUseCase(repo: repo, session: userSession) as FetchHomeData, mock: MockFetchHomeDataUseCase())
         #else
-        return FetchHomeDataUseCase(repo: repo)
+        return FetchHomeDataUseCase(repo: repo, session: userSession)
         #endif
     }
     
@@ -82,6 +82,7 @@ extension HomeSceneDIContainer {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
+            userSession: userSession,
             type: .newFromMeetList)
         return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completionHandler)
     }
@@ -91,6 +92,7 @@ extension HomeSceneDIContainer {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
+            userSession: userSession,
             type: .edit(plan))
         return planCreateDI.makePlanCreateFlowCoordinator()
     }
@@ -99,6 +101,7 @@ extension HomeSceneDIContainer {
     func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -109,6 +112,7 @@ extension HomeSceneDIContainer {
                                        type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()
@@ -117,7 +121,8 @@ extension HomeSceneDIContainer {
     // MARK: - 일정 리스트
     func makeNotifyListFlowCoordinator() -> BaseCoordinator {
         let notifyListSceneDI = NotifyListSceneDIContainer(appNetworkService: appNetworkService,
-                                                           commonFactory: commonViewFactory)
+                                                           commonFactory: commonViewFactory,
+                                                           userSession: userSession)
         return notifyListSceneDI.makeNotifyListCoordinator()
     }
 }

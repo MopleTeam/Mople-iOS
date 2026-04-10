@@ -15,10 +15,11 @@ protocol FetchCommentList {
 final class FetchCommentListUseCase: FetchCommentList {
 
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: CommentRepo) {
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(postId: Int,
@@ -35,7 +36,7 @@ final class FetchCommentListUseCase: FetchCommentList {
         var commentPage = list
         commentPage.content = commentPage.content.map({
             var comment = $0
-            comment.verifyWriter(userId)
+            comment.verifyWriter(session.currentUserId)
             return comment
         })
         return commentPage

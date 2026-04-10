@@ -15,10 +15,11 @@ protocol FetchMeetReviewList {
 final class FetchMeetReviewListUseCase: FetchMeetReviewList {
 
     private let repo: ReviewRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: ReviewRepo) {
+    init(repo: ReviewRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(meetId: Int,
@@ -33,9 +34,8 @@ final class FetchMeetReviewListUseCase: FetchMeetReviewList {
     }
 
     private func verifyCreator(with planList: inout [Review]) {
-        guard let userID else { return }
         planList.enumerated().forEach { index, plan in
-            planList[index].verifyCreator(userID)
+            planList[index].verifyCreator(session.currentUserId)
         }
     }
 }

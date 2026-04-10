@@ -19,10 +19,12 @@ final class PlanCreateSceneDIContainer: BaseContainer, PlanCreateSceneDependenci
     
     init(appNetworkService: AppNetworkService,
          commonViewFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          type: PlanCreationType) {
         self.type = type
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonViewFactory)
+                   commonFactory: commonViewFactory,
+                   userSession: userSession)
     }
     
     func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)? = nil) -> BaseCoordinator {
@@ -69,9 +71,9 @@ extension PlanCreateSceneDIContainer {
     private func makeFetchMeetPageUseCase() -> FetchMeetPage {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         #if DEV
-        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
+        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo, session: userSession) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
         #else
-        return FetchMeetPageUseCase(repo: repo)
+        return FetchMeetPageUseCase(repo: repo, session: userSession)
         #endif
     }
     
@@ -86,6 +88,7 @@ extension PlanCreateSceneDIContainer {
     func makeSearchLocationCoordinator() -> BaseCoordinator {
         let searchLoactionDI = SearchLocationSceneDIContainer(appNetworkService: appNetworkService,
                                                               commonViewFactory: commonViewFactory,
+                                                              userSession: userSession,
                                                               delegate: createPlanReactor)
         return searchLoactionDI.makeSearchLocationFlowCoordinator()
     }

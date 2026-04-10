@@ -14,11 +14,11 @@ protocol FetchMeetPage {
 final class FetchMeetPageUseCase: FetchMeetPage {
 
     private let repo: MeetRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-
-    init(repo: MeetRepo) {
+    init(repo: MeetRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute(cursor: String?) async throws -> Page<Meet> {
@@ -35,9 +35,8 @@ final class FetchMeetPageUseCase: FetchMeetPage {
     }
 
     private func verifyCreator(with meet: inout Meet) {
-        guard let userID else { return }
         guard let ownerId = meet.creatorId,
-              userID == ownerId else { return }
+              session.currentUserId == ownerId else { return }
         meet.isCreator = true
     }
 }

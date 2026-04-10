@@ -4,7 +4,7 @@
 //
 //  Created by CatSlave on 1/20/25.
 //
-import UIKit
+import Foundation
 
 protocol FetchUserInfo {
     func execute() async throws

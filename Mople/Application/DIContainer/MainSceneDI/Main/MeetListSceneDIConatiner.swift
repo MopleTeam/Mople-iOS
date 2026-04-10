@@ -45,9 +45,9 @@ extension MeetListSceneDIConatiner {
     private func makeMeetListUseCase() -> FetchMeetPage {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
         #if DEV
-        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
+        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo, session: userSession) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
         #else
-        return FetchMeetPageUseCase(repo: repo)
+        return FetchMeetPageUseCase(repo: repo, session: userSession)
         #endif
     }
 }
@@ -72,6 +72,7 @@ extension MeetListSceneDIConatiner {
                                        isJoin: Bool) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: isJoin)
         return meetDetailDI.makeMeetDetailCoordinator()

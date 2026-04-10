@@ -51,8 +51,6 @@ final class MockFetchMyHostMeetsUseCase: FetchMyHostMeets {
         let calendar = Calendar.current
         let currentDate = Date()
 
-        let userID = UserInfoStorage.shared.userInfo?.id
-
         return (1...50).map { index in
             let hasPlan = index % 3 != 0  // 3의 배수가 아닌 경우 일정 있음
             let memberCount = (index % 5) + 2  // 2~6명
@@ -61,7 +59,7 @@ final class MockFetchMyHostMeetsUseCase: FetchMyHostMeets {
             return Meet(
                 meetSummary: MeetSummary(id: index, name: meetNames[index - 1]),
                 sinceDays: daysAgo,
-                creatorId: userID ?? 302, // 현재 사용자 ID
+                creatorId: 1, // Mock 사용자 ID
                 memberCount: memberCount,
                 firstPlanDate: hasPlan ? calendar.date(byAdding: .day, value: (index % 7) + 1, to: currentDate) : nil
             )

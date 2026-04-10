@@ -20,10 +20,12 @@ final class SearchLocationSceneDIContainer: BaseContainer, SearchPlaceSceneDepen
     
     init(appNetworkService: AppNetworkService,
          commonViewFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          delegate: SearchPlaceDelegate?) {
         self.delegate = delegate
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonViewFactory)
+                   commonFactory: commonViewFactory,
+                   userSession: userSession)
     }
     
     func makeSearchLocationFlowCoordinator() -> BaseCoordinator {

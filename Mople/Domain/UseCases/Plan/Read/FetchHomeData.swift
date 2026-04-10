@@ -12,10 +12,11 @@ protocol FetchHomeData {
 
 final class FetchHomeDataUseCase: FetchHomeData {
     private let repo: PlanRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
+    private let session: UserSessionProvider
 
-    init(repo: PlanRepo) {
+    init(repo: PlanRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     func execute() async throws -> HomeData {
@@ -26,9 +27,8 @@ final class FetchHomeDataUseCase: FetchHomeData {
     }
 
     private func verifyCreator(with planList: inout [Plan]) {
-        guard let userID else { return }
         planList.enumerated().forEach { index, plan in
-            planList[index].verifyCreator(userID)
+            planList[index].verifyCreator(session.currentUserId)
         }
     }
 }
