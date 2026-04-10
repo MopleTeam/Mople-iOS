@@ -113,14 +113,27 @@ final class MeetListViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension MeetListViewReactor {
     
-    /// 모임 리스트 불러오기
+    /// 모임 리스트 불러오기 (async UseCase를 Observable로 래핑)
     private func fetchMeetList(cursor: String? = nil,
                                isRefresh: Bool = false) -> Observable<Mutation> {
-        return fetchUseCase.execute(cursor: cursor)
-            .map({ result in
-                self.page = result.info
-                return self.updateMeetList(isRefresh: isRefresh, meets: result.content)
-            })
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let result = try await self.fetchUseCase.execute(cursor: cursor)
+                    self.page = result.info
+                    let mutation = self.updateMeetList(isRefresh: isRefresh, meets: result.content)
+                    observer.onNext(mutation)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     /// 모임 리스트 로딩과 함께 불러오기

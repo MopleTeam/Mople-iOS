@@ -129,11 +129,22 @@ final class HomeViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension HomeViewReactor {
     
-    /// 최근 일정 불러오기
+    /// 최근 일정 불러오기 (async UseCase를 Observable로 래핑)
     private func fetchPlanData() -> Observable<Mutation> {
-        return fetchRecentScheduleUseCase.execute()
-            .catchAndReturn(.init(plans: [], hasMeet: true))
-            .map { Mutation.updateHomeData($0) }
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let homeData = try await self?.fetchRecentScheduleUseCase.execute() ?? .init(plans: [], hasMeet: true)
+                    observer.onNext(.updateHomeData(homeData))
+                    observer.onCompleted()
+                } catch {
+                    // 에러 시 기본값 반환 (기존 catchAndReturn 대체)
+                    observer.onNext(.updateHomeData(.init(plans: [], hasMeet: true)))
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     /// 최근 일정 로딩과 함께 불러오기
