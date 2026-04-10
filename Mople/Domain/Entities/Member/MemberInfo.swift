@@ -5,24 +5,13 @@
 //  Created by CatSlave on 2/4/25.
 //
 
-import UIKit
+import Foundation
 
-// MARK: - Memebr
+// MARK: - Member
 enum MemberPositionType {
     case owner
     case host
     case member
-    
-    var image: UIImage? {
-        switch self {
-        case .owner:
-            return .owner
-        case .host:
-            return .host
-        case .member:
-            return nil
-        }
-    }
 }
 
 struct MemberInfo: Hashable {

@@ -149,9 +149,10 @@ extension ReviewEditViewReactor {
         let requestUpdate = Observable<Mutation>.create { [weak self] observer in
             let task = Task { [weak self] in
                 do {
-                    // 이미지 추가
+                    // 이미지 압축 후 업로드
                     if !addImages.isEmpty {
-                        try await self?.imageUpload.execute(id: id, images: addImages)
+                        let imagesData = try self?.compressImages(addImages) ?? []
+                        try await self?.imageUpload.execute(id: id, imagesData: imagesData)
                     }
                     // 이미지 삭제
                     if !deleteIds.isEmpty {
@@ -224,6 +225,27 @@ extension ReviewEditViewReactor {
         let isDeleteExistingImage = !deleteImageIds.isEmpty
         let isAddedImage = images.contains { $0.isNew == true }
         return isDeleteExistingImage || isAddedImage
+    }
+
+    // MARK: - 이미지 압축
+    /// UIImage 배열을 Data로 압축, 실패한 인덱스는 CompressionPhotosError로 throw
+    private func compressImages(_ images: [UIImage]) throws -> [Data] {
+        var compressedData: [Data] = []
+        var failIndexes: [Int] = []
+
+        images.enumerated().forEach { (index, image) in
+            do {
+                let data = try Data.imageDataCompressed(uiImage: image)
+                compressedData.append(data)
+            } catch {
+                failIndexes.append(index + 1)
+            }
+        }
+
+        guard failIndexes.isEmpty else {
+            throw CompressionPhotosError.compressionFailed(indexs: failIndexes)
+        }
+        return compressedData
     }
 
     // MARK: - 이미지 랩핑

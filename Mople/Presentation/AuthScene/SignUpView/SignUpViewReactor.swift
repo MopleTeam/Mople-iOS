@@ -226,10 +226,11 @@ extension SignUpViewReactor {
                 do {
                     guard let self else { return }
 
-                    // 이미지 업로드
+                    // 이미지 압축 후 업로드
                     var imagePath: String?
                     if let image = self.currentState.profileImage {
-                        imagePath = try await self.imageUploadUseCase.execute(image)
+                        let imageData = try Data.imageDataCompressed(uiImage: image)
+                        imagePath = try await self.imageUploadUseCase.execute(imageData)
                     }
 
                     // 회원가입 요청

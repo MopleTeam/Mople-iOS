@@ -231,7 +231,8 @@ extension ProfileEditViewReactor {
             return Observable.create { [weak self] observer in
                 let task = Task { [weak self] in
                     do {
-                        let path = try await self?.imageUpload.execute(image)
+                        let imageData = try Data.imageDataCompressed(uiImage: image)
+                        let path = try await self?.imageUpload.execute(imageData)
                         observer.onNext(path)
                         observer.onCompleted()
                     } catch { observer.onError(error) }
