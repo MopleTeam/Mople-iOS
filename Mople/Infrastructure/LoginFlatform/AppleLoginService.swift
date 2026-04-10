@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 import AuthenticationServices
 
-protocol AppleLoginService {
+protocol AppleLoginService: SocialLoginService {
     func setPresentationContextProvider(_ view: UIViewController)
     func startAppleLogin() -> Single<SocialInfo>
 }
@@ -48,6 +48,20 @@ final class DefaultAppleLoginService: NSObject, AppleLoginService {
             self.loginObserver = single
             
             return Disposables.create()
+        }
+    }
+}
+
+// MARK: - SocialLoginService (async 브릿지)
+extension DefaultAppleLoginService {
+    func login() async throws -> SocialInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            _ = startAppleLogin()
+                .subscribe(onSuccess: { socialInfo in
+                    continuation.resume(returning: socialInfo)
+                }, onFailure: { error in
+                    continuation.resume(throwing: error)
+                })
         }
     }
 }

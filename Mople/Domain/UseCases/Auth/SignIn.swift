@@ -5,7 +5,7 @@
 //  Created by CatSlave on 1/20/25.
 //
 
-import RxSwift
+import Foundation
 
 protocol SignIn {
     func execute(platform: LoginPlatform) async throws
@@ -43,15 +43,13 @@ enum LoginPlatform: String {
 
 final class SignInUseCase: SignIn {
 
-    private let appleLoginService: AppleLoginService
-    private let kakaoLoginService: KakaoLoginService
+    /// 플랫폼별 소셜 로그인 서비스 (SocialLoginService 프로토콜)
+    private let loginServices: [LoginPlatform: SocialLoginService]
     private let authenticationRepo: AuthenticationRepo
 
-    init(appleLoginService: AppleLoginService,
-         kakaoLoginService: KakaoLoginService,
+    init(loginServices: [LoginPlatform: SocialLoginService],
          authenticationRepo: AuthenticationRepo) {
-        self.appleLoginService = appleLoginService
-        self.kakaoLoginService = kakaoLoginService
+        self.loginServices = loginServices
         self.authenticationRepo = authenticationRepo
     }
 
@@ -61,7 +59,10 @@ final class SignInUseCase: SignIn {
         var socialLoginResult: SocialInfo?
 
         do {
-            let accountInfo = try await handleLogin(platform)
+            guard let service = loginServices[platform] else {
+                throw LoginError.completeError
+            }
+            let accountInfo = try await service.login()
             socialLoginResult = accountInfo
             try await authenticationRepo.signIn(social: accountInfo)
         } catch {
@@ -69,66 +70,21 @@ final class SignInUseCase: SignIn {
         }
     }
 
-    /// 플랫폼별 소셜 로그인을 실행하고 결과를 반환한다
-    /// - Note: 로그인 서비스가 RxSwift(Single/Observable) 기반이므로 withCheckedThrowingContinuation으로 브릿지
-    private func handleLogin(_ platform: LoginPlatform) async throws -> SocialInfo {
-        switch platform {
-        case .apple:
-            return try await bridgeAppleLogin()
-        case .kakao:
-            return try await bridgeKakaoLogin()
-        }
-    }
-
-    /// Apple 로그인 Single<SocialInfo>를 async throws로 변환
-    private func bridgeAppleLogin() async throws -> SocialInfo {
-        try await withCheckedThrowingContinuation { continuation in
-            _ = appleLoginService.startAppleLogin()
-                .subscribe(onSuccess: { socialInfo in
-                    continuation.resume(returning: socialInfo)
-                }, onFailure: { error in
-                    continuation.resume(throwing: error)
-                })
-        }
-    }
-
-    /// 카카오 로그인 Observable<SocialInfo>를 async throws로 변환
-    private func bridgeKakaoLogin() async throws -> SocialInfo {
-        try await withCheckedThrowingContinuation { continuation in
-            var resumed = false
-            _ = kakaoLoginService.startKakaoLogin()
-                .take(1)
-                .subscribe(onNext: { socialInfo in
-                    guard !resumed else { return }
-                    resumed = true
-                    continuation.resume(returning: socialInfo)
-                }, onError: { error in
-                    guard !resumed else { return }
-                    resumed = true
-                    continuation.resume(throwing: error)
-                })
-        }
-    }
-
+    // MARK: - 에러 처리
+    /// ServerErrorIdentifiable 프로토콜로 네트워크 에러를 분류
+    /// (DataRequestError 등 Infrastructure 타입을 직접 참조하지 않음)
     private func handleError(_ error: Error,
                              _ socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
         case let err as LoginError:
             return err
-        case let transferError as DataRequestError:
-            return handleTransferError(transferError, socialLoginResult: socialLoginResult)
-        default:
-            return .unknown(error)
-        }
-    }
-
-    private func handleTransferError(_ error: DataRequestError, socialLoginResult: SocialInfo?) -> LoginError {
-        switch error {
-        case .noResponse:
+        case let serverError as ServerErrorIdentifiable where serverError.isNotFound:
             guard let socialLoginResult else { return .completeError }
             return .notFoundInfo(result: socialLoginResult)
-        default:
+        case is ServerErrorIdentifiable:
             return .handled
+        default:
+            return .unknown(error)
         }
     }
 }
