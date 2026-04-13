@@ -5,7 +5,7 @@
 //  Created by CatSlave on 1/7/25.
 //
 
-import UIKit
+import Foundation
 
 struct Review: Comparable {
     var id: Int?

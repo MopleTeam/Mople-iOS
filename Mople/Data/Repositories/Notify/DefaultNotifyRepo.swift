@@ -5,26 +5,23 @@
 //  Created by CatSlave on 4/10/25.
 //
 import UIKit
-import RxSwift
 
 final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
-    func fetchNotifyList(cursor: String?) -> Single<PageResponse<NotifyResponse>> {
-        return networkService.authenticatedRequest {
+    func fetchNotifyList(cursor: String?) async throws -> Page<Notify> {
+        let response: PageResponse<NotifyResponse> = try await networkService.authenticatedRequest {
             try APIEndpoints.fetchNotify(cursor: cursor)
         }
+        return Page(totalCount: response.totalCount ?? 0,
+                    content: response.content.map { $0.toDomain() },
+                    info: response.page?.toDomain())
     }
-    
-    func resetNotifyCount() -> Single<Void> {
-        let resetCount = networkService.authenticatedRequest {
+
+    @MainActor
+    func resetNotifyCount() async throws {
+        try await networkService.authenticatedRequest {
             try APIEndpoints.resetNotifyCount()
         }
-        
-        return resetCount
-            .observe(on: MainScheduler.instance)
-            .flatMap({
-                UserInfoStorage.shared.updateNotifyStatus(hasNotify: false)
-                UIApplication.shared.applicationIconBadgeNumber = 0
-                return .just(())
-            })
+        UserInfoStorage.shared.updateNotifyStatus(hasNotify: false)
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
 }

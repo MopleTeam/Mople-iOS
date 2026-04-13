@@ -5,35 +5,30 @@
 //  Created by CatSlave on 12/10/24.
 //
 
-import RxSwift
 import Foundation
 
 protocol CreatePlan {
-    func execute(request: PlanRequest) -> Observable<Plan>
+    func execute(request: PlanRequest) async throws -> Plan
 }
 
 final class CreatePlanUseCase: CreatePlan {
     let createPlanRepo: PlanRepo
-    
+
     init(createPlanRepo: PlanRepo) {
         self.createPlanRepo = createPlanRepo
     }
-    
-    func execute(request: PlanRequest) -> Observable<Plan> {
-        return createPlanRepo.createPlan(request: request)
-            .map {
-                var plan = $0.toDomain()
-                plan.isCreator = true
-                return plan
-            }
-            .asObservable()
+
+    func execute(request: PlanRequest) async throws -> Plan {
+        var plan = try await createPlanRepo.createPlan(request: request)
+        plan.isCreator = true
+        return plan
     }
 }
 
 // MARK: - Mock UseCase
 #if DEV
 final class MockCreatePlanUseCase: CreatePlan {
-    func execute(request: PlanRequest) -> Observable<Plan> {
+    func execute(request: PlanRequest) async throws -> Plan {
         print("✅ [Mock] 일정 생성 요청")
 
         let mockPlan = Plan(
@@ -53,8 +48,8 @@ final class MockCreatePlanUseCase: CreatePlan {
             description: "Mock 일정입니다."
         )
 
-        return Observable.just(mockPlan)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockPlan
     }
 }
 #endif

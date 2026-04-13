@@ -182,19 +182,29 @@ extension PostDetailViewReactor {
         }
     }
     
+    /// 일정 참여/취소 요청 (async UseCase → Observable 래핑)
     private func requestParticipation(with plan: Plan) -> Observable<Mutation> {
         var newPlan = plan
         let currentParticipation = plan.isParticipation
-        
-        let requestParticipation = participationPlanUseCase
-            .execute(planId: id,
-                     isJoin: !currentParticipation)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.plan = newPlan.updateParticipants()
-                self?.postParticipants(with: newPlan)
-                return .just(.updatePostSummary(PlanPostSummary(plan: newPlan)))
+
+        let requestParticipation = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.participationPlanUseCase.execute(
+                        planId: self?.id ?? 0,
+                        isJoin: !currentParticipation
+                    )
+                    self?.plan = newPlan.updateParticipants()
+                    self?.postParticipants(with: newPlan)
+                    observer.onNext(.updatePostSummary(PlanPostSummary(plan: newPlan)))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: requestParticipation)
     }
     
@@ -294,62 +304,111 @@ extension PostDetailViewReactor {
         }
     }
     
+    /// 일정 상세 조회 (async UseCase → Observable 래핑)
     private func fetchPlan(isRefresh: Bool = false) -> Observable<Mutation> {
-        
-        return fetchPlanDetailUsecase.execute(planId: id)
-            .do(onNext: { [weak self] in
-                self?.plan = $0
-                self?.meetId = $0.meet?.id
-            })
-            .map { Mutation.updatePostSummary(PlanPostSummary(plan: $0)) }
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let plan = try await self.fetchPlanDetailUsecase.execute(planId: self.id)
+                    self.plan = plan
+                    self.meetId = plan.meet?.id
+                    observer.onNext(.updatePostSummary(PlanPostSummary(plan: plan)))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
+    /// 리뷰 상세 조회 (async UseCase → Observable 래핑)
     private func fetchReview(isRefresh: Bool = false, isOldPlan: Bool = false) -> Observable<Mutation> {
-
-        return fetchReviewDetailUseCase.execute(id: id, isOldPlan: isOldPlan)
-            .do(onNext: { [weak self] in
-                self?.review = $0
-                self?.meetId = $0.meet?.id
-            })
-            .map { Mutation.updatePostSummary(ReviewPostSummary(review: $0)) }
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let review = try await self.fetchReviewDetailUseCase.execute(id: self.id, isOldPlan: isOldPlan)
+                    self.review = review
+                    self.meetId = review.meet?.id
+                    observer.onNext(.updatePostSummary(ReviewPostSummary(review: review)))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
-    /// 포스트 삭제하기
+    /// 포스트 삭제하기 (async UseCase → Observable 래핑)
     private func deletePost() -> Observable<Mutation> {
         guard isPastPostWhenPlanType() == false else {
             return .just(.catchError(.midnight))
         }
-        let deletePost = Observable.just(type)
-            .flatMap { [weak self] type -> Observable<Void> in
-                guard let self else { return .empty() }
-                switch type {
-                case .plan:
-                    guard let planId = plan?.id else { return .empty() }
-                    return deletePlanUseCase.execute(id: planId)
-                default:
-                    guard let reviewId = review?.id else { return .empty() }
-                    return deleteReviewUseCase.exectue(id: reviewId)
+
+        let deletePost = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    switch self.type {
+                    case .plan:
+                        guard let planId = self.plan?.id else {
+                            observer.onCompleted()
+                            return
+                        }
+                        try await self.deletePlanUseCase.execute(id: planId)
+                    default:
+                        guard let reviewId = self.review?.id else {
+                            observer.onCompleted()
+                            return
+                        }
+                        try await self.deleteReviewUseCase.exectue(id: reviewId)
+                    }
+                    await MainActor.run {
+                        self.postDeletePlan()
+                        self.coordinator?.endFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
                 }
             }
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.postDeletePlan()
-                self?.coordinator?.endFlow()
-                return .empty()
-            }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: deletePost)
     }
     
-    /// 포스트 신고하기
+    /// 포스트 신고하기 (async UseCase → Observable 래핑)
     private func reportPost() -> Observable<Mutation> {
         guard isPastPostWhenPlanType() == false, let type = getReportType() else {
             return .just(.catchError(.midnight))
         }
-        let reportPost = reportUseCase.execute(type: type,
-                                               reason: nil)
-            .map { Mutation.completeReport }
-        
+
+        let reportPost = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.reportUseCase.execute(type: type, reason: nil)
+                    observer.onNext(.completeReport)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: reportPost)
     }
     

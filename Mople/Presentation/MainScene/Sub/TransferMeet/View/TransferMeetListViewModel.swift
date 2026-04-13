@@ -103,43 +103,35 @@ final class TransferMeetListViewModel: ObservableObject {
         }
         
         let cursor = pageInfo?.nextCursor
-        
-        // RxSwift Observable → Combine Publisher
-        fetchMyHostMeetsUseCase.execute(cursor: cursor)
-            .publisher
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    guard let self = self else { return }
-                    self.isFetching = false
-                    self.isLoading = false
-                    switch completion {
-                    case .finished:
-                        break
-                    case .failure(let error):
-                        self.errorMessage = error.localizedDescription
-                        self.showError = true
-                    }
-                },
-                receiveValue: { [weak self] page in
-                    guard let self = self else { return }
-                    
-                    // 페이징 정보 저장
-                    self.pageInfo = page.info
-                    
-                    // 기존 모임에 새 모임 추가 (중복 방지)
-                    let existingIds = Set(self.meets.compactMap { $0.meetSummary?.id })
-                    let uniqueNewMeets = page.content.filter { meet in
-                        guard let meetId = meet.meetSummary?.id else { return false }
-                        return !existingIds.contains(meetId)
-                    }
-                    self.meets.append(contentsOf: uniqueNewMeets)
-                    
-                    print("📄 모임 로드 완료: 총 \(self.meets.count)개 / hasNext: \(page.info?.hasNext ?? false)")
-                    print("📋 양도 가능한 모임: \(self.transferableMeets.count)개")
+
+        // async throws UseCase 호출
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let page = try await self.fetchMyHostMeetsUseCase.execute(cursor: cursor)
+                self.isFetching = false
+                self.isLoading = false
+
+                // 페이징 정보 저장
+                self.pageInfo = page.info
+
+                // 기존 모임에 새 모임 추가 (중복 방지)
+                let existingIds = Set(self.meets.compactMap { $0.meetSummary?.id })
+                let uniqueNewMeets = page.content.filter { meet in
+                    guard let meetId = meet.meetSummary?.id else { return false }
+                    return !existingIds.contains(meetId)
                 }
-            )
-            .store(in: &cancellables)
+                self.meets.append(contentsOf: uniqueNewMeets)
+
+                print("📄 모임 로드 완료: 총 \(self.meets.count)개 / hasNext: \(page.info?.hasNext ?? false)")
+                print("📋 양도 가능한 모임: \(self.transferableMeets.count)개")
+            } catch {
+                self.isFetching = false
+                self.isLoading = false
+                self.errorMessage = error.localizedDescription
+                self.showError = true
+            }
+        }
     }
     
     // MARK: - Load More
@@ -174,29 +166,24 @@ final class TransferMeetListViewModel: ObservableObject {
         guard !isLoading else { return }
         isLoading = true
 
-        deleteAccountUseCase.execute()
-            .publisher
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    guard let self else { return }
-                    self.isLoading = false
-                    if case .failure(let error) = completion {
-                        self.errorMessage = error.localizedDescription
-                        self.showError = true
-                    }
-                },
-                receiveValue: { [weak self] _ in
-                    guard let self else { return }
-                    // 유저 데이터 초기화
-                    KeychainStorage.shared.deleteToken()
-                    UserInfoStorage.shared.deleteEnitity()
-                    UserDefaults.deleteFCMToken()
-                    // 메인플로우 종료 → 로그인 화면
-                    self.coordinator?.endMainFlow()
-                }
-            )
-            .store(in: &cancellables)
+        // async throws UseCase 호출
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await self.deleteAccountUseCase.execute()
+                self.isLoading = false
+                // 유저 데이터 초기화
+                KeychainStorage.shared.deleteToken()
+                UserInfoStorage.shared.deleteEnitity()
+                UserDefaults.deleteFCMToken()
+                // 메인플로우 종료 → 로그인 화면
+                self.coordinator?.endMainFlow()
+            } catch {
+                self.isLoading = false
+                self.errorMessage = error.localizedDescription
+                self.showError = true
+            }
+        }
     }
     
     /// 플로우 종료 (뒤로가기)

@@ -10,11 +10,14 @@ import Foundation
 class BaseContainer: LifeCycleLoggable {
     let appNetworkService: AppNetworkService
     let commonViewFactory: ViewDependencies
-    
+    let userSession: UserSessionProvider
+
     init(appNetworkService: AppNetworkService,
-         commonFactory: ViewDependencies) {
+         commonFactory: ViewDependencies,
+         userSession: UserSessionProvider) {
         self.appNetworkService = appNetworkService
         self.commonViewFactory = commonFactory
+        self.userSession = userSession
         logLifeCycle()
     }
     
@@ -44,6 +47,9 @@ final class AppDIContainer {
     }()
     
     lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService)
+
+    /// Domain UseCase에 주입할 사용자 세션 프로바이더
+    lazy var userSession: UserSessionProvider = DefaultUserSessionProvider()
 }
 
 // MARK: - Make DIContainer
@@ -85,14 +91,16 @@ extension AppDIContainer {
     // MARK: - 로그인 플로우
     func makeLoginSceneDIContainer() -> AuthSceneDIContainer {
         return AuthSceneDIContainer(appNetworkService: appNetworkService,
-                                     commonFactory: commonDIContainer)
+                                     commonFactory: commonDIContainer,
+                                     userSession: userSession)
     }
-    
+
     // MARK: - 메인 플로우
     func makeMainSceneDIContainer(isLoign: Bool) -> MainSceneDIContainer {
         return MainSceneDIContainer(isLogin: isLoign,
                                     appNetworkService: appNetworkService,
-                                    commonFactory: commonDIContainer)
+                                    commonFactory: commonDIContainer,
+                                    userSession: userSession)
     }
 }
 

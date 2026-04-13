@@ -37,12 +37,14 @@ final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependenci
     
     init(appNetworkService: AppNetworkService,
          commonFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          type: PostType,
          postId: Int) {
         self.postType = type
         self.postId = postId
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonFactory)
+                   commonFactory: commonFactory,
+                   userSession: userSession)
     }
     
     func makePostDetailCoordinator() -> PostDetailFlowCoordinator {
@@ -85,9 +87,9 @@ extension PostDetailSceneDIContainer {
     
     private func makeFetchPlanDetailUsecase(repo: PlanRepo) -> FetchPlanDetail {
         #if DEV
-        return MockDataManager.resolve(FetchPlanDetailUseCase(repo: repo) as FetchPlanDetail, mock: MockFetchPlanDetailUseCase())
+        return MockDataManager.resolve(FetchPlanDetailUseCase(repo: repo, session: userSession) as FetchPlanDetail, mock: MockFetchPlanDetailUseCase())
         #else
-        return FetchPlanDetailUseCase(repo: repo)
+        return FetchPlanDetailUseCase(repo: repo, session: userSession)
         #endif
     }
     
@@ -109,9 +111,9 @@ extension PostDetailSceneDIContainer {
     
     private func makeFetchReviewDetailUseCase(repo: ReviewRepo) -> FetchReviewDetail {
         #if DEV
-        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
+        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo, session: userSession) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
         #else
-        return FetchReviewDetailUseCase(repo: repo)
+        return FetchReviewDetailUseCase(repo: repo, session: userSession)
         #endif
     }
 
@@ -158,34 +160,34 @@ extension PostDetailSceneDIContainer {
     // 댓글 UseCase
     private func makeFetchCommentListUseCase(repo: CommentRepo) -> FetchCommentList {
         #if DEV
-        return MockDataManager.resolve(FetchCommentListUseCase(repo: repo) as FetchCommentList, mock: MockFetchCommentListUseCase())
+        return MockDataManager.resolve(FetchCommentListUseCase(repo: repo, session: userSession) as FetchCommentList, mock: MockFetchCommentListUseCase())
         #else
-        return FetchCommentListUseCase(repo: repo)
+        return FetchCommentListUseCase(repo: repo, session: userSession)
         #endif
     }
 
     private func makeCreateCommentUseCase(repo: CommentRepo) -> CreateComment {
         #if DEV
-        return MockDataManager.resolve(CreateCommentUseCase(repo: repo) as CreateComment, mock: MockCreateCommentUseCase())
+        return MockDataManager.resolve(CreateCommentUseCase(repo: repo, session: userSession) as CreateComment, mock: MockCreateCommentUseCase())
         #else
-        return CreateCommentUseCase(repo: repo)
+        return CreateCommentUseCase(repo: repo, session: userSession)
         #endif
     }
 
     // 대댓글 UseCase
     private func makeFetchReplyCommentListUseCase(repo: CommentRepo) -> FetchReplyCommentList {
         #if DEV
-        return MockDataManager.resolve(FetchReplyCommentListUseCase(repo: repo) as FetchReplyCommentList, mock: MockFetchReplyCommentListUseCase())
+        return MockDataManager.resolve(FetchReplyCommentListUseCase(repo: repo, session: userSession) as FetchReplyCommentList, mock: MockFetchReplyCommentListUseCase())
         #else
-        return FetchReplyCommentListUseCase(repo: repo)
+        return FetchReplyCommentListUseCase(repo: repo, session: userSession)
         #endif
     }
 
     private func makeCreateReplyUseCase(repo: CommentRepo) -> CreateReplyComment {
         #if DEV
-        return MockDataManager.resolve(CreateReplyCommentUseCase(repo: repo) as CreateReplyComment, mock: MockCreateReplyCommentUseCase())
+        return MockDataManager.resolve(CreateReplyCommentUseCase(repo: repo, session: userSession) as CreateReplyComment, mock: MockCreateReplyCommentUseCase())
         #else
-        return CreateReplyCommentUseCase(repo: repo)
+        return CreateReplyCommentUseCase(repo: repo, session: userSession)
         #endif
     }
 
@@ -200,17 +202,17 @@ extension PostDetailSceneDIContainer {
 
     private func makeEditCommentUseCase(repo: CommentRepo) -> EditComment {
         #if DEV
-        return MockDataManager.resolve(EditCommentUseCase(repo: repo) as EditComment, mock: MockEditCommentUseCase())
+        return MockDataManager.resolve(EditCommentUseCase(repo: repo, session: userSession) as EditComment, mock: MockEditCommentUseCase())
         #else
-        return EditCommentUseCase(repo: repo)
+        return EditCommentUseCase(repo: repo, session: userSession)
         #endif
     }
 
     private func makeLikeCommentUseCase(repo: CommentRepo) -> LikeComment {
         #if DEV
-        return MockDataManager.resolve(LikeCommentUseCase(repo: repo) as LikeComment, mock: MockLikeCommentUseCase())
+        return MockDataManager.resolve(LikeCommentUseCase(repo: repo, session: userSession) as LikeComment, mock: MockLikeCommentUseCase())
         #else
-        return LikeCommentUseCase(repo: repo)
+        return LikeCommentUseCase(repo: repo, session: userSession)
         #endif
     }
     
@@ -298,9 +300,9 @@ extension PostDetailSceneDIContainer {
     
     private func makeFetchReviewUseCase(repo: ReviewRepo) -> FetchReviewDetail {
         #if DEV
-        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
+        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo, session: userSession) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
         #else
-        return FetchReviewDetailUseCase(repo: repo)
+        return FetchReviewDetailUseCase(repo: repo, session: userSession)
         #endif
     }
 
@@ -338,6 +340,7 @@ extension PostDetailSceneDIContainer {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
+            userSession: userSession,
             type: .edit(plan))
         return planCreateDI.makePlanCreateFlowCoordinator()
     }

@@ -5,38 +5,33 @@
 //  Created by CatSlave on 1/21/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol EditComment {
     func execute(id: Int,
                  text: String,
-                 mentions: [Int]) -> Observable<Comment>
+                 mentions: [Int]) async throws -> Comment
 }
 
 final class EditCommentUseCase: EditComment {
-    
+
     private let editCommentRepo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: CommentRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.editCommentRepo = repo
+        self.session = session
     }
-    
+
     func execute(id: Int,
                  text: String,
-                 mentions: [Int]) -> Observable<Comment> {
-        return editCommentRepo
+                 mentions: [Int]) async throws -> Comment {
+        var comment = try await editCommentRepo
             .editComment(commentId: id,
                          comment: text,
                          mentions: mentions)
-            .asObservable()
-            .map { $0.toDomain() }
-            .map {
-                var comment = $0
-                comment.verifyWriter(self.userId)
-                return comment
-            }
+        comment.verifyWriter(self.session.currentUserId)
+        return comment
     }
 }
 
@@ -46,7 +41,7 @@ final class MockEditCommentUseCase: EditComment {
 
     func execute(id: Int,
                  text: String,
-                 mentions: [Int]) -> Observable<Comment> {
+                 mentions: [Int]) async throws -> Comment {
         print("✅ [Mock] EditComment - id: \(id), text: \(text), mentions: \(mentions)")
 
         var mockComment = Comment()
@@ -59,8 +54,8 @@ final class MockEditCommentUseCase: EditComment {
         mockComment.createdDate = Date()
         mockComment.isWriter = true
 
-        return Observable.just(mockComment)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockComment
     }
 }
 #endif

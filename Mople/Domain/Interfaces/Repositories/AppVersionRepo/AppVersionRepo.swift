@@ -6,8 +6,7 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol AppVersionRepo {
-    func checkForceUpdate() -> Single<UpdateStatusResponse>
+    func checkForceUpdate() async throws -> UpdateStatus
 }

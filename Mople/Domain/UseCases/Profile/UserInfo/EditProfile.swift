@@ -5,24 +5,21 @@
 //  Created by CatSlave on 10/14/24.
 //
 
-import RxSwift
-
 protocol EditProfile {
-    func execute(request: ProfileEditRequest) -> Observable<Void>
+    func execute(request: ProfileEditRequest) async throws
 }
 
 final class EditProfileUseCase: EditProfile {
-    
+
     private let userInfoRepo: UserInfoRepo
-    
+
     init(userInfoRepo: UserInfoRepo) {
         self.userInfoRepo = userInfoRepo
     }
-    
-    func execute(request: ProfileEditRequest) -> Observable<Void> {
-        return self.userInfoRepo
+
+    func execute(request: ProfileEditRequest) async throws {
+        try await self.userInfoRepo
             .editProfile(requestModel: request)
-            .asObservable()
     }
 }
 
@@ -30,12 +27,10 @@ final class EditProfileUseCase: EditProfile {
 #if DEV
 final class MockEditProfileUseCase: EditProfile {
 
-    func execute(request: ProfileEditRequest) -> Observable<Void> {
+    func execute(request: ProfileEditRequest) async throws {
         print("✅ [Mock] 프로필 수정 요청")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 프로필 수정 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 프로필 수정 성공")
     }
 }
 #endif
-

@@ -5,17 +5,14 @@
 //  Created by CatSlave on 11/19/24.
 //
 
-import RxSwift
-
 protocol MeetRepo {
-    func fetchMeetPage(cursor: String?) -> Single<PageResponse<MeetResponse>>
-    func fetchMeetDetail(meetId: Int) -> Single<MeetResponse>
-    func createMeet(reqeust: CreateMeetRequest) -> Single<MeetResponse>
-    func editMeet(id: Int,
-                  reqeust: CreateMeetRequest) -> Single<MeetResponse>
-    func deleteMeet(id: Int) -> Single<Void>
-    func transferMeet(meetId: Int, newHostId: Int) -> Single<Void>
-    func fetchMyHostMeets(cursor: String?) -> Single<PageResponse<MeetResponse>>
-    func inviteMeet(id: Int) -> Single<String>
-    func joinMeet(code: String) -> Single<MeetResponse>
+    func fetchMeetPage(cursor: String?) async throws -> Page<Meet>
+    func fetchMeetDetail(meetId: Int) async throws -> Meet
+    func createMeet(reqeust: CreateMeetRequest) async throws -> Meet
+    func editMeet(id: Int, reqeust: CreateMeetRequest) async throws -> Meet
+    func deleteMeet(id: Int) async throws
+    func transferMeet(meetId: Int, newHostId: Int) async throws
+    func fetchMyHostMeets(cursor: String?) async throws -> Page<Meet>
+    func inviteMeet(id: Int) async throws -> String
+    func joinMeet(code: String) async throws -> Meet
 }

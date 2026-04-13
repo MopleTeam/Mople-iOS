@@ -29,10 +29,12 @@ final class MainSceneDIContainer: BaseContainer {
 
     init(isLogin: Bool,
          appNetworkService: AppNetworkService,
-         commonFactory: ViewDependencies) {
+         commonFactory: ViewDependencies,
+         userSession: UserSessionProvider) {
         self.isLogin = isLogin
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonFactory)
+                   commonFactory: commonFactory,
+                   userSession: userSession)
     }
     
     func makeMainFlowCoordinator(navigationController: AppNaviViewController) -> MainSceneCoordinator {
@@ -92,28 +94,32 @@ extension MainSceneDIContainer: MainSceneDependencies {
 extension MainSceneDIContainer {
     func makeHomeFlowCoordinator() -> BaseCoordinator {
         let homeSceneDI = HomeSceneDIContainer(appNetworkService: appNetworkService,
-                                               commonFactory: commonViewFactory)
+                                               commonFactory: commonViewFactory,
+                                               userSession: userSession)
         return homeSceneDI.makeHomeFlowCoordinator()
     }
-    
+
     // MARK: - 모임 리스트
     func makeMeetListFlowCoordinator() -> BaseCoordinator {
         let meetListSceneDI = MeetListSceneDIConatiner(appNetworkService: appNetworkService,
-                                                       commonFactory: commonViewFactory)
+                                                       commonFactory: commonViewFactory,
+                                                       userSession: userSession)
         return meetListSceneDI.makeMeetListFlowCoordinator()
     }
-    
+
     // MARK: - 캘린더
     func makeCalendarFlowCoordinator() -> BaseCoordinator {
         let calendarSceneDI = CalendarSceneDIContainer(appNetworkService: appNetworkService,
-                                                       commonFactory: commonViewFactory)
+                                                       commonFactory: commonViewFactory,
+                                                       userSession: userSession)
         return calendarSceneDI.makeCalendarFlowCoordinator()
     }
 
     // MARK: - 프로필
     func makeProfileCoordinator() -> BaseCoordinator {
         let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService,
-                                                commonFactory: commonViewFactory)
+                                                commonFactory: commonViewFactory,
+                                                userSession: userSession)
         return profileDI.makeSetupFlowCoordinator()
     }
 }
@@ -135,6 +141,7 @@ extension MainSceneDIContainer {
     private func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -145,6 +152,7 @@ extension MainSceneDIContainer {
                                                type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()

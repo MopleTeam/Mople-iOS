@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Core
 import ReactorKit
 
 protocol ProfileEditViewCoordination: NavigationCloseable { }
@@ -185,8 +186,18 @@ extension ProfileEditViewReactor {
     // MARK: - 닉네임 중복검사
     private func checkNicknameDuplicate() -> Observable<Mutation> {
         guard let name = profile?.nickname else { return .empty() }
-        let checkValidation = duplicateCheck.execute(name)
-            .map { Mutation.updateDuplicateState($0)}
+        let checkValidation = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let isDuplicate = try await self?.duplicateCheck.execute(name)
+                    if let isDuplicate {
+                        observer.onNext(.updateDuplicateState(isDuplicate))
+                    }
+                    observer.onCompleted()
+                } catch { observer.onError(error) }
+            }
+            return Disposables.create { task.cancel() }
+        }
 
         return requestWithLoading(task: checkValidation)
     }
@@ -217,19 +228,36 @@ extension ProfileEditViewReactor {
             guard let image = currentState.selectedImage else {
                 return .just(nil)
             }
-            return imageUpload
-                .execute(image)
-                .map { $0 }
+            return Observable.create { [weak self] observer in
+                let task = Task { [weak self] in
+                    do {
+                        let imageData = try Data.imageDataCompressed(uiImage: image)
+                        let path = try await self?.imageUpload.execute(imageData)
+                        observer.onNext(path)
+                        observer.onCompleted()
+                    } catch { observer.onError(error) }
+                }
+                return Disposables.create { task.cancel() }
+            }
         } else {
             let previousImagePath = self.previousProfile.imagePath
             return .just(previousImagePath)
         }
     }
-    
+
     private func editProfile(imagePath: String?) -> Observable<Void> {
         guard var profile else { return .just(()) }
         profile.image = imagePath
-        return self.editProfile.execute(request: profile)
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.editProfile.execute(request: profile)
+                    observer.onNext(())
+                    observer.onCompleted()
+                } catch { observer.onError(error) }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
 }
 

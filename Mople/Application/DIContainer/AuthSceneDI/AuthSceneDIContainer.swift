@@ -47,13 +47,17 @@ extension AuthSceneDIContainer: AUthSceneDependencies {
     
     private func makeSignInUseCase() -> SignIn {
         let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
+        let loginServices: [LoginPlatform: SocialLoginService] = [
+            .apple: appleLoginService,
+            .kakao: kakaoLoginService
+        ]
         #if DEV
-        let useCase = MockDataManager.resolve(SignInUseCase(appleLoginService: appleLoginService,
-                                                             kakaoLoginService: kakaoLoginService,
-                                                             authenticationRepo: authRepo) as SignIn, mock: MockSignInUseCase())
+        let useCase = MockDataManager.resolve(
+            SignInUseCase(loginServices: loginServices,
+                          authenticationRepo: authRepo) as SignIn,
+            mock: MockSignInUseCase())
         #else
-        let useCase = SignInUseCase(appleLoginService: appleLoginService,
-                                     kakaoLoginService: kakaoLoginService,
+        let useCase = SignInUseCase(loginServices: loginServices,
                                      authenticationRepo: authRepo)
         #endif
         return useCase

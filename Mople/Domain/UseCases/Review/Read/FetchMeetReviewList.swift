@@ -5,42 +5,33 @@
 //  Created by CatSlave on 1/7/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchMeetReviewList {
     func execute(meetId: Int,
-                 cursor: String?) -> Observable<Page<Review>>
+                 cursor: String?) async throws -> Page<Review>
 }
 
 final class FetchMeetReviewListUseCase: FetchMeetReviewList {
-    
+
     private let repo: ReviewRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: ReviewRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: ReviewRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
+
     func execute(meetId: Int,
-                 cursor: String?) -> Observable<Page<Review>> {
-        return repo.fetchReviewPage(meetId: meetId,
-                                    cursor: cursor)
-        .map { Page(totalCount: $0.totalCount ?? 0,
-                    content: $0.content.map({ $0.toDomain() }),
-                    info: $0.page?.toDomain()) }
-            .map({
-                var page = $0
-                self.verifyCreator(with: &page.content)
-                return page
-            })
-            .asObservable()
+                 cursor: String?) async throws -> Page<Review> {
+        var page = try await repo.fetchReviewPage(meetId: meetId, cursor: cursor)
+        verifyCreator(with: &page.content)
+        return page
     }
-    
+
     private func verifyCreator(with planList: inout [Review]) {
-        guard let userID else { return }
         planList.enumerated().forEach { index, plan in
-            planList[index].verifyCreator(userID)
+            planList[index].verifyCreator(session.currentUserId)
         }
     }
 }
@@ -49,7 +40,7 @@ final class FetchMeetReviewListUseCase: FetchMeetReviewList {
 #if DEV
 final class MockFetchMeetReviewListUseCase: FetchMeetReviewList {
 
-    func execute(meetId: Int, cursor: String?) -> Observable<Page<Review>> {
+    func execute(meetId: Int, cursor: String?) async throws -> Page<Review> {
         print("✅ [Mock] FetchMeetReviewList - meetId: \(meetId), cursor: \(cursor ?? "nil")")
 
         let mockReviews: [Review] = (1...3).map { index in
@@ -77,8 +68,8 @@ final class MockFetchMeetReviewListUseCase: FetchMeetReviewList {
             info: PageInfo(nextCursor: nil, hasNext: false, size: 10)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif

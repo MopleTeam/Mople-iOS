@@ -5,31 +5,23 @@
 //  Created by CatSlave on 8/5/25.
 //
 
-import RxSwift
-
 protocol FetchMentionList {
-    func execute(meetId: Int, cursor: String?, keyword: String?) -> Observable<Page<MemberInfo>>
+    func execute(meetId: Int, cursor: String?, keyword: String?) async throws -> Page<MemberInfo>
 }
 
 final class FetchMentionListUseCase: FetchMentionList {
-    
+
     private let repo: MentionRepo
-    
+
     init(repo: MentionRepo) {
         self.repo = repo
     }
     func execute(meetId: Int,
                  cursor: String?,
-                 keyword: String?) -> Observable<Page<MemberInfo>> {
-
-        return repo.execute(meetId: meetId,
-                            cursor: cursor,
-                            keyword: keyword)
-        .asObservable()
-        .map { Page(totalCount: $0.totalCount ?? 0,
-                    content: $0.content.map({ $0.toDomain() }),
-                    info: $0.page?.toDomain()) }
-
+                 keyword: String?) async throws -> Page<MemberInfo> {
+        return try await repo.execute(meetId: meetId,
+                                       cursor: cursor,
+                                       keyword: keyword)
     }
 }
 
@@ -47,7 +39,7 @@ final class MockFetchMentionListUseCase: FetchMentionList {
         MemberInfo(memberId: 7, nickname: "오승우", imagePath: nil, position: .member)
     ]
 
-    func execute(meetId: Int, cursor: String?, keyword: String?) -> Observable<Page<MemberInfo>> {
+    func execute(meetId: Int, cursor: String?, keyword: String?) async throws -> Page<MemberInfo> {
         print("✅ [Mock] 멘션 멤버 목록 조회 - meetId: \(meetId), cursor: \(cursor ?? "nil"), keyword: \(keyword ?? "nil")")
 
         var filtered = mockMembers
@@ -69,8 +61,8 @@ final class MockFetchMentionListUseCase: FetchMentionList {
                            size: pageSize)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif

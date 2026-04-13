@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct MeetTitleValidator {
-    
-    enum result {
+public struct MeetTitleValidator {
+
+    public enum result {
         case success, empty, countUnder, countOver
     }
-    
-    static func validator(_ text: String?) -> result {
+
+    public static func validator(_ text: String?) -> result {
         guard let text = text, !text.isEmpty else {
             return .empty
         }

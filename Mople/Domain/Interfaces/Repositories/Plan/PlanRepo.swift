@@ -6,15 +6,13 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol PlanRepo {
-    func fetchHomeData() -> Single<HomeDataResponse>
-    func fetchPlanDetail(planId: Int) -> Single<PlanResponse>
-    func fetchPlanPage(meetId: Int, cursor: String?) -> Single<PageResponse<PlanResponse>>
-    func createPlan(request: PlanRequest) -> Single<PlanResponse>
-    func participationPlan(planId: Int,
-                                  isJoin: Bool) -> Single<Void>
-    func editPlan(request: PlanRequest) -> Single<PlanResponse>
-    func deletePlan(id: Int) -> Single<Void>
+    func fetchHomeData() async throws -> HomeData
+    func fetchPlanDetail(planId: Int) async throws -> Plan
+    func fetchPlanPage(meetId: Int, cursor: String?) async throws -> Page<Plan>
+    func createPlan(request: PlanRequest) async throws -> Plan
+    func participationPlan(planId: Int, isJoin: Bool) async throws
+    func editPlan(request: PlanRequest) async throws -> Plan
+    func deletePlan(id: Int) async throws
 }

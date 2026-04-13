@@ -6,23 +6,21 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol DeleteReview {
-    func exectue(id: Int) -> Observable<Void>
+    func exectue(id: Int) async throws
 }
 
 final class DeleteReviewUseCase: DeleteReview {
-    
+
     let repo: ReviewRepo
-    
+
     init(repo: ReviewRepo) {
         self.repo = repo
     }
-    
-    func exectue(id: Int) -> Observable<Void> {
-        return repo.deleteReview(id: id)
-            .asObservable()
+
+    func exectue(id: Int) async throws {
+        try await repo.deleteReview(id: id)
     }
 }
 
@@ -30,10 +28,9 @@ final class DeleteReviewUseCase: DeleteReview {
 #if DEV
 final class MockDeleteReviewUseCase: DeleteReview {
 
-    func exectue(id: Int) -> Observable<Void> {
+    func exectue(id: Int) async throws {
         print("✅ [Mock] DeleteReview - id: \(id)")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
     }
 }
 #endif

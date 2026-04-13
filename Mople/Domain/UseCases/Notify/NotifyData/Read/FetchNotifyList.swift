@@ -5,27 +5,22 @@
 //  Created by CatSlave on 4/10/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchNotifyList {
-    func execute(cursor: String?) -> Observable<Page<Notify>>
+    func execute(cursor: String?) async throws -> Page<Notify>
 }
 
 final class FetchNotifyListUseCase: FetchNotifyList {
-    
+
     private let repo: NotifyRepo
-    
+
     init(repo: NotifyRepo) {
         self.repo = repo
     }
-    
-    func execute(cursor: String?) -> Observable<Page<Notify>> {
-        return repo.fetchNotifyList(cursor: cursor)
-            .asObservable()
-            .map { Page(totalCount: $0.totalCount ?? 0,
-                        content: $0.content.map({ $0.toDomain() }),
-                        info: $0.page?.toDomain()) }
+
+    func execute(cursor: String?) async throws -> Page<Notify> {
+        return try await repo.fetchNotifyList(cursor: cursor)
     }
 }
 
@@ -76,7 +71,7 @@ final class MockFetchNotifyListUseCase: FetchNotifyList {
         ]
     }()
 
-    func execute(cursor: String?) -> Observable<Page<Notify>> {
+    func execute(cursor: String?) async throws -> Page<Notify> {
         print("✅ [Mock] 알림 목록 조회 - cursor: \(cursor ?? "nil")")
 
         let startIndex = cursor.flatMap { Int($0) } ?? 0
@@ -93,8 +88,8 @@ final class MockFetchNotifyListUseCase: FetchNotifyList {
                            size: pageSize)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif

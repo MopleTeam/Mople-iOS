@@ -6,37 +6,28 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol FetchMyHostMeets {
-    func execute(cursor: String?) -> Observable<Page<Meet>>
+    func execute(cursor: String?) async throws -> Page<Meet>
 }
 
 // MARK: - Real UseCase
 final class FetchMyHostMeetsUseCase: FetchMyHostMeets {
-    
+
     private let repo: MeetRepo
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
-        return repo.fetchMyHostMeets(cursor: cursor)
-            .map({ .init(totalCount: $0.totalCount ?? 0,
-                         content: $0.content.map({ $0.toDomain() }),
-                         info: $0.page?.toDomain()) })
-            .do(onSuccess: { _ in
-                print(#function, #line, "Path : #1 데이터 들어옴 ")
-                
-            })
-            .asObservable()
+
+    func execute(cursor: String?) async throws -> Page<Meet> {
+        return try await repo.fetchMyHostMeets(cursor: cursor)
     }
 }
 
 // MARK: - Mock UseCase (테스트용)
 final class MockFetchMyHostMeetsUseCase: FetchMyHostMeets {
-    
+
     // 50개의 Mock 모임 데이터
     private let mockMeets: [Meet] = {
         let meetNames = [
@@ -51,49 +42,47 @@ final class MockFetchMyHostMeetsUseCase: FetchMyHostMeets {
             "보드게임", "댄스 동호회", "트레킹 모임", "스키 동호회", "서핑 클럽",
             "클라이밍", "필라테스", "크로스핏", "헬스 모임", "명상 클럽"
         ]
-        
+
         let calendar = Calendar.current
         let currentDate = Date()
-        
-        let userID = UserInfoStorage.shared.userInfo?.id
-        
+
         return (1...50).map { index in
             let hasPlan = index % 3 != 0  // 3의 배수가 아닌 경우 일정 있음
             let memberCount = (index % 5) + 2  // 2~6명
             let daysAgo = index * 3  // 각각 다른 since days
-            
+
             return Meet(
                 meetSummary: MeetSummary(id: index, name: meetNames[index - 1]),
                 sinceDays: daysAgo,
-                creatorId: userID ?? 302, // 현재 사용자 ID
+                creatorId: 1, // Mock 사용자 ID
                 memberCount: memberCount,
                 firstPlanDate: hasPlan ? calendar.date(byAdding: .day, value: (index % 7) + 1, to: currentDate) : nil
             )
         }
     }()
-    
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
-        
+
+    func execute(cursor: String?) async throws -> Page<Meet> {
+
         // cursor를 사용해서 시작 인덱스 결정 (페이징 제대로 구현)
         let startIndex = cursor.flatMap { Int($0) } ?? 0
         let pageSize = 10
         let endIndex = min(startIndex + pageSize, mockMeets.count)
-        
-        // 🔥 해당 페이지의 모임만 반환 (중복 없이!)
+
+        // 해당 페이지의 모임만 반환 (중복 없이!)
         let contentToReturn = Array(mockMeets[startIndex..<endIndex])
         let hasNext = endIndex < mockMeets.count
         let nextCursor = hasNext ? "\(endIndex)" : nil
-        
+
         let page = Page(
             totalCount: mockMeets.count,
             content: contentToReturn,
             info: PageInfo(nextCursor: nextCursor, hasNext: hasNext, size: pageSize)
         )
-        
+
         print("📄 Mock 페이징: \(startIndex)~\(endIndex - 1)번 인덱스 반환 (총 \(contentToReturn.count)개) | cursor: \(cursor ?? "nil") → nextCursor: \(nextCursor ?? "nil")")
-        
+
         // 3초 딜레이 시뮬레이션
-        return Observable.just(page)
-            .delay(.seconds(3), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 3_000_000_000)
+        return page
     }
 }

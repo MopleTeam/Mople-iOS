@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Core
 import RxSwift
 
 final class DefaultSegmentedControl: UIView {

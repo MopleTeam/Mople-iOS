@@ -40,12 +40,14 @@ final class MeetDetailSceneDIContainer: BaseContainer, MeetDetailSceneDependenci
     
     init(appNetworkService: AppNetworkService,
          commonFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          meetId: Int,
          isJoin: Bool) {
         self.meetId = meetId
         self.isJoin = isJoin
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonFactory)
+                   commonFactory: commonFactory,
+                   userSession: userSession)
     }
     
     func makeMeetDetailCoordinator() -> MeetDetailSceneCoordinator {
@@ -109,9 +111,9 @@ extension MeetDetailSceneDIContainer {
     
     private func makeFetchMeetPlanUsecase(repo: PlanRepo) -> FetchPlanPage {
         #if DEV
-        return MockDataManager.resolve(FetchPlanPageUsecase(repo: repo) as FetchPlanPage, mock: MockFetchPlanPageUseCase())
+        return MockDataManager.resolve(FetchPlanPageUsecase(repo: repo, session: userSession) as FetchPlanPage, mock: MockFetchPlanPageUseCase())
         #else
-        return FetchPlanPageUsecase(repo: repo)
+        return FetchPlanPageUsecase(repo: repo, session: userSession)
         #endif
     }
     
@@ -141,9 +143,9 @@ extension MeetDetailSceneDIContainer {
     private func makeFetchReviewListUsecase() -> FetchMeetReviewList {
         let repo = DefaultReviewRepo(networkService: appNetworkService)
         #if DEV
-        return MockDataManager.resolve(FetchMeetReviewListUseCase(repo: repo) as FetchMeetReviewList, mock: MockFetchMeetReviewListUseCase())
+        return MockDataManager.resolve(FetchMeetReviewListUseCase(repo: repo, session: userSession) as FetchMeetReviewList, mock: MockFetchMeetReviewListUseCase())
         #else
-        return FetchMeetReviewListUseCase(repo: repo)
+        return FetchMeetReviewListUseCase(repo: repo, session: userSession)
         #endif
     }
 }
@@ -242,6 +244,7 @@ extension MeetDetailSceneDIContainer {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
+            userSession: userSession,
             type: .newInMeeting(meet))
         return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completion)
     }
@@ -251,6 +254,7 @@ extension MeetDetailSceneDIContainer {
                                        type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()

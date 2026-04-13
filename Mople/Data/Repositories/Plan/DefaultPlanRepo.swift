@@ -5,47 +5,53 @@
 //  Created by CatSlave on 1/9/25.
 //
 
-import RxSwift
-
 final class DefaultPlanRepo: BaseRepositories, PlanRepo {
-    
-    func fetchHomeData() -> Single<HomeDataResponse> {
-        return self.networkService.authenticatedRequest(endpointClosure: APIEndpoints.fetchRecentPlan)
+
+    func fetchHomeData() async throws -> HomeData {
+        let response: HomeDataResponse = try await self.networkService.authenticatedRequest(
+            endpointClosure: APIEndpoints.fetchRecentPlan
+        )
+        return response.toDomain()
     }
-    
-    func fetchPlanDetail(planId: Int) -> Single<PlanResponse> {
-        self.networkService.authenticatedRequest {
+
+    func fetchPlanDetail(planId: Int) async throws -> Plan {
+        let response: PlanResponse = try await self.networkService.authenticatedRequest {
             try APIEndpoints.fetchPlan(id: planId)
         }
+        return response.toDomain()
     }
-    
-    func fetchPlanPage(meetId: Int, cursor: String?) -> Single<PageResponse<PlanResponse>> {
-        return self.networkService.authenticatedRequest {
+
+    func fetchPlanPage(meetId: Int, cursor: String?) async throws -> Page<Plan> {
+        let response: PageResponse<PlanResponse> = try await self.networkService.authenticatedRequest {
             try APIEndpoints.fetchPlanPage(meetId: meetId, cursor: cursor)
         }
+        return Page(totalCount: response.totalCount ?? 0,
+                    content: response.content.map { $0.toDomain() },
+                    info: response.page?.toDomain())
     }
-    
-    func createPlan(request: PlanRequest) -> Single<PlanResponse> {
-        return networkService.authenticatedRequest {
+
+    func createPlan(request: PlanRequest) async throws -> Plan {
+        let response: PlanResponse = try await networkService.authenticatedRequest {
             try APIEndpoints.createPlan(request: request)
         }
+        return response.toDomain()
     }
-    
-    func participationPlan(planId: Int,
-                           isJoin: Bool) -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func participationPlan(planId: Int, isJoin: Bool) async throws {
+        return try await networkService.authenticatedRequest {
             try isJoin ? APIEndpoints.joinPlan(id: planId) : APIEndpoints.leavePlan(id: planId)
         }
     }
-    
-    func editPlan(request: PlanRequest) -> Single<PlanResponse> {
-        return networkService.authenticatedRequest {
+
+    func editPlan(request: PlanRequest) async throws -> Plan {
+        let response: PlanResponse = try await networkService.authenticatedRequest {
             try APIEndpoints.editPlan(request: request)
         }
+        return response.toDomain()
     }
-    
-    func deletePlan(id: Int) -> Single<Void> {
-        return networkService.authenticatedRequest {
+
+    func deletePlan(id: Int) async throws {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.deletePlan(id: id)
         }
     }

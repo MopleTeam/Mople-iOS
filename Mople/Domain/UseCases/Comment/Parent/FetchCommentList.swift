@@ -5,39 +5,35 @@
 //  Created by CatSlave on 1/16/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchCommentList {
     func execute(postId: Int,
-                 nextCursor: String?) -> Observable<Page<Comment>>
+                 nextCursor: String?) async throws -> Page<Comment>
 }
 
 final class FetchCommentListUseCase: FetchCommentList {
-    
+
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: CommentRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
+
     func execute(postId: Int,
-                 nextCursor: String?) -> Observable<Page<Comment>> {
-        repo.fetchCommentList(postId: postId,
-                              nextCursor: nextCursor)
-            .asObservable()
-            .map { Page(totalCount: $0.totalCount ?? 0,
-                        content: $0.content.map({ $0.toDomain() }),
-                        info: $0.page?.toDomain()) }
-            .map({ self.checkWriter(with: $0)})
+                 nextCursor: String?) async throws -> Page<Comment> {
+        let page = try await repo.fetchCommentList(postId: postId,
+                                                    nextCursor: nextCursor)
+        return checkWriter(with: page)
     }
-    
+
     private func checkWriter(with list: Page<Comment>) -> Page<Comment> {
         var commentPage = list
         commentPage.content = commentPage.content.map({
             var comment = $0
-            comment.verifyWriter(userId)
+            comment.verifyWriter(session.currentUserId)
             return comment
         })
         return commentPage
@@ -49,7 +45,7 @@ final class FetchCommentListUseCase: FetchCommentList {
 final class MockFetchCommentListUseCase: FetchCommentList {
 
     func execute(postId: Int,
-                 nextCursor: String?) -> Observable<Page<Comment>> {
+                 nextCursor: String?) async throws -> Page<Comment> {
         print("✅ [Mock] FetchCommentList - postId: \(postId), nextCursor: \(nextCursor ?? "nil")")
 
         let mockComments: [Comment] = (1...5).map { index in
@@ -74,9 +70,8 @@ final class MockFetchCommentListUseCase: FetchCommentList {
             info: PageInfo(nextCursor: nil, hasNext: false, size: 20)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif
-

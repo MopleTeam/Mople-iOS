@@ -5,34 +5,32 @@
 //  Created by CatSlave on 11/29/24.
 //
 
-import RxSwift
 import FirebaseMessaging
 
 protocol UploadFCMToken {
-    func execute() -> Observable<Void>
+    func execute() async throws
 }
 
 final class UploadFCMTokenUseCase: UploadFCMToken {
-        
+
     private let repo: FCMTokenUploadRepo
-    
-    
+
+
     init(repo: FCMTokenUploadRepo) {
         self.repo = repo
     }
-    
-    func execute() -> Observable<Void> {
+
+    func execute() async throws {
         guard let currentToken = Messaging.messaging().fcmToken else {
-            return .just(())
+            return
         }
 
         if let lastUploadToken = UserDefaults.getFCMToken(),
            currentToken == lastUploadToken {
-            return .just(())
+            return
         }
 
-        return repo.uploadFCMToken(currentToken)
-            .asObservable()
+        try await repo.uploadFCMToken(currentToken)
     }
 }
 
@@ -40,11 +38,10 @@ final class UploadFCMTokenUseCase: UploadFCMToken {
 #if DEV
 final class MockUploadFCMTokenUseCase: UploadFCMToken {
 
-    func execute() -> Observable<Void> {
+    func execute() async throws {
         print("✅ [Mock] FCM 토큰 업로드 요청")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] FCM 토큰 업로드 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] FCM 토큰 업로드 성공")
     }
 }
 #endif

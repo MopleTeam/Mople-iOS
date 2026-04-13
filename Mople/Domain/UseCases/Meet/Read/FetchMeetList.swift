@@ -6,40 +6,34 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol FetchMeetPage {
-    func execute(cursor: String?) -> Observable<Page<Meet>>
+    func execute(cursor: String?) async throws -> Page<Meet>
 }
 
 final class FetchMeetPageUseCase: FetchMeetPage {
-  
-    private let repo: MeetRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
 
-    
-    init(repo: MeetRepo) {
+    private let repo: MeetRepo
+    private let session: UserSessionProvider
+
+    init(repo: MeetRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
-        return repo.fetchMeetPage(cursor: cursor)
-            .map { .init(
-                totalCount: $0.totalCount ?? 0,
-                content: $0.content
-                    .map({
-                        var meet = $0.toDomain()
-                        self.verifyCreator(with: &meet)
-                        return meet
-                    }),
-                info: $0.page?.toDomain()) }
-            .asObservable()
+
+    func execute(cursor: String?) async throws -> Page<Meet> {
+        var page = try await repo.fetchMeetPage(cursor: cursor)
+        page.content = page.content.map { meet in
+            var mutableMeet = meet
+            self.verifyCreator(with: &mutableMeet)
+            return mutableMeet
+        }
+        return page
     }
-    
+
     private func verifyCreator(with meet: inout Meet) {
-        guard let userID else { return }
         guard let ownerId = meet.creatorId,
-              userID == ownerId else { return }
+              session.currentUserId == ownerId else { return }
         meet.isCreator = true
     }
 }
@@ -71,7 +65,7 @@ final class MockFetchMeetPageUseCase: FetchMeetPage {
         }
     }()
 
-    func execute(cursor: String?) -> Observable<Page<Meet>> {
+    func execute(cursor: String?) async throws -> Page<Meet> {
         print("✅ [Mock] 모임 목록 조회 - cursor: \(cursor ?? "nil")")
 
         let startIndex = cursor.flatMap { Int($0) } ?? 0
@@ -88,9 +82,8 @@ final class MockFetchMeetPageUseCase: FetchMeetPage {
             info: PageInfo(nextCursor: nextCursor, hasNext: hasNext, size: pageSize)
         )
 
-        return Observable.just(page)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return page
     }
 }
 #endif
-

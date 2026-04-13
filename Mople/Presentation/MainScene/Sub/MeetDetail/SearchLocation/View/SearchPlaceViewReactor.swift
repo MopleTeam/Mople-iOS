@@ -145,25 +145,39 @@ extension SearchPlaceViewReactor {
         return .just(Mutation.setPlace(.init(places: places, isCached: true)))
     }
     
+    /// 키워드 기반 장소 검색 (async UseCase → Observable 래핑)
     private func searchPlace(query: String) -> Observable<Mutation> {
-        
         let userLocation = currentState.userLocation
 
-        let requestSearch = searchUseCase.execute(query: query,
-                                                  x: userLocation?.longitude,
-                                                  y: userLocation?.latitude)
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] result -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let hasResult = !result.places.isEmpty
-                updateSearchResultVisibility(hasResult: hasResult)
-                
-                return hasResult
-                ? .just(.setPlace(.init(places: result.places,
-                                        isCached: false)))
-                : .empty()
+        let requestSearch = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.searchUseCase.execute(
+                        query: query,
+                        x: userLocation?.longitude,
+                        y: userLocation?.latitude
+                    )
+                    await MainActor.run {
+                        guard let self, let result else {
+                            observer.onCompleted()
+                            return
+                        }
+                        let hasResult = !result.places.isEmpty
+                        self.updateSearchResultVisibility(hasResult: hasResult)
+
+                        if hasResult {
+                            observer.onNext(.setPlace(.init(places: result.places,
+                                                            isCached: false)))
+                        }
+                        observer.onCompleted()
+                    }
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: requestSearch)
     }
 }

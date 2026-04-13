@@ -105,14 +105,28 @@ final class NotifyListViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Requset
 extension NotifyListViewReactor {
+    /// 알림 목록을 불러온다
     private func fetchNotify(cursor: String? = nil,
                              isRefresh: Bool = false) -> Observable<Mutation> {
-        return fetchNotifyListUseCase.execute(cursor: cursor)
-            .flatMap({ result -> Observable<Mutation> in
-                let updateNotify = self.updateNotifyList(isRefresh: isRefresh, notify: result.content)
-                let updatePage = Mutation.updatePage(result.info)
-                return .of(updateNotify, updatePage)
-            })
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let result = try await self.fetchNotifyListUseCase.execute(cursor: cursor)
+                    let updateNotify = self.updateNotifyList(isRefresh: isRefresh, notify: result.content)
+                    let updatePage = Mutation.updatePage(result.info)
+                    observer.onNext(updateNotify)
+                    observer.onNext(updatePage)
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     private func updateNotifyList(isRefresh: Bool, notify: [Notify]) -> Mutation {
@@ -138,11 +152,19 @@ extension NotifyListViewReactor {
             .concat(resetNotifyCount())
     }
     
+    /// 알림 카운트를 초기화한다
     private func resetNotifyCount() -> Observable<Mutation> {
-        return resetNotifyCountUseCase.execute()
-            .flatMap { _ -> Observable<Mutation> in
-                return .empty()
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.resetNotifyCountUseCase.execute()
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     private func fetchNextPage() -> Observable<Mutation> {

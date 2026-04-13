@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Array where Element: Hashable & Comparable {
+public extension Array where Element: Hashable & Comparable {
     mutating func uniqueSorted() {
         var unique = Set(self)
         self = Array(unique).sorted(by: <)

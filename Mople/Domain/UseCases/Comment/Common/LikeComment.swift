@@ -5,31 +5,26 @@
 //  Created by CatSlave on 7/15/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol LikeComment {
-    func execute(commentId: Int) -> Observable<Comment>
+    func execute(commentId: Int) async throws -> Comment
 }
 
 final class LikeCommentUseCase: LikeComment {
-    
+
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: CommentRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
-    func execute(commentId: Int) -> Observable<Comment> {
-        return repo.likeComment(commentId: commentId)
-            .asObservable()
-            .map { $0.toDomain() }
-            .map {
-                var comment = $0
-                comment.verifyWriter(self.userId)
-                return comment
-            }
+
+    func execute(commentId: Int) async throws -> Comment {
+        var comment = try await repo.likeComment(commentId: commentId)
+        comment.verifyWriter(self.session.currentUserId)
+        return comment
     }
 }
 
@@ -37,7 +32,7 @@ final class LikeCommentUseCase: LikeComment {
 #if DEV
 final class MockLikeCommentUseCase: LikeComment {
 
-    func execute(commentId: Int) -> Observable<Comment> {
+    func execute(commentId: Int) async throws -> Comment {
         print("✅ [Mock] LikeComment - commentId: \(commentId)")
 
         var mockComment = Comment()
@@ -52,8 +47,8 @@ final class MockLikeCommentUseCase: LikeComment {
         mockComment.isLiked = true
         mockComment.likeCount = 1
 
-        return Observable.just(mockComment)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockComment
     }
 }
 #endif

@@ -5,31 +5,26 @@
 //  Created by CatSlave on 1/20/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol FetchReviewDetail {
-    func execute(id: Int, isOldPlan: Bool) -> Observable<Review>
+    func execute(id: Int, isOldPlan: Bool) async throws -> Review
 }
 
 final class FetchReviewDetailUseCase: FetchReviewDetail {
-    
+
     private let repo: ReviewRepo
-    private let userID = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: ReviewRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: ReviewRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
-    func execute(id: Int, isOldPlan: Bool) -> Observable<Review> {
-        return repo.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
-            .map { $0.toDomain() }
-            .map { [weak self] review in
-                var verifyReview = review
-                verifyReview.verifyCreator(self?.userID)
-                return verifyReview
-            }
-            .asObservable()
+
+    func execute(id: Int, isOldPlan: Bool) async throws -> Review {
+        var review = try await repo.fetchReviewDetail(id: id, isOldPlan: isOldPlan)
+        review.verifyCreator(self.session.currentUserId)
+        return review
     }
 }
 
@@ -37,7 +32,7 @@ final class FetchReviewDetailUseCase: FetchReviewDetail {
 #if DEV
 final class MockFetchReviewDetailUseCase: FetchReviewDetail {
 
-    func execute(id: Int, isOldPlan: Bool) -> Observable<Review> {
+    func execute(id: Int, isOldPlan: Bool) async throws -> Review {
         print("✅ [Mock] FetchReviewDetail - id: \(id), isOldPlan: \(isOldPlan)")
 
         var mockReview = Review(images: [ReviewImage(id: 1, path: "https://harme.s3.ap-northeast-2.amazonaws.com/profile/dbb4032d-5907-4404-971e-6183a7e69242.null"),
@@ -57,8 +52,8 @@ final class MockFetchReviewDetailUseCase: FetchReviewDetail {
         mockReview.isCreator = true
         mockReview.commentCount = 3
 
-        return Observable.just(mockReview)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockReview
     }
 }
 #endif

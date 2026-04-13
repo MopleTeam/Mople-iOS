@@ -5,24 +5,21 @@
 //  Created by CatSlave on 1/21/25.
 //
 
-import RxSwift
-
 protocol DeleteComment {
-    func execute(commentId: Int) -> Observable<Void>
+    func execute(commentId: Int) async throws
 }
 
 final class DeleteCommentUseCase: DeleteComment {
-    
+
     private let deleteCommentRepo: CommentRepo
-    
+
     init(repo: CommentRepo) {
         self.deleteCommentRepo = repo
     }
-    
-    func execute(commentId: Int) -> Observable<Void> {
-        return deleteCommentRepo
+
+    func execute(commentId: Int) async throws {
+        try await deleteCommentRepo
             .deleteComment(commentId: commentId)
-            .asObservable()
     }
 }
 
@@ -30,10 +27,9 @@ final class DeleteCommentUseCase: DeleteComment {
 #if DEV
 final class MockDeleteCommentUseCase: DeleteComment {
 
-    func execute(commentId: Int) -> Observable<Void> {
+    func execute(commentId: Int) async throws {
         print("✅ [Mock] DeleteComment - commentId: \(commentId)")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
     }
 }
 #endif

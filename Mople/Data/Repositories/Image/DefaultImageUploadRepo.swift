@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import RxSwift
 
 enum ImageUploadPath: String {
     case profile = "profile"
@@ -15,15 +14,15 @@ enum ImageUploadPath: String {
 }
 
 final class DefaultImageUploadRepo: BaseRepositories, ImageUploadRepo {
-    func uploadImage(data: Data, path: ImageUploadPath) -> Single<String> {
+    func uploadImage(data: Data, path: ImageUploadPath) async throws -> String {
         let imageUploadEndpoint = APIEndpoints.uploadImage(imageData: data,
                                                            folderPath: path)
-        return networkService.basicRequest(endpoint: imageUploadEndpoint)
+        return try await networkService.basicRequest(endpoint: imageUploadEndpoint)
     }
-    
+
     func uploadReviewImages(id: Int,
-                            images: [Data]) -> Single<Void> {
-        return networkService.authenticatedRequest {
+                            images: [Data]) async throws {
+        return try await networkService.authenticatedRequest {
             try APIEndpoints.uploadReviewImage(id: id, imageDatas: images)
         }
     }

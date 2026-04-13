@@ -5,10 +5,10 @@
 //  Created by CatSlave on 1/20/25.
 //
 
-import RxSwift
+import Foundation
 
 protocol SignIn {
-    func execute(platform: LoginPlatform) -> Observable<Void>
+    func execute(platform: LoginPlatform) async throws
 }
 
 enum LoginError: Error {
@@ -19,7 +19,7 @@ enum LoginError: Error {
     case cancle
     case handled
     case unknown(Error)
-    
+
     var info: String? {
         switch self {
         case .appleAccountError:
@@ -42,67 +42,49 @@ enum LoginPlatform: String {
 }
 
 final class SignInUseCase: SignIn {
-    
-    private let appleLoginService: AppleLoginService
-    private let kakaoLoginService: KakaoLoginService
+
+    /// 플랫폼별 소셜 로그인 서비스 (SocialLoginService 프로토콜)
+    private let loginServices: [LoginPlatform: SocialLoginService]
     private let authenticationRepo: AuthenticationRepo
-    
-    init(appleLoginService: AppleLoginService,
-         kakaoLoginService: KakaoLoginService,
+
+    init(loginServices: [LoginPlatform: SocialLoginService],
          authenticationRepo: AuthenticationRepo) {
-        self.appleLoginService = appleLoginService
-        self.kakaoLoginService = kakaoLoginService
+        self.loginServices = loginServices
         self.authenticationRepo = authenticationRepo
     }
-    
+
     // MARK: - SignIn
-    func execute(platform: LoginPlatform) -> Observable<Void> {
-        
+    func execute(platform: LoginPlatform) async throws {
+
         var socialLoginResult: SocialInfo?
-        
-        return handleLogin(platform)
-            .do(onNext: { socialLoginResult = $0 })
-            .flatMap({ [weak self] accountInfo -> Single<Void> in
-                guard let self else { return .just(()) }
-                return self.authenticationRepo
-                    .signIn(social: accountInfo)
-            })
-            .asObservable()
-            .catch({ [weak self] err in
-                guard let self else { return .error(err) }
-                return .error(self.handleError(err, socialLoginResult))
-            })
-    }
-    
-    private func handleLogin(_ platform: LoginPlatform) -> Observable<SocialInfo> {
-        switch platform {
-        case .apple:
-            appleLoginService.startAppleLogin()
-                .asObservable()
-        case .kakao:
-            kakaoLoginService.startKakaoLogin()
+
+        do {
+            guard let service = loginServices[platform] else {
+                throw LoginError.completeError
+            }
+            let accountInfo = try await service.login()
+            socialLoginResult = accountInfo
+            try await authenticationRepo.signIn(social: accountInfo)
+        } catch {
+            throw handleError(error, socialLoginResult)
         }
     }
-    
+
+    // MARK: - 에러 처리
+    /// ServerErrorIdentifiable 프로토콜로 네트워크 에러를 분류
+    /// (DataRequestError 등 Infrastructure 타입을 직접 참조하지 않음)
     private func handleError(_ error: Error,
                              _ socialLoginResult: SocialInfo?) -> LoginError {
         switch error {
         case let err as LoginError:
             return err
-        case let transferError as DataRequestError:
-            return handleTransferError(transferError, socialLoginResult: socialLoginResult)
-        default:
-            return .unknown(error)
-        }
-    }
-    
-    private func handleTransferError(_ error: DataRequestError, socialLoginResult: SocialInfo?) -> LoginError {
-        switch error {
-        case .noResponse:
+        case let serverError as ServerErrorIdentifiable where serverError.isNotFound:
             guard let socialLoginResult else { return .completeError }
             return .notFoundInfo(result: socialLoginResult)
-        default:
+        case is ServerErrorIdentifiable:
             return .handled
+        default:
+            return .unknown(error)
         }
     }
 }
@@ -111,11 +93,10 @@ final class SignInUseCase: SignIn {
 #if DEV
 final class MockSignInUseCase: SignIn {
 
-    func execute(platform: LoginPlatform) -> Observable<Void> {
+    func execute(platform: LoginPlatform) async throws {
         print("✅ [Mock] 로그인 요청 - platform: \(platform.rawValue)")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 로그인 성공") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 로그인 성공")
     }
 }
 #endif

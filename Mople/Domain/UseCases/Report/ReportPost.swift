@@ -5,26 +5,23 @@
 //  Created by CatSlave on 2/14/25.
 //
 
-import RxSwift
-
 protocol ReportPost {
     func execute(type: ReportType,
-                 reason: String?) -> Observable<Void>
+                 reason: String?) async throws
 }
 
 final class ReportPostUseCase: ReportPost {
-    
+
     private let repo: ReportRepo
-    
+
     init(repo: ReportRepo) {
         self.repo = repo
     }
-    
+
     func execute(type: ReportType,
-                 reason: String? = nil) -> Observable<Void> {
+                 reason: String? = nil) async throws {
         let request: ReportRequest = .init(type: type, reason: reason)
-        return repo.reportPost(request: request)
-            .asObservable()
+        try await repo.reportPost(request: request)
     }
 }
 
@@ -32,11 +29,9 @@ final class ReportPostUseCase: ReportPost {
 #if DEV
 final class MockReportPostUseCase: ReportPost {
     func execute(type: ReportType,
-                 reason: String?) -> Observable<Void> {
+                 reason: String?) async throws {
         print("✅ [Mock] 게시글 신고 - type: \(type), reason: \(reason ?? "없음")")
-        return Observable.just(())
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
     }
 }
 #endif
-

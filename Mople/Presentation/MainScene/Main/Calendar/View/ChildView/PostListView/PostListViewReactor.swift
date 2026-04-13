@@ -110,18 +110,29 @@ final class PostListViewReactor: Reactor {
 // MARK: - Data Request
 extension PostListViewReactor {
     
-    /// 일정 데이터 요청
+    /// 일정 데이터 요청 (async UseCase를 Observable로 래핑)
     private func fetchPost(month: Date) -> Observable<[MonthlyPost]> {
         guard let monthString = DateManager.toString(date: month, format: .month) else {
             return .just([])
         }
-                
-        return fetchMonthlyPostUseCase.execute(month: monthString)
-            .catchAndReturn([])
-            .do(onNext: { [weak self] planList in
-                self?.updateLoadedMonth(month: month,
-                                        planList: planList)
-            })
+
+        return Observable<[MonthlyPost]>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let planList = try await self?.fetchMonthlyPostUseCase.execute(month: monthString) ?? []
+                    self?.updateLoadedMonth(month: month, planList: planList)
+                    observer.onNext(planList)
+                    observer.onCompleted()
+                } catch {
+                    // 에러 시 빈 배열 반환 (기존 catchAndReturn 대체)
+                    let emptyList: [MonthlyPost] = []
+                    self?.updateLoadedMonth(month: month, planList: emptyList)
+                    observer.onNext(emptyList)
+                    observer.onCompleted()
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
     }
     
     /// fetch monthlist zip

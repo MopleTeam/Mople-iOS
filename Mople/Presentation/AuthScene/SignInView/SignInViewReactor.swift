@@ -74,23 +74,29 @@ final class SignInViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Request
 extension SignInViewReactor {
+    /// 로그인 실행 후 유저 정보 조회, 성공 시 메인 화면 전환
     private func executeSignIn(platform: LoginPlatform) -> Observable<Mutation> {
-                  
-        return signIn.execute(platform: platform)
-            .flatMap({ [weak self] _ -> Observable<Void> in
-                guard let self else { return .empty() }
-                return self.fetchUserInfo.execute()
-            })
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] _ -> Observable<Mutation> in
-                self?.coordinator?.presentMainFlow()
-                return .empty()
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    try await self?.signIn.execute(platform: platform)
+                    try await self?.fetchUserInfo.execute()
+                    await MainActor.run {
+                        self?.coordinator?.presentMainFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    guard let self else {
+                        observer.onCompleted()
+                        return
+                    }
+                    let loginErr = self.handleError(error)
+                    observer.onNext(.catchError(loginErr))
+                    observer.onCompleted()
+                }
             }
-            .catch({ [weak self] err -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                let err = handleError(err)
-                return .just(.catchError(err))
-            })
+            return Disposables.create { task.cancel() }
+        }
     }
     
     private func handleError(_ err: Error) -> LoginError? {

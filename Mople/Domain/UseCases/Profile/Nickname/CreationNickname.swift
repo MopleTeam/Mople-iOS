@@ -5,29 +5,26 @@
 //  Created by CatSlave on 1/20/25.
 //
 
-import RxSwift
+import Foundation
 
 protocol CreationNickname {
-    func executue() -> Observable<String>
+    func executue() async throws -> String
 }
 
 final class CreationNicknameUseCase: CreationNickname {
-    
+
     let nickNameRepo: NicknameRepo
-    
+
     init(nickNameRepo: NicknameRepo) {
         self.nickNameRepo = nickNameRepo
     }
-    
-    func executue() -> Observable<String> {
-        self.nickNameRepo.creationNickname()
-            .asObservable()
-            .flatMap({ data -> Observable<String> in
-                guard let nickname = String(data: data, encoding: .utf8) else {
-                    return .empty()
-                }
-                return .just(nickname)
-            })
+
+    func executue() async throws -> String {
+        let data = try await nickNameRepo.creationNickname()
+        guard let nickname = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: "CreationNickname", code: -1, userInfo: [NSLocalizedDescriptionKey: "닉네임 디코딩 실패"])
+        }
+        return nickname
     }
 }
 
@@ -35,11 +32,11 @@ final class CreationNicknameUseCase: CreationNickname {
 #if DEV
 final class MockCreationNicknameUseCase: CreationNickname {
 
-    func executue() -> Observable<String> {
+    func executue() async throws -> String {
         print("✅ [Mock] 닉네임 생성 요청")
-        return Observable.just("MockUser")
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
-            .do(onNext: { print("✅ [Mock] 닉네임 생성 성공 - nickname: \($0)") })
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        print("✅ [Mock] 닉네임 생성 성공 - nickname: MockUser")
+        return "MockUser"
     }
 }
 #endif

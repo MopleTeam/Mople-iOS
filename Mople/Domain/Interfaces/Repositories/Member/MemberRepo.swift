@@ -5,8 +5,6 @@
 //  Created by CatSlave on 2/4/25.
 //
 
-import RxSwift
-
 protocol MemberRepo {
-    func execute(type: MemberListType, nextCursor: String?) -> Single<PageResponse<MemberInfoResponse>>
+    func execute(type: MemberListType, nextCursor: String?) async throws -> Page<MemberInfo>
 }

@@ -5,41 +5,36 @@
 //  Created by CatSlave on 7/15/25.
 //
 
-import RxSwift
 import Foundation
 
 protocol CreateReplyComment {
     func execute(postId: Int,
                  parentId: Int,
                  comment: String,
-                 mentions: [Int]) -> Observable<Comment>
+                 mentions: [Int]) async throws -> Comment
 }
 
 final class CreateReplyCommentUseCase: CreateReplyComment {
-    
+
     private let repo: CommentRepo
-    private let userId = UserInfoStorage.shared.userInfo?.id
-    
-    init(repo: CommentRepo) {
+    private let session: UserSessionProvider
+
+    init(repo: CommentRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
-    
+
     func execute(postId: Int,
                  parentId: Int,
                  comment: String,
-                 mentions: [Int]) -> Observable<Comment> {
-        return repo
+                 mentions: [Int]) async throws -> Comment {
+        var domainComment = try await repo
             .createReplyComment(postId: postId,
                                 commentId: parentId,
                                 comment: comment,
                                 mentions: mentions)
-            .asObservable()
-            .map { $0.toDomain() }
-            .map {
-                var comment = $0
-                comment.verifyWriter(self.userId)
-                return comment
-            }
+        domainComment.verifyWriter(self.session.currentUserId)
+        return domainComment
     }
 }
 
@@ -50,7 +45,7 @@ final class MockCreateReplyCommentUseCase: CreateReplyComment {
     func execute(postId: Int,
                  parentId: Int,
                  comment: String,
-                 mentions: [Int]) -> Observable<Comment> {
+                 mentions: [Int]) async throws -> Comment {
         print("✅ [Mock] CreateReplyComment - postId: \(postId), parentId: \(parentId), comment: \(comment)")
 
         var mockReply = Comment()
@@ -64,8 +59,8 @@ final class MockCreateReplyCommentUseCase: CreateReplyComment {
         mockReply.createdDate = Date()
         mockReply.isWriter = true
 
-        return Observable.just(mockReply)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockReply
     }
 }
 #endif

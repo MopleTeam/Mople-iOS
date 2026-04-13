@@ -40,7 +40,7 @@
 | 0 | 협업 기반 (SwiftLint, README, 브랜치 전략) | 미시작 |
 | 1 | 테스트 환경 (Swift Testing) | 미시작 |
 | 2 | CI/CD (GitHub Actions + Fastlane) | 미시작 |
-| 3 | RxSwift → Swift Concurrency (async/await) | 미시작 |
+| 3 | RxSwift → Swift Concurrency (async/await) | 완료 |
 | 4 | Swift 6 Strict Concurrency | 미시작 |
 | 5 | SwiftUI 점진적 도입 | 미시작 |
 | 6 | Tuist + 모듈화 | 미시작 |

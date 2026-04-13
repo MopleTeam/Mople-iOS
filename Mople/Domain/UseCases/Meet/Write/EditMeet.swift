@@ -6,28 +6,23 @@
 //
 
 import Foundation
-import RxSwift
 
 protocol EditMeet {
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Observable<Meet>
+                 request: CreateMeetRequest) async throws -> Meet
 }
 
 final class EditMeetUseCase: EditMeet {
-    
+
     let repo: MeetRepo
-    
+
     init(repo: MeetRepo) {
         self.repo = repo
     }
-    
+
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Observable<Meet> {
-        return repo.editMeet(
-            id: id,
-            reqeust: request)
-        .map { $0.toDomain() }
-        .asObservable()
+                 request: CreateMeetRequest) async throws -> Meet {
+        return try await repo.editMeet(id: id, reqeust: request)
     }
 }
 
@@ -35,7 +30,7 @@ final class EditMeetUseCase: EditMeet {
 #if DEV
 final class MockEditMeetUseCase: EditMeet {
     func execute(id: Int,
-                 request: CreateMeetRequest) -> Observable<Meet> {
+                 request: CreateMeetRequest) async throws -> Meet {
         print("✅ [Mock] 모임 수정 - meetId: \(id)")
 
         let mockMeet = Meet(
@@ -47,11 +42,8 @@ final class MockEditMeetUseCase: EditMeet {
             firstPlanDate: nil
         )
 
-        return Observable.just(mockMeet)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockMeet
     }
 }
 #endif
-
-    
-    

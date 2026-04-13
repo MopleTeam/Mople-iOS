@@ -61,6 +61,7 @@ extension NotifyListSceneDIContainer {
     func makeMeetDefailtViewCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -69,6 +70,7 @@ extension NotifyListSceneDIContainer {
     func makePlanDetailFlowCoordinator(postId: Int, type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()

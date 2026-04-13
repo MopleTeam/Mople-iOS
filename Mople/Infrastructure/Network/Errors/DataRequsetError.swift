@@ -7,7 +7,10 @@
 
 import Foundation
 
-enum DataRequestError: Error {
+enum DataRequestError: Error, ServerErrorIdentifiable {
+
+    /// ServerErrorIdentifiable 채택 — Domain에서 타입 참조 없이 에러 분류 가능
+    var isNotFound: Bool { self == .noResponse }
     
     case networkUnavailable
     case serverUnavailable

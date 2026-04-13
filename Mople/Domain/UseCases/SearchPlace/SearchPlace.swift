@@ -5,31 +5,27 @@
 //  Created by CatSlave on 12/22/24.
 //
 
-import RxSwift
 import Foundation
 
 protocol SearchPlace {
     func execute(query: String,
                  x: Double?,
-                 y: Double?) -> Observable<SearchPlaceResult>
+                 y: Double?) async throws -> SearchPlaceResult
 }
 
 final class SearchPlaceUseCase: SearchPlace {
-        
+
     private let searchPlaceRepo: SearchPlaceRepo
-    
+
     init(searchPlaceRepo: SearchPlaceRepo) {
         self.searchPlaceRepo = searchPlaceRepo
     }
-    
+
     func execute(query: String,
                  x: Double?,
-                 y: Double?) -> Observable<SearchPlaceResult> {
-
-        return searchPlaceRepo
+                 y: Double?) async throws -> SearchPlaceResult {
+        return try await searchPlaceRepo
             .search(request: .init(query: query, x: x, y: y))
-            .map { $0.toDomain() }
-            .asObservable()
     }
 }
 
@@ -38,7 +34,7 @@ final class SearchPlaceUseCase: SearchPlace {
 final class MockSearchPlaceUseCase: SearchPlace {
     func execute(query: String,
                  x: Double?,
-                 y: Double?) -> Observable<SearchPlaceResult> {
+                 y: Double?) async throws -> SearchPlaceResult {
         print("✅ [Mock] 장소 검색 - query: \(query), x: \(x ?? 0), y: \(y ?? 0)")
 
         let mockPlaces: [PlaceInfo] = [
@@ -66,8 +62,8 @@ final class MockSearchPlaceUseCase: SearchPlace {
                                        page: 1,
                                        isEnd: true)
 
-        return Observable.just(result)
-            .delay(.seconds(1), scheduler: MainScheduler.instance)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return result
     }
 }
 #endif

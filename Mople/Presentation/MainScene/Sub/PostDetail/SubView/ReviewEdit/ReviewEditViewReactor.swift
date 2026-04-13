@@ -137,47 +137,44 @@ final class ReviewEditViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension ReviewEditViewReactor {
     
-    // MARK: - 이미지 편집하기
+    // MARK: - 이미지 편집하기 (async → Observable 브릿지)
+    /// 이미지 추가/삭제 후 리뷰 새로고침
     private func updateReview() -> Observable<Mutation> {
         guard let id = currentState.review?.id else { return .empty() }
-        let requestUpdate = requestAddImage(id: id)
-            .flatMap({ [weak self] _ -> Observable<Void> in
-                guard let self else { return .empty() }
-                return requsetDeleteImage(id: id)
-            })
-            .flatMap({ [weak self] _ -> Observable<Review> in
-                guard let self else { return .empty() }
-                return fetchReviewUseCase.execute(id: id, isOldPlan: false)
-            })
-            .observe(on: MainScheduler.instance)
-            .flatMap { [weak self] review -> Observable<Mutation> in
-                self?.postUpdateReview(review)
-                self?.coordiantor?.pop()
-                return .empty()
-            }
-        
-        return requestWithLoading(task: requestUpdate)
-    }
-    
-    private func requestAddImage(id: Int) -> Observable<Void> {
         let addImages = currentState.images
             .filter { $0.isNew }
             .compactMap { $0.image }
-        
-        guard !addImages.isEmpty else {
-            return .just(())
+        let deleteIds = deleteImageIds
+
+        let requestUpdate = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    // 이미지 압축 후 업로드
+                    if !addImages.isEmpty {
+                        let imagesData = try self?.compressImages(addImages) ?? []
+                        try await self?.imageUpload.execute(id: id, imagesData: imagesData)
+                    }
+                    // 이미지 삭제
+                    if !deleteIds.isEmpty {
+                        try await self?.deleteReviewImage.execute(reviewId: id, imageIds: deleteIds)
+                    }
+                    // 리뷰 새로고침
+                    let review = try await self?.fetchReviewUseCase.execute(id: id, isOldPlan: false)
+                    await MainActor.run {
+                        if let review {
+                            self?.postUpdateReview(review)
+                        }
+                        self?.coordiantor?.pop()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
         }
-        
-        return imageUpload
-            .execute(id: id,
-                     images: addImages)
-    }
-    
-    private func requsetDeleteImage(id: Int) -> Observable<Void> {
-        guard !deleteImageIds.isEmpty else { return .just(()) }
-        
-        return deleteReviewImage
-            .execute(reviewId: id, imageIds: deleteImageIds)
+
+        return requestWithLoading(task: requestUpdate)
     }
 
     // MARK: - 이미지 업데이트
@@ -228,6 +225,27 @@ extension ReviewEditViewReactor {
         let isDeleteExistingImage = !deleteImageIds.isEmpty
         let isAddedImage = images.contains { $0.isNew == true }
         return isDeleteExistingImage || isAddedImage
+    }
+
+    // MARK: - 이미지 압축
+    /// UIImage 배열을 Data로 압축, 실패한 인덱스는 CompressionPhotosError로 throw
+    private func compressImages(_ images: [UIImage]) throws -> [Data] {
+        var compressedData: [Data] = []
+        var failIndexes: [Int] = []
+
+        images.enumerated().forEach { (index, image) in
+            do {
+                let data = try Data.imageDataCompressed(uiImage: image)
+                compressedData.append(data)
+            } catch {
+                failIndexes.append(index + 1)
+            }
+        }
+
+        guard failIndexes.isEmpty else {
+            throw CompressionPhotosError.compressionFailed(indexs: failIndexes)
+        }
+        return compressedData
     }
 
     // MARK: - 이미지 랩핑

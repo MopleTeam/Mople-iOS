@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Core
 import ReactorKit
 
 protocol SignUpCoordination: AnyObject {
@@ -138,26 +139,26 @@ class SignUpViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Data Request
 extension SignUpViewReactor {
     
-    // MARK: - 랜덤 닉네임 생성
+    // MARK: - 랜덤 닉네임 생성 (async throws UseCase → Observable 브릿지)
     private func creationNickName() -> Observable<Mutation> {
-        let createNickname = creationNickname.executue()
-            .share(replay: 1)
-        
-        let updateNickName = createNickname
-            .map { Mutation.createdNickname($0) }
-        
-        let checkDuplicate = createNickname
-            .flatMap { [weak self] nickName -> Observable<Mutation> in
-                guard let self else { return .empty() }
-                return checkDuplicateAvaliable(name: nickName)
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let nickname = try await self.creationNickname.executue()
+                    observer.onNext(.createdNickname(nickname))
+                    let canCheck = Validator.checkNickname(nickname)
+                    self.setNickname(isValidName: canCheck, name: nickname)
+                    observer.onNext(.updateDuplicateAvaliable(canCheck))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
-        let zipTask = Observable.zip([updateNickName, checkDuplicate])
-            .flatMap { result -> Observable<Mutation> in
-                return .from(result)
-            }
-        
-        return requestWithLoading(task: zipTask)
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: task)
     }
     
     // MARK: - 닉네임 정규식 검사 및 업데이트
@@ -194,54 +195,68 @@ extension SignUpViewReactor {
         return .just(.updateImage(nil))
     }
     
-    // MARK: - 닉네임 중복검사
+    // MARK: - 닉네임 중복검사 (async throws UseCase → Observable 브릿지)
     private func nickNameValidCheck() -> Observable<Mutation> {
         guard let name = signUpModel?.nickname else { return .empty() }
-        let checkValidation = validationNickname.execute(name)
-            .map { Mutation.updateValidState($0)}
 
-        return requestWithLoading(task: checkValidation)
+        let task = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let isValid = try await self.validationNickname.execute(name)
+                    observer.onNext(.updateValidState(isValid))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
+        return requestWithLoading(task: task)
     }
 
-    // MARK: - 회원가입
+    // MARK: - 회원가입 (async throws UseCase → Observable 브릿지)
     private func requsetSignUp() -> Observable<Mutation> {
         guard isLoading == false else { return .empty() }
         isLoading = true
-    
-        let signUp = handleImageUpload()
-            .flatMap { [weak self] imagePath -> Observable<Void> in
-                guard let self else { return .empty() }
-                return self.signUp(imagePath)
+
+        let signUp = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+
+                    // 이미지 압축 후 업로드
+                    var imagePath: String?
+                    if let image = self.currentState.profileImage {
+                        let imageData = try Data.imageDataCompressed(uiImage: image)
+                        imagePath = try await self.imageUploadUseCase.execute(imageData)
+                    }
+
+                    // 회원가입 요청
+                    guard var signUpModel = self.signUpModel else { return }
+                    signUpModel.image = imagePath
+                    try await self.signUpUseCase.execute(request: signUpModel)
+
+                    // 유저 정보 조회
+                    try await self.fetchUserInfo.execute()
+
+                    // 메인 화면 전환 (MainScheduler)
+                    await MainActor.run {
+                        self.coordinator?.presentMainFlow()
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-            .flatMap({ [weak self] _ -> Observable<Void> in
-                guard let self else { return .empty() }
-                return self.fetchUserInfo.execute()
-            })
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] _ -> Observable<Mutation> in
-                self?.coordinator?.presentMainFlow()
-                return .empty()
-            })
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: signUp)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false
             })
-    }
-    
-    private func handleImageUpload() -> Observable<String?> {
-        guard let image = currentState.profileImage else {
-            return .just(nil)
-        }
-        
-        return imageUploadUseCase.execute(image)
-            .map { $0 }
-    }
-    
-    private func signUp(_ imagePath: String?) -> Observable<Void> {
-        guard var signUpModel else { return .empty() }
-        signUpModel.image = imagePath
-        return self.signUpUseCase.execute(request: signUpModel)
     }
 }
 

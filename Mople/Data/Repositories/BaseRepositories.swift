@@ -5,8 +5,6 @@
 //  Created by CatSlave on 1/9/25.
 //
 
-import RxSwift
-
 class BaseRepositories: LifeCycleLoggable {
     private(set) var networkService: AppNetworkService
     
