@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 // MARK: - Custom Navigation Bar (UIKit TitleNaviBar 스타일)
 struct CustomNavigationBar: View {

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol TransferMeetFlowCoordination: AnyObject {
     func showTransferMeet(meet: Meet)

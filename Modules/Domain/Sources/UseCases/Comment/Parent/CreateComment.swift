@@ -1,0 +1,62 @@
+//
+//  CreateComment.swift
+//  Mople
+//
+//  Created by CatSlave on 1/20/25.
+//
+
+import Foundation
+
+public protocol CreateComment {
+    func execute(postId: Int,
+                 comment: String,
+                 mentions: [Int]) async throws -> Comment
+}
+
+public final class CreateCommentUseCase: CreateComment {
+
+    private let createCommentRepo: CommentRepo
+    private let session: UserSessionProvider
+
+    public init(repo: CommentRepo, session: UserSessionProvider) {
+        self.createCommentRepo = repo
+        self.session = session
+    }
+
+    public func execute(postId: Int,
+                 comment: String,
+                 mentions: [Int]) async throws -> Comment {
+        var domainComment = try await createCommentRepo
+            .createComment(postId: postId,
+                           comment: comment,
+                           mentions: mentions)
+        domainComment.verifyWriter(self.session.currentUserId)
+        return domainComment
+    }
+}
+
+// MARK: - Mock UseCase
+#if DEV
+public final class MockCreateCommentUseCase: CreateComment {
+    public init() {}
+
+    public func execute(postId: Int,
+                 comment: String,
+                 mentions: [Int]) async throws -> Comment {
+        print("✅ [Mock] CreateComment - postId: \(postId), comment: \(comment), mentions: \(mentions)")
+
+        var mockComment = Comment()
+        mockComment.isMockup = true
+        mockComment.id = Int.random(in: 1000...9999)
+        mockComment.postId = postId
+        mockComment.writerId = 1
+        mockComment.writerName = "Mock 사용자"
+        mockComment.comment = comment
+        mockComment.createdDate = Date()
+        mockComment.isWriter = true
+
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockComment
+    }
+}
+#endif

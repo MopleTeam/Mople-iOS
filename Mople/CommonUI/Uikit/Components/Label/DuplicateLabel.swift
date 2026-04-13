@@ -5,6 +5,7 @@
 //  Created by CatSlave on 10/17/24.
 //
 import UIKit
+import Domain
 import RxSwift
 
 final class DuplicateLabel: UILabel {

@@ -5,6 +5,7 @@
 //  Created by CatSlave on 1/15/25.
 //
 import UIKit
+import Domain
 import RxSwift
 
 // MARK: - 아이템 타입

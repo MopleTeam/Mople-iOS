@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension NSMutableAttributedString {
     static func makeHighlightText(fullText: String,

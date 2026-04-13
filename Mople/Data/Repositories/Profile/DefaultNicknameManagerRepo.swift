@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 final class DefaultNicknameManagerRepo: BaseRepositories, NicknameRepo {
     func creationNickname() async throws -> Data {

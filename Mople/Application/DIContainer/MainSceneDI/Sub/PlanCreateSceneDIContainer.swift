@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol PlanCreateSceneDependencies {
     func makePlanCreateViewController(coordinator: PlanCreateCoordination) -> CreatePlanViewController

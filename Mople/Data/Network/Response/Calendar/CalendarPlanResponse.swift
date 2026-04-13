@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct CalendarPlanResponse: Decodable {
     let meetId: Int?

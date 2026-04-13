@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct SearchPlaceViewModel {
     var title: String?

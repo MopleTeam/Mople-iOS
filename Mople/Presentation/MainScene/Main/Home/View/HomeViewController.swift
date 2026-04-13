@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import ReactorKit
 import Kingfisher
 import RxSwift

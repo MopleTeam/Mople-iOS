@@ -5,17 +5,12 @@
 //  Created by CatSlave on 2/4/25.
 //
 import UIKit
+import Domain
 import ReactorKit
 
 protocol MemberListViewCoordination: NavigationCloseable {
     func presentPhotoView(imagePath: String?)
     func endFlow()
-}
-
-enum MemberListType {
-    case meet(id: Int?)
-    case plan(id: Int?)
-    case review(id: Int?)
 }
 
 enum MemberListError: Error {

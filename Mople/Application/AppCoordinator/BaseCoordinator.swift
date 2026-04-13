@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol Coordinator: AnyObject {
     var navigationController: AppNaviViewController { get set }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct ReviewPostSummary: PostSummary {
     let postId: Int?

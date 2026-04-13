@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import ReactorKit
 
 final class MainTabBarReactor: Reactor, LifeCycleLoggable {

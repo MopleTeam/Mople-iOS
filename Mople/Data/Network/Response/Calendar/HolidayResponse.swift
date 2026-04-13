@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct HolidayResponse: Decodable {
     let title: String

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct RecentPlanViewModel {
     let title: String?

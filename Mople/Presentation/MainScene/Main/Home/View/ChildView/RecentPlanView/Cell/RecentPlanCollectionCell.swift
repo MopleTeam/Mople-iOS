@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 
 final class RecentPlanCollectionCell: UICollectionViewCell {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 private enum UserDefaultsKey: String {
     case fcmToken

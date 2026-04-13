@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 protocol PostSummary {
     var postId: Int? { get }
@@ -19,6 +20,18 @@ protocol PostSummary {
     var location: Location? { get }
     var commentCount: Int { get }
     var description: String? { get }
+}
+
+// MARK: - PostSummary → PlaceInfo 변환
+extension PlaceInfo {
+    init(post: PostSummary) {
+        self.init(
+            title: post.addressTitle ?? L10n.nonName,
+            address: nil,
+            roadAddress: post.address,
+            location: post.location
+        )
+    }
 }
 
 extension PostSummary {

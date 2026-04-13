@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 class BaseViewController: UIViewController, LifeCycleLoggable, ScreenTrackable {
     

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 /// UserSessionProvider의 구현체
 /// UserInfoStorage 싱글턴을 래핑하여 Domain 레이어에 주입한다

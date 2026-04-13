@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 import Combine
 import RxSwift
 import RxCombine

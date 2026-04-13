@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import ReactorKit
 
 enum PlanDetailError: Error {

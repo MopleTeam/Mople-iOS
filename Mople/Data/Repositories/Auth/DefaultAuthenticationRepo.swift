@@ -5,6 +5,8 @@
 //  Created by CatSlave on 10/23/24.
 //
 
+import Domain
+
 final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
     func signIn(social: SocialInfo) async throws {
         let endpoint = APIEndpoints.signIn(platform: social.provider,
@@ -16,7 +18,8 @@ final class DefaultAuthenticationRepo: BaseRepositories, AuthenticationRepo {
     }
 
     func signUp(requestModel: SignUpRequest) async throws {
-        let endpoint = APIEndpoints.signUp(request: requestModel)
+        let dto = SignUpRequestDTO(request: requestModel)
+        let endpoint = APIEndpoints.signUp(request: dto)
 
         let token = try await networkService.basicRequest(endpoint: endpoint)
         KeychainStorage.shared.saveToken(token)

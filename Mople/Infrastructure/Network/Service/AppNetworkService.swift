@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Domain
 
 // MARK: - 프로토콜 정의
 // Before: func authenticatedRequest(...) -> Single<T>

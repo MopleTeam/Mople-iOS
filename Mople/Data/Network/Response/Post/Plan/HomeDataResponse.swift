@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct HomeDataResponse: Decodable {
     let plans: [PlanResponse]

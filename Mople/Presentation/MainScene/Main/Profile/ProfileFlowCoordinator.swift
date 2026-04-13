@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol ProfileCoordination: AnyObject {
     func presentProfileImageView(imagePath: String?)

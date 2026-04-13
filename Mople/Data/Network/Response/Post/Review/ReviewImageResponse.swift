@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct ReviewImageResponse: Decodable {
     var imageId: Int?

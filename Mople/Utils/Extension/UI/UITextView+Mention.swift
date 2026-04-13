@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension UITextView {
     func addMention(text: String, id: Int) {

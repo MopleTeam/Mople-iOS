@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct MonthlyPostResponse: Decodable {
     let reviews: [CalendarReviewResponse]

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct UploadPlace: Encodable, Equatable {
     let title: String?

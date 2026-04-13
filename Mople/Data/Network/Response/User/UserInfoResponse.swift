@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct UserInfoResponse: Decodable {
     let userId: Int?

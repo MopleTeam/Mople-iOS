@@ -5,6 +5,8 @@
 //  Created by CatSlave on 1/21/25.
 //
 
+import Domain
+
 final class DefaultCommentRepo: BaseRepositories, CommentRepo {
     // MARK: - CRUD
     func createComment(postId: Int,

@@ -5,6 +5,8 @@
 //  Created by CatSlave on 4/14/25.
 //
 
+import Domain
+
 final class DefaultNotifySubscribeRepo: BaseRepositories, NotifySubscribeRepo {
     func fetchNotifyState() async throws -> [String] {
         return try await networkService.authenticatedRequest {

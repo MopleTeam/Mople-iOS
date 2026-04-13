@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 /// present 시 push처럼 동작 + 엣지 스와이프 dismiss 지원하는 UIHostingController
 /// SwiftUI 뷰를 slidePresentWithTracking으로 표시할 때 사용

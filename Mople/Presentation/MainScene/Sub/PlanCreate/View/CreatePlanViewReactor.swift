@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 import ReactorKit
 
 enum PlanCreationType {
@@ -90,7 +91,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var planTitle: String?
         @Pulse var selectedDay : DateComponents?
         @Pulse var selectedTime : DateComponents?
-        @Pulse var selectedPlace: UploadPlace?
+        @Pulse var selectedPlace: PlaceInfo?
         @Pulse var description: String?
         @Pulse var meets: [MeetSummary] = []
         @Pulse var hasNextMeetPage: Bool = true
@@ -127,7 +128,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             return planTitle != previousPlan.title ||
             selectedDate != previousPlan.date ||
             description != previousPlan.description ||
-            selectedPlace != UploadPlace(plan: previousPlan)
+            selectedPlace != PlaceInfo(plan: previousPlan)
         }
     }
     
@@ -233,7 +234,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         
         let day = date.toDateComponents()
         let time = date.getTime()
-        let place = UploadPlace(plan: plan)
+        let place = PlaceInfo(plan: plan)
         let description = plan.description
         
         state.seletedMeet = meet
@@ -298,7 +299,7 @@ extension CreatePlanViewReactor {
         case .time(let time):
             state.selectedTime = time
         case .place(let place):
-            state.selectedPlace = .init(place: place)
+            state.selectedPlace = place
         case .description(let text):
             state.description = text
         }

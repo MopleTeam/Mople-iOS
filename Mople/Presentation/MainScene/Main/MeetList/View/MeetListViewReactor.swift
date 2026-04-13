@@ -6,6 +6,7 @@
 //
 
 import ReactorKit
+import Domain
 
 final class MeetListViewReactor: Reactor, LifeCycleLoggable {
     

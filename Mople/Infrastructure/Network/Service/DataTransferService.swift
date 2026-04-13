@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Domain
 
 // MARK: - 에러 정의
 enum DataTransferError: Error {

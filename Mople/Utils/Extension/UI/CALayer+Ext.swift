@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension CALayer {
     func makeLine(width: CGFloat, color: UIColor = .appStroke) {

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 
 final class CountView: UIView {

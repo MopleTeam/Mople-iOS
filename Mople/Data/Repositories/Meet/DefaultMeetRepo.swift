@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 final class DefaultMeetRepo: BaseRepositories, MeetRepo {
 
@@ -26,15 +27,17 @@ final class DefaultMeetRepo: BaseRepositories, MeetRepo {
     }
 
     func createMeet(reqeust: CreateMeetRequest) async throws -> Meet {
+        let dto = CreateMeetRequestDTO(request: reqeust)
         let response: MeetResponse = try await networkService.authenticatedRequest {
-            try APIEndpoints.createMeet(request: reqeust)
+            try APIEndpoints.createMeet(request: dto)
         }
         return response.toDomain()
     }
 
     func editMeet(id: Int, reqeust: CreateMeetRequest) async throws -> Meet {
+        let dto = CreateMeetRequestDTO(request: reqeust)
         let response: MeetResponse = try await networkService.authenticatedRequest {
-            try APIEndpoints.editMeet(id: id, request: reqeust)
+            try APIEndpoints.editMeet(id: id, request: dto)
         }
         return response.toDomain()
     }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 /// 테마 설정 옵션
 enum ThemeMode: Int, CaseIterable {

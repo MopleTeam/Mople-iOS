@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 typealias MainSceneDependencies = MainTapDependencies
 
@@ -61,10 +62,11 @@ extension MainSceneDIContainer: MainSceneDependencies {
     
     private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
         let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
+        let tokenProvider = DefaultFCMTokenProvider()
         #if DEV
-        let useCase = MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
+        let useCase = MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
         #else
-        let useCase = UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        let useCase = UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider)
         #endif
         return useCase
     }

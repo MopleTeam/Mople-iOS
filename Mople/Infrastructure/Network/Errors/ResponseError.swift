@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 enum ResponseType {
     case meet(id: Int)
