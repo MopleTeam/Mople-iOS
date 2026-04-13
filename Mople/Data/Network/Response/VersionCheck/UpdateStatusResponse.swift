@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct UpdateStatusResponse: Decodable {
     let forceUpdate: Bool

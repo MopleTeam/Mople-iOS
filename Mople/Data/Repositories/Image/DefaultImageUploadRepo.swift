@@ -6,12 +6,7 @@
 //
 
 import Foundation
-
-enum ImageUploadPath: String {
-    case profile = "profile"
-    case meet = "meet"
-    case review = "review"
-}
+import Domain
 
 final class DefaultImageUploadRepo: BaseRepositories, ImageUploadRepo {
     func uploadImage(data: Data, path: ImageUploadPath) async throws -> String {

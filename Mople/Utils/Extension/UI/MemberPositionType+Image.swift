@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 /// Domain의 MemberPositionType에 UIImage 매핑을 추가하는 Presentation 확장
 extension MemberPositionType {

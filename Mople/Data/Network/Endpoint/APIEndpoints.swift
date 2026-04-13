@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 enum HTTPHeader {
     private static let acceptAll = ["Accept": "*/*"]
@@ -80,7 +81,7 @@ extension APIEndpoints {
 
 // MARK: - Login
 extension APIEndpoints {
-    static func signUp(request: SignUpRequest) -> Endpoint<Data> {
+    static func signUp(request: SignUpRequestDTO) -> Endpoint<Data> {
         return try! Endpoint(path: "auth/sign-up",
                              method: .post,
                              headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -125,7 +126,7 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
     
-    static func setupProfile(request: ProfileEditRequest) throws -> Endpoint<UserInfoResponse> {
+    static func setupProfile(request: ProfileEditRequestDTO) throws -> Endpoint<UserInfoResponse> {
         return try Endpoint(path: "user/info",
                             authenticationType: .accessToken,
                             method: .patch,
@@ -200,7 +201,7 @@ extension APIEndpoints {
 
 // MARK: - Meet
 extension APIEndpoints {
-    static func createMeet(request: CreateMeetRequest) throws -> Endpoint<MeetResponse> {
+    static func createMeet(request: CreateMeetRequestDTO) throws -> Endpoint<MeetResponse> {
         return try Endpoint(path: "meet/create",
                             authenticationType: .accessToken,
                             method: .post,
@@ -209,7 +210,7 @@ extension APIEndpoints {
     }
     
     static func editMeet(id: Int,
-                         request: CreateMeetRequest) throws -> Endpoint<MeetResponse> {
+                         request: CreateMeetRequestDTO) throws -> Endpoint<MeetResponse> {
         return try Endpoint(path: "meet/update/\(id)",
                             authenticationType: .accessToken,
                             method: .patch,
@@ -329,7 +330,7 @@ extension APIEndpoints {
                             headerParameters: HTTPHeader.getReceiveAllHeader())
     }
     
-    static func createPlan(request: PlanRequest) throws -> Endpoint<PlanResponse> {
+    static func createPlan(request: PlanRequestDTO) throws -> Endpoint<PlanResponse> {
         return try Endpoint(path: "plan/create",
                             authenticationType: .accessToken,
                             method: .post,
@@ -337,7 +338,7 @@ extension APIEndpoints {
                             bodyParametersEncodable: request)
     }
     
-    static func editPlan(request : PlanRequest) throws -> Endpoint<PlanResponse> {
+    static func editPlan(request: PlanRequestDTO) throws -> Endpoint<PlanResponse> {
         return try Endpoint(path: "plan/update",
                             authenticationType: .accessToken,
                             method: .patch,
@@ -387,7 +388,7 @@ extension APIEndpoints {
 
 // MARK: - Search Location
 extension APIEndpoints {
-    static func searchPlace(request: SearchLocationRequest) throws -> Endpoint<SearchPlaceResultResponse> {
+    static func searchPlace(request: SearchLocationRequestDTO) throws -> Endpoint<SearchPlaceResultResponse> {
         return try Endpoint(path: "location/kakao",
                             authenticationType: .accessToken,
                             method: .post,
@@ -529,7 +530,7 @@ extension APIEndpoints {
 
 // MARK: - 신고
 extension APIEndpoints {
-    static func report(request: ReportRequest) throws -> Endpoint<Void> {
+    static func report(request: ReportRequestDTO) throws -> Endpoint<Void> {
         return try Endpoint(path: getReportPath(type: request.type),
                             authenticationType: .accessToken,
                             method: .post,
@@ -537,7 +538,7 @@ extension APIEndpoints {
                             bodyParametersEncodable: request)
     }
     
-    private static func getReportPath(type: ReportType) -> String {
+    private static func getReportPath(type: ReportTypeDTO) -> String {
         switch type {
         case .plan:
             return "plan/report"

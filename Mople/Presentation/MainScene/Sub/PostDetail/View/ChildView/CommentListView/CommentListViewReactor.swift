@@ -5,6 +5,7 @@
 //  Created by CatSlave on 1/16/25.
 //
 import UIKit
+import Domain
 import ReactorKit
 
 enum CommentListType {

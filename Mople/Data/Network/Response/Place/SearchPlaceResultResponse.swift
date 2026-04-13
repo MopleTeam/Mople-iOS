@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct SearchPlaceResultResponse: Decodable {
     let searchResult: [PlaceInfoResponse]

@@ -5,6 +5,8 @@
 //  Created by CatSlave on 8/5/25.
 //
 
+import Domain
+
 final class DefaultMentionRepo: BaseRepositories, MentionRepo {
     func execute(meetId: Int, cursor: String?, keyword: String?) async throws -> Page<MemberInfo> {
         let response: PageResponse<MemberInfoResponse> = try await networkService.authenticatedRequest {

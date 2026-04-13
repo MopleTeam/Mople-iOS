@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 protocol NotifyListSceneDependencies {
     func makeNotifyListViewController(coordinator: NotifyListFlowCoordination) -> NotifyListViewController

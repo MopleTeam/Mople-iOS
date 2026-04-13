@@ -5,6 +5,9 @@
 //  Created by CatSlave on 2/24/25.
 //
 
+import Foundation
+import Domain
+
 final class DefaultCalendarRepo: BaseRepositories, CalendarRepo {
     func fetchAllDates() async throws -> [Date] {
         let response: AllPlanDateResponse = try await networkService.authenticatedRequest {

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension UITableView {
     /// tableHeaderView의 Auto Layout 기반 높이를 자동 갱신합니다.

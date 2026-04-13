@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 enum AppSettingOpener {
     static func openAppSettings(completion: ((Bool) -> Void)? = nil) {

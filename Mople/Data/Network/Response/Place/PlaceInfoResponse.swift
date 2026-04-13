@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct PlaceInfoResponse: Decodable {
     let title: String?

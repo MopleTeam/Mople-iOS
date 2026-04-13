@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 import UIKit
 import PhotosUI
 import RxSwift

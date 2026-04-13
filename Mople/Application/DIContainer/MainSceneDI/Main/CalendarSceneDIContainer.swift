@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 protocol CalendarSceneDependencies {
     // MARK: - View

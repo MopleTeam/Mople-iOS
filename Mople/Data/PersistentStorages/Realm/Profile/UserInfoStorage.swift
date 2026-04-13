@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RealmSwift
 
 final class UserInfoStorage {

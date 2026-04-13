@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct PlanPostSummary: PostSummary {
     let postId: Int?

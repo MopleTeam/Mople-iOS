@@ -5,6 +5,7 @@
 //  Created by CatSlave on 4/10/25.
 //
 import UIKit
+import Domain
 
 final class DefaultNotifyRepo: BaseRepositories, NotifyRepo {
     func fetchNotifyList(cursor: String?) async throws -> Page<Notify> {

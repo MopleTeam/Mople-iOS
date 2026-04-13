@@ -6,6 +6,7 @@
 //
 
 import RxSwift
+import Domain
 
 extension Single {
     func retryWithDelayAndCondition(retryCount: Int = 1,

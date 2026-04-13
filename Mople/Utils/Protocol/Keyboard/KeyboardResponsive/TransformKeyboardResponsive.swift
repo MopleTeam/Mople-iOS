@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol TransformKeyboardResponsive: KeyboardResponsive {
     var adjustableView: UIView { get }

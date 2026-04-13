@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 enum DateTransitionError: Error {
     case midnightReset

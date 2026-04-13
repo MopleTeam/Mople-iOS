@@ -5,6 +5,8 @@
 //  Created by CatSlave on 1/9/25.
 //
 
+import Domain
+
 final class DefaultPlanRepo: BaseRepositories, PlanRepo {
 
     func fetchHomeData() async throws -> HomeData {
@@ -31,8 +33,9 @@ final class DefaultPlanRepo: BaseRepositories, PlanRepo {
     }
 
     func createPlan(request: PlanRequest) async throws -> Plan {
+        let dto = PlanRequestDTO(request: request)
         let response: PlanResponse = try await networkService.authenticatedRequest {
-            try APIEndpoints.createPlan(request: request)
+            try APIEndpoints.createPlan(request: dto)
         }
         return response.toDomain()
     }
@@ -44,8 +47,9 @@ final class DefaultPlanRepo: BaseRepositories, PlanRepo {
     }
 
     func editPlan(request: PlanRequest) async throws -> Plan {
+        let dto = PlanRequestDTO(request: request)
         let response: PlanResponse = try await networkService.authenticatedRequest {
-            try APIEndpoints.editPlan(request: request)
+            try APIEndpoints.editPlan(request: dto)
         }
         return response.toDomain()
     }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import Core
 import RxSwift
 import RxCocoa

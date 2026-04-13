@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SwiftUI
 
 protocol ProfileSceneDependencies {
@@ -176,10 +177,11 @@ extension ProfileSceneDIContainer {
     
     private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
         let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
+        let tokenProvider = DefaultFCMTokenProvider()
         #if DEV
-        return MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
+        return MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
         #else
-        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        return UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider)
         #endif
     }
     

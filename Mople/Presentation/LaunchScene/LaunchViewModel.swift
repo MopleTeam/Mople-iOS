@@ -5,6 +5,7 @@
 //  Created by CatSlave on 2/11/25.
 //
 import UIKit
+import Domain
 import RxSwift
 
 protocol LaunchViewModel: AnyObject {

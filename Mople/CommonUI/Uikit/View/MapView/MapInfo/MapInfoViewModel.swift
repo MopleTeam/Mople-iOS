@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct MapInfoViewModel {
     let title: String?

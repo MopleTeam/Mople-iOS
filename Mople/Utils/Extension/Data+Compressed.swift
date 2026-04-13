@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 // MARK: - 단일 이미지 압축 에러
 enum CompressionPhotoError: Error {

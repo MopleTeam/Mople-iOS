@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct NotifyResponse: Decodable {
     let notificationId: Int?

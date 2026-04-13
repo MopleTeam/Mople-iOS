@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 struct ImageWrapper {
     let path: String?

@@ -5,6 +5,8 @@
 //  Created by CatSlave on 2/13/25.
 //
 
+import Domain
+
 final class DefaultReviewRepo: BaseRepositories, ReviewRepo {
     func fetchReviewPage(meetId: Int,
                          cursor: String?) async throws -> Page<Review> {

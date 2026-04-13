@@ -6,13 +6,7 @@
 //
 
 import ReactorKit
-
-enum SubscribeType: String {
-    case meet = "MEET"
-    case plan = "PLAN"
-    case mention = "MENTION"
-    case reply = "REPLY"
-}
+import Domain
 
 protocol NotifySubscribeCoordination: NavigationCloseable { }
 

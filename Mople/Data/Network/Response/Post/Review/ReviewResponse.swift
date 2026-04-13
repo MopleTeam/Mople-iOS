@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct ReviewResponse: Decodable {
     let meetId: Int?

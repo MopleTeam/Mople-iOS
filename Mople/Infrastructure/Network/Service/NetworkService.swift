@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Domain
 
 // MARK: - 네트워크 에러 정의
 enum NetworkError: Error {

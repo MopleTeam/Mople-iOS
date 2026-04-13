@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct PlanResponse: Decodable {
     let planId: Int?

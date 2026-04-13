@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct ThumbnailViewModel {
     var name: String?

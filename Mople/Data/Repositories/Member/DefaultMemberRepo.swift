@@ -5,6 +5,8 @@
 //  Created by CatSlave on 2/5/25.
 //
 
+import Domain
+
 final class DefaultMemberRepo: BaseRepositories, MemberRepo {
     func execute(type: MemberListType, nextCursor: String?) async throws -> Page<MemberInfo> {
         let response: PageResponse<MemberInfoResponse> = try await networkService.authenticatedRequest {

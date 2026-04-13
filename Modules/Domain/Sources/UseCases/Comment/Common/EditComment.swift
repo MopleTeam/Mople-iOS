@@ -1,0 +1,62 @@
+//
+//  EditComment.swift
+//  Mople
+//
+//  Created by CatSlave on 1/21/25.
+//
+
+import Foundation
+
+public protocol EditComment {
+    func execute(id: Int,
+                 text: String,
+                 mentions: [Int]) async throws -> Comment
+}
+
+public final class EditCommentUseCase: EditComment {
+
+    private let editCommentRepo: CommentRepo
+    private let session: UserSessionProvider
+
+    public init(repo: CommentRepo, session: UserSessionProvider) {
+        self.editCommentRepo = repo
+        self.session = session
+    }
+
+    public func execute(id: Int,
+                 text: String,
+                 mentions: [Int]) async throws -> Comment {
+        var comment = try await editCommentRepo
+            .editComment(commentId: id,
+                         comment: text,
+                         mentions: mentions)
+        comment.verifyWriter(self.session.currentUserId)
+        return comment
+    }
+}
+
+// MARK: - Mock UseCase
+#if DEV
+public final class MockEditCommentUseCase: EditComment {
+    public init() {}
+
+    public func execute(id: Int,
+                 text: String,
+                 mentions: [Int]) async throws -> Comment {
+        print("✅ [Mock] EditComment - id: \(id), text: \(text), mentions: \(mentions)")
+
+        var mockComment = Comment()
+        mockComment.isMockup = true
+        mockComment.id = id
+        mockComment.postId = 1
+        mockComment.writerId = 1
+        mockComment.writerName = "Mock 사용자"
+        mockComment.comment = text
+        mockComment.createdDate = Date()
+        mockComment.isWriter = true
+
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        return mockComment
+    }
+}
+#endif

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct NotifyViewModel {
     let thumbnailPath: String?

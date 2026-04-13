@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct MeetSummaryResponse: Decodable {
     let meetId: Int?

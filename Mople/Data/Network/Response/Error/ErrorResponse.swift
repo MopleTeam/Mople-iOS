@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct ErrorResponse: Decodable {
     let code: String?

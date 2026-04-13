@@ -168,6 +168,30 @@ let coreTarget: Target = .target(
     )
 )
 
+// MARK: - Domain 모듈 (Entity, UseCase, Repository 인터페이스)
+// 외부 의존성 없음 (Foundation만). Clean Architecture의 핵심 레이어
+
+let domainTarget: Target = .target(
+    name: "Domain",
+    destinations: .iOS,
+    product: .framework,
+    bundleId: "com.moim.moimtable.domain",
+    deploymentTargets: deploymentTarget,
+    sources: ["Modules/Domain/Sources/**"],
+    dependencies: [],
+    settings: .settings(
+        base: [
+            "SWIFT_VERSION": "5.0",
+        ],
+        configurations: [
+            .debug(name: "Debug", settings: [
+                "OTHER_SWIFT_FLAGS": "-DDEV",
+            ]),
+            .release(name: "Release"),
+        ]
+    )
+)
+
 // MARK: - 앱 타겟 (Debug/Release로 Dev/Prod 분리)
 
 let mopleTarget: Target = .target(
@@ -181,7 +205,7 @@ let mopleTarget: Target = .target(
     resources: resources,
     entitlements: "Mople/Mople.entitlements",
     scripts: [swiftgenScript, crashlyticsScript],
-    dependencies: dependencies + [.target(name: "Core")],
+    dependencies: dependencies + [.target(name: "Core"), .target(name: "Domain")],
     settings: .settings(
         base: [
             "MARKETING_VERSION": "\(marketingVersion)",
@@ -237,6 +261,7 @@ let project = Project(
     ),
     targets: [
         coreTarget,
+        domainTarget,
         mopleTarget,
     ]
 )

@@ -7,6 +7,7 @@
 
 #if DEV
 import Foundation
+import Domain
 import RxSwift
 import RxRelay
 

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol AUthSceneDependencies {
     func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController

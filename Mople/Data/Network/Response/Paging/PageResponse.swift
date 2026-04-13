@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 struct PageResponse<T: Decodable>: Decodable {
     var totalCount: Int?
