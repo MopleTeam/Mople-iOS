@@ -1,6 +1,6 @@
 //
-//  LoginViewController.swift
-//  Group
+//  SignInViewController.swift
+//  Mople
 //
 //  Created by CatSlave on 8/12/24.
 //
