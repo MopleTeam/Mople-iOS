@@ -177,6 +177,33 @@ let coreTarget: Target = .target(
     )
 )
 
+// MARK: - DesignSystem 모듈 (공용 UI 컴포넌트 / 리소스 / 스타일)
+// Phase 8 Stage 1 부트스트랩. 이후 CommonUI, Asset Catalog, FontStyle, L10n,
+// UIKit/RxSwift 확장이 이 모듈로 승격되어 Feature 모듈들이 공유한다.
+// SnapKit, Kingfisher 등 UI 외부 라이브러리는 여기 의존시키게 되지만,
+// 첫 부트스트랩 시점에는 외부 의존성 없이 placeholder 파일만 포함한다.
+
+let designSystemTarget: Target = .target(
+    name: "DesignSystem",
+    destinations: .iOS,
+    product: .framework,
+    bundleId: "com.moim.moimtable.designsystem",
+    deploymentTargets: deploymentTarget,
+    sources: ["Modules/DesignSystem/Sources/**"],
+    dependencies: [
+        .target(name: "Core"),
+    ],
+    settings: .settings(
+        base: [
+            "SWIFT_VERSION": "5.0",
+        ],
+        configurations: [
+            .debug(name: "Debug"),
+            .release(name: "Release"),
+        ]
+    )
+)
+
 // MARK: - Domain 모듈 (Entity, UseCase, Repository 인터페이스)
 // 외부 의존성 없음 (Foundation만). Clean Architecture의 핵심 레이어
 
@@ -304,6 +331,7 @@ let project = Project(
     ),
     targets: [
         coreTarget,
+        designSystemTarget,
         domainTarget,
         dataTarget,
         mopleTarget,
