@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import RxSwift
+import Data
 
 protocol PostDetailSceneDependencies {
     // MARK: - 기본 뷰

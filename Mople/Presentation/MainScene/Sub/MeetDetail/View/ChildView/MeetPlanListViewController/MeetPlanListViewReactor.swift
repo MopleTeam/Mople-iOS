@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import ReactorKit
+import Data
 
 protocol MeetPlanListCommands: AnyObject {
     func fetchPlan()

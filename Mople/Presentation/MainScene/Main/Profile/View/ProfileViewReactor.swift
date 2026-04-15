@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import ReactorKit
+import Data
 
 final class ProfileViewReactor: Reactor, LifeCycleLoggable {
 

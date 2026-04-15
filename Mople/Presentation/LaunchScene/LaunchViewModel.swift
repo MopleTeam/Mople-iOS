@@ -7,6 +7,7 @@
 import UIKit
 import Domain
 import RxSwift
+import Data
 
 protocol LaunchViewModel: AnyObject {
     var errObservable: Observable<LaunchError?> { get }

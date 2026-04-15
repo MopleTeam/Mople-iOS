@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Data
 
 protocol HomeSceneDependencies {
     // MARK: - View

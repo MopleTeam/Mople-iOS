@@ -7,6 +7,7 @@
 
 import UIKit
 import Domain
+import Data
 
 protocol SearchPlaceSceneDependencies {
     func makeSearchPlaceViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController

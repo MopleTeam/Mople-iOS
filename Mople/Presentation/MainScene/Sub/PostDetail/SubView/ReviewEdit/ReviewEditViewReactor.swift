@@ -8,6 +8,7 @@ import UIKit
 import Domain
 import Kingfisher
 import ReactorKit
+import Data
 
 protocol ReviewEditViewCoordination: NavigationCloseable {
     func pushMemberListView(postId: Int)

@@ -4,45 +4,12 @@
 //
 //  Created by CatSlave on 8/19/24.
 //  Refactored: RxSwift → async/await (Phase 3)
+//  Data 모듈 분리: 프로토콜/에러/디코더 정의는 Data 모듈로 이전됨
 //
 
 import Foundation
 import Domain
-
-// MARK: - 에러 정의
-enum DataTransferError: Error {
-    case parsing(Error)
-    case networkFailure(NetworkError)
-    case expiredToken
-    case noResponse
-    case unknownError(Error)
-    case badRequest
-}
-
-// MARK: - 프로토콜 정의
-// Before: func request(with:) -> Single<T>
-// After:  func request(with:) async throws -> T
-protocol DataTransferService {
-    func request<T: Decodable, E: ResponseRequestable>(
-        with endpoint: E
-    ) async throws -> T where E.Response == T
-
-    func request<E: ResponseRequestable>(
-        with endpoint: E
-    ) async throws where E.Response == Void
-}
-
-protocol DataTransferErrorResolver {
-    func resolve(error: NetworkError) -> DataTransferError
-}
-
-protocol ResponseDecoder {
-    func decode<T: Decodable>(_ data: Data) throws -> T
-}
-
-protocol DataTransferErrorLogger {
-    func log(error: Error)
-}
+import Data
 
 // MARK: - 구현체
 final class DefaultDataTransferService {
@@ -135,37 +102,6 @@ class DefaultDataTransferErrorResolver: DataTransferErrorResolver {
         case 403: .noResponse
         case 404: .noResponse
         default : .unknownError(err)
-        }
-    }
-}
-
-// MARK: - Response Decoders (변경 없음)
-class JSONResponseDecoder: ResponseDecoder {
-    private let jsonDecoder = JSONDecoder()
-
-    init() { }
-
-    func decode<T: Decodable>(_ data: Data) throws -> T {
-        return try jsonDecoder.decode(T.self, from: data)
-    }
-}
-
-class RawDataResponseDecoder: ResponseDecoder {
-
-    init() { }
-
-    enum CodingKeys: String, CodingKey {
-        case `default` = ""
-    }
-    func decode<T: Decodable>(_ data: Data) throws -> T {
-        if T.self is Data.Type, let data = data as? T {
-            return data
-        } else {
-            let context = DecodingError.Context(
-                codingPath: [CodingKeys.default],
-                debugDescription: "Expected Data type"
-            )
-            throw Swift.DecodingError.typeMismatch(T.self, context)
         }
     }
 }

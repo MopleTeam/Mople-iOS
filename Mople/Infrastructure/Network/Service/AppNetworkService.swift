@@ -8,25 +8,10 @@
 
 import Foundation
 import Domain
-
-// MARK: - 프로토콜 정의
-// Before: func authenticatedRequest(...) -> Single<T>
-// After:  func authenticatedRequest(...) async throws -> T
-protocol AppNetworkService {
-    func basicRequest<T: Decodable, E: ResponseRequestable>(
-        endpoint: E
-    ) async throws -> T where E.Response == T
-
-    func authenticatedRequest<T: Decodable, E: ResponseRequestable>(
-        endpointClosure: @escaping () throws -> E
-    ) async throws -> E.Response where E.Response == T
-
-    func authenticatedRequest<E: ResponseRequestable>(
-        endpointClosure: @escaping () throws -> E
-    ) async throws where E.Response == Void
-}
+import Data
 
 // MARK: - 구현체
+// 프로토콜 정의(`AppNetworkService`)는 Data 모듈로 이전됨
 final class DefaultAppNetWorkService: AppNetworkService {
 
     private let errorHandlingService = DefaultErrorHandlingService()
