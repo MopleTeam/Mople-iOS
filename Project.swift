@@ -15,6 +15,16 @@ let deploymentTarget: DeploymentTargets = .iOS("17.6")
 let infoPlist: [String: Plist.Value] = [
     "CFBundleLocalizations": .array([.string("ko")]),
 
+    // 버전 정보를 base settings(MARKETING_VERSION / CURRENT_PROJECT_VERSION)에 연결
+    // Tuist extendingDefault는 이 두 키에 "1.0" / "1"을 리터럴로 심어놓기 때문에
+    // 명시적으로 빌드 변수를 가리키도록 덮어써야 실제 앱 버전이 Info.plist에 반영된다.
+    "CFBundleShortVersionString": .string("$(MARKETING_VERSION)"),
+    "CFBundleVersion": .string("$(CURRENT_PROJECT_VERSION)"),
+
+    // iOS 26 Liquid Glass 디자인 opt-out (기존 UI 유지)
+    // 앱이 새 디자인 언어에 대응되기 전까지 호환 모드로 렌더링
+    "UIDesignRequiresCompatibility": .boolean(true),
+
     // URL Schemes (카카오, 딥링크)
     "CFBundleURLTypes": .array([
         .dictionary([
@@ -248,6 +258,10 @@ let mopleTarget: Target = .target(
             "TARGETED_DEVICE_FAMILY": "1",
             // Xcode 15+ 에셋 카탈로그 → Swift symbol 자동 생성 (UIColor.bgPrimary 등)
             "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
+            // Mac(Designed for iPad) run destination 숨김 — iPhone 전용 앱이라 실수로 Mac 빌드 방지
+            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
+            // NSLocalizedString 호출을 컴파일러가 자동 추출해 .strings 생성 (Tuist 이전 상태 복구)
+            "SWIFT_EMIT_LOC_STRINGS": "YES",
         ],
         configurations: [
             // Debug = 개발 서버 (기존 MopleDev)
