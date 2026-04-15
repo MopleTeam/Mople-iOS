@@ -7,6 +7,7 @@
 import UIKit
 import Domain
 import RxSwift
+import Data
 
 // MARK: - 아이템 타입
 typealias MeetPayload = NotificationManager.Payload<Meet>

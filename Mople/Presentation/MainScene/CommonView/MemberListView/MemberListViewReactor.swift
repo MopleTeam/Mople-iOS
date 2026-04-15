@@ -7,6 +7,7 @@
 import UIKit
 import Domain
 import ReactorKit
+import Data
 
 protocol MemberListViewCoordination: NavigationCloseable {
     func presentPhotoView(imagePath: String?)

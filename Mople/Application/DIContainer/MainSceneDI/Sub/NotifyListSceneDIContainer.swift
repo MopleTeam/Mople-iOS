@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Data
 
 protocol NotifyListSceneDependencies {
     func makeNotifyListViewController(coordinator: NotifyListFlowCoordination) -> NotifyListViewController
@@ -41,7 +42,7 @@ extension NotifyListSceneDIContainer {
     }
     
     private func makeFetchNotifyListUseCase() -> FetchNotifyList {
-        let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        let repo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
         #if DEV
         return MockDataManager.resolve(FetchNotifyListUseCase(repo: repo) as FetchNotifyList, mock: MockFetchNotifyListUseCase())
         #else
@@ -50,7 +51,7 @@ extension NotifyListSceneDIContainer {
     }
 
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
-        let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        let repo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
         #if DEV
         return MockDataManager.resolve(ResetNotifyCountUseCase(repo: repo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
         #else

@@ -8,32 +8,10 @@
 
 import Foundation
 import Domain
+import Data
 
-// MARK: - 네트워크 에러 정의
-enum NetworkError: Error {
-    case notConnectedInternet
-    case notConnectedServer
-    case unknownError(Error?)
-    case urlGeneration
-    case error(statusCode: Int, data: Data)
-}
-
-// MARK: - 프로토콜 정의
-// Before: func request(endpoint:) -> Single<Data?>
-// After:  func request(endpoint:) async throws -> Data?
-protocol NetworkService {
-    func request(endpoint: Requestable) async throws -> Data?
-}
-
-protocol NetworkSessionManager {
-    func request(_ request: URLRequest) async throws -> (response: HTTPURLResponse, data: Data)
-}
-
-protocol NetworkErrorLogger {
-    func log(request: URLRequest)
-    func log(responseData data: Data?)
-    func log(error: Error)
-}
+// NetworkError / NetworkService / NetworkSessionManager / NetworkErrorLogger 프로토콜 정의는
+// Data 모듈로 이전됨
 
 // MARK: - NetworkService 구현
 final class DefaultNetworkService {
@@ -150,10 +128,4 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
     func log(error: Error) {
         printIfDebug("\(error)")
     }
-}
-
-func printIfDebug(_ string: String) {
-#if DEBUG
-    print(string)
-#endif
 }

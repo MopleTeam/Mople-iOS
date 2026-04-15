@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import ReactorKit
+import Data
 
 enum PlanCreationType {
     case newFromMeetList

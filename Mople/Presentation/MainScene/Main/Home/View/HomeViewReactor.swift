@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import ReactorKit
+import Data
 
 enum HomeError: Error {
     case midnight(DateTransitionError)

@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import ReactorKit
+import Data
 
 protocol MeetSetupCoordination: NavigationCloseable {
     func pushEditMeetView(previousMeet: Meet)

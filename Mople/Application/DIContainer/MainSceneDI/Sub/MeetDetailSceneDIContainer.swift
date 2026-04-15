@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import SwiftUI
+import Data
 
 protocol MeetDetailSceneDependencies {
     // MARK: - View
