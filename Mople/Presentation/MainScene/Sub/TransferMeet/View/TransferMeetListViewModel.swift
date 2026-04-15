@@ -10,6 +10,7 @@ import Domain
 import Combine
 import RxSwift
 import RxCombine
+import Data
 
 @MainActor
 final class TransferMeetListViewModel: ObservableObject {

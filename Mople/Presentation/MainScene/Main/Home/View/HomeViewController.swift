@@ -11,6 +11,7 @@ import ReactorKit
 import Kingfisher
 import RxSwift
 import RxCocoa
+import Data
 
 final class HomeViewController: DefaultViewController, View {
     

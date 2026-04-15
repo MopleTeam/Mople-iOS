@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import ReactorKit
+import Data
 
 protocol SearchPlaceDelegate: AnyObject {
     func selectedPlace(with place: PlaceInfo)

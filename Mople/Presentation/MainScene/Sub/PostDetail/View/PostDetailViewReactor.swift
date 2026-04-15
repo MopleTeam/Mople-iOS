@@ -8,6 +8,7 @@
 import UIKit
 import Domain
 import ReactorKit
+import Data
 
 enum PlanDetailError: Error {
     case noResponse(ResponseError)

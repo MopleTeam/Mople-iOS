@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Data
 
 class BaseContainer: LifeCycleLoggable {
     let appNetworkService: AppNetworkService

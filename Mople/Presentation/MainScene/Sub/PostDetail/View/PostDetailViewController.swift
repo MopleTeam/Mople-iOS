@@ -11,6 +11,7 @@ import SnapKit
 import RxSwift
 import RxRelay
 import ReactorKit
+import Data
 
 enum PostType {
     case plan

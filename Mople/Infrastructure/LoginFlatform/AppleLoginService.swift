@@ -9,6 +9,7 @@ import Foundation
 import Domain
 import RxSwift
 import AuthenticationServices
+import Data
 
 protocol AppleLoginService: SocialLoginService {
     func setPresentationContextProvider(_ view: UIViewController)

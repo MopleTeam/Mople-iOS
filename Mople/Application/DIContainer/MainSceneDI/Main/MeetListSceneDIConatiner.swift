@@ -7,6 +7,7 @@
 
 import UIKit
 import Domain
+import Data
 
 protocol MeetListSceneDependencies {
     // MARK: - View

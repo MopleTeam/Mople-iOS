@@ -8,6 +8,7 @@
 import Foundation
 import Domain
 import ReactorKit
+import Data
 
 protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate {
     func selectedPlan(id: Int, type: PostType)

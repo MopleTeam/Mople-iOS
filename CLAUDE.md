@@ -7,12 +7,14 @@
 
 ## 현재 기술 스택
 - **아키텍처**: Clean Architecture + MVVM + Coordinator + ReactorKit
-- **비동기**: RxSwift 6.7.1 (전체 파일의 48.6%)
-- **UI**: UIKit 중심 (96.4%) + SwiftUI 일부 (3.6%)
-- **네트워크**: Alamofire + RxSwift 기반 DataTransferService
+- **비동기**: async/await (Domain/Data 전환 완료) + RxSwift (Presentation 레이어)
+- **UI**: UIKit 중심 + SwiftUI 일부 (신규 화면은 SwiftUI)
+- **네트워크**: async/await 기반 DataTransferService (URLSession)
 - **로컬 DB**: Realm
 - **의존성 관리**: Swift Package Manager
-- **프로젝트 관리**: Vanilla Xcode (.xcodeproj)
+- **프로젝트 관리**: Tuist (Project.swift 기반, 멀티 모듈)
+- **모듈 구조**: Core(Framework) + Domain(Framework) + App(Mople)
+- **배포**: Fastlane (TestFlight: `fastlane beta`, App Store: `fastlane deploy_release`)
 
 ## 향후 개발 로드맵 (리팩토링 계획)
 
@@ -33,18 +35,20 @@
 | `리팩토링/Phase-5-SwiftUI.md` | Phase 5 상세 |
 | `리팩토링/Phase-6-Tuist.md` | Phase 6 상세 |
 | `리팩토링/Phase-7-DB전략.md` | Phase 7 상세 |
+| `리팩토링/Phase-8-Feature모듈화.md` | Phase 8 상세 (Phase 6에서 분리된 UI Feature 모듈화) |
 
 ### Phase 요약
 | Phase | 내용 | 상태 |
 |-------|------|------|
 | 0 | 협업 기반 (SwiftLint, README, 브랜치 전략) | 미시작 |
 | 1 | 테스트 환경 (Swift Testing) | 미시작 |
-| 2 | CI/CD (GitHub Actions + Fastlane) | 미시작 |
+| 2 | CI/CD (GitHub Actions + Fastlane) | 완료 |
 | 3 | RxSwift → Swift Concurrency (async/await) | 완료 |
 | 4 | Swift 6 Strict Concurrency | 미시작 |
 | 5 | SwiftUI 점진적 도입 | 미시작 |
-| 6 | Tuist + 모듈화 | 미시작 |
+| 6 | Tuist + 모듈화 (Core/Domain/Data 레이어 경계) | 완료 |
 | 7 | DB 전략 (Realm → SwiftData 검토) | 미시작 |
+| 8 | UI Feature 모듈화 (DesignSystem + Feature 프레임워크) | 미시작 |
 
 ## 작업 규칙
 
@@ -104,21 +108,13 @@ Dataview가 체크박스를 자동 집계하므로 수동 갱신은 최소화됨
 - GitHub 파일 크기 제한: **100MB** (초과 시 push 거부)
 - 새로운 폴더가 staged에 처음 등장하면 `.gitignore` 대상인지 반드시 확인할 것
 
-## 옵시디언 정리 규칙
-- "정리해줘" 요청 시 대화 내용을 옵시디언에 마크다운으로 정리
-- 저장 경로: `/Users/test/Desktop/Task/Develop/Swift/`
-- 리팩토링 관련: `/Users/test/Desktop/Task/Develop/Swift/리팩토링/`
-- 파일명 형식: `주제.md`
-- 문서 형식:
-  ```
-  ---
-  date: YYYY-MM-DD
-  tags: [관련 태그들]
-  ---
-  # 주제 제목
-  ## 작업 결과물
-  ## 과정
-  ## 핵심 로직
-  ## 사용한 방식
-  ## TODO
-  ```
+## 옵시디언 문서 구조
+- **메인 가이드**: `Swift/Mople-Setup-Guide.md` — 프로젝트 진입점 (세팅 + 하위 링크)
+- **가이드 문서**: 카테고리별 `{주제}-가이드.md` — **적용 가이드 / 원리 / 이해** 3단계 템플릿
+  - `Swift/Tuist/Tuist-가이드.md`
+  - `Swift/CICD/CICD-가이드.md`
+  - 새 도구/시스템 도입 시 같은 형식으로 추가
+- **작업 기록**: 도입 과정의 상세 기록 (기존 문서 형식 유지)
+- **리팩토링**: `Swift/리팩토링/` — Phase 체크리스트 + 전환 기록
+- 새 문서 작성 시 **메인 가이드에 하위 링크 추가** 필수
+- 상세 규칙은 루트 CLAUDE.md의 "프로젝트 문서화 규칙" 참조

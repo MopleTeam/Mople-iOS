@@ -9,6 +9,7 @@ import Foundation
 import Domain
 import RxSwift
 import CoreLocation
+import Data
 
 protocol LocationService {
     func updateLocation() -> Observable<Location?>

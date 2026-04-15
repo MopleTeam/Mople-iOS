@@ -7,6 +7,7 @@
 
 import UIKit
 import Domain
+import Data
 
 typealias MainSceneDependencies = MainTapDependencies
 
@@ -72,7 +73,7 @@ extension MainSceneDIContainer: MainSceneDependencies {
     }
     
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
-        let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService)
+        let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
         #if DEV
         let useCase = MockDataManager.resolve(ResetNotifyCountUseCase(repo: notifyRepo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
         #else

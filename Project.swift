@@ -101,8 +101,7 @@ let dependencies: [TargetDependency] = [
     .external(name: "Kingfisher"),
     .external(name: "FSCalendar"),
 
-    // Network & Data
-    .external(name: "MultipartForm"),
+    // Network & Data (MultipartForm은 Data 모듈로 이전, Realm은 AppDelegate migration용 유지)
     .external(name: "Realm"),
     .external(name: "RealmSwift"),
 
@@ -192,6 +191,36 @@ let domainTarget: Target = .target(
     )
 )
 
+// MARK: - Data 모듈 (Repository 구현체, DTO, Network, Persistent Storage)
+// Domain에 의존, App에서 import. Realm/MultipartForm 등 외부 라이브러리 사용
+
+let dataTarget: Target = .target(
+    name: "Data",
+    destinations: .iOS,
+    product: .framework,
+    bundleId: "com.moim.moimtable.data",
+    deploymentTargets: deploymentTarget,
+    sources: ["Modules/Data/Sources/**"],
+    dependencies: [
+        .target(name: "Core"),
+        .target(name: "Domain"),
+        .external(name: "RealmSwift"),
+        .external(name: "Realm"),
+        .external(name: "MultipartForm"),
+    ],
+    settings: .settings(
+        base: [
+            "SWIFT_VERSION": "5.0",
+        ],
+        configurations: [
+            .debug(name: "Debug", settings: [
+                "OTHER_SWIFT_FLAGS": "-DDEV -DDEBUG",
+            ]),
+            .release(name: "Release"),
+        ]
+    )
+)
+
 // MARK: - 앱 타겟 (Debug/Release로 Dev/Prod 분리)
 
 let mopleTarget: Target = .target(
@@ -205,7 +234,7 @@ let mopleTarget: Target = .target(
     resources: resources,
     entitlements: "Mople/Mople.entitlements",
     scripts: [swiftgenScript, crashlyticsScript],
-    dependencies: dependencies + [.target(name: "Core"), .target(name: "Domain")],
+    dependencies: dependencies + [.target(name: "Core"), .target(name: "Domain"), .target(name: "Data")],
     settings: .settings(
         base: [
             "MARKETING_VERSION": "\(marketingVersion)",
@@ -262,6 +291,7 @@ let project = Project(
     targets: [
         coreTarget,
         domainTarget,
+        dataTarget,
         mopleTarget,
     ]
 )
