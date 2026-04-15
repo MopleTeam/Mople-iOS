@@ -35,6 +35,7 @@
 | `리팩토링/Phase-5-SwiftUI.md` | Phase 5 상세 |
 | `리팩토링/Phase-6-Tuist.md` | Phase 6 상세 |
 | `리팩토링/Phase-7-DB전략.md` | Phase 7 상세 |
+| `리팩토링/Phase-8-Feature모듈화.md` | Phase 8 상세 (Phase 6에서 분리된 UI Feature 모듈화) |
 
 ### Phase 요약
 | Phase | 내용 | 상태 |
@@ -45,8 +46,9 @@
 | 3 | RxSwift → Swift Concurrency (async/await) | 완료 |
 | 4 | Swift 6 Strict Concurrency | 미시작 |
 | 5 | SwiftUI 점진적 도입 | 미시작 |
-| 6 | Tuist + 모듈화 | 진행 중 (6/7) |
+| 6 | Tuist + 모듈화 (Core/Domain/Data 레이어 경계) | 완료 |
 | 7 | DB 전략 (Realm → SwiftData 검토) | 미시작 |
+| 8 | UI Feature 모듈화 (DesignSystem + Feature 프레임워크) | 미시작 |
 
 ## 작업 규칙
 
