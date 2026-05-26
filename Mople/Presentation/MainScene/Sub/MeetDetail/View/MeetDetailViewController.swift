@@ -82,7 +82,9 @@ final class MeetDetailViewController: TitleNaviViewController, View {
 
     // 공지 + pill을 하나의 헤더 단위로 묶음. 자식 스크롤 시 transform으로 위로 슬라이드해 사라지고 다시 나타남.
     // 공지가 없을 때는 noticePreviewContainer가 isHidden 처리되어 UIStackView가 자동 collapse.
-    private lazy var headerContainer: UIStackView = {
+    // PassThroughStackView로 만들어서 자체 영역의 hit는 통과시키고, 자식 view(공지 카드/pill)만 터치를 받게 한다.
+    // → 헤더 overlay 영역에서도 swipe가 그 아래 tableView로 전달됨.
+    private lazy var headerContainer: PassThroughStackView = {
         let pillWrap = UIView()
         pillWrap.addSubview(pillSegment)
         pillSegment.snp.makeConstraints { make in
@@ -99,7 +101,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             make.height.equalTo(80)
         }
 
-        let sv = UIStackView(arrangedSubviews: [noticePreviewContainer, pillWrap])
+        let sv = PassThroughStackView(arrangedSubviews: [noticePreviewContainer, pillWrap])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.spacing = 16
@@ -108,9 +110,14 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return sv
     }()
 
-    // 자식 스크롤 시 헤더가 사라질 수 있는 최대 거리 (= 헤더 전체 높이)
-    private var headerMaxHide: CGFloat { headerContainer.bounds.height }
+    // 자식 스크롤에 따라 헤더 transform 조정
+    // 헤더는 contentView 상단 overlay로 떠 있고, 자식 tableView는 contentInset.top = headerHeight로
+    // 헤더 아래에서 시작한다. 위로 swipe하면 tableView의 contentOffset.y가 -headerHeight → 0 으로
+    // 이동하며, 같은 양만큼 헤더가 transform y로 위로 슬라이드해 사라진다.
+    private var lastPropagatedHeaderHeight: CGFloat = -1
     private var currentHideAmount: CGFloat = 0
+    private weak var planChild: MeetPlanListViewController?
+    private weak var reviewChild: MeetReviewListViewController?
 
     // 일정/리뷰 페이지 영역
     private(set) var pageController: UIPageViewController = {
@@ -149,6 +156,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         setupUI()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        propagateHeaderInsetIfNeeded()
+    }
+
     // MARK: - UI Setup
     private func setupUI() {
         setupNavi()
@@ -160,8 +172,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         view.addSubview(contentView)
         view.addSubview(addPlanButton)
 
-        contentView.addSubview(headerContainer)
+        // pageController.view는 contentView 전체를 채운다 (height 고정).
+        // 헤더는 그 위에 overlay로 떠서 transform.y로만 슬라이드 → 페이지 컨텐츠 영역은 일정.
         contentView.addSubview(pageController.view)
+        contentView.addSubview(headerContainer)
 
         contentView.snp.makeConstraints { make in
             make.top.equalTo(self.titleViewBottom)
@@ -175,10 +189,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
+        headerContainer.layer.zPosition = 1
 
         pageController.view.snp.makeConstraints { make in
-            make.top.equalTo(headerContainer.snp.bottom)
-            make.horizontalEdges.bottom.equalToSuperview()
+            make.edges.equalToSuperview()
         }
 
         addPlanButton.snp.makeConstraints { make in
@@ -397,35 +411,51 @@ extension MeetDetailViewController {
     }
 
     // MARK: - Sticky Header
-    // Coordinator가 page child VC들을 생성한 직후 wire-up. 두 자식 모두 같은 콜백으로 묶어
-    // 헤더 transform이 한 곳에서만 변하도록 한다.
+    // Coordinator가 page child VC들을 생성한 직후 wire-up.
+    // 두 자식 모두 같은 콜백으로 묶어 헤더 transform이 한 곳에서만 변하도록 한다.
+    // 그리고 layout 사이클 후 setTopContentInset(headerHeight)로 자식 tableView의 상단을 비워둔다.
     func attachChildScrollObservers(_ children: UIViewController...) {
         for child in children {
             if let plan = child as? MeetPlanListViewController {
+                planChild = plan
                 plan.onScrollChange = { [weak self] offset in
                     self?.handleChildScroll(offset)
                 }
             } else if let review = child as? MeetReviewListViewController {
+                reviewChild = review
                 review.onScrollChange = { [weak self] offset in
                     self?.handleChildScroll(offset)
                 }
             }
         }
+        // 다음 layout 사이클에서 inset이 전파되도록 트리거
+        view.setNeedsLayout()
     }
 
-    // 자식 VC(MeetPlanListVC / MeetReviewListVC)가 emit하는 contentOffset.y를 받아
-    // 헤더가 위로 슬라이드되며 사라지고, 아래로 당기면 다시 나타나는 동작을 만든다.
+    // 헤더 높이가 변동되면(공지 유무 변화 등) 자식 tableView에 새 inset 전파
+    private func propagateHeaderInsetIfNeeded() {
+        let h = headerContainer.bounds.height
+        guard h > 0,
+              abs(h - lastPropagatedHeaderHeight) > 0.5 else { return }
+        lastPropagatedHeaderHeight = h
+        planChild?.setTopContentInset(h)
+        reviewChild?.setTopContentInset(h)
+    }
+
+    // 자식 VC가 emit하는 contentOffset.y에 따라 헤더가 슬라이드되며 사라지고 다시 나타난다.
+    // contentOffset.y == -headerHeight  → 헤더 완전 노출 (hide 0)
+    // contentOffset.y == 0              → 헤더 완전 사라짐 (hide headerHeight)
     private func handleChildScroll(_ offset: CGFloat) {
-        let clamped = max(0, min(headerMaxHide, offset))
-        guard abs(clamped - currentHideAmount) > 0.5 else { return }
-        currentHideAmount = clamped
-        applyHide(clamped)
+        let h = lastPropagatedHeaderHeight
+        guard h > 0 else { return }
+        let hide = max(0, min(h, offset + h))
+        guard abs(hide - currentHideAmount) > 0.5 else { return }
+        currentHideAmount = hide
+        applyHide(hide)
     }
 
     private func applyHide(_ amount: CGFloat) {
-        let translate = CGAffineTransform(translationX: 0, y: -amount)
-        headerContainer.transform = translate
-        pageController.view.transform = translate
+        headerContainer.transform = CGAffineTransform(translationX: 0, y: -amount)
     }
 
     // MARK: - 에러 핸들링
@@ -456,5 +486,15 @@ extension MeetDetailViewController {
     private func showActivityViewController(items: [Any]) {
         let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
         self.present(ac, animated: true)
+    }
+}
+
+// MARK: - PassThroughStackView
+// 자기 영역의 hit는 통과시키고 자식 view들의 hit만 잡는 UIStackView.
+// 헤더 overlay 영역에서도 그 아래 tableView의 swipe가 동작하도록 한다.
+final class PassThroughStackView: UIStackView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hit = super.hitTest(point, with: event)
+        return hit === self ? nil : hit
     }
 }

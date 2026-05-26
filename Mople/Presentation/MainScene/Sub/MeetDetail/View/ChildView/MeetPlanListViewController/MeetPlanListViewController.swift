@@ -31,6 +31,17 @@ final class MeetPlanListViewController: BaseViewController, View {
 
     // 부모(MeetDetail)가 자식 스크롤을 추적해 헤더 sticky/hide를 처리할 수 있게 노출
     var onScrollChange: ((CGFloat) -> Void)?
+
+    // 헤더 overlay 높이만큼 tableView 상단을 비워두는 inset. 부모가 layout 후 호출.
+    private var topInsetApplied: Bool = false
+    func setTopContentInset(_ inset: CGFloat) {
+        tableView.contentInset.top = inset
+        tableView.verticalScrollIndicatorInsets.top = inset
+        if !topInsetApplied {
+            topInsetApplied = true
+            tableView.contentOffset = CGPoint(x: 0, y: -inset)
+        }
+    }
     
     // MARK: - UI Components
     private let countView: CountView = {
