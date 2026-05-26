@@ -160,53 +160,92 @@ struct NoticeDetailView: View {
         .background(Color(uiColor: .bgPrimary))
     }
 
-    // MARK: - 입력바 (ChatingTextFieldView SwiftUI 포팅, 멘션 제외)
-    // edit 모드면 상단에 "댓글 수정중" 라벨 + 취소 버튼 표시
+    // MARK: - 입력바 (ChatingTextFieldView 레이아웃 SwiftUI 재구현, 멘션 제외)
+    // 박스형 입력(.bgInput, cornerRadius 8) + 우측 52pt 폭의 send 영역 + (edit 모드 시) 상단 라벨.
+    // ChatingTextFieldView와 동일하게 키보드 떠있을 때(inputFocused == true)만 send 버튼 노출.
     private var inputBar: some View {
         VStack(alignment: .leading, spacing: 8) {
             if viewModel.isEditingComment {
-                HStack(spacing: 8) {
-                    Text("댓글 수정중")
-                        .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body2))
-                        .foregroundColor(Color(uiColor: .text03))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color(uiColor: .bgSecondary))
-                        .cornerRadius(4)
-                    Button("취소") {
-                        viewModel.cancelCommentEdit()
-                        inputFocused = false
-                    }
-                    .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body2))
-                    .foregroundColor(Color(uiColor: .text02))
-                    Spacer(minLength: 0)
-                }
+                editLabelRow
             }
 
             HStack(alignment: .bottom, spacing: 0) {
-                TextField("댓글을 입력해주세요", text: $viewModel.inputText, axis: .vertical)
-                    .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
-                    .foregroundColor(Color(uiColor: .text01))
-                    .focused($inputFocused)
-                    .lineLimit(1...5)
-                    .padding(.vertical, 8)
-
-                Button(action: {
-                    inputFocused = false
-                    viewModel.submitComment()
-                }) {
-                    Image(viewModel.canSubmit ? .sendArrowCircle : .sendArrowCircleDisable)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
+                inputBox
+                if inputFocused {
+                    sendButton
                 }
-                .disabled(!viewModel.canSubmit)
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
-        .padding(.bottom, 8)
+        // 하단은 ChatingTextFieldView와 동일하게 safeArea만 — 추가 padding 없음
         .background(Color(uiColor: .bgPrimary))
+    }
+
+    // "댓글 수정중" 뱃지 + 취소 (UIKit editLabel: 25x70, cornerRadius 4, bgSecondary, Body2.medium, text03)
+    private var editLabelRow: some View {
+        HStack(spacing: 8) {
+            Text("댓글 수정중")
+                .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body2))
+                .foregroundColor(Color(uiColor: .text03))
+                .frame(width: 70, height: 25)
+                .background(Color(uiColor: .bgSecondary))
+                .cornerRadius(4)
+            Button("취소") {
+                viewModel.cancelCommentEdit()
+                inputFocused = false
+            }
+            .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body2))
+            .foregroundColor(Color(uiColor: .text02))
+            Spacer(minLength: 0)
+        }
+    }
+
+    // DefaultTextView 박스: bgInput + cornerRadius 8 + 내부 padding (좌우 8, 상하 18)
+    // placeholder는 같은 padding으로 ZStack(topLeading) 겹쳐서 위치 일치
+    private var inputBox: some View {
+        ZStack(alignment: .topLeading) {
+            if viewModel.inputText.isEmpty {
+                Text("댓글을 입력해주세요")
+                    .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
+                    .foregroundColor(Color(uiColor: .text04))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 18)
+                    .allowsHitTesting(false)
+            }
+            TextField("", text: $viewModel.inputText, axis: .vertical)
+                .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
+                .foregroundColor(Color(uiColor: .text01))
+                .tint(Color(uiColor: .text02))
+                .focused($inputFocused)
+                // ChatingTextFieldView의 maxTextLine = 4와 동일
+                .lineLimit(1...4)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 18)
+        }
+        .background(Color(uiColor: .bgInput))
+        .cornerRadius(8)
+    }
+
+    // sendButton: ChatingTextFieldView 정확 매핑
+    //   - 전체 폭 52
+    //   - 아이콘 영역: leading 12, trailing 0, bottom 6, height = width (1:1 정사각형 = 40x40)
+    private var sendButton: some View {
+        Button(action: {
+            inputFocused = false
+            viewModel.submitComment()
+        }) {
+            Color.clear
+                .overlay(alignment: .bottom) {
+                    Image(viewModel.canSubmit ? .sendArrowCircle : .sendArrowCircleDisable)
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.leading, 12)
+                        .padding(.bottom, 6)
+                }
+        }
+        .frame(width: 52)
+        .disabled(!viewModel.canSubmit)
     }
 }
 
