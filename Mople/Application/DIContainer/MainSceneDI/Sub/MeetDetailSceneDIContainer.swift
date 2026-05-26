@@ -27,9 +27,11 @@ protocol MeetDetailSceneDependencies {
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meet: MeetSummary,
                                        completion: ((Plan) -> Void)?) -> BaseCoordinator
-    
+
     func makePostDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator
+
+    func makeNoticeFlowCoordinator(entry: NoticeFlowEntry) -> BaseCoordinator
 }
 
 final class MeetDetailSceneDIContainer: BaseContainer, MeetDetailSceneDependencies {
@@ -260,5 +262,14 @@ extension MeetDetailSceneDIContainer {
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()
+    }
+
+    // MARK: - 공지
+    func makeNoticeFlowCoordinator(entry: NoticeFlowEntry) -> BaseCoordinator {
+        let noticeDI = NoticeSceneDIContainer(appNetworkService: appNetworkService,
+                                              commonFactory: commonViewFactory,
+                                              userSession: userSession,
+                                              entry: entry)
+        return noticeDI.makeNoticeFlowCoordinator()
     }
 }
