@@ -24,7 +24,7 @@ protocol MeetDetailCoordination: AnyObject {
                                type: PostType)
     func pushMemberListView()
     func presentNoticeListView(meetId: Int, isCreator: Bool)
-    func presentNoticeDetailView(noticeId: Int)
+    func presentNoticeDetailView(notice: Notice, isCreator: Bool)
     func endFlow()
 }
 
@@ -164,9 +164,9 @@ extension MeetDetailSceneCoordinator {
     }
 
     // 공지 미리보기 카드 → 공지 상세 (modal present)
-    func presentNoticeDetailView(noticeId: Int) {
+    func presentNoticeDetailView(notice: Notice, isCreator: Bool) {
         let coordinator = dependencies.makeNoticeFlowCoordinator(
-            entry: .detail(noticeId: noticeId)
+            entry: .detail(notice: notice, isCreator: isCreator)
         )
         start(coordinator: coordinator)
         self.present(coordinator.navigationController)

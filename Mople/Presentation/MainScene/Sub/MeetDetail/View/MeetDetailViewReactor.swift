@@ -198,8 +198,11 @@ extension MeetDetailViewReactor {
                                                isCreator: meet.isCreator)
         case .openNoticeDetail:
             // 미리보기 카드 → 공지 상세 진입 (pinnedNotice가 있을 때만)
-            guard let noticeId = currentState.meet?.pinnedNotice?.noticeId else { return .empty() }
-            coordinator?.presentNoticeDetailView(noticeId: noticeId)
+            guard let meet = currentState.meet,
+                  let notice = meet.pinnedNotice,
+                  notice.noticeId != nil else { return .empty() }
+            coordinator?.presentNoticeDetailView(notice: notice,
+                                                 isCreator: meet.isCreator)
         }
 
         return .empty()
