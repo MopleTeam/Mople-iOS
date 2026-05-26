@@ -31,6 +31,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             case endFlow
             case showMeetImage
             case memberList
+            case openNoticeList
+            case openNoticeDetail
         }
 
         enum Loading {
@@ -188,8 +190,18 @@ extension MeetDetailViewReactor {
                                           imagePath: imagePath)
         case .memberList:
             coordinator?.pushMemberListView()
+        case .openNoticeList:
+            // 확성기 버튼 → 공지 리스트 진입
+            guard let meet = currentState.meet,
+                  let meetId = meet.meetSummary?.id else { return .empty() }
+            coordinator?.presentNoticeListView(meetId: meetId,
+                                               isCreator: meet.isCreator)
+        case .openNoticeDetail:
+            // 미리보기 카드 → 공지 상세 진입 (pinnedNotice가 있을 때만)
+            guard let noticeId = currentState.meet?.pinnedNotice?.noticeId else { return .empty() }
+            coordinator?.presentNoticeDetailView(noticeId: noticeId)
         }
-        
+
         return .empty()
     }
 }
