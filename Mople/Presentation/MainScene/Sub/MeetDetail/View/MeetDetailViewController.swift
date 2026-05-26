@@ -114,12 +114,13 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return sv
     }()
 
-    // 자식 스크롤에 따라 헤더 transform 조정. pill은 sticky이므로 transform의 max는
-    // "pill 시작 위치(=공지 영역) = pillWrap.frame.minY"로 제한한다.
-    // 헤더 전체에 같은 transform이 걸리지만, max로 인해 pill이 sticky 위치(navi 아래 16pt)에서 멈춘다.
-    // 자식 tableView contentInset.top = pillWrap.frame.minY → 첫 셀이 pill의 minY부터 시작해
-    // pill 알파 0.6 배경 뒤로 깔리는 디자인.
-    private var lastPropagatedNoticeArea: CGFloat = -1
+    // 자식 스크롤에 따라 헤더 transform 조정. 약속 탭은 sticky로 navi 아래 16pt에서 멈춘다.
+    // - inset.top = 약속 탭 maxY + spacing → 첫 셀이 약속 탭 아래에서 시작 (겹치지 않음)
+    // - hideMax   = 약속 탭 sticky 도달까지 필요한 transform 거리 (= 약속 탭 minY - 16)
+    //   inset != hideMax 이므로 1:1 매핑은 아니지만, swipe 시작과 동시에 transform이 진행되고
+    //   sticky 도달 후 추가 swipe에서는 tableView만 정상 스크롤된다.
+    private var lastPropagatedInset: CGFloat = -1
+    private var lastPropagatedHideMax: CGFloat = -1
     private var currentHideAmount: CGFloat = 0
     private weak var planChild: MeetPlanListViewController?
     private weak var reviewChild: MeetReviewListViewController?
@@ -163,6 +164,12 @@ final class MeetDetailViewController: TitleNaviViewController, View {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        propagateHeaderInsetIfNeeded()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // 첫 layout 사이클에서 stale일 수 있는 height를 viewDidAppear 시점에 한 번 더 측정
         propagateHeaderInsetIfNeeded()
     }
 
@@ -440,30 +447,35 @@ extension MeetDetailViewController {
         propagateHeaderInsetIfNeeded()
     }
 
-    // 공지 영역(transform 대상)이 변동되면(공지 hidden ↔ visible 등) 자식 tableView에 새 inset 전파.
-    // bounds 측정 직전에 layoutIfNeeded로 강제 갱신.
+    // 헤더 layout 변동 시(공지 hidden ↔ visible, 첫 표시 등) 자식 tableView에 inset 전파.
+    // 두 값을 계산해 보관:
+    //   inset   = 약속 탭 maxY + spacing (= pillWrap.frame.maxY + 16)
+    //             → 자식 tableView contentInset.top. 셀이 약속 탭 아래에서 시작.
+    //   hideMax = 약속 탭이 sticky 위치(navi 아래 16pt)까지 이동해야 하는 transform 거리
+    //             = pillWrap.frame.minY - 16
     private func propagateHeaderInsetIfNeeded() {
         headerContainer.layoutIfNeeded()
-        // pillWrap.frame.minY = stackView 좌표에서 pill이 시작되는 위치
-        //   공지 visible: 16(layoutMargin.top) + 80(noticeContainer) + 16(spacing) = 112
-        //   공지 hidden : 16(layoutMargin.top)                                       = 16
-        let area = pillWrap.frame.minY
-        guard area > 0,
-              abs(area - lastPropagatedNoticeArea) > 0.5 else { return }
-        lastPropagatedNoticeArea = area
-        planChild?.setTopContentInset(area)
-        reviewChild?.setTopContentInset(area)
+        let inset = pillWrap.frame.maxY + 16
+        let hideMax = max(0, pillWrap.frame.minY - 16)
+        guard inset > 0,
+              abs(inset - lastPropagatedInset) > 0.5 else { return }
+        lastPropagatedInset = inset
+        lastPropagatedHideMax = hideMax
+        planChild?.setTopContentInset(inset)
+        reviewChild?.setTopContentInset(inset)
     }
 
     // 자식 VC가 emit하는 contentOffset.y에 따라 헤더가 슬라이드되며 사라지고 다시 나타난다.
-    // pill은 sticky이므로 hide max = noticeArea (pill이 sticky 위치에 도달하면 멈춤).
-    // contentOffset.y == -noticeArea → 헤더 완전 노출 (hide 0)
-    // contentOffset.y == 0          → 공지 완전 사라짐, pill sticky 위치 (hide noticeArea)
-    // contentOffset.y >  0          → tableView 정상 스크롤, 헤더 transform 그대로 유지
+    // swipeDistance = offset + inset (사용자가 위로 swipe한 누적 거리, 0 이상)
+    // hide          = min(hideMax, swipeDistance)
+    // → swipe 0 ~ hideMax: 공지 사라지면서 약속 탭이 sticky 위치 도달
+    // → swipe hideMax+:   sticky 유지, tableView만 자체 스크롤 (약속 탭 transform 더 안 됨)
     private func handleChildScroll(_ offset: CGFloat) {
-        let area = lastPropagatedNoticeArea
-        guard area > 0 else { return }
-        let hide = max(0, min(area, offset + area))
+        let inset = lastPropagatedInset
+        let hideMax = lastPropagatedHideMax
+        guard inset > 0 else { return }
+        let swipeDistance = max(0, offset + inset)
+        let hide = min(hideMax, swipeDistance)
         guard abs(hide - currentHideAmount) > 0.5 else { return }
         currentHideAmount = hide
         applyHide(hide)
