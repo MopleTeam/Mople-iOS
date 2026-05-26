@@ -277,6 +277,15 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             guard let gestureVC = $0 as? EdgeGestureConfigurable else { return }
             gestureVC.configureEdgeGesture(appNavi.edgeGesture)
         }
+
+        // PageController의 paging pan gesture도 edge gesture가 먼저 인식되도록 양보.
+        // dataSource 활성화 이후 좌측 edge swipe로 modal dismiss가 안 되는 충돌을 해결.
+        for sv in pageController.view.subviews {
+            if let scrollView = sv as? UIScrollView {
+                scrollView.panGestureRecognizer.require(toFail: appNavi.edgeGesture)
+                break
+            }
+        }
     }
 }
 
