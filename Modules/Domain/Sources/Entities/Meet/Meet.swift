@@ -14,13 +14,24 @@ public struct Meet {
     public var creatorId: Int?
     public let memberCount: Int?
     public let firstPlanDate: Date?
+    public let version: Int?
+    public let pinnedNotice: PinnedNotice?
 
-    public init(isCreator: Bool = false, meetSummary: MeetSummary? = nil, sinceDays: Int? = nil, creatorId: Int? = nil, memberCount: Int? = nil, firstPlanDate: Date? = nil) {
+    public init(isCreator: Bool = false,
+                meetSummary: MeetSummary? = nil,
+                sinceDays: Int? = nil,
+                creatorId: Int? = nil,
+                memberCount: Int? = nil,
+                firstPlanDate: Date? = nil,
+                version: Int? = nil,
+                pinnedNotice: PinnedNotice? = nil) {
         self.isCreator = isCreator
         self.meetSummary = meetSummary
         self.sinceDays = sinceDays
         self.creatorId = creatorId
         self.memberCount = memberCount
         self.firstPlanDate = firstPlanDate
+        self.version = version
+        self.pinnedNotice = pinnedNotice
     }
 }
