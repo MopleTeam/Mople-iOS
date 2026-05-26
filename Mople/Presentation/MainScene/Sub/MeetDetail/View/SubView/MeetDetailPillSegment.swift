@@ -122,3 +122,49 @@ final class MeetDetailPillSegment: UIView {
         }
     }
 }
+
+// MARK: - Interactive Transition (PageController swipe와 연동)
+extension MeetDetailPillSegment {
+
+    // PageController가 emit하는 -1.0 ~ +1.0 progress를 받아 selectedPill x 위치를 보간.
+    // progress > 0 → 다음 인덱스 방향, progress < 0 → 이전 인덱스 방향.
+    // transform.x로만 이동시켜서 constraint 변경 없이 가볍게 처리한다.
+    func setInteractiveProgress(_ progress: CGFloat) {
+        let clamped = max(-1, min(1, progress))
+        let baseIndex = selectedIndex
+
+        let targetIndex: Int
+        if clamped > 0 && baseIndex < buttons.count - 1 {
+            targetIndex = baseIndex + 1
+        } else if clamped < 0 && baseIndex > 0 {
+            targetIndex = baseIndex - 1
+        } else {
+            // 끝 페이지에서 그 이상 방향 swipe — bounce. transform 0.
+            selectedPill.transform = .identity
+            return
+        }
+
+        guard let baseBtn = buttons[safe: baseIndex],
+              let targetBtn = buttons[safe: targetIndex] else { return }
+
+        let deltaX = (targetBtn.frame.minX - baseBtn.frame.minX) * abs(clamped)
+        selectedPill.transform = CGAffineTransform(translationX: deltaX, y: 0)
+    }
+
+    // PageController 전환 결과 확정 시 호출.
+    // - 새 인덱스로 전환 성공: selectedIndex 갱신 + constraint 새 버튼으로 remake + transform reset
+    // - 복귀(전환 실패): transform만 reset
+    // selectedIndexChanged stream은 emit하지 않는다 — 외부 PageController swipe로 인한 전환이라
+    // 부모로 다시 통지하면 루프 위험.
+    func commitInteractiveTransition(to newIndex: Int) {
+        guard newIndex != selectedIndex,
+              newIndex >= 0, newIndex < buttons.count else {
+            selectedPill.transform = .identity
+            return
+        }
+        selectedIndex = newIndex
+        buttons.enumerated().forEach { $0.element.isSelected = ($0.offset == newIndex) }
+        selectedPill.transform = .identity
+        updatePillPosition(animated: false)
+    }
+}

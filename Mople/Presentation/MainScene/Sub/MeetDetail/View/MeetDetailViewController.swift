@@ -112,6 +112,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return sv
     }()
 
+    // PageController 내부 scrollView contentOffset KVO observer.
+    // 사용자 swipe progress를 selectedPill 보간 이동에 사용.
+    private var pageScrollObservation: NSKeyValueObservation?
+
     // 자식 스크롤에 따라 헤더 transform 조정. 약속 탭은 sticky로 navi 아래 16pt에서 멈춘다.
     // - inset.top = 약속 탭 maxY + spacing → 첫 셀이 약속 탭 아래에서 시작 (겹치지 않음)
     // - hideMax   = 약속 탭 sticky 도달까지 필요한 transform 거리 (= 약속 탭 minY - 16)
@@ -463,6 +467,37 @@ extension MeetDetailViewController {
         // contentInset 없이 잘못된 위치에서 첫 표시될 수 있다.
         view.layoutIfNeeded()
         propagateHeaderInsetIfNeeded()
+
+        // 인터랙티브 swipe ↔ pill 트래킹 setup
+        setupInteractivePageSwipe()
+    }
+
+    // PageController 좌우 swipe와 pill 세그먼트 selectedPill을 동기화한다.
+    // - dataSource로 양방향 swipe 활성화 (plan ↔ review)
+    // - delegate로 transition 완료 후 selectedIndex 동기화
+    // - 내부 scrollView contentOffset KVO로 progress 추출 → pill에 보간 이동 적용
+    private func setupInteractivePageSwipe() {
+        pageController.dataSource = self
+        pageController.delegate = self
+
+        for sv in pageController.view.subviews {
+            guard let scrollView = sv as? UIScrollView else { continue }
+            pageScrollObservation = scrollView.observe(\.contentOffset, options: [.new]) { [weak self] sv, _ in
+                self?.handlePageInteractiveScroll(sv)
+            }
+            break
+        }
+    }
+
+    // UIPageViewController scrollView 동작:
+    //   정상 상태 contentOffset.x = bounds.width (가운데 페이지가 visible)
+    //   왼→오 swipe: x < bounds.width (이전 페이지 방향)
+    //   오→왼 swipe: x > bounds.width (다음 페이지 방향)
+    private func handlePageInteractiveScroll(_ sv: UIScrollView) {
+        let pageWidth = sv.bounds.width
+        guard pageWidth > 0 else { return }
+        let progress = (sv.contentOffset.x - pageWidth) / pageWidth
+        pillSegment.setInteractiveProgress(progress)
     }
 
     // 헤더 layout 변동 시(공지 hidden ↔ visible, 첫 표시 등) 자식 tableView에 inset 전파.
@@ -541,5 +576,42 @@ final class PassThroughStackView: UIStackView {
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let hit = super.hitTest(point, with: event)
         return hit === self ? nil : hit
+    }
+}
+
+// MARK: - UIPageViewController DataSource / Delegate (인터랙티브 swipe)
+extension MeetDetailViewController: UIPageViewControllerDataSource {
+    func pageViewController(_ pageViewController: UIPageViewController,
+                            viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        // review의 이전 = plan
+        if viewController === reviewChild { return planChild }
+        return nil
+    }
+
+    func pageViewController(_ pageViewController: UIPageViewController,
+                            viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        // plan의 다음 = review
+        if viewController === planChild { return reviewChild }
+        return nil
+    }
+}
+
+extension MeetDetailViewController: UIPageViewControllerDelegate {
+    func pageViewController(_ pageViewController: UIPageViewController,
+                            didFinishAnimating finished: Bool,
+                            previousViewControllers: [UIViewController],
+                            transitionCompleted completed: Bool) {
+        // 전환 실패(복귀): transform reset만
+        guard completed else {
+            pillSegment.commitInteractiveTransition(to: pillSegment.selectedIndex)
+            return
+        }
+        // 전환 성공: 현재 visible VC로 selectedIndex 확정
+        guard let currentVC = pageViewController.viewControllers?.first else { return }
+        let newIndex: Int
+        if currentVC === planChild { newIndex = 0 }
+        else if currentVC === reviewChild { newIndex = 1 }
+        else { return }
+        pillSegment.commitInteractiveTransition(to: newIndex)
     }
 }
