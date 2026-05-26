@@ -30,14 +30,22 @@ final class MeetReviewListViewController: BaseViewController, View {
     var onScrollChange: ((CGFloat) -> Void)?
 
     // 헤더 overlay 높이만큼 tableView 상단을 비워두는 inset. 부모가 layout 후 호출.
+    // 헤더 height가 변동(공지 hidden ↔ visible)되면, 자식 contentOffset도 같은 delta만큼 따라 이동시켜
+    // swipe 거리와 hide 거리가 항상 1:1로 매핑되게 한다.
     private var topInsetApplied: Bool = false
     func setTopContentInset(_ inset: CGFloat) {
+        let oldInset = tableView.contentInset.top
         tableView.contentInset.top = inset
         tableView.verticalScrollIndicatorInsets.top = inset
         if !topInsetApplied {
             topInsetApplied = true
-            tableView.contentOffset = CGPoint(x: 0, y: -inset)
+            tableView.setContentOffset(CGPoint(x: 0, y: -inset), animated: false)
+            return
         }
+        let delta = inset - oldInset
+        guard abs(delta) > 0.5 else { return }
+        let oldOffset = tableView.contentOffset.y
+        tableView.setContentOffset(CGPoint(x: 0, y: oldOffset - delta), animated: false)
     }
     
     // MARK: - UI Components
