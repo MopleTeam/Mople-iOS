@@ -32,12 +32,9 @@ struct NoticeComposeView: View {
             submitButton
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        // VStack 빈 영역 탭으로 키보드 내림. background에 contentShape를 줘야 빈 영역 hit testing 됨.
-        .background(
-            Color(uiColor: .bgPrimary)
-                .contentShape(Rectangle())
-                .onTapGesture { editorFocused = false }
-        )
+        .background(Color(uiColor: .bgPrimary))
+        // 키보드 dismiss는 InteractivePopHostingController의 UIKit tap recognizer가 담당.
+        // SwiftUI .background+.onTapGesture는 자식 영역에서 간헐적으로 안 잡히는 문제가 있어 사용 안 함.
         .customNavigationBar(title: viewModel.navigationTitle,
                              isLoading: viewModel.isSubmitting,
                              onBack: { viewModel.dismissFlow() })

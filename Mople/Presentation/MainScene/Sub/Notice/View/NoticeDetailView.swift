@@ -41,12 +41,8 @@ struct NoticeDetailView: View {
                 inputBar
             }
         }
-        .background(
-            // 화면 빈 영역 탭으로 키보드 dismiss
-            Color(uiColor: .bgPrimary)
-                .contentShape(Rectangle())
-                .onTapGesture { inputFocused = false }
-        )
+        .background(Color(uiColor: .bgPrimary))
+        // 키보드 dismiss는 InteractivePopHostingController의 UIKit tap recognizer가 담당
         .customNavigationBar(title: navigationTitle,
                              isLoading: viewModel.isLoading,
                              trailing: { trailingMenuButton })
