@@ -428,12 +428,17 @@ extension MeetDetailViewController {
                 }
             }
         }
-        // 다음 layout 사이클에서 inset이 전파되도록 트리거
-        view.setNeedsLayout()
+        // 즉시 layout을 강제해서 attach 직후에도 인셋 전파가 일어나도록 한다.
+        // setNeedsLayout만으로는 다음 runloop으로 미뤄지고, 그 사이 child가 그려지면
+        // contentInset 없이 잘못된 위치에서 첫 표시될 수 있다.
+        view.layoutIfNeeded()
+        propagateHeaderInsetIfNeeded()
     }
 
-    // 헤더 높이가 변동되면(공지 유무 변화 등) 자식 tableView에 새 inset 전파
+    // 헤더 높이가 변동되면(공지 유무 변화 등) 자식 tableView에 새 inset 전파.
+    // bounds.height는 마지막 layout 결과만 반영하므로 측정 직전에 layoutIfNeeded로 강제 갱신.
     private func propagateHeaderInsetIfNeeded() {
+        headerContainer.layoutIfNeeded()
         let h = headerContainer.bounds.height
         guard h > 0,
               abs(h - lastPropagatedHeaderHeight) > 0.5 else { return }
