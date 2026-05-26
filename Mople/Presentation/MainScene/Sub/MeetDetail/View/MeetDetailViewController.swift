@@ -80,12 +80,16 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     // 공지 카드를 20pt 좌우 인셋으로 감싸는 wrapper (UIStackView가 width를 full로 강제하므로 필요)
     private let noticePreviewContainer = UIView()
 
-    // 공지 + pill을 하나의 헤더 단위로 묶음. 자식 스크롤 시 transform으로 위로 슬라이드해 사라지고 다시 나타남.
-    // 공지가 없을 때는 noticePreviewContainer가 isHidden 처리되어 UIStackView가 자동 collapse.
+    // pill을 감싸는 wrapper. frame.minY를 측정해서 "공지 영역(transform 대상)"의 크기를 알아낸다.
+    private let pillWrap = UIView()
+
+    // 공지 + pill을 하나의 헤더 단위로 묶음. 자식 스크롤 시 transform으로 위로 슬라이드.
+    // transform max는 pillWrap.frame.minY로 제한 — pill이 sticky 위치(navi 아래 16pt)에 도달하면 멈춘다.
+    // 공지가 없을 때는 noticePreviewContainer가 isHidden 처리되어 UIStackView가 자동 collapse,
+    // pillWrap.frame.minY도 같이 줄어들어 hide max가 자동 조정된다.
     // PassThroughStackView로 만들어서 자체 영역의 hit는 통과시키고, 자식 view(공지 카드/pill)만 터치를 받게 한다.
     // → 헤더 overlay 영역에서도 swipe가 그 아래 tableView로 전달됨.
     private lazy var headerContainer: PassThroughStackView = {
-        let pillWrap = UIView()
         pillWrap.addSubview(pillSegment)
         pillSegment.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -110,11 +114,12 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return sv
     }()
 
-    // 자식 스크롤에 따라 헤더 transform 조정
-    // 헤더는 contentView 상단 overlay로 떠 있고, 자식 tableView는 contentInset.top = headerHeight로
-    // 헤더 아래에서 시작한다. 위로 swipe하면 tableView의 contentOffset.y가 -headerHeight → 0 으로
-    // 이동하며, 같은 양만큼 헤더가 transform y로 위로 슬라이드해 사라진다.
-    private var lastPropagatedHeaderHeight: CGFloat = -1
+    // 자식 스크롤에 따라 헤더 transform 조정. pill은 sticky이므로 transform의 max는
+    // "pill 시작 위치(=공지 영역) = pillWrap.frame.minY"로 제한한다.
+    // 헤더 전체에 같은 transform이 걸리지만, max로 인해 pill이 sticky 위치(navi 아래 16pt)에서 멈춘다.
+    // 자식 tableView contentInset.top = pillWrap.frame.minY → 첫 셀이 pill의 minY부터 시작해
+    // pill 알파 0.6 배경 뒤로 깔리는 디자인.
+    private var lastPropagatedNoticeArea: CGFloat = -1
     private var currentHideAmount: CGFloat = 0
     private weak var planChild: MeetPlanListViewController?
     private weak var reviewChild: MeetReviewListViewController?
@@ -435,25 +440,30 @@ extension MeetDetailViewController {
         propagateHeaderInsetIfNeeded()
     }
 
-    // 헤더 높이가 변동되면(공지 유무 변화 등) 자식 tableView에 새 inset 전파.
-    // bounds.height는 마지막 layout 결과만 반영하므로 측정 직전에 layoutIfNeeded로 강제 갱신.
+    // 공지 영역(transform 대상)이 변동되면(공지 hidden ↔ visible 등) 자식 tableView에 새 inset 전파.
+    // bounds 측정 직전에 layoutIfNeeded로 강제 갱신.
     private func propagateHeaderInsetIfNeeded() {
         headerContainer.layoutIfNeeded()
-        let h = headerContainer.bounds.height
-        guard h > 0,
-              abs(h - lastPropagatedHeaderHeight) > 0.5 else { return }
-        lastPropagatedHeaderHeight = h
-        planChild?.setTopContentInset(h)
-        reviewChild?.setTopContentInset(h)
+        // pillWrap.frame.minY = stackView 좌표에서 pill이 시작되는 위치
+        //   공지 visible: 16(layoutMargin.top) + 80(noticeContainer) + 16(spacing) = 112
+        //   공지 hidden : 16(layoutMargin.top)                                       = 16
+        let area = pillWrap.frame.minY
+        guard area > 0,
+              abs(area - lastPropagatedNoticeArea) > 0.5 else { return }
+        lastPropagatedNoticeArea = area
+        planChild?.setTopContentInset(area)
+        reviewChild?.setTopContentInset(area)
     }
 
     // 자식 VC가 emit하는 contentOffset.y에 따라 헤더가 슬라이드되며 사라지고 다시 나타난다.
-    // contentOffset.y == -headerHeight  → 헤더 완전 노출 (hide 0)
-    // contentOffset.y == 0              → 헤더 완전 사라짐 (hide headerHeight)
+    // pill은 sticky이므로 hide max = noticeArea (pill이 sticky 위치에 도달하면 멈춤).
+    // contentOffset.y == -noticeArea → 헤더 완전 노출 (hide 0)
+    // contentOffset.y == 0          → 공지 완전 사라짐, pill sticky 위치 (hide noticeArea)
+    // contentOffset.y >  0          → tableView 정상 스크롤, 헤더 transform 그대로 유지
     private func handleChildScroll(_ offset: CGFloat) {
-        let h = lastPropagatedHeaderHeight
-        guard h > 0 else { return }
-        let hide = max(0, min(h, offset + h))
+        let area = lastPropagatedNoticeArea
+        guard area > 0 else { return }
+        let hide = max(0, min(area, offset + area))
         guard abs(hide - currentHideAmount) > 0.5 else { return }
         currentHideAmount = hide
         applyHide(hide)
