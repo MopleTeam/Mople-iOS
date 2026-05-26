@@ -89,7 +89,14 @@ final class MeetReviewListViewController: BaseViewController, View {
         super.viewDidLoad()
         setupUI()
     }
-    
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 페이지 전환으로 다시 표시될 때 부모(MeetDetail)의 헤더 transform이 이전 자식의 상태로
+        // stale일 수 있다. 자기 contentOffset.y를 즉시 알려서 헤더 transform을 재계산하게 한다.
+        onScrollChange?(tableView.contentOffset.y)
+    }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         setHeaderView()
