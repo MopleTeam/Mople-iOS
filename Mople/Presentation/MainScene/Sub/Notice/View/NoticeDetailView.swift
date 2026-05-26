@@ -202,9 +202,17 @@ struct NoticeDetailView: View {
     }
 
     // DefaultTextView 박스: bgInput + cornerRadius 8 + 내부 padding (좌우 8, 상하 18)
-    // placeholder는 같은 padding으로 ZStack(topLeading) 겹쳐서 위치 일치
+    // TextEditor는 UIKit UITextView 기반이라 ChatingTextFieldView와 동일하게
+    // 줄바꿈/자동 높이 확장/초과 시 자체 스크롤 동작이 매칭됨.
+    // 높이는 minHeight(1줄) ~ maxHeight(4줄) 범위에서 콘텐츠에 맞춰 자동.
     private var inputBox: some View {
-        ZStack(alignment: .topLeading) {
+        // Body1.regular(=14pt) lineHeight ≈ 14 * 1.4 = 19.6pt 가정.
+        // ChatingTextFieldView의 maxTextLine 4 매핑 → 4줄까지 늘어나고 그 이상은 내부 스크롤.
+        let lineHeight: CGFloat = 20
+        let minHeight: CGFloat = lineHeight
+        let maxHeight: CGFloat = lineHeight * 4
+
+        return ZStack(alignment: .topLeading) {
             if viewModel.inputText.isEmpty {
                 Text("댓글을 입력해주세요")
                     .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
@@ -213,15 +221,17 @@ struct NoticeDetailView: View {
                     .padding(.vertical, 18)
                     .allowsHitTesting(false)
             }
-            TextField("", text: $viewModel.inputText, axis: .vertical)
+            TextEditor(text: $viewModel.inputText)
                 .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
                 .foregroundColor(Color(uiColor: .text01))
                 .tint(Color(uiColor: .text02))
                 .focused($inputFocused)
-                // ChatingTextFieldView의 maxTextLine = 4와 동일
-                .lineLimit(1...4)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 18)
+                .scrollContentBackground(.hidden)
+                .frame(minHeight: minHeight, maxHeight: maxHeight)
+                .fixedSize(horizontal: false, vertical: true)
+                // TextEditor 내부 inset(약 ~5pt)을 빼고 ChatingTextFieldView padding(8/18)에 맞춤
+                .padding(.horizontal, 3)
+                .padding(.vertical, 13)
         }
         .background(Color(uiColor: .bgInput))
         .cornerRadius(8)
