@@ -25,11 +25,12 @@ final class MeetDetailPillSegment: UIView {
     private let titles: [String]
     private var buttons: [UIButton] = []
 
-    // 선택된 알약 — 버튼 frame에 맞춰 슬라이드
+    // 선택된 알약 — 버튼 frame에 맞춰 슬라이드.
+    // button height = container(48) - padding(6+6) = 36 → cornerRadius 18 (capsule)
     private let selectedPill: UIView = {
         let v = UIView()
         v.backgroundColor = .appPrimary
-        v.layer.cornerRadius = 22
+        v.layer.cornerRadius = 18
         v.layer.makeShadow(opactity: 0.12, radius: 8, offset: .init(width: 0, height: 0))
         return v
     }()

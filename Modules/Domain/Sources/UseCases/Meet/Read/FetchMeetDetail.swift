@@ -31,7 +31,9 @@ public final class MockFetchMeetDetailUseCase: FetchMeetDetail {
     public func execute(meetId: Int) async throws -> Meet {
         print("✅ [Mock] 모임 상세 조회 - meetId: \(meetId)")
 
-        let mockPinnedNotice = PinnedNotice(
+        // meetId 짝수: 공지 있음 / 홀수: 공지 없음 → 모임장 작성 유도 툴팁 노출 케이스 둘 다 확인 가능
+        let hasNotice = meetId % 2 == 0
+        let mockPinnedNotice: PinnedNotice? = hasNotice ? PinnedNotice(
             noticeId: 1,
             version: 1,
             meetId: meetId,
@@ -39,7 +41,7 @@ public final class MockFetchMeetDetailUseCase: FetchMeetDetail {
             content: "11/28일 모임 18:00 → 20:00 변경 되었습니다. 날씨이슈로 인해서",
             isPinned: true,
             createdAt: Date()
-        )
+        ) : nil
 
         let mockMeet = Meet(
             isCreator: true,

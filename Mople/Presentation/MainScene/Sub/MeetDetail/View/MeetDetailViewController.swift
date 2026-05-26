@@ -51,22 +51,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         return dot
     }()
 
-    // 작성 유도 툴팁 (모임장 + 공지 없음 조건)
-    private let composeTooltipView: UIView = {
-        let v = UIView()
-        v.backgroundColor = .bgPrimary
-        v.layer.cornerRadius = 8
-        v.layer.makeShadow(opactity: 0.08, radius: 8, offset: .init(width: 0, height: 2))
+    // 작성 유도 툴팁 (모임장 + 공지 없음 조건). 위쪽에 삼각형 꼬리가 달린 말풍선.
+    private let composeTooltipView: TooltipBalloonView = {
+        let v = TooltipBalloonView(text: "공지를 작성해보세요.")
         v.isHidden = true
         return v
-    }()
-
-    private let composeTooltipLabel: UILabel = {
-        let label = UILabel()
-        label.text = "공지를 작성해보세요."
-        label.font = FontStyle.Body2.medium
-        label.textColor = .text02
-        return label
     }()
 
     // 공지 미리보기 카드
@@ -77,12 +66,13 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         titles: [L10n.Meetdetail.planlist, L10n.Meetdetail.reviwelist]
     )
 
-    // 공지 카드 wrapper. height constraint를 명시적으로 0/80 토글해서 가변 처리.
-    // isHidden / 자동 collapse 대신 명시적 height로 layout이 항상 명확하다.
-    // clipsToBounds = true로 height 0일 때 안쪽 컨텐츠를 시각적으로 클립.
+    // 공지 카드 wrapper. height constraint와 isHidden을 함께 토글해서 가변 처리.
+    // 기본은 isHidden = true / height = 0 → mock 도착 전에도 약속 탭이 sticky 위치(navi 아래 16)에 있음.
+    // pinnedNotice 도착 시 applyMeet에서 isHidden = false / height = 80으로 동시 전환.
     private let noticePreviewContainer: UIView = {
         let v = UIView()
         v.clipsToBounds = true
+        v.isHidden = true
         return v
     }()
     private var noticeHeightConstraint: Constraint?
@@ -173,6 +163,18 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         propagateHeaderInsetIfNeeded()
+        alignTooltipTailToMegaphone()
+    }
+
+    // tooltip의 trailing이 화면 우측 inset에 고정되어 있으므로, tail의 가로 위치를
+    // megaphoneButton의 centerX와 매칭시켜야 확성기를 정확히 가리킨다.
+    private func alignTooltipTailToMegaphone() {
+        guard composeTooltipView.bounds.width > 0 else { return }
+        let megaphoneCenter = megaphoneButton.convert(
+            CGPoint(x: megaphoneButton.bounds.midX, y: 0),
+            to: composeTooltipView
+        )
+        composeTooltipView.tailCenterX = megaphoneCenter.x
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -185,6 +187,10 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private func setupUI() {
         setupNavi()
         setLayout()
+        // setupNavi에서 add한 composeTooltipView가 setLayout에서 나중에 add된 contentView/addPlanButton에
+        // 가려지지 않도록 가장 앞으로 가져온다.
+        view.bringSubviewToFront(composeTooltipView)
+        composeTooltipView.layer.zPosition = 2
     }
 
     private func setLayout() {
@@ -247,15 +253,14 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             make.trailing.equalToSuperview().inset(8)
         }
 
-        // 작성 유도 툴팁 — 확성기 버튼 아래
-        composeTooltipView.addSubview(composeTooltipLabel)
-        composeTooltipLabel.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12))
-        }
+        // 작성 유도 툴팁 — 확성기 버튼 아래.
+        // 조건 1: 말풍선의 trailing = 확성기 trailing (오른쪽 끝이 확성기와 정렬)
+        // 조건 2: tail의 centerX = 확성기의 centerX (꼬리가 확성기 중앙을 가리킴)
+        //         → tail은 viewDidLayoutSubviews의 alignTooltipTailToMegaphone()에서 동적 설정
         view.addSubview(composeTooltipView)
         composeTooltipView.snp.makeConstraints { make in
             make.top.equalTo(megaphoneButton.snp.bottom).offset(4)
-            make.centerX.equalTo(megaphoneButton)
+            make.trailing.equalTo(megaphoneButton.snp.trailing)
         }
     }
 
@@ -415,9 +420,12 @@ extension MeetDetailViewController {
             noticePreviewView.configure(content: content)
         }
 
-        // 공지 카드 height 명시적 토글 — 가변은 이 한 값만, 0 ↔ 80
-        // layoutIfNeeded()로 즉시 layout 반영 → propagate 시점에 정확한 pillWrap frame 측정 보장
+        // 공지 카드 토글:
+        //   isHidden: UIStackView가 자동 collapse — 자식 + 인접 spacing이 함께 빠짐
+        //            → 약속 탭이 navi 바로 아래(layoutMargin.top 16만)에 위치
+        //   height : 명시적 안전망 (isHidden 처리 외 상황에서도 layout 명확)
         let targetHeight: CGFloat = hasNotice ? 80 : 0
+        noticePreviewContainer.isHidden = !hasNotice
         noticeHeightConstraint?.update(offset: targetHeight)
         view.layoutIfNeeded()
         propagateHeaderInsetIfNeeded()
