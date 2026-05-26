@@ -77,18 +77,22 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         titles: [L10n.Meetdetail.planlist, L10n.Meetdetail.reviwelist]
     )
 
-    // 공지 카드를 20pt 좌우 인셋으로 감싸는 wrapper (UIStackView가 width를 full로 강제하므로 필요)
-    private let noticePreviewContainer = UIView()
+    // 공지 카드 wrapper. height constraint를 명시적으로 0/80 토글해서 가변 처리.
+    // isHidden / 자동 collapse 대신 명시적 height로 layout이 항상 명확하다.
+    // clipsToBounds = true로 height 0일 때 안쪽 컨텐츠를 시각적으로 클립.
+    private let noticePreviewContainer: UIView = {
+        let v = UIView()
+        v.clipsToBounds = true
+        return v
+    }()
+    private var noticeHeightConstraint: Constraint?
 
-    // pill을 감싸는 wrapper. frame.minY를 측정해서 "공지 영역(transform 대상)"의 크기를 알아낸다.
+    // pill을 감싸는 wrapper. frame.maxY/minY를 측정해서 inset과 hideMax를 계산.
     private let pillWrap = UIView()
 
     // 공지 + pill을 하나의 헤더 단위로 묶음. 자식 스크롤 시 transform으로 위로 슬라이드.
-    // transform max는 pillWrap.frame.minY로 제한 — pill이 sticky 위치(navi 아래 16pt)에 도달하면 멈춘다.
-    // 공지가 없을 때는 noticePreviewContainer가 isHidden 처리되어 UIStackView가 자동 collapse,
-    // pillWrap.frame.minY도 같이 줄어들어 hide max가 자동 조정된다.
-    // PassThroughStackView로 만들어서 자체 영역의 hit는 통과시키고, 자식 view(공지 카드/pill)만 터치를 받게 한다.
-    // → 헤더 overlay 영역에서도 swipe가 그 아래 tableView로 전달됨.
+    // 공지 height가 0(기본)이면 wrapper도 0, 80이면 80 — 그에 따라 pillWrap.minY/maxY가 자동 변동.
+    // PassThroughStackView로 만들어서 자체 영역의 hit는 통과시키고, 자식 view만 터치를 받게 한다.
     private lazy var headerContainer: PassThroughStackView = {
         pillWrap.addSubview(pillSegment)
         pillSegment.snp.makeConstraints { make in
@@ -100,9 +104,13 @@ final class MeetDetailViewController: TitleNaviViewController, View {
 
         noticePreviewContainer.addSubview(noticePreviewView)
         noticePreviewView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(20)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(80)
+        }
+        noticePreviewContainer.snp.makeConstraints { make in
+            self.noticeHeightConstraint = make.height.equalTo(0).constraint
         }
 
         let sv = PassThroughStackView(arrangedSubviews: [noticePreviewContainer, pillWrap])
@@ -194,9 +202,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             make.horizontalEdges.bottom.equalToSuperview()
         }
 
-        // 헤더 (공지 미리보기 + pill 세그먼트) — 기본은 공지 hidden 상태로 시작
-        noticePreviewContainer.isHidden = true
-
+        // 헤더 (공지 미리보기 + pill 세그먼트) — 공지 height는 기본 0 (constraint로 처리)
         headerContainer.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
@@ -405,12 +411,16 @@ extension MeetDetailViewController {
         let pinned = meet.pinnedNotice
         let hasNotice = pinned != nil
 
-        // 공지 미리보기 카드 (UIStackView가 isHidden 자동 collapse → 헤더 높이도 함께 변동)
-        noticePreviewContainer.isHidden = !hasNotice
-        noticePreviewView.isHidden = !hasNotice
         if let content = pinned?.content {
             noticePreviewView.configure(content: content)
         }
+
+        // 공지 카드 height 명시적 토글 — 가변은 이 한 값만, 0 ↔ 80
+        // layoutIfNeeded()로 즉시 layout 반영 → propagate 시점에 정확한 pillWrap frame 측정 보장
+        let targetHeight: CGFloat = hasNotice ? 80 : 0
+        noticeHeightConstraint?.update(offset: targetHeight)
+        view.layoutIfNeeded()
+        propagateHeaderInsetIfNeeded()
 
         // 헤더 높이가 바뀔 수 있으므로 sticky 상태도 재계산
         applyHide(currentHideAmount)
