@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 import Domain
 import Data
 
@@ -38,21 +39,32 @@ final class NoticeSceneDIContainer: BaseContainer, NoticeSceneDependencies {
     }
 }
 
-// MARK: - View Factories
+// MARK: - View Factories (SwiftUI + UIHostingController)
 extension NoticeSceneDIContainer {
 
+    @MainActor
     func makeNoticeListViewController(meetId: Int,
                                       isCreator: Bool,
                                       coordinator: NoticeFlowCoordination) -> UIViewController {
-        // 작성 진입점 연결은 본 구현 시 NoticeListViewReactor에 coordinator를 주입하는 방식으로 확장.
-        return NoticeListViewController(meetId: meetId, isCreator: isCreator)
+        let view = NoticeListView(
+            meetId: meetId,
+            isCreator: isCreator,
+            onComposeTap: { [weak coordinator] in
+                coordinator?.pushComposeView()
+            }
+        )
+        return UIHostingController(rootView: view)
     }
 
+    @MainActor
     func makeNoticeDetailViewController(noticeId: Int) -> UIViewController {
-        return NoticeDetailViewController(noticeId: noticeId)
+        let view = NoticeDetailView(noticeId: noticeId)
+        return UIHostingController(rootView: view)
     }
 
+    @MainActor
     func makeNoticeComposeViewController(meetId: Int) -> UIViewController {
-        return NoticeComposeViewController(meetId: meetId)
+        let view = NoticeComposeView(meetId: meetId)
+        return UIHostingController(rootView: view)
     }
 }
