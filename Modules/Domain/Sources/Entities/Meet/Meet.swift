@@ -15,7 +15,7 @@ public struct Meet {
     public let memberCount: Int?
     public let firstPlanDate: Date?
     public let version: Int?
-    public let pinnedNotice: PinnedNotice?
+    public let pinnedNotice: Notice?
 
     public init(isCreator: Bool = false,
                 meetSummary: MeetSummary? = nil,
@@ -24,7 +24,7 @@ public struct Meet {
                 memberCount: Int? = nil,
                 firstPlanDate: Date? = nil,
                 version: Int? = nil,
-                pinnedNotice: PinnedNotice? = nil) {
+                pinnedNotice: Notice? = nil) {
         self.isCreator = isCreator
         self.meetSummary = meetSummary
         self.sinceDays = sinceDays

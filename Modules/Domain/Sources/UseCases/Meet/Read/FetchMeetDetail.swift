@@ -33,7 +33,7 @@ public final class MockFetchMeetDetailUseCase: FetchMeetDetail {
 
         // meetId 짝수: 공지 있음 / 홀수: 공지 없음 → 모임장 작성 유도 툴팁 노출 케이스 둘 다 확인 가능
         let hasNotice = meetId % 2 == 0
-        let mockPinnedNotice: PinnedNotice? = hasNotice ? PinnedNotice(
+        let mockPinnedNotice: Notice? = hasNotice ? Notice(
             noticeId: 1,
             version: 1,
             meetId: meetId,

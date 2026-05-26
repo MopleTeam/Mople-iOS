@@ -17,7 +17,7 @@ struct MeetResponse: Decodable {
     let hostId: Int?
     let memberCount: Int?
     let lastPlanDay: String?
-    let pinnedNotice: PinnedNoticeResponse?
+    let pinnedNotice: NoticeResponse?
 }
 
 extension MeetResponse {

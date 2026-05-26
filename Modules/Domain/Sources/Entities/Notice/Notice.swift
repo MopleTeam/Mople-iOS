@@ -1,5 +1,5 @@
 //
-//  PinnedNotice.swift
+//  Notice.swift
 //  Domain
 //
 //  Created by CatSlave on 5/26/26.
@@ -7,8 +7,9 @@
 
 import Foundation
 
-// MeetDetail 응답에 포함되는 상단 고정 공지. nil이면 표시할 공지 없음.
-public struct PinnedNotice {
+// 모임 공지. MeetDetail 응답의 pinnedNotice, Notice 리스트 응답의 셀, 공지 상세 모두 같은 구조.
+// isPinned 플래그로 고정 여부 표현.
+public struct Notice: Hashable {
     public let noticeId: Int?
     public let version: Int?
     public let meetId: Int?

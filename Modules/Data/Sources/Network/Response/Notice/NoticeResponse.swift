@@ -1,15 +1,17 @@
 //
-//  PinnedNoticeResponse.swift
+//  NoticeResponse.swift
 //  Data
 //
 //  Created by CatSlave on 5/26/26.
+//
+//  서버 NoticeClientResponse — 공지 객체 단일 표현.
+//  MeetDetail 응답의 pinnedNotice 중첩 + 공지 리스트/상세 응답 모두 같은 구조.
 //
 
 import Foundation
 import Domain
 
-// MeetDetail 응답에 nested로 포함되는 고정 공지 DTO
-struct PinnedNoticeResponse: Decodable {
+struct NoticeResponse: Decodable {
     let noticeId: Int?
     let version: Int?
     let meetId: Int?
@@ -19,8 +21,8 @@ struct PinnedNoticeResponse: Decodable {
     let createdAt: String?
 }
 
-extension PinnedNoticeResponse {
-    func toDomain() -> PinnedNotice {
+extension NoticeResponse {
+    func toDomain() -> Notice {
         return .init(
             noticeId: noticeId,
             version: version,
