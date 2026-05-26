@@ -77,6 +77,41 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         titles: [L10n.Meetdetail.planlist, L10n.Meetdetail.reviwelist]
     )
 
+    // 공지 카드를 20pt 좌우 인셋으로 감싸는 wrapper (UIStackView가 width를 full로 강제하므로 필요)
+    private let noticePreviewContainer = UIView()
+
+    // 공지 + pill을 하나의 헤더 단위로 묶음. 자식 스크롤 시 transform으로 위로 슬라이드해 사라지고 다시 나타남.
+    // 공지가 없을 때는 noticePreviewContainer가 isHidden 처리되어 UIStackView가 자동 collapse.
+    private lazy var headerContainer: UIStackView = {
+        let pillWrap = UIView()
+        pillWrap.addSubview(pillSegment)
+        pillSegment.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+            make.width.equalTo(200)
+            make.height.equalTo(48)
+        }
+
+        noticePreviewContainer.addSubview(noticePreviewView)
+        noticePreviewView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.height.equalTo(80)
+        }
+
+        let sv = UIStackView(arrangedSubviews: [noticePreviewContainer, pillWrap])
+        sv.axis = .vertical
+        sv.alignment = .fill
+        sv.spacing = 16
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.layoutMargins = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
+        return sv
+    }()
+
+    // 자식 스크롤 시 헤더가 사라질 수 있는 최대 거리 (= 헤더 전체 높이)
+    private var headerMaxHide: CGFloat { headerContainer.bounds.height }
+    private var currentHideAmount: CGFloat = 0
+
     // 일정/리뷰 페이지 영역
     private(set) var pageController: UIPageViewController = {
         let pageVC = UIPageViewController(transitionStyle: .scroll,
@@ -125,8 +160,7 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         view.addSubview(contentView)
         view.addSubview(addPlanButton)
 
-        contentView.addSubview(noticePreviewView)
-        contentView.addSubview(pillSegment)
+        contentView.addSubview(headerContainer)
         contentView.addSubview(pageController.view)
 
         contentView.snp.makeConstraints { make in
@@ -134,23 +168,16 @@ final class MeetDetailViewController: TitleNaviViewController, View {
             make.horizontalEdges.bottom.equalToSuperview()
         }
 
-        // 공지 미리보기 카드 — 기본 hidden, pinnedNotice 존재 시만 표시
-        noticePreviewView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.height.equalTo(80)
-        }
-        noticePreviewView.isHidden = true
+        // 헤더 (공지 미리보기 + pill 세그먼트) — 기본은 공지 hidden 상태로 시작
+        noticePreviewContainer.isHidden = true
 
-        pillSegment.snp.makeConstraints { make in
-            make.top.equalTo(noticePreviewView.snp.bottom).offset(16)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(200)
-            make.height.equalTo(48)
+        headerContainer.snp.makeConstraints { make in
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
         }
 
         pageController.view.snp.makeConstraints { make in
-            make.top.equalTo(pillSegment.snp.bottom).offset(16)
+            make.top.equalTo(headerContainer.snp.bottom)
             make.horizontalEdges.bottom.equalToSuperview()
         }
 
@@ -352,17 +379,53 @@ extension MeetDetailViewController {
         let pinned = meet.pinnedNotice
         let hasNotice = pinned != nil
 
-        // 공지 미리보기 카드
+        // 공지 미리보기 카드 (UIStackView가 isHidden 자동 collapse → 헤더 높이도 함께 변동)
+        noticePreviewContainer.isHidden = !hasNotice
         noticePreviewView.isHidden = !hasNotice
         if let content = pinned?.content {
             noticePreviewView.configure(content: content)
         }
+
+        // 헤더 높이가 바뀔 수 있으므로 sticky 상태도 재계산
+        applyHide(currentHideAmount)
 
         // 확성기 파란 점 배지
         megaphoneBadge.isHidden = !hasNotice
 
         // 모임장 + 공지 없음 → 작성 유도 툴팁
         composeTooltipView.isHidden = !(meet.isCreator && !hasNotice)
+    }
+
+    // MARK: - Sticky Header
+    // Coordinator가 page child VC들을 생성한 직후 wire-up. 두 자식 모두 같은 콜백으로 묶어
+    // 헤더 transform이 한 곳에서만 변하도록 한다.
+    func attachChildScrollObservers(_ children: UIViewController...) {
+        for child in children {
+            if let plan = child as? MeetPlanListViewController {
+                plan.onScrollChange = { [weak self] offset in
+                    self?.handleChildScroll(offset)
+                }
+            } else if let review = child as? MeetReviewListViewController {
+                review.onScrollChange = { [weak self] offset in
+                    self?.handleChildScroll(offset)
+                }
+            }
+        }
+    }
+
+    // 자식 VC(MeetPlanListVC / MeetReviewListVC)가 emit하는 contentOffset.y를 받아
+    // 헤더가 위로 슬라이드되며 사라지고, 아래로 당기면 다시 나타나는 동작을 만든다.
+    private func handleChildScroll(_ offset: CGFloat) {
+        let clamped = max(0, min(headerMaxHide, offset))
+        guard abs(clamped - currentHideAmount) > 0.5 else { return }
+        currentHideAmount = clamped
+        applyHide(clamped)
+    }
+
+    private func applyHide(_ amount: CGFloat) {
+        let translate = CGAffineTransform(translationX: 0, y: -amount)
+        headerContainer.transform = translate
+        pageController.view.transform = translate
     }
 
     // MARK: - 에러 핸들링

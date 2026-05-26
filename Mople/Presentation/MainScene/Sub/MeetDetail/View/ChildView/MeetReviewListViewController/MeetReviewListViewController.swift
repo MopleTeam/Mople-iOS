@@ -25,6 +25,9 @@ final class MeetReviewListViewController: BaseViewController, View {
     // MARK: - Variables
     private var hasAppeared: Bool = false
     private var isSetEdgeGesture: Bool = false
+
+    // 부모(MeetDetail)가 자식 스크롤을 추적해 헤더 sticky/hide를 처리할 수 있게 노출
+    var onScrollChange: ((CGFloat) -> Void)?
     
     // MARK: - UI Components
     private lazy var countView: CountView = {
@@ -192,6 +195,9 @@ extension MeetReviewListViewController: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // 부모 헤더 sticky/hide 처리용 offset 전달
+        onScrollChange?(scrollView.contentOffset.y)
+
         guard scrollView.isBottom(threshold: 50),
               reactor?.page?.hasNext == true else { return }
         nextPage.onNext(())

@@ -53,6 +53,11 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
         reviewListVC = dependencies.makeMeetReviewListViewController()
         detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
         detailMeetVC?.configureEdgeGesture()
+
+        // sticky 헤더 — 자식 스크롤을 부모로 전달
+        if let plan = planListVC, let review = reviewListVC {
+            detailMeetVC?.attachChildScrollObservers(plan, review)
+        }
     }
 }
 
