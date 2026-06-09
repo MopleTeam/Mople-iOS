@@ -5,7 +5,7 @@ import ProjectDescription
 
 // MARK: - 공통 설정
 
-let marketingVersion = "1.3.0"
+let marketingVersion = "1.4.0"
 let currentProjectVersion = "8"
 let developmentTeam = "LNXWGGBBH6"
 let deploymentTarget: DeploymentTargets = .iOS("17.6")
