@@ -21,9 +21,9 @@ default_platform(:ios)
 # → 2FA 없이 자동화 가능, CI/CD 필수
 # ──────────────────────────────────────────────
 API_KEY = app_store_connect_api_key(
-  key_id: "9GV3U3P562",
+  key_id: "4AD2MCFFH2",
   issuer_id: "077a4d64-9ada-4316-9cf8-45e9b944ba64",
-  key_filepath: File.join(Dir.home, "Desktop/Task/Develop/Swift/CICD/Release/AuthKey_9GV3U3P562.p8"),
+  key_filepath: File.join(Dir.home, "Desktop/Task/Develop/Swift/CICD/Release/AuthKey_4AD2MCFFH2.p8"),
   in_house: false
 )
 
