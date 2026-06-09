@@ -112,6 +112,7 @@ platform :ios do
     # 3) App Store 업로드 (심사 제출은 수동)
     upload_to_app_store(
       api_key: API_KEY,
+      app_identifier: "com.moim.moimtable",  # 프로덕션 앱 명시 (Appfile 기본값=dev 방지)
       skip_metadata: true,
       skip_screenshots: true,
       precheck_include_in_app_purchases: false
@@ -198,6 +199,7 @@ platform :ios do
 
     upload_to_app_store(
       api_key: API_KEY,
+      app_identifier: "com.moim.moimtable",  # 프로덕션 앱 명시 (Appfile 기본값=dev 방지)
       skip_metadata: !submit,              # 심사 제출 시에만 메타데이터 포함
       skip_screenshots: true,
       submit_for_review: submit,            # submit:true 시 심사 자동 제출
