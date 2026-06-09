@@ -279,6 +279,9 @@ let mopleTarget: Target = .target(
             .release(name: "Release", settings: [
                 "PRODUCT_BUNDLE_IDENTIFIER": "com.moim.moimtable",
                 "CODE_SIGN_STYLE": "Manual",
+                // Tuist 전환 시 누락된 Manual 서명 지정 (App Store 배포 archive용)
+                "CODE_SIGN_IDENTITY": "Apple Distribution",
+                "PROVISIONING_PROFILE_SPECIFIER": "Mople Distribution",
                 "API_BASE_URL": "https://prod.2erod.com",
                 "MAIN_SCHEME": "mople",
                 "KAKAO_NATIVE_APP_KEY": "72b95832d0237fce2c5c7eb82d4a6a7a",
