@@ -269,7 +269,7 @@ let mopleTarget: Target = .target(
                 "PRODUCT_BUNDLE_IDENTIFIER": "com.moim.moimtable.dev",
                 "CODE_SIGN_STYLE": "Automatic",
                 "OTHER_SWIFT_FLAGS": "-DDEV",
-                "API_BASE_URL": "https://dev.zerod.store",
+                "API_BASE_URL": "https://dev.2erod.com",
                 "MAIN_SCHEME": "mopledev",
                 "KAKAO_NATIVE_APP_KEY": "0fcc3c29ae8669444767451bb1e89e7e",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon-Dev",
@@ -279,7 +279,7 @@ let mopleTarget: Target = .target(
             .release(name: "Release", settings: [
                 "PRODUCT_BUNDLE_IDENTIFIER": "com.moim.moimtable",
                 "CODE_SIGN_STYLE": "Manual",
-                "API_BASE_URL": "https://prod.zerod.store",
+                "API_BASE_URL": "https://prod.2erod.com",
                 "MAIN_SCHEME": "mople",
                 "KAKAO_NATIVE_APP_KEY": "72b95832d0237fce2c5c7eb82d4a6a7a",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
