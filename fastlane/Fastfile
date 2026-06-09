@@ -200,6 +200,7 @@ platform :ios do
     upload_to_app_store(
       api_key: API_KEY,
       app_identifier: "com.moim.moimtable",  # 프로덕션 앱 명시 (Appfile 기본값=dev 방지)
+      force: true,                          # 비대화형 실행: 메타데이터 확인 프롬프트 건너뜀
       skip_metadata: !submit,              # 심사 제출 시에만 메타데이터 포함
       skip_screenshots: true,
       submit_for_review: submit,            # submit:true 시 심사 자동 제출
