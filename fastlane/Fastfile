@@ -43,12 +43,12 @@ platform :ios do
       ) + 1
     )
 
-    # 2) Mople Dev 스킴으로 빌드
+    # 2) Mople Dev 빌드 (Tuist 전환 후: 단일 "Mople" 스킴 + Debug = Dev 서버)
     notification(title: "📦 TestFlight", message: "[2/3] 빌드 시작... (약 2~3분)")
     build_app(
-      project: "Mople.xcodeproj",
-      scheme: "Mople Dev",
-      configuration: "Release",
+      workspace: "Mople.xcworkspace",
+      scheme: "Mople",
+      configuration: "Debug",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
@@ -94,7 +94,7 @@ platform :ios do
 
     # 2) Mople 프로덕션 스킴으로 빌드 (Release 설정)
     build_app(
-      project: "Mople.xcodeproj",
+      workspace: "Mople.xcworkspace",
       scheme: "Mople",
       configuration: "Release",
       clean: true,
@@ -177,7 +177,7 @@ platform :ios do
 
     # 6) Mople 프로덕션 빌드
     build_app(
-      project: "Mople.xcodeproj",
+      workspace: "Mople.xcworkspace",
       scheme: "Mople",
       configuration: "Release",
       clean: true,
@@ -224,9 +224,9 @@ platform :ios do
   desc "빌드만 수행 (업로드 없음, PR 검증용)"
   lane :build_only do
     build_app(
-      project: "Mople.xcodeproj",
-      scheme: "Mople Dev",
-      configuration: "Release",
+      workspace: "Mople.xcworkspace",
+      scheme: "Mople",
+      configuration: "Debug",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
