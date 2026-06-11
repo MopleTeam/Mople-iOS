@@ -23,11 +23,14 @@ protocol ViewDependencies {
 }
 
 final class ViewDIContainer: ViewDependencies {
-    
+
     private let appNetworkService: AppNetworkService
-    
-    init(appNetworkService: AppNetworkService) {
+    private let userSession: UserSessionProvider
+
+    init(appNetworkService: AppNetworkService,
+         userSession: UserSessionProvider) {
         self.appNetworkService = appNetworkService
+        self.userSession = userSession
     }
 }
 
@@ -77,17 +80,17 @@ extension ViewDIContainer {
 
     private func makeCreateMeetUseCase(repo: MeetRepo) -> CreateMeet {
         #if DEV
-        return MockDataManager.resolve(CreateMeetUseCase(createMeetRepo: repo) as CreateMeet, mock: MockCreateMeetUseCase())
+        return MockDataManager.resolve(CreateMeetUseCase(createMeetRepo: repo, session: userSession) as CreateMeet, mock: MockCreateMeetUseCase())
         #else
-        return CreateMeetUseCase(createMeetRepo: repo)
+        return CreateMeetUseCase(createMeetRepo: repo, session: userSession)
         #endif
     }
 
     private func makeEditMeetUseCase(repo: MeetRepo) -> EditMeet {
         #if DEV
-        return MockDataManager.resolve(EditMeetUseCase(repo: repo) as EditMeet, mock: MockEditMeetUseCase())
+        return MockDataManager.resolve(EditMeetUseCase(repo: repo, session: userSession) as EditMeet, mock: MockEditMeetUseCase())
         #else
-        return EditMeetUseCase(repo: repo)
+        return EditMeetUseCase(repo: repo, session: userSession)
         #endif
     }
     
