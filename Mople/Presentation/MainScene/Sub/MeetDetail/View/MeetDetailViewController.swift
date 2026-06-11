@@ -359,6 +359,12 @@ extension MeetDetailViewController {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
+        // 공지 핀 토글 알림 → 모임상세 pinnedNotice 갱신
+        NotificationManager.shared.addNoticeObservable()
+            .map { Reactor.Action.applyNotice($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
         NotificationManager.shared.addObservable(name: .midnightUpdate)
             .map { _ in Reactor.Action.refresh }
             .bind(to: reactor.action)
@@ -446,11 +452,17 @@ extension MeetDetailViewController {
         // 헤더 높이가 바뀔 수 있으므로 sticky 상태도 재계산
         applyHide(currentHideAmount)
 
-        // 확성기 파란 점 배지
-        megaphoneBadge.isHidden = !hasNotice
+        // 확성기 파란 점 배지 — 향후 개발 예정 (서버에 unread 신호가 들어오면 활성화)
+        megaphoneBadge.isHidden = true
 
         // 모임장 + 공지 없음 → 작성 유도 툴팁
-        composeTooltipView.isHidden = !(meet.isCreator && !hasNotice)
+        // 단 모임별로 "첫 진입 1회"만 표시 (UserDefaults에 seen 플래그 기록).
+        let shouldShowTooltip = meet.isCreator && !hasNotice
+            && !NoticeTooltipMemory.hasSeen(meetId: meet.meetSummary?.id)
+        composeTooltipView.isHidden = !shouldShowTooltip
+        if shouldShowTooltip {
+            NoticeTooltipMemory.markSeen(meetId: meet.meetSummary?.id)
+        }
     }
 
     // MARK: - Sticky Header

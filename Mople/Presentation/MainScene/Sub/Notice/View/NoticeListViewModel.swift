@@ -152,7 +152,7 @@ final class NoticeListViewModel: ObservableObject {
                 )
                 if let idx = self.notices.firstIndex(where: { $0.noticeId == updated.noticeId }) {
                     let existing = self.notices[idx]
-                    self.notices[idx] = Notice(
+                    let merged = Notice(
                         noticeId: existing.noticeId,
                         version: updated.version ?? existing.version,
                         meetId: existing.meetId,
@@ -161,6 +161,9 @@ final class NoticeListViewModel: ObservableObject {
                         isPinned: updated.isPinned,
                         createdAt: existing.createdAt
                     )
+                    self.notices[idx] = merged
+                    // 모임상세 화면이 구독해서 pinnedNotice를 갱신할 수 있도록 알림 발행
+                    NotificationManager.shared.postItem(NoticePayload.updated(merged), from: self)
                 }
             } catch {
                 self.errorMessage = error.localizedDescription
