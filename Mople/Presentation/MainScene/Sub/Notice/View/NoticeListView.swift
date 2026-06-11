@@ -35,9 +35,10 @@ struct NoticeListView: View {
                              trailing: {
             if viewModel.isCreator {
                 Button(action: { viewModel.tapCompose() }) {
-                    Image(systemName: "square.and.pencil")
-                        .font(.system(size: 20, weight: .regular))
-                        .foregroundColor(Color(uiColor: .text01))
+                    Image(.pencil)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
                 }
                 .frame(width: 40, height: 40)
             }
@@ -107,10 +108,15 @@ struct NoticeListView: View {
                                 Button {
                                     viewModel.togglePin(notice)
                                 } label: {
+                                    // 라벨에 직접 .doAnchor를 못 받아서 systemImage placeholder를 두고
+                                    // tint로 배경색만 분기. (실제 이미지는 placeholder가 보임)
+                                    // 정확한 .doAnchor 이미지 + 배경색 적용을 위해 Label 대신 VStack 사용 가능하지만,
+                                    // SwiftUI .swipeActions는 systemImage만 정식 지원이라 placeholder 유지 + tint 분기.
                                     Label(notice.isPinned ? "고정해제" : "고정",
-                                          systemImage: "pin.fill")
+                                          image: ImageResource.doAnchor)
                                 }
-                                .tint(Color(uiColor: .appPrimary))
+                                // 고정 요청 시 .appPrimary, 해제 시 .appRed
+                                .tint(notice.isPinned ? Color(uiColor: .appRed) : Color(uiColor: .appPrimary))
                             }
                         }
                 }
@@ -125,21 +131,53 @@ struct NoticeListView: View {
     }
 }
 
-// MARK: - Row (피그마 4154-3802 기준)
-// 흰 배경 + 하단 hairline. 모임장은 leading swipe로 파란 핀 버튼이 드러난다.
+// MARK: - Row (피그마 4206-3611 기준)
+// 흰 배경 + 하단 hairline.
+// 좌측 아이콘 구성:
+//   - 고정(pinned) 공지: anchor(24×24) + 타입 아이콘
+//   - 그 외: 타입 아이콘만
+// 타입 아이콘: .custom → megaphone, .system → system
+// 모임장은 leading swipe로 핀 토글 가능.
 private struct NoticeListRow: View {
     let notice: Notice
 
     var body: some View {
-        textColumn
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(uiColor: .bgPrimary))
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(Color(uiColor: .appStroke))
-                    .frame(height: 1)
-            }
+        HStack(alignment: .center, spacing: 0) {
+            leadingIcons
+            textColumn
+                .padding(.leading, 8)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(uiColor: .bgPrimary))
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color(uiColor: .appStroke))
+                .frame(height: 1)
+        }
+    }
+
+    @ViewBuilder
+    private var leadingIcons: some View {
+        if notice.isPinned {
+            Image(.anchor)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+        }
+        Image(typeIconResource)
+            .resizable()
+            .scaledToFit()
+            // 피그마: 24 컨테이너에 20 아이콘
+            .frame(width: 20, height: 20)
+            .frame(width: 24, height: 24)
+    }
+
+    private var typeIconResource: ImageResource {
+        switch notice.type {
+        case .system: return .system
+        case .custom, .none: return .megaphone
+        }
     }
 
     private var textColumn: some View {

@@ -34,11 +34,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private let naviTitleView = MeetDetailNaviTitleView()
 
     // 네비 우측 확성기 버튼 (rightButton(햄버거) 왼쪽에 배치)
+    // SF Symbol에서 디자이너가 export한 .meetMegaphone 에셋으로 교체
     private let megaphoneButton: UIButton = {
         let btn = UIButton()
-        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
-        btn.setImage(UIImage(systemName: "megaphone.fill", withConfiguration: config), for: .normal)
-        btn.tintColor = .text01
+        btn.setImage(.meetMegaphone, for: .normal)
+        btn.imageView?.contentMode = .scaleAspectFit
         return btn
     }()
 
