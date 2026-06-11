@@ -134,7 +134,13 @@ final class NoticeListViewModel: ObservableObject {
     }
 
     // MARK: - Pin Toggle
-    // 모임장이 swipe action으로 호출. 응답 받은 Notice로 로컬 상태 교체.
+    // 모임장이 swipe action으로 호출.
+    // togglePin은 의미상 isPinned/version 외 필드(type/content/createdAt 등)를 바꾸지 않으므로
+    // 응답을 통째로 덮어쓰지 않고 기존 Notice에 isPinned/version만 머지한다.
+    // 이렇게 하면:
+    //  - Mock UseCase가 type을 항상 .custom으로 반환하는 한계를 회피
+    //  - 실제 서버 응답이 일부 필드를 누락해도 안전
+    //  - 의미상 옳음(토글 액션의 책임 범위 밖 필드는 건드리지 않음)
     func togglePin(_ notice: Notice) {
         guard isCreator, let noticeId = notice.noticeId else { return }
         Task { [weak self] in
@@ -145,7 +151,16 @@ final class NoticeListViewModel: ObservableObject {
                     isCurrentlyPinned: notice.isPinned
                 )
                 if let idx = self.notices.firstIndex(where: { $0.noticeId == updated.noticeId }) {
-                    self.notices[idx] = updated
+                    let existing = self.notices[idx]
+                    self.notices[idx] = Notice(
+                        noticeId: existing.noticeId,
+                        version: updated.version ?? existing.version,
+                        meetId: existing.meetId,
+                        type: existing.type,
+                        content: existing.content,
+                        isPinned: updated.isPinned,
+                        createdAt: existing.createdAt
+                    )
                 }
             } catch {
                 self.errorMessage = error.localizedDescription
