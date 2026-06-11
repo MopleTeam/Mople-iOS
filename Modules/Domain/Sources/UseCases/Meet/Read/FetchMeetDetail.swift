@@ -14,13 +14,26 @@ public protocol FetchMeetDetail {
 public final class FetchMeetDetailUseCase: FetchMeetDetail {
 
     private let repo: MeetRepo
+    private let session: UserSessionProvider
 
-    public init(repo: MeetRepo) {
+    public init(repo: MeetRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     public func execute(meetId: Int) async throws -> Meet {
-        return try await repo.fetchMeetDetail(meetId: meetId)
+        var meet = try await repo.fetchMeetDetail(meetId: meetId)
+        verifyCreator(with: &meet)
+        return meet
+    }
+
+    // 서버 MeetResponse엔 isCreator 필드가 없어 default false로 들어온다.
+    // FetchMeetPage와 동일한 패턴으로 currentUserId와 creatorId를 비교해 isCreator를 채움.
+    // 이 호출이 빠지면 모임장이어도 isCreator=false로 남아 작성 툴팁/연필 버튼 등 모임장 전용 UI가 노출되지 않는다.
+    private func verifyCreator(with meet: inout Meet) {
+        guard let ownerId = meet.creatorId,
+              session.currentUserId == ownerId else { return }
+        meet.isCreator = true
     }
 }
 

@@ -38,7 +38,6 @@ struct NoticeListView: View {
                     Image(.pencil)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 24, height: 24)
                 }
                 .frame(width: 40, height: 40)
             }
