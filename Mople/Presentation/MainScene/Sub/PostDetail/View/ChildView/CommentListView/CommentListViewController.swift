@@ -55,6 +55,8 @@ final class CommentListViewController: TitleNaviViewController, View, ScrollKeyb
     private let fetchComment: PublishSubject<Int> = .init()
     private let fetchNextPage: PublishSubject<Void> = .init()
     private let reply: PublishSubject<Comment> = .init()
+    private let updateReplyCount: PublishSubject<(parentId: Int, increment: Bool)> = .init()
+    private let updateParentComment: PublishSubject<Comment> = .init()
 
     
     // MARK: - UI Components
@@ -328,13 +330,35 @@ extension CommentListViewController {
             .compactMap({ $0 })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        // 답글 페이지는 자체 새로고침 바인딩이 필요하다.
+        // (메인 댓글 리스트의 당김 새로고침은 PostDetail이 처리하므로 child 타입에서만 바인딩)
+        if case .child = reactor.type {
+            self.rx.refresh
+                .map { Reactor.Action.refresh }
+                .bind(to: reactor.action)
+                .disposed(by: disposeBag)
+        }
+
+        updateReplyCount
+            .map { Reactor.Action.updateReplyCount(parentId: $0.parentId,
+                                                   increment: $0.increment) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        updateParentComment
+            .map { Reactor.Action.updateParentComment($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
         writeComment
             .observe(on: MainScheduler.asyncInstance)
             .compactMap({ self.handleWriteComment(text: $0.text,
                                         mentionIds: $0.mentionIds) })
-            .do(onNext: { _ in
-                self.changeWriteMode(.basic)
+            .do(onNext: { [weak self] _ in
+                self?.changeWriteMode(.basic)
+                // 댓글 전송 후 입력창에서 포커스를 해제해 키보드를 내린다.
+                self?.chatingTextFieldView.textView.rx.isResign.onNext(true)
             })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -437,12 +461,23 @@ extension CommentListViewController {
             }
             .disposed(by: disposeBag)
         
+        // 부모 댓글 목록 조회/새로고침 시 메인 카운트를 부모 댓글 수로 동기화 (대댓글 제외)
+        reactor.pulse(\.$commentCount)
+            .asDriver(onErrorJustReturn: nil)
+            .compactMap({ $0 })
+            .drive(with: self, onNext: { vc, count in
+                vc.totalCount = count
+                vc.updateHeaderCount()
+            })
+            .disposed(by: disposeBag)
+
         // 댓글 추가/삭제 시 총 댓글 수 업데이트
         reactor.pulse(\.$adjustCommentCount)
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, increment in
                 vc.totalCount += increment ? 1 : -1
+                vc.updateHeaderCount()
             })
             .disposed(by: disposeBag)
 
@@ -586,9 +621,25 @@ extension CommentListViewController {
         guard let commentsCount = reactor?.currentState.comments.count else { return false }
         return commentsCount == (index + 1)
     }
+
+    /// 섹션 헤더의 댓글 수 표시를 현재 totalCount로 즉시 갱신한다.
+    private func updateHeaderCount() {
+        guard let header = tableView.headerView(forSection: 0) as? CommentSectionHeader else { return }
+        header.updateCount(totalCount)
+    }
     
     public func deletedComment(id: Int) {
         deletedComment.onNext(id)
+    }
+
+    /// 답글 페이지에서 전달받은 답글 수 변동을 메인 댓글 리스트의 부모 댓글에 반영한다.
+    public func updateReplyCount(parentId: Int, increment: Bool) {
+        updateReplyCount.onNext((parentId, increment))
+    }
+
+    /// 답글 페이지에서 부모 댓글의 좋아요 등 변경을 메인 댓글 리스트에 반영한다.
+    public func updateParentComment(_ comment: Comment) {
+        updateParentComment.onNext(comment)
     }
 }
 
