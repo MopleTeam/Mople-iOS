@@ -332,7 +332,12 @@ extension PostDetailViewController {
         guard postSummary.isCreator,
               let isReviewd = (postSummary as? ReviewPostSummary)?.isReviewd,
               !isReviewd else { return }
-        
+
+        // 게시글별 최초 1회만 노출 — 같은 후기 게시글에 다시 들어와도 반복 노출되지 않도록 이력 체크
+        guard let postId = postSummary.postId,
+              !UserDefaults.hasSuggestedReview(postId: postId) else { return }
+        UserDefaults.markSuggestedReview(postId: postId)
+
         let writeReview = writeReview()
         let cancleAction = cancleWriteReview()
         
