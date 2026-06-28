@@ -77,7 +77,7 @@ extension DefaultPickerView {
         return (view as? UILabel) ?? {
             let newLabel = UILabel()
             newLabel.textAlignment = .center
-            newLabel.textColor = .black
+            newLabel.textColor = .tertiaryText
             newLabel.font = FontStyle.Title2.semiBold
             return newLabel
         }()
