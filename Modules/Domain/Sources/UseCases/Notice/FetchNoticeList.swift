@@ -50,6 +50,7 @@ public final class MockFetchNoticeListUseCase: FetchNoticeList {
                 meetId: meetId,
                 type: .custom,
                 content: "11/28일 모임 18:00 → 20:00 변경되었습니다. 날씨이슈로 인해서 부득이하게 변경했습니다! (#\(index))",
+                writer: UserInfo(id: 1, name: "모임장 매튜", imagePath: nil),
                 isPinned: index == 1,
                 createdAt: now.addingTimeInterval(Double(-index) * 86400)
             ))

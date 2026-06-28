@@ -15,6 +15,7 @@ public struct Notice: Hashable {
     public let meetId: Int?
     public let type: NoticeType?
     public let content: String?
+    public let writer: UserInfo?   // 공지 작성자 (백엔드 writer 응답)
     public let isPinned: Bool
     public let createdAt: Date?
 
@@ -23,6 +24,7 @@ public struct Notice: Hashable {
                 meetId: Int? = nil,
                 type: NoticeType? = nil,
                 content: String? = nil,
+                writer: UserInfo? = nil,
                 isPinned: Bool = false,
                 createdAt: Date? = nil) {
         self.noticeId = noticeId
@@ -30,6 +32,7 @@ public struct Notice: Hashable {
         self.meetId = meetId
         self.type = type
         self.content = content
+        self.writer = writer
         self.isPinned = isPinned
         self.createdAt = createdAt
     }

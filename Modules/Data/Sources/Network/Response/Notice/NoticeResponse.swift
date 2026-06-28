@@ -17,6 +17,7 @@ struct NoticeResponse: Decodable {
     let meetId: Int?
     let type: String?
     let content: String?
+    let writer: UserInfoResponse?   // 공지 작성자 (isExistBadgeCount는 응답에 없어도 옵셔널이라 디코딩 OK)
     let pinned: Bool?
     let createdAt: String?
 }
@@ -29,6 +30,7 @@ extension NoticeResponse {
             meetId: meetId,
             type: NoticeType(rawValue: type ?? ""),
             content: content,
+            writer: writer?.toDomain(),
             isPinned: pinned ?? false,
             createdAt: DateManager.parseServerFullDate(string: createdAt)
         )
