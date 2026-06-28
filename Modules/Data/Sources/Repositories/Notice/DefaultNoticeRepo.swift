@@ -24,6 +24,13 @@ public final class DefaultNoticeRepo: BaseRepositories, NoticeRepo {
                     info: response.page?.toDomain())
     }
 
+    public func fetchNoticeDetail(noticeId: Int) async throws -> Notice {
+        let response: NoticeResponse = try await self.networkService.authenticatedRequest {
+            try APIEndpoints.fetchNoticeDetail(noticeId: noticeId)
+        }
+        return response.toDomain()
+    }
+
     public func createNotice(meetId: Int,
                              content: String) async throws -> Notice {
         let response: NoticeResponse = try await self.networkService.authenticatedRequest {

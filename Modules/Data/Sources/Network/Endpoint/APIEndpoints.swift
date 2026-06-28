@@ -398,7 +398,7 @@ extension APIEndpoints {
             query["cursor"] = cursor
         }
         
-        return try Endpoint(path: "comment/\(postId)",
+        return try Endpoint(path: "comment/post/\(postId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
@@ -408,7 +408,7 @@ extension APIEndpoints {
     static func createComment(postId: Int,
                               comment: String,
                               mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(postId)",
+        return try Endpoint(path: "comment/post/\(postId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -439,7 +439,7 @@ extension APIEndpoints {
                                    commentId: Int,
                                    comment: String,
                                    mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+        return try Endpoint(path: "comment/post/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -456,7 +456,7 @@ extension APIEndpoints {
             cursorQuery["cursor"] = nextCursor
         }
         
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+        return try Endpoint(path: "comment/post/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
@@ -465,7 +465,7 @@ extension APIEndpoints {
     
     // MARK: - Like
     static func likeComment(commentId: Int) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(commentId)/likes",
+        return try Endpoint(path: "comment/post/\(commentId)/likes",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
@@ -625,6 +625,14 @@ extension APIEndpoints {
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
                             queryParameters: query)
+    }
+
+    // 공지 단건 상세 — GET /notice/detail/{noticeId}
+    static func fetchNoticeDetail(noticeId: Int) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/detail/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
     }
 
     // 공지 생성 — POST /notice/create

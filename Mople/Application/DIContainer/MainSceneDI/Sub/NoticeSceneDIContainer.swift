@@ -71,6 +71,15 @@ private extension NoticeSceneDIContainer {
         #endif
     }
 
+    func makeFetchNoticeUseCase(repo: NoticeRepo) -> FetchNotice {
+        #if DEV
+        return MockDataManager.resolve(FetchNoticeUseCase(repo: repo) as FetchNotice,
+                                       mock: MockFetchNoticeUseCase())
+        #else
+        return FetchNoticeUseCase(repo: repo)
+        #endif
+    }
+
     func makeTogglePinNoticeUseCase(repo: NoticeRepo) -> TogglePinNotice {
         #if DEV
         return MockDataManager.resolve(TogglePinNoticeUseCase(repo: repo) as TogglePinNotice,
@@ -183,6 +192,7 @@ extension NoticeSceneDIContainer {
         let viewModel = NoticeDetailViewModel(
             notice: notice,
             isCreator: isCreator,
+            fetchNoticeUseCase: makeFetchNoticeUseCase(repo: noticeRepo),
             fetchCommentsUseCase: makeFetchNoticeCommentListUseCase(repo: noticeRepo),
             createCommentUseCase: makeCreateNoticeCommentUseCase(repo: noticeRepo),
             editCommentUseCase: makeEditCommentUseCase(repo: commentRepo),

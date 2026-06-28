@@ -19,6 +19,9 @@ public protocol NoticeRepo {
                          size: Int?,
                          cursor: String?) async throws -> Page<Notice>
 
+    // 단건 상세 조회 — 상세 화면 진입/새로고침 시 fresh한 공지를 받기 위함
+    func fetchNoticeDetail(noticeId: Int) async throws -> Notice
+
     func createNotice(meetId: Int, content: String) async throws -> Notice
 
     func updateNotice(noticeId: Int,
