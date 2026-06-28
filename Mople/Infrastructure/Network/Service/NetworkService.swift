@@ -39,6 +39,9 @@ final class DefaultNetworkService {
             let statusCode = result.response.statusCode
             let data = result.data
 
+            // 응답 상태코드 + 데이터 로깅 (Rx→async 리팩토링 때 누락됐던 부분 복원)
+            logger.log(response: result.response, data: data)
+
             switch statusCode {
             case 200...299:
                 return data
@@ -116,6 +119,11 @@ final class DefaultNetworkErrorLogger: NetworkErrorLogger {
         } else {
             printIfDebug("body: Unable to parse")
         }
+    }
+
+    func log(response: HTTPURLResponse, data: Data?) {
+        print("response: \(response.statusCode) \(response.url?.absoluteString ?? "")")
+        log(responseData: data)
     }
 
     func log(responseData data: Data?) {
