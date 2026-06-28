@@ -78,18 +78,24 @@ final class NoticeComposeViewModel: ObservableObject {
             guard let self else { return }
             defer { self.isSubmitting = false }
             do {
+                // 수정 시 갱신된 Notice를 상세 화면에 전달하기 위해 결과를 보관
+                var updatedNotice: Notice?
                 switch self.mode {
                 case .create(let meetId):
                     _ = try await self.createUseCase.execute(meetId: meetId, content: text)
                 case .edit(let notice):
                     guard let noticeId = notice.noticeId, let meetId = notice.meetId else { return }
-                    _ = try await self.updateUseCase.execute(noticeId: noticeId,
-                                                             meetId: meetId,
-                                                             content: text)
+                    updatedNotice = try await self.updateUseCase.execute(noticeId: noticeId,
+                                                                         meetId: meetId,
+                                                                         content: text)
                 }
                 self.didSubmit = true
-                // 리스트/상세 갱신 트리거
-                NotificationCenter.default.post(name: .noticeUpdated, object: nil)
+                // 리스트 reload 트리거 + (수정 시) 상세 본문 즉시 갱신용 payload 전달
+                NotificationCenter.default.post(
+                    name: .noticeUpdated,
+                    object: nil,
+                    userInfo: updatedNotice.map { ["notice": $0] }
+                )
                 // 작성/수정 완료 후엔 modal 전체 종료가 아니라 한 단계 pop만 (list/detail 복귀)
                 self.coordinator?.popCurrentView()
             } catch {

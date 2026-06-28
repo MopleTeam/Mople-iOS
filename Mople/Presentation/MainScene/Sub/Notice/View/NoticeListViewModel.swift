@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Data   // DataRequestError.isHandledError 사용 (취소/이미 처리된 에러 필터)
 
 // 공지 리스트 화면의 상태 머신.
 // API 1회 호출로 전체 공지를 모두 받아두고, 탭 전환은 로컬 필터링으로만 처리한다 (명세 요구사항).
@@ -101,11 +102,17 @@ final class NoticeListViewModel: ObservableObject {
     private var updateToken: NSObjectProtocol?
 
     // MARK: - Loading
-    func loadInitial() async {
+    // showLoadingIndicator: 전체화면 블로킹 로더(customNavigationBar isLoading) 표시 여부.
+    // isFetching(중복 요청 guard)은 항상 동작. 당겨서 새로고침은 false — 블로킹 로더가 터치를 막아
+    // 진행 중인 refresh 제스처를 취소시키는 것을 방지(상세 화면과 동일 패턴).
+    func loadInitial(showLoadingIndicator: Bool = true) async {
         guard !isFetching else { return }
         isFetching = true
-        isLoading = true
-        defer { isFetching = false; isLoading = false }
+        if showLoadingIndicator { isLoading = true }
+        defer {
+            isFetching = false
+            if showLoadingIndicator { isLoading = false }
+        }
 
         do {
             let page = try await fetchListUseCase.execute(meetId: meetId,
@@ -114,6 +121,8 @@ final class NoticeListViewModel: ObservableObject {
             self.notices = page.content
             self.pageInfo = page.info
         } catch {
+            // 이미 처리된(.handled) 에러(요청 취소 등)는 alert를 띄우지 않는다.
+            guard !DataRequestError.isHandledError(err: error) else { return }
             self.errorMessage = error.localizedDescription
             self.showError = true
         }
@@ -158,6 +167,7 @@ final class NoticeListViewModel: ObservableObject {
                         meetId: existing.meetId,
                         type: existing.type,
                         content: existing.content,
+                        writer: existing.writer,
                         isPinned: updated.isPinned,
                         createdAt: existing.createdAt
                     )

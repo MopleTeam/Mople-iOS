@@ -7,6 +7,7 @@
 
 import Foundation
 import Domain
+import Data   // DataRequestError.isHandledError 사용 (취소/이미 처리된 에러 필터)
 
 // 공지 상세 화면의 상태 머신.
 // 진입 시점에 Notice 객체를 받아 본문을 즉시 그리고, 댓글만 별도 API로 로드한다.
@@ -24,6 +25,8 @@ final class NoticeDetailViewModel: ObservableObject {
     // MARK: - State
     @Published private(set) var notice: Notice
     @Published var comments: [Comment] = []
+    // 댓글 수는 일정/리뷰와 동일하게 서버 totalCount를 사용 (로컬 로드 수가 아님)
+    @Published private(set) var totalCount: Int = 0
     @Published var inputText: String = ""
     @Published var writeMode: WriteMode = .basic
     @Published var isLoading = false
@@ -42,6 +45,7 @@ final class NoticeDetailViewModel: ObservableObject {
     }
 
     // MARK: - Dependencies
+    private let fetchNoticeUseCase: FetchNotice
     private let fetchCommentsUseCase: FetchNoticeCommentList
     private let createCommentUseCase: CreateNoticeComment
     private let editCommentUseCase: EditComment
@@ -50,9 +54,13 @@ final class NoticeDetailViewModel: ObservableObject {
     private let deleteNoticeUseCase: DeleteNotice
     private weak var coordinator: NoticeFlowCoordination?
     private var pageInfo: PageInfo?
+    private var isLoadingMore = false
+    // 블록 기반 옵저버 토큰 (deinit에서 해제)
+    private var noticeUpdateToken: NSObjectProtocol?
 
     init(notice: Notice,
          isCreator: Bool,
+         fetchNoticeUseCase: FetchNotice,
          fetchCommentsUseCase: FetchNoticeCommentList,
          createCommentUseCase: CreateNoticeComment,
          editCommentUseCase: EditComment,
@@ -62,6 +70,7 @@ final class NoticeDetailViewModel: ObservableObject {
          coordinator: NoticeFlowCoordination?) {
         self.notice = notice
         self.isCreator = isCreator
+        self.fetchNoticeUseCase = fetchNoticeUseCase
         self.fetchCommentsUseCase = fetchCommentsUseCase
         self.createCommentUseCase = createCommentUseCase
         self.editCommentUseCase = editCommentUseCase
@@ -69,6 +78,9 @@ final class NoticeDetailViewModel: ObservableObject {
         self.reportUseCase = reportUseCase
         self.deleteNoticeUseCase = deleteNoticeUseCase
         self.coordinator = coordinator
+
+        // 진입 시 공지 본문을 fresh하게 다시 받는다 (목록에서 건네받은 값은 stale일 수 있음)
+        Task { await self.loadNotice() }
 
         // 시스템 공지는 댓글이 없으니 fetch 스킵
         if notice.type != .system {
@@ -80,25 +92,52 @@ final class NoticeDetailViewModel: ObservableObject {
     }
 
     // MARK: - Notification (공지 수정 완료 시 본문 갱신)
+    // Compose에서 수정 완료 시 userInfo["notice"]에 갱신된 Notice를 실어 발행한다.
+    // 같은 공지면 본문을 즉시 교체해 stale 표시를 막는다 (일정/리뷰의 수정 즉시 반영과 동일).
     private func observeNoticeUpdate() {
-        NotificationCenter.default.addObserver(forName: .noticeUpdated,
-                                               object: nil,
-                                               queue: .main) { [weak self] _ in
-            // 현재 본문을 그대로 두면 stale. 일단 dismiss하지 않고 placeholder 유지.
-            // 보다 정확한 갱신은 list로 돌아간 후 fetch에 맡김.
-            _ = self
+        noticeUpdateToken = NotificationCenter.default.addObserver(
+            forName: .noticeUpdated,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            let updated = notification.userInfo?["notice"] as? Notice
+            Task { @MainActor [weak self] in
+                guard let self,
+                      let updated,
+                      updated.noticeId == self.notice.noticeId else { return }
+                self.notice = updated
+            }
         }
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        if let token = noticeUpdateToken {
+            NotificationCenter.default.removeObserver(token)
+        }
+    }
+
+    // MARK: - Notice (단건 본문 fresh 조회)
+    // 진입/새로고침 시 호출. 실패해도 이미 들고 있는 notice로 표시를 유지(조용히 무시).
+    func loadNotice() async {
+        guard let noticeId = notice.noticeId else { return }
+        do {
+            let fresh = try await fetchNoticeUseCase.execute(noticeId: noticeId)
+            self.notice = fresh
+        } catch {
+            // 취소/이미 처리된 에러는 무시. 그 외 본문 갱신 실패도 화면을 막지 않도록 조용히 둔다.
+            guard !DataRequestError.isHandledError(err: error) else { return }
+        }
     }
 
     // MARK: - Comments
-    func loadComments() async {
+    // showLoadingIndicator: 전체 화면 로딩 오버레이(customNavigationBar isLoading) 표시 여부.
+    // 초기 로드는 true, 당겨서 새로고침은 false(.refreshable 자체 스피너가 있어 오버레이가 겹치면 화면이 깨져 보임).
+    func loadComments(showLoadingIndicator: Bool = true) async {
         guard let noticeId = notice.noticeId else { return }
-        isLoading = true
-        defer { isLoading = false }
+        if showLoadingIndicator { isLoading = true }
+        defer {
+            if showLoadingIndicator { isLoading = false }
+        }
 
         do {
             let page = try await fetchCommentsUseCase.execute(noticeId: noticeId,
@@ -106,6 +145,39 @@ final class NoticeDetailViewModel: ObservableObject {
                                                               cursor: nil)
             self.comments = page.content
             self.pageInfo = page.info
+            // 서버 totalCount 우선, 미제공(0) 시 로드된 개수로 폴백
+            self.totalCount = max(page.totalCount, page.content.count)
+        } catch {
+            // 이미 처리된(.handled) 에러(요청 취소 등)는 alert를 띄우지 않는다 (기존 Reactor와 동일 패턴).
+            guard !DataRequestError.isHandledError(err: error) else { return }
+            self.errorMessage = error.localizedDescription
+            self.showError = true
+        }
+    }
+
+    // MARK: - Pagination
+    // 일정/리뷰 댓글과 동일하게 스크롤 하단 도달 시 다음 페이지를 이어 로드한다.
+    func loadMoreIfNeeded(currentItem: Comment) {
+        guard let pageInfo, pageInfo.hasNext, !isLoadingMore else { return }
+        // 마지막(가장 오래된) 댓글이 화면에 등장하면 다음 페이지 요청
+        guard comments.last?.id == currentItem.id else { return }
+        Task { await loadMore() }
+    }
+
+    private func loadMore() async {
+        guard let noticeId = notice.noticeId,
+              let cursor = pageInfo?.nextCursor,
+              !isLoadingMore else { return }
+        isLoadingMore = true
+        defer { isLoadingMore = false }
+
+        do {
+            let page = try await fetchCommentsUseCase.execute(noticeId: noticeId,
+                                                              size: nil,
+                                                              cursor: cursor)
+            self.comments.append(contentsOf: page.content)
+            self.pageInfo = page.info
+            if page.totalCount > 0 { self.totalCount = page.totalCount }
         } catch {
             self.errorMessage = error.localizedDescription
             self.showError = true
@@ -135,7 +207,9 @@ final class NoticeDetailViewModel: ObservableObject {
                 let created = try await self.createCommentUseCase.execute(noticeId: noticeId,
                                                                           content: text,
                                                                           mentions: [])
-                self.comments.append(created)
+                // 댓글은 최신순 — 새 댓글을 상단에 삽입 (일정/리뷰와 동일)
+                self.comments.insert(created, at: 0)
+                self.totalCount += 1
                 self.inputText = ""
             } catch {
                 self.errorMessage = error.localizedDescription
@@ -183,6 +257,7 @@ final class NoticeDetailViewModel: ObservableObject {
             do {
                 try await self.deleteCommentUseCase.execute(commentId: commentId)
                 self.comments.removeAll { $0.id == commentId }
+                self.totalCount = max(0, self.totalCount - 1)
                 // 편집 중이던 댓글을 지운 경우 입력바 초기화
                 if case .edit(let editId) = self.writeMode, editId == commentId {
                     self.cancelCommentEdit()
@@ -220,7 +295,7 @@ final class NoticeDetailViewModel: ObservableObject {
             }
             SheetManager.shared.showSheet(actions: [editAction, deleteAction])
         } else {
-            let reportAction = DefaultSheetAction(text: "신고하기", image: .report) { [weak self] in
+            let reportAction = DefaultSheetAction(text: L10n.Report.comment, image: .report) { [weak self] in
                 self?.reportComment(comment)
             }
             SheetManager.shared.showSheet(actions: [reportAction])
@@ -232,16 +307,16 @@ final class NoticeDetailViewModel: ObservableObject {
     // 모임원: "신고하기" (공지 신고 API 미구현 — placeholder Toast)
     func showPageMenu() {
         if isCreator {
-            let editAction = DefaultSheetAction(text: "공지 수정", image: .editPlan) { [weak self] in
+            let editAction = DefaultSheetAction(text: L10n.Notice.edit, image: .editPlan) { [weak self] in
                 guard let self else { return }
                 self.coordinator?.pushEditView(notice: self.notice)
             }
-            let deleteAction = DefaultSheetAction(text: "공지 삭제", image: .delete) { [weak self] in
+            let deleteAction = DefaultSheetAction(text: L10n.Notice.delete, image: .delete) { [weak self] in
                 self?.deleteNotice()
             }
             SheetManager.shared.showSheet(actions: [editAction, deleteAction])
         } else {
-            let reportAction = DefaultSheetAction(text: "신고하기", image: .report) { [weak self] in
+            let reportAction = DefaultSheetAction(text: L10n.Notice.report, image: .report) { [weak self] in
                 self?.reportNoticePlaceholder()
             }
             SheetManager.shared.showSheet(actions: [reportAction])

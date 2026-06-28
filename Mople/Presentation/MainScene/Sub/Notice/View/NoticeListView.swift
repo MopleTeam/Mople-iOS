@@ -123,8 +123,9 @@ struct NoticeListView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(Color(uiColor: .bgPrimary))
+            // 당겨서 새로고침은 블로킹 로더(isLoading)를 끈다 — 켜면 터치 차단이 refresh 제스처를 취소시킴.
             .refreshable {
-                await viewModel.loadInitial()
+                await viewModel.loadInitial(showLoadingIndicator: false)
             }
         }
     }
