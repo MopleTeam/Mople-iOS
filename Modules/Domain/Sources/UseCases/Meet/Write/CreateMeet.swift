@@ -14,13 +14,26 @@ public protocol CreateMeet {
 public final class CreateMeetUseCase: CreateMeet {
 
     let createMeetRepo: MeetRepo
+    private let session: UserSessionProvider
 
-    public init(createMeetRepo: MeetRepo) {
+    public init(createMeetRepo: MeetRepo, session: UserSessionProvider) {
         self.createMeetRepo = createMeetRepo
+        self.session = session
     }
 
     public func execute(requset: CreateMeetRequest) async throws -> Meet {
-        return try await self.createMeetRepo.createMeet(reqeust: requset)
+        var meet = try await self.createMeetRepo.createMeet(reqeust: requset)
+        verifyCreator(with: &meet)
+        return meet
+    }
+
+    // 서버 MeetResponse엔 isCreator 필드가 없어 default false로 들어온다.
+    // 모임을 만든 본인이 곧 모임장이지만, 단일 진실 소스(meet.isCreator)를 정상화하기 위해
+    // FetchMeetPage/FetchMeetDetail과 동일한 verifyCreator 패턴 적용.
+    private func verifyCreator(with meet: inout Meet) {
+        guard let ownerId = meet.creatorId,
+              session.currentUserId == ownerId else { return }
+        meet.isCreator = true
     }
 }
 

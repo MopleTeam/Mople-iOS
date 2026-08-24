@@ -398,7 +398,7 @@ extension APIEndpoints {
             query["cursor"] = cursor
         }
         
-        return try Endpoint(path: "comment/\(postId)",
+        return try Endpoint(path: "comment/post/\(postId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
@@ -408,7 +408,7 @@ extension APIEndpoints {
     static func createComment(postId: Int,
                               comment: String,
                               mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(postId)",
+        return try Endpoint(path: "comment/post/\(postId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -426,7 +426,7 @@ extension APIEndpoints {
     static func editComment(commentId: Int,
                             comment: String,
                             mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(commentId)",
+        return try Endpoint(path: "comment/post/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -439,7 +439,7 @@ extension APIEndpoints {
                                    commentId: Int,
                                    comment: String,
                                    mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+        return try Endpoint(path: "comment/post/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -456,7 +456,7 @@ extension APIEndpoints {
             cursorQuery["cursor"] = nextCursor
         }
         
-        return try Endpoint(path: "comment/\(postId)/\(commentId)",
+        return try Endpoint(path: "comment/post/\(postId)/\(commentId)",
                             authenticationType: .accessToken,
                             method: .get,
                             headerParameters: HTTPHeader.getReceiveJsonHeader(),
@@ -465,7 +465,7 @@ extension APIEndpoints {
     
     // MARK: - Like
     static func likeComment(commentId: Int) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(commentId)/likes",
+        return try Endpoint(path: "comment/post/\(commentId)/likes",
                             authenticationType: .accessToken,
                             method: .post,
                             headerParameters: HTTPHeader.getReceiveJsonHeader())
@@ -600,7 +600,7 @@ extension APIEndpoints {
     
     static func subscribeMeetNotify(type: SubscribeType,
                                     isSubscribe: Bool) throws -> Endpoint<Void> {
-        
+
         let path = isSubscribe ? "notification/subscribe" : "notification/unsubscribe"
         return try Endpoint(path: path,
                             authenticationType: .accessToken,
@@ -609,3 +609,119 @@ extension APIEndpoints {
                             bodyParameters: ["topics": ["\(type.rawValue)"]])
     }
 }
+
+// MARK: - 공지 (Notice)
+extension APIEndpoints {
+    // 공지 리스트 — GET /notice/list/{meetId}
+    // type: "CUSTOM" | "SYSTEM" (nil이면 전체). 종류별 필터 + 커서 페이지네이션.
+    static func fetchNoticeList(meetId: Int,
+                                type: String?,
+                                size: Int?,
+                                cursor: String?) throws -> Endpoint<PageResponse<NoticeResponse>> {
+        var query: [String: Any] = [:]
+        if let type, !type.isEmpty { query["type"] = type }
+        if let size { query["size"] = size }
+        if let cursor, !cursor.isEmpty { query["cursor"] = cursor }
+
+        return try Endpoint(path: "notice/list/\(meetId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
+    }
+
+    // 공지 단건 상세 — GET /notice/detail/{noticeId}
+    static func fetchNoticeDetail(noticeId: Int) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/detail/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+
+    // 공지 생성 — POST /notice/create
+    static func createNotice(meetId: Int,
+                             content: String) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/create",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["meetId": meetId,
+                                             "content": content])
+    }
+
+    // 공지 수정 — PATCH /notice/update/{noticeId}
+    static func updateNotice(noticeId: Int,
+                             meetId: Int,
+                             content: String) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/update/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["meetId": meetId,
+                                             "content": content])
+    }
+
+    // 공지 삭제 — DELETE /notice/{noticeId}
+    static func deleteNotice(noticeId: Int) throws -> Endpoint<Void> {
+        return try Endpoint(path: "notice/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .delete,
+                            headerParameters: HTTPHeader.getReceiveAllHeader())
+    }
+
+    // 공지 고정 — PATCH /notice/pin/{noticeId}
+    static func pinNotice(noticeId: Int) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/pin/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+
+    // 공지 고정 해제 — DELETE /notice/pin/{noticeId}
+    static func unpinNotice(noticeId: Int) throws -> Endpoint<NoticeResponse> {
+        return try Endpoint(path: "notice/pin/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .delete,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader())
+    }
+
+    // 공지 댓글 조회 — GET /comment/notice/{noticeId}
+    static func fetchNoticeCommentList(noticeId: Int,
+                                       size: Int?,
+                                       cursor: String?) throws -> Endpoint<PageResponse<NoticeCommentResponse>> {
+        var query: [String: Any] = [:]
+        if let size { query["size"] = size }
+        if let cursor, !cursor.isEmpty { query["cursor"] = cursor }
+
+        return try Endpoint(path: "comment/notice/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .get,
+                            headerParameters: HTTPHeader.getReceiveJsonHeader(),
+                            queryParameters: query)
+    }
+
+    // 공지 댓글 생성 — POST /comment/notice/{noticeId}
+    static func createNoticeComment(noticeId: Int,
+                                    content: String,
+                                    mentions: [Int]) throws -> Endpoint<NoticeCommentResponse> {
+        return try Endpoint(path: "comment/notice/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .post,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["contents": content,
+                                             "mentions": mentions])
+    }
+    
+    // 공지 댓글 생성 — POST /comment/notice/{noticeId}
+    static func editNoticeComment(noticeId: Int,
+                                  content: String,
+                                  mentions: [Int]) throws -> Endpoint<NoticeCommentResponse> {
+        return try Endpoint(path: "comment/notice/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["contents": content,
+                                             "mentions": mentions])
+    }
+}
+

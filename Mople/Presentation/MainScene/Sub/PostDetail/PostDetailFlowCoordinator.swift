@@ -29,6 +29,8 @@ protocol CommentListCoordination: NavigationCloseable {
     
     func pushReplyPage(parentComment: Comment, meetId: Int)
     func deleteParentComment(id: Int)
+    func updateReplyCount(parentId: Int, increment: Bool)
+    func updateParentComment(_ comment: Comment)
 }
 
 final class PostDetailFlowCoordinator: BaseCoordinator, PostDetailCoordination {
@@ -86,6 +88,16 @@ extension PostDetailFlowCoordinator: CommentListCoordination {
     func deleteParentComment(id: Int) {
         postVC?.commentVC.deletedComment(id: id)
         self.pop()
+    }
+
+    /// 답글 페이지의 답글 생성/삭제를 메인 댓글 페이지의 부모 댓글 '답글 N개'에 반영한다.
+    func updateReplyCount(parentId: Int, increment: Bool) {
+        postVC?.commentVC.updateReplyCount(parentId: parentId, increment: increment)
+    }
+
+    /// 답글 페이지에서 부모 댓글의 좋아요 등 변경을 메인 댓글 페이지에 반영한다.
+    func updateParentComment(_ comment: Comment) {
+        postVC?.commentVC.updateParentComment(comment)
     }
     
     func presentPhotoView(title: String?,

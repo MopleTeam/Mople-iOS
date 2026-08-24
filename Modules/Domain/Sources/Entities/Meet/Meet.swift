@@ -35,3 +35,20 @@ public struct Meet {
         self.pinnedNotice = pinnedNotice
     }
 }
+
+public extension Meet {
+    // pinnedNotice는 let 이라 부분 갱신 불가 — copy with replacement 헬퍼.
+    // 공지 핀 토글 알림 수신 시 모임상세 상태를 새 인스턴스로 갱신할 때 사용.
+    func with(pinnedNotice: Notice?) -> Meet {
+        return Meet(
+            isCreator: isCreator,
+            meetSummary: meetSummary,
+            sinceDays: sinceDays,
+            creatorId: creatorId,
+            memberCount: memberCount,
+            firstPlanDate: firstPlanDate,
+            version: version,
+            pinnedNotice: pinnedNotice
+        )
+    }
+}

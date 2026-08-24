@@ -41,7 +41,7 @@ final class MainTabBarController: UITabBarController, View {
         let view = UIView()
         view.backgroundColor = .clear
         view.layer.makeCornes(radius: 16, corners: [.layerMinXMinYCorner, .layerMaxXMinYCorner])
-        view.setDynamicBorder(width: 1, color: .appStroke)
+        view.setDynamicBorder(width: 1, color: .appTertiary)
         view.isUserInteractionEnabled = false
         return view
     }()

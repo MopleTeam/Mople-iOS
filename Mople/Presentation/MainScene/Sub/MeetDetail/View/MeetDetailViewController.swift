@@ -34,11 +34,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
     private let naviTitleView = MeetDetailNaviTitleView()
 
     // 네비 우측 확성기 버튼 (rightButton(햄버거) 왼쪽에 배치)
+    // SF Symbol에서 디자이너가 export한 .meetMegaphone 에셋으로 교체
     private let megaphoneButton: UIButton = {
         let btn = UIButton()
-        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
-        btn.setImage(UIImage(systemName: "megaphone.fill", withConfiguration: config), for: .normal)
-        btn.tintColor = .text01
+        btn.setImage(.meetMegaphone, for: .normal)
+        btn.imageView?.contentMode = .scaleAspectFit
         return btn
     }()
 
@@ -234,20 +234,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .list)
 
-        // 중앙: 모임 이미지 + 이름
-        self.naviBar.addSubview(naviTitleView)
-        naviTitleView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.centerX.equalToSuperview()
-        }
+        // 중앙: 모임 이미지 + 이름 (타이틀은 화면 중앙 유지 + 좌우 아이템과 겹침 방지 — TitleNaviBar가 처리)
+        self.naviBar.setCustomTitleView(naviTitleView)
 
-        // 확성기 (햄버거 rightButton 좌측에 배치: 20 padding + 40 rightButton + 8 gap = 68)
-        self.naviBar.addSubview(megaphoneButton)
-        megaphoneButton.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().inset(68)
-            make.size.equalTo(40)
-        }
+        // 확성기 — 리스트(rightButton) 안쪽(왼쪽)에 삽입: [확성기][리스트]
+        self.naviBar.addRightItem(megaphoneButton)
 
         // 배지 점 — 확성기 우상단
         megaphoneButton.addSubview(megaphoneBadge)
@@ -351,11 +342,23 @@ extension MeetDetailViewController {
             .map { Reactor.Action.flow(.openNoticeDetail) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        // 네비 중앙 썸네일 탭 → 모임 사진 크게보기
+        self.naviTitleView.rx.imageTap
+            .map { Reactor.Action.flow(.showMeetImage) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 
     private func setNotificationBind(_ reactor: Reactor) {
         NotificationManager.shared.addMeetObservable()
             .map { Reactor.Action.editMeet($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // 공지 핀 토글 알림 → 모임상세 pinnedNotice 갱신
+        NotificationManager.shared.addNoticeObservable()
+            .map { Reactor.Action.applyNotice($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
@@ -446,11 +449,17 @@ extension MeetDetailViewController {
         // 헤더 높이가 바뀔 수 있으므로 sticky 상태도 재계산
         applyHide(currentHideAmount)
 
-        // 확성기 파란 점 배지
-        megaphoneBadge.isHidden = !hasNotice
+        // 확성기 파란 점 배지 — 향후 개발 예정 (서버에 unread 신호가 들어오면 활성화)
+        megaphoneBadge.isHidden = true
 
         // 모임장 + 공지 없음 → 작성 유도 툴팁
-        composeTooltipView.isHidden = !(meet.isCreator && !hasNotice)
+        // 단 모임별로 "첫 진입 1회"만 표시 (UserDefaults에 seen 플래그 기록).
+        let shouldShowTooltip = meet.isCreator && !hasNotice
+            && !NoticeTooltipMemory.hasSeen(meetId: meet.meetSummary?.id)
+        composeTooltipView.isHidden = !shouldShowTooltip
+        if shouldShowTooltip {
+            NoticeTooltipMemory.markSeen(meetId: meet.meetSummary?.id)
+        }
     }
 
     // MARK: - Sticky Header

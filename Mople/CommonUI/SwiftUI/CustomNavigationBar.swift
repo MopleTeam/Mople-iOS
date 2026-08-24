@@ -9,17 +9,18 @@ import SwiftUI
 import Domain
 
 // MARK: - Custom Navigation Bar (UIKit TitleNaviBar 스타일)
-struct CustomNavigationBar: View {
+struct CustomNavigationBar<Trailing: View>: View {
     let title: String
     let isLoading: Bool
     let onBackTapped: () -> Void
-    
+    let trailing: Trailing
+
     var body: some View {
         VStack(spacing: 0) {
             // Status Bar 영역 (notchView)
             Color(uiColor: .bgPrimary)
                 .frame(height: UIScreen.getTopNotchSize())
-            
+
             // Navigation Bar (TitleNaviBar 스타일, 56pt 높이)
             HStack(spacing: 0) {
                 // Left Button Container (40pt)
@@ -31,16 +32,16 @@ struct CustomNavigationBar: View {
                 .frame(width: 40, height: 40)
                 .padding(.leading, 20)  // mainStackView horizontalEdges inset 20
                 .disabled(isLoading)  // 로딩 중에는 뒤로가기 비활성화
-                
+
                 Spacer()
                 Text(title)
                     .font(.custom(FontFamily.Pretendard.bold, size: FontStyle.Size.title2))
                     .foregroundColor(Color(uiColor: .text01))
-                
+
                 Spacer()
-                
-                // Right Button Container (40pt) - 빈 공간으로 타이틀 센터 정렬
-                Color.clear
+
+                // Right Button Container (40pt) - 호출 측에서 옵셔널 View 주입
+                trailing
                     .frame(width: 40, height: 40)
                     .padding(.trailing, 20)  // mainStackView horizontalEdges inset 20
             }
@@ -48,6 +49,15 @@ struct CustomNavigationBar: View {
             .background(Color(uiColor: .bgPrimary))
         }
         .ignoresSafeArea(edges: .top)
+    }
+}
+
+extension CustomNavigationBar where Trailing == Color {
+    init(title: String, isLoading: Bool, onBackTapped: @escaping () -> Void) {
+        self.init(title: title,
+                  isLoading: isLoading,
+                  onBackTapped: onBackTapped,
+                  trailing: Color.clear)
     }
 }
 
@@ -73,22 +83,27 @@ struct LoadingView: View {
 
 // MARK: - Custom Navigation Bar Modifier
 //onBack 클로저 추가: 커스텀 뒤로가기 동작 지원 (coordinator dismiss 등)
-struct CustomNavigationBarModifier: ViewModifier {
+//trailing 슬롯 추가: 우상단 액션 버튼 옵셔널 주입
+struct CustomNavigationBarModifier<Trailing: View>: ViewModifier {
     let title: String
     let isLoading: Bool
     let onBack: (() -> Void)?
+    let trailing: Trailing
     @Environment(\.dismiss) private var dismiss
 
     func body(content: Content) -> some View {
         ZStack {
             VStack(spacing: 0) {
-                CustomNavigationBar(title: title, isLoading: isLoading) {
-                    if let onBack {
-                        onBack()
-                    } else {
-                        dismiss()
-                    }
-                }
+                CustomNavigationBar(title: title,
+                                    isLoading: isLoading,
+                                    onBackTapped: {
+                                        if let onBack {
+                                            onBack()
+                                        } else {
+                                            dismiss()
+                                        }
+                                    },
+                                    trailing: trailing)
 
                 content
                     .allowsHitTesting(!isLoading)  // 로딩 중 콘텐츠 터치 차단
@@ -107,23 +122,38 @@ struct CustomNavigationBarModifier: ViewModifier {
 
 
 extension View {
-    func customNavigationBar(title: String, isLoading: Bool = false, onBack: (() -> Void)? = nil) -> some View {
-        modifier(CustomNavigationBarModifier(title: title, isLoading: isLoading, onBack: onBack))
+    func customNavigationBar(title: String,
+                             isLoading: Bool = false,
+                             onBack: (() -> Void)? = nil) -> some View {
+        modifier(CustomNavigationBarModifier(title: title,
+                                             isLoading: isLoading,
+                                             onBack: onBack,
+                                             trailing: Color.clear))
+    }
+
+    func customNavigationBar<Trailing: View>(title: String,
+                                             isLoading: Bool = false,
+                                             onBack: (() -> Void)? = nil,
+                                             @ViewBuilder trailing: () -> Trailing) -> some View {
+        modifier(CustomNavigationBarModifier(title: title,
+                                             isLoading: isLoading,
+                                             onBack: onBack,
+                                             trailing: trailing()))
     }
 }
 // MARK: - Preview
 #Preview {
-    CustomNavigationBar(title: "타이틀", isLoading: false) {
-        print("Back button tapped")
-    }
+    CustomNavigationBar(title: "타이틀",
+                        isLoading: false,
+                        onBackTapped: { print("Back button tapped") })
 }
 
 #Preview("With Content") {
     VStack(spacing: 0) {
-        CustomNavigationBar(title: "설정", isLoading: false) {
-            print("Back button tapped")
-        }
-        
+        CustomNavigationBar(title: "설정",
+                            isLoading: false,
+                            onBackTapped: { print("Back button tapped") })
+
         ScrollView {
             VStack(spacing: 20) {
                 ForEach(0..<20) { index in

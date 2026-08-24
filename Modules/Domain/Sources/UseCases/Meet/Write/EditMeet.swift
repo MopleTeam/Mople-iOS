@@ -15,14 +15,25 @@ public protocol EditMeet {
 public final class EditMeetUseCase: EditMeet {
 
     let repo: MeetRepo
+    private let session: UserSessionProvider
 
-    public init(repo: MeetRepo) {
+    public init(repo: MeetRepo, session: UserSessionProvider) {
         self.repo = repo
+        self.session = session
     }
 
     public func execute(id: Int,
                  request: CreateMeetRequest) async throws -> Meet {
-        return try await repo.editMeet(id: id, reqeust: request)
+        var meet = try await repo.editMeet(id: id, reqeust: request)
+        verifyCreator(with: &meet)
+        return meet
+    }
+
+    // FetchMeet*/CreateMeet과 동일한 verifyCreator 패턴.
+    private func verifyCreator(with meet: inout Meet) {
+        guard let ownerId = meet.creatorId,
+              session.currentUserId == ownerId else { return }
+        meet.isCreator = true
     }
 }
 

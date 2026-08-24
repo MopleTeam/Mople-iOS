@@ -30,7 +30,7 @@ final class MeetDetailNoticePreviewView: UIView {
     private let iconImageView: UIImageView = {
         let iv = UIImageView()
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
-        iv.image = UIImage(systemName: "megaphone.fill", withConfiguration: config)
+        iv.image = .megaphone
         iv.tintColor = .defaultRed1
         iv.contentMode = .scaleAspectFit
         return iv

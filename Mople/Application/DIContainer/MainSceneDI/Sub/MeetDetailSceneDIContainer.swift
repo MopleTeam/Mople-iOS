@@ -81,9 +81,9 @@ extension MeetDetailSceneDIContainer {
     
     private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
         #if DEV
-        return MockDataManager.resolve(FetchMeetDetailUseCase(repo: repo) as FetchMeetDetail, mock: MockFetchMeetDetailUseCase())
+        return MockDataManager.resolve(FetchMeetDetailUseCase(repo: repo, session: userSession) as FetchMeetDetail, mock: MockFetchMeetDetailUseCase())
         #else
-        return FetchMeetDetailUseCase(repo: repo)
+        return FetchMeetDetailUseCase(repo: repo, session: userSession)
         #endif
     }
     

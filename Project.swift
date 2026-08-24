@@ -5,10 +5,10 @@ import ProjectDescription
 
 // MARK: - 공통 설정
 
-let marketingVersion = "1.3.0"
+let marketingVersion = "1.5.0"
 let currentProjectVersion = "8"
 let developmentTeam = "LNXWGGBBH6"
-let deploymentTarget: DeploymentTargets = .iOS("17.6")
+let deploymentTarget: DeploymentTargets = .iOS("18.0")
 
 // MARK: - Info.plist
 
@@ -269,7 +269,7 @@ let mopleTarget: Target = .target(
                 "PRODUCT_BUNDLE_IDENTIFIER": "com.moim.moimtable.dev",
                 "CODE_SIGN_STYLE": "Automatic",
                 "OTHER_SWIFT_FLAGS": "-DDEV",
-                "API_BASE_URL": "https://dev.zerod.store",
+                "API_BASE_URL": "https://dev.2erod.com",
                 "MAIN_SCHEME": "mopledev",
                 "KAKAO_NATIVE_APP_KEY": "0fcc3c29ae8669444767451bb1e89e7e",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon-Dev",
@@ -279,7 +279,10 @@ let mopleTarget: Target = .target(
             .release(name: "Release", settings: [
                 "PRODUCT_BUNDLE_IDENTIFIER": "com.moim.moimtable",
                 "CODE_SIGN_STYLE": "Manual",
-                "API_BASE_URL": "https://prod.zerod.store",
+                // Tuist 전환 시 누락된 Manual 서명 지정 (App Store 배포 archive용)
+                "CODE_SIGN_IDENTITY": "Apple Distribution",
+                "PROVISIONING_PROFILE_SPECIFIER": "Mople Distribution",
+                "API_BASE_URL": "https://prod.2erod.com",
                 "MAIN_SCHEME": "mople",
                 "KAKAO_NATIVE_APP_KEY": "72b95832d0237fce2c5c7eb82d4a6a7a",
                 "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
@@ -295,7 +298,7 @@ let project = Project(
     name: "Mople",
     settings: .settings(
         base: [
-            "IPHONEOS_DEPLOYMENT_TARGET": "17.6",
+            "IPHONEOS_DEPLOYMENT_TARGET": "18.0",
         ],
         configurations: [
             .debug(name: "Debug"),

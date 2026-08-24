@@ -120,12 +120,12 @@ final class MeetSetupViewReactor: Reactor, LifeCycleLoggable {
 // MARK: - Set Meet
 extension MeetSetupViewReactor {
     /// 모임 정보 설정 및 호스트 여부 확인
+    /// meet.isCreator는 FetchMeetDetail / CreateMeet / EditMeet UseCase에서
+    /// verifyCreator로 채워지므로 단일 진실 소스를 그대로 사용한다
+    /// (예전엔 UserInfoStorage를 들춰서 직접 비교했음 — 중복 로직 제거).
     private func setMeetInfo(_ meet: Meet) -> Observable<Mutation> {
-        let userID = UserInfoStorage.shared.userInfo?.id
-        
-        let checkHost = Observable.just(Mutation.checkHost(userID == meet.creatorId))
+        let checkHost = Observable.just(Mutation.checkHost(meet.isCreator))
         let updateMeet = Observable.just(Mutation.updateMeet(meet))
-        
         return Observable.concat([checkHost, updateMeet])
     }
 }

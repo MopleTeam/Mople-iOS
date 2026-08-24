@@ -21,9 +21,9 @@ default_platform(:ios)
 # → 2FA 없이 자동화 가능, CI/CD 필수
 # ──────────────────────────────────────────────
 API_KEY = app_store_connect_api_key(
-  key_id: "9GV3U3P562",
+  key_id: "4AD2MCFFH2",
   issuer_id: "077a4d64-9ada-4316-9cf8-45e9b944ba64",
-  key_filepath: File.join(Dir.home, "Desktop/Task/Develop/Swift/CICD/Release/AuthKey_9GV3U3P562.p8"),
+  key_filepath: File.join(Dir.home, "Desktop/Task/Develop/Swift/CICD/Release/AuthKey_4AD2MCFFH2.p8"),
   in_house: false
 )
 
@@ -43,12 +43,12 @@ platform :ios do
       ) + 1
     )
 
-    # 2) Mople Dev 스킴으로 빌드
+    # 2) Mople Dev 빌드 (Tuist 전환 후: 단일 "Mople" 스킴 + Debug = Dev 서버)
     notification(title: "📦 TestFlight", message: "[2/3] 빌드 시작... (약 2~3분)")
     build_app(
-      project: "Mople.xcodeproj",
-      scheme: "Mople Dev",
-      configuration: "Release",
+      workspace: "Mople.xcworkspace",
+      scheme: "Mople",
+      configuration: "Debug",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
@@ -94,7 +94,7 @@ platform :ios do
 
     # 2) Mople 프로덕션 스킴으로 빌드 (Release 설정)
     build_app(
-      project: "Mople.xcodeproj",
+      workspace: "Mople.xcworkspace",
       scheme: "Mople",
       configuration: "Release",
       clean: true,
@@ -112,6 +112,7 @@ platform :ios do
     # 3) App Store 업로드 (심사 제출은 수동)
     upload_to_app_store(
       api_key: API_KEY,
+      app_identifier: "com.moim.moimtable",  # 프로덕션 앱 명시 (Appfile 기본값=dev 방지)
       skip_metadata: true,
       skip_screenshots: true,
       precheck_include_in_app_purchases: false
@@ -177,7 +178,7 @@ platform :ios do
 
     # 6) Mople 프로덕션 빌드
     build_app(
-      project: "Mople.xcodeproj",
+      workspace: "Mople.xcworkspace",
       scheme: "Mople",
       configuration: "Release",
       clean: true,
@@ -198,6 +199,8 @@ platform :ios do
 
     upload_to_app_store(
       api_key: API_KEY,
+      app_identifier: "com.moim.moimtable",  # 프로덕션 앱 명시 (Appfile 기본값=dev 방지)
+      force: true,                          # 비대화형 실행: 메타데이터 확인 프롬프트 건너뜀
       skip_metadata: !submit,              # 심사 제출 시에만 메타데이터 포함
       skip_screenshots: true,
       submit_for_review: submit,            # submit:true 시 심사 자동 제출
@@ -224,9 +227,9 @@ platform :ios do
   desc "빌드만 수행 (업로드 없음, PR 검증용)"
   lane :build_only do
     build_app(
-      project: "Mople.xcodeproj",
-      scheme: "Mople Dev",
-      configuration: "Release",
+      workspace: "Mople.xcworkspace",
+      scheme: "Mople",
+      configuration: "Debug",
       clean: true,
       export_method: "app-store",
       cloned_source_packages_path: "SourcePackages",
