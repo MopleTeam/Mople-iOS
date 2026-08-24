@@ -140,10 +140,10 @@ private extension NoticeSceneDIContainer {
         return MockDataManager.resolve(EditNoticeCommentUseCase(repo: repo, session: userSession) as EditNoticeComment,
                                        mock: MockEditNoticeCommentUseCase())
 #else
-        return EditCommentUseCase(repo: repo, session: userSession)
+        return EditNoticeCommentUseCase(repo: repo, session: userSession)
 #endif
     }
-    
+
     func makeDeleteCommentUseCase(repo: CommentRepo) -> DeleteComment {
 #if DEV
         return MockDataManager.resolve(DeleteCommentUseCase(repo: repo) as DeleteComment,
