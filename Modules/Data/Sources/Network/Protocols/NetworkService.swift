@@ -19,6 +19,7 @@ public protocol NetworkSessionManager {
 
 public protocol NetworkErrorLogger {
     func log(request: URLRequest)
+    func log(response: HTTPURLResponse, data: Data?)
     func log(responseData data: Data?)
     func log(error: Error)
 }

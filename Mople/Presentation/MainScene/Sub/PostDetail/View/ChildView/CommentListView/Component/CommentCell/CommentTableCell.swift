@@ -31,7 +31,7 @@ final class CommentTableCell: UITableViewCell {
     
     private let borderView = {
         let view = UIView()
-        view.backgroundColor = .appStroke
+        view.backgroundColor = .inputIcon
         view.layer.zPosition = 1
         return view
     }()

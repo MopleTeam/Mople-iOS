@@ -48,7 +48,8 @@ final class AppDIContainer {
         return DefaultAppNetWorkService(dataTransferService: transferService)
     }()
     
-    lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService)
+    lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService,
+                                                 userSession: userSession)
 
     /// Domain UseCase에 주입할 사용자 세션 프로바이더
     lazy var userSession: UserSessionProvider = DefaultUserSessionProvider()

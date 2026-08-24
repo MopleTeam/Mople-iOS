@@ -175,6 +175,11 @@
 "report.comment" = "댓글 신고";
 "report.completed" = "신고 접수가 완료되었습니다.";
 
+// MARK: - Notice
+"notice.edit" = "공지 수정";
+"notice.delete" = "공지 삭제";
+"notice.report" = "신고하기";
+
 // MARK: - Common
 "create" = "생성하기";
 "search" = "검색";

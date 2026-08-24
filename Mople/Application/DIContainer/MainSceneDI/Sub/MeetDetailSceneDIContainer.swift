@@ -27,9 +27,11 @@ protocol MeetDetailSceneDependencies {
     // MARK: - Flow
     func makePlanCreateFlowCoordinator(meet: MeetSummary,
                                        completion: ((Plan) -> Void)?) -> BaseCoordinator
-    
+
     func makePostDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator
+
+    func makeNoticeFlowCoordinator(entry: NoticeFlowEntry) -> BaseCoordinator
 }
 
 final class MeetDetailSceneDIContainer: BaseContainer, MeetDetailSceneDependencies {
@@ -79,9 +81,9 @@ extension MeetDetailSceneDIContainer {
     
     private func makeFetchMeetDetailUseCase(repo: MeetRepo) -> FetchMeetDetail {
         #if DEV
-        return MockDataManager.resolve(FetchMeetDetailUseCase(repo: repo) as FetchMeetDetail, mock: MockFetchMeetDetailUseCase())
+        return MockDataManager.resolve(FetchMeetDetailUseCase(repo: repo, session: userSession) as FetchMeetDetail, mock: MockFetchMeetDetailUseCase())
         #else
-        return FetchMeetDetailUseCase(repo: repo)
+        return FetchMeetDetailUseCase(repo: repo, session: userSession)
         #endif
     }
     
@@ -260,5 +262,14 @@ extension MeetDetailSceneDIContainer {
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()
+    }
+
+    // MARK: - 공지
+    func makeNoticeFlowCoordinator(entry: NoticeFlowEntry) -> BaseCoordinator {
+        let noticeDI = NoticeSceneDIContainer(appNetworkService: appNetworkService,
+                                              commonFactory: commonViewFactory,
+                                              userSession: userSession,
+                                              entry: entry)
+        return noticeDI.makeNoticeFlowCoordinator()
     }
 }

@@ -5,10 +5,10 @@ import ProjectDescription
 
 // MARK: - 공통 설정
 
-let marketingVersion = "1.4.1"
+let marketingVersion = "1.5.0"
 let currentProjectVersion = "8"
 let developmentTeam = "LNXWGGBBH6"
-let deploymentTarget: DeploymentTargets = .iOS("17.6")
+let deploymentTarget: DeploymentTargets = .iOS("18.0")
 
 // MARK: - Info.plist
 
@@ -298,7 +298,7 @@ let project = Project(
     name: "Mople",
     settings: .settings(
         base: [
-            "IPHONEOS_DEPLOYMENT_TARGET": "17.6",
+            "IPHONEOS_DEPLOYMENT_TARGET": "18.0",
         ],
         configurations: [
             .debug(name: "Debug"),

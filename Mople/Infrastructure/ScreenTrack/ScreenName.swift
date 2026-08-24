@@ -43,6 +43,11 @@ enum ScreenName: String {
     case notification
     case notification_setting
 
+    // MARK: - Notice (모임 공지)
+    case notice_list
+    case notice_detail
+    case notice_compose
+
     // MARK: - Member
     case participant_list
 

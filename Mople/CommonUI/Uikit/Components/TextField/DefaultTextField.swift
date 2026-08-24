@@ -35,8 +35,7 @@ final class DefaultTextField: UIView {
     // MARK: - UI Components
     private let textFieldContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .bgInput
-        view.layer.cornerRadius = 8
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -62,6 +61,7 @@ final class DefaultTextField: UIView {
     // MARK: - UI Setup
     private func setupUI() {
         self.backgroundColor = .bgInput
+        self.layer.cornerRadius = 8
         self.addSubview(textFieldContainer)
         self.textFieldContainer.addSubview(inputTextField)
 
