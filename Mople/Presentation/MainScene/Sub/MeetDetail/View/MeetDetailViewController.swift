@@ -234,20 +234,11 @@ final class MeetDetailViewController: TitleNaviViewController, View {
         self.setBarItem(type: .left)
         self.setBarItem(type: .right, image: .list)
 
-        // 중앙: 모임 이미지 + 이름
-        self.naviBar.addSubview(naviTitleView)
-        naviTitleView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.centerX.equalToSuperview()
-        }
+        // 중앙: 모임 이미지 + 이름 (타이틀은 화면 중앙 유지 + 좌우 아이템과 겹침 방지 — TitleNaviBar가 처리)
+        self.naviBar.setCustomTitleView(naviTitleView)
 
-        // 확성기 (햄버거 rightButton 좌측에 배치: 20 padding + 40 rightButton + 8 gap = 68)
-        self.naviBar.addSubview(megaphoneButton)
-        megaphoneButton.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().inset(68)
-            make.size.equalTo(40)
-        }
+        // 확성기 — 리스트(rightButton) 안쪽(왼쪽)에 삽입: [확성기][리스트]
+        self.naviBar.addRightItem(megaphoneButton)
 
         // 배지 점 — 확성기 우상단
         megaphoneButton.addSubview(megaphoneBadge)
@@ -349,6 +340,12 @@ extension MeetDetailViewController {
         // 미리보기 카드 → 공지 상세 진입
         self.noticePreviewView.tapEvent
             .map { Reactor.Action.flow(.openNoticeDetail) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // 네비 중앙 썸네일 탭 → 모임 사진 크게보기
+        self.naviTitleView.rx.imageTap
+            .map { Reactor.Action.flow(.showMeetImage) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

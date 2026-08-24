@@ -426,7 +426,7 @@ extension APIEndpoints {
     static func editComment(commentId: Int,
                             comment: String,
                             mentions: [Int]) throws -> Endpoint<CommentResponse> {
-        return try Endpoint(path: "comment/\(commentId)",
+        return try Endpoint(path: "comment/post/\(commentId)",
                             authenticationType: .accessToken,
                             method: .patch,
                             headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
@@ -613,10 +613,13 @@ extension APIEndpoints {
 // MARK: - 공지 (Notice)
 extension APIEndpoints {
     // 공지 리스트 — GET /notice/list/{meetId}
+    // type: "CUSTOM" | "SYSTEM" (nil이면 전체). 종류별 필터 + 커서 페이지네이션.
     static func fetchNoticeList(meetId: Int,
+                                type: String?,
                                 size: Int?,
                                 cursor: String?) throws -> Endpoint<PageResponse<NoticeResponse>> {
         var query: [String: Any] = [:]
+        if let type, !type.isEmpty { query["type"] = type }
         if let size { query["size"] = size }
         if let cursor, !cursor.isEmpty { query["cursor"] = cursor }
 
@@ -708,4 +711,17 @@ extension APIEndpoints {
                             bodyParameters: ["contents": content,
                                              "mentions": mentions])
     }
+    
+    // 공지 댓글 생성 — POST /comment/notice/{noticeId}
+    static func editNoticeComment(noticeId: Int,
+                                  content: String,
+                                  mentions: [Int]) throws -> Endpoint<NoticeCommentResponse> {
+        return try Endpoint(path: "comment/notice/\(noticeId)",
+                            authenticationType: .accessToken,
+                            method: .patch,
+                            headerParameters: HTTPHeader.getSendAndReceiveJsonHeader(),
+                            bodyParameters: ["contents": content,
+                                             "mentions": mentions])
+    }
 }
+

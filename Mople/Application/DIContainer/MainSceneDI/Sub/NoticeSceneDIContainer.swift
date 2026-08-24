@@ -25,9 +25,9 @@ protocol NoticeSceneDependencies {
 }
 
 final class NoticeSceneDIContainer: BaseContainer, NoticeSceneDependencies {
-
+    
     private let entry: NoticeFlowEntry
-
+    
     init(appNetworkService: AppNetworkService,
          commonFactory: ViewDependencies,
          userSession: UserSessionProvider,
@@ -37,7 +37,7 @@ final class NoticeSceneDIContainer: BaseContainer, NoticeSceneDependencies {
                    commonFactory: commonFactory,
                    userSession: userSession)
     }
-
+    
     func makeNoticeFlowCoordinator() -> NoticeFlowCoordinator {
         return .init(dependencies: self,
                      entry: entry,
@@ -47,127 +47,127 @@ final class NoticeSceneDIContainer: BaseContainer, NoticeSceneDependencies {
 
 // MARK: - Repo & UseCases
 private extension NoticeSceneDIContainer {
-
+    
     func makeNoticeRepo() -> NoticeRepo {
         return DefaultNoticeRepo(networkService: appNetworkService)
     }
-
+    
     // 댓글 수정/삭제는 일반 CommentRepo의 endpoint(/comment/{commentId})를 그대로 사용 가능
     func makeCommentRepo() -> CommentRepo {
         return DefaultCommentRepo(networkService: appNetworkService)
     }
-
+    
     func makeReportRepo() -> ReportRepo {
         return DefaultReportRepo(networkService: appNetworkService)
     }
-
+    
     // MARK: Notice UseCases
     func makeFetchNoticeListUseCase(repo: NoticeRepo) -> FetchNoticeList {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(FetchNoticeListUseCase(repo: repo) as FetchNoticeList,
                                        mock: MockFetchNoticeListUseCase())
-        #else
+#else
         return FetchNoticeListUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeFetchNoticeUseCase(repo: NoticeRepo) -> FetchNotice {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(FetchNoticeUseCase(repo: repo) as FetchNotice,
                                        mock: MockFetchNoticeUseCase())
-        #else
+#else
         return FetchNoticeUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeTogglePinNoticeUseCase(repo: NoticeRepo) -> TogglePinNotice {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(TogglePinNoticeUseCase(repo: repo) as TogglePinNotice,
                                        mock: MockTogglePinNoticeUseCase())
-        #else
+#else
         return TogglePinNoticeUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeCreateNoticeUseCase(repo: NoticeRepo) -> CreateNotice {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(CreateNoticeUseCase(repo: repo) as CreateNotice,
                                        mock: MockCreateNoticeUseCase())
-        #else
+#else
         return CreateNoticeUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeUpdateNoticeUseCase(repo: NoticeRepo) -> UpdateNotice {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(UpdateNoticeUseCase(repo: repo) as UpdateNotice,
                                        mock: MockUpdateNoticeUseCase())
-        #else
+#else
         return UpdateNoticeUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeDeleteNoticeUseCase(repo: NoticeRepo) -> DeleteNotice {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(DeleteNoticeUseCase(repo: repo) as DeleteNotice,
                                        mock: MockDeleteNoticeUseCase())
-        #else
+#else
         return DeleteNoticeUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     func makeFetchNoticeCommentListUseCase(repo: NoticeRepo) -> FetchNoticeCommentList {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(FetchNoticeCommentListUseCase(repo: repo, session: userSession) as FetchNoticeCommentList,
                                        mock: MockFetchNoticeCommentListUseCase())
-        #else
+#else
         return FetchNoticeCommentListUseCase(repo: repo, session: userSession)
-        #endif
+#endif
     }
-
+    
     func makeCreateNoticeCommentUseCase(repo: NoticeRepo) -> CreateNoticeComment {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(CreateNoticeCommentUseCase(repo: repo, session: userSession) as CreateNoticeComment,
                                        mock: MockCreateNoticeCommentUseCase())
-        #else
+#else
         return CreateNoticeCommentUseCase(repo: repo, session: userSession)
-        #endif
+#endif
     }
-
+    
     // MARK: Comment UseCases (수정/삭제는 일반 댓글 패턴 재사용)
-    func makeEditCommentUseCase(repo: CommentRepo) -> EditComment {
-        #if DEV
-        return MockDataManager.resolve(EditCommentUseCase(repo: repo, session: userSession) as EditComment,
-                                       mock: MockEditCommentUseCase())
-        #else
+    func makeEditCommentUseCase(repo: NoticeRepo) -> EditNoticeComment {
+#if DEV
+        return MockDataManager.resolve(EditNoticeCommentUseCase(repo: repo, session: userSession) as EditNoticeComment,
+                                       mock: MockEditNoticeCommentUseCase())
+#else
         return EditCommentUseCase(repo: repo, session: userSession)
-        #endif
+#endif
     }
-
+    
     func makeDeleteCommentUseCase(repo: CommentRepo) -> DeleteComment {
-        #if DEV
+#if DEV
         return MockDataManager.resolve(DeleteCommentUseCase(repo: repo) as DeleteComment,
                                        mock: MockDeleteCommentUseCase())
-        #else
+#else
         return DeleteCommentUseCase(repo: repo)
-        #endif
+#endif
     }
-
+    
     // MARK: Report UseCase
     func makeReportUseCase() -> ReportPost {
         let repo = makeReportRepo()
-        #if DEV
+#if DEV
         return MockDataManager.resolve(ReportPostUseCase(repo: repo) as ReportPost,
                                        mock: MockReportPostUseCase())
-        #else
+#else
         return ReportPostUseCase(repo: repo)
-        #endif
+#endif
     }
 }
 
 // MARK: - View Factories (SwiftUI + UIHostingController)
 extension NoticeSceneDIContainer {
-
+    
     @MainActor
     func makeNoticeListViewController(meetId: Int,
                                       isCreator: Bool,
@@ -182,7 +182,7 @@ extension NoticeSceneDIContainer {
         )
         return UIHostingController(rootView: NoticeListView(viewModel: viewModel))
     }
-
+    
     @MainActor
     func makeNoticeDetailViewController(notice: Notice,
                                         isCreator: Bool,
@@ -195,7 +195,7 @@ extension NoticeSceneDIContainer {
             fetchNoticeUseCase: makeFetchNoticeUseCase(repo: noticeRepo),
             fetchCommentsUseCase: makeFetchNoticeCommentListUseCase(repo: noticeRepo),
             createCommentUseCase: makeCreateNoticeCommentUseCase(repo: noticeRepo),
-            editCommentUseCase: makeEditCommentUseCase(repo: commentRepo),
+            editCommentUseCase: makeEditCommentUseCase(repo: noticeRepo),
             deleteCommentUseCase: makeDeleteCommentUseCase(repo: commentRepo),
             reportUseCase: makeReportUseCase(),
             deleteNoticeUseCase: makeDeleteNoticeUseCase(repo: noticeRepo),
@@ -203,7 +203,7 @@ extension NoticeSceneDIContainer {
         )
         return InteractivePopHostingController(rootView: NoticeDetailView(viewModel: viewModel))
     }
-
+    
     @MainActor
     func makeNoticeComposeViewController(mode: NoticeComposeViewModel.Mode,
                                          coordinator: NoticeFlowCoordination) -> UIViewController {
@@ -216,7 +216,7 @@ extension NoticeSceneDIContainer {
         )
         return InteractivePopHostingController(rootView: NoticeComposeView(viewModel: viewModel))
     }
-
+    
     @MainActor
     func makeProfileImageViewController(title: String?,
                                         imagePath: String?) -> UIViewController {

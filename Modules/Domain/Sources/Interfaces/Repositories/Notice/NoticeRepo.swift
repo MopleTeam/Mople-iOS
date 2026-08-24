@@ -15,7 +15,9 @@ import Foundation
 public protocol NoticeRepo {
 
     // MARK: - 공지 CRUD
+    // type: 공지 종류 필터(nil=전체). 서버 GET /notice/list?type=CUSTOM|SYSTEM 로 종류별 페이지네이션.
     func fetchNoticeList(meetId: Int,
+                         type: NoticeType?,
                          size: Int?,
                          cursor: String?) async throws -> Page<Notice>
 
@@ -44,4 +46,8 @@ public protocol NoticeRepo {
     func createNoticeComment(noticeId: Int,
                              content: String,
                              mentions: [Int]) async throws -> Comment
+    
+    func editNoticeComment(noticeId: Int,
+                           content: String,
+                           mentions: [Int]) async throws -> Comment
 }

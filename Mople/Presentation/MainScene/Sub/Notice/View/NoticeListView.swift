@@ -9,7 +9,8 @@ import SwiftUI
 import Domain
 
 // 확성기 버튼에서 진입하는 공지 리스트.
-// 상단 세그먼트(전체/모임공지/시스템)는 로컬 필터링이며 API는 1회 호출.
+// 상단 세그먼트(전체/모임공지/시스템)는 탭마다 서버 필터(type)로 조회하며 커서 페이지네이션을 지원한다.
+// 탭 전환 시 이미 로드한 페이지는 캐시로 유지된다(ViewModel의 탭별 상태).
 // 우상단 작성(연필) 아이콘은 모임장에게만 노출.
 // 모임장은 셀을 leading swipe하면 파란 핀 버튼이 드러나며 탭하면 pin/unpin API 호출.
 // 모임원에게는 swipe action 자체가 노출되지 않는다.
@@ -75,7 +76,7 @@ struct NoticeListView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.22)) {
-                            viewModel.selectedFilter = filter
+                            viewModel.selectFilter(filter)
                         }
                     }
             }
@@ -88,17 +89,19 @@ struct NoticeListView: View {
     // MARK: - 본문
     @ViewBuilder
     private var content: some View {
-        if viewModel.filteredNotices.isEmpty && !viewModel.isLoading {
+        if viewModel.notices.isEmpty && !viewModel.isLoading {
             Color(uiColor: .bgPrimary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             // List를 쓰는 이유: SwiftUI `.swipeActions`가 List 셀에서만 동작.
             // 디자인은 카드형이 아니라 흰 row + hairline이라 listRowInsets/Separator를 직접 제어.
             List {
-                ForEach(viewModel.filteredNotices, id: \.noticeId) { notice in
+                ForEach(viewModel.notices, id: \.noticeId) { notice in
                     NoticeListRow(notice: notice)
                         .contentShape(Rectangle())
                         .onTapGesture { viewModel.selectNotice(notice) }
+                        // 마지막 셀이 나타나면 다음 페이지 요청 (커서 페이지네이션)
+                        .onAppear { viewModel.loadMoreIfNeeded(currentItem: notice) }
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color(uiColor: .bgPrimary))
@@ -115,7 +118,7 @@ struct NoticeListView: View {
                                           image: ImageResource.doAnchor)
                                 }
                                 // 고정 요청 시 .appPrimary, 해제 시 .appRed
-                                .tint(notice.isPinned ? Color(uiColor: .appRed) : Color(uiColor: .appPrimary))
+                                .tint(notice.isPinned ? Color(uiColor: .gray05) : Color(uiColor: .appPrimary))
                             }
                         }
                 }
@@ -123,9 +126,9 @@ struct NoticeListView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(Color(uiColor: .bgPrimary))
-            // 당겨서 새로고침은 블로킹 로더(isLoading)를 끈다 — 켜면 터치 차단이 refresh 제스처를 취소시킴.
+            // 당겨서 새로고침: 현재 탭만 첫 페이지부터 다시 로드 (블로킹 로더 없이).
             .refreshable {
-                await viewModel.loadInitial(showLoadingIndicator: false)
+                await viewModel.refresh()
             }
         }
     }
@@ -145,49 +148,40 @@ private struct NoticeListRow: View {
         HStack(alignment: .center, spacing: 0) {
             leadingIcons
             textColumn
-                .padding(.leading, 8)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(uiColor: .bgPrimary))
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(Color(uiColor: .appStroke))
+                .fill(Color(uiColor: .inputIcon))
                 .frame(height: 1)
         }
     }
 
     @ViewBuilder
     private var leadingIcons: some View {
-        if notice.isPinned {
-            Image(.anchor)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
+        Group {
+            if notice.isPinned {
+                Image(.anchor)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .padding(.trailing, 8)
+            }
         }
-        Image(typeIconResource)
-            .resizable()
-            .scaledToFit()
-            // 피그마: 24 컨테이너에 20 아이콘
-            .frame(width: 20, height: 20)
-            .frame(width: 24, height: 24)
+        .frame(maxHeight: .infinity, alignment: .top)
     }
-
-    private var typeIconResource: ImageResource {
-        switch notice.type {
-        case .system: return .system
-        case .custom, .none: return .megaphone
-        }
-    }
-
+    
     private var textColumn: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading) {
             // 본문 (1줄 말줄임)
             Text(notice.content ?? "")
                 .font(.custom(FontFamily.Pretendard.medium, size: FontStyle.Size.body1))
                 .foregroundColor(Color(uiColor: .text02))
                 .lineLimit(1)
                 .truncationMode(.tail)
+                .frame(height: 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             // 메타 라인: 절대시간 · 상대시간 (· 읽음수는 데이터 들어올 때만)

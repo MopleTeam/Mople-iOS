@@ -48,7 +48,7 @@ final class NoticeDetailViewModel: ObservableObject {
     private let fetchNoticeUseCase: FetchNotice
     private let fetchCommentsUseCase: FetchNoticeCommentList
     private let createCommentUseCase: CreateNoticeComment
-    private let editCommentUseCase: EditComment
+    private let editCommentUseCase: EditNoticeComment
     private let deleteCommentUseCase: DeleteComment
     private let reportUseCase: ReportPost
     private let deleteNoticeUseCase: DeleteNotice
@@ -63,7 +63,7 @@ final class NoticeDetailViewModel: ObservableObject {
          fetchNoticeUseCase: FetchNotice,
          fetchCommentsUseCase: FetchNoticeCommentList,
          createCommentUseCase: CreateNoticeComment,
-         editCommentUseCase: EditComment,
+         editCommentUseCase: EditNoticeComment,
          deleteCommentUseCase: DeleteComment,
          reportUseCase: ReportPost,
          deleteNoticeUseCase: DeleteNotice,
@@ -224,8 +224,8 @@ final class NoticeDetailViewModel: ObservableObject {
             guard let self else { return }
             defer { self.isSubmitting = false }
             do {
-                let updated = try await self.editCommentUseCase.execute(id: commentId,
-                                                                        text: text,
+                let updated = try await self.editCommentUseCase.execute(noticeId: commentId,
+                                                                        content: text,
                                                                         mentions: [])
                 if let idx = self.comments.firstIndex(where: { $0.id == updated.id }) {
                     self.comments[idx] = updated

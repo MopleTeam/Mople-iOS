@@ -12,10 +12,12 @@ public final class DefaultNoticeRepo: BaseRepositories, NoticeRepo {
 
     // MARK: - 공지 CRUD
     public func fetchNoticeList(meetId: Int,
+                                type: NoticeType?,
                                 size: Int?,
                                 cursor: String?) async throws -> Page<Notice> {
         let response: PageResponse<NoticeResponse> = try await self.networkService.authenticatedRequest {
             try APIEndpoints.fetchNoticeList(meetId: meetId,
+                                             type: type?.rawValue,
                                              size: size,
                                              cursor: cursor)
         }
@@ -93,6 +95,17 @@ public final class DefaultNoticeRepo: BaseRepositories, NoticeRepo {
             try APIEndpoints.createNoticeComment(noticeId: noticeId,
                                                  content: content,
                                                  mentions: mentions)
+        }
+        return response.toDomain()
+    }
+    
+    public func editNoticeComment(noticeId: Int,
+                                  content: String,
+                                  mentions: [Int]) async throws -> Comment {
+        let response: NoticeCommentResponse = try await self.networkService.authenticatedRequest {
+            try APIEndpoints.editNoticeComment(noticeId: noticeId,
+                                               content: content,
+                                               mentions: mentions)
         }
         return response.toDomain()
     }

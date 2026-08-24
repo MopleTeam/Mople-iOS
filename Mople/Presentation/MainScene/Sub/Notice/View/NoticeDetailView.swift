@@ -311,35 +311,47 @@ struct NoticeDetailView: View {
     // 줄바꿈/자동 높이 확장/초과 시 자체 스크롤 동작이 매칭됨.
     // 높이는 minHeight(1줄) ~ maxHeight(4줄) 범위에서 콘텐츠에 맞춰 자동.
     private var inputBox: some View {
-        // Body1.regular(=14pt) lineHeight ≈ 14 * 1.4 = 19.6pt 가정.
-        // ChatingTextFieldView의 maxTextLine 4 매핑 → 4줄까지 늘어나고 그 이상은 내부 스크롤.
-        let lineHeight: CGFloat = 20
-        let minHeight: CGFloat = lineHeight
-        let maxHeight: CGFloat = lineHeight * 4
+        // 박스 높이는 "보이지 않는 sizer Text"가 결정한다.
+        // TextEditor(UITextView)의 intrinsic 높이는 first responder 전후로 달라져서,
+        // 예전처럼 .fixedSize로 그 값을 따라가면 포커스 순간 박스가 커졌다.
+        // sizer Text는 포커스와 무관하게 "입력한 내용"만으로 높이가 정해지므로 안정적이다.
+        // sizer가 크기를 만들고, placeholder/TextEditor는 overlay로 얹혀 박스 크기에 영향을 주지 않는다.
+        // 1~4줄까지 커지고(lineLimit 4), 그 이상은 TextEditor가 내부 스크롤한다.
+        let hInset: CGFloat = 8
+        let vInset: CGFloat = 18
+        // TextEditor(UITextView) 기본 inset 보정(수평 ~5, 수직 ~8) → placeholder/sizer와 글자 위치 일치
+        let editorHInset: CGFloat = hInset - 5
+        let editorVInset: CGFloat = vInset - 8
 
-        return ZStack(alignment: .topLeading) {
-            if viewModel.inputText.isEmpty {
-                Text("댓글을 입력해주세요")
-                    .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
-                    .foregroundColor(Color(uiColor: .text04))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 18)
-                    .allowsHitTesting(false)
+        return Text(viewModel.inputText.isEmpty ? " " : viewModel.inputText)
+            .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
+            .lineLimit(4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, hInset)
+            .padding(.vertical, vInset)
+            .foregroundColor(.clear)                 // sizer 글자는 숨기고 높이만 사용
+            .overlay(alignment: .topLeading) {
+                if viewModel.inputText.isEmpty {
+                    Text("댓글을 입력해주세요")
+                        .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
+                        .foregroundColor(Color(uiColor: .text04))
+                        .padding(.horizontal, hInset)
+                        .padding(.vertical, vInset)
+                        .allowsHitTesting(false)
+                }
             }
-            TextEditor(text: $viewModel.inputText)
-                .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
-                .foregroundColor(Color(uiColor: .text01))
-                .tint(Color(uiColor: .text02))
-                .focused($inputFocused)
-                .scrollContentBackground(.hidden)
-                .frame(minHeight: minHeight, maxHeight: maxHeight)
-                .fixedSize(horizontal: false, vertical: true)
-                // TextEditor 내부 inset(약 ~5pt)을 빼고 ChatingTextFieldView padding(8/18)에 맞춤
-                .padding(.horizontal, 3)
-                .padding(.vertical, 13)
-        }
-        .background(Color(uiColor: .bgInput))
-        .cornerRadius(8)
+            .overlay(alignment: .topLeading) {
+                TextEditor(text: $viewModel.inputText)
+                    .font(.custom(FontFamily.Pretendard.regular, size: FontStyle.Size.body1))
+                    .foregroundColor(Color(uiColor: .text01))
+                    .tint(Color(uiColor: .text02))
+                    .focused($inputFocused)
+                    .scrollContentBackground(.hidden)
+                    .padding(.horizontal, editorHInset)
+                    .padding(.vertical, editorVInset)
+            }
+            .background(Color(uiColor: .bgInput))
+            .cornerRadius(8)
     }
 
     // sendButton: ChatingTextFieldView 정확 매핑
@@ -413,7 +425,7 @@ private struct NoticeCommentRow: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(Color(uiColor: .appStroke))
+                .fill(Color(uiColor: .inputIcon))
                 .frame(height: 1)
         }
     }
