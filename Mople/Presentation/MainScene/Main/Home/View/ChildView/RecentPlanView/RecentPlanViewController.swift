@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -22,6 +23,7 @@ final class RecentPlanViewController: BaseViewController, View {
     
     // MARK: - Observable
     private let footerTapObserver: PublishSubject<Void> = .init()
+    private let weathreTapObserver: PublishSubject<Plan> = .init()
     
     // MARK: - UI Components
     private let collectionView: UICollectionView = {
@@ -37,7 +39,7 @@ final class RecentPlanViewController: BaseViewController, View {
         let emptyView = DefaultEmptyView(imageSize: .init(width: 100, height: 100))
         emptyView.setTitle(text: L10n.Home.emptyPlan)
         emptyView.setImage(image: .emptyHomePlan)
-        emptyView.backgroundColor = .defaultWhite
+        emptyView.backgroundColor = .bgPrimary
         emptyView.layer.cornerRadius = 12
         return emptyView
     }()
@@ -96,6 +98,9 @@ final class RecentPlanViewController: BaseViewController, View {
         let dataSource = RxCollectionViewSectionedReloadDataSource<Section>(
              configureCell: { _, collectionView, indexPath, item in
                  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RecentPlanCollectionCell.reuseIdentifier, for: indexPath) as! RecentPlanCollectionCell
+                 cell.weatherTapped = { [weak self] in
+                     self?.weathreTapObserver.onNext(item)
+                 }
                  cell.configure(with: .init(plan: item))
                  return cell
              },
@@ -142,6 +147,11 @@ extension RecentPlanViewController {
         
         collectionView.rx.itemSelected
             .map { Reactor.Action.flow(.planDetail(index: $0.item)) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        weathreTapObserver
+            .map({ Reactor.Action.flow(.editPlan($0)) })
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }

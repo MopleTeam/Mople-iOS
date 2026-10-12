@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -66,7 +67,7 @@ final class SearchResultViewController: BaseViewController, View, UIScrollViewDe
     }
         
     private func setLayout() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         view.addSubview(countView)
         view.addSubview(tableView)
         

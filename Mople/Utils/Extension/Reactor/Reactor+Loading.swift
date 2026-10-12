@@ -6,6 +6,8 @@
 //
 
 import RxSwift
+import Domain
+import Data
 
 protocol LoadingReactor: AnyObject {
     associatedtype Mutation

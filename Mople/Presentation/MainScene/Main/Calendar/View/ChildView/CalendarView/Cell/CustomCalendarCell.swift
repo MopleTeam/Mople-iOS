@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import FSCalendar
 
@@ -70,7 +71,7 @@ extension CustomCalendarCell {
     }
 
     private func setDefaultBackColor(_ isToday: Bool) {
-        indicatorView.backgroundColor = isToday ? .bgPrimary : .clear
+        indicatorView.backgroundColor = isToday ? .bgSecondary : .clear
     }
 }
  

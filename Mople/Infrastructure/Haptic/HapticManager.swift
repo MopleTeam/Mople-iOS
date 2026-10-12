@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 final class HapticManager {
     static let shared = HapticManager()

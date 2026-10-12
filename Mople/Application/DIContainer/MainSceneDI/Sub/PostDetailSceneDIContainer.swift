@@ -6,7 +6,9 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
+import Data
 
 protocol PostDetailSceneDependencies {
     // MARK: - 기본 뷰
@@ -34,14 +36,17 @@ final class PostDetailSceneDIContainer: BaseContainer, PostDetailSceneDependenci
     private let postType: PostType
     private let postId: Int
     
+    
     init(appNetworkService: AppNetworkService,
          commonFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          type: PostType,
          postId: Int) {
         self.postType = type
         self.postId = postId
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonFactory)
+                   commonFactory: commonFactory,
+                   userSession: userSession)
     }
     
     func makePostDetailCoordinator() -> PostDetailFlowCoordinator {
@@ -83,23 +88,43 @@ extension PostDetailSceneDIContainer {
     
     
     private func makeFetchPlanDetailUsecase(repo: PlanRepo) -> FetchPlanDetail {
-        return FetchPlanDetailUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchPlanDetailUseCase(repo: repo, session: userSession) as FetchPlanDetail, mock: MockFetchPlanDetailUseCase())
+        #else
+        return FetchPlanDetailUseCase(repo: repo, session: userSession)
+        #endif
     }
     
     private func makeDeletePlanUseCase(repo: PlanRepo) -> DeletePlan {
+        #if DEV
+        return MockDataManager.resolve(DeletePlanUseCase(repo: repo) as DeletePlan, mock: MockDeletePlanUseCase())
+        #else
         return DeletePlanUseCase(repo: repo)
+        #endif
     }
     
     private func makeParticipationPlanUseCase(repo: PlanRepo) -> ParticipationPlan {
+        #if DEV
+        return MockDataManager.resolve(ParticipationPlanUseCase(participationRepo: repo) as ParticipationPlan, mock: MockParticipationPlanUseCase())
+        #else
         return ParticipationPlanUseCase(participationRepo: repo)
+        #endif
     }
     
     private func makeFetchReviewDetailUseCase(repo: ReviewRepo) -> FetchReviewDetail {
-        return FetchReviewDetailUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo, session: userSession) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
+        #else
+        return FetchReviewDetailUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     private func makeDeleteReviewUseCase(repo: ReviewRepo) -> DeleteReview {
+        #if DEV
+        return MockDataManager.resolve(DeleteReviewUseCase(repo: repo) as DeleteReview, mock: MockDeleteReviewUseCase())
+        #else
         return DeleteReviewUseCase(repo: repo)
+        #endif
     }
 
     // MARK: - 댓글뷰
@@ -108,7 +133,8 @@ extension PostDetailSceneDIContainer {
         let commentReactor = makeCommentListViewReactor(type: type,
                                                         reportUseCase: makeReportUseCase(),
                                                         coordinator: coordinator)
-        return .init(reactor: commentReactor,
+        return .init(type: type,
+                     reactor: commentReactor,
                      mentionVC: makeMentionListViewController())
     }
     
@@ -135,39 +161,71 @@ extension PostDetailSceneDIContainer {
     
     // 댓글 UseCase
     private func makeFetchCommentListUseCase(repo: CommentRepo) -> FetchCommentList {
-        return FetchCommentListUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchCommentListUseCase(repo: repo, session: userSession) as FetchCommentList, mock: MockFetchCommentListUseCase())
+        #else
+        return FetchCommentListUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     private func makeCreateCommentUseCase(repo: CommentRepo) -> CreateComment {
-        return CreateCommentUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(CreateCommentUseCase(repo: repo, session: userSession) as CreateComment, mock: MockCreateCommentUseCase())
+        #else
+        return CreateCommentUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     // 대댓글 UseCase
     private func makeFetchReplyCommentListUseCase(repo: CommentRepo) -> FetchReplyCommentList {
-        return FetchReplyCommentListUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchReplyCommentListUseCase(repo: repo, session: userSession) as FetchReplyCommentList, mock: MockFetchReplyCommentListUseCase())
+        #else
+        return FetchReplyCommentListUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     private func makeCreateReplyUseCase(repo: CommentRepo) -> CreateReplyComment {
-        return CreateReplyCommentUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(CreateReplyCommentUseCase(repo: repo, session: userSession) as CreateReplyComment, mock: MockCreateReplyCommentUseCase())
+        #else
+        return CreateReplyCommentUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     // 공통
     private func makeDeleteCommentUseCase(repo: CommentRepo) -> DeleteComment {
+        #if DEV
+        return MockDataManager.resolve(DeleteCommentUseCase(repo: repo) as DeleteComment, mock: MockDeleteCommentUseCase())
+        #else
         return DeleteCommentUseCase(repo: repo)
+        #endif
     }
-    
+
     private func makeEditCommentUseCase(repo: CommentRepo) -> EditComment {
-        return EditCommentUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(EditCommentUseCase(repo: repo, session: userSession) as EditComment, mock: MockEditCommentUseCase())
+        #else
+        return EditCommentUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     private func makeLikeCommentUseCase(repo: CommentRepo) -> LikeComment {
-        return LikeCommentUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(LikeCommentUseCase(repo: repo, session: userSession) as LikeComment, mock: MockLikeCommentUseCase())
+        #else
+        return LikeCommentUseCase(repo: repo, session: userSession)
+        #endif
     }
     
     // MARK: - 신고 유즈케이스
     private func makeReportUseCase() -> ReportPost {
         let repo = DefaultReportRepo(networkService: appNetworkService)
+        #if DEV
+        return MockDataManager.resolve(ReportPostUseCase(repo: repo) as ReportPost, mock: MockReportPostUseCase())
+        #else
         return ReportPostUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 멘션뷰
@@ -180,7 +238,11 @@ extension PostDetailSceneDIContainer {
     }
     
     private func makeFetchMentionListUseCase() -> FetchMentionList {
+        #if DEV
+        return MockDataManager.resolve(FetchMentionListUseCase(repo: DefaultMentionRepo(networkService: appNetworkService)) as FetchMentionList, mock: MockFetchMentionListUseCase())
+        #else
         return FetchMentionListUseCase(repo: DefaultMentionRepo(networkService: appNetworkService))
+        #endif
     }
 }
 
@@ -239,15 +301,27 @@ extension PostDetailSceneDIContainer {
     }
     
     private func makeFetchReviewUseCase(repo: ReviewRepo) -> FetchReviewDetail {
-        return FetchReviewDetailUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchReviewDetailUseCase(repo: repo, session: userSession) as FetchReviewDetail, mock: MockFetchReviewDetailUseCase())
+        #else
+        return FetchReviewDetailUseCase(repo: repo, session: userSession)
+        #endif
     }
-    
+
     private func makeDeleteReviewUseCase(repo: ReviewRepo) -> DeleteReviewImage {
+        #if DEV
+        return MockDataManager.resolve(DeleteReviewImageUseCase(repo: repo) as DeleteReviewImage, mock: MockDeleteReviewImageUseCase())
+        #else
         return DeleteReviewImageUseCase(repo: repo)
+        #endif
     }
-    
+
     private func makeReviewImageUploadUseCase(repo: ImageUploadRepo) -> ReviewImageUpload {
+        #if DEV
+        return MockDataManager.resolve(ReviewImageUploadUseCase(repo: repo) as ReviewImageUpload, mock: MockReviewImageUploadUseCase())
+        #else
         return ReviewImageUploadUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - 포토북
@@ -268,6 +342,7 @@ extension PostDetailSceneDIContainer {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
+            userSession: userSession,
             type: .edit(plan))
         return planCreateDI.makePlanCreateFlowCoordinator()
     }

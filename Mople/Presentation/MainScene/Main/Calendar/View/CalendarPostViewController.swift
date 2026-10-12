@@ -5,6 +5,7 @@
 //  Created by CatSlave on 8/31/24.
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -28,7 +29,7 @@ final class CalendarPostViewController: TitleNaviViewController, View {
         let view = UIButton()
         view.clipsToBounds = true
         view.layer.cornerRadius = 10
-        view.backgroundColor = .bgPrimary
+        view.backgroundColor = .bgSecondary
         return view
     }()
     
@@ -36,7 +37,7 @@ final class CalendarPostViewController: TitleNaviViewController, View {
         let header = IconLabel(icon: .downArrow,
                                iconSize: .init(width: 24, height: 24))
         header.setTitle(font: FontStyle.Title3.semiBold,
-                        color: .gray01)
+                        color: .text01)
         header.rightIconAligment()
         header.isUserInteractionEnabled = false
         return header
@@ -324,7 +325,7 @@ extension CalendarPostViewController {
     }
     
     private func updateBackgroundColor(scope: ScopeType) {
-        self.postListContainer.backgroundColor = scope == .month ? .defaultWhite : .bgPrimary
+        self.postListContainer.backgroundColor = scope == .month ? .bgPrimary : .bgSecondary
     }
     
     private func naviItemChange(scope: ScopeType) {

@@ -6,6 +6,8 @@
 //
 
 import RxSwift
+import Domain
+import Data
 
 protocol ChildLoadingDelegate: AnyObject {
     func updateLoadingMutation(_ isLoading: Bool, index: Int)

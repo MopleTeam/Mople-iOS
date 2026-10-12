@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension UITextView {
     func addMention(text: String, id: Int) {
@@ -70,7 +71,7 @@ extension UITextView {
     
     func resetTypingAttributes() {
         let defaultAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.gray03,
+            .foregroundColor: UIColor.text02,
             .font: FontStyle.Body1.medium
         ]
         typingAttributes = defaultAttributes
@@ -125,6 +126,7 @@ extension UITextView {
     }
     
     func setTextFromServer(text: String, mentions: [UserInfo]) {
+        print(#function, #line, "Path : # 댓글 \(text) ")
         var resultText = text
         var mentionRanges: [(range: NSRange, id: Int, nickname: String)] = []
         
@@ -167,7 +169,7 @@ extension UITextView {
         
         let fullRange = NSRange(location: 0, length: resultText.utf16.count)
         mutableAttributedString.addAttributes([
-            .foregroundColor: UIColor.gray02,
+            .foregroundColor: UIColor.text02,
             .font: FontStyle.Body1.regular
         ], range: fullRange)
         
@@ -182,7 +184,6 @@ extension UITextView {
                 NSAttributedString.Key(rawValue: "MentionTag"): mentionInfo.id
             ], range: mentionInfo.range)
         }
-        
         self.attributedText = mutableAttributedString
         resetTypingAttributes()
     }

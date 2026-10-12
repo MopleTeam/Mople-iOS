@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
 
@@ -24,7 +25,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     private let indicatorLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title3.semiBold
-        label.textColor = .gray04
+        label.textColor = .text03
         label.layer.zPosition = 2
         return label
     }()
@@ -35,7 +36,7 @@ final class PhotoBookViewController: TitleNaviViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
-        collectionView.backgroundColor = .defaultBlack
+        collectionView.backgroundColor = .appBlack
         return collectionView
     }()
     
@@ -95,7 +96,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     
     private func setNavi() {
         self.naviBar.setBarItem(type: .left,
-                                image: .backArrow.withTintColor(.defaultWhite))
+                                image: .backArrow.withTintColor(.bgPrimary))
     }
     
     private func setLayout() {
@@ -117,10 +118,10 @@ final class PhotoBookViewController: TitleNaviViewController {
     }
     
     private func setBackgroundColor() {
-        self.view.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
-        notchView.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
-        naviBar.backgroundColor = .defaultBlack.withAlphaComponent(opacity)
-        naviBar.setTitleColor(.defaultWhite)
+        self.view.backgroundColor = .appBlack.withAlphaComponent(opacity)
+        notchView.backgroundColor = .appBlack.withAlphaComponent(opacity)
+        naviBar.backgroundColor = .appBlack.withAlphaComponent(opacity)
+        naviBar.setTitleColor(.bgPrimary)
     }
     
     private func scrollToSelectedIndex() {
@@ -242,7 +243,7 @@ final class PhotoBookViewController: TitleNaviViewController {
     
     // 배경 투명도 조정
     private func changeOpacity(opacity: CGFloat) {
-        let backColor: UIColor = .defaultBlack
+        let backColor: UIColor = .appBlack
         self.view.backgroundColor = backColor.withAlphaComponent(opacity)
     }
     

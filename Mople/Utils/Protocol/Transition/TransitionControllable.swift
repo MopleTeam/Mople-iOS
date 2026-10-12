@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 // MARK: - 플로우 용도
 protocol TransitionControllable: NSObject, UIViewControllerTransitioningDelegate {

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol SearchPlaceCoordination: AnyObject {
     func updateSearchResultViewVisibility(shouldShow: Bool)

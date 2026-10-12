@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import Domain
 
 extension NSMutableAttributedString {
     static func makeHighlightText(fullText: String,
                                  fullTextFont: UIFont = FontStyle.Body1.medium,
-                                  fullTextColor: UIColor = .gray04,
+                                  fullTextColor: UIColor = .text03,
                                  highlightText: String,
                                  highlightFont: UIFont = FontStyle.Body1.medium,
                                   highlightColor: UIColor = .appPrimary) -> NSMutableAttributedString {

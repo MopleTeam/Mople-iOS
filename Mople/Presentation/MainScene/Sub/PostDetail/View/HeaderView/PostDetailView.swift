@@ -6,13 +6,20 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
+
+enum PostDetailMapType {
+    case none
+    case some
+}
 
 final class PostDetailView: UIView {
     
     // MARK: - Variables
     private let postType: PostType
+    fileprivate var mapType: PostDetailMapType?
     
     // MARK: - UI Components
     fileprivate let postInfoView = PostInfoView()
@@ -20,7 +27,7 @@ final class PostDetailView: UIView {
     fileprivate let mapView: MapView = {
         let view = MapView()
         view.layer.cornerRadius = 8
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1)
         view.backgroundColor = .bgInput
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true
@@ -38,8 +45,8 @@ final class PostDetailView: UIView {
     fileprivate lazy var participationButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite,
-                     selectedColor: .gray03)
+                     normalColor: .primaryText,
+                     selectedColor: .tertiaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        selectedColor: .appTertiary)
         btn.setRadius(8)
@@ -52,7 +59,7 @@ final class PostDetailView: UIView {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 20, left: 20, bottom: 28, right: 20)
         return sv
@@ -110,8 +117,21 @@ final class PostDetailView: UIView {
     
     public func configure(with postSummary: PostSummary) {
         postInfoView.configure(with: postSummary)
-        mapView.initializeMap(location: postSummary.location)
+        
         handlePostTypeView(with: postSummary)
+        
+        if let location = postSummary.location {
+            mapView.initializeMap(location: location)
+            mapType = PostDetailMapType.some
+        } else if let date = postSummary.date,
+                  date > Date(),
+                  postSummary.isCreator {
+            mapView.setAddMapView()
+            mapType = PostDetailMapType.none
+        } else {
+            mapType = nil
+            mapView.isHidden = true
+        }
     }
     
     private func handlePostTypeView(with postSummary: PostSummary) {
@@ -218,9 +238,10 @@ extension Reactive where Base: PostDetailView {
         return base.postInfoView.rx.memberTapped
     }
     
-    var mapTapped: Observable<Void> {
+    var mapTapped: Observable<PostDetailMapType> {
         return base.mapTapGesture.rx.event
-            .map { _ in }
+            .map { [weak base] _ in base?.mapType }
+            .compactMap { $0 }
     }
     
     var participationTapped: ControlEvent<Void> {

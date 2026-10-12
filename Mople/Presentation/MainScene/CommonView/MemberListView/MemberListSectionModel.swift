@@ -6,6 +6,7 @@
 //
 
 import Differentiator
+import Domain
 
 struct MembersSectionModel: SectionModelType {
     var items: [MemberInfo] = []

@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Domain
+import Data
 
 struct DefaultAlertAction {
     
@@ -15,7 +17,7 @@ struct DefaultAlertAction {
     let completion: (() -> Void)?
     
     init(text: String = L10n.check,
-         textColor: UIColor = .defaultWhite,
+         textColor: UIColor = .primaryText,
          bgColor: UIColor = .appPrimary,
          completion: (() -> Void)? = nil) {
         

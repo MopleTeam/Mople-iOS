@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 
 final class PostListTableHeaderView: UITableViewHeaderFooterView {
@@ -14,7 +15,7 @@ final class PostListTableHeaderView: UITableViewHeaderFooterView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body1.medium
-        label.textColor = .gray05
+        label.textColor = .text04
         label.textAlignment = .center
         return label
     }()

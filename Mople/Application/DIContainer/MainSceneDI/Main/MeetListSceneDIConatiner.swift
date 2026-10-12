@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Domain
+import Data
 
 protocol MeetListSceneDependencies {
     // MARK: - View
@@ -44,7 +46,11 @@ extension MeetListSceneDIConatiner {
     
     private func makeMeetListUseCase() -> FetchMeetPage {
         let repo = DefaultMeetRepo(networkService: appNetworkService)
-        return FetchMeetPageUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchMeetPageUseCase(repo: repo, session: userSession) as FetchMeetPage, mock: MockFetchMeetPageUseCase())
+        #else
+        return FetchMeetPageUseCase(repo: repo, session: userSession)
+        #endif
     }
 }
 
@@ -68,6 +74,7 @@ extension MeetListSceneDIConatiner {
                                        isJoin: Bool) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: isJoin)
         return meetDetailDI.makeMeetDetailCoordinator()

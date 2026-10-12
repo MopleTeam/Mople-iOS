@@ -6,15 +6,34 @@
 //
 
 import Foundation
+import Domain
 import RxSwift
 import KakaoSDKUser
 
-protocol KakaoLoginService {
+protocol KakaoLoginService: SocialLoginService {
     func startKakaoLogin() -> Observable<SocialInfo>
 }
 
 final class DefaultKakaoLoginService: KakaoLoginService {
-    
+
+    // MARK: - SocialLoginService (async 브릿지)
+    func login() async throws -> SocialInfo {
+        try await withCheckedThrowingContinuation { continuation in
+            var resumed = false
+            _ = startKakaoLogin()
+                .take(1)
+                .subscribe(onNext: { socialInfo in
+                    guard !resumed else { return }
+                    resumed = true
+                    continuation.resume(returning: socialInfo)
+                }, onError: { error in
+                    guard !resumed else { return }
+                    resumed = true
+                    continuation.resume(throwing: error)
+                })
+        }
+    }
+
     init() {
         print(#function, #line, "LifeCycle Test DefaultKakaoLoginService Created" )
     }

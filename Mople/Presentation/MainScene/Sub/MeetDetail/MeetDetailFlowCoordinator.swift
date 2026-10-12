@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol MeetDetailCoordination: AnyObject {
     
@@ -22,6 +23,8 @@ protocol MeetDetailCoordination: AnyObject {
     func presentPlanDetailView(postId: Int,
                                type: PostType)
     func pushMemberListView()
+    func presentNoticeListView(meetId: Int, isCreator: Bool)
+    func presentNoticeDetailView(notice: Notice, isCreator: Bool)
     func endFlow()
 }
 
@@ -50,6 +53,11 @@ final class MeetDetailSceneCoordinator: BaseCoordinator, MeetDetailCoordination 
         reviewListVC = dependencies.makeMeetReviewListViewController()
         detailMeetVC?.pageController.setViewControllers([planListVC!], direction: .forward, animated: false)
         detailMeetVC?.configureEdgeGesture()
+
+        // sticky 헤더 — 자식 스크롤을 부모로 전달
+        if let plan = planListVC, let review = reviewListVC {
+            detailMeetVC?.attachChildScrollObservers(plan, review)
+        }
     }
 }
 
@@ -82,6 +90,11 @@ extension MeetDetailSceneCoordinator: MeetSetupCoordination {
     func pushMeetSetupView(meet: Meet) {
         let vc = dependencies.makeMeetSetupViewController(meet: meet,
                                                           coordinator: self)
+        self.pushWithTracking(vc, animated: true)
+    }
+    
+    func pushTransferMeetView(meet: Meet) {
+        let vc = dependencies.makeTransferMeetViewController(meet: meet)
         self.pushWithTracking(vc, animated: true)
     }
 }
@@ -135,6 +148,28 @@ extension MeetDetailSceneCoordinator {
                                                                                    type: type)
         start(coordinator: planDetailFlowCoordinator)
         self.present(planDetailFlowCoordinator.navigationController)
+    }
+}
+
+// MARK: - Notice Flow
+extension MeetDetailSceneCoordinator {
+
+    // 확성기 버튼 → 공지 리스트 (modal present)
+    func presentNoticeListView(meetId: Int, isCreator: Bool) {
+        let coordinator = dependencies.makeNoticeFlowCoordinator(
+            entry: .list(meetId: meetId, isCreator: isCreator)
+        )
+        start(coordinator: coordinator)
+        self.present(coordinator.navigationController)
+    }
+
+    // 공지 미리보기 카드 → 공지 상세 (modal present)
+    func presentNoticeDetailView(notice: Notice, isCreator: Bool) {
+        let coordinator = dependencies.makeNoticeFlowCoordinator(
+            entry: .detail(notice: notice, isCreator: isCreator)
+        )
+        start(coordinator: coordinator)
+        self.present(coordinator.navigationController)
     }
 }
 

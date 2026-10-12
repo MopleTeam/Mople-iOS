@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import KakaoSDKCommon
 import FirebaseCore
 import Firebase
@@ -13,6 +14,7 @@ import FirebaseMessaging
 import KakaoSDKAuth
 import NMapsMap
 import RealmSwift
+import Data
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,6 +25,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Data 모듈의 토큰 저장소 프로바이더를 Keychain으로 등록
+        // (Data 모듈은 KeychainStorage를 직접 알지 못하므로 App 측에서 주입)
+        EndpointTokenStorage.shared.provider = KeychainStorage.shared
         appInitialSetup()
         
         window = UIWindow(frame: UIScreen.main.bounds)
@@ -35,8 +40,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = navigationController
         appFlowCoordinator?.start()
         
+        // 저장된 테마 설정 복원
+        let savedTheme = UserDefaults.standard.integer(forKey: "appThemeMode")
+        window?.overrideUserInterfaceStyle = (ThemeMode(rawValue: savedTheme) ?? .system).userInterfaceStyle
+
         self.window?.makeKeyAndVisible()
-        
+
         return true
     }
     

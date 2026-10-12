@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxRelay
 import ReactorKit
+import Data
 
 enum PostType {
     case plan
@@ -44,7 +46,7 @@ final class PostDetailViewController: TitleNaviViewController, View {
     public let commentVC: CommentListViewController
     private let commentContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
 
@@ -200,7 +202,12 @@ extension PostDetailViewController {
             .disposed(by: disposeBag)
         
         postInfoView.rx.mapTapped
-            .map { Reactor.Action.flow(.placeDetailView) }
+            .map {
+                switch $0 {
+                case .none: Reactor.Action.flow(.editPost)
+                case .some: Reactor.Action.flow(.placeDetailView)
+                }
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -242,7 +249,9 @@ extension PostDetailViewController {
             .asDriver(onErrorJustReturn: nil)
             .compactMap({ $0 })
             .drive(with: self, onNext: { vc, postSummary in
-                vc.commentVC.loadComment(with: postSummary.postId, totalCount: postSummary.commentCount)
+                vc.commentVC.loadComment(with: postSummary.postId,
+                                         meetId: postSummary.meet?.id,
+                                         totalCount: postSummary.commentCount)
                 vc.setPostInfoView(with: postSummary)
                 vc.showSuggestReviewAlert(with: postSummary)
             })
@@ -303,6 +312,7 @@ extension PostDetailViewController {
     
     private func showLeavePlanAlert() {
         let createAction: DefaultAlertAction = .init(text: L10n.yes,
+                                                     textColor: .secondaryText,
                                                      bgColor: .appSecondary,
                                                      completion: { [weak self] in
             self?.participation.onNext(())
@@ -310,7 +320,7 @@ extension PostDetailViewController {
         
         alertManager.showDefaultAlert(title: L10n.Meetdetail.planLeaveInfo,
                                       defaultAction: .init(text: L10n.cancle,
-                                                           textColor: .gray01,
+                                                           textColor: .tertiaryText,
                                                            bgColor: .appTertiary),
                                       addAction: [createAction])
     }
@@ -322,7 +332,12 @@ extension PostDetailViewController {
         guard postSummary.isCreator,
               let isReviewd = (postSummary as? ReviewPostSummary)?.isReviewd,
               !isReviewd else { return }
-        
+
+        // 게시글별 최초 1회만 노출 — 같은 후기 게시글에 다시 들어와도 반복 노출되지 않도록 이력 체크
+        guard let postId = postSummary.postId,
+              !UserDefaults.hasSuggestedReview(postId: postId) else { return }
+        UserDefaults.markSuggestedReview(postId: postId)
+
         let writeReview = writeReview()
         let cancleAction = cancleWriteReview()
         
@@ -334,7 +349,7 @@ extension PostDetailViewController {
     
     private func writeReview() -> DefaultAlertAction {
         return .init(text: L10n.Review.create,
-                     textColor: .defaultWhite,
+                     textColor: .primaryText,
                      bgColor: .appPrimary,
                      completion: { [weak self] in
             self?.editPost.onNext(())
@@ -343,7 +358,7 @@ extension PostDetailViewController {
     
     private func cancleWriteReview() -> DefaultAlertAction {
         return .init(text: L10n.cancle,
-                     textColor: .gray01,
+                     textColor: .tertiaryText,
                      bgColor: .appTertiary)
     }
 }

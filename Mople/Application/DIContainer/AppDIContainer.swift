@@ -6,15 +6,20 @@
 //
 
 import Foundation
+import Domain
+import Data
 
 class BaseContainer: LifeCycleLoggable {
     let appNetworkService: AppNetworkService
     let commonViewFactory: ViewDependencies
-    
+    let userSession: UserSessionProvider
+
     init(appNetworkService: AppNetworkService,
-         commonFactory: ViewDependencies) {
+         commonFactory: ViewDependencies,
+         userSession: UserSessionProvider) {
         self.appNetworkService = appNetworkService
         self.commonViewFactory = commonFactory
+        self.userSession = userSession
         logLifeCycle()
     }
     
@@ -43,7 +48,11 @@ final class AppDIContainer {
         return DefaultAppNetWorkService(dataTransferService: transferService)
     }()
     
-    lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService)
+    lazy var commonDIContainer = ViewDIContainer(appNetworkService: appNetworkService,
+                                                 userSession: userSession)
+
+    /// Domain UseCase에 주입할 사용자 세션 프로바이더
+    lazy var userSession: UserSessionProvider = DefaultUserSessionProvider()
 }
 
 // MARK: - Make DIContainer
@@ -64,25 +73,37 @@ extension AppDIContainer {
     }
     
     private func makeFetchUserInfoUseCase(repo: UserInfoRepo) -> FetchUserInfo {
-        return FetchUserInfoUseCase(userInfoRepo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(FetchUserInfoUseCase(userInfoRepo: repo) as FetchUserInfo, mock: MockFetchUserInfoUseCase())
+        #else
+        let useCase = FetchUserInfoUseCase(userInfoRepo: repo)
+        #endif
+        return useCase
     }
     
     private func makeCheckAppVersionUseCase() -> CheckVersion {
         let repo = DefaultAppVersionRepo(networkService: appNetworkService)
-        return CheckVersionUseCase(repo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(CheckVersionUseCase(repo: repo) as CheckVersion, mock: MockCheckVersionUseCase())
+        #else
+        let useCase = CheckVersionUseCase(repo: repo)
+        #endif
+        return useCase
     }
 
     // MARK: - 로그인 플로우
     func makeLoginSceneDIContainer() -> AuthSceneDIContainer {
         return AuthSceneDIContainer(appNetworkService: appNetworkService,
-                                     commonFactory: commonDIContainer)
+                                     commonFactory: commonDIContainer,
+                                     userSession: userSession)
     }
-    
+
     // MARK: - 메인 플로우
     func makeMainSceneDIContainer(isLoign: Bool) -> MainSceneDIContainer {
         return MainSceneDIContainer(isLogin: isLoign,
                                     appNetworkService: appNetworkService,
-                                    commonFactory: commonDIContainer)
+                                    commonFactory: commonDIContainer,
+                                    userSession: userSession)
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -22,7 +23,7 @@ final class MeetPlanTableCell: UITableViewCell {
     private let dateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Body2.semiBold
-        label.textColor = .gray04
+        label.textColor = .text03
         label.setContentHuggingPriority(.init(1), for: .horizontal)
         return label
     }()
@@ -37,7 +38,7 @@ final class MeetPlanTableCell: UITableViewCell {
         let label = IconLabel(icon: .circlePan,
                               iconSize: .init(width: 20, height: 22))
         label.setTitle(font: FontStyle.Title3.semiBold,
-                       color: .gray01)
+                       color: .text01)
         label.setSpacing(4)
         return label
     }()
@@ -46,7 +47,7 @@ final class MeetPlanTableCell: UITableViewCell {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 20, height: 20))
         label.setTitle(font: FontStyle.Body2.medium,
-                       color: .gray04)
+                       color: .text03)
         label.setSpacing(4)
         return label
     }()
@@ -56,8 +57,8 @@ final class MeetPlanTableCell: UITableViewCell {
     private lazy var participationButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Body1.semiBold,
-                     normalColor: .defaultWhite,
-                     selectedColor: .gray03)
+                     normalColor: .primaryText,
+                     selectedColor: .tertiaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        selectedColor: .appTertiary)
         btn.setRadius(8)
@@ -68,7 +69,7 @@ final class MeetPlanTableCell: UITableViewCell {
         let label = UILabel()
         label.text = L10n.Meetdetail.planEnd
         label.font = FontStyle.Body1.medium
-        label.textColor = .gray05
+        label.textColor = .text04
         label.textAlignment = .center
         return label
     }()
@@ -96,7 +97,7 @@ final class MeetPlanTableCell: UITableViewCell {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
@@ -153,7 +154,8 @@ final class MeetPlanTableCell: UITableViewCell {
         self.dateLabel.text = viewModel.dateString
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
-        self.weatherView.configure(with: .init(weather: viewModel.weather))
+        self.weatherView.configure(with: .init(weather: viewModel.weather),
+                                   isCreator: viewModel.isCreator)
         self.handleViewType(isCreator: viewModel.isCreator,
                              isParticipant: viewModel.isParticipant,
                              planDate: viewModel.date)

@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Domain
+import Data
 
 protocol AUthSceneDependencies {
     func makeSignInViewController(coordinator: AuthFlowCoordination) -> SignInViewController
@@ -47,9 +49,20 @@ extension AuthSceneDIContainer: AUthSceneDependencies {
     
     private func makeSignInUseCase() -> SignIn {
         let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
-        return SignInUseCase(appleLoginService: appleLoginService,
-                             kakaoLoginService: kakaoLoginService,
-                             authenticationRepo: authRepo)
+        let loginServices: [LoginPlatform: SocialLoginService] = [
+            .apple: appleLoginService,
+            .kakao: kakaoLoginService
+        ]
+        #if DEV
+        let useCase = MockDataManager.resolve(
+            SignInUseCase(loginServices: loginServices,
+                          authenticationRepo: authRepo) as SignIn,
+            mock: MockSignInUseCase())
+        #else
+        let useCase = SignInUseCase(loginServices: loginServices,
+                                     authenticationRepo: authRepo)
+        #endif
+        return useCase
     }
     
     // MARK: - View
@@ -76,20 +89,40 @@ extension AuthSceneDIContainer: AUthSceneDependencies {
     
     private func makeSignUpUseCase() -> SignUp {
         let authRepo = DefaultAuthenticationRepo(networkService: appNetworkService)
-        return SignUpUseCase(repo: authRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(SignUpUseCase(repo: authRepo) as SignUp, mock: MockSignUpUseCase())
+        #else
+        let useCase = SignUpUseCase(repo: authRepo)
+        #endif
+        return useCase
     }
     
     private func makeImageUploadUseCase() -> ImageUpload {
         let imageRepo = DefaultImageUploadRepo(networkService: appNetworkService)
-        return ImageUploadUseCase(imageUploadRepo: imageRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(ImageUploadUseCase(imageUploadRepo: imageRepo) as ImageUpload, mock: MockImageUploadUseCase())
+        #else
+        let useCase = ImageUploadUseCase(imageUploadRepo: imageRepo)
+        #endif
+        return useCase
     }
     
     private func makeCreationNicknameUseCase(repo: NicknameRepo) -> CreationNickname {
-        return CreationNicknameUseCase(nickNameRepo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(CreationNicknameUseCase(nickNameRepo: repo) as CreationNickname, mock: MockCreationNicknameUseCase())
+        #else
+        let useCase = CreationNicknameUseCase(nickNameRepo: repo)
+        #endif
+        return useCase
     }
     
     private func makeDuplicateNicknameUseCase(repo: NicknameRepo) -> CheckDuplicateNickname {
-        return CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo)
+        #if DEV
+        let useCase = MockDataManager.resolve(CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo) as CheckDuplicateNickname, mock: MockCheckDuplicateNicknameUseCase())
+        #else
+        let useCase = CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo)
+        #endif
+        return useCase
     }
 }
 
@@ -97,7 +130,12 @@ extension AuthSceneDIContainer: AUthSceneDependencies {
 extension AuthSceneDIContainer {
     private func makeFetchUserInfoUseCase() -> FetchUserInfo {
         let userInfoRepo = DefaultUserInfoRepo(networkService: appNetworkService)
-        return FetchUserInfoUseCase(userInfoRepo: userInfoRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(FetchUserInfoUseCase(userInfoRepo: userInfoRepo) as FetchUserInfo, mock: MockFetchUserInfoUseCase())
+        #else
+        let useCase = FetchUserInfoUseCase(userInfoRepo: userInfoRepo)
+        #endif
+        return useCase
     }
 }
 

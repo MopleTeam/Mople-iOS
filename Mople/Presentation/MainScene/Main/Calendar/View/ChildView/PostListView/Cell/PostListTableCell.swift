@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 
 final class PostListTableCell: UITableViewCell {
@@ -15,7 +16,7 @@ final class PostListTableCell: UITableViewCell {
         let view = ThumbnailView(thumbnailSize: 28,
                                       thumbnailRadius: 6)
         view.setTitleLabel(font: FontStyle.Body2.semiBold,
-                           color: .gray02)
+                           color: .text03)
         view.setSpacing(8)
         view.addArrowImageView()
         view.isUserInteractionEnabled = false
@@ -25,7 +26,7 @@ final class PostListTableCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.Title2.bold
-        label.textColor = .gray01
+        label.textColor = .text01
         return label
     }()
     
@@ -33,7 +34,7 @@ final class PostListTableCell: UITableViewCell {
         let label = IconLabel(icon: .member,
                               iconSize: .init(width: 18, height: 18))
         label.setTitle(font: FontStyle.Body2.medium,
-                       color: .gray04)
+                       color: .text03)
         label.setSpacing(4)
         return label
     }()
@@ -55,7 +56,7 @@ final class PostListTableCell: UITableViewCell {
         sv.spacing = 16
         sv.alignment = .fill
         sv.distribution = .fill
-        sv.backgroundColor = .defaultWhite
+        sv.backgroundColor = .bgPrimary
         sv.layer.cornerRadius = 12
         sv.isLayoutMarginsRelativeArrangement = true
         sv.layoutMargins = .init(top: 16, left: 16, bottom: 16, right: 16)
@@ -103,10 +104,12 @@ final class PostListTableCell: UITableViewCell {
     }
 
     // MARK: - Configure
-    public func configure(viewModel: PostListViewModel) {
+    public func configure(viewModel: PostListViewModel, isPlan: Bool) {
         self.titleLabel.text = viewModel.title
         self.countInfoLabel.text = viewModel.participantCountString
         self.thumbnailView.configure(with: ThumbnailViewModel(meetSummary: viewModel.meet))
-        self.weatherView.configure(with: .init(weather: viewModel.weather))
+        self.weatherView.configure(with: .init(weather: viewModel.weather),
+                                   isCreator: viewModel.isCreator,
+                                   isValidPlan: isPlan)
     }
 }

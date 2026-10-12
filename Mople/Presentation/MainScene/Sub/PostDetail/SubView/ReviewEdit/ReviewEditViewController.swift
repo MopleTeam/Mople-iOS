@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxCocoa
 import ReactorKit
@@ -30,7 +31,7 @@ final class ReviewEditViewController: TitleNaviViewController, View {
     
     private let titleContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -38,7 +39,7 @@ final class ReviewEditViewController: TitleNaviViewController, View {
         let label = UILabel()
         label.numberOfLines = 2
         label.text = L10n.Createreview.header
-        label.textColor = .gray01
+        label.textColor = .text01
         label.font = FontStyle.Heading.bold
         return label
     }()
@@ -65,7 +66,7 @@ final class ReviewEditViewController: TitleNaviViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Createreview.complete,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(8)

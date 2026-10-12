@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol AuthFlowCoordination: AnyObject {
     func pushSignUpView(_ socialInfo: SocialInfo)

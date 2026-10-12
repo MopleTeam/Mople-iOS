@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import Domain
+import SwiftUI
+import Data
 
 protocol ProfileSceneDependencies {
     // MARK: - View
@@ -14,7 +17,11 @@ protocol ProfileSceneDependencies {
     func makeProfileEditViewController(previousProfile: UserInfo,
                                        coordinator: ProfileEditViewCoordination) -> ProfileEditViewController
     func makeNotifyViewController(coordinator: NotifySubscribeCoordination) -> NotifySubcribeViewController
+    func makeThemeSettingViewController() -> UIViewController
     func makePolicyViewController() -> PolicyViewController
+
+    // MARK: - SwiftUI (Transfer Meet)
+    func makeTransferMeetFlow() -> BaseCoordinator
 }
 
 final class ProfileSceneDIContainer: BaseContainer, ProfileSceneDependencies {
@@ -40,19 +47,40 @@ extension ProfileSceneDIContainer {
     private func makeProfileViewReactor(coordinator: ProfileCoordination) -> ProfileViewReactor {
         return ProfileViewReactor(signOutUseCase: makeSignoutUseCase(),
                                   deleteAccountUseCase: makeDeleteAccountUseCase(),
+                                  fetchMyHostMeetsUseCase: makeFetchMyHostMeetsUseCase(),
                                   coordinator: coordinator)
     }
     
     private func makeSignoutUseCase() -> SignOut {
+        #if DEV
+        return MockDataManager.resolve(SignOutUseCase(repo: makeAuthRepo()) as SignOut, mock: MockSignOutUseCase())
+        #else
         return SignOutUseCase(repo: makeAuthRepo())
+        #endif
     }
     
     private func makeDeleteAccountUseCase() -> DeleteAccount {
+        #if DEV
+        return MockDataManager.resolve(DeleteAccountUseCase(repo: makeAuthRepo()) as DeleteAccount, mock: MockDeleteAccountUseCase())
+        #else
         return DeleteAccountUseCase(repo: makeAuthRepo())
+        #endif
+    }
+    
+    private func makeFetchMyHostMeetsUseCase() -> FetchMyHostMeets {
+        #if DEV
+        return MockDataManager.resolve(FetchMyHostMeetsUseCase(repo: makeMeetRepo()) as FetchMyHostMeets, mock: MockFetchMyHostMeetsUseCase())
+        #else
+        return FetchMyHostMeetsUseCase(repo: makeMeetRepo())
+        #endif
     }
     
     private func makeAuthRepo() -> AuthenticationRepo {
         return DefaultAuthenticationRepo(networkService: appNetworkService)
+    }
+    
+    private func makeMeetRepo() -> MeetRepo {
+        return DefaultMeetRepo(networkService: appNetworkService)
     }
 }
 
@@ -91,15 +119,27 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeEditProfileUseCase(repo: UserInfoRepo) -> EditProfile {
+        #if DEV
+        return MockDataManager.resolve(EditProfileUseCase(userInfoRepo: repo) as EditProfile, mock: MockEditProfileUseCase())
+        #else
         return EditProfileUseCase(userInfoRepo: repo)
+        #endif
     }
     
     private func makeDuplicateNicknameUseCase(repo: NicknameRepo) -> CheckDuplicateNickname {
+        #if DEV
+        return MockDataManager.resolve(CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo) as CheckDuplicateNickname, mock: MockCheckDuplicateNicknameUseCase())
+        #else
         return CheckDuplicateNicknameUseCase(duplicateCheckRepo: repo)
+        #endif
     }
     
     private func makeImageUploadUseCase(repo: ImageUploadRepo) -> ImageUpload {
+        #if DEV
+        return MockDataManager.resolve(ImageUploadUseCase(imageUploadRepo: repo) as ImageUpload, mock: MockImageUploadUseCase())
+        #else
         return ImageUploadUseCase(imageUploadRepo: repo)
+        #endif
     }
     
     // MARK: - 알림 관리
@@ -121,25 +161,57 @@ extension ProfileSceneDIContainer {
     }
     
     private func makeFetchNotifyState(repo: NotifySubscribeRepo) -> FetchNotifyState {
+        #if DEV
+        return MockDataManager.resolve(FetchNotifyStateUseCase(repo: repo) as FetchNotifyState, mock: MockFetchNotifyStateUseCase())
+        #else
         return FetchNotifyStateUseCase(repo: repo)
+        #endif
     }
     
     private func makeSubscribeNotify(repo: NotifySubscribeRepo) -> SubscribeNotify {
+        #if DEV
+        return MockDataManager.resolve(SubscribeNotifyUseCase(repo: repo) as SubscribeNotify, mock: MockSubscribeNotifyUseCase())
+        #else
         return SubscribeNotifyUseCase(repo: repo)
+        #endif
     }
     
     private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
         let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
-        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        let tokenProvider = DefaultFCMTokenProvider()
+        #if DEV
+        return MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
+        #else
+        return UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider)
+        #endif
     }
     
     private func makeNotifyService() -> NotificationService {
         return DefaultNotificationService()
     }
     
+    // MARK: - 테마 설정 View (SwiftUI)
+    func makeThemeSettingViewController() -> UIViewController {
+        let view = ThemeSettingView()
+        let hostingController = DismissableHostingController(rootView: view)
+        return hostingController
+    }
+
     // MARK: - 개인정보 처리방침 View
     func makePolicyViewController() -> PolicyViewController {
         return .init(screenName: .privacy_policy,
                      title: L10n.Profile.policy)
     }
 }
+
+// MARK: - SwiftUI Views (Transfer Meet)
+extension ProfileSceneDIContainer {
+    
+    func makeTransferMeetFlow() -> BaseCoordinator {
+        let di = TransferMeetSceneDIContainer(appNetworkService: appNetworkService, commonFactory: commonViewFactory, userSession: userSession)
+        return di.makeFlowCoordinator(onComplete: {
+            
+        })
+    }
+}
+

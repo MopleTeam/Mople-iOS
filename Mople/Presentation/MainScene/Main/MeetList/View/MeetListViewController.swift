@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -24,7 +25,7 @@ class MeetListViewController: TitleNaviViewController, View {
     // MARK: - UI Components
     private let borderView: UIView = {
         let view = UIView()
-        view.layer.makeLine(width: 1)
+        view.setDynamicBorder(width: 1, color: .appTertiary)
         return view
     }()
     
@@ -86,7 +87,7 @@ class MeetListViewController: TitleNaviViewController, View {
     }
 
     private func setLayout() {
-        self.view.backgroundColor = .bgPrimary
+        self.view.backgroundColor = .bgSecondary
         self.view.addSubview(borderView)
         self.view.addSubview(tableView)
         self.view.addSubview(emptyView)

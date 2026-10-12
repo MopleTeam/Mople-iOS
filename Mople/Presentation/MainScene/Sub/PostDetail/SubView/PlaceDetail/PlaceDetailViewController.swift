@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import ReactorKit
 
@@ -23,7 +24,7 @@ final class PlaceDetailViewController: TitleNaviViewController, View {
         let view = MapInfoView()
         view.setSelectButton(text: L10n.Placedetail.findLoad,
                              textFont: FontStyle.Title3.semiBold,
-                             textColor: .gray01,
+                             textColor: .tertiaryText,
                              backColor: .appTertiary)
         return view
     }()

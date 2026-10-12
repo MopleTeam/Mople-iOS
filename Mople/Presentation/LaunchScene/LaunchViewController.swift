@@ -6,8 +6,8 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
-import FirebaseAnalytics
 
 
 final class LaunchViewController: DefaultViewController {
@@ -47,7 +47,7 @@ final class LaunchViewController: DefaultViewController {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(logoImage)
         
         logoImage.snp.makeConstraints { make in

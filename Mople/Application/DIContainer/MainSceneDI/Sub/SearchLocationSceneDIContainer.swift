@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Domain
+import Data
 
 protocol SearchPlaceSceneDependencies {
     func makeSearchPlaceViewController(coordinator: SearchPlaceCoordination) -> SearchPlaceViewController
@@ -20,10 +22,12 @@ final class SearchLocationSceneDIContainer: BaseContainer, SearchPlaceSceneDepen
     
     init(appNetworkService: AppNetworkService,
          commonViewFactory: ViewDependencies,
+         userSession: UserSessionProvider,
          delegate: SearchPlaceDelegate?) {
         self.delegate = delegate
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonViewFactory)
+                   commonFactory: commonViewFactory,
+                   userSession: userSession)
     }
     
     func makeSearchLocationFlowCoordinator() -> BaseCoordinator {
@@ -64,7 +68,11 @@ extension SearchLocationSceneDIContainer {
     }
     
     private func makeSearchLocationUseCase() -> SearchPlace {
+        #if DEV
+        return MockDataManager.resolve(SearchPlaceUseCase(searchPlaceRepo: makeSearchLocationRepo()) as SearchPlace, mock: MockSearchPlaceUseCase())
+        #else
         return SearchPlaceUseCase(searchPlaceRepo: makeSearchLocationRepo())
+        #endif
     }
     
     private func makeSearchLocationRepo() -> SearchPlaceRepo {

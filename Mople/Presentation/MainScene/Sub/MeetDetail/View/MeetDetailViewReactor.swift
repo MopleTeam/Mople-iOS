@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import Domain
 import ReactorKit
+import Data
 
 protocol MeetDetailDelegate: AnyObject, ChildLoadingDelegate {
     func selectedPlan(id: Int, type: PostType)
@@ -29,6 +31,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             case endFlow
             case showMeetImage
             case memberList
+            case openNoticeList
+            case openNoticeDetail
         }
 
         enum Loading {
@@ -41,6 +45,7 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
         case flow(Flow)
         case loading(Loading)
         case editMeet(MeetPayload)
+        case applyNotice(NoticePayload)
         case catchError(MeetDetailError)
     }
     
@@ -107,6 +112,8 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
             return fetchMeetInfo()
         case let .editMeet(payload):
             return handleMeetPayload(with: payload)
+        case let .applyNotice(payload):
+            return handleNoticePayload(with: payload)
         case .refresh:
             return resetPost()
         case let .loading(action):
@@ -143,14 +150,23 @@ final class MeetDetailViewReactor: Reactor, LifeCycleLoggable {
 
 // MARK: - Data Request
 extension MeetDetailViewReactor {
+    /// 모임 정보 불러오기 (async UseCase를 Observable로 래핑)
     private func fetchMeetInfo() -> Observable<Mutation> {
-        
-        let fetchMeet = fetchMeetUseCase.execute(meetId: meetId)
-            .map { [weak self] in
-                self?.fetchPost()
-                return Mutation.setMeetInfo(meet: $0)
+        let fetchMeet = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    guard let self else { return }
+                    let meet = try await self.fetchMeetUseCase.execute(meetId: self.meetId)
+                    self.fetchPost()
+                    observer.onNext(.setMeetInfo(meet: meet))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
             }
-        
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: fetchMeet)
     }
 }
@@ -177,8 +193,21 @@ extension MeetDetailViewReactor {
                                           imagePath: imagePath)
         case .memberList:
             coordinator?.pushMemberListView()
+        case .openNoticeList:
+            // 확성기 버튼 → 공지 리스트 진입
+            guard let meet = currentState.meet,
+                  let meetId = meet.meetSummary?.id else { return .empty() }
+            coordinator?.presentNoticeListView(meetId: meetId,
+                                               isCreator: meet.isCreator)
+        case .openNoticeDetail:
+            // 미리보기 카드 → 공지 상세 진입 (pinnedNotice가 있을 때만)
+            guard let meet = currentState.meet,
+                  let notice = meet.pinnedNotice,
+                  notice.noticeId != nil else { return .empty() }
+            coordinator?.presentNoticeDetailView(notice: notice,
+                                                 isCreator: meet.isCreator)
         }
-        
+
         return .empty()
     }
 }
@@ -190,7 +219,25 @@ extension MeetDetailViewReactor {
         guard case .updated(let meet) = payload else { return .empty() }
         return .just(.setMeetInfo(meet: meet))
     }
-    
+
+    /// 공지 핀 토글 알림 수신 — 모임상세 화면의 pinnedNotice 갱신.
+    /// - 핀(isPinned == true): 기존 pinnedNotice 유무 무관하게 무조건 새 공지로 교체
+    /// - 해제(isPinned == false):
+    ///   · 메인의 pinnedNotice가 해제된 공지와 동일하면 → nil 처리
+    ///   · 다른 공지면 → 변경 없음 (다른 공지가 메인을 차지하고 있는 상태 유지)
+    private func handleNoticePayload(with payload: NoticePayload) -> Observable<Mutation> {
+        guard case .updated(let notice) = payload,
+              let meet = currentState.meet else { return .empty() }
+
+        if notice.isPinned {
+            return .just(.setMeetInfo(meet: meet.with(pinnedNotice: notice)))
+        } else {
+            // 해제: 메인 공지가 같은 noticeId일 때만 nil 처리
+            guard meet.pinnedNotice?.noticeId == notice.noticeId else { return .empty() }
+            return .just(.setMeetInfo(meet: meet.with(pinnedNotice: nil)))
+        }
+    }
+
     private func resetPost() -> Observable<Mutation> {
         return fetchMeetInfo()
     }

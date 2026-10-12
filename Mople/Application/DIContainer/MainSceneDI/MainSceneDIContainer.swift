@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Domain
+import Data
 
 typealias MainSceneDependencies = MainTapDependencies
 
@@ -29,10 +31,12 @@ final class MainSceneDIContainer: BaseContainer {
 
     init(isLogin: Bool,
          appNetworkService: AppNetworkService,
-         commonFactory: ViewDependencies) {
+         commonFactory: ViewDependencies,
+         userSession: UserSessionProvider) {
         self.isLogin = isLogin
         super.init(appNetworkService: appNetworkService,
-                   commonFactory: commonFactory)
+                   commonFactory: commonFactory,
+                   userSession: userSession)
     }
     
     func makeMainFlowCoordinator(navigationController: AppNaviViewController) -> MainSceneCoordinator {
@@ -59,17 +63,33 @@ extension MainSceneDIContainer: MainSceneDependencies {
     
     private func makeUploadFCMTokenUseCase() -> UploadFCMToken {
         let fcmTokenRepo = DefaultFCMTokenRepo(networkService: appNetworkService)
-        return UploadFCMTokenUseCase(repo: fcmTokenRepo)
+        let tokenProvider = DefaultFCMTokenProvider()
+        #if DEV
+        let useCase = MockDataManager.resolve(UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider) as UploadFCMToken, mock: MockUploadFCMTokenUseCase())
+        #else
+        let useCase = UploadFCMTokenUseCase(repo: fcmTokenRepo, tokenProvider: tokenProvider)
+        #endif
+        return useCase
     }
     
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
-        let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService)
-        return ResetNotifyCountUseCase(repo: notifyRepo)
+        let notifyRepo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
+        #if DEV
+        let useCase = MockDataManager.resolve(ResetNotifyCountUseCase(repo: notifyRepo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
+        #else
+        let useCase = ResetNotifyCountUseCase(repo: notifyRepo)
+        #endif
+        return useCase
     }
     
     private func makeJoinMeetUseCase() -> JoinMeet {
         let meetRepo = DefaultMeetRepo(networkService: appNetworkService)
-        return JoinMeetUseCase(repo: meetRepo)
+        #if DEV
+        let useCase = MockDataManager.resolve(JoinMeetUseCase(repo: meetRepo) as JoinMeet, mock: MockJoinMeetUseCase())
+        #else
+        let useCase = JoinMeetUseCase(repo: meetRepo)
+        #endif
+        return useCase
     }
 }
 
@@ -77,28 +97,32 @@ extension MainSceneDIContainer: MainSceneDependencies {
 extension MainSceneDIContainer {
     func makeHomeFlowCoordinator() -> BaseCoordinator {
         let homeSceneDI = HomeSceneDIContainer(appNetworkService: appNetworkService,
-                                               commonFactory: commonViewFactory)
+                                               commonFactory: commonViewFactory,
+                                               userSession: userSession)
         return homeSceneDI.makeHomeFlowCoordinator()
     }
-    
+
     // MARK: - 모임 리스트
     func makeMeetListFlowCoordinator() -> BaseCoordinator {
         let meetListSceneDI = MeetListSceneDIConatiner(appNetworkService: appNetworkService,
-                                                       commonFactory: commonViewFactory)
+                                                       commonFactory: commonViewFactory,
+                                                       userSession: userSession)
         return meetListSceneDI.makeMeetListFlowCoordinator()
     }
-    
+
     // MARK: - 캘린더
     func makeCalendarFlowCoordinator() -> BaseCoordinator {
         let calendarSceneDI = CalendarSceneDIContainer(appNetworkService: appNetworkService,
-                                                       commonFactory: commonViewFactory)
+                                                       commonFactory: commonViewFactory,
+                                                       userSession: userSession)
         return calendarSceneDI.makeCalendarFlowCoordinator()
     }
 
     // MARK: - 프로필
     func makeProfileCoordinator() -> BaseCoordinator {
         let profileDI = ProfileSceneDIContainer(appNetworkService: appNetworkService,
-                                                commonFactory: commonViewFactory)
+                                                commonFactory: commonViewFactory,
+                                                userSession: userSession)
         return profileDI.makeSetupFlowCoordinator()
     }
 }
@@ -120,6 +144,7 @@ extension MainSceneDIContainer {
     private func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -130,6 +155,7 @@ extension MainSceneDIContainer {
                                                type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()

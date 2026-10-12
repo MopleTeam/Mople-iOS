@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -52,13 +53,13 @@ final class CalendarViewController: BaseViewController, View {
     // MARK: - UI Components
     private let topInsetView: UIView = {
         let view = UIView()
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
     public lazy var calendar: FSCalendar = {
         let calendar = FSCalendar()
-        calendar.backgroundColor = .defaultWhite
+        calendar.backgroundColor = .bgPrimary
         calendar.scrollDirection = .horizontal
         calendar.adjustsBoundingRectWhenChangingMonths = false
         calendar.placeholderType = .none
@@ -85,7 +86,7 @@ final class CalendarViewController: BaseViewController, View {
         view.isUserInteractionEnabled = false
         view.layer.makeCornes(radius: 20, corners: [.layerMinXMaxYCorner, .layerMaxXMaxYCorner])
         view.clipsToBounds = true
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         return view
     }()
     
@@ -130,7 +131,7 @@ final class CalendarViewController: BaseViewController, View {
     }
     
     private func setLayout() {
-        view.backgroundColor = .defaultWhite
+        view.backgroundColor = .bgPrimary
         view.addSubview(topInsetView)
         view.addSubview(calendar)
         view.addSubview(grabberBackView)
@@ -189,7 +190,7 @@ final class CalendarViewController: BaseViewController, View {
     }
 
     private func setCalendarAppearance() {
-        calendar.appearance.weekdayTextColor = .gray05
+        calendar.appearance.weekdayTextColor = .text04
         calendar.appearance.titleFont = FontStyle.Title3.semiBold
         calendar.appearance.weekdayFont = FontStyle.Body1.medium
         calendar.appearance.todayColor = .clear
@@ -333,18 +334,18 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return isHoliday(date) ? .defaultRed : .gray01
+            return isHoliday(date) ? .appRed : .text01
         default :
-            return isHoliday(date) ? .defaultRed1 : .gray07
+            return isHoliday(date) ? .appRed : .gray07
         }
     }
     
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
         switch date {
         case _ where events.contains(where: { DateManager.isSameDay($0, date) }):
-            return isHoliday(date) ? .defaultRed : .gray01
+            return .appPrimary
         default :
-            return isHoliday(date) ? .defaultRed1 : .gray07
+            return isHoliday(date) ? .appRed : .gray07
         }
     }
     
@@ -360,7 +361,7 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
 // MARK: - UI Update
 extension CalendarViewController {
     private func updateGrabberBackColor(_ scope: ScopeType) {
-        self.grabberBackView.backgroundColor = scope == .month ? .defaultWhite : .bgPrimary
+        self.grabberBackView.backgroundColor = scope == .month ? .bgPrimary : .bgSecondary
     }
     
     private func updateGrabberVisible(_ scope: ScopeType) {

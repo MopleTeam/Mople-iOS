@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import NMapsMap
 import ReactorKit
 import RxSwift
@@ -24,7 +25,7 @@ final class PlaceSelectViewController: BaseViewController, View {
         let view = MapInfoView()
         view.setSelectButton(text: L10n.Searchplace.selected,
                              textFont: FontStyle.Title3.semiBold,
-                             textColor: .defaultWhite,
+                             textColor: .primaryText,
                              backColor: .appPrimary)
         return view
     }()

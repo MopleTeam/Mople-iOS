@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 enum NotificationDestination {
     case meet(id: Int)

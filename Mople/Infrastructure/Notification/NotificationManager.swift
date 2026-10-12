@@ -5,12 +5,15 @@
 //  Created by CatSlave on 1/15/25.
 //
 import UIKit
+import Domain
 import RxSwift
+import Data
 
 // MARK: - 아이템 타입
 typealias MeetPayload = NotificationManager.Payload<Meet>
 typealias PlanPayload = NotificationManager.Payload<Plan>
 typealias ReviewPayload = NotificationManager.Payload<Review>
+typealias NoticePayload = NotificationManager.Payload<Notice>
 
 final class NotificationManager {
     
@@ -24,6 +27,7 @@ final class NotificationManager {
             case is Meet.Type: return .meet
             case is Plan.Type: return .plan
             case is Review.Type: return .review
+            case is Notice.Type: return .notice
             default: return .init("Default")
             }
         }
@@ -67,6 +71,10 @@ final class NotificationManager {
     
     func addReviewObservable() -> Observable<ReviewPayload> {
         return makeObservable(name: .review)
+    }
+
+    func addNoticeObservable() -> Observable<NoticePayload> {
+        return makeObservable(name: .notice)
     }
     
     // MARK: - Meet Participation
@@ -125,6 +133,9 @@ extension Notification.Name {
     
     /// 후기
     static let review = Notification.Name(String(describing: Review.self))
+
+    /// 공지
+    static let notice = Notification.Name(String(describing: Notice.self))
     
     /// 일정 참여
     static let participating = Notification.Name("participating")

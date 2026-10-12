@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Domain
+import Data
 
 protocol HomeSceneDependencies {
     // MARK: - View
@@ -14,8 +16,8 @@ protocol HomeSceneDependencies {
     
     // MARK: - Flow
     func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
-                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)?) -> BaseCoordinator
+    func makePlanEditFlowCoorinator(plan: Plan) -> BaseCoordinator
     func makePlanDetailFlowCoordinator(postId: Int,
                                        type: PostType) -> BaseCoordinator
     func makeNotifyListFlowCoordinator() -> BaseCoordinator
@@ -50,7 +52,11 @@ extension HomeSceneDIContainer {
     
     private func makeRecentPlanUseCase() -> FetchHomeData {
         let repo = DefaultPlanRepo(networkService: appNetworkService)
-        return FetchHomeDataUseCase(repo: repo)
+        #if DEV
+        return MockDataManager.resolve(FetchHomeDataUseCase(repo: repo, session: userSession) as FetchHomeData, mock: MockFetchHomeDataUseCase())
+        #else
+        return FetchHomeDataUseCase(repo: repo, session: userSession)
+        #endif
     }
     
     private func makeRecentPlanViewController(reactor: HomeViewReactor) -> RecentPlanViewController {
@@ -74,19 +80,30 @@ extension HomeSceneDIContainer {
 extension HomeSceneDIContainer {
     
     // MARK: - 일정생성
-    func makePlanCreateFlowCoordinator(meetList: [MeetSummary],
-                                       completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
+    func makePlanCreateFlowCoordinator(completionHandler: ((Plan) -> Void)?) -> BaseCoordinator {
         let planCreateDI = PlanCreateSceneDIContainer(
             appNetworkService: appNetworkService,
             commonViewFactory: commonViewFactory,
-            type: .newFromMeetList(meetList))
+            userSession: userSession,
+            type: .newFromMeetList)
         return planCreateDI.makePlanCreateFlowCoordinator(completionHandler: completionHandler)
+    }
+    
+    // MARK: - 장소 추가
+    func makePlanEditFlowCoorinator(plan: Plan) -> BaseCoordinator {
+        let planCreateDI = PlanCreateSceneDIContainer(
+            appNetworkService: appNetworkService,
+            commonViewFactory: commonViewFactory,
+            userSession: userSession,
+            type: .edit(plan))
+        return planCreateDI.makePlanCreateFlowCoordinator()
     }
     
     // MARK: - 모임 상세 
     func makeMeetDetailFlowCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -97,6 +114,7 @@ extension HomeSceneDIContainer {
                                        type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()
@@ -105,7 +123,8 @@ extension HomeSceneDIContainer {
     // MARK: - 일정 리스트
     func makeNotifyListFlowCoordinator() -> BaseCoordinator {
         let notifyListSceneDI = NotifyListSceneDIContainer(appNetworkService: appNetworkService,
-                                                           commonFactory: commonViewFactory)
+                                                           commonFactory: commonViewFactory,
+                                                           userSession: userSession)
         return notifyListSceneDI.makeNotifyListCoordinator()
     }
 }

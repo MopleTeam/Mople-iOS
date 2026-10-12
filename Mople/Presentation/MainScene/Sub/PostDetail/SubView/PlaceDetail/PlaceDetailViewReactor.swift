@@ -6,6 +6,7 @@
 //
 
 import ReactorKit
+import Domain
 
 protocol PlaceDetailCoordination: NavigationCloseable { }
 

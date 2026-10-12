@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 extension UIViewController {
     func findCurrentNavigation() -> UINavigationController? {

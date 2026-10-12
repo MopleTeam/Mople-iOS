@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
 import ReactorKit
@@ -30,7 +31,7 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
         let label = UILabel()
         label.text = L10n.CreateProfile.header
         label.font = FontStyle.Heading.bold
-        label.textColor = .gray01
+        label.textColor = .text01
         label.numberOfLines = 2
         return label
     }()
@@ -57,7 +58,7 @@ class SignUpViewController: DefaultViewController, View, KeyboardDismissable {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainTitle)
         self.view.addSubview(profileSetupView)
 

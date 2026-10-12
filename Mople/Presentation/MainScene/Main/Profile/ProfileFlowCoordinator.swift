@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import Domain
 
 protocol ProfileCoordination: AnyObject {
     func presentProfileImageView(imagePath: String?)
     func presentEditView(previousProfile: UserInfo)
     func pushNotifyView()
+    func presentThemeView()
     func pushPolicyView()
+    func showTransferMeetList()
     func endMainFlow()
 }
 
@@ -57,12 +60,32 @@ extension ProfileFlowCoordinator {
 }
 
 
+// MARK: - Theme Setting View
+extension ProfileFlowCoordinator {
+    func presentThemeView() {
+        let themeView = dependencies.makeThemeSettingViewController()
+        self.slidePresentWithTracking(themeView)
+    }
+}
+
 // MARK: - Profile Edit Flow
 extension ProfileFlowCoordinator: ProfileEditViewCoordination {
     func presentEditView(previousProfile: UserInfo) {
         let profileEditView = dependencies.makeProfileEditViewController(previousProfile: previousProfile,
                                                                          coordinator: self)
         self.slidePresentWithTracking(profileEditView)
+    }
+}
+
+
+// MARK: - Transfer Meet Flow (Modal)
+extension ProfileFlowCoordinator {
+    
+    func showTransferMeetList() {
+        // TransferMeet 전용 DIContainer 생성
+        let transferMeetCoordinator = dependencies.makeTransferMeetFlow()
+        self.start(coordinator: transferMeetCoordinator)
+        self.present(transferMeetCoordinator.navigationController)
     }
 }
 

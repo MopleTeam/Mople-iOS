@@ -1,11 +1,12 @@
 //
-//  LoginViewController.swift
-//  Group
+//  SignInViewController.swift
+//  Mople
 //
 //  Created by CatSlave on 8/12/24.
 //
 
 import UIKit
+import Domain
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -32,7 +33,7 @@ final class SignInViewController: BaseViewController, View {
         let label = UILabel()
         label.text = L10n.appSubTitle
         label.font = FontStyle.Title3.medium
-        label.textColor = .gray03
+        label.textColor = .text02
         label.textAlignment = .center
         return label
     }()
@@ -51,7 +52,7 @@ final class SignInViewController: BaseViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Login.kakao,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .gray01)
+                     normalColor: .text06)
         
         btn.setImage(image: .kakao,
                      imagePlacement: .leading,
@@ -65,7 +66,7 @@ final class SignInViewController: BaseViewController, View {
         let btn = BaseButton()
         btn.setTitle(text: L10n.Login.apple,
                      font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .secondaryText)
         
         btn.setImage(image: .apple,
                      imagePlacement: .leading,
@@ -111,7 +112,7 @@ final class SignInViewController: BaseViewController, View {
     
     // MARK: - UI Setup
     private func setupUI() {
-        self.view.backgroundColor = .white
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainStackView)
         self.titleContainerView.addSubview(titleStackView)
         

@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Domain
 import ReactorKit
+import Data
 
 enum PlanCreationType {
-    case newFromMeetList([MeetSummary])
+    case newFromMeetList
     case newInMeeting(MeetSummary)
     case edit(Plan)
 }
@@ -43,6 +45,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             case name(_ name: String)
             case date(_ date: DateComponents, type: UpdatePlanType)
             case place(_ placeInfo: PlaceInfo)
+            case description(_ text: String)
         }
 
         enum Flow {
@@ -56,7 +59,8 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         
         case setValue(SetValue)
         
-        case updateMeetList([MeetSummary])
+        case fetchMeetList
+        case fetchNextMeetList
         case updateMeet(MeetSummary)
         case updatePreviousPlan(Plan)
         case requestPlanCreation
@@ -71,12 +75,14 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             case date(_ date: DateComponents)
             case time(_ date: DateComponents)
             case place(_ location: PlaceInfo)
+            case description(_ text: String)
         }
         
         case updateValue(UpdateValue)
         case updatePreviousPlan(Plan)
         case updateInitalMeet(MeetSummary)
         case updateMeetList(_ meets: [MeetSummary])
+        case updateHasNextMeetPage(Bool)
         case updateLoadingState(Bool)
         case catchError(CreatePlanError)
     }
@@ -86,8 +92,10 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         @Pulse var planTitle: String?
         @Pulse var selectedDay : DateComponents?
         @Pulse var selectedTime : DateComponents?
-        @Pulse var selectedPlace: UploadPlace?
+        @Pulse var selectedPlace: PlaceInfo?
+        @Pulse var description: String?
         @Pulse var meets: [MeetSummary] = []
+        @Pulse var hasNextMeetPage: Bool = true
         @Pulse var isSelectMeetAvaliable: Bool = true
         @Pulse var isLoading: Bool = false
         @Pulse var error: CreatePlanError?
@@ -107,8 +115,7 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             return seletedMeet != nil &&
             planTitle != nil &&
             selectedDay != nil &&
-            selectedTime != nil &&
-            selectedPlace != nil
+            selectedTime != nil
         }
         
         private func isChanged(previousPlan: Plan) -> Bool {
@@ -121,7 +128,8 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             
             return planTitle != previousPlan.title ||
             selectedDate != previousPlan.date ||
-            selectedPlace != UploadPlace(plan: previousPlan)
+            description != previousPlan.description ||
+            selectedPlace != PlaceInfo(plan: previousPlan)
         }
     }
     
@@ -129,10 +137,13 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     var initialState: State = State()
     private let type: PlanCreationType
     private var isLoading: Bool = false
+    private(set) var page: PageInfo?
+    private var isLoadingMeetPage: Bool = false
     
     // MARK: - UseCase
     private let createPlanUseCase: CreatePlan
     private let editPlanUseCase: EditPlan
+    private let fetchMeetPageUseCase: FetchMeetPage
     
     // MARK: - Coordinator
     private weak var coordinator: PlanCreateCoordination?
@@ -140,10 +151,12 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - LifeCycle
     init(createPlanUseCase: CreatePlan,
          editPlanUseCase: EditPlan,
+         fetchMeetPageUseCase: FetchMeetPage,
          type: PlanCreationType,
          coordinator: PlanCreateCoordination) {
         self.createPlanUseCase = createPlanUseCase
         self.editPlanUseCase = editPlanUseCase
+        self.fetchMeetPageUseCase = fetchMeetPageUseCase
         self.coordinator = coordinator
         self.type = type
         handleViewType()
@@ -157,8 +170,8 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
     // MARK: - Initial Setup
     private func handleViewType() {
         switch type {
-        case let .newFromMeetList(meets):
-            action.onNext(.updateMeetList(meets))
+        case .newFromMeetList:
+            action.onNext(.fetchMeetList)
         case let .newInMeeting(meet):
             action.onNext(.updateMeet(meet))
         case let .edit(plan):
@@ -173,8 +186,10 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
             return self.handleSetValueAction(value)
         case .requestPlanCreation:
             return self.handleCreation()
-        case let .updateMeetList(meets):
-            return .just(.updateMeetList(meets))
+        case .fetchMeetList:
+            return fetchMeetList()
+        case .fetchNextMeetList:
+            return fetchNextMeetList()
         case let .updatePreviousPlan(plan):
             return .just(.updatePreviousPlan(plan))
         case let .updateMeet(meet):
@@ -193,6 +208,8 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         switch mutation {
         case .updateMeetList(let meets):
             newState.meets = meets
+        case .updateHasNextMeetPage(let hasNext):
+            newState.hasNextMeetPage = hasNext
         case let .updateInitalMeet(meet):
             newState.seletedMeet = meet
             newState.isSelectMeetAvaliable = false
@@ -218,13 +235,15 @@ final class CreatePlanViewReactor: Reactor, LifeCycleLoggable {
         
         let day = date.toDateComponents()
         let time = date.getTime()
-        let place = UploadPlace(plan: plan)
+        let place = PlaceInfo(plan: plan)
+        let description = plan.description
         
         state.seletedMeet = meet
         state.planTitle = title
         state.selectedDay = day
         state.selectedTime = time
         state.selectedPlace = place
+        state.description = description
         state.previousPlan = plan
     }
 }
@@ -241,6 +260,8 @@ extension CreatePlanViewReactor {
             return self.updateDate(date: date, type: type)
         case let .place(placeInfo):
             return .just(.updateValue(.place(placeInfo)))
+        case let .description(text):
+            return .just(.updateValue(.description(text)))
         }
     }
     
@@ -279,8 +300,72 @@ extension CreatePlanViewReactor {
         case .time(let time):
             state.selectedTime = time
         case .place(let place):
-            state.selectedPlace = .init(place: place)
+            state.selectedPlace = place
+        case .description(let text):
+            state.description = text
         }
+    }
+}
+
+// MARK: - Meet Paging
+extension CreatePlanViewReactor {
+    
+    /// 모임 리스트 초기 로드 (async → Observable 브릿지)
+    private func fetchMeetList() -> Observable<Mutation> {
+        return Observable.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchMeetPageUseCase.execute(cursor: nil)
+                    guard let self, let result else {
+                        observer.onCompleted()
+                        return
+                    }
+                    self.page = result.info
+                    let meets = result.content.compactMap { $0.meetSummary }
+                    let hasNext = result.info?.hasNext ?? false
+                    observer.onNext(.updateMeetList(meets))
+                    observer.onNext(.updateHasNextMeetPage(hasNext))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+    }
+
+    /// 모임 리스트 다음 페이지 로드 (async → Observable 브릿지)
+    private func fetchNextMeetList() -> Observable<Mutation> {
+        guard !isLoadingMeetPage,
+              let cursor = page?.nextCursor,
+              page?.hasNext == true else {
+            return .empty()
+        }
+        isLoadingMeetPage = true
+        return Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let result = try await self?.fetchMeetPageUseCase.execute(cursor: cursor)
+                    guard let self, let result else {
+                        observer.onCompleted()
+                        return
+                    }
+                    self.page = result.info
+                    let newMeets = result.content.compactMap { $0.meetSummary }
+                    let currentMeets = self.currentState.meets
+                    let hasNext = result.info?.hasNext ?? false
+                    observer.onNext(.updateMeetList(currentMeets + newMeets))
+                    observer.onNext(.updateHasNextMeetPage(hasNext))
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+        .do(onDispose: { [weak self] in
+            self?.isLoadingMeetPage = false
+        })
     }
 }
 
@@ -301,35 +386,57 @@ extension CreatePlanViewReactor {
         }
     }
     
+    /// 일정 생성 (async → Observable 브릿지)
     private func createPlan(request: PlanRequest) -> Observable<Mutation> {
-        let uploadPlan = createPlanUseCase.execute(request: request)
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] plan -> Observable<Mutation> in
-                self?.postNewPlan(plan)
-                self?.coordinator?.completed(with: plan)
-                return .empty()
-            })
-        
+        let uploadPlan = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let plan = try await self?.createPlanUseCase.execute(request: request)
+                    await MainActor.run {
+                        if let plan {
+                            self?.postNewPlan(plan)
+                            self?.coordinator?.completed(with: plan)
+                        }
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: uploadPlan)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false
             })
     }
-    
+
+    /// 일정 수정 (async → Observable 브릿지)
     private func editPlan(request: PlanRequest) -> Observable<Mutation> {
         guard let date = currentState.previousPlan?.date,
               DateManager.isPastDay(on: date) == false else {
             return .just(.catchError(.midnight(.midnightReset)))
         }
-        
-        let editPlan = editPlanUseCase.execute(request: request)
-            .observe(on: MainScheduler.instance)
-            .flatMap({ [weak self] plan -> Observable<Mutation> in
-                self?.postNewPlan(plan)
-                self?.coordinator?.endFlow()
-                return .empty()
-            })
-        
+
+        let editPlan = Observable<Mutation>.create { [weak self] observer in
+            let task = Task { [weak self] in
+                do {
+                    let plan = try await self?.editPlanUseCase.execute(request: request)
+                    await MainActor.run {
+                        if let plan {
+                            self?.postNewPlan(plan)
+                            self?.coordinator?.endFlow()
+                        }
+                    }
+                    observer.onCompleted()
+                } catch {
+                    observer.onError(error)
+                }
+            }
+            return Disposables.create { task.cancel() }
+        }
+
         return requestWithLoading(task: editPlan)
             .do(onDispose: { [weak self] in
                 self?.isLoading = false
@@ -338,9 +445,10 @@ extension CreatePlanViewReactor {
     
     private func buliderPlanRequset() throws -> PlanRequest? {
         guard let date = try self.createDate(),
-              let name = currentState.planTitle,
-              let location = currentState.selectedPlace else { return nil }
+              let name = currentState.planTitle else { return nil }
         
+        let location = currentState.selectedPlace
+        let description = currentState.description
         let requestType: PlanRequestType
         
         switch type {
@@ -355,6 +463,7 @@ extension CreatePlanViewReactor {
         return .init(type: requestType,
                      name: name,
                      date: DateManager.toServerDateString(date),
+                     description: description,
                      place: location)
     }
     

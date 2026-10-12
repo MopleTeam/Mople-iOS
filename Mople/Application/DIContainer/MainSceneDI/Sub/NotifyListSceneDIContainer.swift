@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Domain
+import Data
 
 protocol NotifyListSceneDependencies {
     func makeNotifyListViewController(coordinator: NotifyListFlowCoordination) -> NotifyListViewController
@@ -40,19 +42,28 @@ extension NotifyListSceneDIContainer {
     }
     
     private func makeFetchNotifyListUseCase() -> FetchNotifyList {
-        let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        let repo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
+        #if DEV
+        return MockDataManager.resolve(FetchNotifyListUseCase(repo: repo) as FetchNotifyList, mock: MockFetchNotifyListUseCase())
+        #else
         return FetchNotifyListUseCase(repo: repo)
+        #endif
     }
-    
+
     private func makeResetNotifyCountUseCase() -> ResetNotifyCount {
-        let repo = DefaultNotifyRepo(networkService: appNetworkService)
+        let repo = DefaultNotifyRepo(networkService: appNetworkService, badgeResetter: DefaultBadgeResetter())
+        #if DEV
+        return MockDataManager.resolve(ResetNotifyCountUseCase(repo: repo) as ResetNotifyCount, mock: MockResetNotifyCountUseCase())
+        #else
         return ResetNotifyCountUseCase(repo: repo)
+        #endif
     }
     
     // MARK: - Flow
     func makeMeetDefailtViewCoordinator(meetId: Int) -> BaseCoordinator {
         let meetDetailDI = MeetDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       meetId: meetId,
                                                       isJoin: false)
         return meetDetailDI.makeMeetDetailCoordinator()
@@ -61,6 +72,7 @@ extension NotifyListSceneDIContainer {
     func makePlanDetailFlowCoordinator(postId: Int, type: PostType) -> BaseCoordinator {
         let planDetailDI = PostDetailSceneDIContainer(appNetworkService: appNetworkService,
                                                       commonFactory: commonViewFactory,
+                                                      userSession: userSession,
                                                       type: type,
                                                       postId: postId)
         return planDetailDI.makePostDetailCoordinator()

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol CalendarCoordination: AnyObject {
     func pushPostDetailView(postId: Int,

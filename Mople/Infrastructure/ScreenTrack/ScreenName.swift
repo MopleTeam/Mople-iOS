@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 
 enum ScreenName: String {
     // MARK: - Splash
@@ -25,6 +26,7 @@ enum ScreenName: String {
     case meet_write
     case meet_detail
     case meet_setting
+    case meet_transfer
 
     // MARK: - Plan
     case plan_write
@@ -40,6 +42,11 @@ enum ScreenName: String {
     // MARK: - Notification
     case notification
     case notification_setting
+
+    // MARK: - Notice (모임 공지)
+    case notice_list
+    case notice_detail
+    case notice_compose
 
     // MARK: - Member
     case participant_list

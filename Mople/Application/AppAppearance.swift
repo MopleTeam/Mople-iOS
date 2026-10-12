@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Domain
 import UIKit
 
 final class AppAppearance {
@@ -20,7 +21,7 @@ final class AppAppearance {
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.gray05,
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.text04,
                                                                          .font: FontStyle.App.tabbar]
         appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -5)
         appearance.stackedLayoutAppearance.normal.iconColor = .appIcon

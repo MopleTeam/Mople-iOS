@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 import RxSwift
 import RxCocoa
@@ -72,7 +73,8 @@ final class CreateMeetViewController: TitleNaviViewController,
     private let completionButton: BaseButton = {
         let btn = BaseButton()
         btn.setTitle(font: FontStyle.Title3.semiBold,
-                     normalColor: .defaultWhite)
+                     normalColor: .primaryText,
+                     disabledColor: .disableText)
         btn.setBgColor(normalColor: .appPrimary,
                        disabledColor: .disablePrimary)
         btn.setRadius(8)
@@ -126,7 +128,7 @@ final class CreateMeetViewController: TitleNaviViewController,
     }
     
     private func setupLayout() {
-        self.view.backgroundColor = .defaultWhite
+        self.view.backgroundColor = .bgPrimary
         self.view.addSubview(mainStackView)
         self.view.addSubview(completionButton)
         self.imageContainerView.addSubview(thumnailView)

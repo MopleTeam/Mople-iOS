@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 import SnapKit
 
 final class ToastManager {
@@ -32,7 +33,7 @@ final class ToastManager {
         label.backgroundColor = .toastPrimary
         label.addBlur(style: .systemUltraThinMaterialDark)
         label.setTitle(font: FontStyle.Body1.medium,
-                       color: .defaultWhite)
+                       color: .bgPrimary)
         label.setSpacing(12)
         label.setMargin(.init(top: 16, left: 20, bottom: 16, right: 20))
         label.layer.cornerRadius = 10

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Domain
 
 protocol NotifyListFlowCoordination: AnyObject {
     func presentMeetDetailView(meetId: Int)

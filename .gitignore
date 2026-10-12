@@ -16,7 +16,13 @@ Carthage/Build/
 
 # Swift Package Manager
 .build/
+.spm-packages/
 Package.resolved
+
+# Tuist
+# .xcodeproj와 .xcworkspace는 tuist generate로 생성되므로 Git에서 제외
+Derived/
+Tuist/.build/
 
 # Playgrounds
 timeline.xctimeline
@@ -26,12 +32,22 @@ playground.xcworkspace
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
+fastlane/test_output/
+fastlane/README.md
 
-# 개인 설정
+# Fastlane 빌드 결과물
+*.ipa
+*.dSYM.zip
+
+# SPM 패키지 캐시 (Fastlane 빌드용)
+SourcePackages/
+
+# 개인 설정 (Tuist가 .xcworkspace/.xcodeproj를 매번 생성하므로 Git에서 제외)
+*.xcodeproj
 *.xcworkspace
-!default.xcworkspace
 
 # 인증서, 키
+*.p8
 *.p12
 *.mobileprovision
 
@@ -48,3 +64,4 @@ Secrets.xcconfig
 
 # SwiftGen generated files
 Mople/Generated/L10n.swift
+.claude/
